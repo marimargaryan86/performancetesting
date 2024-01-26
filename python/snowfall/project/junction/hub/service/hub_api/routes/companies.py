@@ -2,8 +2,10 @@ import lagom
 from starlette import endpoints, requests, status
 
 from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api.routes import routes_handlers
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.companies.v1 import models_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -24,20 +26,43 @@ class AdminCompany(endpoints.HTTPEndpoint):
         payload = await request_helpers.flatten_request(request)
 
         address = payload.get("address", {})
-        company = await companies_client.update(
-            models_pb2.Company(
-                id=company_id,
-                name=payload.get("name", ""),
-                address=postal_address_pb2.PostalAddress(
-                    address_lines=address.get("addressLines"),
-                    region_code=address.get("countryCode"),
-                    postal_code=address.get("postalCode"),
-                    locality=address.get("city"),
-                ),
-                fx_markup=payload.get("fxMarkup", 0),
-                processing_markup=payload.get("processingMarkup", 0),
-                sales_markup=payload.get("salesMarkup", 0),
+
+        request_company = models_pb2.Company(
+            id=company_id,
+            name=payload.get("name"),  # type: ignore[arg-type]
+            address=postal_address_pb2.PostalAddress(
+                address_lines=address.get("addressLines"),
+                region_code=address.get("countryCode"),
+                postal_code=address.get("postalCode"),
+                locality=address.get("city"),
+                administrative_area=address.get("state"),
             ),
+            fx_markup=payload.get("fxMarkup"),  # type: ignore[arg-type]
+            processing_markup=payload.get("processingMarkup"),  # type: ignore[arg-type]
+            sales_markup=payload.get("salesMarkup"),  # type: ignore[arg-type]
+            payment_method=protobuf.slug_to_enum_value(  # type: ignore[arg-type]
+                models_pb2.PaymentMethod,
+                payload["paymentMethod"],
+            )
+            if payload.get("PaymentMethod")
+            else None,
+            payment_type=protobuf.slug_to_enum_value(  # type: ignore[arg-type]
+                models_pb2.PaymentType,
+                payload["paymentType"],
+            )
+            if payload.get("PaymentType")
+            else None,
+        )
+        for fee_amount in payload.get("feeAmounts", []):
+            request_company.fee_amounts.append(
+                money.Money(
+                    fee_amount["amount"],
+                    money.Currency(fee_amount["currency"]),
+                ).protobuf(),
+            )
+
+        company = await companies_client.update(
+            request_company,
         )
 
         return await messages.create_response(
@@ -71,6 +96,7 @@ class AdminCompany(endpoints.HTTPEndpoint):
 class AdminCompanies(endpoints.HTTPEndpoint):
     _default_page_size = 20
 
+    @routes_handlers.grpc_errors_handler
     async def post(
         self,
         request: requests.Request,
@@ -79,28 +105,38 @@ class AdminCompanies(endpoints.HTTPEndpoint):
         body = await request_helpers.flatten_request(request)
         address = body["address"]
 
-        company = await companies_client.create(
-            models_pb2.Company(
-                name=body["name"],
-                address=postal_address_pb2.PostalAddress(
-                    address_lines=address["addressLines"],
-                    region_code=address["countryCode"],
-                    postal_code=address["postalCode"],
-                    locality=address["city"],
-                    revision=0,
-                ),
-                fx_markup=float(body["fxMarkup"]),
-                processing_markup=float(body["processingMarkup"]),
-                sales_markup=float(body["salesMarkup"]),
-                payment_method=protobuf.slug_to_enum_value(
-                    models_pb2.PaymentMethod,
-                    body["paymentMethod"],
-                ),
-                payment_type=protobuf.slug_to_enum_value(
-                    models_pb2.PaymentType,
-                    body["paymentType"],
-                ),
+        request_company = models_pb2.Company(
+            name=body["name"],
+            address=postal_address_pb2.PostalAddress(
+                address_lines=address["addressLines"],
+                region_code=address["countryCode"],
+                postal_code=address["postalCode"],
+                locality=address["city"],
+                administrative_area=address["state"],
+                revision=0,
             ),
+            fx_markup=float(body["fxMarkup"]),
+            processing_markup=float(body["processingMarkup"]),
+            sales_markup=float(body["salesMarkup"]),
+            payment_method=protobuf.slug_to_enum_value(
+                models_pb2.PaymentMethod,
+                body["paymentMethod"],
+            ),
+            payment_type=protobuf.slug_to_enum_value(
+                models_pb2.PaymentType,
+                body["paymentType"],
+            ),
+        )
+        for fee_amount in body.get("feeAmounts", []):
+            request_company.fee_amounts.append(
+                money.Money(
+                    fee_amount["amount"],
+                    money.Currency(fee_amount["currency"]),
+                ).protobuf(),
+            )
+
+        company = await companies_client.create(
+            request_company,
         )
 
         return await messages.create_response(

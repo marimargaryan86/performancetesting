@@ -551,6 +551,7 @@ class Company(models.Resource):
                     "countryCode": company.address.region_code,
                     "postalCode": company.address.postal_code,
                     "city": company.address.locality,
+                    "state": company.address.administrative_area,
                 },
                 "fxMarkup": round(company.fx_markup, 3),
                 "processingMarkup": round(company.processing_markup, 3),
@@ -1207,6 +1208,7 @@ class UsersProfileResource(models.Resource):
                         "countryCode": company.address.region_code,
                         "postalCode": company.address.postal_code,
                         "city": company.address.locality,
+                        "state": company.address.administrative_area,
                     },
                 },
                 "contacts": [

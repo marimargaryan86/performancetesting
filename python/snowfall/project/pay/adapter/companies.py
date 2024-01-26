@@ -123,11 +123,9 @@ class GrpcClient(Client):
         self,
         company: models_pb2.Company,
     ) -> models_pb2.Company:
-        response = await errors.handle_grpc_errors(
-            self._companies.CreateCompany(
-                grpc_pb2.CreateCompanyRequest(
-                    company=company,
-                ),
+        response = await self._companies.CreateCompany(
+            grpc_pb2.CreateCompanyRequest(
+                company=company,
             ),
         )
 

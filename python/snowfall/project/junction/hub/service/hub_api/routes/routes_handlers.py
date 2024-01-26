@@ -31,6 +31,9 @@ field_to_source = {
     "refunded_to_provider": models.ErrorSourcePointer(
         pointer="/data/attributes/refundedUs",
     ),
+    "name": models.ErrorSourcePointer(
+        pointer="/data/attributes/name",
+    ),
 }
 
 

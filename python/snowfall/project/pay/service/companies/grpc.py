@@ -88,6 +88,9 @@ class CompaniesService(
         ):
             company.address.ClearField("address_lines")
 
+        if request.company.fee_amounts:
+            company.ClearField("fee_amounts")
+
         company.MergeFrom(request.company)
 
         try:

@@ -3470,7 +3470,7 @@
         "schema": {
           "minLength": 3,
           "type": "string",
-          "example":"Doe"
+          "example": "Doe"
         }
       },
       "filterByPassengerLastNameEquals": {
@@ -3480,7 +3480,9 @@
         "description": "Filter for journeys based on an exact match of the passenger's last name. Use for names with fewer than 3 characters.",
         "schema": {
           "type": "array",
-          "example":["Li"]
+          "example": [
+            "Li"
+          ]
         },
         "style": "form",
         "explode": false
@@ -6492,18 +6494,7 @@
                     "maxLength": 255
                   },
                   "beneficiaryAddress": {
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/EnhancedAddressDetails"
-                      },
-                      {
-                        "type": "object",
-                        "required": [
-                          "addressLines",
-                          "countryCode"
-                        ]
-                      }
-                    ]
+                    "$ref": "#/components/schemas/EnhancedAddressDetails"
                   },
                   "bankDetails": {
                     "allOf": [
@@ -6962,6 +6953,13 @@
           },
           {
             "type": "object",
+            "required": [
+              "addressLines",
+              "countryCode",
+              "postalCode",
+              "city",
+              "state"
+            ],
             "properties": {
               "postalCode": {
                 "type": "string",

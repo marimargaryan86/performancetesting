@@ -66,7 +66,7 @@ class Beneficiary(endpoints.HTTPEndpoint):
                         region_code=beneficiary_address["countryCode"],
                         postal_code=beneficiary_address.get("postalCode"),
                         locality=beneficiary_address.get("city"),
-                        administrative_area=beneficiary_address.get("sate"),
+                        administrative_area=beneficiary_address.get("state"),
                     ),
                     bank_details=BankDetails(
                         name=bank_details["name"],
@@ -148,7 +148,7 @@ class Beneficiaries(endpoints.HTTPEndpoint):
                         region_code=beneficiary_address["countryCode"],
                         postal_code=beneficiary_address.get("postalCode"),
                         locality=beneficiary_address.get("city"),
-                        administrative_area=beneficiary_address.get("sate"),
+                        administrative_area=beneficiary_address.get("state"),
                     ),
                     bank_details=BankDetails(
                         name=bank_details["name"],
