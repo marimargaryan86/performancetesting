@@ -318,6 +318,7 @@ module = [
   "grpc_health.*",                          # https://github.com/nipunn1313/mypy-protobuf/issues/507
   "grpc_reflection.*",                      # https://github.com/nipunn1313/mypy-protobuf/issues/507
   "grpc_status.*",                          # https://github.com/nipunn1313/mypy-protobuf/issues/507
+  "grpc_testing.*",                         # https://github.com/nipunn1313/mypy-protobuf/issues/507
   "h3.*",                                   # https://github.com/uber/h3-py/pull/216
   "hvac.*",                                 # https://github.com/hvac/hvac/issues/800
   "isodate.*",

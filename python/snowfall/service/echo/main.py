@@ -21,7 +21,7 @@ class _GrpcSettings(application.Settings):
     grpc_port: application.NetworkPort = 50051
 
 
-class _EchoService(grpc_service.Service, echo_pb2_grpc.EchoServiceServicer):
+class EchoService(grpc_service.Service, echo_pb2_grpc.EchoServiceServicer):
     def get_name(self) -> str:
         return echo_pb2.DESCRIPTOR.services_by_name["EchoService"].full_name
 
@@ -42,7 +42,7 @@ async def _grpc(app: application.Application[_GrpcSettings]) -> None:
     server = grpc_server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
-        [_EchoService()],
+        [EchoService()],
     )
 
     async with server.serve() as running:

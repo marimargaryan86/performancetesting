@@ -29,6 +29,7 @@ python_requirements(
         "grpcio-health-checking": ["grpc_health"],
         "grpcio-reflection": ["grpc_reflection"],
         "grpcio-status": ["grpc_status"],
+        "grpcio-testing": ["grpc_testing"],
         "protobuf": ["google.protobuf"],
         "pyjwt": ["jwt"],
         "pyshp": ["shapefile"],
