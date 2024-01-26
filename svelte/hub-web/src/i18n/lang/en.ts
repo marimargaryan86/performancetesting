@@ -235,6 +235,8 @@ export default {
     passengerNameRecordPlaceholder: "For example: 9A2FDF56",
     passengerLastNamePlaceholder: "As on your booking confirmation",
     passengerNameRecordError: "Your reference is a sequence of eight letters and/or numbers.",
+    noTripsFoundMessage:
+      "Please ensure you have entered the correct reference number.\nPlease try again or contact support.",
   },
   tableHeaders: {
     id: "ID",

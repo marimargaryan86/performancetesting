@@ -230,6 +230,8 @@ export default {
     passengerNameRecordPlaceholder: "Till exempel: 9A2FDF56",
     passengerLastNamePlaceholder: "Som på din bokningsbekräftelse",
     passengerNameRecordError: "Din referens är en sekvens av åtta bokstäver och/eller siffror.",
+    noTripsFoundMessage:
+      "Se till att du har angett rätt referensnummer.\nFörsök igen eller kontakta supporten.",
   },
   tableHeaders: {
     id: "ID",
