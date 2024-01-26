@@ -19,6 +19,7 @@ from snowfall.project.pay.adapter import (
     companies,
     contacts,
     conversions,
+    credit_card_payment,
     currencies,
     quotations,
     refunds,
@@ -360,6 +361,11 @@ def resellers_client() -> resellers.Client:
     return resellers.DictClient(fixtures.get_resellers())
 
 
+@pytest.fixture()
+def credit_card_payment_client() -> credit_card_payment.Client:
+    return credit_card_payment.DictClient()
+
+
 def _create_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
@@ -375,6 +381,7 @@ def _create_app(
     bills_client: bills.Client,
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
+    credit_card_payment_client: credit_card_payment.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -393,6 +400,7 @@ def _create_app(
                 bills_client=bills_client,
                 refunds_client=refunds_client,
                 resellers_client=resellers_client,
+                credit_card_payment_client=credit_card_payment_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -462,6 +470,7 @@ def app(
     bills_client: bills.Client,
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
+    credit_card_payment_client: credit_card_payment.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -478,6 +487,7 @@ def app(
         bills_client=bills_client,
         refunds_client=refunds_client,
         resellers_client=resellers_client,
+        credit_card_payment_client=credit_card_payment_client,
     )
 
 
@@ -497,6 +507,7 @@ def users_app(
     bills_client: bills.Client,
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
+    credit_card_payment_client: credit_card_payment.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -513,4 +524,5 @@ def users_app(
         bills_client=bills_client,
         refunds_client=refunds_client,
         resellers_client=resellers_client,
+        credit_card_payment_client=credit_card_payment_client,
     )

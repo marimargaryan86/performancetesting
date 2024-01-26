@@ -118,6 +118,10 @@ job "junction-hub-hub-api-http" {
               local_bind_port  = 8080
               destination_name = "resellers-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8090
+              destination_name = "credit-card-payments-${var.environment}"
+            }
           }
         }
       }
@@ -162,6 +166,7 @@ TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
 RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_resellers-${var.environment}"))}}
+CREDIT_CARD_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_credit-card-payments-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/hub-api" }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 {{ end }}

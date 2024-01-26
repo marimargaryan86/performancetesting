@@ -15,6 +15,7 @@ message CreditCardPayment {
   bool enable_automatic_payment_method = 5;
   string secret = 6;
   string status = 7;
+  string setup_future_usage = 8;
 }
 
 message CreditCardHolder {

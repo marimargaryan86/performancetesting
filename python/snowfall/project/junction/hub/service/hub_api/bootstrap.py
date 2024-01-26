@@ -10,6 +10,7 @@ from snowfall.project.pay.adapter import (
     companies,
     contacts,
     conversions,
+    credit_card_payment,
     currencies,
     quotations,
     refunds,
@@ -33,6 +34,7 @@ def create_dependencies(
     bills_client: bills.Client,
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
+    credit_card_payment_client: credit_card_payment.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[orders.Client] = orders_client  # type: ignore[type-abstract]
@@ -49,6 +51,7 @@ def create_dependencies(
     container[bills.Client] = bills_client  # type: ignore[type-abstract]
     container[refunds.Client] = refunds_client  # type: ignore[type-abstract]
     container[resellers.Client] = resellers_client  # type: ignore[type-abstract]
+    container[credit_card_payment.Client] = credit_card_payment_client  # type: ignore[type-abstract]
 
     includes.register_resolvers(
         orders_client=orders_client,

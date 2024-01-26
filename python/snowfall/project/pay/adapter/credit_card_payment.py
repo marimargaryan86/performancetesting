@@ -42,6 +42,7 @@ class Client(abc.ABC):
         credit_card_holder_id: str,
         enable_automatic_payment_method: bool,  # noqa: FBT001
         capture_method: str = "manual",
+        setup_future_usage: str = "on_session",
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Create credit card payment."""
 
@@ -131,6 +132,7 @@ class DictClient(Client):
         credit_card_holder_id: str,
         enable_automatic_payment_method: bool,  # noqa: FBT001
         capture_method: str = "manual",
+        setup_future_usage: str = "on_session",
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment_id = string.uuid()
         credit_card_payment = credit_card_models_pb2.CreditCardPayment(
@@ -140,6 +142,7 @@ class DictClient(Client):
             credit_card_holder_id=credit_card_holder_id,
             enable_automatic_payment_method=enable_automatic_payment_method,
             secret="Payment_Secret",  # noqa: S106
+            setup_future_usage=setup_future_usage,
         )
         self._credit_card_payments[credit_card_payment_id] = credit_card_payment
         return credit_card_payment
@@ -288,6 +291,7 @@ class GrpcClient(Client):
         credit_card_holder_id: str,
         enable_automatic_payment_method: bool,  # noqa: FBT001
         capture_method: str = "manual",
+        setup_future_usage: str = "on_session",
     ) -> credit_card_models_pb2.CreditCardPayment:
         payment_request = credit_card_pb2.CreateCreditCardPaymentRequest(
             payment=credit_card_models_pb2.CreditCardPayment(
@@ -295,6 +299,7 @@ class GrpcClient(Client):
                 credit_card_holder_id=credit_card_holder_id,
                 capture_method=capture_method,
                 enable_automatic_payment_method=enable_automatic_payment_method,
+                setup_future_usage=setup_future_usage,
             ),
         )
 

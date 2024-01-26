@@ -22,6 +22,7 @@ from snowfall.project.pay.adapter import (
     companies,
     contacts,
     conversions,
+    credit_card_payment,
     currencies,
     quotations,
     refunds,
@@ -34,6 +35,9 @@ from snowfall.project.pay.service.companies.v1.grpc_pb2_grpc import (
     ContactsServiceStub,
 )
 from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
+from snowfall.project.pay.service.payments.v1.credit_card_pb2_grpc import (
+    CreditCardPaymentServiceStub,
+)
 from snowfall.project.pay.service.refunds.v1.grpc_pb2_grpc import (
     RefundsServiceStub,
 )
@@ -64,6 +68,7 @@ class Settings(starlette.Settings):
     refunds_address: str
     resellers_address: str
     stripe_api_key: str
+    credit_card_address: str
 
 
 class _Channels(NamedTuple):
@@ -73,6 +78,7 @@ class _Channels(NamedTuple):
     currencies: aio.Channel
     refunds: aio.Channel
     resellers: aio.Channel
+    credit_card_payments: aio.Channel
 
 
 async def _http(app: application.Application[Settings]) -> None:
@@ -107,6 +113,10 @@ async def _http(app: application.Application[Settings]) -> None:
             grpc_factory.make_insecure_channel(
                 app,
                 app.settings.resellers_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.credit_card_address,
             ),
         ),
     )
@@ -187,6 +197,11 @@ async def _http(app: application.Application[Settings]) -> None:
                 resellers_client=resellers.GrpcClient(
                     resellers_pb2_grpc.ResellerServiceStub(
                         channels.resellers,
+                    ),
+                ),
+                credit_card_payment_client=credit_card_payment.GrpcClient(
+                    CreditCardPaymentServiceStub(
+                        channels.credit_card_payments,
                     ),
                 ),
             ),
