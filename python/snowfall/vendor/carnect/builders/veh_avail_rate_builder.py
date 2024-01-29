@@ -10,6 +10,7 @@ from snowfall.vendor.carnect.models.service import (
     RateQueryType,
     VehAvailRateRq,
     VehAvailRateRqTarget,
+    VehicleAvailRqadditionalInfoType,
     VehicleAvailRqcoreType,
     VehicleRentalCoreType,
 )
@@ -119,6 +120,13 @@ class VehAvailRateRqBuilder(BaseBuilderRq[VehAvailRateRq]):
         vendor = ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref()
         vendor.code = vendor_code
         self._vendor_pref().append(vendor)
+        return self
+
+    def add_passenger_quantity(self, quantity: int) -> VehAvailRateRqBuilder:
+        if not self._rq.veh_avail_rqinfo:
+            self._rq.veh_avail_rqinfo = VehicleAvailRqadditionalInfoType()
+
+            self._rq.veh_avail_rqinfo.passenger_qty = quantity
         return self
 
     def _vendor_pref(self) -> list[ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref]:
