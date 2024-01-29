@@ -178,6 +178,28 @@ def mobile_client(
     )
 
 
+@pytest.fixture()
+def mock_mobile_client(
+    api_token: str,
+    host: str,
+    sentry_url: str,
+) -> MobileApiClient:
+    api_url = "{0}{1}".format(
+        HTTPS_PREFIX,
+        get_variable_value(host, api_token, "mock_mobile_api_host"),
+    )
+    mobile_token = get_variable_value(host, api_token, "mobile_api_token")
+    client_timeout = 20
+
+    return MobileApiClient(
+        base_url=api_url,
+        auth=auth.TokenAuth(mobile_token),
+        token=mobile_token,
+        client=httpx.AsyncClient(timeout=client_timeout),
+        sentry_url=sentry_url,
+    )
+
+
 def get_variable_value(
     host: str,
     api_token: str,
