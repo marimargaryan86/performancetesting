@@ -24,7 +24,9 @@
   $: statusColumns = [showCancellationColumn, showRefundColumn, showActionsColumn].filter(
     ensureDefined,
   ).length;
-  $: columns = `repeat(3, min-content) repeat(5, 1fr) repeat(${statusColumns}, min-content)`;
+  $: columns = `repeat(3, min-content) repeat(5, 1fr)${
+    statusColumns > 0 ? ` repeat(${statusColumns}, min-content)` : ""
+  }`;
 
   function cancelBooking(booking: TripBooking): void {
     cancellationDialog?.open(booking);
@@ -57,7 +59,7 @@
 
 <x-table class="bookings-table" style:grid-template-columns={columns}>
   <x-thead>
-    <x-th>{$i18n.tableHeaders.booking} Booking</x-th>
+    <x-th>{$i18n.tableHeaders.booking}</x-th>
     <x-th />
     <x-th>{$i18n.tableHeaders.ticket}</x-th>
     <x-th>{$i18n.tableHeaders.departureDate}</x-th>
