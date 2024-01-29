@@ -18,14 +18,7 @@ class Settings(BaseSettings):
 settings = Settings()
 payload = {
     "version": settings.jwt_token_version,
-    "user_info": {
-        "id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
-        "email": "example@example.com",
-        "metadata": {
-            "client_id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
-            "default_currency": "USD",
-        },
-    },
+    "client_id": "d85ac9ee-55f1-4273-8cc8-5e9c9f326b84",
 }
 
 
