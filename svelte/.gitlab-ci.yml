@@ -1,6 +1,6 @@
 .svelte:lint:
   stage: test
-  image: node:20-bullseye-slim
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:20-bullseye-slim
   interruptible: true
   before_script:
     - cd "${PROJECT_PATH}"
