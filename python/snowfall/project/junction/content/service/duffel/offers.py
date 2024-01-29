@@ -12,6 +12,9 @@ _TIME_FORMAT = "%H:%M"
 
 
 class Transformer(object):
+    def __init__(self, trip_parser: parsers.TripParser):
+        self._trip_parser = trip_parser
+
     def to_results(
         self,
         offer_result: offer_response.OfferRequest,
@@ -34,6 +37,7 @@ class Transformer(object):
                         offer.total_currency,
                     ),
                 ),
+                trips=[self._trip_parser.trip_to_proto(trip) for trip in offer.slices],
             )
             for offer in offer_result.offers
         ]

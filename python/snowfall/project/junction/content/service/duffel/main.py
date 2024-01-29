@@ -3,7 +3,7 @@ import uuid
 import pydantic
 
 from snowfall.project.junction.content import bootstrap
-from snowfall.project.junction.content.service.duffel import offers, trips
+from snowfall.project.junction.content.service.duffel import offers, parsers, trips
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.service import application, grpc_factory, httpx_factory
@@ -46,11 +46,11 @@ async def _factory(
     )
     trip_searcher = trips.Trips(
         search_client=duffel_client,
-        transformer=trips.Transformer(),
+        transformer=trips.Transformer(trip_parser=parsers.TripParser()),
     )
     offer_searcher = offers.Offers(
         search_client=duffel_client,
-        transformer=offers.Transformer(),
+        transformer=offers.Transformer(trip_parser=parsers.TripParser()),
     )
 
     return bootstrap.ProviderConfiguration(

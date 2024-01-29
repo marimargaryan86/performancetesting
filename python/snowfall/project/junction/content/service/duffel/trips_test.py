@@ -1,15 +1,13 @@
 import datetime
-from collections.abc import Iterable
 
 import pytest
 import pytest_httpx
 
-from snowfall.project.junction.content.service.duffel import conftest, trips
+from snowfall.project.junction.content.service.duffel import conftest, parsers, trips
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import date_pb2
 from snowfall.vendor.duffel import client
-from snowfall.vendor.duffel.models import offer_slice
 
 _ORIGIN = "SYD"
 _DESTINATION = "SIN"
@@ -18,7 +16,7 @@ _DEPARTURE_DATE = datetime.date(2023, 2, 23)
 
 @pytest.fixture()
 def trips_transformer() -> trips.Transformer:
-    return trips.Transformer()
+    return trips.Transformer(parsers.TripParser())
 
 
 @pytest.fixture()
@@ -76,6 +74,13 @@ class TestTripSearcher(object):
     ) -> None:
         assert len(trip_search_response.results)
 
+    def test_one_way_results_contain_trips(
+        self,
+        trip_search_response: trips_pb2.SearchTripsResponse,
+    ) -> None:
+        for result in trip_search_response.results:
+            assert len(result.trips)
+
     def test_one_way_contains_no_duplicates(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,
@@ -86,22 +91,6 @@ class TestTripSearcher(object):
             signature = trips.calculate_result_hash(result)
             assert signature not in result_signatures, "Duplicate result found"
             result_signatures.add(signature)
-
-    def test_trips_have_fare_type(
-        self,
-        trip_search_response: trips_pb2.SearchTripsResponse,
-    ) -> None:
-        for result in trip_search_response.results:
-            for trip in result.trips:
-                assert trip.fare.type
-
-    def test_trips_have_fare_marketing_name(
-        self,
-        trip_search_response: trips_pb2.SearchTripsResponse,
-    ) -> None:
-        for result in trip_search_response.results:
-            for trip in result.trips:
-                assert trip.fare.marketing_name
 
     async def test_results_are_priced(
         self,
@@ -115,101 +104,6 @@ def trip_result(
     trip_search_response: trips_pb2.SearchTripsResponse,
 ) -> trips_pb2.Result:
     return trip_search_response.results[0]
-
-
-@pytest.fixture()
-def segments_results(trip_result: trips_pb2.Result) -> list[trips_pb2.Segment]:
-    return [segment for trip in trip_result.trips for segment in trip.segments]
-
-
-@pytest.fixture()
-async def segment_with_stops(
-    trips_transformer: trips.Transformer,
-) -> trips_pb2.Segment:
-    fixture = await conftest.load_json_fixture("segment_with_stops")
-    segment_model = offer_slice.OfferSliceSegment(**fixture)
-
-    return trips_transformer.segment_to_proto(segment_model)
-
-
-class TestSegmentModel(object):
-    def test_locations(self, segments_results: Iterable[trips_pb2.Segment]) -> None:
-        for segment in segments_results:
-            self._assert_location(segment.origin)
-            self._assert_location(segment.destination)
-
-    def test_segment_has_arrival_and_departure(
-        self,
-        segments_results: Iterable[trips_pb2.Segment],
-    ) -> None:
-        for segment in segments_results:
-            assert segment.departure_at.year
-            assert segment.arrival_at.year
-
-    def test_segment_has_companies(
-        self,
-        segments_results: Iterable[trips_pb2.Segment],
-    ) -> None:
-        for segment in segments_results:
-            self._assert_company(segment.marketed_by)
-            self._assert_company(segment.operated_by)
-
-    def test_segment_has_vehicles(
-        self,
-        segments_results: Iterable[trips_pb2.Segment],
-    ) -> None:
-        for segment in segments_results:
-            self._assert_vehicle(segment.vehicle)
-
-    def test_segment_has_passenger_seating(
-        self,
-        segments_results: Iterable[trips_pb2.Segment],
-    ) -> None:
-        for segment in segments_results:
-            assert segment.passengers, "Segments must have passengers"
-
-            for passenger in segment.passengers:
-                self._assert_passenger_seating(passenger)
-
-    def test_segment_has_stops(
-        self,
-        segment_with_stops: trips_pb2.Segment,
-    ) -> None:
-        assert segment_with_stops.stops
-
-    def test_stop_locations(
-        self,
-        segment_with_stops: trips_pb2.Segment,
-    ) -> None:
-        for stop in segment_with_stops.stops:
-            self._assert_location(stop.location)
-
-    def test_stop_locations_have_arrival_and_departure(
-        self,
-        segment_with_stops: trips_pb2.Segment,
-    ) -> None:
-        for stop in segment_with_stops.stops:
-            assert stop.arrival_at.year
-            assert stop.departure_at.year
-
-    def _assert_location(self, location: trips_pb2.Location) -> None:
-        assert location.ref, "Locations should have a ref"
-        assert location.name, "Locations should have a name"
-        assert location.coordinates.longitude, "Locations should have longitude"
-        assert location.coordinates.latitude, "Locations should have latitude"
-
-    def _assert_company(self, company: trips_pb2.Segment.Company) -> None:
-        assert company.code, "Companies should have a code"
-        assert company.name, "Companies should have a name"
-        assert company.route_number, "Companies should have a route number"
-
-    def _assert_vehicle(self, vehicle: trips_pb2.Segment.Vehicle) -> None:
-        assert vehicle.code, "Vehicles should have a code"
-        assert vehicle.name, "Vehicles should have a name"
-
-    def _assert_passenger_seating(self, passenger: trips_pb2.Segment.Passenger) -> None:
-        assert passenger.seating.type, "Passenger seating should have a type"
-        assert passenger.seating.marketing_name, "Passenger seating should have a name"
 
 
 def test_passenger_with_age_is_added_to_request(

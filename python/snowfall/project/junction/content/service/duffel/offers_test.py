@@ -3,7 +3,7 @@ import datetime
 import pytest
 import pytest_httpx
 
-from snowfall.project.junction.content.service.duffel import conftest, offers
+from snowfall.project.junction.content.service.duffel import conftest, offers, parsers
 from snowfall.project.junction.provider.v2alpha import trips_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.format import protobuf
@@ -21,7 +21,7 @@ _TIME_FORMAT = "%H:%M"
 
 @pytest.fixture()
 def offers_transformer() -> offers.Transformer:
-    return offers.Transformer()
+    return offers.Transformer(parsers.TripParser())
 
 
 @pytest.fixture()
@@ -81,11 +81,18 @@ async def offer_search_response(
 
 
 class TestOffers(object):
-    async def test_one_way_contains_results(
+    async def test_one_way_contains_offers(
         self,
         offer_search_response: trips_pb2.SearchOffersResponse,
     ) -> None:
         assert len(offer_search_response.offers)
+
+    async def test_one_way_offers_contain_trips(
+        self,
+        offer_search_response: trips_pb2.SearchOffersResponse,
+    ) -> None:
+        for offer in offer_search_response.offers:
+            assert len(offer.trips)
 
 
 @pytest.fixture()

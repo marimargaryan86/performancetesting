@@ -128,6 +128,7 @@ message Offer {
   string id = 1;
   Price price = 2;
   google.protobuf.Timestamp expires_at = 3;
+  repeated Trip trips = 4;
   // @todo: add more information from PriceQuote
 }
 
