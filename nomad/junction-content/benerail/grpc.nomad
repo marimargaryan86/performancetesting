@@ -102,7 +102,7 @@ job "junction-content-benerail-grpc" {
 {{ base64Decode .Data.data.cert_base64 }}
 {{ end }}
 EOH
-        destination = "certificate.pem"
+        destination = "${NOMAD_TASK_DIR}/certificate.pem"
         change_mode = "restart"
       }
 
@@ -139,7 +139,7 @@ EOH
         API_BASE_URL    = "${var.api_base_url}"
         SENTRY_DSN      = "https://33b3cd67d72f0e03884c325b75d7cc45@sentry.snowfall.se/213"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
-        CERT_PATH       = "certificate.pem"
+        CERT_PATH       = "${NOMAD_TASK_DIR}/certificate.pem"
       }
     }
   }
