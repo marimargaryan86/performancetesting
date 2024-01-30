@@ -1,7 +1,8 @@
 from collections.abc import AsyncIterator, Callable
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
-from snowfall.project.junction.service.providers.ask2go import search, transformer
+from snowfall.project.junction.service.providers.ask2go import transformer
+from snowfall.vendor.ask2go.adapter import Adapter
 from snowfall.vendor.ask2go.models import search as search_model
 
 OfferGroupGenerator = Callable[
@@ -11,7 +12,7 @@ OfferGroupGenerator = Callable[
 
 
 def offer_group_generator(
-    a2g_adapter: search.Adapter,
+    a2g_adapter: Adapter,
     a2g_transformer: transformer.OfferTransformer,
 ) -> OfferGroupGenerator:
     def wrapper(

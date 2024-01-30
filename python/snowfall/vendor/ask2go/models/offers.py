@@ -116,14 +116,7 @@ class BrandedPriceInformationFeature(CamelCaseBaseModel):
     baggage: list[TripBaggageAllowance] = pydantic.Field(default_factory=list)
 
 
-class BrandedPriceInformation(CamelCaseBaseModel):
-    base_fare: str
-    total_tax: str
-    total_cost: str
-    original_cost: str
-    service_fee: str
-    currency: str
-    brand_name: str | None = None
+class BrandedPriceInformation(PricingInformationBase):
     brand_id: str | None = None
     fare_basis: list[str] = pydantic.Field(default_factory=list)
     is_refundable: bool = False

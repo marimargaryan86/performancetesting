@@ -45,6 +45,7 @@ from snowfall.stdlib.service import amqp_factory, grpc_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
+from snowfall.vendor.ask2go.adapter import Adapter
 from snowfall.vendor.ask2go.models import search as search_models
 from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
@@ -210,7 +211,7 @@ async def _offers(
         search_criteria_generator=search.search_criteria_generator,
         offer_group_cache_key_generator=search.generate_cache_key,
         offer_group_generator=a2g_offers.offer_group_generator(
-            a2g_adapter=search.Adapter(
+            a2g_adapter=Adapter(
                 ask2go_client=ask2go_client,
                 poll_retries_limit=app.settings.poll_retries_limit,
                 wait_time_between_polling=app.settings.wait_time_between_polling,

@@ -21,7 +21,6 @@ from snowfall.project.junction.service.providers.ask2go import (
     cache,
     criteria,
     pricing,
-    search,
     transformer,
 )
 from snowfall.stdlib import h3
@@ -29,6 +28,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
+from snowfall.vendor.ask2go.adapter import Adapter
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
@@ -133,8 +133,8 @@ def ask2go_client(http_client: httpx.AsyncClient) -> client.Ask2GoClient:
 @pytest.fixture()
 def search_adapter(
     ask2go_client: client.Ask2GoClient,
-) -> search.Adapter:
-    return search.Adapter(
+) -> Adapter:
+    return Adapter(
         ask2go_client=ask2go_client,
         poll_retries_limit=1,
         wait_time_between_polling=0,

@@ -14,6 +14,7 @@ from snowfall.project.junction.service.providers.ask2go import (
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
+from snowfall.vendor.ask2go.adapter import Adapter
 
 _ARN_LHR = amqp_pb2.SearchCriteriaTask(
     segments=[
@@ -75,7 +76,7 @@ _ARN_LHR = amqp_pb2.SearchCriteriaTask(
 
 
 async def test_search_result_data(  # noqa: WPS218
-    search_adapter: search.Adapter,
+    search_adapter: Adapter,
     offer_transformer: transformer.OfferTransformer,
     magic_mocker: conftest.MagicMocker,
 ) -> None:
