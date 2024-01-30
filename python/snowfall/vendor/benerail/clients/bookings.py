@@ -1,9 +1,9 @@
 import http
-from collections.abc import Collection
 
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.benerail.clients import base
-from snowfall.vendor.benerail.models.bookings import offer, order, payment
+from snowfall.vendor.benerail.models import enums
+from snowfall.vendor.benerail.models.bookings import booking, offer, order, payment
 from snowfall.vendor.benerail.models.bookings import response as booking_response
 from snowfall.vendor.benerail.models.products import response as product_response
 
@@ -24,6 +24,30 @@ class BookingsClient(base.BenerailBaseClient):
                     dialogue_id=dialogue_id,
                 ),
                 headers=self._get_headers(etag, session_token),
+            ),
+        )
+
+        return booking_response.GetBookingResponse(
+            **response.json(),
+            dialogue_etag=response.headers.get("etag"),
+        )
+
+    async def update_booking(
+        self,
+        booking_id: str,
+        etag: str,
+        body: booking.BookingUpdateBody,
+        session_token: str | None = None,
+    ) -> booking_response.GetBookingResponse:
+        response = await self._make_request(
+            client.RequestOptions(
+                method="PATCH",
+                path="{base_path}/{booking_id}".format(
+                    base_path=_BASE_PATH,
+                    booking_id=booking_id,
+                ),
+                headers=self._get_headers(etag, session_token),
+                payload=body.dict(by_alias=True, exclude_unset=True),
             ),
         )
 
@@ -197,18 +221,26 @@ class BookingsClient(base.BenerailBaseClient):
         self,
         booking_id: str,
         fulfillment_id: str,
-    ) -> Collection[str]:
+        use_mobile_tickets: bool,  # noqa: FBT001
+    ) -> list[str]:
         fulfillment_res = await self.get_fulfillment(
             booking_id=booking_id,
             fulfillment_id=fulfillment_id,
             etag="",
         )
-
-        return [
-            str(document.download_link.href)
-            for document in fulfillment_res.response_result.documents or []
-            if document.download_link
-        ]
+        link_format = (
+            enums.Format.image_png
+            if use_mobile_tickets
+            else enums.Format.application_pdf
+        )
+        return list(
+            {
+                str(doc.download_link.href)
+                for doc in fulfillment_res.response_result.documents or []
+                if doc.download_link
+                and str(doc.download_link.link_format) == link_format.value
+            },
+        )
 
     async def get_fulfillment(
         self,

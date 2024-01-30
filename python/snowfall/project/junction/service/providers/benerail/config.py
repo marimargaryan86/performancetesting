@@ -25,6 +25,7 @@ class BenerailSettings(pydantic.BaseModel):
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
     cert_base64: str
+    use_mobile_tickets: bool = False
 
 
 class DumpStationsSettings(BenerailSettings, service.Settings):

@@ -52,6 +52,7 @@ class NotificationsConsumer(object):
         booking_storage: filesystem.Storage,
         zendesk_client: ZendeskClient,
         zendesk_booked_ticket_group_id: int,
+        use_mobile_tickets: bool,  # noqa: FBT001
     ):
         self._booking_storage = booking_storage
         self._consumer = consumer_obj
@@ -60,6 +61,7 @@ class NotificationsConsumer(object):
         self._zendesk_client = zendesk_client
         self._zendesk_booked_ticket_group_id = zendesk_booked_ticket_group_id
         self._logger = stdout.get_logger()
+        self._use_mobile_tickets = use_mobile_tickets
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -85,12 +87,23 @@ class NotificationsConsumer(object):
         if not booking_res.response_result.fulfillments:
             return await self._handle_no_fulfillment(message)
 
-        ticket_urls = (
-            await self._client.bookings_client.get_ticket_urls_from_fulfillment(
-                booking_id=booking_res.response_result.identifier,
-                fulfillment_id=booking_res.response_result.fulfillments[0].identifier,
-            )
+        ticket_urls: set[str] = set()
+        fulfillment_ids = [
+            fulfillment.identifier
+            for fulfillment in booking_res.response_result.fulfillments
+        ]
+        results = await asyncio.gather(
+            *(
+                self._client.bookings_client.get_ticket_urls_from_fulfillment(
+                    booking_id=booking_res.response_result.identifier,
+                    fulfillment_id=fulfillment_id,
+                    use_mobile_tickets=self._use_mobile_tickets,
+                )
+                for fulfillment_id in fulfillment_ids
+            ),
         )
+        for fulfillment_document_urls in results:
+            ticket_urls.update(fulfillment_document_urls)
 
         if not ticket_urls:
             return await self._handle_no_fulfillment(message)

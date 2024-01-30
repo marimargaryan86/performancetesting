@@ -147,6 +147,7 @@ async def _consume_notifications(
         zendesk_booked_ticket_group_id=app.settings.zendesk_booked_ticket_group_id,
         notifier=notifier,
         booking_storage=booking_storage,
+        use_mobile_tickets=app.settings.use_mobile_tickets,
     )
     await _configure_queue(app, amqp_connection)
     await notifications_consumer.consume()

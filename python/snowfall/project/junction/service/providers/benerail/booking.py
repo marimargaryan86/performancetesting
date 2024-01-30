@@ -31,7 +31,7 @@ from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.errors import BenerailError
 from snowfall.vendor.benerail.models import etag
-from snowfall.vendor.benerail.models.bookings import offer, order, payment
+from snowfall.vendor.benerail.models.bookings import booking, offer, order, payment
 from snowfall.vendor.benerail.models.bookings import response as bookings_response
 from snowfall.vendor.benerail.models.dialogue import enums as dialogue_enums
 from snowfall.vendor.benerail.models.dialogue import passenger
@@ -168,11 +168,13 @@ class BookingCreationHandler(object):
         benerail_client: client.BenerailClient,
         notifications_producer: producer.Producer,
         booking_storage: filesystem.Storage,
+        use_mobile_tickets: bool,  # noqa: FBT001
     ) -> None:
         self._client = benerail_client
         self._notifications_producer = notifications_producer
         self._logger = stdout.get_logger()
         self._storage = booking_storage
+        self._use_mobile_tickets = use_mobile_tickets
 
     async def create_booking(
         self,
@@ -322,6 +324,20 @@ class BookingCreationHandler(object):
             session_token=booking_offer_details.session_token,
         )
         order_res.set_etags(etag_data)
+
+        if self._use_mobile_tickets:
+            booking_res, raw_response = await self._get_booking(
+                booking_id=booking_res.response_result.identifier,
+                session_token=booking_offer_details.session_token,
+            )
+            booking_res = await self._client.bookings_client.update_booking(
+                booking_id=booking_res.response_result.identifier,
+                etag=booking_res.etag,
+                body=booking.BookingUpdateBody(
+                    delivery_mode="urn:bnds:delivery_mode:DH_AB",
+                ),
+                session_token=booking_offer_details.session_token,
+            )
 
         payment_res = await self._client.payments_client.create_payment_info_for_order(
             booking_id=booking_res.response_result.identifier,

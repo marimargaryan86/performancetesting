@@ -119,3 +119,9 @@ class BookingInformation(BenerailBaseModel):
     identifier: str | None = Field(None, alias="id")
     booked_offer_id: str | None = None
     provisional_balance: float | None = None
+
+
+class BookingUpdateBody(BenerailBaseModel):
+    delivery_mode: str | None = Field(None, example="urn:bnds:delivery_mode:DH")
+    fulfillment_language: str | None = None
+    backoffice_references: str | None = None

@@ -63,6 +63,7 @@ def orders_factory(
                     booking_storage=await stack.enter_async_context(
                         filesystem.Storage.from_dsn(app.settings.storage_dsn),
                     ),
+                    use_mobile_tickets=app.settings.use_mobile_tickets,
                 ),
                 booking_offers_cache=cache.BookingOffersCache(
                     client=redis_client,
