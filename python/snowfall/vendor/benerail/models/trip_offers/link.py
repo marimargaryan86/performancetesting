@@ -26,7 +26,7 @@ class ProductResourceLink(ResourceLink):
 
 
 class OfferResourceLink(ResourceLink):
-    summary: OfferSummary | None = None
+    summary: OfferSummary
 
 
 class OfferPartResourceLink(ResourceLink):

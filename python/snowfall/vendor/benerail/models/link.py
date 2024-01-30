@@ -46,6 +46,10 @@ class Link(BenerailBaseModel):
         alias="type",
     )
 
+    @property
+    def identifier(self) -> str:
+        return helper_functions.last_id_of_url(self.href)
+
 
 class Supplier(BenerailBaseModel):
     href: AnyUrl | None = Field(

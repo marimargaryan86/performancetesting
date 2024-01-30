@@ -62,3 +62,4 @@ The following ports are configured in local environments by default:
 | 50080 | co2 emissions          | gRPC Server       |
 | 50081 | karhoo                 | gRPC Server       |
 | 50082 | carnect                | gRPC Server       |
+| 50083 | content/benerail       | gRPC Server       |

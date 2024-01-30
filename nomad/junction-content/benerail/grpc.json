@@ -1,0 +1,23 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://benerail-stg-apim.azure-api.net"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://benerail-prd-apim.azure-api.net"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://benerail-stg-apim.azure-api.net"
+    }
+  }
+}

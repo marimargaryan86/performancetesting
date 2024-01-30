@@ -1,0 +1,116 @@
+{
+  "trip": {
+    "identifier": "631c569e4f3b490253d16252d201ac401daa0ccb8501cf00b0e4f4cf2846f84f_3211015908d33aeda3592e81dd6208b1acf5d192f896e57b14aaded0d746513e",
+    "duration": "PT2H57M",
+    "origin": {
+      "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bdws:tstatn_id:DEBHF",
+      "place_value": "urn:bdws:tstatn_id:DEBHF"
+    },
+    "destination": {
+      "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bdws:tstatn_id:DEATD",
+      "place_value": "urn:bdws:tstatn_id:DEATD"
+    },
+    "departure_at": "2024-01-26T13:07:00+01:00",
+    "arrival_at": "2024-01-26T16:04:00+01:00",
+    "number_of_transfers": 1.0,
+    "co2_info": null,
+    "trip_legs": [
+      {
+        "leg_type": "TimedLeg",
+        "seq_id": 1.0,
+        "origin": {
+          "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bdws:tstatn_id:DEBHF",
+          "place_value": "urn:bdws:tstatn_id:DEBHF"
+        },
+        "destination": {
+          "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bdws:tstatn_id:DEATD",
+          "place_value": "urn:bdws:tstatn_id:DEATD"
+        },
+        "departure_at": "2024-01-26T13:07:00+01:00",
+        "arrival_at": "2024-01-26T16:04:00+01:00",
+        "duration": "PT2H57M",
+        "train_type": {
+          "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:train_type:ICE",
+          "train_type_value": "urn:itti:train_type:ICE"
+        },
+        "train_numbers": [
+          "756"
+        ]
+      }
+    ]
+  },
+  "trip_offer": {
+    "identifier": "b04a2125da9c0bc3361f04d23776098c5dac08431cfbe23625281a55417d2a92_3211015908d33aeda3592e81dd6208b1acf5d192f896e57b14aaded0d746513e",
+    "origin": {
+      "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bnds:tstatn_id:DEBHF",
+      "place_value": "urn:bnds:tstatn_id:DEBHF"
+    },
+    "destination": {
+      "href": "https://benerail-stg-apim.azure-api.net/rcode/places/urn:bdws:tstatn_id:DEATD",
+      "place_value": "urn:bdws:tstatn_id:DEATD"
+    },
+    "departure_at": "2024-01-26T13:07:00+01:00",
+    "duration": "PT6H45M",
+    "number_of_transfers": 1,
+    "trip": {
+      "href": "https://benerail-stg-apim.azure-api.net/trips/trips/631c569e4f3b490253d16252d201ac401daa0ccb8501cf00b0e4f4cf2846f84f_3211015908d33aeda3592e81dd6208b1acf5d192f896e57b14aaded0d746513e",
+      "title": "DEBHF-DEATD-20240126-1307-PT2H57M-#1",
+      "summary": {
+        "departure_at": "2024-01-26T13:07:00+01:00",
+        "arrival_at": "2024-01-26T16:04:00+01:00",
+        "number_of_transfers": 1.0,
+        "duration": "PT2H57M",
+        "train_types": [
+          {
+            "train_type": null,
+            "preference_type": null
+          }
+        ]
+      }
+    },
+    "offers": [
+      {
+        "href": "https://benerail-stg-apim.azure-api.net/trip-offers/offers/69e9a9bcf0fec604fdc3b892bd4ad6085866f1f1164a16059ed83acfe82d61df",
+        "title": "DEBHF-DEATD-20240126-1307-PT2H57M-#1-2-NF-SEAT-35.9",
+        "summary": {
+          "price_with_optional_parts": {
+            "amount": 35.9,
+            "currency": "EUR"
+          },
+          "price_without_optional_parts": {
+            "amount": 29.9,
+            "currency": "EUR"
+          },
+          "total_price": null,
+          "flexibility": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:railteam_flexibility:NF",
+            "flexibility_value": "urn:itti:railteam_flexibility:NF"
+          },
+          "comfort_class": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:taco:class:2",
+            "comfort_class_value": "urn:taco:class:2"
+          },
+          "accommodation_type": {
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:accommodation_type:SEAT",
+            "accommodation_type_value": "urn:bnds:accommodation_type:SEAT"
+          }
+        }
+      }
+    ],
+    "passengers": [
+      {
+        "href": "https://benerail-stg-apim.azure-api.net/dialogue-engine/dialogues/{dialogueId}/passengers/629_1?idType=xref",
+        "title": "ageCategory: urn:bdws:taco_passenger_type:A",
+        "summary": {
+          "age_category": "urn:bdws:taco_passenger_type:A",
+          "cards": "",
+          "corporate_contracts": ""
+        }
+      }
+    ],
+    "bookable_status": {
+      "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bdws:bookable_status:BOOKABLE",
+      "status_value": "urn:bdws:bookable_status:BOOKABLE"
+    }
+  }
+}

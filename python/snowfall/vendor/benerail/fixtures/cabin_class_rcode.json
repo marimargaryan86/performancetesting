@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "apiVersion": "0.6.1",
+    "buildVersion": "mr68.0",
+    "environment": "accept-c04",
+    "respondedAt": "2024-01-25T12:59:53.415+01:00",
+    "resourceType": "RcodesResult"
+  },
+  "result": {
+    "links": {
+      "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:taco:class:2",
+      "parent": "https://benerail-stg-apim.azure-api.net/rcode/rcode-type/class"
+    },
+    "rcodes": [
+      {
+        "links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/68/4"
+        },
+        "id": "68#4#1701375742000",
+        "codeId": 4,
+        "typeId": "CLASS",
+        "sortingTag": 4,
+        "metadata": {
+          "lastUpdateAt": "2023-11-30T20:22:22Z",
+          "validity": {
+            "startsAt": "1995-11-26",
+            "travel": {
+              "startsAt": "1995-11-26",
+              "endsAt": "2999-12-31"
+            }
+          }
+        },
+        "labels": {
+          "en": {
+            "codeShort": "2",
+            "codeLong": "Standard Class"
+          },
+          "fr": {
+            "codeShort": "2",
+            "codeLong": "Deuxième classe"
+          },
+          "nl-BE": {
+            "codeShort": "2",
+            "codeLong": "Standard Class"
+          },
+          "nl": {
+            "codeShort": "2",
+            "codeLong": "Tweede klasse"
+          }
+        },
+        "codes": {
+          "rtb": "urn:rtb:class:2",
+          "uic": "urn:uic:class:2",
+          "taco": "urn:taco:class:2",
+          "trl": "urn:trl:class:economy",
+          "bdws": "urn:bdws:class:2",
+          "itti": "urn:itti:class:2",
+          "csta": "urn:csta:class:2",
+          "ama": "urn:ama:class:002",
+          "bnds": "urn:bnds:class:2",
+          "awdi": "urn:awdi:class:002",
+          "epa": "urn:epa:class:2",
+          "htrl": "urn:htrl:class:2",
+          "osdm": "urn:osdm:class:SECOND",
+          "pao": "urn:pao:class:2"
+        },
+        "_links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/68/4"
+        }
+      },
+      {
+        "links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/68/9"
+        },
+        "id": "68#9#1662568748000",
+        "codeId": 9,
+        "typeId": "CLASS",
+        "sortingTag": 9,
+        "metadata": {
+          "lastUpdateAt": "2022-09-07T16:39:08Z",
+          "validity": {
+            "startsAt": "2014-01-30",
+            "travel": {
+              "startsAt": "2014-01-30",
+              "endsAt": "2999-12-30"
+            }
+          }
+        },
+        "labels": {},
+        "codes": {
+          "bdws": "urn:bdws:class:2",
+          "rtb": "urn:rtb:class:2",
+          "itti": "urn:itti:class:2",
+          "csta": "urn:csta:class:2",
+          "bnds": "urn:bnds:class:2",
+          "epa": "urn:epa:class:2",
+          "htrl": "urn:htrl:class:2",
+          "taco": "urn:taco:class:2",
+          "trl": "urn:trl:class:Standard"
+        },
+        "_links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/68/9"
+        }
+      }
+    ],
+    "_links": {
+      "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:taco:class:2",
+      "parent": "https://benerail-stg-apim.azure-api.net/rcode/rcode-type/class"
+    }
+  }
+}

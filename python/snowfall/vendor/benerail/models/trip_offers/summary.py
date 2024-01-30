@@ -41,7 +41,7 @@ class ProductSummary(BenerailBaseModel):
 
 
 class OfferSummary(BenerailBaseModel):
-    price_with_optional_parts: Price | None = None
+    price_with_optional_parts: Price
     price_without_optional_parts: Price | None = None
     total_price: Price | None = None
     flexibility: Flexibility | None = None

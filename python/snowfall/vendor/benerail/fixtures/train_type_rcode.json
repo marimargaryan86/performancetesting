@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "apiVersion": "0.6.1",
+    "buildVersion": "mr68.0",
+    "environment": "accept-c04",
+    "respondedAt": "2024-01-24T19:07:39.234+01:00",
+    "resourceType": "RcodesResult"
+  },
+  "result": {
+    "links": {
+      "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:train_type:ICE",
+      "parent": "https://benerail-stg-apim.azure-api.net/rcode/rcode-type/train_type"
+    },
+    "rcodes": [
+      {
+        "links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/4029/45"
+        },
+        "id": "4029#45#1692035447000",
+        "codeId": 45,
+        "typeId": "TRAIN_TYPE",
+        "sortingTag": 0,
+        "metadata": {
+          "lastUpdateAt": "2023-08-14T17:50:47Z",
+          "validity": {
+            "startsAt": "2001-12-31",
+            "travel": {
+              "startsAt": "2001-12-31",
+              "endsAt": "2999-12-31"
+            }
+          }
+        },
+        "labels": {
+          "en": {
+            "codeShort": "ICE",
+            "codeLong": "ICE",
+            "text": "INTERCITY EXPRESS"
+          },
+          "*": {
+            "codeShort": "ICE",
+            "codeLong": "ICE",
+            "text": "INTERCITY EXPRESS"
+          },
+          "fr": {
+            "codeShort": "ICE",
+            "codeLong": "ICE",
+            "text": "INTERCITY EXPRESS"
+          },
+          "nl": {
+            "codeShort": "ICE",
+            "codeLong": "ICE",
+            "text": "INTERCITY EXPRESS"
+          }
+        },
+        "codes": {
+          "bdws": "urn:bdws:train_type:ICE",
+          "rtb": "urn:rtb:train_type:ICE",
+          "tam": "urn:tam:train_type:ICE",
+          "itti": "urn:itti:train_type:ICE",
+          "csta": "urn:csta:train_type:ICE",
+          "bnds": "urn:bnds:train_type:ICE",
+          "htrl": "urn:htrl:train_type:51",
+          "epa": "urn:epa:train_type:09",
+          "osdm": "urn:osdm:train_type:51",
+          "uic": "urn:uic:train_type:ICE",
+          "taco": "urn:taco:train_type:ICE",
+          "trl": "urn:trl:train_type:ICE"
+        },
+        "attributes": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/4029/45/attributes",
+        "_links": {
+          "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/id/4029/45"
+        }
+      }
+    ],
+    "_links": {
+      "self": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:itti:train_type:ICE",
+      "parent": "https://benerail-stg-apim.azure-api.net/rcode/rcode-type/train_type"
+    }
+  }
+}
