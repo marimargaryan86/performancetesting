@@ -21,6 +21,8 @@ class CarnectConfig(pydantic.BaseModel):
 
 class PricingSettings(application.Settings, CarnectConfig):
     amqp_dsn: pydantic.AmqpDsn
+    provider_company_id: str
+    redis_dsn: pydantic.RedisDsn
 
 
 class Settings(CarnectConfig, service.ProviderSettings):
