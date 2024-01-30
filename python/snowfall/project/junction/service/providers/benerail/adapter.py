@@ -151,7 +151,7 @@ class BenerailAdapter(object):
             trip_id=offer_details.trip_id,
         )
 
-        offers = await self._get_offers(
+        offers, _ = await self._get_offers(
             offer_ids=[
                 offer_ref.identifier
                 for offer_ref in trip_offer_obj.response_result.offers
@@ -389,7 +389,7 @@ class BenerailAdapter(object):
         self,
         offer_ids: Iterable[str],
         session_token: str | None = None,
-    ) -> list[offer.Offer]:
+    ) -> tuple[list[offer.Offer], set[str]]:
         responses = await asyncio.gather(
             *(
                 self._client.offers_client.get_offer_info(
@@ -400,11 +400,16 @@ class BenerailAdapter(object):
             ),
         )
 
-        return [
-            response.response_result
-            for response in responses
-            if response.response_result.price.currency != "?"
-        ]
+        offers = []
+        excluded_ids = set()
+
+        for response in responses:
+            if response.response_result.price.currency == "?":
+                excluded_ids.add(response.response_result.identifier)
+            else:
+                offers.append(response.response_result)
+
+        return offers, excluded_ids
 
 
 class BenerailOffersAdapter(BenerailAdapter):
@@ -468,17 +473,14 @@ class BenerailOffersAdapter(BenerailAdapter):
             for trip_offer_res in trip_offer_responses
         )
 
-        offer_map = {
-            offer_info.identifier: offer_info
-            for offer_info in await self._get_offers(
-                offer_ids=(
-                    offer_id
-                    for _, offer_ids in trip_id_offer_ids
-                    for offer_id in offer_ids
-                ),
-                session_token=search_task.session_token,
-            )
-        }
+        offers, excluded_ids = await self._get_offers(
+            offer_ids=(
+                offer_id for _, offer_ids in trip_id_offer_ids for offer_id in offer_ids
+            ),
+            session_token=search_task.session_token,
+        )
+
+        offer_map = {offer_info.identifier: offer_info for offer_info in offers}
 
         trip_map = await self._get_trip_map(
             trip_ids=(trip_id for trip_id, _ in trip_id_offer_ids),
@@ -488,12 +490,16 @@ class BenerailOffersAdapter(BenerailAdapter):
         expires_at_dt = datetime.datetime.now(datetime.UTC) + self._ttl
 
         for trip_id, offer_ids in trip_id_offer_ids:
+            offer_ids_filtered = [
+                offer_id for offer_id in offer_ids if offer_id not in excluded_ids
+            ]
+
             try:
                 trip = trip_map[trip_id]
             except KeyError:
                 self._logger.warning(
                     "Trip info not found, skipping offers",
-                    offer_ids=offer_ids,
+                    offer_ids=offer_ids_filtered,
                     trip_id=trip_id,
                 )
 
@@ -504,9 +510,9 @@ class BenerailOffersAdapter(BenerailAdapter):
             )
             segment_ids = [string.uuid() for _ in range(timed_legs_count)]
 
-            offers = []
+            offer_protos = []
 
-            for offer_id in offer_ids:
+            for offer_id in offer_ids_filtered:
                 offer_model = await self._parse_offer(
                     offer_obj=offer_map[offer_id],
                     offer_segment_ids=segment_ids,
@@ -532,12 +538,12 @@ class BenerailOffersAdapter(BenerailAdapter):
                     key=offer_model.id,
                 )
 
-                offers.append(offer_model)
+                offer_protos.append(offer_model)
 
             yield offer_models_pb2.OfferGroup(
                 id=string.uuid(),
                 expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
-                offers=offers,
+                offers=offer_protos,
                 segments=await self._parse_segments(trip, segment_ids),
                 provider_id=str(PROVIDER_ID),
             )
