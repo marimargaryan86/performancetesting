@@ -1,38 +1,23 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
   import routeConfig from "routeConfig";
   import { getLocaleData } from "i18n";
   import Card from "components/ui/card.svelte";
   import { getPageTitle } from "utils/page-title";
-  import FindTripDialog from "./find-trip-dialog.svelte";
+  import FindTripDialog from "components/modals/find-trip-dialog.svelte";
   import TripGraphicOne from "assets/images/trip-graphic-1.png";
   import TripGraphicTwo from "assets/images/trip-graphic-2.png";
   import SearchingGraphic from "assets/images/searching.png";
-  import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
-  import { URLExtended } from "utils/url";
 
   const i18n = getLocaleData();
 
   let findTripDialog: FindTripDialog | undefined;
-
-  async function searchOrders(event: CustomEvent<JourneyFilterOptions>): Promise<void> {
-    const { passengerNameRecord, passengerLastName } = event.detail;
-
-    await goto(
-      new URLExtended(routeConfig.routes.tripManagement.routes.orders.root, {
-        base: $page.url,
-        query: { passengerNameRecord, passengerLastName },
-      }),
-    );
-  }
 </script>
 
 <svelte:head>
   <title>{getPageTitle($i18n.title, $i18n.pages.dashboard.title)}</title>
 </svelte:head>
 
-<FindTripDialog bind:this={findTripDialog} on:search={searchOrders} />
+<FindTripDialog bind:this={findTripDialog} />
 
 <header>
   <h1 typography="headline-medium" weight="bold">{$i18n.pages.dashboard.title}</h1>

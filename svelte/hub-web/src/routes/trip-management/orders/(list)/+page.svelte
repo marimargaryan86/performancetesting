@@ -89,10 +89,11 @@
   import { formatAmount } from "formatting/currency";
   import StatusBadge from "components/ui/status-badge.svelte";
   import { validatePassengerNameRecord } from "utils/booking";
+  import FindTripDialog from "components/modals/find-trip-dialog.svelte";
 
   export let data;
 
-  let searchQuery = "";
+  let findTripDialog: FindTripDialog | undefined;
 
   const filters = getQueryStore({
     get: queryFiltersGetter,
@@ -146,20 +147,22 @@
   </title>
 </svelte:head>
 
+<FindTripDialog bind:this={findTripDialog} />
+
 <StandardLayout
   pageTitle={$i18n.pages.tripManagement.pages.orders.title}
-  bind:searchQuery
   filtersActive={Boolean(Object.values($filters).find(ensureDefined))}
 >
-  <a
-    variant="primary"
-    size="small"
-    href={routeConfig.routes.tripManagement.routes.book.root}
-    slot="actions"
-  >
-    {$i18n.actions.newOrder}
-    <Icon variant="plus" size="20px" />
-  </a>
+  <div slot="actions">
+    <button variant="outline" size="small" on:click={findTripDialog?.open}>
+      <Icon variant="search" size="20px" />
+      {$i18n.actions.findTrip}
+    </button>
+    <a variant="primary" size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
+      <Icon variant="plus" size="20px" />
+      {$i18n.actions.newOrder}
+    </a>
+  </div>
 
   <Filters slot="filters" bind:filters={$filters} />
 

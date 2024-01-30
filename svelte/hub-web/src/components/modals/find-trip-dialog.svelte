@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { scale } from "svelte/transition";
   import { getLocaleData } from "i18n";
   import Backdrop from "components/ui/backdrop.svelte";
   import TextField from "components/ui/text-field.svelte";
   import { validatePassengerNameRecord } from "utils/booking";
   import Icon from "components/icons/icon.svelte";
-  import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
+  import { goto } from "$app/navigation";
+  import { URLExtended } from "utils/url";
+  import routeConfig from "routeConfig";
+  import { page } from "$app/stores";
 
   const i18n = getLocaleData();
-  const dispatch = createEventDispatcher<{ search: JourneyFilterOptions }>();
   let backdrop: Backdrop | undefined;
   let passengerNameRecord: string;
   let passengerLastName: string;
@@ -23,7 +24,7 @@
     backdrop?.close();
   }
 
-  export function search(): void {
+  async function search(): Promise<void> {
     passengerNameRecordError = false;
     const isPassengerNameRecordInvalid = !validatePassengerNameRecord(passengerNameRecord);
 
@@ -33,7 +34,13 @@
       return;
     }
 
-    dispatch("search", { passengerNameRecord, passengerLastName });
+    await goto(
+      new URLExtended(routeConfig.routes.tripManagement.routes.orders.root, {
+        base: $page.url,
+        query: { passengerNameRecord, passengerLastName },
+      }),
+    );
+    close();
   }
 
   $: passengerNameRecord = "";
