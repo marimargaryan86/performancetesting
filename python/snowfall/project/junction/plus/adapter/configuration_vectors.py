@@ -47,7 +47,7 @@ class Client(abc.ABC):
     async def get_permissions(
         self,
         reseller_id: str,
-    ) -> Sequence[str]:
+    ) -> list[notifications_models_pb2.Permission]:
         """Update Reseller configuration vector."""
 
     @abc.abstractmethod
@@ -112,7 +112,7 @@ class DictClient(Client):
     async def get_permissions(
         self,
         reseller_id: str,
-    ) -> Sequence[str]:
+    ) -> list[notifications_models_pb2.Permission]:
         configuration_vector = next(
             filter(
                 lambda cv: cv.reseller_id == reseller_id,
@@ -124,7 +124,14 @@ class DictClient(Client):
         if not configuration_vector:
             raise errors.NotFoundError()
 
-        return configuration_vector.permissions
+        return [
+            notifications_models_pb2.Permission(
+                ref=ref,
+                name="Permission Name",
+                enabled=True,
+            )
+            for ref in configuration_vector.permissions
+        ]
 
     async def update_permissions(
         self,
@@ -215,7 +222,10 @@ class GrpcClient(Client):
         if not response.is_success:
             raise errors.UnprocessableEntityError()
 
-    async def get_permissions(self, reseller_id: str) -> Sequence[str]:
+    async def get_permissions(
+        self,
+        reseller_id: str,
+    ) -> list[notifications_models_pb2.Permission]:
         request = notifications_grpc_pb2.GetPermissionsRequest(
             reseller_id=reseller_id,
         )
@@ -229,7 +239,7 @@ class GrpcClient(Client):
             )
         )
 
-        return response.permissions
+        return list(response.permissions)
 
     async def update_permissions(
         self,

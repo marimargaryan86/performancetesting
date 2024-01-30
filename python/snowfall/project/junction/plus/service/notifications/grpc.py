@@ -1,5 +1,11 @@
+import copy
+from collections.abc import Sequence
+
 from grpc import StatusCode, aio
 
+from snowfall.project.junction.plus.service.notifications.models import (
+    permissions as config_vector_models,
+)
 from snowfall.project.junction.plus.service.notifications.notifications import (
     ConfigurationVectorRepository,
     MonitoringRuleRepository,
@@ -11,6 +17,9 @@ from snowfall.project.junction.plus.service.notifications.v1alpha import (
 )
 from snowfall.project.junction.plus.service.notifications.v1alpha import (
     grpc_pb2_grpc as notifications_pb2_grpc,
+)
+from snowfall.project.junction.plus.service.notifications.v1alpha import (
+    models_pb2 as notifications_models,
 )
 from snowfall.stdlib import string
 from snowfall.stdlib.transport.amqp import producer
@@ -258,8 +267,14 @@ class ConfigurationVectorService(
         request: notifications_pb2.GetPermissionsRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.GetPermissionsResponse:
+        permission_refs = self._cv_permissions.get(request.reseller_id, [])
+        permissions = fill_permission_defaults(
+            config_vector_models.permission_defaults,
+            permission_refs,
+        )
+
         return notifications_pb2.GetPermissionsResponse(
-            permissions=self._cv_permissions.get(request.reseller_id, []),
+            permissions=permissions,
         )
 
     async def UpdatePermissions(  # type: ignore[override] # noqa: N802
@@ -268,10 +283,10 @@ class ConfigurationVectorService(
         context: aio.ServicerContext,
     ) -> notifications_pb2.UpdatePermissionsResponse:
         permissions_to_add = [
-            update.name for update in request.updates if update.enabled
+            update.ref for update in request.updates if update.enabled
         ]
         permissions_to_remove = [
-            update.name for update in request.updates if not update.enabled
+            update.ref for update in request.updates if not update.enabled
         ]
 
         update_status = await self._configuration_vectors.update_permissions(
@@ -427,3 +442,15 @@ class NotificationEventPublisherService(
         return notifications_pb2.PublishNotificationEventResponse(
             is_success=True,
         )
+
+
+def fill_permission_defaults(
+    defaults: Sequence[notifications_models.Permission],
+    permission_refs: Sequence[str],
+) -> Sequence[notifications_models.Permission]:
+    defaults = copy.deepcopy(defaults)
+
+    for default in defaults:
+        default.enabled = default.ref in permission_refs
+
+    return defaults

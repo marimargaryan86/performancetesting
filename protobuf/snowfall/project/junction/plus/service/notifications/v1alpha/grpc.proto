@@ -200,12 +200,12 @@ message GetPermissionsRequest {
 }
 
 message GetPermissionsResponse {
-  repeated string permissions = 1;
+  repeated Permission permissions = 1;
 }
 
 message UpdatePermissionsRequest {
   string reseller_id = 1;
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.PermissionUpdate updates = 2;
+  repeated PermissionUpdate updates = 2;
 }
 
 message UpdatePermissionsResponse {

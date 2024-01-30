@@ -194,5 +194,11 @@ message Location {
 
 message PermissionUpdate {
   bool enabled = 1;
+  string ref = 2;
+}
+
+message Permission {
+  string ref = 1;
   string name = 2;
+  bool enabled = 3;
 }
