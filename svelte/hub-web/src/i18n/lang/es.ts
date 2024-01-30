@@ -294,6 +294,21 @@ export default {
     origin: "Origen",
     destination: "Destino",
   },
+  gender: {
+    female: "Mujer",
+    male: "Hombre",
+    unspecified: "No especificado",
+  },
+  documentTypes: {
+    passport: "Pasaporte",
+  },
+  passengerTitle: {
+    miss: "Srta",
+    mr: "Sr",
+    mrs: "Sra",
+    ms: "Srta",
+    unspecified: "No especificado",
+  },
   passengerTypes: {
     adult: {
       plural: "Adultos",

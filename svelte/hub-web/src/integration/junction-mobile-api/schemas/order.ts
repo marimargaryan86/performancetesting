@@ -14,9 +14,14 @@ import {
 } from "./journey";
 import type { Payment, PaymentSchema, Voucher, VoucherSchema } from "./payment";
 import type { TripOfferPriceQuoteSchema } from "./trip-offer-price-quote";
+import type {
+  Gender,
+  PassengerTitle,
+  TravelerDocumentType,
+} from "integration/common/schemas/order";
 
 export type TravelerDocument = {
-  type?: "passport";
+  type?: TravelerDocumentType;
   number?: string;
   expiryDate?: Date;
   issueDate?: Date;
@@ -28,7 +33,7 @@ export type TravelerDocument = {
 };
 
 export type TravelerDocumentSchema = {
-  documentType?: "passport";
+  documentType?: TravelerDocumentType;
   documentNumber?: string;
   documentIssueCountry?: string;
   documentExpirationDate?: string;
@@ -66,8 +71,8 @@ export const travelerDocumentParser = {
 export type OrderPassenger = {
   firstName: string;
   lastName: string;
-  title: "unspecified" | "mr" | "mrs" | "ms" | "miss";
-  gender: "unspecified" | "male" | "female";
+  title: PassengerTitle;
+  gender: Gender;
   birthDate: Date;
   document?: TravelerDocument;
 };
@@ -75,8 +80,8 @@ export type OrderPassenger = {
 export type OrderPassengerSchema = {
   firstName: string;
   lastName: string;
-  title: "unspecified" | "mr" | "mrs" | "ms" | "miss";
-  gender: "unspecified" | "male" | "female";
+  title: PassengerTitle;
+  gender: Gender;
   dateOfBirth: string;
   travelerDocument?: TravelerDocumentSchema | null;
 };

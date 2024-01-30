@@ -7,9 +7,12 @@
   import type { Account } from "integration/junction-hub-api/schemas/account";
   import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
   import countryData from "data/country-data";
+  import { getLocaleData } from "i18n";
 
   export let data: BeneficiaryPut;
   export let accounts: Account[];
+
+  const i18n = getLocaleData();
 
   let country = countryData.mapping[data.address?.countryCode ?? ""];
 
@@ -87,7 +90,7 @@
         label="Country"
         placeholder="Select country"
         options={countryData.list}
-        formatter={formatCountryOption}
+        formatter={formatCountryOption.bind(formatCountryOption, $i18n)}
         bind:value={country}
       />
     </div>

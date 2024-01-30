@@ -268,6 +268,21 @@ export default {
     origin: "Ursprung",
     destination: "Destination",
   },
+  gender: {
+    female: "Kvinna",
+    male: "Man",
+    unspecified: "Ospecificerad",
+  },
+  documentTypes: {
+    passport: "Pass",
+  },
+  passengerTitle: {
+    miss: "Fröken",
+    mr: "Herr",
+    mrs: "Fru",
+    ms: "Fröken",
+    unspecified: "Ospecificerad",
+  },
   passengerTypes: {
     adult: {
       plural: "Vuxna",

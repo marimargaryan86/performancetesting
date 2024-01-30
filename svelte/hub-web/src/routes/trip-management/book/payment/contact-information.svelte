@@ -81,7 +81,7 @@
         label={$i18n.words.countryCode}
         placeholder={$i18n.actions.select}
         required
-        formatter={formatCountryPhoneOption}
+        formatter={formatCountryPhoneOption.bind(formatCountryPhoneOption, $i18n)}
         bind:value={phone.country}
         error={Boolean(errors?.phone?._errors)}
         dialogMinWidth="240px"
@@ -132,7 +132,7 @@
         options={countryData.list}
         label={$i18n.words.country}
         placeholder={$i18n.actions.selectCountry}
-        formatter={formatCountryOption}
+        formatter={formatCountryOption.bind(formatCountryOption, $i18n)}
         required
         bind:value={country}
         error={errors?.address?.countryCode?._errors}

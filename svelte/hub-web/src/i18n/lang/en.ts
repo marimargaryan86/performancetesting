@@ -5,6 +5,11 @@ import type { PassengerType } from "../../routes/trip-management/components/trip
 import type { ContentElement, WordQuantity } from "i18n";
 import type { SortOption } from "../../routes/trip-management/book/select-offer/search-options.svelte";
 import type { PriceBreakdownType } from "integration/common/schemas/price";
+import type {
+  Gender,
+  PassengerTitle,
+  TravelerDocumentType,
+} from "integration/common/schemas/order";
 
 export default {
   title: "Junction Hub",
@@ -273,6 +278,21 @@ export default {
     origin: "Origin",
     destination: "Destination",
   },
+  gender: {
+    female: "Female",
+    male: "Male",
+    unspecified: "Unspecified",
+  } satisfies Record<Gender, string>,
+  documentTypes: {
+    passport: "Passport",
+  } satisfies Record<TravelerDocumentType, string>,
+  passengerTitle: {
+    miss: "Miss",
+    mr: "Mr",
+    mrs: "Mrs",
+    ms: "Ms",
+    unspecified: "Unspecified",
+  } satisfies Record<PassengerTitle, string>,
   passengerTypes: {
     adult: {
       plural: "Adults",

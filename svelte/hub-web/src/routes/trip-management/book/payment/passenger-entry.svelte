@@ -1,29 +1,38 @@
 <script lang="ts" context="module">
-  const passengerTitles: OrderPassenger["title"][] = ["unspecified", "mr", "mrs", "ms", "miss"];
-  const passengerGenders: OrderPassenger["gender"][] = ["unspecified", "male", "female"];
-  const travelerDocumentTypes: NonNullable<TravelerDocument["type"]>[] = ["passport"];
+  const passengerGenders: Gender[] = ["unspecified", "male", "female"];
+  const travelerDocumentTypes: TravelerDocumentType[] = ["passport"];
 
   export type PartialPassengerData = Omit<Partial<OrderPassenger>, "document"> & {
     type: keyof PassengerPickerData;
     document?: Require<Partial<TravelerDocument>, "countryCodes">;
   };
 
-  function formatTitleOption(option?: OrderPassenger["title"]): string {
-    return option ? capitalize(option) : "";
+  function formatTitleOption(lang: LocaleData, option?: PassengerTitle): string {
+    return option ? lang.passengerTitle[option] : "";
   }
 
-  function formatGenderOption(option?: OrderPassenger["gender"]): string {
-    return option ? capitalize(option) : "";
+  function formatGenderOption(lang: LocaleData, option?: Gender): string {
+    return option ? lang.gender[option] : "";
   }
 
-  function formatTravelerDocumentOption(option?: NonNullable<TravelerDocument["type"]>): string {
-    return option ? capitalize(option) : "None";
+  function formatTravelerDocumentOption(lang: LocaleData, option?: TravelerDocumentType): string {
+    return option ? lang.documentTypes[option] : lang.words.none;
+  }
+
+  function getPassengerTitles(locale: Locale): PassengerTitle[] {
+    const base: PassengerTitle[] = ["unspecified", "mr", "mrs", "miss"];
+
+    if (locale === "es-ES" || locale === "sv") {
+      return base;
+    }
+
+    // Only add ms for English locale
+    return [...base, "ms"];
   }
 </script>
 
 <script lang="ts">
   import type { z } from "zod";
-  import { capitalize } from "utils/common";
   import DateTextField from "components/ui/date-text-field.svelte";
   import SelectField from "components/ui/select-field.svelte";
   import TextField from "components/ui/text-field.svelte";
@@ -39,13 +48,19 @@
     PASSENGER_DEFINITIONS,
     type PassengerPickerData,
   } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocaleData } from "i18n";
+  import { getLocale, getLocaleData, type Locale, type LocaleData } from "i18n";
+  import type {
+    Gender,
+    TravelerDocumentType,
+    PassengerTitle,
+  } from "integration/common/schemas/order";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;
   export let errors: z.ZodFormattedError<OrderPassenger> | undefined = undefined;
   export let required: TripOfferPriceQuote["required"];
 
+  const locale = getLocale();
   const i18n = getLocaleData();
 
   let collapsible: Collapsible | undefined;
@@ -70,8 +85,8 @@
 
   <div class="details">
     <SelectField
-      options={passengerTitles}
-      formatter={formatTitleOption}
+      options={getPassengerTitles($locale)}
+      formatter={formatTitleOption.bind(formatTitleOption, $i18n)}
       bind:value={passenger.title}
       placeholder={$i18n.actions.select}
       label={$i18n.words.title}
@@ -107,7 +122,7 @@
 
     <SelectField
       options={passengerGenders}
-      formatter={formatGenderOption}
+      formatter={formatGenderOption.bind(formatGenderOption, $i18n)}
       bind:value={passenger.gender}
       placeholder={$i18n.actions.select}
       label={$i18n.words.gender}
@@ -119,7 +134,7 @@
       <SelectField
         bind:value={document.type}
         options={[undefined, ...travelerDocumentTypes]}
-        formatter={formatTravelerDocumentOption}
+        formatter={formatTravelerDocumentOption.bind(formatTravelerDocumentOption, $i18n)}
         placeholder={$i18n.actions.select}
         label={$i18n.words.documentType}
         required

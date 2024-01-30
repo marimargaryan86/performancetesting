@@ -8,8 +8,11 @@
   import countryData from "data/country-data";
   import currencyData from "data/currency-data";
   import Icon from "components/icons/icon.svelte";
+  import { getLocaleData } from "i18n";
 
   export let data: BeneficiaryPut;
+
+  const i18n = getLocaleData();
 
   let country = countryData.mapping[data.address?.countryCode ?? ""];
 
@@ -64,7 +67,7 @@
       label="Country"
       placeholder="Select country"
       options={countryData.list}
-      formatter={formatCountryOption}
+      formatter={formatCountryOption.bind(formatCountryOption, $i18n)}
       required
       bind:value={country}
     />

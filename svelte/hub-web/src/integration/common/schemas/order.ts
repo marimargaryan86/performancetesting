@@ -11,6 +11,10 @@ export type OrderBookingStatus = TripBooking["status"] | "mixed";
 export type OrderCancellationStatus = NonNullable<TripBooking["cancellation"]>["status"] | "mixed";
 export type OrderRefundStatus = NonNullable<HubTripBooking["refund"]>["status"] | "mixed";
 
+export type TravelerDocumentType = "passport";
+export type Gender = "unspecified" | "male" | "female";
+export type PassengerTitle = "unspecified" | "mr" | "mrs" | "ms" | "miss";
+
 export const getOrderStatus = {
   booking(order: Order): OrderBookingStatus | undefined {
     const statuses = Array.from(new Set(order.bookings.flatMap((booking) => booking.status)));
