@@ -107,6 +107,10 @@ job "pay-transactions-grpc" {
     task "grpc" {
       driver = "docker"
 
+      resources {
+        memory = 600
+      }
+
       vault {
         policies = ["currencycloud-${var.environment}"]
       }
