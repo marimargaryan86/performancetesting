@@ -100,6 +100,7 @@
   .splash {
     display: flex;
     flex-flow: column;
+    min-width: 480px;
     padding: 20px 33px 63px;
     color: var(--color-common-dark-strong);
     background-image: url("/images/welcome-bg.png");
@@ -137,7 +138,9 @@
 
   .widgets {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 564px);
+
+    /* Scale the widgets to fit the dashboard horizontally for 1280px and above */
+    grid-template-columns: repeat(auto-fit, minmax(480px, auto));
     gap: 32px;
     padding: 24px 0;
   }

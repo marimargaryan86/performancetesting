@@ -73,6 +73,7 @@
 
   .content-wrapper {
     display: flex;
+    flex: 1;
     flex-flow: column;
     gap: 24px;
     justify-content: space-between;
