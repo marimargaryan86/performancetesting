@@ -5,7 +5,7 @@
   import { getUser } from "utils/permissions";
 
   export let transitionTimeMs: number;
-  export let expanded: boolean;
+  export let compact: boolean;
 
   const i18n = getLocaleData();
   const user = getUser();
@@ -13,7 +13,7 @@
   $: gravatarHash = md5($user.email.trim().toLowerCase());
 </script>
 
-<div class="account" style:--transition-time="{transitionTimeMs}ms" class:expanded>
+<div class="account" style:--transition-time="{transitionTimeMs}ms" class:compact>
   <a href={routeConfig.routes.account.root}>
     <img src="https://www.gravatar.com/avatar/{gravatarHash}?s=40&d=retro" alt="" />
   </a>
@@ -33,8 +33,8 @@
 
   img {
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
   }
 
@@ -60,7 +60,7 @@
     text-overflow: ellipsis;
   }
 
-  .account:not(.expanded) > .info {
+  .account.compact > .info {
     opacity: 0;
   }
 </style>
