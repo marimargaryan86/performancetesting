@@ -38,7 +38,7 @@ async def test_get_emissions(
     )
 
     response = await co2_emissions_client.get_emissions(
-        flights=(
+        flights=[
             co2_emissions_models.Flight(
                 origin="ZRH",
                 destination="CDG",
@@ -50,7 +50,7 @@ async def test_get_emissions(
                     "day": 1,
                 },
             ),
-        ),
+        ],
     )
 
     assert len(response.flight_emissions) == 1
