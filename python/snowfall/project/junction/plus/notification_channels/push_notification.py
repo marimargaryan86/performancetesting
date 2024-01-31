@@ -15,7 +15,7 @@ from snowfall.project.junction.plus.notification_channels.flight_stats_messages 
 from snowfall.project.junction.plus.notification_channels.order_utils import (
     proto_to_format_dt,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 

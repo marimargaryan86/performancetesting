@@ -21,7 +21,7 @@ from snowfall.project.junction.plus.notification_channels.whatsapp import (
 from snowfall.project.junction.plus.service.flight_prediction.v1 import (
     flight_prediction_pb2_grpc,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
 from snowfall.project.junction.plus.service.plus_webhooks import (

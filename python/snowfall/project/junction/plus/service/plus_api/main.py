@@ -5,7 +5,7 @@ from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.plus.adapter import (
     subscribers,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
 from snowfall.project.junction.plus.service.plus_api import bootstrap

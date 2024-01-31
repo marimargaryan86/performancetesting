@@ -6,7 +6,7 @@ from collections.abc import Sequence
 import httpx
 
 from snowfall.project.junction.plus.notification_channels.channel import AbstractChannel
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.stdlib import string
 
 

@@ -2,7 +2,7 @@ from gettext import gettext as _
 from types import MappingProxyType
 from typing import Any
 
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 
 _CODE_TO_MESSAGE: MappingProxyType[int, dict[str, Any]] = MappingProxyType(
     {

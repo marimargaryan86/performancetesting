@@ -12,7 +12,7 @@ from snowfall.project.junction.plus.adapter import (
     validation,
 )
 from snowfall.project.junction.plus.notification_channels import whatsapp
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_pb2,
 )
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers

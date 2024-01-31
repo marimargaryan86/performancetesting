@@ -15,7 +15,7 @@ from snowfall.project.junction.plus.notification_channels import (
     whatsapp,
 )
 from snowfall.project.junction.plus.service.notification_center import importer, states
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
 from snowfall.stdlib.instrumentation.httpx import logging, metrics

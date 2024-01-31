@@ -1,7 +1,7 @@
 import enum
 import typing
 
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notification_models,
 )
 

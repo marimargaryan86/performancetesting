@@ -12,13 +12,13 @@ from snowfall.project.junction.plus.service.notifications.notifications import (
     OrderRepository,
     SubscriberRepository,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2 as notifications_pb2,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_models,
 )
 from snowfall.stdlib import string

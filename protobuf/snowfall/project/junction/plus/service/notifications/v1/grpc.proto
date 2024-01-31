@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.junction.plus.service.notifications.v1alpha;
+package snowfall.project.junction.plus.service.notifications.v1;
 
-import "snowfall/project/junction/plus/service/notifications/v1alpha/models.proto";
+import "snowfall/project/junction/plus/service/notifications/v1/models.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1";
 
 service OrderService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {}
@@ -47,13 +47,13 @@ message CreateOrderRequest {
   string reseller_id = 1;
   string external_ref_id = 2;
   string booking_reference = 3;
-  snowfall.project.junction.plus.service.notifications.v1alpha.ContactDetails contact_details = 4;
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Passenger passengers = 5;
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.Booking bookings = 6;
+  ContactDetails contact_details = 4;
+  repeated Passenger passengers = 5;
+  repeated Booking bookings = 6;
 }
 
 message CreateOrderResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
+  PersistedOrder order = 1;
 }
 
 message GetOrderRequest {
@@ -61,7 +61,7 @@ message GetOrderRequest {
 }
 
 message GetOrderResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder order = 1;
+  PersistedOrder order = 1;
 }
 
 message FindOrdersRequest {
@@ -70,7 +70,7 @@ message FindOrdersRequest {
 }
 
 message FindOrdersResponse {
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.PersistedOrder orders = 1;
+  repeated PersistedOrder orders = 1;
 }
 
 message GetSubscriberRequest {
@@ -78,7 +78,7 @@ message GetSubscriberRequest {
 }
 
 message GetSubscriberResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.Subscriber subscriber = 1;
+  Subscriber subscriber = 1;
 }
 
 message GetSubscriberFromResellerRequest {
@@ -87,7 +87,7 @@ message GetSubscriberFromResellerRequest {
 }
 
 message GetSubscriberFromResellerResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.Subscriber subscriber = 1;
+  Subscriber subscriber = 1;
 }
 
 message UnsubscribeRequest {
@@ -122,19 +122,19 @@ message GetConfigurationVectorRequest {
 }
 
 message GetConfigurationVectorResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+  ConfigurationVector configuration_vector = 1;
 }
 
 message CreateConfigurationVectorRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+  ConfigurationVector configuration_vector = 1;
 }
 
 message CreateConfigurationVectorResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+  ConfigurationVector configuration_vector = 1;
 }
 
 message UpdateConfigurationVectorRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.ConfigurationVector configuration_vector = 1;
+  ConfigurationVector configuration_vector = 1;
 }
 
 message UpdateConfigurationVectorResponse {
@@ -145,23 +145,23 @@ message GetMonitoringRuleRequest {
   string monitoring_rule_id = 1;
 }
 message GetMonitoringRuleResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+  MonitoringRule monitoring_rule = 1;
 }
 
 message GetMonitoringRuleByBookingRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.Booking booking = 1;
+  Booking booking = 1;
 }
 message GetMonitoringRuleByBookingResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+  MonitoringRule monitoring_rule = 1;
 }
 message CreateMonitoringRuleRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+  MonitoringRule monitoring_rule = 1;
 }
 message CreateMonitoringRuleResponse {
-  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+  MonitoringRule monitoring_rule = 1;
 }
 message UpdateMonitoringRuleRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rule = 1;
+  MonitoringRule monitoring_rule = 1;
 }
 message UpdateMonitoringRuleResponse {
   bool is_success = 1;
@@ -185,11 +185,11 @@ message FindMonitoringRulesRequest {
 }
 
 message FindMonitoringRulesResponse {
-  repeated snowfall.project.junction.plus.service.notifications.v1alpha.MonitoringRule monitoring_rules = 1;
+  repeated MonitoringRule monitoring_rules = 1;
 }
 
 message PublishNotificationEventRequest {
-  snowfall.project.junction.plus.service.notifications.v1alpha.NotificationEvent event = 1;
+  NotificationEvent event = 1;
 }
 message PublishNotificationEventResponse {
   bool is_success = 1;

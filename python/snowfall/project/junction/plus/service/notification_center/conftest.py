@@ -16,7 +16,7 @@ from snowfall.project.junction.plus.service.notification_center import (
     importer,
     states,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_models_pb2,
 )
 from snowfall.stdlib.transport.amqp import types

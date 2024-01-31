@@ -1,4 +1,4 @@
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 
 
 def proto_to_route_identifier(identifier: models_pb2.RouteIdentifier) -> str:

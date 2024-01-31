@@ -1,7 +1,7 @@
 import pytest
 
 from snowfall.project.junction.plus.service.notification_center import importer
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.stdlib.transport.amqp import types
 
 

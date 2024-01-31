@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 from google.protobuf import timestamp_pb2
 
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 
 

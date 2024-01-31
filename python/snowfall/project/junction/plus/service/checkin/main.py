@@ -7,7 +7,7 @@ from snowfall.project.junction.plus.adapter import (
 )
 from snowfall.project.junction.plus.service.checkin.cron import CheckinCronJob
 from snowfall.project.junction.plus.service.checkin.grpc import CheckinService
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
 from snowfall.stdlib.service import application, grpc_factory

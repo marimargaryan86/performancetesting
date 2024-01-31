@@ -1,7 +1,7 @@
 import datetime
 
 from snowfall.project.junction.plus.notification_channels import order_utils
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
 

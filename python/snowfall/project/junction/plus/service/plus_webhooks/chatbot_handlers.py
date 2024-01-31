@@ -20,7 +20,7 @@ from snowfall.project.junction.plus.notification_channels.order_utils import (
 from snowfall.project.junction.plus.notification_channels.whatsapp import (
     transform_trip_details,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.project.junction.plus.service.plus_webhooks import open_ai, shortener
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout

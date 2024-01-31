@@ -16,7 +16,7 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.adapter import (
     subscribers as subscribers_adapter,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import (
+from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_models_pb2,
 )
 from snowfall.project.junction.plus.service.plus_webhooks.models import (

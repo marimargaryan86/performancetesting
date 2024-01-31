@@ -9,7 +9,7 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.adapter import (
     orders as orders_adapter,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.project.junction.plus.service.orders_registration import flight_stats
 from snowfall.project.junction.plus.service.orders_registration.importer import (
     OrderImporter,

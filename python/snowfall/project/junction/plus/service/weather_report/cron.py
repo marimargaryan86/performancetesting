@@ -17,7 +17,7 @@ from snowfall.project.junction.plus.adapter import subscribers as subscribers_ad
 from snowfall.project.junction.plus.notification_channels.order_utils import (
     compress_flights,
 )
-from snowfall.project.junction.plus.service.notifications.v1alpha import models_pb2
+from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.project.junction.plus.service.weather_report import open_weather_map
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout

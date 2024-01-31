@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package snowfall.project.junction.plus.service.notifications.v1alpha;
+package snowfall.project.junction.plus.service.notifications.v1;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/plus/service/notifications/v1";
 
 message PersistedOrder {
   string id = 1;
