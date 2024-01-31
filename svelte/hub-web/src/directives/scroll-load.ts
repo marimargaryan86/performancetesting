@@ -8,6 +8,7 @@ interface ScrollLoadParams {
   threshold?: number;
   func?: ScrollLoadFunc;
   pending?: Writable<boolean>;
+  error?: Writable<Error | undefined>;
 }
 
 const DEFAULT_THRESHOLD = 400;
@@ -33,14 +34,19 @@ export function scrollLoad(
       }
 
       params.pending?.set(true);
+      params.error?.set(undefined);
       pending = true;
-      const result = await func();
-      pending = false;
-      params.pending?.set(false);
-
-      // Trigger an additional onScroll in case the container isn't fully populated
-      if (!result.depleted) {
-        await onScroll();
+      try {
+        const result = await func();
+        // Trigger an additional onScroll in case the container isn't fully populated
+        if (!result.depleted) {
+          await onScroll();
+        }
+      } catch (e) {
+        params.error?.set(e as Error);
+      } finally {
+        pending = false;
+        params.pending?.set(false);
       }
     }
   }
