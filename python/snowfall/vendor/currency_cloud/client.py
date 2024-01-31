@@ -232,9 +232,9 @@ class PaymentClient(object):
         page_index: int,
     ) -> list[AccountResponse]:
         accounts = await self._make_request(
-            _METHOD_GET,
+            _METHOD_POST,
             "/accounts/find",
-            query_parameters={
+            payload={
                 "page": page_index,
                 "status": "enabled",
             },
