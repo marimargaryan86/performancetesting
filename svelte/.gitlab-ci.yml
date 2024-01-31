@@ -10,6 +10,7 @@
   script:
     - yarn run lint
     - yarn run check
+    - yarn run vitest --run
     - yarn run build
   cache:
     paths:
