@@ -7,6 +7,13 @@ import { cookieStore } from "stores/cookie-store.server";
 import type { Locale } from "i18n";
 import languageData from "i18n/lang";
 
+// Environment variable check
+if (!env.JWT_SECRET) {
+  // eslint-disable-next-line no-console
+  console.error("Error: JWT_SECRET is not set.");
+  process.exit(1);
+}
+
 function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
   const session = cookieStore.sessionToken.get(event);
   const sessionMeta = cookieStore.sessionMetaToken.get(event);

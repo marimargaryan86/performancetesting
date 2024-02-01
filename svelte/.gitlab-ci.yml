@@ -6,6 +6,7 @@
     - cd "${PROJECT_PATH}"
     - echo 'yarn-offline-mirror ".yarn-cache/"' >> .yarnrc
     - echo 'yarn-offline-mirror-pruning true' >> .yarnrc
+    - cp .env.example .env
     - yarn install
   script:
     - yarn run lint
