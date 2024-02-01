@@ -196,6 +196,11 @@ class OfferImporter(object):
         # got, but let's not make any assumptions.
         gw_offer_search_id = response.id
         cutoff = datetime.datetime.now(tz=datetime.UTC) + self._gateway_timeout
+        self._logger.info(
+            "Starting to poll",
+            now=datetime.datetime.now(tz=datetime.UTC).isoformat(),
+            session_token=offer_search.session_token,
+        )
 
         while datetime.datetime.now(tz=datetime.UTC) < cutoff:
             await asyncio.sleep(self._gateway_poll_sleep)
@@ -217,6 +222,13 @@ class OfferImporter(object):
                 break
 
             await asyncio.sleep(self._gateway_poll_sleep)
+
+        self._logger.info(
+            "Marking as completed",
+            now=datetime.datetime.now(tz=datetime.UTC).isoformat(),
+            cutoff=cutoff.isoformat(),
+            session_token=offer_search.session_token,
+        )
 
         await self._searches.mark_as_completed(offer_search.id)
 
