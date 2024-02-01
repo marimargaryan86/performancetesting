@@ -119,6 +119,7 @@ MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mong
 PASSENGER_NAME_RECORDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_passenger-name-records-${var.environment}"))}}
 RESELLERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_resellers-${var.environment}"))}}
 REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
+SMTP_DSN={{range $index, $service := service "smtp-${var.environment}"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 EOH
         destination = "services.env"
         env         = true

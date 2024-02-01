@@ -3,6 +3,7 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import aiosmtplib
 import httpx
 import pydantic
 from motor import motor_asyncio
@@ -15,6 +16,7 @@ from snowfall.project.junction.go.service.orders import (
     importer,
     orders,
     orders_handlers,
+    smtp,
 )
 from snowfall.project.junction.go.service.orders import consumer as orders_consumer
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
@@ -54,6 +56,7 @@ class _GrpcSettings(application.Settings):
     passenger_name_records_address: str
     resellers_address: str
     refunds_address: str
+    smtp_dsn: pydantic.AnyUrl
 
 
 class _ImportSettings(application.Settings):
@@ -79,6 +82,7 @@ class _CancellationsConsumerSettings(application.Settings):
     gateway_address: str
     resellers_address: str
     passenger_name_records_address: str
+    smtp_dsn: pydantic.AnyUrl
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -100,6 +104,15 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         collection=mongo.orders.journeys,
     )
 
+    smtp_cl = smtp.EmailClient(
+        aiosmtplib.SMTP(
+            hostname=app.settings.smtp_dsn.host,
+            port=int(app.settings.smtp_dsn.port or 0) or None,
+            username=app.settings.smtp_dsn.username,
+            password=app.settings.smtp_dsn.password,
+        ),
+    )
+
     resellers_channel, gateway_channel, refund_channel = await asyncio.gather(
         grpc_factory.make_insecure_channel(
             app,
@@ -114,7 +127,6 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
             app.settings.refunds_address,
         ),
     )
-
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -162,6 +174,8 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     connection=amqp_connection,
                     exchange=types.Exchange("orders.cancellations"),
                 ),
+                smtp_client=smtp_cl,
+                environment=app.environment,
             ),
         ],
     )
@@ -241,7 +255,14 @@ async def _consume_cancellations(
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-
+    smtp_cl = smtp.EmailClient(
+        aiosmtplib.SMTP(
+            hostname=app.settings.smtp_dsn.host,
+            port=int(app.settings.smtp_dsn.port or 0) or None,
+            username=app.settings.smtp_dsn.username,
+            password=app.settings.smtp_dsn.password,
+        ),
+    )
     resellers_chan, gateway_chan, refund_chan, pnr_chan = await asyncio.gather(
         grpc_factory.make_insecure_channel(
             app,
@@ -283,6 +304,9 @@ async def _consume_cancellations(
             bookings=orders.BookingRepository(
                 collection=mongo.orders.journeys,
             ),
+            orders=orders.OrderRepository(
+                collection=mongo.orders.journeys,
+            ),
             cancellations=orders.CancellationRequestsRepository(
                 collection=mongo.orders.cancellation_requests,
             ),
@@ -296,6 +320,8 @@ async def _consume_cancellations(
             refund_client=refunds_adapter.GrpcClient(
                 refund_pb2_grpc.RefundsServiceStub(refund_chan),
             ),
+            smtp_client=smtp_cl,
+            environment=app.environment,
         ),
     )
     await event_consumer.consume()

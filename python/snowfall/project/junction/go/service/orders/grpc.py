@@ -3,7 +3,7 @@ from types import MappingProxyType
 import more_itertools
 from grpc import StatusCode, aio
 
-from snowfall.project.junction.go.service.orders import bookings
+from snowfall.project.junction.go.service.orders import bookings, smtp
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.orders import (
     BookingCancellationsRepository,
@@ -47,7 +47,9 @@ class OrderService(
         cancellation_requests: CancellationRequestsRepository,
         publisher: OrderProducer,
         cancellation_task_producer: producer.Producer,
+        smtp_client: smtp.EmailClient,
         default_page_size: int,
+        environment: str,
         refund_client: refunds_adapter.Client,
     ):
         self._default_page_size = default_page_size
@@ -61,6 +63,8 @@ class OrderService(
         self._publisher = publisher
         self._cancellation_task_producer = cancellation_task_producer
         self._refund_client = refund_client
+        self._environment = environment
+        self._smtp_client = smtp_client
 
     def get_name(self) -> str:
         return orders_pb2.DESCRIPTOR.services_by_name["OrderService"].full_name
@@ -369,8 +373,12 @@ class OrderService(
             request,
             context,
             self._bookings,
+            self._orders,
+            self._journeys,
             self._cancellation_requests,
+            self._smtp_client,
             self._refund_client,
+            self._environment,
         )
 
         return await ticket_completed_handler.execute()

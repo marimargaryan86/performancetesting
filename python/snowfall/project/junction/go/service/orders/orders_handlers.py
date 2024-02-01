@@ -11,10 +11,12 @@ from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2,
     bookings_pb2_grpc,
 )
+from snowfall.project.junction.go.service.orders import cancel_confirmation, smtp
 from snowfall.project.junction.go.service.orders.orders import (
     BookingRepository,
     CancellationRequestsRepository,
     JourneyRepository,
+    OrderRepository,
 )
 from snowfall.project.junction.go.service.orders.v1 import (
     amqp_pb2,
@@ -26,7 +28,7 @@ from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.project.pay.service.refunds.v1 import models_pb2 as refund_models_pb2
 from snowfall.project.pay.service.refunds.v1 import models_pb2 as refunds_model_pb2
 from snowfall.stdlib import money, sequence, string
-from snowfall.stdlib.format.protobuf import protobuf_to_datetime
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import rich_status
@@ -233,14 +235,23 @@ class CancellationTicketCompletedHandler(object):
         request: orders_pb2.HandleCancellationTicketCompletedRequest,
         context: aio.ServicerContext,
         bookings: BookingRepository,
+        orders: OrderRepository,
+        journeys: JourneyRepository,
         cancellations: CancellationRequestsRepository,
+        smtp_client: smtp.EmailClient,
         refund_client: refunds_adapter.Client,
+        environment: str,
     ):
         self._request = request
         self._context = context
         self._bookings = bookings
+        self._journeys = journeys
+        self._orders = orders
         self._cancellations = cancellations
         self._refund_client = refund_client
+        self.smtp_client = smtp_client
+        self._environment = environment
+        self._logger = stdout.get_logger()
 
     async def execute(  # noqa: WPS217
         self,
@@ -258,8 +269,11 @@ class CancellationTicketCompletedHandler(object):
             if booking_cancellation.ticket_id == self._request.ticket_id
         )
         ticket_status = self._request.status
-        booking = await self._get_booking(booking_id=booking_cancellation.booking_id)
-
+        booking = await self._bookings.find_by_id(
+            document_id=booking_cancellation.booking_id,
+        )
+        if not booking:
+            return await self._context.abort(StatusCode.NOT_FOUND)
         match ticket_status:
             case orders_pb2.Status.STATUS_REJECTED:
                 booking_cancellation.status = (
@@ -269,10 +283,29 @@ class CancellationTicketCompletedHandler(object):
                 booking_cancellation.status = (
                     models_pb2.BookingCancellation.STATUS_NO_REFUND
                 )
+                await _cancel_confirmation_email(
+                    booking=booking,
+                    booking_cancellation_status=models_pb2.BookingCancellation.STATUS_NO_REFUND,
+                    journeys=self._journeys,
+                    orders=self._orders,
+                    smtp_client=self.smtp_client,
+                    logger=self._logger,
+                    environment=self._environment,
+                )
                 await _mark_booking_as_cancelled(self._bookings, booking)
+
             case orders_pb2.Status.STATUS_REFUND_DUE:
                 booking_cancellation.status = (
                     models_pb2.BookingCancellation.STATUS_REFUND_DUE
+                )
+                await _cancel_confirmation_email(
+                    booking=booking,
+                    booking_cancellation_status=models_pb2.BookingCancellation.STATUS_REFUND_DUE,
+                    journeys=self._journeys,
+                    orders=self._orders,
+                    smtp_client=self.smtp_client,
+                    logger=self._logger,
+                    environment=self._environment,
                 )
                 await _mark_booking_as_cancelled(self._bookings, booking)
                 await self._refund_client.create(
@@ -288,16 +321,38 @@ class CancellationTicketCompletedHandler(object):
             booking_cancellation=booking_cancellation,
         )
 
-    async def _get_booking(
-        self,
-        booking_id: str,
-    ) -> models_pb2.Booking:
-        booking = await self._bookings.find_by_id(document_id=booking_id)
 
-        if booking is None:
-            return await self._context.abort(StatusCode.NOT_FOUND)
-
-        return booking
+async def _cancel_confirmation_email(
+    booking_cancellation_status: models_pb2.BookingCancellation.Status.ValueType,
+    orders: OrderRepository,
+    journeys: JourneyRepository,
+    smtp_client: smtp.EmailClient,
+    environment: str,
+    logger: stdout.Logger,
+    booking: models_pb2.Booking,
+) -> None:
+    order = await orders.find_by_id(booking.order_id)
+    if order is None:
+        logger.error(
+            "Order not found",
+            order_id=booking.order_id,
+        )
+        return
+    journey = await journeys.find_by_id(order.journey_id)
+    if journey is None:
+        logger.error(
+            "Journey not found",
+            journey_id=order.journey_id,
+        )
+        return
+    await cancel_confirmation.send_cancel_confirmation(
+        journey,
+        order,
+        booking,
+        smtp_client,
+        booking_cancellation_status=booking_cancellation_status,
+        environment=environment,
+    )
 
 
 def _create_order_model(
@@ -340,7 +395,9 @@ def _create_booking_model(
                     cancellation_request_models.Leg(
                         origin_name=leg.origin.name,
                         destination_name=leg.destination.name,
-                        departure_date=str(protobuf_to_datetime(leg.departure_at)),
+                        departure_date=str(
+                            protobuf.protobuf_to_datetime(leg.departure_at),
+                        ),
                     )
                     for leg in trip_option.segment.legs
                 ],
@@ -480,18 +537,24 @@ class CreateCancellationTaskHandler(object):
         refund_client: refunds_adapter.GrpcClient,
         journeys: JourneyRepository,
         bookings: BookingRepository,
+        orders: OrderRepository,
+        smtp_client: smtp.EmailClient,
         cancellations: CancellationRequestsRepository,
         zendesk_client: ZendeskClient,
         cancellation_group_id: int,
+        environment: str,
     ):
         self._gateway = gateway
         self._refund_client = refund_client
+        self._orders = orders
         self._journeys = journeys
         self._bookings = bookings
         self._cancellations = cancellations
         self._zendesk_client = zendesk_client
         self._cancellation_group_id = cancellation_group_id
         self._logger = stdout.get_logger()
+        self.smtp_client = smtp_client
+        self._environment = environment
 
     async def execute(self, cancellation_request_id: str) -> None:  # noqa: WPS217
         cancellation_request = await self._cancellations.find_by_id(
@@ -620,6 +683,16 @@ class CreateCancellationTaskHandler(object):
                                 cancellation_response.cancellation.refunded_us,
                             ),
                         ),
+                    )
+                else:
+                    await _cancel_confirmation_email(
+                        booking=bookings_container.get_by_id(booking_id),
+                        booking_cancellation_status=models_pb2.BookingCancellation.STATUS_REFUND_DUE,
+                        journeys=self._journeys,
+                        orders=self._orders,
+                        smtp_client=self.smtp_client,
+                        logger=self._logger,
+                        environment=self._environment,
                     )
 
         manual_items.extend(
