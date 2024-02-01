@@ -112,7 +112,7 @@ class OryClient(object):
         metadata: Mapping[str, Any],
     ) -> models.Identity:
         response = await self._client.post(
-            url="/admin/identities/",
+            url="/admin/identities",
             json={
                 "metadata_public": metadata,
                 "schema_id": self._schema_id,
