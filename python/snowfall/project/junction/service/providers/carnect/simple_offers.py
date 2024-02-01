@@ -13,7 +13,11 @@ from snowfall.project.junction.service.providers.carnect import (
     criteria,
 )
 from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
-from snowfall.stdlib.service import application
+from snowfall.stdlib.instrumentation.httpx import logging
+from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import application, httpx_factory
+from snowfall.vendor.carnect import client
+from snowfall.vendor.carnect import config as carnect_settings
 
 _Impl = simple_offers.SimpleOfferSearchImplementation[amqp_pb2.Criteria]
 
@@ -24,7 +28,30 @@ async def simple_search_app(
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
-    carnect_adapter = adapter.CarnectOffersAdapter()
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
+    logging.register(http_client)
+
+    carnect_config = carnect_settings.Config(
+        timeout=app.settings.ttl.seconds,
+        base_url=str(app.settings.api_base_url),
+        export_soap_requests=True,
+        username=app.settings.api_username,
+        password=app.settings.api_password,
+        is_test=app.settings.is_test,
+    )
+
+    carnect_client = client.CarnectClient(
+        http_client=http_client,
+        config=carnect_config,
+    )
+    carnect_adapter = adapter.CarnectOffersAdapter(
+        carnect_client=carnect_client,
+        carnect_config=carnect_config,
+        offers_cache=cache.OffersCache(
+            client=redis.Client(redis_conn, prefix=app.name),
+        ),
+        ttl=app.settings.ttl,
+    )
 
     return simple_offers.SimpleOfferSearchImplementation(
         search_criteria_task_generator=criteria.simple_search_criteria_task_generator,

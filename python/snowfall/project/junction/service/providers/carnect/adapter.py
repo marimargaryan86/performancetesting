@@ -1,14 +1,479 @@
+import datetime
+import zoneinfo
+from collections import defaultdict
 from collections.abc import AsyncIterator
+from types import MappingProxyType
+from typing import Any
+
+import timezonefinder
 
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
+from snowfall.project.junction.go.v1 import models_pb2
+from snowfall.project.junction.service.providers.carnect import (
+    cache,
+    constants,
+)
 from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
+from snowfall.stdlib import money, string
+from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.transport.http import errors
+from snowfall.stdlib.v1 import latlng_pb2
+from snowfall.vendor.carnect import client, config
+from snowfall.vendor.carnect.adapters import veh_avail_rate_adapter
+from snowfall.vendor.carnect.builders import veh_avail_rate_builder
+from snowfall.vendor.carnect.models import service, vehicle
+
+CarnectVehAvail = service.VehicleVendorAvailabilityType.VehAvails.VehAvail
+CoordinatesTuple = tuple[tuple[float, float], tuple[float, float]]
+_tz_finder = timezonefinder.TimezoneFinder()
+
+_CABIN_MAPPING = MappingProxyType({
+    "1": models_pb2.CabinClass.TYPE_ECONOMY,
+    "2": models_pb2.CabinClass.TYPE_ECONOMY,
+    "3": models_pb2.CabinClass.TYPE_ECONOMY,
+    "4": models_pb2.CabinClass.TYPE_ECONOMY,
+    "5": models_pb2.CabinClass.TYPE_ECONOMY,
+    "6": models_pb2.CabinClass.TYPE_ECONOMY,
+    "7": models_pb2.CabinClass.TYPE_ECONOMY,
+    "8": models_pb2.CabinClass.TYPE_PREMIUM,
+    "9": models_pb2.CabinClass.TYPE_FIRST,
+    "10": models_pb2.CabinClass.TYPE_PREMIUM,
+    "11": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "12": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "13": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "14": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "15": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "16": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "17": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "18": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "19": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "20": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "21": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "22": models_pb2.CabinClass.TYPE_ECONOMY,
+    "23": models_pb2.CabinClass.TYPE_FIRST,
+    "24": models_pb2.CabinClass.TYPE_FIRST,
+    "25": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+    "26": models_pb2.CabinClass.TYPE_UNSPECIFIED,
+})
+_TYPE_GEO_COORDINATES = "6"
+_LOCATION_CODE_CONTEXT = "3"
+_REQ_RESP_VERSION = "large"
+_COVERAGE_TYPE_CANCELLATION_FEE = "CF"
+
+
+class FieldMissingError(Exception):
+    """When required field is missing."""
+
+
+def get_zone_for_coordinate(coordinate: latlng_pb2.LatLng) -> zoneinfo.ZoneInfo:
+    return zoneinfo.ZoneInfo(
+        _tz_finder.timezone_at(
+            lat=coordinate.latitude,
+            lng=coordinate.longitude,
+        )
+        or "",
+    )
+
+
+def split_coordinates(coordinate_pair: str) -> tuple[float, float]:
+    lat, lng = coordinate_pair.split(",")
+    return float(lat), float(lng)
+
+
+def get_optional_value(obj: Any, accessor: str, default: Any) -> Any:
+    parts = accessor.split(".")
+    for part in parts:
+        obj = getattr(obj, part)
+        if obj is None:
+            return default
+    return obj
+
+
+def _get_coordinates(  # noqa: WPS238
+    veh_avail: CarnectVehAvail,
+) -> CoordinatesTuple:
+    try:
+        origin = veh_avail.veh_avail_core.vendor_location.value  # type: ignore[union-attr]
+    except AttributeError as error:
+        raise FieldMissingError() from error
+
+    try:
+        destination = veh_avail.veh_avail_core.drop_off_location.value  # type: ignore[union-attr]
+    except AttributeError as exc:
+        raise FieldMissingError() from exc
+
+    if not origin:
+        raise FieldMissingError("Origin field is missing")
+    if not destination:
+        raise FieldMissingError("Destination field is missing")
+    return split_coordinates(origin), split_coordinates(destination)
+
+
+def _get_equipment(
+    veh_avail: CarnectVehAvail,
+) -> str:
+    veh_size_id = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.veh_class.size",
+        "",
+    )
+    veh_category_id = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.veh_type.vehicle_category",
+        "",
+    )
+    veh_size = vehicle.VEHICLE_SIZES.get(veh_size_id)
+    veh_category = vehicle.VEHICLE_CATEGORIES.get(veh_category_id)
+    equipment_parts = []
+
+    if veh_size:
+        equipment_parts.append(veh_size)
+    if veh_category:
+        equipment_parts.append(veh_category)
+
+    return ",".join(equipment_parts)
+
+
+def _get_offer_price(  # noqa: WPS238
+    veh_avail: CarnectVehAvail,
+) -> money.Money:
+    try:
+        amount = veh_avail.veh_avail_core.total_charge[0].estimated_total_amount  # type: ignore[union-attr]
+    except (AttributeError, IndexError) as error:
+        raise FieldMissingError() from error
+
+    try:
+        currency_code = veh_avail.veh_avail_core.total_charge[0].currency_code  # type: ignore[union-attr]
+    except (AttributeError, IndexError) as exc:
+        raise FieldMissingError() from exc
+
+    if not amount:
+        raise FieldMissingError("Price amount field is missing: {0}".format(amount))
+    if not currency_code:
+        raise FieldMissingError(
+            "Price currency_code field is missing: {0}".format(currency_code),
+        )
+
+    return money.from_string(
+        str(amount),
+        currency=money.Currency(currency_code.upper()),
+    )
+
+
+def _parse_offer(
+    veh_avail: CarnectVehAvail,
+    segment: offer_models_pb2.OfferSegment,
+) -> offer_models_pb2.Offer:
+    offer_price = _get_offer_price(veh_avail)
+    free_baggage = get_optional_value(
+        veh_avail,
+        accessor="veh_avail_core.vehicle.baggage_quantity",
+        default=False,
+    )
+
+    price_breakdown = [
+        offer_models_pb2.PriceBreakdown(
+            price=offer_price.protobuf(),
+            breakdown_type=offer_models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+        ),
+    ]
+
+    priced_coverages = get_optional_value(
+        veh_avail,
+        "veh_avail_info.priced_coverages.priced_coverage",
+        [],
+    )
+
+    conditional_prices = []
+
+    for priced_coverage in priced_coverages:
+        details = get_optional_value(priced_coverage, "coverage.details", [])
+        coverage_code = get_optional_value(priced_coverage, "coverage.code", None)
+
+        for detail in details:
+            charge = detail.charge
+
+            if (  # noqa: WPS337
+                not charge
+                or not charge.amount
+                or not charge.currency_code
+                or coverage_code == _COVERAGE_TYPE_CANCELLATION_FEE
+            ):
+                continue
+
+            conditional_prices.append(
+                offer_models_pb2.ConditionalPrice(
+                    price=money.from_string(
+                        string_amount=str(charge.amount),
+                        currency=money.Currency(charge.currency_code),
+                    ).protobuf(),
+                    description=charge.description,
+                    included_in_total=charge.included_in_est_total_ind,
+                ),
+            )
+
+    return offer_models_pb2.Offer(
+        id=string.uuid(),
+        segment_details=[
+            offer_models_pb2.OfferSegmentDetails(
+                id=string.uuid(),
+                offer_segment_id=segment.id,
+                cabin_class=models_pb2.CabinClass(
+                    type=_CABIN_MAPPING.get(
+                        get_optional_value(
+                            veh_avail,
+                            "veh_avail_core.vehicle.veh_class.size",
+                            "",
+                        ),
+                        models_pb2.CabinClass.TYPE_UNSPECIFIED,
+                    ),
+                    marketing_name="Snowfall",
+                ),
+                baggage_allowances=[
+                    offer_models_pb2.BaggageAllowance(
+                        free=free_baggage,
+                    ),
+                ],
+            ),
+        ],
+        price=offer_price.protobuf(),
+        price_breakdown=price_breakdown,
+        conditional_prices=conditional_prices,
+        brand_name=get_optional_value(
+            veh_avail,
+            "veh_avail_core.vendor.company_short_name",
+            "",
+        ),
+    )
+
+
+def _parse_segment(
+    veh_avail: CarnectVehAvail,
+    pick_up_datetime: datetime.datetime,
+    return_datetime: datetime.datetime,
+) -> offer_models_pb2.OfferSegment:
+    leg = _get_leg(veh_avail, pick_up_datetime, return_datetime)
+    vendor = get_optional_value(veh_avail, "veh_avail_core.vendor.code", "")
+
+    return offer_models_pb2.OfferSegment(
+        id=string.uuid(),
+        legs=[leg],
+        vehicle=offer_models_pb2.Vehicle(
+            equipment=_get_equipment(veh_avail),
+        ),
+        vendor=vendor,
+        type=models_pb2.Schedule.TYPE_CAR,
+    )
+
+
+def _get_leg(
+    veh_avail: CarnectVehAvail,
+    pick_up_datetime: datetime.datetime,
+    return_datetime: datetime.datetime,
+) -> offer_models_pb2.OfferSegmentLeg:
+    origin, destination = _get_coordinates(veh_avail)
+
+    origin_coordinate = latlng_pb2.LatLng(
+        latitude=origin[0],
+        longitude=origin[1],
+    )
+    destination_coordinate = latlng_pb2.LatLng(
+        latitude=destination[0],
+        longitude=destination[1],
+    )
+    return offer_models_pb2.OfferSegmentLeg(
+        id=string.uuid(),
+        origin=models_pb2.Point(
+            name=get_optional_value(
+                veh_avail,
+                "veh_avail_core.vendor_location.name",
+                "",
+            ),
+            coordinates=origin_coordinate,
+            time_zone=get_zone_for_coordinate(
+                coordinate=origin_coordinate,
+            ).key,
+        ),
+        destination=models_pb2.Point(
+            name=get_optional_value(
+                veh_avail,
+                "veh_avail_core.drop_off_location.name",
+                "",
+            ),
+            coordinates=destination_coordinate,
+            time_zone=get_zone_for_coordinate(
+                coordinate=destination_coordinate,
+            ).key,
+        ),
+        departure_at=protobuf.datetime_to_protobuf(pick_up_datetime),
+        arrival_at=protobuf.datetime_to_protobuf(return_datetime),
+    )
 
 
 class CarnectOffersAdapter(object):
+    def __init__(
+        self,
+        carnect_client: client.CarnectClient,
+        carnect_config: config.Config,
+        offers_cache: cache.OffersCache,
+        ttl: datetime.timedelta,
+    ):
+        self._client = carnect_client
+        self._config = carnect_config
+        self._logger = stdout.get_logger()
+        self._offers_cache = offers_cache
+        self._ttl = ttl
+
     async def gather_offer_groups(
         self,
         search_task: amqp_pb2.Criteria,
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
-        yield offer_models_pb2.OfferGroup()
+        try:
+            async for offer_group in self._gather_offer_groups(search_task):
+                yield offer_group
+        except errors.HttpError:
+            self._logger.exception("Offer search failed")
+
+    async def _gather_offer_groups(
+        self,
+        search_task: amqp_pb2.Criteria,
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        response = await self._client.get_avail_rate(self._build_request(search_task))
+        rs_adapter = veh_avail_rate_adapter.VehAvailRateAdapter(response)
+        if not rs_adapter.is_success():
+            self._logger.error(
+                "VehAvailRate search failed",
+                criteria=str(search_task),
+                message=rs_adapter.get_error(),
+            )
+            return
+
+        veh_avail_map = self._get_veh_avail_map(rs_adapter.available())
+
+        async for offer_group in self._generate_groups(search_task, veh_avail_map):
+            yield offer_group
+
+    def _get_veh_avail_map(
+        self,
+        veh_avails_type: list[service.VehicleVendorAvailabilityType],
+    ) -> dict[CoordinatesTuple, list[CarnectVehAvail]]:
+        mapping = defaultdict(list)
+        for availability_type in veh_avails_type:
+            veh_avails = get_optional_value(
+                availability_type,
+                "veh_avails.veh_avail",
+                [],
+            )
+            for veh_avail in veh_avails:
+                try:
+                    key = _get_coordinates(veh_avail)
+                except FieldMissingError:
+                    self._logger.exception(
+                        "Required field is missing while parsing coordinates",
+                    )
+                    continue
+                mapping[key].append(veh_avail)
+        return mapping
+
+    async def _generate_groups(
+        self,
+        search_task: amqp_pb2.Criteria,
+        veh_avail_map: dict[CoordinatesTuple, list[CarnectVehAvail]],
+    ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
+        for veh_avails in veh_avail_map.values():
+            try:
+                segment = _parse_segment(
+                    veh_avails[0],
+                    protobuf.protobuf_to_datetime(search_task.pick_up_datetime),
+                    protobuf.protobuf_to_datetime(search_task.return_datetime),
+                )
+            except FieldMissingError:
+                self._logger.exception("Required field missing while parsing segment")
+                continue
+
+            offers = await self._generate_offers(search_task, veh_avails, segment)
+            if not offers:
+                continue
+
+            yield offer_models_pb2.OfferGroup(
+                id=string.uuid(),
+                expires_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(datetime.UTC) + self._ttl,
+                ),
+                offers=offers,
+                segments=[segment],
+                provider_id=str(constants.PROVIDER_ID),
+            )
+
+    async def _generate_offers(
+        self,
+        search_task: amqp_pb2.Criteria,
+        veh_avails: list[CarnectVehAvail],
+        segment: offer_models_pb2.OfferSegment,
+    ) -> list[offer_models_pb2.Offer]:
+        offers = []
+        for veh_avail in veh_avails:
+            try:
+                offer = _parse_offer(veh_avail, segment)
+            except FieldMissingError:
+                self._logger.exception("Missing field while parsing offer")
+                continue
+            await self._cache_offer(search_task, offer.id)
+            offers.append(offer)
+        return offers
+
+    async def _cache_offer(self, search_task: amqp_pb2.Criteria, offer_id: str) -> None:
+        await self._offers_cache.store(
+            cache.OfferDetails(
+                origin=cache.Coordinates(
+                    latitude=search_task.origin.latitude,
+                    longitude=search_task.origin.longitude,
+                ),
+                destination=cache.Coordinates(
+                    latitude=search_task.destination.latitude,
+                    longitude=search_task.destination.longitude,
+                ),
+                passengers_count=search_task.passengers_count,
+                departure_at=protobuf.protobuf_to_datetime(
+                    search_task.pick_up_datetime,
+                ),
+                arrival_at=protobuf.protobuf_to_datetime(
+                    search_task.return_datetime,
+                ),
+            ),
+            expires_at=datetime.datetime.now(datetime.UTC) + self._ttl,
+            key=offer_id,
+        )
+
+    def _build_request(self, search_task: amqp_pb2.Criteria) -> service.VehAvailRateRq:
+        request = veh_avail_rate_builder.VehAvailRateRqBuilder(self._config)
+
+        request.version(_REQ_RESP_VERSION)
+        request.rate_query_type(service.RateQueryType.LIVE)
+        request.rate_query_parameter_type(_TYPE_GEO_COORDINATES)
+        request.add_passenger_quantity(search_task.passengers_count)
+        rental_core = request.get_rental_core()
+        rental_core.pick_up_date(
+            protobuf.protobuf_to_datetime(
+                search_task.pick_up_datetime,
+            ),
+        )
+        rental_core.return_date(
+            protobuf.protobuf_to_datetime(
+                search_task.return_datetime,
+            ),
+        )
+        origin = "{lat},{lon}".format(
+            lat=search_task.origin.latitude,
+            lon=search_task.origin.longitude,
+        )
+        destination = "{lat},{lon}".format(
+            lat=search_task.destination.latitude,
+            lon=search_task.destination.longitude,
+        )
+        rental_core.add_pick_up_location(origin, _LOCATION_CODE_CONTEXT)
+        rental_core.return_location(destination, _LOCATION_CODE_CONTEXT)
+        return request.build()

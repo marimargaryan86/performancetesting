@@ -16,7 +16,11 @@ class CarnectConfig(pydantic.BaseModel):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
-    use_carnect_in_test_mode: bool = True
+    env_name: str = "local"
+
+    @property
+    def is_test(self) -> bool:
+        return self.env_name.lower() != "production"
 
 
 class PricingSettings(application.Settings, CarnectConfig):

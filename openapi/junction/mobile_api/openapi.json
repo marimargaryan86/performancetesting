@@ -5658,6 +5658,29 @@
           "breakdownType"
         ]
       },
+      "ConditionalPrice": {
+        "title": "Conditional Price",
+        "description": "Additional fees that may or may not be included in total price",
+        "type": "object",
+        "properties": {
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "description": {
+            "type": "string",
+            "example": "one-way fee",
+            "nullable": true
+          },
+          "includedInTotal": {
+            "type": "boolean",
+            "example": false,
+            "nullable": true
+          }
+        },
+        "required": [
+          "price"
+        ]
+      },
       "RouteIdentifiers": {
         "title": "Route Identifiers",
         "description": "Route identifiers that the operator (operating) and vendor (marketing) uses, i.e. operating flight number and marketing flight number or vice versa for train or buss line numbers.",
@@ -5911,6 +5934,12 @@
                     "type": "array",
                     "items": {
                       "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
+                  "conditionalPrices": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ConditionalPrice"
                     }
                   },
                   "brandName": {

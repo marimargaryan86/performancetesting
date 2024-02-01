@@ -120,6 +120,7 @@ message Offer {
   string brand_name = 4;
   repeated BaggageAllowance baggage_allowances = 5;
   repeated PriceBreakdown price_breakdown = 7;
+  repeated ConditionalPrice conditional_prices = 8;
   // isRefundable
 }
 
@@ -134,6 +135,12 @@ message PriceBreakdown {
     BREAKDOWN_TYPE_SERVICE_MARK_UP = 5;
   }
   BreakdownType breakdown_type = 2;
+}
+
+message ConditionalPrice {
+  snowfall.stdlib.v1.Money price = 1;
+  string description = 2;
+  bool included_in_total = 3;
 }
 
 message PriceQuote {

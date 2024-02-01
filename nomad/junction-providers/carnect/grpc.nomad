@@ -34,7 +34,6 @@ variable "api_base_url" {
   type = string
 }
 
-
 job "junction-providers-carnect-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"

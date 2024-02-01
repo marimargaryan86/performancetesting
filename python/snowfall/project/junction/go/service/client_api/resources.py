@@ -309,6 +309,10 @@ class OfferOptionResource(models.Resource):
                     PriceBreakdown.from_proto(price_breakdown)
                     for price_breakdown in option.price_breakdown
                 ],
+                "conditionalPrices": [
+                    ConditionalPrice.from_proto(conditional_price)
+                    for conditional_price in option.conditional_prices
+                ],
                 "brandName": option.brand_name,
                 "baggageAllowances": [
                     BaggageAllowance.from_proto(baggage)
@@ -519,6 +523,23 @@ class PriceBreakdown(models.BaseModel):
             )
             for breakdown_type, price_breakdowns in price_breakdowns_by_type.items()
         ]
+
+
+class ConditionalPrice(models.BaseModel):
+    price: Price
+    description: str | None
+    included_in_total: bool | None = pydantic.Field(alias="includedInTotal")
+
+    @classmethod
+    def from_proto(
+        cls,
+        conditional_price: offer_models_pb2.ConditionalPrice,
+    ) -> ConditionalPrice:
+        return cls(
+            price=Price.from_proto(conditional_price.price),
+            description=conditional_price.description,
+            includedInTotal=conditional_price.included_in_total,
+        )
 
 
 class PriceQuoteResource(models.Resource):
