@@ -218,7 +218,7 @@ class BookingCreationHandler(object):
                     currency=booking_offer_details.currency,
                 ).protobuf(),
                 trip_result=models_pb2.TripBooking(
-                    provider_booking_reference=create_booking_response.booking_res.response_result.identifier,
+                    provider_booking_reference=create_booking_response.booking_res.response_result.dnr,
                     record_locator=create_booking_response.booking_res.response_result.dnr,
                     created_at=protobuf.datetime_to_protobuf(
                         datetime.datetime.now(tz=datetime.UTC),
@@ -526,28 +526,42 @@ class BookingCancellationHandler(object):
         self._client = benerail_client
         self._logger = stdout.get_logger()
 
-    async def cancel_booking(self, booking_id: str) -> bookings_pb2.BookingCancellation:
+    async def cancel_booking(
+        self,
+        provider_booking_reference: str,
+    ) -> bookings_pb2.BookingCancellation:
         session_token = string.uuid()
 
         try:
-            return await self._cancel_booking(booking_id, session_token)
-        except errors.HttpError:
+            return await self._cancel_booking(
+                provider_booking_reference,
+                session_token,
+            )
+        except (errors.HttpError, BenerailError):
             self._logger.exception(
                 "Booking cancellation failed",
-                booking_id=booking_id,
+                provider_booking_reference=provider_booking_reference,
                 session_token=session_token,
             )
 
             return bookings_pb2.BookingCancellation(
-                provider_booking_reference=booking_id,
+                provider_booking_reference=provider_booking_reference,
                 status=bookings_pb2.BookingCancellation.STATUS_REFUND_FAILED,
             )
 
     async def _cancel_booking(  # noqa: WPS217
         self,
-        booking_id: str,
+        provider_booking_reference: str,
         session_token: str,
     ) -> bookings_pb2.BookingCancellation:
+        dialogue_res = await self._client.dialogue.create_dialogue(
+            from_dnr=provider_booking_reference,
+            session_token=session_token,
+        )
+        if not dialogue_res.response_result.booking:
+            raise BenerailError("Booking resource is missing from the dialogue")
+
+        booking_id = dialogue_res.response_result.booking.identifier
         booking_res = (
             await self._client.bookings_client.get_booking(
                 booking_id=booking_id,
