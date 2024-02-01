@@ -16,7 +16,7 @@
     }
   },
   "sandbox": {
-    "deploy": true,
+    "deploy": false,
     "variables": {
       "count": 1,
       "provider_company_id": "",
