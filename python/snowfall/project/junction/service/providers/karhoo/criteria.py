@@ -1,4 +1,5 @@
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
+from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.service.providers.karhoo.v1 import amqp_pb2
 from snowfall.stdlib.format import protobuf
 
@@ -6,6 +7,9 @@ from snowfall.stdlib.format import protobuf
 def simple_search_criteria_task_generator(
     search: offers_pb2.SimpleTripOfferSearch,
 ) -> list[amqp_pb2.Criteria]:
+    if models_pb2.Schedule.TYPE_TAXI not in search.allowed_segment_types:
+        return []
+
     return [
         amqp_pb2.Criteria(
             origin=search.origin.coordinates,
