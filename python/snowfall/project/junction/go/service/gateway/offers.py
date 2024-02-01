@@ -117,11 +117,13 @@ class Queue(
         providers_list: providers.Collection,
         runner: tasks.Runner[amqp_pb2.TripOfferSearchResult],
         timeout: datetime.timedelta,
+        simple_search_timeout: datetime.timedelta,
     ):
         self._name_prefix = name_prefix
         self._providers = providers_list
         self._runner = runner
         self._timeout = timeout
+        self._simple_search_timeout = simple_search_timeout
 
     @property
     def binds(self) -> Sequence[tuple[amqp.Exchange, str]]:
@@ -149,7 +151,7 @@ class Queue(
         msg: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask,
     ) -> AsyncGenerator[amqp_pb2.TripOfferSearchResult, None]:
         search_tasks = [
-            _do_offer_search(provider, msg, self._timeout)
+            _do_offer_search(provider, msg, self._timeout, self._simple_search_timeout)
             async for provider in self._providers.all_healthy()
         ]
 
@@ -164,6 +166,7 @@ async def _do_offer_search(
     provider: providers.Provider,
     msg: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask,
     timeout: datetime.timedelta,
+    simple_search_timeout: datetime.timedelta,
 ) -> providers_pb2.SearchOffersResponse:
     start = time.perf_counter()
     status = "ok"
@@ -174,7 +177,7 @@ async def _do_offer_search(
                 providers_pb2.SimpleSearchOffersRequest(
                     simple_offer_search_task=msg,
                 ),
-                timeout=timeout.total_seconds(),
+                timeout=simple_search_timeout.total_seconds(),
             )
         else:
             response = await provider.connection.offers.SearchOffers(

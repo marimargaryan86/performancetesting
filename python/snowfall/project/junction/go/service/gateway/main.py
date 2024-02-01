@@ -36,6 +36,7 @@ class _SharedSettings(application.Settings):
 class _ConsumeSettings(_SharedSettings):
     places_address: str
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
+    simple_search_timeout: datetime.timedelta = datetime.timedelta(seconds=60)
     stops_resolver_timeout: datetime.timedelta = datetime.timedelta(seconds=5)
     trip_search_cache_ttl: datetime.timedelta = datetime.timedelta(days=1)
     trip_search_timeout: datetime.timedelta = datetime.timedelta(seconds=10)
@@ -99,6 +100,7 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
         providers_list=bootstrap_return.providers,
         runner=bootstrap_return.trip_offer_search_runner,
         timeout=app.settings.search_timeout,
+        simple_search_timeout=app.settings.simple_search_timeout,
     )
 
     await consumer.QueueConsumer(
