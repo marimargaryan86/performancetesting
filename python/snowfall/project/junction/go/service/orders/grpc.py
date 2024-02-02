@@ -1,6 +1,7 @@
 from types import MappingProxyType
 
 import more_itertools
+from google.protobuf import json_format
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.go.service.orders import bookings, smtp
@@ -20,6 +21,7 @@ from snowfall.project.junction.go.service.orders.orders_handlers import (
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2, orders_pb2_grpc
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 
@@ -65,6 +67,7 @@ class OrderService(
         self._refund_client = refund_client
         self._environment = environment
         self._smtp_client = smtp_client
+        self._logger = stdout.get_logger()
 
     def get_name(self) -> str:
         return orders_pb2.DESCRIPTOR.services_by_name["OrderService"].full_name
@@ -388,6 +391,11 @@ class OrderService(
         request: orders_pb2.UpdateBookingCancellationRequest,
         context: aio.ServicerContext,
     ) -> orders_pb2.UpdateBookingCancellationResponse:
+        self._logger.info(
+            "Got booking cancellation update request",
+            request=json_format.MessageToJson(request),
+        )
+
         booking_cancellation = await self._booking_cancellations.find_by_id(
             request.booking_cancellation.id,
         )
