@@ -175,7 +175,7 @@ class Transformer(object):
             datetime.datetime.fromisoformat(leg.departure_at),
         )
         arrival_at = protobuf.datetime_to_protobuf_datetime(
-            datetime.datetime.fromisoformat(leg.departure_at),
+            datetime.datetime.fromisoformat(leg.arrival_at),
         )
         origin = self._place_to_proto(leg.origin)
         destination = self._place_to_proto(leg.destination)
