@@ -48,6 +48,7 @@
   import { getLocaleData } from "i18n";
   import { manager, type PartialSelectedOffer } from "../../booking-flow";
   import { browser } from "$app/environment";
+  import CollapsibleTripSearch from "../../components/trip-search/collapsible-trip-search.svelte";
 
   export let data;
 
@@ -152,7 +153,9 @@
 </svelte:head>
 
 <div class="search-wrapper">
-  <TripSearch data={data.bookingSession.searchData} on:search={search} />
+  <CollapsibleTripSearch searchData={data.bookingSession.searchData}>
+    <TripSearch data={data.bookingSession.searchData} on:search={search} />
+  </CollapsibleTripSearch>
 </div>
 
 <div class="content">
@@ -226,27 +229,6 @@
   .search-wrapper {
     position: relative;
     background-color: #ffffff;
-  }
-
-  .search-wrapper > :global(.trip-search > .autocomplete-field),
-  .search-wrapper > :global(.trip-search > .date-picker) {
-    --height: 40px;
-    --icon-size: 16px;
-  }
-
-  .search-wrapper > :global(.trip-search > button.swap) {
-    margin-top: 24px;
-  }
-
-  .search-wrapper > :global(.trip-search > button) {
-    height: 40px;
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-
-  .search-wrapper > :global(.trip-search > button > svg) {
-    width: 20px;
-    height: 20px;
   }
 
   .search-wrapper::after {

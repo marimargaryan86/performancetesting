@@ -103,6 +103,8 @@ export default {
     manageTrip: "Gestionar un viaje",
     passengerNameRecord: "Número de referencia",
     optional: "Opcional",
+    roundtrip: "Ida y vuelta",
+    oneWay: "De una sola mano",
   },
   actions: {
     logout: "Cerrar sesión",
@@ -156,6 +158,7 @@ export default {
     enterRefundReference: "Introduzca la referencia de reembolso",
     bookTrip: "Reservar viaje",
     findTrip: "Buscar viaje",
+    modifySearch: "Modificar búsqueda",
   },
   sentences: {
     priceChange: "Cambio de precio",

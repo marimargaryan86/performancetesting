@@ -114,6 +114,8 @@ export default {
     manageTrip: "Manage a Trip",
     passengerNameRecord: "Reference number",
     optional: "Optional",
+    roundtrip: "Roundtrip",
+    oneWay: "One-way",
   },
   actions: {
     logout: "Logout",
@@ -167,6 +169,7 @@ export default {
     enterRefundReference: "Enter refund reference",
     bookTrip: "Book Trip",
     findTrip: "Find Trip",
+    modifySearch: "Modify Search",
   },
   sentences: {
     priceChange: "Price change",

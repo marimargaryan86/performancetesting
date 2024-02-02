@@ -103,6 +103,8 @@ export default {
     manageTrip: "Hantera en resa",
     passengerNameRecord: "Referensnummer",
     optional: "Frivillig",
+    roundtrip: "Tur och retur",
+    oneWay: "Enkel",
   },
   actions: {
     logout: "Logga ut",
@@ -156,6 +158,7 @@ export default {
     enterRefundReference: "Ange återbetalningsreferens",
     bookTrip: "Boka resa",
     findTrip: "Hitta resa",
+    modifySearch: "Ändra sökning",
   },
   sentences: {
     priceChange: "Prisändring",
