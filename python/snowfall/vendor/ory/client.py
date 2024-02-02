@@ -124,6 +124,12 @@ class OryClient(object):
 
         return models.Identity(**response.json())
 
+    async def delete_identity(self, identifier: str) -> None:
+        response = await self._client.delete(
+            url="/admin/identities/{0}".format(identifier),
+        )
+        response.raise_for_status()
+
     def _calculate_cookie_name(self) -> str:
         if not self._slug:
             return "ory_kratos_session"

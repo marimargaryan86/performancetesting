@@ -52,6 +52,12 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             user_handler.view,
             name="ViewUser",
         ),
+        routes.to_route(
+            "/users/{userId}",
+            user_handler.delete,
+            name="DeleteUser",
+            methods=["DELETE"],
+        ),
         integration.route(
             "/orders/{orderId}/bookings",
             go_orders.BookingsByOrder,

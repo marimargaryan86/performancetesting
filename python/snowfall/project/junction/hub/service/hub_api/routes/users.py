@@ -28,6 +28,18 @@ class Users(object):
 
         raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
+    async def delete(self, request: messages.Request) -> responses.Response:
+        check_permission("user.delete", request.starlette_request.user.permissions)
+        user_id = request.path_params["userId"]
+        await self._identities_client.delete_ory_identity(
+            identifier=user_id,
+        )
+        return await messages.create_response(
+            body=models.Body(data=None),
+            request=request.starlette_request,
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
+
     async def list_(self, request: messages.Request) -> responses.Response:
         check_permission("user.view", request.starlette_request.user.permissions)
 

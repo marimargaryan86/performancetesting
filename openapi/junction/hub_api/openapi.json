@@ -397,6 +397,28 @@
         },
         "operationId": "get-users-id",
         "description": "Used to lookup data for a User Identifier."
+      },
+      "delete": {
+        "summary": "Delete User",
+        "tags": [
+          "users"
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "operationId": "delete-users-id",
+        "description": "Used to permanently delete a user"
       }
     },
     "/users/me": {
@@ -4050,6 +4072,9 @@
             }
           }
         }
+      },
+      "NoContent": {
+        "description": "No Content"
       },
       "BadRequest": {
         "description": "Bad Request",

@@ -32,6 +32,7 @@ from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     QuotationAmounts,
     QuotationRates,
 )
+from snowfall.service.authentication.v1 import identities_pb2
 from snowfall.stdlib import authentication as stdlib_auth
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import application, authentication, handlers
@@ -73,8 +74,18 @@ def orders_client() -> orders.Client:
 
 
 @pytest.fixture()
-def identities_client() -> identities.Client:
-    return identities.DictClient([])
+def ory_users() -> Sequence[identities_pb2.Identity]:
+    return [
+        identities_pb2.Identity(id="37b82d2f-dba3-469e-9076-12b15777d1f5"),
+        identities_pb2.Identity(id="dc33945e-40b9-4227-ae9a-81c68a3a592a"),
+    ]
+
+
+@pytest.fixture()
+def identities_client(
+    ory_users: Sequence[identities_pb2.Identity],
+) -> identities.Client:
+    return identities.DictClient(ory_users)
 
 
 @pytest.fixture()

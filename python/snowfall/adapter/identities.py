@@ -41,6 +41,13 @@ class Client(abc.ABC):
         """Create an ORY identity."""
 
     @abc.abstractmethod
+    async def delete_ory_identity(
+        self,
+        identifier: str,
+    ) -> None:
+        """Delete an ORY identity."""
+
+    @abc.abstractmethod
     async def list_ory_identities(
         self,
         page_size: int | None = None,
@@ -95,6 +102,12 @@ class DictClient(Client):
             raise InvalidArgumentError()
 
         return identity
+
+    async def delete_ory_identity(
+        self,
+        identifier: str,
+    ) -> None:
+        self._identities.pop(identifier)
 
     async def list_ory_identities(
         self,
@@ -175,6 +188,16 @@ class GrpcClient(Client):
             raise
 
         return response.identity
+
+    async def delete_ory_identity(
+        self,
+        identifier: str,
+    ) -> None:
+        return await self._identity_service.DeleteIdentity(
+            identities_pb2.DeleteIdentityRequest(
+                id=identifier,
+            ),
+        )
 
     async def list_ory_identities(
         self,

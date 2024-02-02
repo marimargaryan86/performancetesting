@@ -11,6 +11,7 @@ service IdentitiesService {
   rpc ListIdentities(ListIdentitiesRequest) returns (ListIdentitiesResponse);
   rpc UpdateIdentity(UpdateIdentityRequest) returns (UpdateIdentityResponse);
   rpc CreateIdentity(CreateIdentityRequest) returns (CreateIdentityResponse);
+  rpc DeleteIdentity(DeleteIdentityRequest) returns (DeleteIdentityResponse);
 }
 
 message GetIdentityRequest {
@@ -28,6 +29,12 @@ message CreateIdentityRequest {
 message CreateIdentityResponse {
   Identity identity = 1;
 }
+
+message DeleteIdentityRequest {
+  string id = 1;
+}
+
+message DeleteIdentityResponse {}
 
 message ListIdentitiesRequest {
   int32 page_size = 1;

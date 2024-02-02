@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 import httpx
@@ -5,6 +6,7 @@ import pytest
 from starlette import status
 
 from snowfall.project.junction.hub.service.hub_api.conftest import RESELLER_ID
+from snowfall.service.authentication.v1 import identities_pb2
 
 
 @pytest.mark.parametrize(
@@ -45,6 +47,18 @@ async def test_create_user(
     assert response.status_code == expected_status, "Test ID: {0} failed.".format(
         test_id,
     )
+
+
+async def test_delete_user(
+    client: httpx.AsyncClient,
+    ory_users: Sequence[identities_pb2.Identity],
+) -> None:
+    response = await client.delete(
+        "/users/{0}".format(ory_users[0].id),
+        headers={"Content-Type": "application/vnd.api+json"},
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 class TestUserDataIncludesCompanyAndContacts(object):

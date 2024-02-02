@@ -106,6 +106,7 @@ def stub(
     stub.CreateIdentity = mock.AsyncMock(return_value=create_identity_response)
     stub.UpdateIdentity = mock.AsyncMock(return_value=update_identity_response)
     stub.ListIdentities = mock.AsyncMock(return_value=list_identities_response)
+    stub.DeleteIdentity = mock.AsyncMock(return_value=None)
 
     return stub
 
@@ -182,6 +183,19 @@ class TestDictClient(object):
         identities_response = await identities_client.list_ory_identities()
 
         assert len(identities_response.identities) == 2
+
+    async def test_delete_identity(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        identities = await identities_client.list_ory_identities()
+        assert len(identities.identities) == 2
+
+        first_identity = next(iter(identities.identities))
+        await identities_client.delete_ory_identity(identifier=first_identity.id)
+
+        identities = await identities_client.list_ory_identities()
+        assert len(identities.identities) == 1
 
 
 class TestGrpcClient(object):

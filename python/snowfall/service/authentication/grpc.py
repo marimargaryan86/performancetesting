@@ -336,6 +336,17 @@ class IdentitiesService(
             identity=self._create_identity_protobuf_model(identity),
         )
 
+    async def DeleteIdentity(  # type: ignore[override] # noqa: N802
+        self,
+        request: identities_pb2.DeleteIdentityRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> identities_pb2.DeleteIdentityResponse:
+        try:
+            await self._client.delete_identity(request.id)
+        except httpx.HTTPStatusError:
+            return await context.abort(grpc.StatusCode.UNKNOWN)
+        return identities_pb2.DeleteIdentityResponse()
+
     async def ListIdentities(  # type: ignore[override] # noqa: N802
         self,
         request: identities_pb2.ListIdentitiesRequest,

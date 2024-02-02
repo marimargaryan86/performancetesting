@@ -104,6 +104,18 @@ class TestClient(object):
             == mock_identity_response["metadata_public"]["role"]
         )
 
+    async def test_delete_identity(
+        self,
+        ory_client: client.OryClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(status_code=204)
+        await ory_client.delete_identity(identifier="user_id_string")
+        request = httpx_mock.get_request()
+        assert request
+        assert request.method == "DELETE"
+        assert request.url.path == "/admin/identities/user_id_string"
+
     async def test_list_identities(
         self,
         httpx_mock: pytest_httpx.HTTPXMock,
