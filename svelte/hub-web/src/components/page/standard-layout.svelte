@@ -141,22 +141,13 @@
   }
 
   .filters {
-    --height: 40px;
+    --height: 42px;
 
-    display: flex;
-    flex-flow: row wrap;
-    gap: 8px 16px;
-    margin: 0 0 16px;
-  }
-
-  .filters > :global(*) {
-    width: 100%;
-    max-width: 276px;
-    margin: 16px 0 0;
-  }
-
-  .filters.tabs-after > :global(*) {
-    margin-bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(276px, 1fr));
+    gap: 16px 16px;
+    align-items: flex-end;
+    margin: 16px;
   }
 
   .tabs {

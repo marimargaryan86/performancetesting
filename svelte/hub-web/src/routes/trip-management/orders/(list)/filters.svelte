@@ -105,7 +105,6 @@
 
 <style>
   .clear {
-    align-self: flex-end;
     width: unset;
     min-width: 80px;
   }
