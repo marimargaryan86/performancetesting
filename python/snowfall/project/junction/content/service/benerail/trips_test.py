@@ -114,9 +114,6 @@ class TestTripSearcher(object):
                 trip_result.base_amount.currency_code
             ), "Results should have a base amount"
             assert (
-                trip_result.tax_amount.currency_code
-            ), "Results should have a tax amount"
-            assert (
                 trip_result.total_amount.currency_code
             ), "Results should have a total amount"
 

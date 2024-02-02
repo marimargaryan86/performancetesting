@@ -108,7 +108,6 @@ class Transformer(object):
                     trips_pb2.Result(
                         trips=trips,
                         base_amount=amount,
-                        tax_amount=amount,
                         total_amount=amount,
                     ),
                 )
