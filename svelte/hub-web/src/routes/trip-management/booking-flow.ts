@@ -190,7 +190,7 @@ async function search(data: SearchData): Promise<SimpleOfferSearch> {
   const offerSearch = await integrationInstancesClient.mobile.simpleOfferService.create({
     data: {
       criteria: {
-        departureAfter: data.outbound,
+        outbound: data.outbound,
         destination: data.destination.coordinates,
         origin: data.origin.coordinates,
       },

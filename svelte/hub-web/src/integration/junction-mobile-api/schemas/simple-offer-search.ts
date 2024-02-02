@@ -9,26 +9,55 @@ import { tripOfferPassengerParser } from "./offer-search";
 export type SimpleOfferSearchCriteria = {
   origin: Coordinates;
   destination: Coordinates;
-  departureAfter: Date;
+  outbound: Date;
+  inbound?: Date;
+  windowH?: number;
 };
 
 export type SimpleOfferSearchCriteriaSchema = {
   origin: CoordinatesSchema;
   destination: CoordinatesSchema;
   departureAfter: string;
+  departureBefore?: string | null;
+  arrivalBefore?: string | null;
+  returnDepartureBefore?: string | null;
+  returnDepartureAfter?: string | null;
 };
 
 export const simpleOfferSearchCriteriaParser = {
-  toModel: (data: SimpleOfferSearchCriteriaSchema): SimpleOfferSearchCriteria => ({
-    origin: coordinatesParser.toModel(data.origin),
-    destination: coordinatesParser.toModel(data.destination),
-    departureAfter: new Date(data.departureAfter),
-  }),
-  toSchema: (data: SimpleOfferSearchCriteria): SimpleOfferSearchCriteriaSchema => ({
-    origin: coordinatesParser.toSchema(data.origin),
-    destination: coordinatesParser.toSchema(data.destination),
-    departureAfter: data.departureAfter.toISOString(),
-  }),
+  toModel: (data: SimpleOfferSearchCriteriaSchema): SimpleOfferSearchCriteria => {
+    const outboundAfter = new Date(data.departureAfter);
+    const outboundBefore = data.departureBefore ? new Date(data.departureBefore) : undefined;
+    const windowH = outboundBefore
+      ? (outboundAfter.getTime() - outboundBefore.getTime()) / 3600000
+      : undefined;
+
+    return {
+      origin: coordinatesParser.toModel(data.origin),
+      destination: coordinatesParser.toModel(data.destination),
+      outbound: new Date(data.departureAfter),
+      inbound: data.returnDepartureAfter ? new Date(data.returnDepartureAfter) : undefined,
+      windowH,
+    };
+  },
+  toSchema: (data: SimpleOfferSearchCriteria): SimpleOfferSearchCriteriaSchema => {
+    const outboundAfter = data.outbound;
+    const outboundBefore = data.windowH ? new Date(data.outbound) : undefined;
+    outboundBefore?.setHours(outboundBefore.getHours() + (data.windowH ?? 0));
+
+    const inboundAfter = data.inbound;
+    const inboundBefore = data.windowH && data.inbound ? new Date(data.inbound) : undefined;
+    inboundBefore?.setHours(inboundBefore.getHours() + (data.windowH ?? 0));
+
+    return {
+      origin: coordinatesParser.toSchema(data.origin),
+      destination: coordinatesParser.toSchema(data.destination),
+      departureAfter: outboundAfter.toISOString(),
+      departureBefore: outboundBefore?.toISOString(),
+      returnDepartureAfter: inboundAfter?.toISOString(),
+      returnDepartureBefore: inboundBefore?.toISOString(),
+    };
+  },
 };
 
 export type SimpleOfferSearch = Omit<TripCandidateSearch, "criteria"> & {
