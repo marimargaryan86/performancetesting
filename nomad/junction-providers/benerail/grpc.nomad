@@ -79,7 +79,13 @@ job "junction-providers-benerail-grpc" {
       tags = ["grpc"]
 
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            config {
+              local_request_timeout_ms = 50000 #Timeout is 50s
+            }
+          }
+        }
       }
 
       check {
