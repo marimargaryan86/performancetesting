@@ -1,33 +1,31 @@
 import integrationInstances from "integration-instances";
 import type { Order } from "integration/junction-mobile-api/schemas/order";
-import utils from "../../../integration/trip-management/utils.server";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "routeConfig";
 import type { Markups } from "integration/junction-mobile-api/schemas/markups";
+import { getCookie } from "../../booking-flow";
 
-export function load(event): {
-  order: Promise<Order>;
-  markups: Promise<Markups | undefined>;
-} {
+export async function load(event): Promise<{
+  order: Order;
+  markups?: Markups;
+}> {
+  const { session } = event.locals;
+
   try {
-    const bookingSession = utils.getBookingSession(event);
+    const bookingSession = getCookie("payment", event);
 
-    if (!bookingSession.order) {
-      throw new Error();
-    }
+    const [order, markups] = await Promise.all([
+      integrationInstances.junctionMobileApi.orders.get({ session, id: bookingSession.order.id }),
+      /* eslint-disable indent */
+      bookingSession.markups
+        ? integrationInstances.junctionMobileApi.orders
+            .getMarkups({ session: event.locals.session, orderId: bookingSession.order.id })
+            .catch(() => undefined)
+        : undefined,
+      /* eslint-enable indent */
+    ]);
 
-    return {
-      order: integrationInstances.junctionMobileApi.orders.get({
-        session: event.locals.session,
-        id: bookingSession.order.id,
-      }),
-      markups: integrationInstances.junctionMobileApi.orders
-        .getMarkups({
-          session: event.locals.session,
-          orderId: bookingSession.order.id,
-        })
-        .catch(() => undefined),
-    };
+    return { order, markups };
   } catch {
     throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
   }

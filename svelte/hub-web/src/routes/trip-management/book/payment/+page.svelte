@@ -17,13 +17,9 @@
   import ContactInformation, { contactDetailsModel } from "./contact-information.svelte";
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
-  import { sleep } from "utils/common";
   import { goto } from "$app/navigation";
-  import { browser } from "$app/environment";
-  import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
   import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
-  import tripManagement from "../../../integration/trip-management/trip-management";
   import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
   import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
@@ -34,6 +30,9 @@
   import TripBanner from "../../components/trip-banner.svelte";
   import { getPageTitle } from "utils/page-title";
   import { getLocale, getLocaleData } from "i18n";
+  import type { TripOfferPriceQuoteCompleted } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import { manager, markupsModel, type Markups, type PartialMarkups } from "../../booking-flow";
+  import { browser } from "$app/environment";
 
   export let data;
 
@@ -43,7 +42,7 @@
     passengers: PartialPassengerData[];
     contact: ContactDetails;
   } = {
-    passengers: getDefaultPassengers(data.searchData.passengers),
+    passengers: getDefaultPassengers(data.bookingSession.searchData.passengers),
     contact: {
       phone: data.profile.contacts[0]?.phone ?? "",
       address: {
@@ -58,37 +57,41 @@
       email: data.profile.contacts[0]?.email ?? "",
     },
   };
-  let errors: z.ZodFormattedError<z.infer<typeof bookingDetailsValidator>> | undefined = undefined;
-  let { priceQuote, paymentIntent } = data;
-  let pollSignal = { cancelled: false };
-  let orderMarkups: MarkupsCreate;
+  let errors:
+    | z.ZodFormattedError<z.infer<typeof bookingDetailsValidator> & { markups: Markups }>
+    | undefined = undefined;
+  let markups: PartialMarkups = data.bookingSession.markups ?? {};
+  let priceQuotePollController: AbortController | undefined;
+  let priceQuote: TripOfferPriceQuoteCompleted | undefined;
+
+  $: priceQuoteId = data.bookingSession.priceQuote.id;
+  $: updatePriceQuote(priceQuoteId);
 
   const locale = getLocale();
   const i18n = getLocaleData();
   const pending = writable(false);
 
   $: bookingDetailsValidator = z.object({
-    passengers: z.array(getPassengerValidator(priceQuote.required)),
+    passengers: z.array(getPassengerValidator(priceQuote?.required ?? [])),
     contact: contactDetailsModel,
   });
-  $: if (browser && !paymentIntent) {
-    updatePaymentIntentAndPriceQuote();
-  }
-  $: shouldCreateOrderMarkups =
-    orderMarkups?.serviceFee?.amount > 0 && orderMarkups?.agencyMarkup?.amount > 0;
 
-  async function updatePaymentIntentAndPriceQuote(): Promise<void> {
-    const nextPriceQuote = await tripManagement.getPriceQuote();
-
-    if (!nextPriceQuote.price.total && !pollSignal.cancelled) {
-      await sleep(2000);
-
-      return updatePaymentIntentAndPriceQuote();
+  async function updatePriceQuote(nextPriceQuoteId: string): Promise<void> {
+    if (!browser) {
+      return;
     }
 
-    const nextPaymentIntent = await tripManagement.getPaymentIntent();
+    priceQuotePollController?.abort();
+    priceQuotePollController = new AbortController();
+    priceQuote = await manager.getPriceQuote(
+      data.bookingSession,
+      nextPriceQuoteId,
+      priceQuotePollController.signal,
+    );
 
-    [priceQuote, paymentIntent] = [nextPriceQuote, nextPaymentIntent];
+    if (!data.bookingSession.payment) {
+      data.bookingSession.payment = await manager.getPayment(data.bookingSession, priceQuote);
+    }
   }
 
   function cancel(): void {
@@ -96,39 +99,22 @@
   }
 
   async function createOrder(): Promise<boolean> {
-    if (data.orderId) {
+    if (data.bookingSession.order) {
       return true;
     }
 
-    if (!paymentIntent) {
-      return false;
-    }
-
-    errors = undefined;
-    const validationResult = bookingDetailsValidator.safeParse(bookingData);
-
-    if (!validationResult.success) {
-      errors = validationResult.error.format();
-
+    if (!(data.bookingSession.payment && priceQuote)) {
       return false;
     }
 
     try {
-      const result = await tripManagement.createOrder({
-        priceQuoteId: priceQuote.id,
-        passengers: validationResult.data.passengers,
-        contact: validationResult.data.contact,
-        paymentId: paymentIntent.id,
+      data.bookingSession.order = await manager.createOrder(data.bookingSession, {
+        ...bookingDetailsValidator.parse(bookingData),
+        payment: data.bookingSession.payment,
+        priceQuote,
       });
 
-      if (result.success) {
-        data.orderId = result.order.id;
-        return true;
-      }
-
-      errors = result.errors;
-
-      return false;
+      return true;
     } catch (err) {
       if (err instanceof z.ZodError) {
         errors = err.format();
@@ -138,53 +124,54 @@
     }
   }
 
-  async function createOrderMarkups(): Promise<boolean> {
-    if (!data.orderId) {
+  async function createMarkups(): Promise<boolean> {
+    if (!(data.bookingSession.order && data.bookingSession.payment)) {
       return false;
     }
-
-    orderMarkups.orderId = data.orderId;
 
     try {
-      const result = await tripManagement.createOrderMarkups({ ...orderMarkups });
+      const parsed = markupsModel.parse(markups);
 
-      if (result.success) {
+      if (parsed.agencyMarkup.amount === 0 && parsed.serviceFee.amount === 0) {
         return true;
       }
 
-      errors = result.errors;
+      markups = await manager.createMarkups(data.bookingSession, data.bookingSession.order, parsed);
 
-      return false;
+      return true;
     } catch (err) {
       if (err instanceof z.ZodError) {
-        errors = err.format();
+        errors = { _errors: [], markups: err.format() };
       }
 
       return false;
     }
   }
 
-  async function pay(): Promise<void> {
-    if ($pending) {
+  async function book(): Promise<void> {
+    if ($pending || !data.bookingSession.payment || !payment) {
       return;
     }
 
     try {
       $pending = true;
 
-      if (!payment) {
-        return;
-      }
+      if (!data.bookingSession.payment.confirmed) {
+        if (!(await payment.pay())) {
+          return;
+        }
 
-      if (!(await payment.pay())) {
-        return;
+        data.bookingSession.payment = manager.confirmPayment(
+          data.bookingSession,
+          data.bookingSession.payment,
+        );
       }
 
       if (!(await createOrder())) {
         return;
       }
 
-      if (shouldCreateOrderMarkups && !(await createOrderMarkups())) {
+      if (!(await createMarkups())) {
         return;
       }
 
@@ -194,7 +181,11 @@
     }
   }
 
-  onDestroy(() => (pollSignal.cancelled = true));
+  onDestroy(() => {
+    if (browser) {
+      priceQuotePollController?.abort();
+    }
+  });
 </script>
 
 <svelte:head>
@@ -208,20 +199,22 @@
   </title>
 </svelte:head>
 
-{#if data.selected.originalPrice && priceQuote.price.total}
+{#if priceQuote}
   <PriceDialog
-    originalPrice={data.selected.originalPrice}
+    originalPrice={data.bookingSession.selectedOffer.originalPrice}
     newPrice={priceQuote.price.total}
     on:cancel={cancel}
   />
+
+  <FareRulesDialog bind:this={fareRulesDialog} {priceQuote} />
 {/if}
 
-<FareRulesDialog bind:this={fareRulesDialog} {priceQuote} />
-
 <div class="content">
-  <TripBanner {priceQuote} passengers={data.searchData.passengers} />
+  {#if priceQuote}
+    <TripBanner {priceQuote} passengers={data.bookingSession.searchData.passengers} />
+  {/if}
 
-  <Countdown expiresAt={priceQuote.expiresAt} show />
+  <Countdown expiresAt={data.bookingSession.priceQuote.expiresAt} show />
 
   <div class="wrapper">
     <div class="column passengers">
@@ -229,7 +222,7 @@
         <PassengerEntry
           bind:passenger
           errors={errors?.passengers?.[idx]}
-          required={priceQuote.required}
+          required={priceQuote?.required ?? []}
           passengerNumber={idx + 1}
         />
       {/each}
@@ -239,10 +232,10 @@
       <Summary
         {priceQuote}
         on:showFareRules={fareRulesDialog?.open}
-        passengers={data.searchData.passengers}
+        passengers={data.bookingSession.searchData.passengers}
       />
-      <Fees {priceQuote} bind:orderMarkups />
-      <Payment bind:this={payment} bind:paymentIntent />
+      <Fees {priceQuote} bind:markups errors={errors?.markups} />
+      <Payment bind:this={payment} paymentIntent={data.bookingSession.payment} />
       <ContactInformation bind:data={bookingData.contact} errors={errors?.contact} />
     </div>
   </div>
@@ -271,7 +264,7 @@
       </em>
     </div>
 
-    <button variant="primary" size="small" on:click={pay} disabled={!paymentIntent}>
+    <button variant="primary" size="small" on:click={book} disabled={!data.bookingSession.payment}>
       {$i18n.actions.book}
 
       {#if $pending}

@@ -1,16 +1,20 @@
 import {
   coordinatesParser,
-  type Coordinates,
   type CoordinatesSchema,
+  coordinatesModel,
 } from "integration/common/schemas/point";
+import { z } from "zod";
 
-export type PlaceType =
-  | "unspecified"
-  | "city"
-  | "railway-station"
-  | "airport"
-  | "bus-station"
-  | "ferry-port";
+const placeType = z.enum([
+  "unspecified",
+  "city",
+  "railway-station",
+  "airport",
+  "bus-station",
+  "ferry-port",
+]);
+
+export type PlaceType = z.infer<typeof placeType>;
 
 export type PlaceTypeSchema = {
   id: "unspecified" | "city" | "railway-station" | "airport" | "bus-station" | "ferry-port";
@@ -21,20 +25,22 @@ export const placeTypeParser = {
   toModel: (data: PlaceTypeSchema): PlaceType => data.id,
 };
 
-export type Place = {
-  id: string;
-  types: PlaceType[];
-  name: string;
-  coordinates: Coordinates;
-  country: {
-    code: string;
-    name?: string;
-  };
-  timeZone: string;
-  iataCode?: string;
-  population?: number;
-  mainCity?: string;
-};
+export const placeModel = z.object({
+  id: z.string(),
+  types: z.array(placeType),
+  name: z.string(),
+  coordinates: coordinatesModel,
+  country: z.object({
+    code: z.string(),
+    name: z.string().optional(),
+  }),
+  timeZone: z.string(),
+  iataCode: z.string().optional(),
+  population: z.number().optional(),
+  mainCity: z.string().optional(),
+});
+
+export type Place = z.infer<typeof placeModel>;
 
 export type PlaceSchema = {
   id: string;
@@ -44,7 +50,7 @@ export type PlaceSchema = {
     countryCode: string;
     countryName?: string;
     timeZone: string;
-    iataCode?: string;
+    iataCode?: string | null;
     population?: number;
     mainCity?: string;
   };
@@ -64,7 +70,7 @@ export const placeParser = {
       name: data.attributes.countryName,
     },
     timeZone: data.attributes.timeZone,
-    iataCode: data.attributes.iataCode,
+    iataCode: data.attributes.iataCode ?? undefined,
     population: data.attributes.population,
     mainCity: data.attributes.mainCity?.length ? data.attributes.mainCity : undefined,
   }),

@@ -4,7 +4,6 @@ import type { RequestEvent } from "@sveltejs/kit";
 import type { Session, SessionMeta } from "integration/ory/schemas/authentication";
 import jwt from "jsonwebtoken";
 import * as devalue from "devalue";
-import type { BookingSessionModel } from "../routes/integration/trip-management/trip-management";
 
 type CookieOptions = {
   path?: string;
@@ -74,5 +73,4 @@ export const cookieStore = {
   ),
   sessionToken: createCookie<Session>("session-token"),
   sessionMetaToken: createCookie<SessionMeta>("session-meta-token"),
-  searchToken: createCookie<BookingSessionModel>("search-token"),
 };

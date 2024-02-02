@@ -22,26 +22,6 @@
       vendors,
     };
   }
-
-  function getOptions(offers: OfferModel[], offerId: string, optionIds: string[]): OfferOption[] {
-    const options =
-      offers
-        .find(({ id }) => offerId === id)
-        ?.groups.flatMap((group) => group.options.filter(({ id }) => optionIds?.includes(id))) ??
-      [];
-
-    return Array.from(new Set(options));
-  }
-
-  function getTotalPrice(options: OfferOption[]): Price {
-    return options.reduce<Price>(
-      (prev, curr) => ({
-        currency: curr.price.total.currency,
-        amount: prev.amount + curr.price.total.amount,
-      }),
-      { currency: "EUR", amount: 0 },
-    );
-  }
 </script>
 
 <script lang="ts">
@@ -52,36 +32,27 @@
   } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
   import routeConfig from "routeConfig";
-  import { goto } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
-  import { browser } from "$app/environment";
   import Countdown from "../countdown.svelte";
-  import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
-  import type {
-    Offer as OfferModel,
-    OfferOption,
-  } from "integration/junction-mobile-api/schemas/offer";
+  import type { Offer as OfferModel } from "integration/junction-mobile-api/schemas/offer";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Alert from "components/ui/alert.svelte";
   import { getSortOffersFunc } from "sorting/offer";
   import { getFilterOffersFunc } from "filters/offer";
   import { getOfferDurationM, getVendors } from "utils/offer";
-  import type { Price } from "integration/common/schemas/price";
-  import tripManagement from "../../../integration/trip-management/trip-management";
-  import { onDestroy } from "svelte";
+  import { onDestroy, type ComponentEvents } from "svelte";
   import { writable } from "svelte/store";
-  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { getPageTitle } from "utils/page-title";
   import { getLocaleData } from "i18n";
+  import { manager, type PartialSelectedOffer } from "../../booking-flow";
+  import { browser } from "$app/environment";
 
   export let data;
 
-  let selected = {
-    offerId: data.selectedOffer?.offerId,
-    optionIds: data.selectedOffer?.optionIds,
-  };
-  let offers: OfferModel[] = data.offers.data;
+  let selected: PartialSelectedOffer = data.bookingSession.selectedOffer ?? {};
+  let offers: OfferModel[] = [];
   let searchOptionsSettings = getSearchOptionSettings(offers);
   let searchOptions: SearchOptionsData = {
     sortBy: "lowest-price",
@@ -91,84 +62,82 @@
     durationM: searchOptionsSettings.durationSpanM.start,
     vendors: [],
   };
-  let pollSignal = { cancelled: false };
-  let fareRulesDialog: FareRulesDialog | undefined;
-  let selectedPriceQuote: TripOfferPriceQuote | undefined = undefined;
+  let offerPollController: AbortController | undefined;
 
   const i18n = getLocaleData();
-  const offersPending = writable(false);
+  const offersPending = writable(true);
   const selectOfferPending = writable(false);
 
-  $: if (browser && data.offerSearch && data.offers.status !== "completed") {
-    getOffers();
-  }
+  $: offerSearchId = data.bookingSession.offerSearch.id;
+  $: getOffers(offerSearchId);
   $: sortAndFilter = getSortAndFilteringFunc(searchOptions);
 
-  async function getOffers(): Promise<void> {
-    if ($offersPending) {
+  async function getOffers(nextOfferSearchId: string): Promise<void> {
+    if (!browser) {
       return;
     }
 
-    try {
-      $offersPending = true;
-      offers = [];
+    $offersPending = true;
+    offers = [];
+    offerPollController?.abort();
+    offerPollController = new AbortController();
 
-      // Cancel any ongoing polls
-      pollSignal.cancelled = true;
-      pollSignal = { cancelled: false };
-
-      for await (const offer of tripManagement.yieldOffers(pollSignal)) {
-        offers = [...offers, offer];
-      }
-
-      searchOptionsSettings = getSearchOptionSettings(offers);
-      searchOptions = {
-        ...searchOptions,
-        durationM: searchOptionsSettings.durationSpanM.start,
-      };
-    } finally {
-      $offersPending = false;
+    for await (const offer of manager.getOffers(nextOfferSearchId, offerPollController.signal)) {
+      offers = [...offers, offer];
     }
+
+    searchOptionsSettings = getSearchOptionSettings(offers);
+    searchOptions = {
+      ...searchOptions,
+      durationM: searchOptionsSettings.durationSpanM.start,
+    };
+
+    $offersPending = false;
   }
 
-  function select(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
+  async function select(event: ComponentEvents<Offer>["select"]): Promise<void> {
     if ($selectOfferPending) {
       return;
     }
 
-    markSelection(event);
-    selectOffer();
-  }
+    const { proceed, ...nextSelected } = event.detail;
+    selected = nextSelected;
 
-  function markSelection(event: CustomEvent<{ offerId: string; optionIds: string[] }>): void {
-    selected = event.detail;
-  }
-
-  async function selectOffer(): Promise<void> {
-    if ($selectOfferPending) {
+    if (!proceed) {
       return;
     }
 
     try {
       $selectOfferPending = true;
 
-      if (!(selected.offerId && selected.optionIds)) {
+      const offer = offers.find((item) => item.id === selected.offerId);
+      const options = offer?.groups
+        .flatMap((item) => item.options)
+        .filter((item) => selected.optionIds?.includes(item.id));
+
+      if (!(offer && options?.length)) {
         return;
       }
 
-      await tripManagement.selectOffer({
-        offerId: selected.offerId,
-        optionIds: selected.optionIds,
-        originalPrice: getTotalPrice(getOptions(offers, selected.offerId, selected.optionIds)),
-      });
-
+      await manager.selectOffer(data.bookingSession, offer, options);
       await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);
     } finally {
       $selectOfferPending = false;
     }
   }
 
-  onDestroy(() => (pollSignal.cancelled = true));
+  async function search(event: ComponentEvents<TripSearch>["search"]): Promise<void> {
+    event.detail.pending.set(true);
+    await manager.search(event.detail.data);
+    await invalidateAll();
+    event.detail.pending.set(false);
+  }
+
+  onDestroy(() => {
+    if (browser) {
+      offerPollController?.abort();
+    }
+  });
 </script>
 
 <svelte:head>
@@ -183,17 +152,11 @@
 </svelte:head>
 
 <div class="search-wrapper">
-  <TripSearch data={data.searchData} origin={data.origin} destination={data.destination} />
+  <TripSearch data={data.bookingSession.searchData} on:search={search} />
 </div>
 
-{#if selectedPriceQuote}
-  <FareRulesDialog bind:this={fareRulesDialog} priceQuote={selectedPriceQuote} />
-{/if}
-
 <div class="content">
-  {#if offers[0]?.expiresAt}
-    <Countdown expiresAt={offers[0]?.expiresAt} show />
-  {/if}
+  <Countdown expiresAt={data.bookingSession.offerSearch.expiresAt} show />
 
   <div class="scroll">
     <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />
@@ -206,7 +169,6 @@
             selected={selected.offerId === offer.id}
             selectedOptionIds={selected.offerId === offer.id ? selected.optionIds : undefined}
             on:select={select}
-            on:markSelection={markSelection}
           />
         </li>
       {:else}
@@ -240,7 +202,16 @@
 {#if selected.offerId && selected.optionIds}
   <div class="actions" transition:fade={{ duration: 200 }}>
     <div class="wrapper">
-      <button on:click={selectOffer} variant="primary" size="small">
+      <button
+        on:click={select.bind(
+          select,
+          new CustomEvent("search", {
+            detail: { proceed: true, offerId: selected.offerId, optionIds: selected.optionIds },
+          }),
+        )}
+        variant="primary"
+        size="small"
+      >
         {$i18n.actions.next}
 
         {#if $selectOfferPending}

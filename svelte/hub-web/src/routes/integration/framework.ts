@@ -2,6 +2,7 @@ import * as devalue from "devalue";
 import { error, type MaybePromise, type RequestEvent } from "@sveltejs/kit";
 import { ensureJunctionError } from "integration/common/junction-error";
 import { browser } from "$app/environment";
+import { z } from "zod";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyFunc = (...args: any[]) => any;
@@ -57,6 +58,10 @@ function getFetchFunc(route: string, action: string, func: AnyFunc): AnyFunc {
 
     if (resp.status === 200) {
       return devalue.parse(await resp.text());
+    }
+
+    if (resp.status === 400) {
+      throw new z.ZodError(await devalue.parse(await resp.text()));
     }
 
     throw new Error(`Service error (${resp.statusText}): ${await resp.text()}`);
@@ -122,6 +127,10 @@ export function serverServiceFactory<TClient extends Record<string, AnyFunc>>(
           "x-trace-id": err.traceId ?? "unknown",
         });
         throw error(err.status, { message: err.message });
+      }
+
+      if (err instanceof z.ZodError) {
+        return new Response(devalue.stringify(err.issues), { status: 400 });
       }
 
       if (err instanceof Error) {

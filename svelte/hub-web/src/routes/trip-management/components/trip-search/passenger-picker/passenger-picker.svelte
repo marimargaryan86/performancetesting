@@ -66,6 +66,19 @@
       .filter(ensureDefined)
       .join(", ");
   }
+
+  export function getDefaultValue(): PassengerPickerData {
+    return {
+      adults: 1,
+      children0: 0,
+      children4: 0,
+      children6: 0,
+      seniors60: 0,
+      seniors65: 0,
+      youths12: 0,
+      youths15: 0,
+    };
+  }
 </script>
 
 <script lang="ts">

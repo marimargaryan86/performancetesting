@@ -47,8 +47,7 @@
   const locale = getLocale();
   const i18n = getLocaleData();
   const dispatch = createEventDispatcher<{
-    select: { offerId: string; optionIds: string[] };
-    markSelection: { offerId: string; optionIds: string[] };
+    select: { proceed: boolean; offerId: string; optionIds: string[] };
   }>();
 
   $: selectedOption = offer.groups
@@ -66,7 +65,11 @@
   $: totalPrice = getTotalPrice(selectedOption);
 
   function selectOffer(): void {
-    dispatch("select", { offerId: offer.id, optionIds: selectedOption.map((item) => item.id) });
+    dispatch("select", {
+      proceed: true,
+      offerId: offer.id,
+      optionIds: selectedOption.map((item) => item.id),
+    });
   }
 
   function selectOption(event: CustomEvent<OfferOption>): void {
@@ -82,7 +85,8 @@
       })
       .filter(ensureDefined);
 
-    dispatch("markSelection", {
+    dispatch("select", {
+      proceed: false,
       offerId: offer.id,
       optionIds: nextSelectedOptions.map((item) => item.id),
     });

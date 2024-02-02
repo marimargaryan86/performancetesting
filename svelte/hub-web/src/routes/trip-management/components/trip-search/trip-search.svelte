@@ -1,4 +1,23 @@
 <script lang="ts" context="module">
+  export const searchDataModel = z
+    .object({
+      origin: z.object(placeModel.shape, { required_error: "Origin is mandatory" }),
+      destination: z.object(placeModel.shape, { required_error: "Destination is mandatory" }),
+      outbound: z
+        .date({ coerce: true, required_error: "Departure date is mandatory" })
+        .refine((value) => value > new Date(), "Outbound date can't be in the past"),
+      inbound: z.date({ coerce: true }).optional(),
+      passengers: passengerPickerData,
+    })
+    .refine((value) => !value.inbound || value.inbound > value.outbound, {
+      message: "Inbound date must be after outbound date",
+      path: ["inbound"],
+    });
+  export type SearchData = z.infer<typeof searchDataModel>;
+  export type PartialSearchData = Omit<Partial<SearchData>, "passengers"> &
+    Pick<SearchData, "passengers">;
+  export type SearchDataError = z.ZodFormattedError<SearchData>;
+
   export function formatPlace(place?: Place): string {
     if (!place) {
       return "";
@@ -6,96 +25,51 @@
 
     return [place.name, place.mainCity, place.country.name].filter(ensureDefined).join(", ");
   }
-
-  function getPrecision(place: Place): "precise" | undefined {
-    if (place.types.includes("city") || place.types.includes("unspecified")) {
-      return undefined;
-    }
-
-    return "precise";
-  }
 </script>
 
 <script lang="ts">
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import PassengerPicker, {
-    type PassengerPickerData,
+    getDefaultValue,
+    passengerPickerData,
   } from "./passenger-picker/passenger-picker.svelte";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
-  import { z } from "zod";
   import SwapIcon from "components/icons/swap-icon.svelte";
-  import type { Place } from "integration/junction-mobile-api/schemas/place";
+  import { placeModel, type Place } from "integration/junction-mobile-api/schemas/place";
   import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { goto } from "$app/navigation";
-  import tripManagement, {
-    type SearchDataModel,
-  } from "../../../integration/trip-management/trip-management";
-  import routeConfig from "routeConfig";
   import integrationInstancesClient from "integration-instances-client";
   import { ensureDefined } from "utils/array";
-  import { writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import { getLocaleData } from "i18n";
   import Icon from "components/icons/icon.svelte";
+  import { createEventDispatcher } from "svelte";
+  import { z } from "zod";
 
-  export let data: Partial<SearchDataModel> = {};
-  export let origin: Place | undefined = undefined;
-  export let destination: Place | undefined = undefined;
-
-  let passengers: PassengerPickerData = data.passengers ?? {
-    seniors65: 0,
-    seniors60: 0,
-    adults: 1,
-    youths15: 0,
-    youths12: 0,
-    children6: 0,
-    children4: 0,
-    children0: 0,
+  export let data: PartialSearchData = {
+    passengers: getDefaultValue(),
   };
-  let outbound = data.outbound;
-  let errors: z.ZodFormattedError<SearchDataModel> | undefined = undefined;
+  let errors: SearchDataError | undefined = undefined;
 
+  const dispatch = createEventDispatcher<{
+    search: { data: SearchData; pending: Writable<boolean> };
+  }>();
   const pending = writable(false);
   const i18n = getLocaleData();
   const today = new Date();
   today.setSeconds(0);
   today.setMinutes(0);
 
-  $: data = {
-    ...data,
-    origin: origin
-      ? { id: origin.id, ...origin.coordinates, precision: getPrecision(origin) }
-      : undefined,
-    destination: destination
-      ? { id: destination.id, ...destination.coordinates, precision: getPrecision(destination) }
-      : undefined,
-    passengers,
-    timeZoneOffset: data.outbound?.getTimezoneOffset() ?? 0,
-    outbound,
-  };
-
   function swapOriginAndDestination(): void {
-    [origin, destination] = [destination, origin];
+    [data.origin, data.destination] = [data.destination, data.origin];
   }
 
-  async function search(): Promise<void> {
-    if ($pending) {
-      return;
-    }
-
+  function search(): void {
     try {
-      $pending = true;
-
-      await tripManagement.search(data);
-
-      await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root, {
-        invalidateAll: true,
-      });
+      dispatch("search", { data: searchDataModel.parse(data), pending });
     } catch (err) {
       if (err instanceof z.ZodError) {
         errors = err.format();
       }
-    } finally {
-      $pending = false;
     }
   }
 </script>
@@ -105,14 +79,14 @@
     label={$i18n.words.from}
     required
     placeholder={$i18n.sentences.cityOrStation}
-    bind:value={origin}
+    bind:value={data.origin}
     autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
     error={errors?.origin?._errors}
     clearable
   />
 
-  <button type="button" class="swap" on:click={swapOriginAndDestination}>
+  <button type="button" tabindex="-1" class="swap" on:click={swapOriginAndDestination}>
     <SwapIcon />
   </button>
 
@@ -120,7 +94,7 @@
     label={$i18n.words.to}
     required
     placeholder={$i18n.sentences.cityOrStation}
-    bind:value={destination}
+    bind:value={data.destination}
     autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
     error={errors?.destination?._errors}
@@ -129,14 +103,14 @@
 
   <DatePicker
     label={$i18n.words.depart}
-    bind:value={outbound}
+    bind:value={data.outbound}
     error={errors?.outbound?._errors}
     required
     min={today}
     includeTime
   />
 
-  <button variant="primary" on:click={search}>
+  <button variant="primary">
     {#if $pending}
       <LoadingIcon />
     {:else}
@@ -144,7 +118,7 @@
     {/if}
   </button>
 
-  <PassengerPicker bind:passengers error={errors?.passengers?._errors} />
+  <PassengerPicker bind:passengers={data.passengers} error={errors?.passengers?._errors} />
 </form>
 
 <style>

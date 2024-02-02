@@ -46,11 +46,13 @@
   import TextField from "components/ui/text-field.svelte";
   import { formatAmount } from "formatting/currency";
   import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import type { MarkupsCreate } from "integration/junction-mobile-api/schemas/markups";
   import { getLocale, getLocaleData } from "i18n";
+  import type { Markups, PartialMarkups } from "../../booking-flow";
+  import type { z } from "zod";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
-  export let orderMarkups: MarkupsCreate;
+  export let markups: PartialMarkups;
+  export let errors: z.ZodFormattedError<Markups> | undefined;
 
   const locale = getLocale();
   const i18n = getLocaleData();
@@ -58,8 +60,8 @@
   let collapsible: Collapsible | undefined;
   let serviceFeeType: FeeType = feeTypes[0];
   let agencyMarkupType: FeeType = feeTypes[0];
-  let serviceFeeAmount = 0;
-  let agencyMarkupAmount = 0;
+  let serviceFeeAmount = markups.serviceFee?.amount ?? 0;
+  let agencyMarkupAmount = markups.agencyMarkup?.amount ?? 0;
 
   /**
    * Returns a formatted string for the fee type select field. Must stay in
@@ -91,8 +93,7 @@
   $: totalToCollectAmount = roundCurrency(
     totalPrice.amount + calculatedServiceFeeAmount + calculatedAgencyMarkupAmount,
   );
-  $: orderMarkups = {
-    orderId: "",
+  $: markups = {
     serviceFee: {
       currency,
       amount: calculatedServiceFeeAmount,
@@ -118,6 +119,7 @@
         step="0.01"
         placeholder={$i18n.actions.enterAmount}
         label={$i18n.words.serviceFee}
+        error={errors?.serviceFee?.amount?._errors ?? errors?.serviceFee?._errors}
       />
 
       <SelectField
@@ -135,6 +137,7 @@
         step="0.01"
         placeholder={$i18n.actions.enterAmount}
         label={$i18n.words.agencyMarkup}
+        error={errors?.agencyMarkup?.amount?._errors}
       />
 
       <SelectField

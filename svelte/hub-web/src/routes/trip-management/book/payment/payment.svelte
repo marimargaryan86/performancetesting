@@ -48,12 +48,10 @@
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "components/icons/loading-icon.svelte";
   import Dialog from "components/ui/dialogues/dialog.svelte";
-  import tripManagement, {
-    type BookingSessionModel,
-  } from "../../../integration/trip-management/trip-management";
   import { getLocale, getLocaleData } from "i18n";
+  import type { PaymentIntent } from "../../booking-flow";
 
-  export let paymentIntent: BookingSessionModel["paymentIntent"];
+  export let paymentIntent: PaymentIntent | undefined;
 
   const locale = getLocale();
   const i18n = getLocaleData();
@@ -111,12 +109,6 @@
       error = confirmationResult.error.message;
       return false;
     }
-
-    if (paymentIntent) {
-      paymentIntent.confirmed = true;
-    }
-
-    await tripManagement.confirmPayment();
 
     return true;
   }

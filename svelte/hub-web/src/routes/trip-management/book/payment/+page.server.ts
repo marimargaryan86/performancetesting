@@ -1,46 +1,19 @@
 import { redirect } from "@sveltejs/kit";
 import integrationInstances from "integration-instances";
-import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-import utils from "../../../integration/trip-management/utils.server";
 import routeConfig from "routeConfig";
-import type {
-  BookingSessionModel,
-  SearchDataModel,
-} from "../../../integration/trip-management/trip-management";
 import type { UserProfile } from "integration/junction-hub-api/schemas/user";
+import { getCookie, type BookingSessionSelect } from "../../booking-flow";
 
 export async function load(event): Promise<{
-  searchData: SearchDataModel;
-  priceQuote: TripOfferPriceQuote;
-  selected: NonNullable<BookingSessionModel["selected"]>;
-  paymentIntent: BookingSessionModel["paymentIntent"];
+  bookingSession: BookingSessionSelect;
   profile: UserProfile;
-  orderId?: string;
 }> {
-  const session = event.locals.session;
-
   try {
-    const bookingSession = utils.getBookingSession(event);
-
-    if (!(bookingSession.searchData && bookingSession.priceQuote && bookingSession.selected)) {
-      throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
-    }
-
-    const [priceQuote, profile] = await Promise.all([
-      integrationInstances.junctionMobileApi.offers.get({
-        session,
-        id: bookingSession.priceQuote.id,
-      }),
-      integrationInstances.junctionHubApi.users.getProfile({ session }),
-    ]);
-
     return {
-      searchData: bookingSession.searchData,
-      priceQuote,
-      selected: bookingSession.selected,
-      paymentIntent: bookingSession.paymentIntent,
-      profile,
-      orderId: bookingSession.order?.id,
+      bookingSession: getCookie("select", event),
+      profile: await integrationInstances.junctionHubApi.users.getProfile({
+        session: event.locals.session,
+      }),
     };
   } catch {
     throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);

@@ -90,6 +90,14 @@ export type TripOfferPriceQuote = {
   options: OfferOption[];
 };
 
+export type TripOfferPriceQuoteCompleted = Omit<TripOfferPriceQuote, "status" | "price"> & {
+  status: "completed";
+  price: {
+    total: Price;
+    breakdown: PriceBreakdown[];
+  };
+};
+
 export type TripOfferPriceQuoteSchema = {
   id: string;
   type: "trip-offer-price-quotes";
