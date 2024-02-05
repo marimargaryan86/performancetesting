@@ -8,14 +8,23 @@ import pytest
 from motor import core
 
 from snowfall.project.junction.go.adapter import passenger_name_records
-from snowfall.project.junction.go.service.orders import orders
+from snowfall.project.junction.go.service.orders import (
+    amqp,
+    bookings,
+    grpc,
+    orders,
+    smtp,
+)
 from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.resellers.v1 import (
     resellers_pb2,
     resellers_pb2_grpc,
 )
+from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.transport.amqp import producer
+from snowfall.stdlib.transport.grpc import testing
 
 
 @pytest.fixture()
@@ -165,5 +174,33 @@ async def cancellation_request(
             ],
             status=models_pb2.CancellationRequest.STATUS_PENDING,
             reseller_id="foo",
+        ),
+    )
+
+
+@pytest.fixture()
+async def order_service_tester(
+    journey_repository: orders.JourneyRepository,
+    order_repository: orders.OrderRepository,
+    booking_repository: orders.BookingRepository,
+    booking_details_repository: orders.BookingDetailsRepository,
+    booking_cancellations_repository: orders.BookingCancellationsRepository,
+    cancellation_requests_repository: orders.CancellationRequestsRepository,
+) -> testing.ServerTester:
+    return testing.ServerTester(
+        grpc.OrderService(
+            journeys=journey_repository,
+            orders=order_repository,
+            booking_repository=booking_repository,
+            booking_details=booking_details_repository,
+            booking_cancellations=booking_cancellations_repository,
+            cancellation_requests=cancellation_requests_repository,
+            default_page_size=100,
+            booking_handler=mock.create_autospec(bookings.BookingHandler),
+            publisher=mock.create_autospec(amqp.OrderProducer),
+            refund_client=mock.create_autospec(refunds_adapter.Client),
+            cancellation_task_producer=mock.create_autospec(producer.Producer),
+            smtp_client=mock.create_autospec(smtp.EmailClient),
+            environment="test",
         ),
     )
