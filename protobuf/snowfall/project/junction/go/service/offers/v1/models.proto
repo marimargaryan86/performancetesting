@@ -164,6 +164,7 @@ message PriceQuote {
   repeated FareRule rules = 7;
   string pay_quote_id = 8;
   repeated PriceBreakdown price_breakdown = 9;
+  repeated ConditionalPrice conditional_prices = 10;
 }
 
 message PriceQuoteContainer {

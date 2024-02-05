@@ -14,14 +14,28 @@ class OfferDetails(redis_repository.RedisRecord):
     departure_at: datetime.datetime
     arrival_at: datetime.datetime
     passengers_count: int
+    vendor: str | None
     origin: Coordinates
     destination: Coordinates
+    cabin_class: int
+    equipment: str
+    free_baggage: bool
 
 
 class OffersCache(redis_repository.PydanticRepository[OfferDetails]):
     """Stores offer details in the cache."""
 
     _record_type: type[OfferDetails] = OfferDetails
+
+
+class PriceQuote(redis_repository.RedisRecord):
+    quote_id: str
+
+
+class PricingCache(redis_repository.PydanticRepository[PriceQuote]):
+    """Stores pricing details in the cache."""
+
+    _record_type: type[PriceQuote] = PriceQuote
 
 
 def generate_cache_key(

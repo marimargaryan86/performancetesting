@@ -573,6 +573,11 @@ class PriceQuoteResource(models.Resource):
                         for price_breakdown in quote.price_breakdown
                     ],
                 ),
+                "conditionalPrices": [
+                    ConditionalPrice.from_proto(conditional_price)
+                    for quote in price_quote.quotes
+                    for conditional_price in quote.conditional_prices
+                ],
                 "penalties": [
                     Penalty.from_proto(penalty)
                     for quote in price_quote.quotes

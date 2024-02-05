@@ -6,7 +6,6 @@ from datetime import datetime
 from snowfall.vendor.carnect.builders.common import BaseBuilderRq, PosBuilder
 from snowfall.vendor.carnect.config import Config
 from snowfall.vendor.carnect.models.service import (
-    ArrayOfVehicleAvailRqcoreTypeVehPref,
     RateQueryType,
     VehAvailRateRq,
     VehAvailRateRqTarget,
@@ -117,9 +116,15 @@ class VehAvailRateRqBuilder(BaseBuilderRq[VehAvailRateRq]):
         return self
 
     def add_pref_vendor(self, vendor_code: str) -> VehAvailRateRqBuilder:
-        vendor = ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref()
-        vendor.code = vendor_code
-        self._vendor_pref().append(vendor)
+        rq_core = self._veh_avail_rqcore()
+
+        if not rq_core.vendor_prefs:
+            rq_core.vendor_prefs = VehicleAvailRqcoreType.VendorPrefs()
+
+        vendor_pref = VehicleAvailRqcoreType.VendorPrefs.VendorPref()
+        vendor_pref.code = vendor_code
+
+        rq_core.vendor_prefs.vendor_pref.append(vendor_pref)
         return self
 
     def add_passenger_quantity(self, quantity: int) -> VehAvailRateRqBuilder:
@@ -128,14 +133,6 @@ class VehAvailRateRqBuilder(BaseBuilderRq[VehAvailRateRq]):
 
             self._rq.veh_avail_rqinfo.passenger_qty = quantity
         return self
-
-    def _vendor_pref(self) -> list[ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref]:
-        rq_core = self._veh_avail_rqcore()
-
-        if not rq_core.veh_prefs:
-            rq_core.veh_prefs = ArrayOfVehicleAvailRqcoreTypeVehPref()
-
-        return rq_core.veh_prefs.veh_pref
 
     def _veh_avail_rqcore(self) -> VehicleAvailRqcoreType:
         if not self._rq.veh_avail_rqcore:

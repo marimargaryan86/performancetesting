@@ -27,6 +27,7 @@ class PricingSettings(application.Settings, CarnectConfig):
     amqp_dsn: pydantic.AmqpDsn
     provider_company_id: str
     redis_dsn: pydantic.RedisDsn
+    ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
 
 
 class Settings(CarnectConfig, service.ProviderSettings):

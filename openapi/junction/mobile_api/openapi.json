@@ -4168,6 +4168,14 @@
                       "$ref": "#/components/schemas/PriceBreakdown"
                     }
                   },
+                  "conditionalPrices": {
+                    "readOnly": true,
+                    "nullable": true,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ConditionalPrice"
+                    }
+                  },
                   "penalties": {
                     "type": "array",
                     "items": {
