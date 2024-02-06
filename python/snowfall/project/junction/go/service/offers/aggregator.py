@@ -4,7 +4,6 @@ import itertools
 from collections.abc import Mapping, Sequence
 
 import prometheus_client
-from google.protobuf import timestamp_pb2
 
 from snowfall.project.junction.go.service.offers import offers
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2, models_pb2
@@ -23,23 +22,8 @@ class NoExpiryError(Exception):
     """Raised when an offer bucket list has no expiry."""
 
 
-class NoTripSequenceError(Exception):
-    """Raised when an offer trip sequence is not found."""
-
-
 class SkippedOfferError(Exception):
     """Raised when an offer is skipped."""
-
-
-class IncorrectBucketOfferIdFormatError(Exception):
-    """Raised when an offer id is incorrect format (results bucket)."""
-
-
-def validate_offer_ids(offer_ids: list[str]) -> None:
-    if len(offer_ids) != 2:
-        raise IncorrectBucketOfferIdFormatError(
-            "Offer {0} is incorrect format.".format(offer_ids),
-        )
 
 
 def generate_offer_aggregates(
@@ -67,23 +51,6 @@ def generate_offer_aggregates(
             fulfilled_segments=frozenset(),
             segment_index=0,
         )
-    ]
-
-
-def generate_offer_aggregates_simple(
-    list_offers: Sequence[tuple[str, str]],
-    expires_at: datetime.datetime,
-) -> list[models_pb2.OfferAggregateMapping]:
-    return [
-        models_pb2.OfferAggregateMapping(
-            id=string.uuid(),
-            created_at=protobuf.datetime_to_protobuf(
-                datetime.datetime.now(datetime.UTC),
-            ),
-            expires_at=protobuf.datetime_to_protobuf(expires_at),
-            offer_result_ids=offer_result_ids,
-        )
-        for offer_result_ids in list_offers
     ]
 
 
@@ -139,10 +106,6 @@ def generate_offer_aggregates_recursive(
 
 
 class OfferBucketRepository(object):
-    INBOUND_BUCKET_NAME = "inbound"  # noqa: WPS115
-    OUTBOUND_BUCKET_NAME = "outbound"  # noqa: WPS115
-    RESULTS_BUCKET_NAME = "results"  # noqa: WPS115
-
     def __init__(
         self,
         redis_client: redis.Client[str],
@@ -201,132 +164,6 @@ class OfferBucketRepository(object):
 
         return expires_at
 
-    async def add_offer_to_results_bucket(
-        self,
-        offer_search_id: str,
-        offer_product: tuple[str, str],
-        offer_expiry: timestamp_pb2.Timestamp,
-    ) -> None:
-        product = "{0}:{1}".format(offer_product[0], offer_product[1])
-
-        bucket = self._redis.list_(OfferBucketRepository.RESULTS_BUCKET_NAME)
-
-        await bucket.push(product)
-        await redis.put_expires_at_if_less_than_current(
-            self._redis,
-            bucket,
-            protobuf.protobuf_to_datetime(offer_expiry),
-        )
-
-        bucket_list = self._redis.set_(offer_search_id)
-        await bucket_list.add(OfferBucketRepository.RESULTS_BUCKET_NAME)
-        await redis.put_expires_at_if_less_than_current(
-            self._redis,
-            bucket_list,
-            protobuf.protobuf_to_datetime(offer_expiry),
-        )
-
-    async def add_offer_outbound(
-        self,
-        offer_search_id: str,
-        offer: models_pb2.OfferGroup,
-    ) -> None:
-        return await self._add_offer_to_bucket(
-            offer_search_id=offer_search_id,
-            offer=offer,
-            bucket_name=OfferBucketRepository.OUTBOUND_BUCKET_NAME,
-        )
-
-    async def add_offer_inbound(
-        self,
-        offer_search_id: str,
-        offer: models_pb2.OfferGroup,
-    ) -> None:
-        return await self._add_offer_to_bucket(
-            offer_search_id=offer_search_id,
-            offer=offer,
-            bucket_name=OfferBucketRepository.INBOUND_BUCKET_NAME,
-        )
-
-    async def get_offer_bucket_results(
-        self,
-        offer_search_id: str,
-    ) -> dict[str, list[tuple[str, str]]]:
-        bucket_list = self._redis.set_(offer_search_id)
-        buckets: dict[str, list[tuple[str, str]]] = collections.defaultdict(list)
-
-        async for bucket_name in bucket_list.to_iterable():
-            if bucket_name != OfferBucketRepository.RESULTS_BUCKET_NAME:
-                continue
-            bucket = self._redis.list_(bucket_name)
-            async for offer_id in bucket.to_iterable():
-                offer_ids = offer_id.split(":")
-                validate_offer_ids(offer_ids)
-                buckets[bucket_name].append((offer_ids[0], offer_ids[1]))
-
-        return buckets
-
-    async def get_offer_bucket_outbound(
-        self,
-        offer_search_id: str,
-    ) -> list[str]:
-        buckets = await self._get_offer_buckets(
-            offer_search_id=offer_search_id,
-        )
-        return buckets[OfferBucketRepository.OUTBOUND_BUCKET_NAME]
-
-    async def get_offer_bucket_inbound(
-        self,
-        offer_search_id: str,
-    ) -> list[str]:
-        buckets = await self._get_offer_buckets(
-            offer_search_id=offer_search_id,
-        )
-        return buckets[OfferBucketRepository.INBOUND_BUCKET_NAME]
-
-    async def clear_results_buckets(self, offer_search_id: str) -> None:
-        bucket_list = self._redis.set_(offer_search_id)
-
-        async for bucket_name in bucket_list.to_iterable():
-            if bucket_name == OfferBucketRepository.RESULTS_BUCKET_NAME:
-                await self._redis.delete(bucket_name)
-                break
-
-    async def _add_offer_to_bucket(
-        self,
-        offer_search_id: str,
-        offer: models_pb2.OfferGroup,
-        bucket_name: str,
-    ) -> None:
-        bucket = self._redis.list_(bucket_name)
-
-        await bucket.push(offer.id)
-        await redis.put_expires_at_if_less_than_current(
-            self._redis,
-            bucket,
-            protobuf.protobuf_to_datetime(offer.expires_at),
-        )
-
-        bucket_list = self._redis.set_(offer_search_id)
-        await bucket_list.add(bucket_name)
-        await redis.put_expires_at_if_less_than_current(
-            self._redis,
-            bucket_list,
-            protobuf.protobuf_to_datetime(offer.expires_at),
-        )
-
-    async def _get_offer_buckets(self, offer_search_id: str) -> dict[str, list[str]]:
-        bucket_list = self._redis.set_(offer_search_id)
-        buckets: dict[str, list[str]] = collections.defaultdict(list)
-
-        async for bucket_name in bucket_list.to_iterable():
-            bucket = self._redis.list_(bucket_name)
-            buckets[bucket_name].extend([
-                offer_id async for offer_id in bucket.to_iterable()
-            ])
-
-        return buckets
-
 
 class OfferAggregator(object):
     _skippable_statuses = (trackable_pb2.Trackable.STATUS_FAILED,)
@@ -348,143 +185,44 @@ class OfferAggregator(object):
         self._aggregates = offer_aggregates
         self._logger = stdout.get_logger()
 
-    async def simple_trip_add_offer_to_outbound_bucket(
-        self,
-        offer: models_pb2.OfferGroup,
-        offer_search: models_pb2.OfferSearch,
-    ) -> None:
-        inbound_bucket = await self._buckets.get_offer_bucket_inbound(
-            offer_search.id,
-        )
-        for inbound in inbound_bucket:
-            product = (offer.id, inbound)
-            await self._buckets.add_offer_to_results_bucket(
-                offer_search.id,
-                product,
-                offer.expires_at,
-            )
-
-        await self._buckets.add_offer_outbound(offer_search.id, offer)
-
-    async def simple_trip_add_offer_to_inbound_bucket(
-        self,
-        offer: models_pb2.OfferGroup,
-        offer_search: models_pb2.OfferSearch,
-    ) -> None:
-        outbound_bucket = await self._buckets.get_offer_bucket_outbound(
-            offer_search.id,
-        )
-        for outbound in outbound_bucket:
-            product = (outbound, offer.id)
-            await self._buckets.add_offer_to_results_bucket(
-                offer_search.id,
-                product,
-                offer.expires_at,
-            )
-
-        await self._buckets.add_offer_inbound(offer_search.id, offer)
-
-    async def simple_trip_check_trip_seq_and_add_to_buckets(
-        self,
-        offer: models_pb2.OfferGroup,
-        offer_search: models_pb2.OfferSearch,
-    ) -> None:
-        offer_segment = offer.segments[0]
-        trip_sequence = offer_segment.trip_sequence
-
-        if trip_sequence == 1:
-            await self.simple_trip_add_offer_to_outbound_bucket(
-                offer=offer,
-                offer_search=offer_search,
-            )
-        elif trip_sequence == 2:
-            await self.simple_trip_add_offer_to_inbound_bucket(
-                offer=offer,
-                offer_search=offer_search,
-            )
-        else:
-            raise NoTripSequenceError(
-                "Offer search {id} is missing trip sequence.".format(
-                    id=offer_search.id,
-                ),
-            )
-
-    async def simple_trip_aggregate(
-        self,
-        search_result: amqp_pb2.TripOfferSearchResult,
-        offer_search: models_pb2.OfferSearch,
-    ) -> None:
-        _set_sequence_numbers_for_simple_offer(search_result.offer)
-
-        # Assign offer to correct inbound/outbound bucket
-        await self.simple_trip_check_trip_seq_and_add_to_buckets(
-            offer=search_result.offer,
-            offer_search=offer_search,
-        )
-
-        results_bucket = await self._buckets.get_offer_bucket_results(offer_search.id)
-        offer_results: list[tuple[str, str]] = results_bucket["results"]
-
-        try:
-            expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
-        except NoExpiryError:
-            self._logger.warning(
-                "Offer search has expired",
-                offer_search_id=offer_search.id,
-                provider_company_id=search_result.provider_company_id,
-            )
-            return
-
-        for aggregate in generate_offer_aggregates_simple(offer_results, expires_at):
-            aggregate.offer_search_id = offer_search.id
-            await self._aggregates.insert(aggregate)
-
-        await self._buckets.clear_results_buckets(offer_search.id)
-
-    async def trip_aggregate(
-        self,
-        search_result: amqp_pb2.TripOfferSearchResult,
-        offer_search: models_pb2.OfferSearch,
-    ) -> None:
-        _set_sequence_numbers(offer_search, search_result.offer)
-        buckets = _override_buckets(
-            search_result=search_result,
-            buckets=await self._buckets.get_offer_buckets(offer_search.id),
-        )
-
-        await self._buckets.add_offer(offer_search.id, search_result.offer)
-
-        segments = itertools.chain(
-            *[trip.segments for trip in offer_search.trip.trips],
-        )
-
-        # check if all segments can be fulfilled by offers gotten so far
-        if any(segment.id not in buckets for segment in segments):
-            return
-
-        try:
-            expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
-        except NoExpiryError:
-            self._logger.warning(
-                "Offer search has expired",
-                offer_search_id=offer_search.id,
-                provider_company_id=search_result.provider_company_id,
-            )
-            return
-
-        for aggregate in generate_offer_aggregates(buckets, expires_at):
-            aggregate.offer_search_id = offer_search.id
-            await self._aggregates.insert(aggregate)
-
     async def aggregate(
         self,
         search_result: amqp_pb2.TripOfferSearchResult,
     ) -> None:
         offer_search = await self._get_offer_search(search_result)
-        if offer_search.HasField("simple_trip"):
-            await self.simple_trip_aggregate(search_result, offer_search)
-        else:
-            await self.trip_aggregate(search_result, offer_search)
+        _set_sequence_numbers(offer_search, search_result.offer)
+
+        buckets = _override_buckets(
+            search_result=search_result,
+            buckets=await self._buckets.get_offer_buckets(offer_search.id),
+            simple_trip=bool(offer_search.HasField("simple_trip")),
+        )
+
+        await self._buckets.add_offer(offer_search.id, search_result.offer)
+
+        if offer_search.HasField("trip"):
+            segments = itertools.chain(
+                *[trip.segments for trip in offer_search.trip.trips],
+            )
+
+            # check if all segments can be fulfilled by offers gotten so far
+            if any(segment.id not in buckets for segment in segments):
+                return
+
+        try:
+            expires_at = await self._buckets.get_bucket_list_expiry(offer_search)
+        except NoExpiryError:
+            self._logger.warning(
+                "Offer search has expired",
+                offer_search_id=offer_search.id,
+                provider_company_id=search_result.provider_company_id,
+            )
+
+            return
+
+        for aggregate in generate_offer_aggregates(buckets, expires_at):
+            aggregate.offer_search_id = offer_search.id
+            await self._aggregates.insert(aggregate)
 
     async def _get_offer_search(
         self,
@@ -522,6 +260,7 @@ class OfferAggregator(object):
 def _override_buckets(
     search_result: amqp_pb2.TripOfferSearchResult,
     buckets: Mapping[str, Sequence[str]],
+    simple_trip: bool,  # noqa: FBT001
 ) -> dict[str, list[str]]:
     # this overrides the true bucket values for segments that this offer
     # group covers, so that we only generate offer aggregates with this
@@ -540,6 +279,9 @@ def _override_buckets(
         }
         mutable_buckets[offer_segment.segment_id] = [search_result.offer.id]
 
+    if simple_trip:
+        return {idx: list(bucket) for idx, bucket in mutable_buckets.items()}
+
     return {
         idx: [offer_id for offer_id in bucket if offer_id not in unqualified_offers]
         for idx, bucket in mutable_buckets.items()
@@ -548,6 +290,7 @@ def _override_buckets(
 
 def _set_sequence_numbers_for_simple_offer(offer: models_pb2.OfferGroup) -> None:
     for segment_seq, segment in enumerate(offer.segments, 1):
+        segment.trip_sequence = 1
         segment.segment_sequence = segment_seq
 
 
@@ -557,6 +300,9 @@ def _set_sequence_numbers(
 ) -> None:
     sequence_mapping: dict[str, tuple[int, int]] = {}
 
+    if not offer_search.HasField("trip"):
+        return _set_sequence_numbers_for_simple_offer(offer)
+
     for trip_idx, trip in enumerate(offer_search.trip.trips):
         for segment_idx, trip_segment in enumerate(trip.segments):
             sequence_mapping[trip_segment.id] = (trip_idx + 1, segment_idx + 1)
@@ -565,3 +311,4 @@ def _set_sequence_numbers(
         trip_sequence, segment_sequence = sequence_mapping[segment.segment_id]
         segment.trip_sequence = trip_sequence
         segment.segment_sequence = segment_sequence
+    return None

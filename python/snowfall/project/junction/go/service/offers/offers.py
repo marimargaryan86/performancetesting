@@ -308,18 +308,6 @@ class OfferAggregateMappingRepository(
         except StopAsyncIteration:
             return None
 
-    async def find_by_offer_search_id(
-        self,
-        offer_search_id: str,
-        cursor: str,
-        sort: tuple[str, int] | None = None,
-    ) -> resultset.ResultSet[models_pb2.OfferAggregateMapping]:
-        return await self._find_with_cursor(
-            cur=cursor,
-            filter_={_OFFER_SEARCH_ID: offer_search_id},
-            sort=sort,
-        )
-
 
 class OfferSearchRepository(
     repository.ProtoRepository[models_pb2.OfferSearch],

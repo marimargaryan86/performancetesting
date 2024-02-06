@@ -191,82 +191,36 @@ def create_criteria_time_windows(
     destinations: Collection[train_stations.TrainStation],
     search: offers_pb2.SimpleTripOfferSearch,
 ) -> list[criteria.SearchCriteria]:
-    inbound_timestamps = []
+    timestamps = []
     departure_at = normalize_datetime(
         protobuf.protobuf_to_datetime(search.departure_at),
     ).replace(hour=0)
 
-    outbound_timestamps = find_time_windows(
-        departure_before=protobuf.protobuf_to_datetime(search.departure_before)
-        if search.HasField("departure_before")
-        else None,
-        departure_at=departure_at,
-    )
-
-    origin = _find_nearest_provider_place(
-        origins,
-        search.origin.coordinates,
-    )
-    destination = _find_nearest_provider_place(
-        destinations,
-        search.destination.coordinates,
-    )
-
-    search_criteria = [
-        criteria.SearchCriteria(
-            origin=origin,
-            destination=destination,
-            passenger_dobs=[
-                protobuf.protobuf_to_date(passenger.date_of_birth)
-                for passenger in search.passengers
-            ],
-            outbound_departure_datetime=timestamp,
-            trip_sequence=1,
-            session_token=search.session_token,
-        )
-        for timestamp in outbound_timestamps
-    ]
-
-    if search.HasField("return_departure_at"):
-        inbound_timestamps = find_time_windows(
-            departure_before=protobuf.protobuf_to_datetime(
-                search.return_departure_before,
-            )
-            if search.HasField("return_departure_before")
-            else None,
-            departure_at=normalize_datetime(
-                protobuf.protobuf_to_datetime(search.return_departure_at),
-            ),
-        )
-        search_criteria.extend([
-            criteria.SearchCriteria(
-                origin=destination,
-                destination=origin,
-                passenger_dobs=[
-                    protobuf.protobuf_to_date(passenger.date_of_birth)
-                    for passenger in search.passengers
-                ],
-                outbound_departure_datetime=timestamp,
-                trip_sequence=2,
-                session_token=search.session_token,
-            )
-            for timestamp in inbound_timestamps
-        ])
-
-    return search_criteria
-
-
-def find_time_windows(
-    departure_before: datetime.datetime | None,
-    departure_at: datetime.datetime,
-) -> list[datetime.datetime]:
-    timestamps = []
-    if not departure_before:
-        departure_before = departure_at.replace(hour=0)
-        departure_before += datetime.timedelta(days=1)
+    if search.HasField("departure_before"):
+        departure_before = protobuf.protobuf_to_datetime(search.departure_before)
+    else:
+        departure_before = departure_at + datetime.timedelta(days=1)
 
     while departure_at < departure_before:
         timestamps.append(departure_at)
         departure_at += datetime.timedelta(hours=2)
 
-    return timestamps
+    return [
+        criteria.SearchCriteria(
+            origin=_find_nearest_provider_place(
+                origins,
+                search.origin.coordinates,
+            ),
+            destination=_find_nearest_provider_place(
+                destinations,
+                search.destination.coordinates,
+            ),
+            passenger_dobs=[
+                protobuf.protobuf_to_date(passenger.date_of_birth)
+                for passenger in search.passengers
+            ],
+            outbound_departure_datetime=timestamp,
+            session_token=search.session_token,
+        )
+        for timestamp in timestamps
+    ]

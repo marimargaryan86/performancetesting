@@ -25,7 +25,6 @@ message Criteria {
   snowfall.stdlib.v1.DateTime outbound_departure_datetime = 4;
   string cabin_class = 6;
   string br_session_token = 7;
-  int32 trip_sequence = 8;
 }
 
 message BookingNotificationTask {

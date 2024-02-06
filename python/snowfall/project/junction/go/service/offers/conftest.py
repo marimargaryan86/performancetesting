@@ -23,42 +23,6 @@ def offer_bucket_repository(
 
 
 @pytest.fixture()
-def inbound_bucket_repository(
-    decoding_redis_client: aioredis.Redis[str],
-) -> aggregator.OfferBucketRepository:
-    return aggregator.OfferBucketRepository(
-        redis_client=redis.Client(
-            redis=decoding_redis_client,
-            prefix="inbound",
-        ),
-    )
-
-
-@pytest.fixture()
-def outbound_bucket_repository(
-    decoding_redis_client: aioredis.Redis[str],
-) -> aggregator.OfferBucketRepository:
-    return aggregator.OfferBucketRepository(
-        redis_client=redis.Client(
-            redis=decoding_redis_client,
-            prefix="outbound",
-        ),
-    )
-
-
-@pytest.fixture()
-def offer_results_bucket_repository(
-    decoding_redis_client: aioredis.Redis[str],
-) -> aggregator.OfferBucketRepository:
-    return aggregator.OfferBucketRepository(
-        redis_client=redis.Client(
-            redis=decoding_redis_client,
-            prefix="results",
-        ),
-    )
-
-
-@pytest.fixture()
 async def trip_offer_repository(
     mongo_client: core.AgnosticClient,
 ) -> offers.TripOfferRepository:

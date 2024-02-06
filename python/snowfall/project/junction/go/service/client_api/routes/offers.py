@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import dataclasses
 import datetime
 import itertools
@@ -532,11 +531,6 @@ class SimpleOfferSearches(object):
         arrival_before = get_arrival_before(criteria, allowed_segment_types)
 
         departure_after = get_departure_after(criteria)
-
-        return_departure_after = get_return_departure_after(criteria)
-
-        return_departure_before = get_return_departure_before(criteria)
-
         origin_coords = latlng_pb2.LatLng(
             latitude=criteria["origin"]["latitude"],
             longitude=criteria["origin"]["longitude"],
@@ -580,16 +574,6 @@ class SimpleOfferSearches(object):
                 if departure_before
                 else None,
                 departure_at=protobuf.datetime_to_protobuf(departure_after),
-                return_departure_at=protobuf.datetime_to_protobuf(
-                    return_departure_after,
-                )
-                if return_departure_after
-                else None,
-                return_departure_before=protobuf.datetime_to_protobuf(
-                    return_departure_before,
-                )
-                if return_departure_before
-                else None,
                 passengers=[
                     models_pb2.Passenger(
                         date_of_birth=protobuf.date_to_protobuf(
@@ -907,30 +891,3 @@ def get_arrival_before(
         )
 
     return arrival_before
-
-
-def get_return_departure_after(
-    body: Mapping[str, Any],
-) -> datetime.datetime | None:
-    with contextlib.suppress(KeyError):
-        return parser.isoparse(body["returnDepartureAfter"])
-    return None
-
-
-def get_return_departure_before(
-    body: Mapping[str, Any],
-) -> datetime.datetime | None:
-    try:
-        return_departure_before = parser.isoparse(body["returnDepartureBefore"])
-    except KeyError:
-        return None
-
-    try:
-        return_departure_after = parser.isoparse(body["returnDepartureAfter"])
-    except KeyError:
-        return None
-
-    if return_departure_before > return_departure_after:
-        raise exceptions.HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-    return return_departure_before
