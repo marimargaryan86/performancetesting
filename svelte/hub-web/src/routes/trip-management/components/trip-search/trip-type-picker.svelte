@@ -1,6 +1,4 @@
 <script lang="ts" context="module">
-  import { getLocaleData } from "~/i18n";
-
   export const tripTypes = ["one-way", "round-trip"] as const;
   export type TripType = (typeof tripTypes)[number];
 </script>
@@ -10,10 +8,11 @@
   import { createSelect, melt } from "@melt-ui/svelte";
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import Icon from "~/components/icons/icon.svelte";
+  import { getTranslator } from "~/i18n";
 
   export let value: TripType = "one-way";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   const {
     elements: { trigger, menu, option, label: meltLabel },
@@ -27,7 +26,7 @@
     },
     defaultSelected: {
       value,
-      label: $i18n.tripTypes[value],
+      label: $t(`tripTypes.${value}`),
     },
     highlightOnHover: true,
   });
@@ -36,7 +35,7 @@
   $: updateInternalValue(value);
 
   function updateInternalValue(nextValue: TripType): void {
-    $selected = { label: $i18n.tripTypes[nextValue], value: nextValue };
+    $selected = { label: $t(`tripTypes.${nextValue}`), value: nextValue };
   }
 </script>
 
@@ -48,7 +47,7 @@
       <Icon variant="swap-directions" color="var(--color-main-primary-500)" size="16px" />
     {/if}
 
-    <span>{$i18n.tripTypes[value]}</span>
+    <span>{$t(`tripTypes.${value}`)}</span>
 
     <ChevronIcon direction={$open ? "up" : "down"} color="var(--color-main-primary-500)" />
   </span>
@@ -59,7 +58,7 @@
         <li
           typography="body-medium"
           class="option"
-          use:melt={$option({ value: item, label: $i18n.tripTypes[item] })}
+          use:melt={$option({ value: item, label: $t(`tripTypes.${item}`) })}
           class:highlighted={$isHighlighted(item)}
         >
           {#if $isSelected(item)}
@@ -67,7 +66,7 @@
           {:else}
             <span />
           {/if}
-          {$i18n.tripTypes[item]}
+          {$t(`tripTypes.${item}`)}
         </li>
       {/each}
     </ul>

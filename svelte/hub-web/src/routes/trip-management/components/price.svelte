@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatAmount } from "~/formatting/currency";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { Price } from "~/integration/common/schemas/price";
   import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
   import type { TripBooking as HubTripBooking } from "~/integration/junction-hub-api/schemas/booking";
@@ -8,7 +8,7 @@
   export let bookings: MobileTripBooking[] | HubTripBooking[];
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   $: totalPrice = bookings.reduce<Price>(
     (prev, curr) => ({
@@ -20,17 +20,17 @@
 </script>
 
 <div class="price" typography="body-small">
-  <span>{$i18n.sentences.thisPriceIsForAllPassengers}</span>
+  <span>{$t("sentences.thisPriceIsForAllPassengers")}</span>
   <ul>
     <li>
-      <span>{$i18n.priceBreakdownTypes["base-fare"]} + {$i18n.priceBreakdownTypes.tax}</span>
+      <span>{$t(`priceBreakdownTypes.base-fare`)} + {$t("priceBreakdownTypes.tax")}</span>
       <strong weight="bold">
         {formatAmount(totalPrice, { locale: $locale, sign: true })}
       </strong>
     </li>
 
     <li typography="body-xlarge" weight="bold">
-      <span>{$i18n.sentences.totalPaid}</span>
+      <span>{$t("sentences.totalPaid")}</span>
       <strong>
         {formatAmount(totalPrice, { locale: $locale, sign: true })}
       </strong>

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import type { StatusBadgeValue } from "~/components/ui/status-badge.svelte";
 import type {
   PaymentMethod,
@@ -5,7 +6,6 @@ import type {
 } from "~/integration/junction-hub-api/schemas/transaction";
 import type { UserRole } from "~/integration/ory/schemas/authentication";
 import type { PassengerType } from "../../routes/trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
-import type { ContentElement, WordQuantity } from "~/i18n";
 import type { SortOption } from "../../routes/trip-management/book/select-offer/search-options.svelte";
 import type { PriceBreakdownType } from "~/integration/common/schemas/price";
 import type {
@@ -34,16 +34,14 @@ export default {
     from: "From",
     to: "To",
     depart: "Depart",
-    passenger: {
-      plural: "Passengers",
-      singular: "Passenger",
-    } satisfies WordQuantity,
+    passenger_one: "Passenger",
+    passenger_other: "Passengers",
     fareRules: "Fare rules",
-    stop: {
-      plural: "Stops",
-      singular: "Stop",
-    } satisfies WordQuantity,
-    direct: "Direct",
+    stop_zero: "Direct",
+    stop_one: "Stop",
+    stop_other: "Stops",
+    stopCounter_zero: "$t(words.stop_zero)",
+    stopCounter: "{{count}} $t(words.stop, lowercase)",
     departureTime: "Departure time",
     departure: "Departure",
     arrival: "Arrival",
@@ -66,15 +64,11 @@ export default {
     nationality: "Nationality",
     residenceCountryCode: "Residence country code",
     summary: "Summary",
-    fareBrand: {
-      plural: "Fare Brands",
-      singular: "Fare Brand",
-    } satisfies WordQuantity,
+    fareBrand_one: "Fare Brand",
+    fareBrand_other: "Fare Brands",
     itinerary: "Itinerary",
-    fee: {
-      plural: "Fees",
-      singular: "Fee",
-    } satisfies WordQuantity,
+    fee_one: "Fee",
+    fee_other: "Fees",
     serviceFee: "Service fee",
     agencyMarkup: "Agency mark-up",
     paymentMethod: "Payment method",
@@ -178,7 +172,7 @@ export default {
   sentences: {
     priceChange: "Price change",
     priceChangeInfo:
-      'We have noticed a price change; the initial price was <strong typography="body-medium" weight="bold">{originalPrice}</strong>, and the new price is <strong typography="body-medium" weight="bold">{newPrice}</strong>. Do you wish to continue?',
+      'We have noticed a price change; the initial price was <strong typography="body-medium" weight="bold">{{originalPrice}}</strong>, and the new price is <strong typography="body-medium" weight="bold">{{newPrice}}</strong>. Do you wish to continue?' satisfies `${string}{{originalPrice}}${string}{{newPrice}}${string}`,
     areYouSure: "Are you sure?",
     copiedToClipboard: "Copied to clipboard",
     noBalancesFound: "No balances found",
@@ -187,7 +181,8 @@ export default {
     noTripsMatchesTheFilterCriteria: "No trips matches the filter criteria",
     noTripsFound: "No trips found",
     timeRemaining: "Time remaining",
-    timeRemainingInfo: '{timeLeft} mins to <strong weight="bold">complete</strong> your booking',
+    timeRemainingInfo:
+      '{{timeLeft}} mins to <strong weight="bold">complete</strong> your booking' satisfies `${string}{{timeLeft}}${string}`,
     startingAt: "From",
     loadingTripDetails: "Loading trip details...",
     thisPriceIsForAllPassengers: "This price is for all passengers",
@@ -301,23 +296,15 @@ export default {
     unspecified: "Unspecified",
   } satisfies Record<PassengerTitle, string>,
   passengerTypes: {
-    adult: {
-      plural: "Adults",
-      singular: "Adult",
-    },
-    child: {
-      plural: "Children",
-      singular: "Child",
-    },
-    senior: {
-      plural: "Seniors",
-      singular: "Senior",
-    },
-    youth: {
-      plural: "Youths",
-      singular: "Youth",
-    },
-  } satisfies Record<PassengerType, WordQuantity>,
+    adult_one: "Adult",
+    adult_other: "Adults",
+    child_one: "Child",
+    child_other: "Children",
+    senior_one: "Senior",
+    senior_other: "Seniors",
+    youth_one: "Youth",
+    youth_other: "Youths",
+  } satisfies Record<`${PassengerType}_${"one" | "other"}`, string>,
   tripTypes: {
     "one-way": "One way",
     "round-trip": "Round trip",
@@ -378,171 +365,71 @@ export default {
       pages: {
         privacyPolicy: {
           title: "Privacy Policy",
-          content: [
-            {
-              type: "p",
-              html: "We believe in protecting the end customer’s privacy. Please see our privacy policy at (insert hyperlink to Website Privacy Policy) and please make your privacy policy available to the end customer as this will apply to their booking.",
-            },
-            { type: "h2", html: "Indemnification" },
-            {
-              type: "p",
-              html: "You agree to defend us, and/or our respective suppliers and any of their officers, directors, employees, and agents from and against any claims, causes of action, demands, recoveries, losses, damages, fines, penalties or other costs or expenses of any kind or nature including but not limited to reasonable legal and accounting fees, brought by third parties as a result of:",
-            },
-            {
-              type: "ul",
-              items: [
-                "- Your breach of this Agreement or the documents referenced herein;",
-                "- Your violation of any law or the rights of a third party; or",
-                "- Your use of the Booking Hub.",
-              ],
-            },
-            { type: "h2", html: "Currency Converter, Price, and Payment" },
-            {
-              type: "p",
-              html: "Prices for travel services are dynamic and subject to frequent change at any time. Price changes will not affect bookings already submitted, except where there has been an obvious error. We make every effort to ensure that the prices we display are accurate and available. Snowfall accepts no liability for bookings at an incorrect price where the error was (or ought to have been) reasonably apparent at the time of booking, or due to Snowfall’s failure to exercise reasonable care.",
-            },
-            {
-              type: "p",
-              html: "The prices displayed through our service may include taxes. Such taxes may include amounts associated with value-added tax, goods and services tax, sales tax, occupancy tax and other taxes of a similar nature.",
-            },
-            {
-              type: "p",
-              html: "In certain jurisdictions, where applicable, the end customer may also be responsible for paying local taxes imposed by local tax authorities (such as city taxes or tourist taxes, etc). We will notify You of any local taxes that will be payable by the end customer prior to completion of the booking, where such taxes have been notified to us by the travel provider.",
-            },
-            {
-              type: "p",
-              html: "The amount of local taxes can change between the booking date and stay date. If taxes have changed by the date of travel, the end customer may be liable to pay taxes at the higher rate.",
-            },
-            {
-              type: "p",
-              html: "Payment is made directly to Snowfall Limited on behalf of the travel provider only.",
-            },
-            {
-              type: "p",
-              html: "The travel provider usually requires payment upfront; it may be taken or pre-authorised when the booking is made, and it will usually be non-refundable. Before You make a booking, please note the individual booking terms and conditions that apply.",
-            },
-            {
-              type: "p",
-              html: "We may store the end customer’s method of payment details for future transactions if You have obtained their consent to do so.",
-            },
-            {
-              type: "p",
-              html: "As mentioned above, You accept the applicable policies as displayed in the booking process. You'll find each travel provider's cancellation policy and any other policies (about age requirements, cards accepted, etc.) in the fine print, and/or in the confirmation email or ticket (if applicable).",
-            },
-            {
-              type: "p",
-              html: "As You are making a booking on behalf of anyone else, You accept responsibility for obtaining their permission before providing us with their personal data.",
-            },
-            { type: "h2", html: "Cancellations and Refunds" },
-            {
-              type: "p",
-              html: "The cancellation fees applied to the booking are subject to the specific policy set by the respective provider. These fees will vary based on the terms and conditions of the provider, and we hold no responsibility for their determination. While we endeavour to provide accurate and timely refund processing, we accept no responsibility for the actions or policies of the third-party provider. Any disputes or concerns related to cancellations, refunds, or associated fees should be addressed directly with the individual provider.",
-            },
-            { type: "h2", html: "Account Termination" },
-            {
-              type: "p",
-              html: "At our sole discretion, we may terminate account holders who are deemed to be repeat infringers. We may also at our sole discretion limit access to the Booking Hub and/or terminate the accounts of any users who infringe any intellectual property rights of others, whether or not there is any repeat infringement.",
-            },
-            { type: "h2", html: "General" },
-            {
-              type: "p",
-              html: "If any part of this Agreement is found to be invalid, illegal, or unenforceable, the validity, legality and enforceability of the remaining provisions will not in any way be affected or impaired. Our failure or delay in enforcing any provision of this Agreement at any time does not waive our right to enforce the same or any other provision(s) hereof in the future. This Agreement (and any other terms and conditions referenced herein) constitutes the entire agreement between You and us with respect to the Booking Hub and it supersedes all prior or contemporaneous communications and proposals, whether electronic, oral, or written, between the end customer and us with respect to the Booking Hub.",
-            },
-            {
-              type: "p",
-              html: "Access to this Booking Hub is conditional on Your agreement that all information contained in it and all matters that arise between You and us will be governed by the laws of England and Wales. It is also conditional on Your agreement that any dispute that arises between You and us will be subject to the exclusive jurisdiction of the Courts of England and Wales.",
-            },
-            {
-              type: "p",
-              html: "Any rights not expressly granted herein are reserved.",
-            },
-            { type: "h2", html: "Contact" },
-            {
-              type: "p",
-              html: 'All comments, queries and requests relating to our use of Your information should be addressed to <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a>',
-            },
-          ] satisfies ContentElement[],
+          content: `
+<p>We believe in protecting the end customer’s privacy. Please see our privacy policy at (insert hyperlink to Website Privacy Policy) and please make your privacy policy available to the end customer as this will apply to their booking.</p>
+<h2 typography="body-large" weight="bold">Indemnification</h2>
+<p>You agree to defend us, and/or our respective suppliers and any of their officers, directors, employees, and agents from and against any claims, causes of action, demands, recoveries, losses, damages, fines, penalties or other costs or expenses of any kind or nature including but not limited to reasonable legal and accounting fees, brought by third parties as a result of:</p>
+<ul>
+  <li>- Your breach of this Agreement or the documents referenced herein;</li>
+  <li>- Your violation of any law or the rights of a third party; or</li>
+  <li>- Your use of the Booking Hub.</li>
+</ul>
+<h2 typography="body-large" weight="bold">Currency Converter, Price, and Payment</h2>
+<p>Prices for travel services are dynamic and subject to frequent change at any time. Price changes will not affect bookings already submitted, except where there has been an obvious error. We make every effort to ensure that the prices we display are accurate and available. Snowfall accepts no liability for bookings at an incorrect price where the error was (or ought to have been) reasonably apparent at the time of booking, or due to Snowfall’s failure to exercise reasonable care.</p>
+<p>The prices displayed through our service may include taxes. Such taxes may include amounts associated with value-added tax, goods and services tax, sales tax, occupancy tax and other taxes of a similar nature.</p>
+<p>In certain jurisdictions, where applicable, the end customer may also be responsible for paying local taxes imposed by local tax authorities (such as city taxes or tourist taxes, etc). We will notify You of any local taxes that will be payable by the end customer prior to completion of the booking, where such taxes have been notified to us by the travel provider.</p>
+<p>The amount of local taxes can change between the booking date and stay date. If taxes have changed by the date of travel, the end customer may be liable to pay taxes at the higher rate.</p>
+<p>Payment is made directly to Snowfall Limited on behalf of the travel provider only.</p>
+<p>The travel provider usually requires payment upfront; it may be taken or pre-authorised when the booking is made, and it will usually be non-refundable. Before You make a booking, please note the individual booking terms and conditions that apply.</p>
+<p>We may store the end customer’s method of payment details for future transactions if You have obtained their consent to do so.</p>
+<p>As mentioned above, You accept the applicable policies as displayed in the booking process. You'll find each travel provider's cancellation policy and any other policies (about age requirements, cards accepted, etc.) in the fine print, and/or in the confirmation email or ticket (if applicable).</p>
+<p>As You are making a booking on behalf of anyone else, You accept responsibility for obtaining their permission before providing us with their personal data.</p>
+<h2 typography="body-large" weight="bold">Cancellations and Refunds</h2>
+<p>The cancellation fees applied to the booking are subject to the specific policy set by the respective provider. These fees will vary based on the terms and conditions of the provider, and we hold no responsibility for their determination. While we endeavour to provide accurate and timely refund processing, we accept no responsibility for the actions or policies of the third-party provider. Any disputes or concerns related to cancellations, refunds, or associated fees should be addressed directly with the individual provider.</p>
+<h2 typography="body-large" weight="bold">Account Termination</h2>
+<p>At our sole discretion, we may terminate account holders who are deemed to be repeat infringers. We may also at our sole discretion limit access to the Booking Hub and/or terminate the accounts of any users who infringe any intellectual property rights of others, whether or not there is any repeat infringement.</p>
+<h2 typography="body-large" weight="bold">General</h2>
+<p>If any part of this Agreement is found to be invalid, illegal, or unenforceable, the validity, legality and enforceability of the remaining provisions will not in any way be affected or impaired. Our failure or delay in enforcing any provision of this Agreement at any time does not waive our right to enforce the same or any other provision(s) hereof in the future. This Agreement (and any other terms and conditions referenced herein) constitutes the entire agreement between You and us with respect to the Booking Hub and it supersedes all prior or contemporaneous communications and proposals, whether electronic, oral, or written, between the end customer and us with respect to the Booking Hub.</p>
+<p>Access to this Booking Hub is conditional on Your agreement that all information contained in it and all matters that arise between You and us will be governed by the laws of England and Wales. It is also conditional on Your agreement that any dispute that arises between You and us will be subject to the exclusive jurisdiction of the Courts of England and Wales.</p>
+<p>Any rights not expressly granted herein are reserved.</p>
+<h2 typography="body-large" weight="bold">Contact</h2>
+<p>All comments, queries and requests relating to our use of Your information should be addressed to <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a></p>`,
         },
         termsAndConditions: {
           title: "Terms and Conditions",
-          content: [
-            { type: "h2", html: "Booking Terms of Use" },
-            {
-              type: "p",
-              html: "These Booking Terms (the “Terms”) apply to bookings made via the Junction online client portal (the “Booking Hub”) which is owned and operated by Snowfall Limited, a company registered in England (Company no: 12356236, 10-12 East Parade, Leeds, West Yorkshire, LS1 2BH). The Booking Hub is provided to assist in making reservations and/or otherwise transacting with travel providers. This service is offered to You, the agent, subject to Your acceptance, without modification, of all the terms, conditions, and notices collectively set out in these Terms, the Junction Client Booking Hub Terms of Use, and the Snowfall Travel Website Terms of Use, and the Privacy Policy (collectively, the “Agreement”). In making a booking through the Booking Hub, You agree to be bound by this Agreement. These Terms supplement the terms of any agreement that You may have with us, but solely with respect to the making of bookings as facilitated through the Booking Hub. In the event of a direct conflict between these Terms and any other agreement You may have with us, these Terms will control the details of the booking. The term “You” refers to the customer service agent making the booking on behalf of the end customer.",
-            },
-            {
-              type: "p",
-              html: "Please read the Agreement carefully. We reserve the right at any time, at our sole discretion, to change or otherwise modify the Agreement without prior notice.",
-            },
-            { type: "h2", html: "Conditions of Use" },
-            {
-              type: "p",
-              html: "As a condition of Your use of the Booking Hub, You warrant that (i) You are at least 18 years of age; (ii) You possess the legal authority to create a binding legal obligation; (iii) You will use the Booking Hub to book only in accordance with any applicable terms and conditions and policies; (iv) You will only use the Booking Hub to make reservations for another person for whom You are legally authorised to act; (v) You will inform such other persons about the terms and conditions that apply to the reservations You have made on their behalf, including all rules and restrictions applicable thereto; (vi) all information supplied by You on the Booking Hub is true, accurate, current and complete, and (vii) if You have an account, You will safeguard Your account information and will supervise and be completely responsible for any use of Your account by You and anyone other than You. We retain the right at our sole discretion to deny access to anyone to the Booking Hub and the services we offer, at any time and for any reason, including, but not limited to, for violation of these terms and conditions.",
-            },
-            { type: "h2", html: "Prohibited Activities" },
-            {
-              type: "p",
-              html: "The content and information on the Booking Hub (including, but not limited to, price and availability of travel services), as well as the infrastructure used to provide such content and information, is proprietary to us or our suppliers and providers. You agree not to: make any speculative, false, or fraudulent reservation or any reservation in anticipation of demand; access, monitor or copy any content or information of this Website using any robot, spider, scraper or other automated means or any manual process for any purpose without our express written permission; violate the restrictions in any robot exclusion headers on this Website or bypass or circumvent other measures employed to prevent or limit access to this Website; take any action that imposes, or may impose, in our discretion, an unreasonable or disproportionately large load on our infrastructure; deep-link to any portion of this Website (including, without limitation, the purchase path for any travel services) for any purpose without our express written permission; or “frame”, “mirror” or otherwise incorporate any part of the Booking Hub into any other Website without our prior written authorisation.",
-            },
-            { type: "h2", html: "Fraud" },
-            {
-              type: "p",
-              html: "If an account shows repeated signs of fraud, abuse, association with a government-sanctioned person or entity, or other suspicious activity, we may request extra information from You.",
-            },
-            {
-              type: "p",
-              html: "Following review of that information and if we reasonably conclude that a booking or account is associated with suspicious activity, we may:",
-            },
-            {
-              type: "ul",
-              items: [
-                "- Cancel any bookings associated with Your name, email address or account;",
-                "- Close any associated accounts;",
-                "- Take legal action, including to seek to hold You liable for any loss.",
-              ],
-            },
-            {
-              type: "p",
-              html: "Please contact us about the cancellation of a booking or closing of an account if You believe a mistake has occurred.",
-            },
-            { type: "h2", html: "Making Travel Bookings" },
-            {
-              type: "p",
-              html: "Any travel services which You can find and/or book via the Booking Hub are provided by third-party suppliers. We are not responsible and have no liability to You or the end customer in respect of such bookings. The identity of the relevant travel provider and the terms and conditions that govern and apply to the booking will be notified to You at the time of booking and You should ensure that You read and fully understand them before completing the booking, and communicate them to the end customer. You acknowledge that breaching the terms and conditions notified to You by the travel provider could result in the cancellation of tickets, cancellation of hotel reservations etc. and impose additional charges for the end customer.",
-            },
-            { type: "h2", html: "Limitations and Exclusions of Liability" },
-            {
-              type: "p",
-              html: "In operating the Booking Hub, we merely facilitate bookings with third parties and bear no responsibility for providing any travel options displayed on the Booking Hub or for any arrangements made with any third party on behalf of the end customer as a result of the use of the Booking Hub. Any issues and/or differences that may arise with booking(s) must be resolved with the relevant travel provider. To the maximum extent permitted by law, we do not accept any liability for any inaccuracies or omissions in the content displayed on or via the Booking Hub or any Act of God, accident, delay or any special, exemplary, punitive, indirect, incidental or consequential loss or damage of any kind (including, without limitation, lost profits or lost savings), whether based in contract, tort (including negligence), strict liability or otherwise, incurred by You or the end customer arising out of or in connection with Your access to, use of, or inability to access or use of the Booking Hub or any content contained provided therein.",
-            },
-            {
-              type: "p",
-              html: "Our maximum aggregate liability to You and/or the end customer arising out of or in connection with these terms and conditions or Your access to, use of, or inability to access or use, the Booking Hub shall be limited to the maximum extent permitted by law. The present terms and conditions provide the full extent of our obligations and liabilities in respect of the Booking Hub. Nothing in these Terms shall limit or exclude (a) our liability in respect of death or personal injury caused by our negligence or for our fraud or fraudulent misrepresentation; (b) any other liability that cannot be excluded by law; or (c) the end customer’s statutory rights.",
-            },
-          ] satisfies ContentElement[],
+          content: `
+<h2 typography="body-large" weight="bold">Booking Terms of Use</h2>
+<p>These Booking Terms (the “Terms”) apply to bookings made via the Junction online client portal (the “Booking Hub”) which is owned and operated by Snowfall Limited, a company registered in England (Company no: 12356236, 10-12 East Parade, Leeds, West Yorkshire, LS1 2BH). The Booking Hub is provided to assist in making reservations and/or otherwise transacting with travel providers. This service is offered to You, the agent, subject to Your acceptance, without modification, of all the terms, conditions, and notices collectively set out in these Terms, the Junction Client Booking Hub Terms of Use, and the Snowfall Travel Website Terms of Use, and the Privacy Policy (collectively, the “Agreement”). In making a booking through the Booking Hub, You agree to be bound by this Agreement. These Terms supplement the terms of any agreement that You may have with us, but solely with respect to the making of bookings as facilitated through the Booking Hub. In the event of a direct conflict between these Terms and any other agreement You may have with us, these Terms will control the details of the booking. The term “You” refers to the customer service agent making the booking on behalf of the end customer.</p>
+<p>Please read the Agreement carefully. We reserve the right at any time, at our sole discretion, to change or otherwise modify the Agreement without prior notice.</p>
+<h2 typography="body-large" weight="bold">Conditions of Use</h2>
+<p>As a condition of Your use of the Booking Hub, You warrant that (i) You are at least 18 years of age; (ii) You possess the legal authority to create a binding legal obligation; (iii) You will use the Booking Hub to book only in accordance with any applicable terms and conditions and policies; (iv) You will only use the Booking Hub to make reservations for another person for whom You are legally authorised to act; (v) You will inform such other persons about the terms and conditions that apply to the reservations You have made on their behalf, including all rules and restrictions applicable thereto; (vi) all information supplied by You on the Booking Hub is true, accurate, current and complete, and (vii) if You have an account, You will safeguard Your account information and will supervise and be completely responsible for any use of Your account by You and anyone other than You. We retain the right at our sole discretion to deny access to anyone to the Booking Hub and the services we offer, at any time and for any reason, including, but not limited to, for violation of these terms and conditions.</p>
+<h2 typography="body-large" weight="bold">Prohibited Activities</h2>
+<p>The content and information on the Booking Hub (including, but not limited to, price and availability of travel services), as well as the infrastructure used to provide such content and information, is proprietary to us or our suppliers and providers. You agree not to: make any speculative, false, or fraudulent reservation or any reservation in anticipation of demand; access, monitor or copy any content or information of this Website using any robot, spider, scraper or other automated means or any manual process for any purpose without our express written permission; violate the restrictions in any robot exclusion headers on this Website or bypass or circumvent other measures employed to prevent or limit access to this Website; take any action that imposes, or may impose, in our discretion, an unreasonable or disproportionately large load on our infrastructure; deep-link to any portion of this Website (including, without limitation, the purchase path for any travel services) for any purpose without our express written permission; or “frame”, “mirror” or otherwise incorporate any part of the Booking Hub into any other Website without our prior written authorisation.</p>
+<h2 typography="body-large" weight="bold">Fraud</h2>
+<p>If an account shows repeated signs of fraud, abuse, association with a government-sanctioned person or entity, or other suspicious activity, we may request extra information from You.</p>
+<p>Following review of that information and if we reasonably conclude that a booking or account is associated with suspicious activity, we may:</p>
+<ul>
+  <li>- Cancel any bookings associated with Your name, email address or account;</li>
+  <li>- Close any associated accounts;</li>
+  <li>- Take legal action, including to seek to hold You liable for any loss.</li>
+</ul>
+<p>Please contact us about the cancellation of a booking or closing of an account if You believe a mistake has occurred.</p>
+<h2 typography="body-large" weight="bold">Making Travel Bookings</h2>
+<p>Any travel services which You can find and/or book via the Booking Hub are provided by third-party suppliers. We are not responsible and have no liability to You or the end customer in respect of such bookings. The identity of the relevant travel provider and the terms and conditions that govern and apply to the booking will be notified to You at the time of booking and You should ensure that You read and fully understand them before completing the booking, and communicate them to the end customer. You acknowledge that breaching the terms and conditions notified to You by the travel provider could result in the cancellation of tickets, cancellation of hotel reservations etc. and impose additional charges for the end customer.</p>
+<h2 typography="body-large" weight="bold">Limitations and Exclusions of Liability</h2>
+<p>In operating the Booking Hub, we merely facilitate bookings with third parties and bear no responsibility for providing any travel options displayed on the Booking Hub or for any arrangements made with any third party on behalf of the end customer as a result of the use of the Booking Hub. Any issues and/or differences that may arise with booking(s) must be resolved with the relevant travel provider. To the maximum extent permitted by law, we do not accept any liability for any inaccuracies or omissions in the content displayed on or via the Booking Hub or any Act of God, accident, delay or any special, exemplary, punitive, indirect, incidental or consequential loss or damage of any kind (including, without limitation, lost profits or lost savings), whether based in contract, tort (including negligence), strict liability or otherwise, incurred by You or the end customer arising out of or in connection with Your access to, use of, or inability to access or use of the Booking Hub or any content contained provided therein.</p>
+<p>Our maximum aggregate liability to You and/or the end customer arising out of or in connection with these terms and conditions or Your access to, use of, or inability to access or use, the Booking Hub shall be limited to the maximum extent permitted by law. The present terms and conditions provide the full extent of our obligations and liabilities in respect of the Booking Hub. Nothing in these Terms shall limit or exclude (a) our liability in respect of death or personal injury caused by our negligence or for our fraud or fraudulent misrepresentation; (b) any other liability that cannot be excluded by law; or (c) the end customer’s statutory rights.</p>`,
         },
         customerService: {
           title: "Customer Service",
-          content: [
-            {
-              type: "p",
-              html: "Contact us with your request for specialised assistance",
-            },
-            {
-              type: "p",
-              html: '<a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a>',
-            },
-          ] satisfies ContentElement[],
+          content: `
+<p>Contact us with your request for specialised assistance</p>
+<p><a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a></p>`,
         },
         conditionsOfCarriage: {
           title: "Conditions of Carriage",
-          content: [
-            {
-              type: "p",
-              html: "Train operator conditions. Your booking of train tickets/ rail passes is subject to the transportation terms and conditions of one or more rail operators. Please select and view the carrier conditions applicable to your trip.",
-            },
-          ] satisfies ContentElement[],
+          content: `
+<p>Train operator conditions. Your booking of train tickets/ rail passes is subject to the transportation terms and conditions of one or more rail operators. Please select and view the carrier conditions applicable to your trip.</p>`,
         },
       },
     },
@@ -707,7 +594,6 @@ export default {
       link: "Link",
       code: "Code",
       totp: "Two-factor authentication",
-      // eslint-disable-next-line camelcase
       lookup_secret: "Backup recovery codes",
       webauthn: "Security keys",
     },

@@ -4,7 +4,7 @@ import sv from "./sv";
 import es from "./es";
 
 export default {
-  "en-GB": en,
+  "en-GB": en as LocaleData,
   "es-ES": es,
   sv,
 } satisfies Record<Locale, LocaleData>;

@@ -6,17 +6,16 @@
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
   import { getLegsFromPriceQuote } from "~/utils/offer";
-  import { getLocale, getLocaleData } from "~/i18n";
-  import { formatStopCount } from "~/formatting/trip";
+  import { getLocale, getTranslator } from "~/i18n";
 
   export let priceQuote: TripOfferPriceQuote;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
-  $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? $i18n.words.unknown;
+  $: vendor = priceQuote.options[0]?.detailsList[0]?.details?.vendor ?? $t("words.unknown");
   $: trainNumber = priceQuote.options[0]?.detailsList[0]?.details?.routeIdentifiers.vendor ?? "";
-  $: stopCount = priceQuote.options[0]?.detailsList.length ?? 1;
+  $: stopCount = (priceQuote.options[0]?.detailsList.length ?? 1) - 1;
   $: departureLeg = priceQuote.options[0]?.detailsList[0]?.details?.legs[0];
 
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
@@ -28,12 +27,12 @@
   $: legs = getLegsFromPriceQuote(priceQuote);
 </script>
 
-<Collapsible class="itinerary" title={$i18n.words.itinerary}>
+<Collapsible class="itinerary" title={$t("words.itinerary")}>
   <div class="trip-info" typography="body-small">
     <div>
       <EntityAvatar name={vendor} size="24px" />
       {vendor}
-      {trainNumber} • {formatStopCount(stopCount, $i18n)}
+      {trainNumber} • {$t("words.stopCounter", { count: stopCount })}
     </div>
     <span>
       {#if departureLeg}
@@ -81,7 +80,7 @@
 
   <div class="fare-rules">
     <button typography="body-small" on:click={showFareRules}>
-      {$i18n.actions.viewFareRules}
+      {$t("actions.viewFareRules")}
     </button>
   </div>
 </Collapsible>

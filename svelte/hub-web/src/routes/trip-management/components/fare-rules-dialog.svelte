@@ -2,11 +2,11 @@
   import { onDestroy } from "svelte";
   import Backdrop from "~/components/ui/backdrop.svelte";
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
   export let priceQuote: TripOfferPriceQuote;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let backdrop: Backdrop | undefined = undefined;
 
@@ -25,7 +25,7 @@
 
 <Backdrop bind:this={backdrop}>
   <div class="dialog">
-    <h2 typography="display-small" weight="bold">{$i18n.words.fareRules}</h2>
+    <h2 typography="display-small" weight="bold">{$t("words.fareRules")}</h2>
 
     {#each rules as rule}
       <h3 typography="title-small" weight="bold">{rule.title}</h3>
@@ -33,7 +33,7 @@
     {/each}
 
     <div class="actions">
-      <button variant="primary" on:click={close}>{$i18n.actions.returnToBookings}</button>
+      <button variant="primary" on:click={close}>{$t("actions.returnToBookings")}</button>
     </div>
   </div>
 </Backdrop>

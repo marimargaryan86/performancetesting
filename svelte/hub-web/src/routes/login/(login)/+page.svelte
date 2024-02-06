@@ -11,6 +11,7 @@
   import { getPageTitle } from "~/utils/page-title";
   import { page } from "$app/stores";
   import { sleep } from "~/utils/common";
+  import { getTranslator } from "~/i18n";
 
   export let data;
 
@@ -19,6 +20,7 @@
   let form: HTMLFormElement | undefined;
   let submitButton: HTMLButtonElement | undefined;
 
+  const t = getTranslator();
   const pending = writable<string | undefined>();
 
   $: form && submitButton && checkHash($page.url.hash);
@@ -109,7 +111,8 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Login")}</title>
+  <!-- TODO: Add i18n -->
+  <title>{getPageTitle($t("title"), "Login")}</title>
 </svelte:head>
 
 <section class="login">
@@ -164,24 +167,28 @@
   {/each}
 
   <p class="cookie-info" typography="body-small">
+    <!-- TODO: Add i18n -->
     We store some strictly necessary cookies. These cookies are used for Authentication and managing
-    form data during a session. We currently do not use cookies for marketing, analytics or any
-    other use cases.
+    form data during a session. We currently do not use cookies for marketing, analytics or any other
+    use cases.
   </p>
 
   <label for="remember-me" class="remember-me">
     <Checkbox id="remember-me" bind:checked={rememberMe} />
+    <!-- TODO: Add i18n -->
     <span typography="body-small">Remember me for 14 days</span>
   </label>
 
   <div class="actions" typography="body-medium">
     {#if data.flow.requestedAal !== "aal1"}
+      <!-- TODO: Add i18n -->
       <a href={routeConfig.routes.login.root} on:click={reset}>Sign in to a different account</a>
     {:else}
       <span />
     {/if}
 
-    <a href={routeConfig.routes.login.routes.accountRecovery.root}> Recover account </a>
+    <!-- TODO: Add i18n -->
+    <a href={routeConfig.routes.login.routes.accountRecovery.root}>Recover account</a>
   </div>
 </section>
 

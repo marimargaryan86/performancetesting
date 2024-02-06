@@ -8,7 +8,7 @@
   import { dev } from "$app/environment";
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import { formatAmount } from "~/formatting/currency";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
@@ -19,7 +19,7 @@
   let expanded = false;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const dispatch = createEventDispatcher<{ select: OfferOption }>();
 
   function open(): void {
@@ -45,7 +45,7 @@
 
 <div class="alternative-fares">
   <button class="toggle" typography="body-medium" weight="bold" on:click={toggle}>
-    {$i18n.words.alternativeFares}
+    {$t("words.alternativeFares")}
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
   </button>
 
@@ -59,7 +59,7 @@
 
           {#if dev}
             <button typography="body-small" class="fare-rules-btn">
-              {$i18n.actions.viewFareRules}
+              {$t("actions.viewFareRules")}
             </button>
           {/if}
 
@@ -76,9 +76,9 @@
           >
             {#if selected}
               <span class="selected" />
-              {$i18n.words.selected}
+              {$t("words.selected")}
             {:else}
-              {$i18n.actions.select}
+              {$t("actions.select")}
             {/if}
           </button>
         </li>

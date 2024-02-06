@@ -1,18 +1,18 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { getPageTitle } from "~/utils/page-title";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <svelte:head>
-  <title>{getPageTitle($i18n.title, $i18n.words.error)}</title>
+  <title>{getPageTitle($t("title"), $t("words.error"))}</title>
 </svelte:head>
 
 <main>
   {#if $page.status === 500}
-    <h1 typography="headline-medium">{$i18n.sentences.oopsSomethingWentWrong}</h1>
+    <h1 typography="headline-medium">{$t("sentences.oopsSomethingWentWrong")}</h1>
   {:else}
     <h1 typography="headline-medium">{$page.error?.message}</h1>
   {/if}

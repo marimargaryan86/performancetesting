@@ -21,12 +21,12 @@
   import { getOrderStatus, type OrderBookingStatus } from "~/integration/common/schemas/order";
   import Fees from "./fees.svelte";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let data;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   $: hasTickets = Boolean(
     data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
@@ -38,10 +38,10 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.book.title,
-      $i18n.pages.tripManagement.pages.book.pages.confirmation.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.book.title"),
+      $t("pages.tripManagement.pages.book.pages.confirmation.title"),
     )}
   </title>
 </svelte:head>
@@ -52,18 +52,18 @@
       <span class="icon success">
         <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
       </span>
-      <span typography="body-medium" weight="bold">{$i18n.words.success}</span>
-      <span typography="body-medium">{$i18n.sentences.theOrderWasCreatedSuccessfully}</span>
+      <span typography="body-medium" weight="bold">{$t("words.success")}</span>
+      <span typography="body-medium">{$t("sentences.theOrderWasCreatedSuccessfully")}</span>
     {:else if alertType === "error"}
       <span class="icon error">
         <Icon color="var(--color-common-dark-strong)" variant="close" />
       </span>
-      <span typography="body-medium" weight="bold">{$i18n.words.error}</span>
-      <span typography="body-medium">{$i18n.sentences.theOrderWasCreatedWithErrors}</span>
+      <span typography="body-medium" weight="bold">{$t("words.error")}</span>
+      <span typography="body-medium">{$t("sentences.theOrderWasCreatedWithErrors")}</span>
     {:else}
       <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
-      <span typography="body-medium" weight="bold">{$i18n.words.warning}</span>
-      <span typography="body-medium">{$i18n.sentences.theOrderIsInAPendingState}</span>
+      <span typography="body-medium" weight="bold">{$t("words.warning")}</span>
+      <span typography="body-medium">{$t("sentences.theOrderIsInAPendingState")}</span>
     {/if}
   </Alert>
 
@@ -79,7 +79,7 @@
               .tickets.root}
             download
           >
-            {$i18n.actions.downloadTickets}
+            {$t("actions.downloadTickets")}
           </a>
         {/if}
 
@@ -100,7 +100,7 @@
 <div class="actions">
   <div class="wrapper">
     <a variant="primary" size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
-      {$i18n.sentences.newSearch}
+      {$t("sentences.newSearch")}
     </a>
   </div>
 </div>

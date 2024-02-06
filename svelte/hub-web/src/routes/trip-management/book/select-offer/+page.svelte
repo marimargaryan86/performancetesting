@@ -51,7 +51,7 @@
   import { onDestroy, type ComponentEvents } from "svelte";
   import { writable } from "svelte/store";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { manager, type PartialSelectedOffer } from "../../booking-flow";
   import { browser, dev } from "$app/environment";
   import CollapsibleTripSearch from "../../components/trip-search/collapsible-trip-search.svelte";
@@ -73,7 +73,7 @@
   };
   let offerPollController: AbortController | undefined;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const selectOfferPending = writable(false);
   let offersPending: PendingType | undefined = "initial";
 
@@ -183,10 +183,10 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.book.title,
-      $i18n.pages.tripManagement.pages.book.pages.select.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.book.title"),
+      $t("pages.tripManagement.pages.book.pages.select.title"),
     )}
   </title>
 </svelte:head>
@@ -212,7 +212,7 @@
               disabled={Boolean(offersPending)}
             >
               <span typography="label-medium" weight="bold">
-                {$i18n.pages.tripManagement.pages.book.pages.select.earlier}
+                {$t("pages.tripManagement.pages.book.pages.select.earlier")}
               </span>
               {#if offersPending === "earlier"}
                 <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
@@ -238,7 +238,7 @@
           <li>
             <Alert type="warning" dismissable={false}>
               <span typography="body-medium">
-                {$i18n.sentences.noTripsMatchesTheFilterCriteria}
+                {$t("sentences.noTripsMatchesTheFilterCriteria")}
               </span>
             </Alert>
           </li>
@@ -253,7 +253,7 @@
       {:else if !offers.length}
         <li>
           <Alert type="warning" dismissable={false}>
-            <span typography="body-medium">{$i18n.sentences.noTripsFound}</span>
+            <span typography="body-medium">{$t("sentences.noTripsFound")}</span>
           </Alert>
         </li>
       {/if}
@@ -264,7 +264,7 @@
           <li class="later">
             <button on:click={fetchMore.bind(fetchMore, "later")} disabled={Boolean(offersPending)}>
               <span typography="label-medium" weight="bold">
-                {$i18n.pages.tripManagement.pages.book.pages.select.later}
+                {$t("pages.tripManagement.pages.book.pages.select.later")}
               </span>
               {#if offersPending === "later"}
                 <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
@@ -292,7 +292,7 @@
         variant="primary"
         size="small"
       >
-        {$i18n.actions.next}
+        {$t("actions.next")}
 
         {#if $selectOfferPending}
           <LoadingIcon />

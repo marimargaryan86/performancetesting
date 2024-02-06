@@ -1,16 +1,12 @@
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <div>
-  {#each $i18n.pages.help.pages.customerService.content as element}
-    {#if element.type === "p"}
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-      {@html element.html}
-    {/if}
-  {/each}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+  {@html $t("pages.help.pages.customerService.content")}
 </div>
 
 <style>

@@ -10,13 +10,13 @@
   import integrationInstancesClient from "~/integration-instances-client";
   import currencyData from "~/data/currency-data";
   import { writable } from "svelte/store";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let accountId: string;
   export let exclude: Balance[];
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   export function close(): void {
     visible = false;
@@ -82,12 +82,12 @@
     transition:fade={{ duration: 200 }}
   >
     <div class="dialogue" transition:fly={{ duration: 200, y: 24 }} on:introend={focusSearch}>
-      <h1 typography="headline-medium" weight="bold">{$i18n.actions.addBalances}</h1>
+      <h1 typography="headline-medium" weight="bold">{$t("actions.addBalances")}</h1>
 
       <TextField
         type="text"
         bind:value={searchQuery}
-        placeholder={$i18n.sentences.findABalance}
+        placeholder={$t("sentences.findABalance")}
         bind:this={inputRef}
       >
         <Icon
@@ -113,9 +113,9 @@
       </ul>
 
       <div class="actions">
-        <button on:click={close} variant="outline" size="medium">{$i18n.actions.cancel}</button>
+        <button on:click={close} variant="outline" size="medium">{$t("actions.cancel")}</button>
         <button on:click={addBalances} variant="primary" size="medium" disabled={!value.length}>
-          {$i18n.actions.add}
+          {$t("actions.add")}
 
           {#if $pending}
             <LoadingIcon />

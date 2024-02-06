@@ -2,7 +2,7 @@
   function getPassengerLabel(
     passenger: OrderPassenger,
     createdAt: Date,
-    locale: LocaleData,
+    translator: Translator,
   ): string {
     const age = getAge(passenger.birthDate, createdAt);
 
@@ -14,7 +14,7 @@
       return false;
     });
 
-    return def ? getPassengerFullLabel(def, locale) : locale.words.unknown;
+    return def ? getPassengerFullLabel(def, translator) : translator("words.unknown");
   }
 </script>
 
@@ -25,24 +25,24 @@
     PASSENGER_DEFINITIONS,
     getPassengerFullLabel,
   } from "./trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocaleData, type LocaleData } from "~/i18n";
+  import { getTranslator, type Translator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let passengers: OrderPassenger[];
   export let orderCreatedAt: Date = new Date();
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <ul class="passengers">
-  <li typography="body-large" weight="bold">{$i18n.words.passengerDetails}</li>
+  <li typography="body-large" weight="bold">{$t("words.passengerDetails")}</li>
   {#each passengers as passenger}
     <li class="passenger" typography="body-large">
       <span class="circle">
         <Icon variant="passenger" size="20px" color="var(--color-main-primary-600" />
       </span>
       <strong weight="bold">{passenger.firstName} {passenger.lastName}</strong>
-      <em>{getPassengerLabel(passenger, orderCreatedAt, $i18n)}</em>
+      <em>{getPassengerLabel(passenger, orderCreatedAt, $t)}</em>
     </li>
   {/each}
 </ul>

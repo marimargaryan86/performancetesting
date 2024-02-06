@@ -10,13 +10,13 @@
 </script>
 
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { ensureDefined } from "~/utils/array";
   import Card from "~/components/ui/card.svelte";
   import VideoPlayer from "./video-player.svelte";
   import Icon from "~/components/icons/icon.svelte";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let videoPlayer: VideoPlayer | undefined;
 </script>
@@ -24,13 +24,13 @@
 <VideoPlayer bind:this={videoPlayer} />
 
 <section>
-  <h2 typography="headline-small" weight="bold">{$i18n.pages.knowledgeHub.videos.title}</h2>
+  <h2 typography="headline-small" weight="bold">{$t("pages.knowledgeHub.videos.title")}</h2>
   <p typography="title-medium">
-    {$i18n.pages.knowledgeHub.videos.description}
+    {$t("pages.knowledgeHub.videos.description")}
   </p>
 
   <div class="videos">
-    {#each $i18n.pages.knowledgeHub.videos.items as video}
+    {#each $t("pages.knowledgeHub.videos.items", { returnObjects: true }) as video}
       {@const action = videoPlayer?.open.bind(videoPlayer.open, video)}
       <Card variant="vertical">
         <button

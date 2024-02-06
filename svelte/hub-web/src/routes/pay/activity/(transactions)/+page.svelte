@@ -10,7 +10,7 @@
   import type TransactionService from "~/integration/junction-hub-api/services/transaction-service";
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import { writable } from "svelte/store";
   import { slideFade } from "~/transitions/slide-fade";
   import { formatAmount } from "~/formatting/currency";
@@ -18,7 +18,7 @@
 
   export let data;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const locale = getLocale();
   const pending = writable(false);
 
@@ -47,10 +47,10 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.pay.title,
-      $i18n.pages.pay.pages.activity.title,
-      $i18n.pages.pay.pages.activity.pages.transactions.title,
+      $t("title"),
+      $t("pages.pay.title"),
+      $t("pages.pay.pages.activity.title"),
+      $t("pages.pay.pages.activity.pages.transactions.title"),
     )}
   </title>
 </svelte:head>
@@ -61,24 +61,24 @@
   use:scrollLoad={{ func: loadMore, pending }}
 >
   <x-thead>
-    <x-th>{$i18n.tableHeaders.id}</x-th>
-    <x-th>{$i18n.tableHeaders.createdDate}</x-th>
-    <x-th>{$i18n.tableHeaders.transactionType}</x-th>
-    <x-th>{$i18n.tableHeaders.paymentType}</x-th>
-    <x-th>{$i18n.tableHeaders.payer}</x-th>
-    <x-th>{$i18n.tableHeaders.owedToUs}</x-th>
-    <x-th>{$i18n.tableHeaders.beneficiary}</x-th>
-    <x-th>{$i18n.tableHeaders.whatWeOwe}</x-th>
-    <x-th>{$i18n.tableHeaders.salesProfit}</x-th>
-    <x-th>{$i18n.tableHeaders.reference}</x-th>
+    <x-th>{$t("tableHeaders.id")}</x-th>
+    <x-th>{$t("tableHeaders.createdDate")}</x-th>
+    <x-th>{$t("tableHeaders.transactionType")}</x-th>
+    <x-th>{$t("tableHeaders.paymentType")}</x-th>
+    <x-th>{$t("tableHeaders.payer")}</x-th>
+    <x-th>{$t("tableHeaders.owedToUs")}</x-th>
+    <x-th>{$t("tableHeaders.beneficiary")}</x-th>
+    <x-th>{$t("tableHeaders.whatWeOwe")}</x-th>
+    <x-th>{$t("tableHeaders.salesProfit")}</x-th>
+    <x-th>{$t("tableHeaders.reference")}</x-th>
   </x-thead>
 
   {#each transactions as item (item.id)}
     <x-tr>
       <x-td>{item.externalReference}</x-td>
       <x-td>{item.createdAt.toLocaleDateString($locale)}</x-td>
-      <x-td>{$i18n.types[item.payment.method]}</x-td>
-      <x-td>{$i18n.types[item.payment.type]}</x-td>
+      <x-td>{$t(`types.${item.payment.method}`)}</x-td>
+      <x-td>{$t(`types.${item.payment.type}`)}</x-td>
       <x-td class="company">
         {#if item.payer}
           <EntityAvatar name={item.payer.name} size="24px" /> {item.payer.name}

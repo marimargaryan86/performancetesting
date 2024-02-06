@@ -1,8 +1,8 @@
-import type { LocaleData } from "~/i18n";
+import type { Translator } from "~/i18n";
 import type { CountryModel } from "~/models/location";
 
 export function formatCountryOption(
-  lang: LocaleData,
+  translator: Translator,
   option?: CountryModel,
   selected?: boolean,
 ): string | undefined {
@@ -10,11 +10,11 @@ export function formatCountryOption(
     return option?.name;
   }
 
-  return option?.name ?? lang.words.none;
+  return option?.name ?? translator("words.none");
 }
 
 export function formatCountryPhoneOption(
-  lang: LocaleData,
+  translator: Translator,
   option?: CountryModel,
   selected?: boolean,
 ): string | undefined {
@@ -22,5 +22,5 @@ export function formatCountryPhoneOption(
     return option?.phoneCode ? `+${option.phoneCode}` : undefined;
   }
 
-  return option?.phoneCode ? `${option.name} (+${option.phoneCode})` : lang.words.none;
+  return option?.phoneCode ? `${option.name} (+${option.phoneCode})` : translator("words.none");
 }

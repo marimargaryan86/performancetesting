@@ -46,7 +46,7 @@
   import TextField from "~/components/ui/text-field.svelte";
   import { formatAmount } from "~/formatting/currency";
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { Markups, PartialMarkups } from "../../booking-flow";
   import type { z } from "zod";
 
@@ -55,7 +55,7 @@
   export let errors: z.ZodFormattedError<Markups> | undefined;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let collapsible: Collapsible | undefined;
   let serviceFeeType: FeeType = feeTypes[0];
@@ -109,7 +109,7 @@
   };
 </script>
 
-<Collapsible bind:this={collapsible} title={$i18n.words.fee.plural}>
+<Collapsible bind:this={collapsible} title={$t("words.fee_other")}>
   <div class="details">
     <div class="input-wrapper">
       <TextField
@@ -117,8 +117,8 @@
         type="number"
         min="0"
         step="0.01"
-        placeholder={$i18n.actions.enterAmount}
-        label={$i18n.words.serviceFee}
+        placeholder={$t("actions.enterAmount")}
+        label={$t("words.serviceFee")}
         error={errors?.serviceFee?.amount?._errors ?? errors?.serviceFee?._errors}
       />
 
@@ -126,7 +126,7 @@
         formatter={formatFeeType}
         options={feeTypes}
         bind:value={serviceFeeType}
-        placeholder={$i18n.actions.selectFeeType}
+        placeholder={$t("actions.selectFeeType")}
         label="&nbsp;"
       />
 
@@ -135,8 +135,8 @@
         type="number"
         min="0"
         step="0.01"
-        placeholder={$i18n.actions.enterAmount}
-        label={$i18n.words.agencyMarkup}
+        placeholder={$t("actions.enterAmount")}
+        label={$t("words.agencyMarkup")}
         error={errors?.agencyMarkup?.amount?._errors}
       />
 
@@ -144,7 +144,7 @@
         formatter={formatFeeType}
         options={feeTypes}
         bind:value={agencyMarkupType}
-        placeholder={$i18n.actions.selectFeeType}
+        placeholder={$t("actions.selectFeeType")}
         label="&nbsp;"
       />
     </div>
@@ -155,7 +155,7 @@
       <div transition:slideFade={{ duration: transitionTimeMs }} class="fees-breakdown">
         <ul>
           <li>
-            <span typography="label-medium">{$i18n.words.serviceFee}</span>
+            <span typography="label-medium">{$t("words.serviceFee")}</span>
             <span typography="body-small" weight="bold">
               {formatAmount(
                 { currency, amount: calculatedServiceFeeAmount },
@@ -164,7 +164,7 @@
             </span>
           </li>
           <li>
-            <span typography="label-medium">{$i18n.words.agencyMarkup}</span>
+            <span typography="label-medium">{$t("words.agencyMarkup")}</span>
             <span typography="body-small" weight="bold">
               {formatAmount(
                 { currency, amount: calculatedAgencyMarkupAmount },
@@ -177,7 +177,7 @@
     {/if}
 
     <div class="total">
-      <span typography="body-large" weight="bold">{$i18n.sentences.totalToCollect}</span>
+      <span typography="body-large" weight="bold">{$t("sentences.totalToCollect")}</span>
       <em typography="body-large" weight="bold">
         {#if priceQuote?.price}
           {formatAmount(

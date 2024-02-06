@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import UserManualImage from "~/assets/images/user-manual.png";
   import Icon from "~/components/icons/icon.svelte";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   const downloadUrl =
     "https://snowfall-public-files.s3.eu-north-1.amazonaws.com/junction/Junction+Hub+-+User+Manual+(ES).pdf";
 </script>
 
 <section>
-  <h2 typography="headline-small" weight="bold">{$i18n.pages.knowledgeHub.userManuals.title}</h2>
+  <h2 typography="headline-small" weight="bold">{$t("pages.knowledgeHub.userManuals.title")}</h2>
   <p typography="title-medium">
-    {$i18n.pages.knowledgeHub.userManuals.description}
+    {$t("pages.knowledgeHub.userManuals.description")}
   </p>
 
   <div class="download-manual">
@@ -21,7 +21,7 @@
         <p typography="title-medium" weight="bold" color="var(--color-main-primary-900)">
           <Icon variant="pdf" color="var(--color-semantic-error-500)" />
           <span class="spacer" />
-          {$i18n.pages.knowledgeHub.userManuals.userManual}
+          {$t("pages.knowledgeHub.userManuals.userManual")}
         </p>
         <Icon variant="download" color="var(--color-main-primary-500)" />
       </div>

@@ -37,15 +37,14 @@
   import type { Offer, OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
   import type { Price } from "~/integration/common/schemas/price";
   import { ensureDefined } from "~/utils/array";
-  import { getLocale, getLocaleData, type Locale } from "~/i18n";
-  import { formatStopCount } from "~/formatting/trip";
+  import { getLocale, getTranslator, type Locale } from "~/i18n";
 
   export let offer: Offer;
   export let selectedOptionIds: string[] | undefined;
   export let selected: boolean;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const dispatch = createEventDispatcher<{
     select: { proceed: boolean; offerId: string; optionIds: string[] };
   }>();
@@ -95,16 +94,16 @@
 
 <div class="offer" class:selected>
   {#each offer.groups as group, groupIdx}
-    {@const vendor = group.detailsList[0]?.vendor ?? $i18n.words.unknown}
+    {@const vendor = group.detailsList[0]?.vendor ?? $t("words.unknown")}
     {@const trainNumber = group.detailsList[0]?.routeIdentifiers.vendor ?? ""}
-    {@const stopCount = group.detailsList?.length ?? 1}
+    {@const stopCount = (group.detailsList?.length ?? 1) - 1}
 
     <div class="group">
       <div class="header" typography="label-medium">
         <EntityAvatar name={vendor} size="24px" />
         <span>
           {vendor}
-          {trainNumber} • {formatStopCount(stopCount, $i18n)}
+          {trainNumber} • {$t("words.stopCounter", { count: stopCount })}
         </span>
       </div>
 
@@ -155,14 +154,14 @@
         {#if groupIdx === 0}
           <div class="price">
             <span>
-              <em typography="label-medium">{$i18n.sentences.startingAt}</em>
+              <em typography="label-medium">{$t("sentences.startingAt")}</em>
               <strong typography="title-large" weight="bold">
                 {formatAmount(totalPrice, { locale: $locale, sign: true })}
               </strong>
             </span>
 
             <button size="x-small" variant="outline" on:click={selectOffer}>
-              {$i18n.actions.bookNow}
+              {$t("actions.bookNow")}
             </button>
           </div>
         {/if}

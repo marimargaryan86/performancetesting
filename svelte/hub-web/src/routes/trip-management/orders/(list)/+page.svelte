@@ -80,7 +80,7 @@
   import { bookingStatuses } from "~/integration/junction-hub-api/schemas/booking";
   import { parseDateRange } from "~/utils/date-time";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
   import { getQueryStore } from "~/stores/query-store";
   import { writable } from "svelte/store";
@@ -108,7 +108,7 @@
     }),
     valid: queryFiltersValid,
   });
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const locale = getLocale();
   const pending = writable(false);
   const columns =
@@ -140,9 +140,9 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.orders.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.orders.title"),
     )}
   </title>
 </svelte:head>
@@ -150,17 +150,17 @@
 <FindTripDialog bind:this={findTripDialog} />
 
 <StandardLayout
-  pageTitle={$i18n.pages.tripManagement.pages.orders.title}
+  pageTitle={$t("pages.tripManagement.pages.orders.title")}
   filtersActive={Boolean(Object.values($filters).find(ensureDefined))}
 >
   <div slot="actions">
     <button variant="outline" size="small" on:click={findTripDialog?.open}>
       <Icon variant="search" size="20px" />
-      {$i18n.actions.findTrip}
+      {$t("actions.findTrip")}
     </button>
     <a variant="primary" size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
       <Icon variant="plus" size="20px" />
-      {$i18n.actions.newOrder}
+      {$t("actions.newOrder")}
     </a>
   </div>
 
@@ -173,15 +173,15 @@
       style:grid-template-columns={columns}
     >
       <x-thead>
-        <x-th>{$i18n.tableHeaders.orderReference}</x-th>
-        <x-th>{$i18n.tableHeaders.createdDate}</x-th>
-        <x-th>{$i18n.tableHeaders.tickets}</x-th>
-        <x-th>{$i18n.tableHeaders.departureDate}</x-th>
-        <x-th>{$i18n.tableHeaders.passengers}</x-th>
-        <x-th>{$i18n.tableHeaders.totalPrice}</x-th>
-        <x-th>{$i18n.tableHeaders.bookingStatus}</x-th>
-        <x-th>{$i18n.tableHeaders.cancellationStatus}</x-th>
-        <x-th>{$i18n.tableHeaders.refundStatus}</x-th>
+        <x-th>{$t("tableHeaders.orderReference")}</x-th>
+        <x-th>{$t("tableHeaders.createdDate")}</x-th>
+        <x-th>{$t("tableHeaders.tickets")}</x-th>
+        <x-th>{$t("tableHeaders.departureDate")}</x-th>
+        <x-th>{$t("tableHeaders.passengers")}</x-th>
+        <x-th>{$t("tableHeaders.totalPrice")}</x-th>
+        <x-th>{$t("tableHeaders.bookingStatus")}</x-th>
+        <x-th>{$t("tableHeaders.cancellationStatus")}</x-th>
+        <x-th>{$t("tableHeaders.refundStatus")}</x-th>
       </x-thead>
 
       {#each orders as order (order.id)}
@@ -195,7 +195,7 @@
         <x-tr>
           <x-td>
             <a href={routeConfig.routes.tripManagement.routes.orders.routes.order(order.id).root}>
-              {order.journey?.reference ?? $i18n.words.unknown}
+              {order.journey?.reference ?? $t("words.unknown")}
             </a>
           </x-td>
           <x-td>{order.createdAt.toLocaleDateString($locale)}</x-td>
@@ -206,10 +206,10 @@
                   .tickets.root}
                 download
               >
-                {$i18n.actions.download}
+                {$t("actions.download")}
               </a>
             {:else}
-              <span class="not-available">{$i18n.words.notAvailable}</span>
+              <span class="not-available">{$t("words.notAvailable")}</span>
             {/if}
           </x-td>
           <x-td>
@@ -239,8 +239,8 @@
     <div class="not-found-wrapper">
       <div class="not-found-container">
         <img src={NotFoundGraphic} alt="" />
-        <h3 typography="headline-large" weight="bold">{$i18n.sentences.noTripsFound}</h3>
-        <pre typography="body-large">{$i18n.sentences.noTripsFoundMessage}</pre>
+        <h3 typography="headline-large" weight="bold">{$t("sentences.noTripsFound")}</h3>
+        <pre typography="body-large">{$t("sentences.noTripsFoundMessage")}</pre>
       </div>
     </div>
   {/if}

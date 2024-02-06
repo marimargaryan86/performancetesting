@@ -28,27 +28,26 @@
   import { getTimeDeltaS } from "~/utils/date-time";
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
   import type { OfferSegmentLeg } from "~/integration/common/schemas/offer-segment-leg";
-  import { getLocale, getLocaleData } from "~/i18n";
-  import { formatStopCount } from "~/formatting/trip";
+  import { getLocale, getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let bookings: TripBooking[];
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <div class="itinerary">
-  <h3 typography="body-large" weight="bold">{$i18n.words.itineraryDetails}</h3>
+  <h3 typography="body-large" weight="bold">{$t("words.itineraryDetails")}</h3>
 
   {#each bookings as booking}
     {@const origDestLegs = getOrigDestLegs(booking)}
     {@const cabinClasses = Array.from(
       new Set(booking.detailsList.map((item) => item.cabinClassName)),
     )}
-    {@const vendor = booking.detailsList[0]?.vendor ?? $i18n.words.unknown}
+    {@const vendor = booking.detailsList[0]?.vendor ?? $t("words.unknown")}
     {@const trainNumber = booking.detailsList[0]?.routeIdentifiers.vendor ?? ""}
-    {@const stopCount = booking.detailsList.length}
+    {@const stopCount = booking.detailsList.length - 1}
 
     {#if origDestLegs}
       {@const { originLeg, destinationLeg } = origDestLegs}
@@ -64,7 +63,7 @@
 
         <div class="orig-dest">
           <span typography="title-medium" weight="bold">{originLeg.origin.name}</span>
-          <em typography="title-small">{$i18n.words.to.toLowerCase()}</em>
+          <em typography="title-small">{$t("words.to").toLowerCase()}</em>
           <span typography="title-medium" weight="bold">
             {destinationLeg.destination.name}
           </span>
@@ -74,13 +73,13 @@
           <EntityAvatar name={vendor} />
           <span typography="label-medium">
             {vendor}
-            {trainNumber} • {formatStopCount(stopCount, $i18n)}
+            {trainNumber} • {$t("words.stopCounter", { count: stopCount })}
           </span>
         </div>
 
         <div class="fare-info">
           <div class="time">
-            <span typography="body-xsmall">{$i18n.words.departure}</span>
+            <span typography="body-xsmall">{$t("words.departure")}</span>
             <strong typography="body-xlarge" weight="bold">
               {originLeg.departureAt.toLocaleTimeString($locale, {
                 hour: "2-digit",
@@ -91,7 +90,7 @@
           </div>
 
           <div class="time">
-            <span typography="body-xsmall">{$i18n.words.arrival}</span>
+            <span typography="body-xsmall">{$t("words.arrival")}</span>
             <strong typography="body-xlarge" weight="bold">
               {destinationLeg.arrivalAt.toLocaleTimeString($locale, {
                 hour: "2-digit",
@@ -107,7 +106,7 @@
             </span>
 
             <div>
-              <em typography="body-xsmall">{$i18n.words.tripDuration}</em>
+              <em typography="body-xsmall">{$t("words.tripDuration")}</em>
               <strong typography="body-medium" weight="bold">
                 {formatDuration(getTimeDeltaS(originLeg.departureAt, destinationLeg.arrivalAt))}
               </strong>
@@ -121,7 +120,7 @@
 
             <div>
               <em typography="body-xsmall">
-                {$i18n.words.fareBrand[cabinClasses.length === 1 ? "singular" : "plural"]}
+                {$t("words.fareBrand", { count: cabinClasses.length })}
               </em>
               <strong typography="body-medium" weight="bold">
                 {cabinClasses.join(", ")}

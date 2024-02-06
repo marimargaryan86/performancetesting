@@ -7,12 +7,14 @@
   import { writable } from "svelte/store";
   import { slideFade } from "~/transitions/slide-fade";
   import { getPageTitle } from "~/utils/page-title";
+  import { getTranslator } from "~/i18n/index";
 
   export let data;
 
   let errors: string[] = [];
   let info: string[] = [];
 
+  const t = getTranslator();
   const pending = writable<string | undefined>();
 
   async function submit(
@@ -56,7 +58,8 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle("Junction Hub", "Account recovery")}</title>
+  <!-- TODO: Add i18n -->
+  <title>{getPageTitle($t("title"), "Account recovery")}</title>
 </svelte:head>
 
 <section class="account-recovery">
@@ -119,6 +122,7 @@
     {/if}
 
     <a class="back" typography="body-medium" href={routeConfig.routes.login.root}>
+      <!-- TODO: Add i18n -->
       Back to login
     </a>
   </form>

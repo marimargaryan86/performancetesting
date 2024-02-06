@@ -7,16 +7,19 @@
     document?: Require<Partial<TravelerDocument>, "countryCodes">;
   };
 
-  function formatTitleOption(lang: LocaleData, option?: PassengerTitle): string {
-    return option ? lang.passengerTitle[option] : "";
+  function formatTitleOption(translator: Translator, option?: PassengerTitle): string {
+    return option ? translator(`passengerTitle.${option}`) : "";
   }
 
-  function formatGenderOption(lang: LocaleData, option?: Gender): string {
-    return option ? lang.gender[option] : "";
+  function formatGenderOption(translator: Translator, option?: Gender): string {
+    return option ? translator(`gender.${option}`) : "";
   }
 
-  function formatTravelerDocumentOption(lang: LocaleData, option?: TravelerDocumentType): string {
-    return option ? lang.documentTypes[option] : lang.words.none;
+  function formatTravelerDocumentOption(
+    translator: Translator,
+    option?: TravelerDocumentType,
+  ): string {
+    return option ? translator(`documentTypes.${option}`) : translator("words.none");
   }
 
   function getPassengerTitles(locale: Locale): PassengerTitle[] {
@@ -48,7 +51,7 @@
     PASSENGER_DEFINITIONS,
     type PassengerPickerData,
   } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocale, getLocaleData, type Locale, type LocaleData } from "~/i18n";
+  import { getLocale, getTranslator, type Locale, type Translator } from "~/i18n";
   import type {
     Gender,
     TravelerDocumentType,
@@ -61,7 +64,7 @@
   export let required: TripOfferPriceQuote["required"];
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let collapsible: Collapsible | undefined;
   let document = passenger.document ?? { countryCodes: {} };
@@ -75,21 +78,21 @@
 <Collapsible expandedOnMount bind:this={collapsible}>
   <h2 slot="title">
     <strong typography="title-medium" weight="bold">
-      {$i18n.words.passenger.singular}
+      {$t("words.passenger_one")}
       {passengerNumber}
     </strong>
     <span typography="title-small">
-      {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type], $i18n)}
+      {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type], $t)}
     </span>
   </h2>
 
   <div class="details">
     <SelectField
       options={getPassengerTitles($locale)}
-      formatter={formatTitleOption.bind(formatTitleOption, $i18n)}
+      formatter={formatTitleOption.bind(formatTitleOption, $t)}
       bind:value={passenger.title}
-      placeholder={$i18n.actions.select}
-      label={$i18n.words.title}
+      placeholder={$t("actions.select")}
+      label={$t("words.title")}
       required
       error={errors?.title?._errors}
     />
@@ -98,16 +101,16 @@
 
     <TextField
       bind:value={passenger.firstName}
-      placeholder={$i18n.actions.enterFirstName}
-      label={$i18n.words.firstName}
+      placeholder={$t("actions.enterFirstName")}
+      label={$t("words.firstName")}
       required
       error={errors?.firstName?._errors}
     />
 
     <TextField
       bind:value={passenger.lastName}
-      placeholder={$i18n.actions.enterLastName}
-      label={$i18n.words.lastName}
+      placeholder={$t("actions.enterLastName")}
+      label={$t("words.lastName")}
       required
       error={errors?.lastName?._errors}
     />
@@ -115,17 +118,17 @@
     <DateTextField
       bind:value={passenger.birthDate}
       placeholder="dd/mm/yyyy"
-      label={$i18n.words.birthdayDate}
+      label={$t("words.birthdayDate")}
       required
       error={errors?.birthDate?._errors}
     />
 
     <SelectField
       options={passengerGenders}
-      formatter={formatGenderOption.bind(formatGenderOption, $i18n)}
+      formatter={formatGenderOption.bind(formatGenderOption, $t)}
       bind:value={passenger.gender}
-      placeholder={$i18n.actions.select}
-      label={$i18n.words.gender}
+      placeholder={$t("actions.select")}
+      label={$t("words.gender")}
       required
       error={errors?.gender?._errors}
     />
@@ -134,9 +137,9 @@
       <SelectField
         bind:value={document.type}
         options={[undefined, ...travelerDocumentTypes]}
-        formatter={formatTravelerDocumentOption.bind(formatTravelerDocumentOption, $i18n)}
-        placeholder={$i18n.actions.select}
-        label={$i18n.words.documentType}
+        formatter={formatTravelerDocumentOption.bind(formatTravelerDocumentOption, $t)}
+        placeholder={$t("actions.select")}
+        label={$t("words.documentType")}
         required
         error={errors?.document?.type?._errors}
       />
@@ -146,8 +149,8 @@
       {#if required.includes("passport-number")}
         <TextField
           bind:value={document.number}
-          placeholder={$i18n.actions.enterDocumentNumber}
-          label={$i18n.words.documentNumber}
+          placeholder={$t("actions.enterDocumentNumber")}
+          label={$t("words.documentNumber")}
           required
           error={errors?.document?.number?._errors}
         />
@@ -156,7 +159,7 @@
         <DateTextField
           bind:value={document.expiryDate}
           placeholder="dd/mm/yyyy"
-          label={$i18n.words.expiryDate}
+          label={$t("words.expiryDate")}
           required
           error={errors?.document?.expiryDate?._errors}
         />
@@ -165,7 +168,7 @@
         <DateTextField
           bind:value={document.issueDate}
           placeholder="dd/mm/yyyy"
-          label={$i18n.words.issueDate}
+          label={$t("words.issueDate")}
           required
           error={errors?.document?.issueDate?._errors}
         />
@@ -173,8 +176,8 @@
       {#if required.includes("issuing-country")}
         <TextField
           bind:value={document.countryCodes.issue}
-          placeholder={$i18n.actions.enterIssuingCountry}
-          label={$i18n.words.issuingCountry}
+          placeholder={$t("actions.enterIssuingCountry")}
+          label={$t("words.issuingCountry")}
           required
           error={errors?.document?.countryCodes?.issue?._errors}
         />
@@ -182,8 +185,8 @@
       {#if required.includes("nationality")}
         <TextField
           bind:value={document.countryCodes.nationality}
-          placeholder={$i18n.actions.enterNationality}
-          label={$i18n.words.nationality}
+          placeholder={$t("actions.enterNationality")}
+          label={$t("words.nationality")}
           required
           error={errors?.document?.countryCodes?.nationality?._errors}
         />
@@ -191,8 +194,8 @@
       {#if required.includes("residence-country-code")}
         <TextField
           bind:value={document.countryCodes.residence}
-          placeholder={$i18n.actions.enterResidenceCountryCode}
-          label={$i18n.words.residenceCountryCode}
+          placeholder={$t("actions.enterResidenceCountryCode")}
+          label={$t("words.residenceCountryCode")}
           required
           error={errors?.document?.countryCodes?.residence?._errors}
         />

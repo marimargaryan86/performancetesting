@@ -1,9 +1,9 @@
 <script lang="ts">
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { slideFade } from "~/transitions/slide-fade";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let expandedIdx: number | undefined;
 
@@ -13,10 +13,10 @@
 </script>
 
 <section>
-  <h2 typography="headline-large" weight="bold">{$i18n.pages.knowledgeHub.faq.title}</h2>
+  <h2 typography="headline-large" weight="bold">{$t("pages.knowledgeHub.faq.title")}</h2>
 
   <ol>
-    {#each $i18n.pages.knowledgeHub.faq.items as item, idx}
+    {#each $t("pages.knowledgeHub.faq.items", { returnObjects: true }) as item, idx}
       {@const expanded = expandedIdx === idx}
 
       <li>

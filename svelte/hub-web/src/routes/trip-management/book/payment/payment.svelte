@@ -48,13 +48,13 @@
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import Dialog from "~/components/ui/dialogues/dialog.svelte";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { PaymentIntent } from "../../booking-flow";
 
   export let paymentIntent: PaymentIntent | undefined;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let dialog: Dialog | undefined = undefined;
   let stripe: Stripe | undefined = undefined;
@@ -122,15 +122,15 @@
   <div class="dialog">
     <img src={paymentIllustrationImg} alt="" />
     <div>
-      <h3 typography="display-small" weight="bold">{$i18n.sentences.paymentDeclined}</h3>
-      <p typography="body-medium">{error ?? $i18n.sentences.anUnexpectedErrorOccurred}</p>
+      <h3 typography="display-small" weight="bold">{$t("sentences.paymentDeclined")}</h3>
+      <p typography="body-medium">{error ?? $t("sentences.anUnexpectedErrorOccurred")}</p>
     </div>
-    <button variant="primary" size="small" on:click={clearError}>{$i18n.actions.tryAgain}</button>
+    <button variant="primary" size="small" on:click={clearError}>{$t("actions.tryAgain")}</button>
   </div>
 </Dialog>
 
 <div class="payment">
-  <span typography="title-medium" weight="bold">{$i18n.words.paymentMethod}</span>
+  <span typography="title-medium" weight="bold">{$t("words.paymentMethod")}</span>
 
   <div bind:this={stripeContainer} class="stripe-container" class:pending={!paymentIntent}>
     {#if !paymentIntent}
@@ -139,7 +139,7 @@
   </div>
 
   <span class="toc" typography="body-small">
-    {#each $i18n.sentences.paymentInfo as item}
+    {#each $t("sentences.paymentInfo", { returnObjects: true }) as item}
       {#if item.type === "text"}
         {item.value}
       {:else if item.type === "toc"}

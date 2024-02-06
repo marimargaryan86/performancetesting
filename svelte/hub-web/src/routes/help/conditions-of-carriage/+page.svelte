@@ -70,17 +70,14 @@
 </script>
 
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <div>
-  {#each $i18n.pages.help.pages.conditionsOfCarriage.content as element}
-    {#if element.type === "p"}
-      <p>{element.html}</p>
-    {/if}
-  {/each}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+  {@html $t("pages.help.pages.conditionsOfCarriage.content")}
 
   <ul>
     {#each railServices as service}

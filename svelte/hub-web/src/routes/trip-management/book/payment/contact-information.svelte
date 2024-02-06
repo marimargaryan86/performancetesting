@@ -44,12 +44,12 @@
   import Collapsible from "../../components/collapsible.svelte";
   import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
   import countryData from "~/data/country-data";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
   export let data: ContactDetails;
   export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let collapsible: Collapsible | undefined;
   let country: CountryModel | undefined = countryData.mapping[data.address.countryCode ?? ""];
@@ -72,24 +72,24 @@
   }
 </script>
 
-<Collapsible bind:this={collapsible} title={$i18n.words.contactInformation} expandedOnMount>
+<Collapsible bind:this={collapsible} title={$t("words.contactInformation")} expandedOnMount>
   <div class="details">
     <div class="phone">
       <SelectField
         search={findCountry}
         options={countryData.list}
-        label={$i18n.words.countryCode}
-        placeholder={$i18n.actions.select}
+        label={$t("words.countryCode")}
+        placeholder={$t("actions.select")}
         required
-        formatter={formatCountryPhoneOption.bind(formatCountryPhoneOption, $i18n)}
+        formatter={formatCountryPhoneOption.bind(formatCountryPhoneOption, $t)}
         bind:value={phone.country}
         error={Boolean(errors?.phone?._errors)}
         dialogMinWidth="240px"
       />
       <TextField
-        label={$i18n.words.phoneNumber}
+        label={$t("words.phoneNumber")}
         type="tel"
-        placeholder={$i18n.actions.enterPhoneNumber}
+        placeholder={$t("actions.enterPhoneNumber")}
         required
         bind:value={phone.number}
         error={errors?.phone?._errors}
@@ -97,31 +97,31 @@
     </div>
 
     <TextField
-      label={$i18n.words.email}
+      label={$t("words.email")}
       type="email"
-      placeholder={$i18n.actions.enterEmail}
+      placeholder={$t("actions.enterEmail")}
       required
       bind:value={data.email}
       error={errors?.email?._errors}
     />
     <TextField
-      label={$i18n.words.addressLine1}
-      placeholder={$i18n.actions.enterAddressLine1}
+      label={$t("words.addressLine1")}
+      placeholder={$t("actions.enterAddressLine1")}
       required
       bind:value={data.address.street.line1}
       error={errors?.address?.street?.line1?._errors}
     />
     <TextField
-      label={$i18n.words.addressLine2}
-      placeholder={$i18n.actions.enterAddressLine2}
+      label={$t("words.addressLine2")}
+      placeholder={$t("actions.enterAddressLine2")}
       bind:value={data.address.street.line2}
       error={errors?.address?.street?.line2?._errors}
     />
 
     <div class="location">
       <TextField
-        label={$i18n.words.city}
-        placeholder="{$i18n.actions.enterCity},"
+        label={$t("words.city")}
+        placeholder="{$t('actions.enterCity')},"
         required
         bind:value={data.address.city}
         error={errors?.address?.city?._errors}
@@ -130,17 +130,17 @@
         search={findCountry}
         direction="up"
         options={countryData.list}
-        label={$i18n.words.country}
-        placeholder={$i18n.actions.selectCountry}
-        formatter={formatCountryOption.bind(formatCountryOption, $i18n)}
+        label={$t("words.country")}
+        placeholder={$t("actions.selectCountry")}
+        formatter={formatCountryOption.bind(formatCountryOption, $t)}
         required
         bind:value={country}
         error={errors?.address?.countryCode?._errors}
         dialogMinWidth="240px"
       />
       <TextField
-        label={$i18n.words.postcode}
-        placeholder={$i18n.actions.enterPostcode}
+        label={$t("words.postcode")}
+        placeholder={$t("actions.enterPostcode")}
         required
         bind:value={data.address.postalCode}
         error={errors?.address?.postalCode?._errors}

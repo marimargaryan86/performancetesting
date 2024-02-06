@@ -1,6 +1,6 @@
 <script lang="ts">
   import routeConfig from "~/route-config";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Card from "~/components/ui/card.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
@@ -8,25 +8,25 @@
   import TripGraphicTwo from "~/assets/images/trip-graphic-2.png";
   import SearchingGraphic from "~/assets/images/searching.png";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let findTripDialog: FindTripDialog | undefined;
 </script>
 
 <svelte:head>
-  <title>{getPageTitle($i18n.title, $i18n.pages.dashboard.title)}</title>
+  <title>{getPageTitle($t("title"), $t("pages.dashboard.title"))}</title>
 </svelte:head>
 
 <FindTripDialog bind:this={findTripDialog} />
 
 <header>
-  <h1 typography="headline-medium" weight="bold">{$i18n.pages.dashboard.title}</h1>
+  <h1 typography="headline-medium" weight="bold">{$t("pages.dashboard.title")}</h1>
 </header>
 <div class="wrapper">
   <div class="dashboard">
     <div class="splash">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-      {@html $i18n.pages.dashboard.intro}
+      {@html $t("pages.dashboard.intro")}
     </div>
 
     <div class="widgets">
@@ -40,8 +40,8 @@
           <img src={TripGraphicTwo} alt="Depiction of ticket prices." class="trip-graphic-2" />
         </div>
         <div slot="content" class="content">
-          <h3 typography="headline-small" weight="bold">{$i18n.words.bookTrip}</h3>
-          <p typography="label-large">{$i18n.sentences.bookTrip}</p>
+          <h3 typography="headline-small" weight="bold">{$t("words.bookTrip")}</h3>
+          <p typography="label-large">{$t("sentences.bookTrip")}</p>
         </div>
         <div slot="actions" class="actions">
           <a
@@ -49,7 +49,7 @@
             class="widget-button"
             href={routeConfig.routes.tripManagement.routes.book.root}
           >
-            {$i18n.actions.bookTrip}
+            {$t("actions.bookTrip")}
           </a>
         </div>
       </Card>
@@ -59,12 +59,12 @@
           <img src={SearchingGraphic} alt="" class="media searching-graphic" />
         </div>
         <div slot="content" class="content alt">
-          <h3 typography="headline-small" weight="bold">{$i18n.words.manageTrip}</h3>
-          <p typography="label-large">{$i18n.sentences.manageTrip}</p>
+          <h3 typography="headline-small" weight="bold">{$t("words.manageTrip")}</h3>
+          <p typography="label-large">{$t("sentences.manageTrip")}</p>
         </div>
         <div slot="actions" class="actions alt">
           <button variant="outline" class="widget-button" on:click={findTripDialog?.open}>
-            {$i18n.actions.findTrip}
+            {$t("actions.findTrip")}
           </button>
         </div>
       </Card>

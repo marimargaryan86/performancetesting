@@ -1,14 +1,14 @@
 <script lang="ts">
   import Collapsible from "~/components/ui/collapsible.svelte";
   import { getPassengersPresentation } from "./passenger-picker/passenger-picker.svelte";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import type { SearchData } from "./trip-search.svelte";
 
   export let searchData: SearchData;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <Collapsible>
@@ -35,14 +35,14 @@
           })}
         {/if}
         ·
-        {$i18n.tripTypes[searchData.tripType]}
+        {$t(`tripTypes.${searchData.tripType}`)}
         ·
-        {getPassengersPresentation(searchData.passengers, $i18n)}
+        {getPassengersPresentation(searchData.passengers, $t)}
       </div>
     </div>
 
     <button typography="body-medium" weight="bold" on:click={toggle}>
-      {$i18n.actions.modifySearch}
+      {$t("actions.modifySearch")}
 
       <ChevronIcon
         size="16px"

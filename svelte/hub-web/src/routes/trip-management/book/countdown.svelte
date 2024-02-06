@@ -11,7 +11,7 @@
 <script lang="ts">
   import Icon from "~/components/icons/icon.svelte";
   import Alert from "~/components/ui/alert.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { onDestroy, onMount } from "svelte";
   import { sleep } from "~/utils/common";
   import { getTimeDeltaS } from "~/utils/date-time";
@@ -19,7 +19,7 @@
   export let expiresAt: Date;
   export let show = false;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let ticking = show;
 
@@ -61,9 +61,9 @@
 
 <Alert {show} type="warning" class="countdown">
   <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
-  <strong typography="body-medium" weight="bold">{$i18n.sentences.timeRemaining}</strong>
+  <strong typography="body-medium" weight="bold">{$t("sentences.timeRemaining")}</strong>
   <span typography="body-medium">
     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html $i18n.sentences.timeRemainingInfo.replace("{timeLeft}", timeLeft)}
+    {@html $t("sentences.timeRemainingInfo", { timeLeft })}
   </span>
 </Alert>

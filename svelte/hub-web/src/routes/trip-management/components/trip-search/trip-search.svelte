@@ -65,7 +65,7 @@
   import integrationInstancesClient from "~/integration-instances-client";
   import { ensureDefined } from "~/utils/array";
   import { writable, type Writable } from "svelte/store";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
   import { createEventDispatcher } from "svelte";
   import { z } from "zod";
@@ -81,7 +81,7 @@
     search: { data: SearchData; pending: Writable<boolean> };
   }>();
   const pending = writable(false);
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const today = new Date();
   today.setSeconds(0);
   today.setMinutes(0);
@@ -107,9 +107,9 @@
   on:submit|preventDefault={search}
 >
   <AutocompleteField
-    label={$i18n.words.from}
+    label={$t("words.from")}
     required
-    placeholder={$i18n.sentences.cityOrStation}
+    placeholder={$t("sentences.cityOrStation")}
     bind:value={data.origin}
     autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
@@ -122,9 +122,9 @@
   </button>
 
   <AutocompleteField
-    label={$i18n.words.to}
+    label={$t("words.to")}
     required
-    placeholder={$i18n.sentences.cityOrStation}
+    placeholder={$t("sentences.cityOrStation")}
     bind:value={data.destination}
     autocomplete={integrationInstancesClient.mobile.places.find}
     formatter={formatPlace}
@@ -133,7 +133,7 @@
   />
 
   <DatePicker
-    label={data.tripType === "one-way" ? $i18n.words.depart : $i18n.words.outbound}
+    label={data.tripType === "one-way" ? $t("words.depart") : $t("words.outbound")}
     bind:value={data.outbound}
     error={errors?.outbound?._errors}
     required
@@ -143,7 +143,7 @@
 
   {#if data.tripType === "round-trip"}
     <DatePicker
-      label={$i18n.words.inbound}
+      label={$t("words.inbound")}
       bind:value={data.inbound}
       error={errors && "inbound" in errors ? errors.inbound?._errors : undefined}
       required

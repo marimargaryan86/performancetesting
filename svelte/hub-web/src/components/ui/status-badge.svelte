@@ -45,11 +45,11 @@
 </script>
 
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
   export let value: StatusBadgeValue;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   $: variant = statusMapping[value];
 </script>
@@ -61,7 +61,7 @@
   class:warn={variant === "warn"}
   class:error={variant === "error"}
 >
-  {$i18n.statuses[value]}
+  {$t(`statuses.${value}`)}
 </span>
 
 <style>

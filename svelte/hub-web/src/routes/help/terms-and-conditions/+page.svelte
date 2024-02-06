@@ -1,23 +1,12 @@
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <div>
-  {#each $i18n.pages.help.pages.termsAndConditions.content as element}
-    {#if element.type === "h2"}
-      <h2 typography="body-large" weight="bold">{element.html}</h2>
-    {:else if element.type === "p"}
-      <p>{element.html}</p>
-    {:else if element.type === "ul"}
-      <ul>
-        {#each element.items as item}
-          <li>{item}</li>
-        {/each}
-      </ul>
-    {/if}
-  {/each}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+  {@html $t("pages.help.pages.termsAndConditions.content")}
 </div>
 
 <style>
@@ -27,7 +16,7 @@
     gap: 16px;
   }
 
-  h2 {
+  div :global(h2) {
     margin-bottom: -8px;
     color: var(--color-main-primary-900);
   }

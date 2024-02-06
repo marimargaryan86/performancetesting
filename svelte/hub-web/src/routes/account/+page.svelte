@@ -23,13 +23,13 @@
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import { getUser } from "~/utils/permissions";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { goto, invalidateAll } from "$app/navigation";
   import routeConfig from "~/route-config";
 
   export let data;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const user = getUser();
   const pending = writable<string | undefined>();
 
@@ -72,17 +72,17 @@
 </script>
 
 <svelte:head>
-  <title>{getPageTitle($i18n.title, $i18n.pages.account.title)}</title>
+  <title>{getPageTitle($t("title"), $t("pages.account.title"))}</title>
 </svelte:head>
 
 <StandardLayout
-  pageTitle={$i18n.pages.account.title}
-  pageSubTitle={$user ? `${$user.email} (${$i18n.roles[$user.role]})` : undefined}
+  pageTitle={$t("pages.account.title")}
+  pageSubTitle={$user ? `${$user.email} (${$t(`roles.${$user.role}`)})` : undefined}
 >
   <svelte:fragment slot="actions">
     {#if !$user}
       <button variant="primary" size="small" on:click={logout}>
-        {$i18n.actions.goToLogin}
+        {$t("actions.goToLogin")}
         {#if $pending === "logout"}
           <LoadingIcon size="16px" />
         {/if}
@@ -97,7 +97,7 @@
       {#if nodes.length}
         <form on:submit|preventDefault={submit}>
           <h2 typography="headline-small" weight="bold">
-            {$i18n.ory.formGroups[name]}
+            {$t(`ory.formGroups.${name}`)}
           </h2>
 
           {#each [...nodes, ...(defaultGroup ?? [])] as node}
@@ -129,7 +129,7 @@
                     ? getOnClick(node.attributes.onclick)
                     : undefined}
                 >
-                  {node.meta.label?.text ?? $i18n.actions.click}
+                  {node.meta.label?.text ?? $t("actions.click")}
 
                   {#if $pending === `${node.attributes.name}:${node.attributes.value}`}
                     <LoadingIcon />

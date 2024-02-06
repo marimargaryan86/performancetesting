@@ -7,13 +7,13 @@
   import routeConfig from "~/route-config";
   import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let data;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let searchQuery = "";
   let dialogue: AddBalanceDialogue;
@@ -41,11 +41,11 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.pay.title,
-      $i18n.pages.pay.pages.accounts.title,
+      $t("title"),
+      $t("pages.pay.title"),
+      $t("pages.pay.pages.accounts.title"),
       data.account.name,
-      $i18n.words.balances,
+      $t("words.balances"),
     )}
   </title>
 </svelte:head>
@@ -57,9 +57,9 @@
   bind:this={dialogue}
 />
 
-<StandardLayout pageTitle={$i18n.words.balances} {breadCrumbs} bind:searchQuery>
+<StandardLayout pageTitle={$t("words.balances")} {breadCrumbs} bind:searchQuery>
   <button variant="primary" size="small" on:click={openDialogue} slot="actions">
-    {$i18n.actions.addBalance}
+    {$t("actions.addBalance")}
     <Icon variant="plus" size="20px" />
   </button>
 
@@ -83,7 +83,7 @@
         </a>
       </li>
     {:else}
-      <li typography="body-large" class="empty">{$i18n.sentences.noBalancesFound}</li>
+      <li typography="body-large" class="empty">{$t("sentences.noBalancesFound")}</li>
     {/each}
   </ul>
 </StandardLayout>

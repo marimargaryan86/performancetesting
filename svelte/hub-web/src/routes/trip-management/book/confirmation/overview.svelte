@@ -3,16 +3,16 @@
   import { getOrderStatus } from "~/integration/common/schemas/order";
   import Ticket from "../../components/ticket.svelte";
   import StatusBadge from "~/components/ui/status-badge.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let order: Order;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <div class="overview">
-  <h2 typography="headline-small" weight="bold">{$i18n.sentences.yourOrderHasBeenCreated}</h2>
+  <h2 typography="headline-small" weight="bold">{$t("sentences.yourOrderHasBeenCreated")}</h2>
   <Ticket identifier={order.journey?.reference} />
 
   <div class="item">
@@ -20,7 +20,7 @@
       <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
     </span>
     <div>
-      <span typography="body-xsmall">{$i18n.words.status}</span>
+      <span typography="body-xsmall">{$t("words.status")}</span>
       <StatusBadge value={getOrderStatus.booking(order) ?? "unknown"} />
     </div>
   </div>

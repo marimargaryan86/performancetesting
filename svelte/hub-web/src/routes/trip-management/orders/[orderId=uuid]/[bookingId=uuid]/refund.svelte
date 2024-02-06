@@ -1,6 +1,6 @@
 <script lang="ts">
   import { formatAmount } from "~/formatting/currency";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { Refund } from "~/integration/junction-hub-api/schemas/refund";
   import { slideFade } from "~/transitions/slide-fade";
   import { pricesEqual } from "~/utils/money";
@@ -8,7 +8,7 @@
   export let refund: Refund;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   // Only display usInPayerCurrency if the currency differs from refundedUs
   $: usInPayerCurrency =
@@ -20,12 +20,12 @@
 </script>
 
 <div class="refund" transition:slideFade={{ duration: 300 }}>
-  <h3 typography="title-large" weight="bold">{$i18n.words.refund}</h3>
+  <h3 typography="title-large" weight="bold">{$t("words.refund")}</h3>
 
   <ul class="money">
     {#if refund.refunded.us}
       <li class="amount" typography="body-medium">
-        <strong>{$i18n.sentences.toUs}</strong>
+        <strong>{$t("sentences.toUs")}</strong>
         <span weight="bold" class:negative={refund.refunded.us.amount < 0}>
           {formatAmount(refund.refunded.us, { locale: $locale, sign: true })}
         </span>
@@ -34,7 +34,7 @@
 
     {#if usInPayerCurrency}
       <li class="amount" typography="body-medium">
-        <strong>{$i18n.sentences.toUs} <em>({$i18n.sentences.payerCurrency})</em></strong>
+        <strong>{$t("sentences.toUs")} <em>({$t("sentences.payerCurrency")})</em></strong>
         <span weight="bold" class:negative={usInPayerCurrency.amount < 0}>
           {formatAmount(usInPayerCurrency, { locale: $locale, sign: true })}
         </span>
@@ -43,7 +43,7 @@
 
     {#if refund.refunded.reseller}
       <li class="amount" typography="body-medium">
-        <strong>{$i18n.sentences.toReseller}</strong>
+        <strong>{$t("sentences.toReseller")}</strong>
         <span weight="bold" class:negative={refund.refunded.reseller.amount < 0}>
           {formatAmount(refund.refunded.reseller, { locale: $locale, sign: true })}
         </span>
@@ -52,7 +52,7 @@
 
     {#if refund.refundPosition}
       <li class="amount" typography="body-medium">
-        <strong>{$i18n.words.refundPosition}</strong>
+        <strong>{$t("words.refundPosition")}</strong>
         <span weight="bold" class:negative={refund.refundPosition.amount < 0}>
           {formatAmount(refund.refundPosition, { locale: $locale, sign: true })}
         </span>

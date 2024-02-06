@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import type { LocaleData } from "~/i18n";
 
 export default {
@@ -19,16 +20,14 @@ export default {
     from: "Från",
     to: "Till",
     depart: "Avgå",
-    passenger: {
-      plural: "Resenärer",
-      singular: "Resenär",
-    },
+    passenger_one: "Resenär",
+    passenger_other: "Resenärer",
     fareRules: "Färdregler",
-    stop: {
-      plural: "Stopp",
-      singular: "Stopp",
-    },
-    direct: "Direkt",
+    stop_zero: "Direkt",
+    stop_one: "Stopp",
+    stop_other: "$t(words.stop_one)",
+    stopCounter_zero: "$t(words.stop_zero)",
+    stopCounter: "{{count}} $t(words.stop, lowercase)",
     departureTime: "Avgångstid",
     departure: "Avgång",
     arrival: "Ankomst",
@@ -51,15 +50,11 @@ export default {
     nationality: "Nationalitet",
     residenceCountryCode: "Bostadslandskod",
     summary: "Sammanfattning",
-    fareBrand: {
-      plural: "Klasser",
-      singular: "Klass",
-    },
+    fareBrand_one: "Klass",
+    fareBrand_other: "Klasser",
     itinerary: "Resplan",
-    fee: {
-      plural: "Avgifter",
-      singular: "Avgift",
-    },
+    fee_one: "Avgift",
+    fee_other: "Avgifter",
     serviceFee: "Serviceavgift",
     agencyMarkup: "Byråpåslag",
     paymentMethod: "Betalningssätt",
@@ -163,7 +158,7 @@ export default {
   sentences: {
     priceChange: "Prisändring",
     priceChangeInfo:
-      'Vi har upptäckt en prisändring; ursprungspriset var <strong typography="body-medium" weight="bold">{originalPrice}</strong> och det nya priset är <strong typography="body-medium" weight="bold">{newPrice}</strong>. Vill du fortsätta?',
+      'Vi har upptäckt en prisändring; ursprungspriset var <strong typography="body-medium" weight="bold">{{originalPrice}}</strong> och det nya priset är <strong typography="body-medium" weight="bold">{{newPrice}}</strong>. Vill du fortsätta?',
     areYouSure: "Är du säker?",
     copiedToClipboard: "Kopierad till urklipp",
     noBalancesFound: "Inga saldon funna",
@@ -173,7 +168,7 @@ export default {
     noTripsFound: "Inga resor hittades",
     timeRemaining: "Återstående tid",
     timeRemainingInfo:
-      '{timeLeft} min kvar att <strong weight="bold">slutföra</strong> din bokning',
+      '{{timeLeft}} min kvar att <strong weight="bold">slutföra</strong> din bokning',
     startingAt: "Från",
     loadingTripDetails: "Laddar resedetailjer...",
     thisPriceIsForAllPassengers: "Detta pris gäller för alla passagerare",
@@ -287,22 +282,14 @@ export default {
     unspecified: "Ospecificerad",
   },
   passengerTypes: {
-    adult: {
-      plural: "Vuxna",
-      singular: "Vuxen",
-    },
-    child: {
-      plural: "Barn",
-      singular: "Barn",
-    },
-    senior: {
-      plural: "Seniorer",
-      singular: "Senior",
-    },
-    youth: {
-      plural: "Ungdomar",
-      singular: "Ungdom",
-    },
+    adult_one: "Vuxen",
+    adult_other: "Vuxna",
+    child_one: "Barn",
+    child_other: "Barn",
+    senior_one: "Senior",
+    senior_other: "Seniorer",
+    youth_one: "Ungdom",
+    youth_other: "Ungdomar",
   },
   tripTypes: {
     "round-trip": "Tur och retur",
@@ -361,171 +348,71 @@ export default {
       pages: {
         privacyPolicy: {
           title: "Integritetspolicy",
-          content: [
-            {
-              type: "p",
-              html: "Vi tror på att skydda slutkundens integritet. Se vår integritetspolicy på (infoga hyperlänk till webbplatsens sekretesspolicy) och vänligen gör din integritetspolicy tillgänglig för slutkunden eftersom detta kommer att gälla för deras bokning.",
-            },
-            { type: "h2", html: "Skadeersättning" },
-            {
-              type: "p",
-              html: "Du samtycker till att försvara oss och/eller våra respektive leverantörer och någon av deras tjänstemän, direktörer, anställda och agenter från och mot alla anspråk, orsaker till åtgärder, krav, återkrav, förluster, skadestånd, böter, straff eller andra kostnader eller utgifter av något slag eller slag, inklusive men inte begränsat till rimliga juridiska avgifter och redovisningsavgifter, som tas ut av tredje part som ett resultat av:",
-            },
-            {
-              type: "ul",
-              items: [
-                "- Ditt brott mot detta avtal eller de dokument som hänvisas till häri;",
-                "- Ditt brott mot någon lag eller tredje parts rättigheter; eller",
-                "- Din användning av Booking Hub.",
-              ],
-            },
-            { type: "h2", html: "Valutaomvandlare, pris och betalning" },
-            {
-              type: "p",
-              html: "Priserna för resetjänster är dynamiska och kan ändras ofta när som helst. Prisändringar kommer inte att påverka bokningar som redan lämnats, förutom där det har skett ett uppenbart fel. Vi gör allt vi kan för att säkerställa att priserna vi visar är korrekta och tillgängliga. Snowfall tar inget ansvar för bokningar till ett felaktigt pris där felet rimligen var (eller borde ha varit) uppenbart vid bokningstillfället, eller på grund av Snowfalls underlåtenhet att iaktta rimlig försiktighet.",
-            },
-            {
-              type: "p",
-              html: "Priserna som visas via vår tjänst kan inkludera skatter. Sådana skatter kan inkludera belopp förknippade med mervärdesskatt, skatt på varor och tjänster, försäljningsskatt, uthyrningsskatt och andra skatter av liknande karaktär.",
-            },
-            {
-              type: "p",
-              html: "I vissa jurisdiktioner, där så är tillämpligt, kan slutkunden också vara ansvarig för att betala lokala skatter som åläggs av lokala skattemyndigheter (såsom stadsskatter eller turistskatter etc). Vi kommer att meddela dig om eventuella lokala skatter som kommer att betalas av slutkunden innan bokningen slutförs, där sådana skatter har meddelats oss av reseleverantören.",
-            },
-            {
-              type: "p",
-              html: "Beloppet för lokala skatter kan ändras mellan bokningsdatum och vistelsedatum. Om skatterna har ändrats vid resedatumet kan slutkunden bli skyldig att betala skatt till den högre skattesatsen.",
-            },
-            {
-              type: "p",
-              html: "Betalning sker endast direkt till Snowfall Limited på uppdrag av reseleverantören.",
-            },
-            {
-              type: "p",
-              html: "Reseleverantören kräver vanligtvis betalning i förskott; det kan tas eller förauktoriseras när bokningen görs, och det kommer vanligtvis inte att återbetalas. Innan du gör en bokning, vänligen notera de individuella bokningsvillkoren som gäller.",
-            },
-            {
-              type: "p",
-              html: "Vi kan komma att lagra slutkundens betalningsmetod för framtida transaktioner om du har fått deras medgivande att göra det.",
-            },
-            {
-              type: "p",
-              html: "Som nämnts ovan accepterar du de tillämpliga policyerna som visas i bokningsprocessen. Du hittar varje reseleverantörs avbokningspolicy och alla andra policyer (om ålderskrav, kort som accepteras etc.) i det finstilta och/eller i bekräftelsemejlet eller biljetten (om tillämpligt).",
-            },
-            {
-              type: "p",
-              html: "Eftersom du gör en bokning för någon annans räkning, accepterar du ansvaret för att erhålla deras tillstånd innan du ger oss deras personuppgifter.",
-            },
-            { type: "h2", html: "Avbokningar och återbetalningar" },
-            {
-              type: "p",
-              html: "Avbokningsavgifterna som tillämpas på bokningen är föremål för den specifika policy som fastställts av respektive leverantör. Dessa avgifter kommer att variera beroende på leverantörens villkor och villkor, och vi ansvarar inte för deras beslut. Även om vi strävar efter att tillhandahålla korrekt och snabb återbetalningshantering tar vi inget ansvar för tredje parts leverantörs åtgärder eller policyer. Eventuella tvister eller problem relaterade till avbokningar, återbetalningar eller associerade avgifter ska lösas direkt med den enskilda leverantören.",
-            },
-            { type: "h2", html: "Kontouppsägning" },
-            {
-              type: "p",
-              html: "Efter eget gottfinnande kan vi säga upp kontoinnehavare som anses vara upprepade intrång. Vi kan också efter eget gottfinnande begränsa åtkomsten till bokningshubben och/eller avsluta konton för användare som gör intrång i andras immateriella rättigheter, oavsett om det förekommer upprepade intrång eller inte.",
-            },
-            { type: "h2", html: "Allmänt" },
-            {
-              type: "p",
-              html: "Om någon del av detta avtal visar sig vara ogiltig, olaglig eller omöjlig att verkställa, kommer giltigheten, lagligheten och verkställbarheten av de återstående bestämmelserna inte på något sätt att påverkas eller försämras. Vårt misslyckande eller försening med att upprätthålla någon bestämmelse i detta avtal vid något tillfälle avsäger oss inte vår rätt att genomdriva samma eller någon annan bestämmelse häri i framtiden. Detta avtal (och alla andra villkor som hänvisas till häri) utgör hela avtalet mellan dig och oss med avseende på bokningshubben och det ersätter all tidigare eller samtidig kommunikation och förslag, oavsett om det är elektroniskt, muntligt eller skriftligt, mellan slutkunden och oss med avseende på bokningshubben.",
-            },
-            {
-              type: "p",
-              html: "Tillgång till denna bokningshub är villkorad av ditt samtycke till att all information som finns i den och alla frågor som uppstår mellan dig och oss kommer att styras av lagarna i England och Wales. Det är också villkorat av ditt samtycke att varje tvist som uppstår mellan dig och oss kommer att vara föremål för den exklusiva jurisdiktionen för domstolarna i England och Wales.",
-            },
-            {
-              type: "p",
-              html: "Alla rättigheter som inte uttryckligen beviljas häri är förbehållna.",
-            },
-            { type: "h2", html: "Kontak" },
-            {
-              type: "p",
-              html: 'Alla kommentarer, frågor och förfrågningar som rör vår användning av Din information ska riktas till <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a>',
-            },
-          ],
+          content: `
+<p>Vi tror på att skydda slutkundens integritet. Se vår integritetspolicy på (infoga hyperlänk till webbplatsens sekretesspolicy) och vänligen gör din integritetspolicy tillgänglig för slutkunden eftersom detta kommer att gälla för deras bokning.</p>
+<h2 typography="body-large" weight="bold">Skadeersättning</h2>
+<p>Du samtycker till att försvara oss och/eller våra respektive leverantörer och någon av deras tjänstemän, direktörer, anställda och agenter från och mot alla anspråk, orsaker till åtgärder, krav, återkrav, förluster, skadestånd, böter, straff eller andra kostnader eller utgifter av något slag eller slag, inklusive men inte begränsat till rimliga juridiska avgifter och redovisningsavgifter, som tas ut av tredje part som ett resultat av:</p>
+<ul>
+  <li>- Ditt brott mot detta avtal eller de dokument som hänvisas till häri;</li>
+  <li>- Ditt brott mot någon lag eller tredje parts rättigheter; eller</li>
+  <li>- Din användning av Booking Hub.</li>
+</ul>
+<h2 typography="body-large" weight="bold">Valutaomvandlare, pris och betalning</h2>
+<p>Priserna för resetjänster är dynamiska och kan ändras ofta när som helst. Prisändringar kommer inte att påverka bokningar som redan lämnats, förutom där det har skett ett uppenbart fel. Vi gör allt vi kan för att säkerställa att priserna vi visar är korrekta och tillgängliga. Snowfall tar inget ansvar för bokningar till ett felaktigt pris där felet rimligen var (eller borde ha varit) uppenbart vid bokningstillfället, eller på grund av Snowfalls underlåtenhet att iaktta rimlig försiktighet.</p>
+<p>Priserna som visas via vår tjänst kan inkludera skatter. Sådana skatter kan inkludera belopp förknippade med mervärdesskatt, skatt på varor och tjänster, försäljningsskatt, uthyrningsskatt och andra skatter av liknande karaktär.</p>
+<p>I vissa jurisdiktioner, där så är tillämpligt, kan slutkunden också vara ansvarig för att betala lokala skatter som åläggs av lokala skattemyndigheter (såsom stadsskatter eller turistskatter etc). Vi kommer att meddela dig om eventuella lokala skatter som kommer att betalas av slutkunden innan bokningen slutförs, där sådana skatter har meddelats oss av reseleverantören.</p>
+<p>Beloppet för lokala skatter kan ändras mellan bokningsdatum och vistelsedatum. Om skatterna har ändrats vid resedatumet kan slutkunden bli skyldig att betala skatt till den högre skattesatsen.</p>
+<p>Betalning sker endast direkt till Snowfall Limited på uppdrag av reseleverantören.</p>
+<p>Reseleverantören kräver vanligtvis betalning i förskott; det kan tas eller förauktoriseras när bokningen görs, och det kommer vanligtvis inte att återbetalas. Innan du gör en bokning, vänligen notera de individuella bokningsvillkoren som gäller.</p>
+<p>Vi kan komma att lagra slutkundens betalningsmetod för framtida transaktioner om du har fått deras medgivande att göra det.</p>
+<p>Som nämnts ovan accepterar du de tillämpliga policyerna som visas i bokningsprocessen. Du hittar varje reseleverantörs avbokningspolicy och alla andra policyer (om ålderskrav, kort som accepteras etc.) i det finstilta och/eller i bekräftelsemejlet eller biljetten (om tillämpligt).</p>
+<p>Eftersom du gör en bokning för någon annans räkning, accepterar du ansvaret för att erhålla deras tillstånd innan du ger oss deras personuppgifter.</p>
+<h2 typography="body-large" weight="bold">Avbokningar och återbetalningar</h2>
+<p>Avbokningsavgifterna som tillämpas på bokningen är föremål för den specifika policy som fastställts av respektive leverantör. Dessa avgifter kommer att variera beroende på leverantörens villkor och villkor, och vi ansvarar inte för deras beslut. Även om vi strävar efter att tillhandahålla korrekt och snabb återbetalningshantering tar vi inget ansvar för tredje parts leverantörs åtgärder eller policyer. Eventuella tvister eller problem relaterade till avbokningar, återbetalningar eller associerade avgifter ska lösas direkt med den enskilda leverantören.</p>
+<h2 typography="body-large" weight="bold">Kontouppsägning</h2>
+<p>Efter eget gottfinnande kan vi säga upp kontoinnehavare som anses vara upprepade intrång. Vi kan också efter eget gottfinnande begränsa åtkomsten till bokningshubben och/eller avsluta konton för användare som gör intrång i andras immateriella rättigheter, oavsett om det förekommer upprepade intrång eller inte.</p>
+<h2 typography="body-large" weight="bold">Allmänt</h2>
+<p>Om någon del av detta avtal visar sig vara ogiltig, olaglig eller omöjlig att verkställa, kommer giltigheten, lagligheten och verkställbarheten av de återstående bestämmelserna inte på något sätt att påverkas eller försämras. Vårt misslyckande eller försening med att upprätthålla någon bestämmelse i detta avtal vid något tillfälle avsäger oss inte vår rätt att genomdriva samma eller någon annan bestämmelse häri i framtiden. Detta avtal (och alla andra villkor som hänvisas till häri) utgör hela avtalet mellan dig och oss med avseende på bokningshubben och det ersätter all tidigare eller samtidig kommunikation och förslag, oavsett om det är elektroniskt, muntligt eller skriftligt, mellan slutkunden och oss med avseende på bokningshubben.</p>
+<p>Tillgång till denna bokningshub är villkorad av ditt samtycke till att all information som finns i den och alla frågor som uppstår mellan dig och oss kommer att styras av lagarna i England och Wales. Det är också villkorat av ditt samtycke att varje tvist som uppstår mellan dig och oss kommer att vara föremål för den exklusiva jurisdiktionen för domstolarna i England och Wales.</p>
+<p>Alla rättigheter som inte uttryckligen beviljas häri är förbehållna.</p>
+<h2 typography="body-large" weight="bold">Kontakt</h2>
+<p>Alla kommentarer, frågor och förfrågningar som rör vår användning av Din information ska riktas till <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a></p>`,
         },
         termsAndConditions: {
           title: "Villkor",
-          content: [
-            { type: "h2", html: "Användarvillkor för bokning" },
-            {
-              type: "p",
-              html: 'Dessa bokningsvillkor (”Villkoren”) gäller för bokningar gjorda via Junctions onlineklientportal (”Bokningshubben”) som ägs och drivs av Snowfall Limited, ett företag registrerat i England (företagsnummer: 12356236, 10-12 East Parade, Leeds, West Yorkshire, LS1 2BH). Bokningshubben tillhandahålls för att hjälpa till att göra bokningar och/eller på annat sätt göra transaktioner med reseleverantörer. Denna tjänst erbjuds till dig, agenten, under förutsättning att du godkänner, utan ändringar, av alla villkor, villkor och meddelanden som gemensamt anges i dessa villkor, användarvillkoren för Junction Client Booking Hub och villkoren för Snowfall Travel-webbplatsen för Användning och integritetspolicyn (sammantaget "avtalet"). När du gör en bokning via Booking Hub samtycker du till att vara bunden av detta avtal. Dessa villkor kompletterar villkoren för alla avtal som du kan ha med oss, men endast med avseende på bokningar som underlättas genom bokningshubben. I händelse av en direkt konflikt mellan dessa villkor och andra avtal som du kan ha med oss, kommer dessa villkor att styra informationen om bokningen. Termen "Du" hänvisar till kundtjänstagenten som gör bokningen för slutkundens räkning.',
-            },
-            {
-              type: "p",
-              html: "Läs avtalet noggrant. Vi förbehåller oss rätten att när som helst, efter eget gottfinnande, ändra eller på annat sätt modifiera avtalet utan föregående meddelande.",
-            },
-            { type: "h2", html: "Användarvillkor" },
-            {
-              type: "p",
-              html: "Som ett villkor för din användning av bokningshubben garanterar du att (i) du är minst 18 år gammal; (ii) Du har den juridiska behörigheten att skapa en bindande rättslig förpliktelse; (iii) Du kommer att använda bokningshubben för att endast boka i enlighet med tillämpliga villkor och policyer; (iv) Du kommer endast att använda bokningscentralen för att göra reservationer för en annan person för vilken du är juridiskt behörig att agera; (v) Du kommer att informera sådana andra personer om de villkor och villkor som gäller för de reservationer du har gjort för deras räkning, inklusive alla regler och begränsningar som är tillämpliga på dem; (vi) all information som tillhandahålls av dig på bokningshubben är sann, korrekt, aktuell och fullständig, och (vii) om du har ett konto kommer du att skydda din kontoinformation och kommer att övervaka och vara helt ansvarig för all användning av ditt konto av dig och någon annan än dig. Vi förbehåller oss rätten att efter eget gottfinnande neka någon åtkomst till bokningshubben och de tjänster vi erbjuder, när som helst och av vilken anledning som helst, inklusive, men inte begränsat till, för brott mot dessa villkor.",
-            },
-            { type: "h2", html: "Förbjudna aktiviteter" },
-            {
-              type: "p",
-              html: "The content and information on the Booking Hub (including, but not limited to, price and availability of travel services), as well as the infrastructure used to provide such content and information, is proprietary to us or our suppliers and providers. You agree not to: make any speculative, false, or fraudulent reservation or any reservation in anticipation of demand; access, monitor or copy any content or information of this Website using any robot, spider, scraper or other automated means or any manual process for any purpose without our express written permission; violate the restrictions in any robot exclusion headers on this Website or bypass or circumvent other measures employed to prevent or limit access to this Website; take any action that imposes, or may impose, in our discretion, an unreasonable or disproportionately large load on our infrastructure; deep-link to any portion of this Website (including, without limitation, the purchase path for any travel services) for any purpose without our express written permission; or “frame”, “mirror” or otherwise incorporate any part of the Booking Hub into any other Website without our prior written authorisation.",
-            },
-            { type: "h2", html: "Bedrägeri" },
-            {
-              type: "p",
-              html: "Om ett konto visar upprepade tecken på bedrägeri, missbruk, umgänge med en statligt sanktionerad person eller enhet eller annan misstänkt aktivitet kan vi begära extra information från dig.",
-            },
-            {
-              type: "p",
-              html: "Efter granskning av den informationen och om vi rimligen drar slutsatsen att en bokning eller ett konto är associerat med misstänkt aktivitet, kan vi:",
-            },
-            {
-              type: "ul",
-              items: [
-                "- Avbryt alla bokningar som är kopplade till ditt namn, din e-postadress eller ditt konto;",
-                "- Stäng alla associerade konton;",
-                "- Vidta rättsliga åtgärder, inklusive att försöka hålla dig ansvarig för eventuell förlust.",
-              ],
-            },
-            {
-              type: "p",
-              html: "Vänligen kontakta oss om annullering av en bokning eller stängning av ett konto om du tror att ett misstag har inträffat.",
-            },
-            { type: "h2", html: "Göra resebokningar" },
-            {
-              type: "p",
-              html: "Alla resetjänster som du kan hitta och/eller boka via Booking Hub tillhandahålls av tredjepartsleverantörer. Vi är inte ansvariga och har inget ansvar gentemot dig eller slutkunden med avseende på sådana bokningar. Identiteten för den relevanta reseleverantören och de villkor som styr och gäller för bokningen kommer att meddelas dig vid bokningstillfället och du bör se till att du läser och förstår dem till fullo innan du slutför bokningen och kommunicerar dem till slutkund. Du bekräftar att ett brott mot villkoren som meddelats Dig av reseleverantören kan resultera i annullering av biljetter, avbokning av hotellbokningar etc. och medföra ytterligare avgifter för slutkunden.",
-            },
-            { type: "h2", html: "Begränsningar och undantag från ansvar" },
-            {
-              type: "p",
-              html: "När vi driver bokningshubben underlättar vi endast bokningar med tredje part och tar inget ansvar för att tillhandahålla några resealternativ som visas på bokningshubben eller för arrangemang som gjorts med någon tredje part på uppdrag av slutkunden som ett resultat av användningen av Bokningsnav. Eventuella problem och/eller skillnader som kan uppstå med bokning(ar) måste lösas med relevant reseleverantör. I den maximala utsträckning som lagen tillåter, accepterar vi inget ansvar för eventuella felaktigheter eller utelämnanden i innehållet som visas på eller via bokningshubben eller någon Guds handling, olycka, förseningar eller någon speciell, exemplarisk, straffbar, indirekt, tillfällig eller följdförlust eller skada av något slag (inklusive, utan begränsning, förlorad vinst eller förlorade besparingar), oavsett om de är baserade på kontrakt, skadestånd (inklusive vårdslöshet), strikt ansvar eller annat, som ådras dig eller slutkunden till följd av eller i samband med Din åtkomst till, användning av eller oförmåga att få tillgång till eller användning av bokningshubben eller något innehåll som finns däri.",
-            },
-            {
-              type: "p",
-              html: "Vårt maximala samlade ansvar gentemot dig och/eller slutkunden som härrör från eller i samband med dessa villkor eller din tillgång till, användning av eller oförmåga att få tillgång till eller använda, bokningshubben ska begränsas till den maximala omfattning som tillåts av lag. De nuvarande villkoren tillhandahåller hela omfattningen av våra skyldigheter och ansvar med avseende på bokningshubben. Ingenting i dessa villkor ska begränsa eller utesluta (a) vårt ansvar med avseende på dödsfall eller personskada orsakad av vår vårdslöshet eller för vårt bedrägeri eller bedrägliga felaktiga framställningar; (b) något annat ansvar som inte kan uteslutas enligt lag; eller (c) slutkundens lagstadgade rättigheter.",
-            },
-          ],
+          content: `
+<h2 typography="body-large" weight="bold">Användarvillkor för bokning</h2>
+<p>Dessa bokningsvillkor (”Villkoren”) gäller för bokningar gjorda via Junctions onlineklientportal (”Bokningshubben”) som ägs och drivs av Snowfall Limited, ett företag registrerat i England (företagsnummer: 12356236, 10-12 East Parade, Leeds, West Yorkshire, LS1 2BH). Bokningshubben tillhandahålls för att hjälpa till att göra bokningar och/eller på annat sätt göra transaktioner med reseleverantörer. Denna tjänst erbjuds till dig, agenten, under förutsättning att du godkänner, utan ändringar, av alla villkor, villkor och meddelanden som gemensamt anges i dessa villkor, användarvillkoren för Junction Client Booking Hub och villkoren för Snowfall Travel-webbplatsen för Användning och integritetspolicyn (sammantaget "avtalet"). När du gör en bokning via Booking Hub samtycker du till att vara bunden av detta avtal. Dessa villkor kompletterar villkoren för alla avtal som du kan ha med oss, men endast med avseende på bokningar som underlättas genom bokningshubben. I händelse av en direkt konflikt mellan dessa villkor och andra avtal som du kan ha med oss, kommer dessa villkor att styra informationen om bokningen. Termen "Du" hänvisar till kundtjänstagenten som gör bokningen för slutkundens räkning.</p>
+<p>Läs avtalet noggrant. Vi förbehåller oss rätten att när som helst, efter eget gottfinnande, ändra eller på annat sätt modifiera avtalet utan föregående meddelande.</p>
+<h2 typography="body-large" weight="bold">Användarvillkor</h2>
+<p>Som ett villkor för din användning av bokningshubben garanterar du att (i) du är minst 18 år gammal; (ii) Du har den juridiska behörigheten att skapa en bindande rättslig förpliktelse; (iii) Du kommer att använda bokningshubben för att endast boka i enlighet med tillämpliga villkor och policyer; (iv) Du kommer endast att använda bokningscentralen för att göra reservationer för en annan person för vilken du är juridiskt behörig att agera; (v) Du kommer att informera sådana andra personer om de villkor och villkor som gäller för de reservationer du har gjort för deras räkning, inklusive alla regler och begränsningar som är tillämpliga på dem; (vi) all information som tillhandahålls av dig på bokningshubben är sann, korrekt, aktuell och fullständig, och (vii) om du har ett konto kommer du att skydda din kontoinformation och kommer att övervaka och vara helt ansvarig för all användning av ditt konto av dig och någon annan än dig. Vi förbehåller oss rätten att efter eget gottfinnande neka någon åtkomst till bokningshubben och de tjänster vi erbjuder, när som helst och av vilken anledning som helst, inklusive, men inte begränsat till, för brott mot dessa villkor.</p>
+<h2 typography="body-large" weight="bold">Förbjudna aktiviteter</h2>
+<p>The content and information on the Booking Hub (including, but not limited to, price and availability of travel services), as well as the infrastructure used to provide such content and information, is proprietary to us or our suppliers and providers. You agree not to: make any speculative, false, or fraudulent reservation or any reservation in anticipation of demand; access, monitor or copy any content or information of this Website using any robot, spider, scraper or other automated means or any manual process for any purpose without our express written permission; violate the restrictions in any robot exclusion headers on this Website or bypass or circumvent other measures employed to prevent or limit access to this Website; take any action that imposes, or may impose, in our discretion, an unreasonable or disproportionately large load on our infrastructure; deep-link to any portion of this Website (including, without limitation, the purchase path for any travel services) for any purpose without our express written permission; or “frame”, “mirror” or otherwise incorporate any part of the Booking Hub into any other Website without our prior written authorisation.</p>
+<h2 typography="body-large" weight="bold">Bedrägeri</h2>
+<p>Om ett konto visar upprepade tecken på bedrägeri, missbruk, umgänge med en statligt sanktionerad person eller enhet eller annan misstänkt aktivitet kan vi begära extra information från dig.</p>
+<p>Efter granskning av den informationen och om vi rimligen drar slutsatsen att en bokning eller ett konto är associerat med misstänkt aktivitet, kan vi:</p>
+<ul>
+  <li>- Avbryt alla bokningar som är kopplade till ditt namn, din e-postadress eller ditt konto;</li>
+  <li>- Stäng alla associerade konton;</li>
+  <li>- Vidta rättsliga åtgärder, inklusive att försöka hålla dig ansvarig för eventuell förlust.</li>
+</ul>
+<p>Vänligen kontakta oss om annullering av en bokning eller stängning av ett konto om du tror att ett misstag har inträffat.</p>
+<h2 typography="body-large" weight="bold">Göra resebokningar</h2>
+<p>Alla resetjänster som du kan hitta och/eller boka via Booking Hub tillhandahålls av tredjepartsleverantörer. Vi är inte ansvariga och har inget ansvar gentemot dig eller slutkunden med avseende på sådana bokningar. Identiteten för den relevanta reseleverantören och de villkor som styr och gäller för bokningen kommer att meddelas dig vid bokningstillfället och du bör se till att du läser och förstår dem till fullo innan du slutför bokningen och kommunicerar dem till slutkund. Du bekräftar att ett brott mot villkoren som meddelats Dig av reseleverantören kan resultera i annullering av biljetter, avbokning av hotellbokningar etc. och medföra ytterligare avgifter för slutkunden.</p>
+<h2 typography="body-large" weight="bold">Begränsningar och undantag från ansvar</h2>
+<p>När vi driver bokningshubben underlättar vi endast bokningar med tredje part och tar inget ansvar för att tillhandahålla några resealternativ som visas på bokningshubben eller för arrangemang som gjorts med någon tredje part på uppdrag av slutkunden som ett resultat av användningen av Bokningsnav. Eventuella problem och/eller skillnader som kan uppstå med bokning(ar) måste lösas med relevant reseleverantör. I den maximala utsträckning som lagen tillåter, accepterar vi inget ansvar för eventuella felaktigheter eller utelämnanden i innehållet som visas på eller via bokningshubben eller någon Guds handling, olycka, förseningar eller någon speciell, exemplarisk, straffbar, indirekt, tillfällig eller följdförlust eller skada av något slag (inklusive, utan begränsning, förlorad vinst eller förlorade besparingar), oavsett om de är baserade på kontrakt, skadestånd (inklusive vårdslöshet), strikt ansvar eller annat, som ådras dig eller slutkunden till följd av eller i samband med Din åtkomst till, användning av eller oförmåga att få tillgång till eller användning av bokningshubben eller något innehåll som finns däri.</p>
+<p>Vårt maximala samlade ansvar gentemot dig och/eller slutkunden som härrör från eller i samband med dessa villkor eller din tillgång till, användning av eller oförmåga att få tillgång till eller använda, bokningshubben ska begränsas till den maximala omfattning som tillåts av lag. De nuvarande villkoren tillhandahåller hela omfattningen av våra skyldigheter och ansvar med avseende på bokningshubben. Ingenting i dessa villkor ska begränsa eller utesluta (a) vårt ansvar med avseende på dödsfall eller personskada orsakad av vår vårdslöshet eller för vårt bedrägeri eller bedrägliga felaktiga framställningar; (b) något annat ansvar som inte kan uteslutas enligt lag; eller (c) slutkundens lagstadgade rättigheter.</p>`,
         },
         customerService: {
           title: "Kundtjänst",
-          content: [
-            {
-              type: "p",
-              html: "Kontakta oss med din begäran om specialiserad hjälp",
-            },
-            {
-              type: "p",
-              html: '<a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a>',
-            },
-          ],
+          content: `
+<p>Kontakta oss med din begäran om specialiserad hjälp</p>
+<p><a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a></p>`,
         },
         conditionsOfCarriage: {
           title: "Transportvillkor",
-          content: [
-            {
-              type: "p",
-              html: "Tågoperatörsvillkor. Din bokning av tågbiljetter/tågkort är föremål för transportvillkoren för en eller flera järnvägsoperatörer. Vänligen välj och se de transportvillkor som gäller för din resa.",
-            },
-          ],
+          content: `
+<p>Tågoperatörsvillkor. Din bokning av tågbiljetter/tågkort är föremål för transportvillkoren för en eller flera järnvägsoperatörer. Vänligen välj och se de transportvillkor som gäller för din resa.</p>`,
         },
       },
     },
@@ -694,7 +581,6 @@ export default {
       link: "Länk",
       code: "Kod",
       totp: "Tvåfaktorsautentisering",
-      // eslint-disable-next-line camelcase
       lookup_secret: "Återställningskoder",
       webauthn: "Säkerhetsnycklar",
     },

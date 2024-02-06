@@ -4,16 +4,16 @@
   import Videos from "./videos.svelte";
   import Faq from "./faq.svelte";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <svelte:head>
-  <title>{getPageTitle($i18n.title, $i18n.pages.knowledgeHub.title)}</title>
+  <title>{getPageTitle($t("title"), $t("pages.knowledgeHub.title"))}</title>
 </svelte:head>
 
-<StandardLayout pageTitle={$i18n.pages.knowledgeHub.title} backgroundImage="none">
+<StandardLayout pageTitle={$t("pages.knowledgeHub.title")} backgroundImage="none">
   <div class="content">
     <UserManuals />
 

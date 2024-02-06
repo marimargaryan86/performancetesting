@@ -11,12 +11,12 @@
   import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
   import type { CancellationRequest } from "~/integration/junction-hub-api/schemas/cancellation";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let passengers: OrderPassenger[];
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const dispatch = createEventDispatcher<{ success: void }>();
 
   let backdrop: Backdrop | undefined;
@@ -106,11 +106,11 @@
   >
     {#if state === "info"}
       <div class="header">
-        <em typography="body-small">{$i18n.words.cancellation}</em>
+        <em typography="body-small">{$t("words.cancellation")}</em>
         <h3 typography="headline-small" weight="bold">
-          {$i18n.sentences.youAreCancellingThisBooking}
+          {$t("sentences.youAreCancellingThisBooking")}
         </h3>
-        <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
+        <Ticket identifier={reservationNo} title={$t("words.reservationNumber")} />
       </div>
 
       <Passengers {passengers} />
@@ -120,18 +120,18 @@
       {/if}
 
       <div class="actions">
-        <button variant="outline" on:click={close}>{$i18n.actions.returnToBookings}</button>
-        <button variant="primary" on:click={rules}>{$i18n.actions.cancelBooking}</button>
+        <button variant="outline" on:click={close}>{$t("actions.returnToBookings")}</button>
+        <button variant="primary" on:click={rules}>{$t("actions.cancelBooking")}</button>
       </div>
     {:else if state === "rules" && booking?.rules}
       <div class="icon-wrapper">
         <Icon color="var(--color-semantic-error-500)" size="64px" variant="alert-disc" />
       </div>
 
-      <h3 typography="display-small" weight="bold">{$i18n.sentences.rulesAndFees}</h3>
+      <h3 typography="display-small" weight="bold">{$t("sentences.rulesAndFees")}</h3>
 
       <p typography="title-small">
-        {$i18n.sentences.pleaseReviewTheFollowingRules}
+        {$t("sentences.pleaseReviewTheFollowingRules")}
       </p>
 
       {#each booking.rules as rule}
@@ -140,11 +140,11 @@
         <p typography="body-small">{rule.body}</p>
       {/each}
 
-      <p typography="body-medium">{$i18n.sentences.doYouWishToContinue}</p>
+      <p typography="body-medium">{$t("sentences.doYouWishToContinue")}</p>
 
       <div class="actions">
-        <button variant="outline" on:click={info}>{$i18n.actions.goBack}</button>
-        <button variant="primary" on:click={cancelBooking}>{$i18n.actions.continue}</button>
+        <button variant="outline" on:click={info}>{$t("actions.goBack")}</button>
+        <button variant="primary" on:click={cancelBooking}>{$t("actions.continue")}</button>
       </div>
     {:else if state === "confirm"}
       {#if $pending}
@@ -152,31 +152,31 @@
           <LoadingIcon />
         </div>
       {:else}
-        <h3 typography="display-small" weight="bold">{$i18n.sentences.areYouSure}</h3>
-        <p typography="body-medium">{$i18n.sentences.thisCannotBeUndone}</p>
+        <h3 typography="display-small" weight="bold">{$t("sentences.areYouSure")}</h3>
+        <p typography="body-medium">{$t("sentences.thisCannotBeUndone")}</p>
 
         <div class="actions">
-          <button variant="outline" on:click={close}>{$i18n.words.no}</button>
-          <button variant="primary" on:click={confirm}>{$i18n.words.yes}</button>
+          <button variant="outline" on:click={close}>{$t("words.no")}</button>
+          <button variant="primary" on:click={confirm}>{$t("words.yes")}</button>
         </div>
       {/if}
     {:else if state === "done" || state === "failed"}
       <h3 typography="display-small" weight="bold">
         {#if state === "done"}
-          {$i18n.sentences.cancellationRequestReceived}
+          {$t("sentences.cancellationRequestReceived")}
         {:else}
-          {$i18n.sentences.cancellationRequestFailed}
+          {$t("sentences.cancellationRequestFailed")}
         {/if}
       </h3>
 
       <div typography="body-medium" class="info">
         {#if state === "done"}
           <p>
-            {$i18n.sentences.cancellationRequestInfo}
+            {$t("sentences.cancellationRequestInfo")}
           </p>
         {/if}
 
-        <p>{$i18n.sentences.contactSnowfallSupport}:</p>
+        <p>{$t("sentences.contactSnowfallSupport")}:</p>
       </div>
 
       <div class="support" typography="body-medium">
@@ -189,7 +189,7 @@
       </div>
 
       <div class="actions">
-        <button variant="primary" on:click={close}>{$i18n.actions.returnToBookings}</button>
+        <button variant="primary" on:click={close}>{$t("actions.returnToBookings")}</button>
       </div>
     {/if}
   </div>

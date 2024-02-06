@@ -18,10 +18,10 @@
 
   export function getPassengerFullLabel(
     def: (typeof PASSENGER_DEFINITIONS)[keyof PassengerPickerData],
-    locale: LocaleData,
-    which: Quantity = "singular",
+    translator: Translator,
+    count = 1,
   ): string {
-    return `${locale.passengerTypes[def.type][which]} (${def.span.from}${
+    return `${translator(`passengerTypes.${def.type}`, { count })} (${def.span.from}${
       def.span.to === undefined ? "+" : `-${def.span.to}`
     })`;
   }
@@ -47,7 +47,7 @@
 
   export function getPassengersPresentation(
     passengers: PassengerPickerData,
-    locale: LocaleData,
+    translator: Translator,
   ): string {
     return Object.entries(PASSENGER_DEFINITIONS)
       .map(([key, val]) => {
@@ -57,11 +57,7 @@
           return undefined;
         }
 
-        return `${passengers[type]} ${getPassengerFullLabel(
-          val,
-          locale,
-          passengers[type] === 1 ? "singular" : "plural",
-        )}`;
+        return `${passengers[type]} ${getPassengerFullLabel(val, translator, passengers[type])}`;
       })
       .filter(ensureDefined)
       .join(", ");
@@ -89,12 +85,12 @@
   import { z } from "zod";
   import { slideFade } from "~/transitions/slide-fade";
   import { ensureDefined } from "~/utils/array";
-  import { getLocaleData, type LocaleData, type Quantity } from "~/i18n";
+  import { getTranslator, type Translator } from "~/i18n";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const passengerKeys = Object.keys(passengers) as unknown as (keyof PassengerPickerData)[];
 
   let expanded = false;
@@ -124,7 +120,7 @@
   <button on:click={toggle} type="button">
     <span typography="title-small" weight="bold">
       {totalCount}
-      {$i18n.words.passenger[totalCount === 1 ? "singular" : "plural"]}
+      {$t("words.passenger", { count: totalCount })}
     </span>
 
     <ChevronIcon direction={expanded ? "up" : "down"} color="var(--color-main-primary-500)" />
@@ -137,13 +133,13 @@
   {#if expanded}
     <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
       <div class="header" typography="title-medium" weight="bold">
-        {$i18n.words.passenger.plural}
+        {$t("words.passenger_other")}
       </div>
 
       <div class="counters">
         {#each passengerKeys as key}
           <PassengerCounter
-            label={getPassengerFullLabel(PASSENGER_DEFINITIONS[key], $i18n)}
+            label={getPassengerFullLabel(PASSENGER_DEFINITIONS[key], $t)}
             bind:count={passengers[key]}
             {totalCount}
           />

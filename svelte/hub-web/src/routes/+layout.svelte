@@ -12,28 +12,32 @@
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
-  import { setLocale, setLocaleData, type Locale, setTimeFormat } from "~/i18n";
+  import { setTranslator, type Locale, setTimeFormat } from "~/i18n";
   import { invalidateAll } from "$app/navigation";
   import type { User } from "~/integration/ory/schemas/authentication";
   import { setUser } from "~/utils/permissions";
   import { setQueryStore } from "~/stores/query-store";
   import { page } from "$app/stores";
+  import i18next from "i18next";
 
   export let data;
 
+  const { locale, localeData } = setTranslator(data.locale, data.localeData);
+
+  $: $locale = data.locale;
+  $: $localeData = data.localeData;
+
   const queryStore = setQueryStore($page.url.searchParams);
   const user = setUser(writable<User>(data.user));
-  const locale = setLocale(writable(data.locale));
-  const localeData = setLocaleData(writable(data.localeData));
   const timeFormat = setTimeFormat(writable(data.timeFormat));
 
   let logoutTimer: number | undefined = undefined;
   let prevLocale = data.locale;
 
+  $: i18next.changeLanguage(data.locale);
   $: $queryStore = Object.fromEntries($page.url.searchParams);
   $: $timeFormat = data.timeFormat;
   $: $user = data.user as unknown as User;
-  $: $localeData = data.localeData;
   $: if (browser && data.sessionExpiresAt) {
     setLogoutTimer(data.sessionExpiresAt);
   }

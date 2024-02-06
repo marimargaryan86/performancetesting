@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import md5 from "md5";
   import routeConfig from "~/route-config";
   import { getUser } from "~/utils/permissions";
@@ -7,7 +7,7 @@
   export let transitionTimeMs: number;
   export let compact: boolean;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const user = getUser();
 
   $: gravatarHash = md5($user.email.trim().toLowerCase());
@@ -20,7 +20,7 @@
 
   <div class="info">
     <strong typography="body-small" weight="bold">{$user.email}</strong>
-    <span typography="body-small">{$i18n.roles[$user.role]}</span>
+    <span typography="body-small">{$t(`roles.${$user.role}`)}</span>
   </div>
 </div>
 

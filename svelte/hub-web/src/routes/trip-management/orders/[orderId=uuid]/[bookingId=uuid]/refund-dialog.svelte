@@ -46,7 +46,7 @@
 <script lang="ts">
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import TextField from "~/components/ui/text-field.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import integrationInstancesClient from "~/integration-instances-client";
   import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
   import type { Refund, RefundPut } from "~/integration/junction-hub-api/schemas/refund";
@@ -64,7 +64,7 @@
   let refundPosition = booking.refund?.refundPosition;
   let refundDataDirty = true;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const refreshPending = writable(false);
   const refundPending = writable(false);
 
@@ -164,7 +164,7 @@
         parseResult.data.type === "automatic" &&
         parseResult.data.us === 0 &&
         parseResult.data.reseller === 0 &&
-        !confirm($i18n.sentences.createRefundWithoutAmounts)
+        !confirm($t("sentences.createRefundWithoutAmounts"))
       ) {
         return;
       }
@@ -182,16 +182,16 @@
 </script>
 
 <div class="refund-dialog" transition:slideFade={{ duration: 300 }}>
-  <h3 typography="title-large" weight="bold">{$i18n.words.refund}</h3>
+  <h3 typography="title-large" weight="bold">{$t("words.refund")}</h3>
 
   <div class="refund-type" typography="body-medium">
     <label>
       <input type="radio" value="no-amount" bind:group={refundType} />
-      {$i18n.words.withoutAmounts}
+      {$t("words.withoutAmounts")}
     </label>
     <label>
       <input type="radio" value="with-amount" bind:group={refundType} />
-      {$i18n.words.withAmounts}
+      {$t("words.withAmounts")}
     </label>
   </div>
 
@@ -199,11 +199,11 @@
     {#if refundType === "with-amount"}
       <div>
         <TextField
-          label={$i18n.sentences.providerHowMuchWeGetBack}
+          label={$t("sentences.providerHowMuchWeGetBack")}
           required={refundData.type === "automatic"}
           readonly={refundData.type === "manual"}
           type="number"
-          placeholder={$i18n.actions.enterAmount}
+          placeholder={$t("actions.enterAmount")}
           bind:value={refundData.us}
           error={errors?.us?._errors}
           step="any"
@@ -216,11 +216,11 @@
 
       <div>
         <TextField
-          label={$i18n.sentences.resellerHowMuchWeGiveBack}
+          label={$t("sentences.resellerHowMuchWeGiveBack")}
           required={refundData.type === "automatic"}
           readonly={refundData.type === "manual"}
           type="number"
-          placeholder={$i18n.actions.enterAmount}
+          placeholder={$t("actions.enterAmount")}
           bind:value={refundData.reseller}
           error={errors?.reseller?._errors}
           step="any"
@@ -233,11 +233,11 @@
 
       <div>
         <TextField
-          label={$i18n.words.refundPosition}
+          label={$t("words.refundPosition")}
           required={refundData.type === "automatic"}
           readonly
           type="number"
-          placeholder={$i18n.words.amount}
+          placeholder={$t("words.amount")}
           value={refundPosition?.amount}
           step="any"
         >
@@ -251,29 +251,29 @@
     {#if refundData.type === "manual"}
       <div transition:slideFade={{ duration: 300 }}>
         <TextField
-          label={$i18n.words.refundReference}
+          label={$t("words.refundReference")}
           required
-          placeholder={$i18n.actions.enterRefundReference}
+          placeholder={$t("actions.enterRefundReference")}
           bind:value={refundData.externalReference}
           error={errors?.externalReference?._errors}
-          helpText={$i18n.sentences.refundReferenceInfo}
+          helpText={$t("sentences.refundReferenceInfo")}
         />
       </div>
     {/if}
 
     {#if refundType === "no-amount"}
       <button type="submit" variant="outline">
-        {$i18n.actions.refundWithNoAmount}
+        {$t("actions.refundWithNoAmount")}
         {#if $refundPending}<LoadingIcon />{/if}
       </button>
     {:else if refundDataDirty || $refreshPending}
       <button type="button" variant="primary" on:click={refreshRefundPosition}>
-        {$i18n.actions.calculateRefundPosition}
+        {$t("actions.calculateRefundPosition")}
         {#if $refreshPending}<LoadingIcon />{/if}
       </button>
     {:else}
       <button type="submit" variant="primary">
-        {$i18n.actions.issueRefund}
+        {$t("actions.issueRefund")}
         {#if $refundPending}<LoadingIcon />{/if}
       </button>
     {/if}

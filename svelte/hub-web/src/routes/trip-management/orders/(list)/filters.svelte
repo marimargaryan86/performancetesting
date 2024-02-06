@@ -1,13 +1,13 @@
 <script lang="ts" context="module">
   function getBookingStatusOptionFormatter(
-    locale: LocaleData,
+    translator: Translator,
   ): (status?: BookingStatus, selected?: boolean) => string | undefined {
     return (status, selected) => {
       if (!status) {
-        return selected ? undefined : locale.words.none;
+        return selected ? undefined : translator("words.none");
       }
 
-      return locale.statuses[status];
+      return translator(`statuses.${status}`);
     };
   }
 </script>
@@ -16,7 +16,7 @@
   import DatePicker from "~/components/ui/date-picker/date-picker.svelte";
   import SelectField from "~/components/ui/select-field.svelte";
   import TextField from "~/components/ui/text-field.svelte";
-  import { getLocaleData, type LocaleData } from "~/i18n";
+  import { getTranslator, type Translator } from "~/i18n";
   import {
     bookingStatuses,
     type BookingStatus,
@@ -60,10 +60,10 @@
   $: valid = queryFiltersValid(filters);
   $: errors = {
     passengerNameRecord:
-      valid.passengerNameRecord === false ? $i18n.sentences.passengerNameRecordError : false,
+      valid.passengerNameRecord === false ? $t("sentences.passengerNameRecordError") : false,
   };
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   function reset(): void {
     departureAtFrom = undefined;
@@ -72,35 +72,35 @@
   }
 </script>
 
-<DatePicker bind:value={departureAtFrom} label={$i18n.tableHeaders.departureDate} />
+<DatePicker bind:value={departureAtFrom} label={$t("tableHeaders.departureDate")} />
 
-<DatePicker bind:value={createdAtFrom} label={$i18n.tableHeaders.createdDate} />
+<DatePicker bind:value={createdAtFrom} label={$t("tableHeaders.createdDate")} />
 
 <SelectField
-  label={$i18n.tableHeaders.bookingStatus}
+  label={$t("tableHeaders.bookingStatus")}
   bind:value={filters.bookingStatus}
   options={[undefined, ...bookingStatuses]}
-  formatter={getBookingStatusOptionFormatter($i18n)}
-  placeholder={$i18n.actions.select}
+  formatter={getBookingStatusOptionFormatter($t)}
+  placeholder={$t("actions.select")}
 />
 
 <TextField
-  label={$i18n.words.passengerNameRecord}
-  placeholder={$i18n.sentences.passengerNameRecordPlaceholder}
+  label={$t("words.passengerNameRecord")}
+  placeholder={$t("sentences.passengerNameRecordPlaceholder")}
   bind:value={filters.passengerNameRecord}
   error={errors.passengerNameRecord}
 />
 
 <TextField
-  label={`${
-    $i18n.words.passenger.singular
-  } ${$i18n.words.lastName.toLowerCase()} (${$i18n.words.optional.toLowerCase()})`}
-  placeholder={$i18n.sentences.passengerLastNamePlaceholder}
+  label={`${$t("words.passenger_one")} ${$t("words.lastName").toLowerCase()} (${$t(
+    "words.optional",
+  ).toLowerCase()})`}
+  placeholder={$t("sentences.passengerLastNamePlaceholder")}
   bind:value={filters.passengerLastName}
 />
 
 <button class="clear" variant="primary" size="small" on:click={reset}>
-  {$i18n.actions.clearAll}
+  {$t("actions.clearAll")}
 </button>
 
 <style>

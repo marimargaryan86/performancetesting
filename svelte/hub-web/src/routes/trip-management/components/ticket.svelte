@@ -1,14 +1,14 @@
 <script lang="ts">
   import Icon from "~/components/icons/icon.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
   let titleExt: string | undefined = undefined;
   export { titleExt as title };
   export let identifier: string | undefined = undefined;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
-  $: title = titleExt ?? $i18n.words.orderReference;
+  $: title = titleExt ?? $t("words.orderReference");
 </script>
 
 <div class="ticket">
@@ -19,7 +19,7 @@
   <span>
     <em typography="body-xsmall">{title}</em>
     <strong typography="body-medium" weight="bold">
-      {identifier ?? $i18n.words.notAvailable}
+      {identifier ?? $t("words.notAvailable")}
     </strong>
   </span>
 </div>

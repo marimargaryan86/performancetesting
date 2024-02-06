@@ -1,25 +1,25 @@
 <script lang="ts">
   import { formatAmount } from "~/formatting/currency";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
 
   export let markups: Markups;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 </script>
 
 <div class="fees">
   <div class="fees-breakdown">
     <ul>
       <li>
-        <span typography="label-medium">{$i18n.words.serviceFee}</span>
+        <span typography="label-medium">{$t("words.serviceFee")}</span>
         <span typography="body-small" weight="bold">
           {formatAmount(markups.serviceFee, { locale: $locale, sign: true })}
         </span>
       </li>
       <li>
-        <span typography="label-medium">{$i18n.words.agencyMarkup}</span>
+        <span typography="label-medium">{$t("words.agencyMarkup")}</span>
         <span typography="body-small" weight="bold">
           {formatAmount(markups.agencyMarkup, { locale: $locale, sign: true })}
         </span>
@@ -28,7 +28,7 @@
   </div>
 
   <div class="total">
-    <span typography="body-xlarge" weight="bold">{$i18n.sentences.totalToCollect}</span>
+    <span typography="body-xlarge" weight="bold">{$t("sentences.totalToCollect")}</span>
     <em typography="body-xlarge" weight="bold" class="total-amount">
       {formatAmount(markups.totalToCollect, { locale: $locale, sign: true })}
     </em>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import TextField from "./text-field.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   let placeholderExt: string | undefined = undefined;
@@ -9,11 +9,11 @@
   export let clearable = false;
   export let clearValue = "";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let focused = false;
 
-  $: placeholder = placeholderExt ?? $i18n.actions.search;
+  $: placeholder = placeholderExt ?? $t("actions.search");
   $: expanded = Boolean(value.length || focused);
 
   function focus(): void {

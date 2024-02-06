@@ -6,7 +6,7 @@
   import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import StatusBadge from "~/components/ui/status-badge.svelte";
   import { writable } from "svelte/store";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
@@ -14,7 +14,7 @@
 
   export let data;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const locale = getLocale();
   const pending = writable(false);
 
@@ -42,10 +42,10 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.pay.title,
-      $i18n.pages.pay.pages.activity.title,
-      $i18n.pages.pay.pages.activity.pages.conversions.title,
+      $t("title"),
+      $t("pages.pay.title"),
+      $t("pages.pay.pages.activity.title"),
+      $t("pages.pay.pages.activity.pages.conversions.title"),
     )}
   </title>
 </svelte:head>
@@ -56,16 +56,16 @@
   style:grid-template-columns="repeat(10, minmax(min-content, 1fr))"
 >
   <x-thead>
-    <x-th>{$i18n.tableHeaders.id}</x-th>
-    <x-th>{$i18n.tableHeaders.createdDate}</x-th>
-    <x-th>{$i18n.tableHeaders.settlement}</x-th>
-    <x-th>{$i18n.tableHeaders.from}</x-th>
-    <x-th>{$i18n.tableHeaders.to}</x-th>
-    <x-th>{$i18n.tableHeaders.quoteRate}</x-th>
-    <x-th>{$i18n.tableHeaders.transactionRate}</x-th>
-    <x-th>{$i18n.tableHeaders.fxDelta}</x-th>
-    <x-th>{$i18n.tableHeaders.fxBuffer}</x-th>
-    <x-th>{$i18n.tableHeaders.status}</x-th>
+    <x-th>{$t("tableHeaders.id")}</x-th>
+    <x-th>{$t("tableHeaders.createdDate")}</x-th>
+    <x-th>{$t("tableHeaders.settlement")}</x-th>
+    <x-th>{$t("tableHeaders.from")}</x-th>
+    <x-th>{$t("tableHeaders.to")}</x-th>
+    <x-th>{$t("tableHeaders.quoteRate")}</x-th>
+    <x-th>{$t("tableHeaders.transactionRate")}</x-th>
+    <x-th>{$t("tableHeaders.fxDelta")}</x-th>
+    <x-th>{$t("tableHeaders.fxBuffer")}</x-th>
+    <x-th>{$t("tableHeaders.status")}</x-th>
   </x-thead>
 
   {#each conversions as conversion (conversion.id)}

@@ -29,7 +29,7 @@
   import { formatAmount } from "~/formatting/currency";
   import TripBanner from "../../components/trip-banner.svelte";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { TripOfferPriceQuoteCompleted } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { manager, markupsModel, type Markups, type PartialMarkups } from "../../booking-flow";
   import { browser } from "$app/environment";
@@ -68,7 +68,7 @@
   $: updatePriceQuote(priceQuoteId);
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const pending = writable(false);
 
   $: bookingDetailsValidator = z.object({
@@ -191,10 +191,10 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.book.title,
-      $i18n.pages.tripManagement.pages.book.pages.payment.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.book.title"),
+      $t("pages.tripManagement.pages.book.pages.payment.title"),
     )}
   </title>
 </svelte:head>
@@ -248,12 +248,12 @@
       size="small"
       href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
     >
-      {$i18n.actions.previous}
+      {$t("actions.previous")}
     </a>
 
     <div class="total">
       <div>
-        <span typography="body-large" weight="bold">{$i18n.sentences.totalToPay}</span>
+        <span typography="body-large" weight="bold">{$t("sentences.totalToPay")}</span>
       </div>
       <em typography="body-large" weight="bold">
         {#if priceQuote?.price.total}
@@ -265,7 +265,7 @@
     </div>
 
     <button variant="primary" size="small" on:click={book} disabled={!data.bookingSession.payment}>
-      {$i18n.actions.book}
+      {$t("actions.book")}
 
       {#if $pending}
         <LoadingIcon />

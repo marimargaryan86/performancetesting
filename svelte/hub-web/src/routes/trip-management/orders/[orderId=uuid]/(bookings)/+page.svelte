@@ -4,7 +4,7 @@
   import { getOrigin, getDestination } from "~/utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import { ensureDefined } from "~/utils/array";
   import StatusBadge from "~/components/ui/status-badge.svelte";
   import { formatAmount } from "~/formatting/currency";
@@ -12,7 +12,7 @@
   export let data;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let cancellationDialog: CancellationDialog | undefined;
 
@@ -42,11 +42,11 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.orders.title,
-      data.order.journey?.reference ?? $i18n.words.unknown,
-      $i18n.pages.tripManagement.pages.orders.pages.bookings.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.orders.title"),
+      data.order.journey?.reference ?? $t("words.unknown"),
+      $t("pages.tripManagement.pages.orders.pages.bookings.title"),
     )}
   </title>
 </svelte:head>
@@ -59,16 +59,16 @@
 
 <x-table class="bookings-table" style:grid-template-columns={columns}>
   <x-thead>
-    <x-th>{$i18n.tableHeaders.booking}</x-th>
+    <x-th>{$t("tableHeaders.booking")}</x-th>
     <x-th />
-    <x-th>{$i18n.tableHeaders.ticket}</x-th>
-    <x-th>{$i18n.tableHeaders.departureDate}</x-th>
-    <x-th>{$i18n.tableHeaders.origin}</x-th>
-    <x-th>{$i18n.tableHeaders.destination}</x-th>
-    <x-th>{$i18n.tableHeaders.totalPrice}</x-th>
-    <x-th>{$i18n.tableHeaders.bookingStatus}</x-th>
-    {#if showCancellationColumn}<x-th>{$i18n.tableHeaders.cancellationStatus}</x-th>{/if}
-    {#if showRefundColumn}<x-th>{$i18n.tableHeaders.refundStatus}</x-th>{/if}
+    <x-th>{$t("tableHeaders.ticket")}</x-th>
+    <x-th>{$t("tableHeaders.departureDate")}</x-th>
+    <x-th>{$t("tableHeaders.origin")}</x-th>
+    <x-th>{$t("tableHeaders.destination")}</x-th>
+    <x-th>{$t("tableHeaders.totalPrice")}</x-th>
+    <x-th>{$t("tableHeaders.bookingStatus")}</x-th>
+    {#if showCancellationColumn}<x-th>{$t("tableHeaders.cancellationStatus")}</x-th>{/if}
+    {#if showRefundColumn}<x-th>{$t("tableHeaders.refundStatus")}</x-th>{/if}
     {#if showActionsColumn}<x-th />{/if}
   </x-thead>
 
@@ -84,7 +84,7 @@
             .order(data.order.id)
             .routes.booking(booking.id).root}
         >
-          {$i18n.actions.view}
+          {$t("actions.view")}
         </a>
       </x-td>
 
@@ -95,10 +95,10 @@
             href={orderLink.routes.booking(booking.id).routes.tickets.root}
             download
           >
-            {$i18n.actions.download}
+            {$t("actions.download")}
           </a>
         {:else}
-          <span class="not-available">{$i18n.words.notAvailable}</span>
+          <span class="not-available">{$t("words.notAvailable")}</span>
         {/if}
       </x-td>
 
@@ -108,8 +108,8 @@
         })}
       </x-td>
 
-      <x-td weight="bold">{origin?.name ?? $i18n.words.unknown}</x-td>
-      <x-td weight="bold">{destination?.name ?? $i18n.words.unknown}</x-td>
+      <x-td weight="bold">{origin?.name ?? $t("words.unknown")}</x-td>
+      <x-td weight="bold">{destination?.name ?? $t("words.unknown")}</x-td>
       <x-td>{formatAmount(booking.price.total, { locale: $locale, sign: true })}</x-td>
       <x-td><StatusBadge value={booking.status} /></x-td>
 
@@ -137,7 +137,7 @@
               variant="outline"
               on:click={cancelBooking.bind(cancelBooking, booking)}
             >
-              {$i18n.actions.cancelRequest}
+              {$t("actions.cancelRequest")}
             </button>
           {/if}
         </x-tactions>

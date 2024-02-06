@@ -12,28 +12,28 @@
   import { formatAmount } from "~/formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import Price from "../../../components/price.svelte";
 
   export let data;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const user = getUser();
 
   let breadCrumbs: BreadCrumb[];
 
-  $: i18nOrders = $i18n.pages.tripManagement.pages.orders;
+  $: i18nOrders = $t("pages.tripManagement.pages.orders", { returnObjects: true });
   $: order = data.booking.order;
   $: reservationNo = data.booking.operatorBookingReferences.length
     ? data.booking.operatorBookingReferences.join(", ")
     : undefined;
-  $: bookingTitle = `${$i18n.words.booking} ${data.bookingNo}`;
+  $: bookingTitle = `${$t("words.booking")} ${data.bookingNo}`;
   $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.booking.orderId);
   $: selfLink = orderLink.routes.booking(data.booking.id);
   $: breadCrumbs = [
     { label: i18nOrders.title, url: routeConfig.routes.tripManagement.routes.orders.root },
-    { label: order?.journey?.reference ?? $i18n.words.unknown, url: orderLink.root },
+    { label: order?.journey?.reference ?? $t("words.unknown"), url: orderLink.root },
     {
       label: bookingTitle,
       url: selfLink.root,
@@ -45,9 +45,9 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.orders.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.orders.title"),
       order?.journey?.reference ?? "Unknown",
       bookingTitle,
     )}
@@ -58,18 +58,18 @@
   <svelte:fragment slot="page-title">
     {bookingTitle}:
     <span typography="title-large" weight="bold">
-      {getOrigin(data.booking)?.name ?? $i18n.words.unknown}
-      {$i18n.words.to.toLowerCase()}
-      {getDestination(data.booking)?.name ?? $i18n.words.unknown}
+      {getOrigin(data.booking)?.name ?? $t("words.unknown")}
+      {$t("words.to").toLowerCase()}
+      {getDestination(data.booking)?.name ?? $t("words.unknown")}
     </span>
   </svelte:fragment>
 
   <div class="content" style:--grid-columns={canViewTransactions ? "1fr 1fr" : "1fr"}>
     <div class="booking">
       <div class="itinerary">
-        <h3 typography="title-large" weight="bold">{$i18n.words.itinerary}</h3>
+        <h3 typography="title-large" weight="bold">{$t("words.itinerary")}</h3>
 
-        <Ticket identifier={reservationNo} title={$i18n.words.reservationNumber} />
+        <Ticket identifier={reservationNo} title={$t("words.reservationNumber")} />
 
         {#if order}
           <Price bookings={order.bookings} />
@@ -81,13 +81,13 @@
 
         <div class="statuses">
           <div class="status" typography="body-small" weight="bold">
-            {$i18n.words.bookingStatus}
+            {$t("words.bookingStatus")}
             <StatusBadge value={data.booking.status} />
           </div>
 
           {#if data.booking.cancellation?.status}
             <div class="status" typography="body-small" weight="bold">
-              {$i18n.words.cancellationStatus}
+              {$t("words.cancellationStatus")}
               <StatusBadge value={data.booking.cancellation.status} />
             </div>
           {/if}
@@ -97,15 +97,15 @@
       {#if data.booking.refund}
         <div class="refund" typography="body-medium" weight="bold">
           <h3 typography="body-large" weight="bold">
-            {$i18n.words.refund}
+            {$t("words.refund")}
 
             <StatusBadge value={data.booking.refund.status} />
           </h3>
-          <strong>{$i18n.words.total}</strong>
+          <strong>{$t("words.total")}</strong>
           <span>
             {data.booking.refund.refunded.reseller
               ? formatAmount(data.booking.refund.refunded.reseller, { locale: $locale, sign: true })
-              : $i18n.words.notAvailable}
+              : $t("words.notAvailable")}
           </span>
         </div>
       {/if}

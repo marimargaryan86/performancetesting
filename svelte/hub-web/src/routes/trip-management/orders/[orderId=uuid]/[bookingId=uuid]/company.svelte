@@ -2,7 +2,7 @@
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
   import { formatAmount } from "~/formatting/currency";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import type { Price, PriceBreakdown } from "~/integration/common/schemas/price";
   import type { Company } from "~/integration/junction-hub-api/schemas/company";
   import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
@@ -14,7 +14,7 @@
   export let markupsTask: Promise<Markups | undefined> | undefined = undefined;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   async function getTotal(
     nextPrice: Price,
@@ -51,7 +51,7 @@
     <div class="breakdown" typography="label-medium">
       {#if breakdownList}
         {#each breakdownList as breakdown}
-          <span>{$i18n.priceBreakdownTypes[breakdown.type]}</span>
+          <span>{$t(`priceBreakdownTypes.${breakdown.type}`)}</span>
           <strong>
             {formatAmount(breakdown.price, { locale: $locale })}
             <em typography="body-xsmall">{breakdown.price.currency}</em>
@@ -64,7 +64,7 @@
           <LoadingIcon size="16px" />
         {:then markups}
           {#if markups}
-            <span>{$i18n.words.markup}</span>
+            <span>{$t("words.markup")}</span>
             <strong>
               {formatAmount(markups.agencyMarkup, { locale: $locale })}
               <em typography="body-xsmall">{markups.agencyMarkup.currency}</em>
@@ -73,7 +73,7 @@
         {/await}
       {/if}
 
-      <span>{$i18n.words.total}</span>
+      <span>{$t("words.total")}</span>
 
       {#await totalTask}
         <LoadingIcon size="16px" />
@@ -85,7 +85,7 @@
       {/await}
     </div>
   {:else}
-    <span typography="body-small" weight="bold">{$i18n.words.notAvailable}</span>
+    <span typography="body-small" weight="bold">{$t("words.notAvailable")}</span>
   {/if}
 </div>
 

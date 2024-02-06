@@ -4,7 +4,7 @@
   import Backdrop from "../backdrop.svelte";
   import { formatAmount } from "~/formatting/currency";
   import type { Price } from "~/integration/common/schemas/price";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
 
   export let originalPrice: Price;
@@ -13,7 +13,7 @@
   let backdrop: Backdrop | undefined = undefined;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const dispatch = createEventDispatcher<{ cancel: void }>();
 
   function close(): void {
@@ -44,21 +44,22 @@
   >
     <Icon variant="alert-disc" color="var(--color-semantic-error-500)" size="64px" />
 
-    <h1 typography="display-small" weight="bold" class="title">{$i18n.sentences.priceChange}</h1>
+    <h1 typography="display-small" weight="bold" class="title">{$t("sentences.priceChange")}</h1>
 
     <p typography="body-medium">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-      {@html $i18n.sentences.priceChangeInfo
-        .replace("{originalPrice}", formatAmount(originalPrice, { locale: $locale, sign: true }))
-        .replace("{newPrice}", formatAmount(newPrice, { locale: $locale, sign: true }))}
+      {@html $t("sentences.priceChangeInfo", {
+        originalPrice: formatAmount(originalPrice, { locale: $locale, sign: true }),
+        newPrice: formatAmount(newPrice, { locale: $locale, sign: true }),
+      })}
     </p>
 
     <div class="actions">
       <button variant="primary" size="small" on:click={close}>
-        {$i18n.actions.continue}
+        {$t("actions.continue")}
       </button>
       <button size="small" variant="outline" on:click={cancel} style:min-width="80px">
-        {$i18n.actions.cancel}
+        {$t("actions.cancel")}
       </button>
     </div>
   </div>

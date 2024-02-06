@@ -10,13 +10,13 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import StepView from "~/components/page/step-view.svelte";
-  import { getLocaleData, type LocaleData } from "~/i18n";
+  import { getTranslator, type LocaleData } from "~/i18n";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let steps: { label: string; number: number; title: string }[];
 
-  $: i18nBook = $i18n.pages.tripManagement.pages.book;
+  $: i18nBook = $t("pages.tripManagement.pages.book", { returnObjects: true });
   $: steps = pages.map((item, idx) => ({
     label: i18nBook.pages[item].title,
     number: idx + 1,

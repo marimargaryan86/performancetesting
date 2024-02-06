@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import type { LocaleData } from "~/i18n";
 
 export default {
@@ -19,16 +20,14 @@ export default {
     from: "Origen",
     to: "Destino",
     depart: "Fechas",
-    passenger: {
-      plural: "Pasajeros",
-      singular: "Pasajero",
-    },
+    passenger_one: "Pasajero",
+    passenger_other: "Pasajeros",
     fareRules: "Reglas de tarifas",
-    stop: {
-      plural: "Paradas",
-      singular: "Detener",
-    },
-    direct: "Directo",
+    stop_zero: "Directo",
+    stop_one: "Detener",
+    stop_other: "Paradas",
+    stopCounter_zero: "$t(words.stop_zero)",
+    stopCounter: "{{count}} $t(words.stop, lowercase)",
     departureTime: "Hora de salida",
     departure: "Salida",
     arrival: "Llegada",
@@ -51,15 +50,11 @@ export default {
     nationality: "Nacionalidad",
     residenceCountryCode: "Código de país de residencia",
     summary: "Resumen",
-    fareBrand: {
-      plural: "Tipos de tarifas",
-      singular: "Tipo de tarifa",
-    },
+    fareBrand_one: "Tipo de tarifa",
+    fareBrand_other: "Tipos de tarifas",
     itinerary: "Itinerario",
-    fee: {
-      plural: "Tarifas",
-      singular: "Tarifa",
-    },
+    fee_one: "Tarifa",
+    fee_other: "Tarifas",
     serviceFee: "Tarifa de servicio",
     agencyMarkup: "Comision de agencia",
     paymentMethod: "Método de pago",
@@ -163,7 +158,7 @@ export default {
   sentences: {
     priceChange: "Cambio de precio",
     priceChangeInfo:
-      'Hemos notado un cambio de precio;  <strong typography="body-medium" weight="bold">{originalPrice}</strong>, y el nuevo precio es <strong typography="body-medium" weight="bold">{newPrice}</strong>. ',
+      'Hemos notado un cambio de precio;  <strong typography="body-medium" weight="bold">{{originalPrice}}</strong>, y el nuevo precio es <strong typography="body-medium" weight="bold">{{newPrice}}</strong>. ',
     areYouSure: "¿Está seguro?",
     copiedToClipboard: "Copiado",
     noBalancesFound: "No se encontraron saldos",
@@ -173,7 +168,7 @@ export default {
     noTripsFound: "No se encontraron viajes",
     timeRemaining: "Tiempo restante",
     timeRemainingInfo:
-      '{timeLeft} minutos para <strong weight="bold">completar</strong> su reservación',
+      '{{timeLeft}} minutos para <strong weight="bold">completar</strong> su reservación',
     startingAt: "De",
     loadingTripDetails: "Cargando detalles del viaje...",
     thisPriceIsForAllPassengers: "Precio para todos pasajeros.",
@@ -313,22 +308,14 @@ export default {
     unspecified: "No especificado",
   },
   passengerTypes: {
-    adult: {
-      plural: "Adultos",
-      singular: "Adulto",
-    },
-    child: {
-      plural: "Niños",
-      singular: "Niño",
-    },
-    senior: {
-      plural: "Personas Mayores",
-      singular: "Persona Mayor",
-    },
-    youth: {
-      plural: "Jóvenes",
-      singular: "Jóven",
-    },
+    adult_one: "Adulto",
+    adult_other: "Adultos",
+    child_one: "Niño",
+    child_other: "Niños",
+    senior_one: "Persona Mayor",
+    senior_other: "Personas Mayores",
+    youth_one: "Jóven",
+    youth_other: "Jóvenes",
   },
   tripTypes: {
     "round-trip": "Ida y vuelta",
@@ -389,208 +376,72 @@ export default {
       title: "Ayuda",
       pages: {
         privacyPolicy: {
-          title: "política de privacidad",
-          content: [
-            {
-              type: "p",
-              html: "Creemos en proteger la privacidad del cliente final. ",
-            },
-            {
-              type: "h2",
-              html: "Indemnización",
-            },
-            {
-              type: "p",
-              html: "Usted acepta defendernos a nosotros y/o a nuestros respectivos proveedores y a cualquiera de sus funcionarios, directores, empleados y agentes de y contra cualquier reclamo, causa de acción, demanda, recuperación, pérdida, daño, multa, penalización u otros costos o gastos. ",
-            },
-            {
-              type: "ul",
-              items: [
-                "- Su incumplimiento de este Acuerdo o de los documentos aquí mencionados;",
-                "- Su violación de cualquier ley o de los derechos de un tercero; ",
-                "- Su uso del Booking Hub.",
-              ],
-            },
-            {
-              type: "h2",
-              html: "Convertidor de moneda, precio y pago",
-            },
-            {
-              type: "p",
-              html: "Los precios de los servicios de viajes son dinámicos y están sujetos a cambios frecuentes en cualquier momento. ",
-            },
-            {
-              type: "p",
-              html: "Los precios mostrados a través de nuestro servicio pueden incluir impuestos. ",
-            },
-            {
-              type: "p",
-              html: "En determinadas jurisdicciones, cuando corresponda, el cliente final también puede ser responsable de pagar los impuestos locales impuestos por las autoridades fiscales locales (como impuestos municipales o impuestos turísticos, etc.). ",
-            },
-            {
-              type: "p",
-              html: "El importe de los impuestos locales puede cambiar entre la fecha de reserva y la fecha de estancia. ",
-            },
-            {
-              type: "p",
-              html: "El pago se realiza directamente a Snowfall Limited en nombre del proveedor de viajes únicamente.",
-            },
-            {
-              type: "p",
-              html: "El proveedor de viajes suele exigir el pago por adelantado; ",
-            },
-            {
-              type: "p",
-              html: "Podemos almacenar los detalles del método de pago del cliente final para transacciones futuras si ha obtenido su consentimiento para hacerlo.",
-            },
-            {
-              type: "p",
-              html: "Como se mencionó anteriormente, usted acepta las políticas aplicables tal como se muestran en el proceso de reserva. ",
-            },
-            {
-              type: "p",
-              html: "Como realiza una reserva en nombre de otra persona, acepta la responsabilidad de obtener su permiso antes de proporcionarnos sus datos personales.",
-            },
-            {
-              type: "h2",
-              html: "Cancelaciones y Reembolsos",
-            },
-            {
-              type: "p",
-              html: "Los gastos de cancelación aplicados a la reserva están sujetos a la política específica establecida por el proveedor respectivo. ",
-            },
-            {
-              type: "h2",
-              html: "Terminación de cuenta",
-            },
-            {
-              type: "p",
-              html: "A nuestro exclusivo criterio, podemos cancelar los titulares de cuentas que se consideren infractores reincidentes. ",
-            },
-            {
-              type: "h2",
-              html: "General",
-            },
-            {
-              type: "p",
-              html: "Si se determina que alguna parte de este Acuerdo es inválida, ilegal o inaplicable, la validez, legalidad y aplicabilidad de las disposiciones restantes no se verán afectadas ni perjudicadas de ninguna manera. ",
-            },
-            {
-              type: "p",
-              html: "El acceso a este Centro de reservas está condicionado a su aceptación de que toda la información contenida en él y todos los asuntos que surjan entre usted y nosotros se regirán por las leyes de Inglaterra y Gales. ",
-            },
-            {
-              type: "p",
-              html: "Todos los derechos no otorgados expresamente en este documento están reservados.",
-            },
-            {
-              type: "h2",
-              html: "Contacto",
-            },
-            {
-              type: "p",
-              html: 'Todos los comentarios, consultas y solicitudes relacionadas con nuestro uso de su información deben dirigirse a <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a>',
-            },
-          ],
+          title: "Política de privacidad",
+          content: `
+<p>Creemos en proteger la privacidad del cliente final.</p>
+<h2 typography="body-large" weight="bold">Indemnización</h2>
+<p>Usted acepta defendernos a nosotros y/o a nuestros respectivos proveedores y a cualquiera de sus funcionarios, directores, empleados y agentes de y contra cualquier reclamo, causa de acción, demanda, recuperación, pérdida, daño, multa, penalización u otros costos o gastos.</p>
+<ul>
+  <li>- Su incumplimiento de este Acuerdo o de los documentos aquí mencionados;</li>
+  <li>- Su violación de cualquier ley o de los derechos de un tercero; </li>
+  <li>- Su uso del Booking Hub.</li>
+</ul>
+<h2 typography="body-large" weight="bold">Convertidor de moneda, precio y pago</h2>
+<p>Los precios de los servicios de viajes son dinámicos y están sujetos a cambios frecuentes en cualquier momento.</p>
+<p>Los precios mostrados a través de nuestro servicio pueden incluir impuestos.</p>
+<p>En determinadas jurisdicciones, cuando corresponda, el cliente final también puede ser responsable de pagar los impuestos locales impuestos por las autoridades fiscales locales (como impuestos municipales o impuestos turísticos, etc.).</p>
+<p>El importe de los impuestos locales puede cambiar entre la fecha de reserva y la fecha de estancia.</p>
+<p>El pago se realiza directamente a Snowfall Limited en nombre del proveedor de viajes únicamente.</p>
+<p>El proveedor de viajes suele exigir el pago por adelantado;</p>
+<p>Podemos almacenar los detalles del método de pago del cliente final para transacciones futuras si ha obtenido su consentimiento para hacerlo.</p>
+<p>Como se mencionó anteriormente, usted acepta las políticas aplicables tal como se muestran en el proceso de reserva.</p>
+<p>Como realiza una reserva en nombre de otra persona, acepta la responsabilidad de obtener su permiso antes de proporcionarnos sus datos personales.</p>
+<h2 typography="body-large" weight="bold">Cancelaciones y Reembolsos</h2>
+<p>Los gastos de cancelación aplicados a la reserva están sujetos a la política específica establecida por el proveedor respectivo.</p>
+<h2 typography="body-large" weight="bold">Terminación de cuenta</h2>
+<p>A nuestro exclusivo criterio, podemos cancelar los titulares de cuentas que se consideren infractores reincidentes.</p>
+<h2 typography="body-large" weight="bold">General</h2>
+<p>Si se determina que alguna parte de este Acuerdo es inválida, ilegal o inaplicable, la validez, legalidad y aplicabilidad de las disposiciones restantes no se verán afectadas ni perjudicadas de ninguna manera.</p>
+<p>El acceso a este Centro de reservas está condicionado a su aceptación de que toda la información contenida en él y todos los asuntos que surjan entre usted y nosotros se regirán por las leyes de Inglaterra y Gales.</p>
+<p>Todos los derechos no otorgados expresamente en este documento están reservados.</p>
+<h2 typography="body-large" weight="bold">Contacto</h2>
+<p>Todos los comentarios, consultas y solicitudes relacionadas con nuestro uso de su información deben dirigirse a <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a></p>`,
         },
         termsAndConditions: {
           title: "Términos y condiciones",
-          content: [
-            {
-              type: "h2",
-              html: "Condiciones de uso de reserva",
-            },
-            {
-              type: "p",
-              html: 'Estos Términos de reserva (los "Términos") se aplican a las reservas realizadas a través del portal de clientes en línea de Junction (el "Centro de reservas"), que es propiedad y está operado por Snowfall Limited, una empresa registrada en Inglaterra (n.º de empresa: 12356236, 10-12 East ',
-            },
-            {
-              type: "p",
-              html: "Lea atentamente el Acuerdo. ",
-            },
-            {
-              type: "h2",
-              html: "Condiciones de Uso",
-            },
-            {
-              type: "p",
-              html: "Como condición para su uso del Booking Hub, Usted garantiza que (i) tiene al menos 18 años de edad; ",
-            },
-            {
-              type: "h2",
-              html: "Actividades prohibidas",
-            },
-            {
-              type: "p",
-              html: "El contenido y la información del Booking Hub (incluidos, entre otros, el precio y la disponibilidad de los servicios de viaje), así como la infraestructura utilizada para proporcionar dicho contenido e información, son propiedad nuestra o de nuestros proveedores y proveedores. ",
-            },
-            {
-              type: "h2",
-              html: "Fraude",
-            },
-            {
-              type: "p",
-              html: "Si una cuenta muestra signos repetidos de fraude, abuso, asociación con una persona o entidad sancionada por el gobierno u otra actividad sospechosa, podemos solicitarle información adicional.",
-            },
-            {
-              type: "p",
-              html: "Luego de revisar esa información y si llegamos a la conclusión razonable de que una reserva o cuenta está asociada con una actividad sospechosa, podremos:",
-            },
-            {
-              type: "ul",
-              items: [
-                "- Cancelar cualquier reserva asociada con Su nombre, dirección de correo electrónico o cuenta;",
-                "- Cerrar cualquier cuenta asociada;",
-                "- Tomar acciones legales, incluso para buscar responsabilizarlo por cualquier pérdida.",
-              ],
-            },
-            {
-              type: "p",
-              html: "Comuníquese con nosotros sobre la cancelación de una reserva o el cierre de una cuenta si cree que se ha producido un error.",
-            },
-            {
-              type: "h2",
-              html: "Hacer reservas de viajes",
-            },
-            {
-              type: "p",
-              html: "Todos los servicios de viaje que pueda encontrar y/o reservar a través del Booking Hub son proporcionados por proveedores externos. ",
-            },
-            {
-              type: "h2",
-              html: "Limitaciones y exclusiones de responsabilidad",
-            },
-            {
-              type: "p",
-              html: "Al operar Booking Hub, simplemente facilitamos reservas con terceros y no asumimos ninguna responsabilidad por proporcionar las opciones de viaje mostradas en Booking Hub o por cualquier acuerdo realizado con terceros en nombre del cliente final como resultado del uso de Booking Hub. ",
-            },
-            {
-              type: "p",
-              html: "Nuestra máxima responsabilidad agregada hacia usted y/o el cliente final que surja de o en conexión con estos términos y condiciones o su acceso, uso o incapacidad de acceso o uso del Booking Hub se limitará al máximo permitido por ",
-            },
-          ],
+          content: `
+<h2 typography="body-large" weight="bold">Condiciones de uso de reserva</h2>
+<p>Estos Términos de reserva (los "Términos") se aplican a las reservas realizadas a través del portal de clientes en línea de Junction (el "Centro de reservas"), que es propiedad y está operado por Snowfall Limited, una empresa registrada en Inglaterra (n.º de empresa: 12356236, 10-12 East</p>
+<p>Lea atentamente el Acuerdo.</p>
+<h2 typography="body-large" weight="bold">Condiciones de Uso</h2>
+<p>Como condición para su uso del Booking Hub, Usted garantiza que (i) tiene al menos 18 años de edad;</p>
+<h2 typography="body-large" weight="bold">Actividades prohibidas</h2>
+<p>El contenido y la información del Booking Hub (incluidos, entre otros, el precio y la disponibilidad de los servicios de viaje), así como la infraestructura utilizada para proporcionar dicho contenido e información, son propiedad nuestra o de nuestros proveedores y proveedores.</p>
+<h2 typography="body-large" weight="bold">Fraude</h2>
+<p>Si una cuenta muestra signos repetidos de fraude, abuso, asociación con una persona o entidad sancionada por el gobierno u otra actividad sospechosa, podemos solicitarle información adicional.</p>
+<p>Luego de revisar esa información y si llegamos a la conclusión razonable de que una reserva o cuenta está asociada con una actividad sospechosa, podremos:</p>
+<ul>
+  <li>- Cancelar cualquier reserva asociada con Su nombre, dirección de correo electrónico o cuenta;</li>
+  <li>- Cerrar cualquier cuenta asociada;</li>
+  <li>- Tomar acciones legales, incluso para buscar responsabilizarlo por cualquier pérdida.</li>
+</ul>
+<p>Comuníquese con nosotros sobre la cancelación de una reserva o el cierre de una cuenta si cree que se ha producido un error.</p>
+<h2 typography="body-large" weight="bold">Hacer reservas de viajes</h2>
+<p>Todos los servicios de viaje que pueda encontrar y/o reservar a través del Booking Hub son proporcionados por proveedores externos.</p>
+<h2 typography="body-large" weight="bold">Limitaciones y exclusiones de responsabilidad</h2>
+<p>Al operar Booking Hub, simplemente facilitamos reservas con terceros y no asumimos ninguna responsabilidad por proporcionar las opciones de viaje mostradas en Booking Hub o por cualquier acuerdo realizado con terceros en nombre del cliente final como resultado del uso de Booking Hub.</p>
+<p>Nuestra máxima responsabilidad agregada hacia usted y/o el cliente final que surja de o en conexión con estos términos y condiciones o su acceso, uso o incapacidad de acceso o uso del Booking Hub se limitará al máximo permitido por</p>`,
         },
         customerService: {
           title: "Servicio al Cliente",
-          content: [
-            {
-              type: "p",
-              html: "Contáctenos con su solicitud de asistencia especializada",
-            },
-            {
-              type: "p",
-              html: '<a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">soporte@snowfalltravel.com</a>',
-            },
-          ],
+          content: `
+<p>Contáctenos con su solicitud de asistencia especializada</p>
+<p><a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">soporte@snowfalltravel.com</a></p>`,
         },
         conditionsOfCarriage: {
           title: "Condiciones de Transporte",
-          content: [
-            {
-              type: "p",
-              html: "Condiciones del operador del tren. ",
-            },
-          ],
+          content: `
+<p>Condiciones del operador del tren.</p>`,
         },
       },
     },
@@ -757,7 +608,6 @@ export default {
       link: "Enlace",
       code: "Código",
       totp: "Autenticación de dos factores",
-      // eslint-disable-next-line camelcase
       lookup_secret: "Códigos de recuperación de respaldo",
       webauthn: "Claves de seguridad",
     },

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from "svelte";
   import Dialog from "./dialog.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
   let dialog: Dialog | undefined = undefined;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const dispatch = createEventDispatcher<{ confirm: void; cancel: void }>();
 
   function confirm(): void {
@@ -36,15 +36,15 @@
 <Dialog bind:this={dialog} on:close on:open>
   <div class="content">
     <slot>
-      <span>{$i18n.sentences.areYouSure}</span>
+      <span>{$t("sentences.areYouSure")}</span>
     </slot>
 
     <div class="actions">
       <button size="small" variant="outline" on:click={cancel} style:min-width="80px">
-        {$i18n.words.no}
+        {$t("words.no")}
       </button>
       <button size="small" variant="primary" on:click={confirm} style:min-width="80px">
-        {$i18n.words.yes}
+        {$t("words.yes")}
       </button>
     </div>
   </div>

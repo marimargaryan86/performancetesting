@@ -6,13 +6,13 @@
     getPassengersPresentation,
     type PassengerPickerData,
   } from "./trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
 
   export let priceQuote: TripOfferPriceQuote;
   export let passengers: PassengerPickerData;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   $: legs = getLegsFromPriceQuote(priceQuote);
   $: departureLeg = legs[0];
@@ -37,10 +37,10 @@
     </p>
 
     <p class="truncate">
-      {getPassengersPresentation(passengers, $i18n)}
+      {getPassengersPresentation(passengers, $t)}
     </p>
   {:else}
-    <p>{$i18n.sentences.loadingTripDetails}</p>
+    <p>{$t("sentences.loadingTripDetails")}</p>
   {/if}
 </div>
 

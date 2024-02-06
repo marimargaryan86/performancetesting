@@ -9,7 +9,7 @@
   import integrationInstancesClient from "~/integration-instances-client";
   import type { Bill } from "~/integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
   import { browser } from "$app/environment";
   import { getPageTitle } from "~/utils/page-title";
   import { formatAmount } from "~/formatting/currency";
@@ -22,7 +22,7 @@
   let searchQuery = "";
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const pending = writable(false);
 
   $: ({ data: bills } = data.bills);
@@ -72,29 +72,29 @@
 
 <svelte:head>
   <title>
-    {getPageTitle($i18n.title, $i18n.pages.pay.title, $i18n.pages.pay.pages.bills.title)}
+    {getPageTitle($t("title"), $t("pages.pay.title"), $t("pages.pay.pages.bills.title"))}
   </title>
 </svelte:head>
 
-<StandardLayout pageTitle={$i18n.pages.pay.pages.bills.title} bind:searchQuery>
+<StandardLayout pageTitle={$t("pages.pay.pages.bills.title")} bind:searchQuery>
   <x-table
     class="bills-table"
     style:grid-template-columns="repeat(4, minmax(max-content, 1fr)) min-content"
     use:scrollLoad={{ func: loadMore, pending }}
   >
     <x-thead>
-      <x-th>{$i18n.tableHeaders.orderId}</x-th>
-      <x-th>{$i18n.tableHeaders.createdDate}</x-th>
-      <x-th>{$i18n.tableHeaders.updatedDate}</x-th>
-      <x-th>{$i18n.tableHeaders.owedToUs}</x-th>
-      <x-th>{$i18n.tableHeaders.reconciledQuestion}</x-th>
+      <x-th>{$t("tableHeaders.orderId")}</x-th>
+      <x-th>{$t("tableHeaders.createdDate")}</x-th>
+      <x-th>{$t("tableHeaders.updatedDate")}</x-th>
+      <x-th>{$t("tableHeaders.owedToUs")}</x-th>
+      <x-th>{$t("tableHeaders.reconciledQuestion")}</x-th>
     </x-thead>
 
     {#each bills as bill}
       <x-tr>
         <x-td>{bill.orderId}</x-td>
-        <x-td>{bill.createdAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}</x-td>
-        <x-td>{bill.updatedAt?.toLocaleDateString($locale) ?? $i18n.words.notAvailable}</x-td>
+        <x-td>{bill.createdAt?.toLocaleDateString($locale) ?? $t("words.notAvailable")}</x-td>
+        <x-td>{bill.updatedAt?.toLocaleDateString($locale) ?? $t("words.notAvailable")}</x-td>
         <x-td>
           {#if bill.amounts.total}
             {formatAmount(bill.amounts.total, { locale: $locale, sign: true })}

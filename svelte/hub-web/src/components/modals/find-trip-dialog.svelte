@@ -1,16 +1,16 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import { getLocaleData } from "~/i18n";
   import Backdrop from "~/components/ui/backdrop.svelte";
   import TextField from "~/components/ui/text-field.svelte";
   import { validatePassengerNameRecord } from "~/utils/booking";
   import Icon from "~/components/icons/icon.svelte";
+  import { getTranslator } from "~/i18n";
   import { goto } from "$app/navigation";
   import { URLExtended } from "~/utils/url";
   import routeConfig from "~/route-config";
   import { page } from "$app/stores";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
   let backdrop: Backdrop | undefined;
   let passengerNameRecord: string;
   let passengerLastName: string;
@@ -29,7 +29,7 @@
     const isPassengerNameRecordInvalid = !validatePassengerNameRecord(passengerNameRecord);
 
     if (isPassengerNameRecordInvalid) {
-      passengerNameRecordError = $i18n.sentences.passengerNameRecordError;
+      passengerNameRecordError = $t("sentences.passengerNameRecordError");
 
       return;
     }
@@ -56,25 +56,27 @@
     <button class="close-icon" on:click={close}>
       <Icon variant="close" />
     </button>
-    <h3 typography="headline-small" weight="bold">{$i18n.actions.findTrip}</h3>
+    <h3 typography="headline-small" weight="bold">{$t("actions.findTrip")}</h3>
     <div class="fields">
       <TextField
-        label={$i18n.words.passengerNameRecord}
-        placeholder={$i18n.sentences.passengerNameRecordPlaceholder}
+        label={$t("words.passengerNameRecord")}
+        placeholder={$t("sentences.passengerNameRecordPlaceholder")}
         bind:value={passengerNameRecord}
         error={passengerNameRecordError}
       />
       <TextField
-        label={`${
-          $i18n.words.passenger.singular
-        } ${$i18n.words.lastName.toLowerCase()} (${$i18n.words.optional.toLowerCase()})`}
-        placeholder={$i18n.sentences.passengerLastNamePlaceholder}
+        label={[
+          $t("words.passenger_one"),
+          $t("words.lastName").toLowerCase(),
+          $t("words.optional").toLowerCase(),
+        ].join(" ")}
+        placeholder={$t("sentences.passengerLastNamePlaceholder")}
         bind:value={passengerLastName}
       />
     </div>
     <div class="actions">
-      <button variant="outline" on:click={close}>{$i18n.actions.cancel}</button>
-      <button variant="primary" on:click={search}>{$i18n.actions.findTrip}</button>
+      <button variant="outline" on:click={close}>{$t("actions.cancel")}</button>
+      <button variant="primary" on:click={search}>{$t("actions.findTrip")}</button>
     </div>
   </div>
 </Backdrop>

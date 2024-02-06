@@ -8,12 +8,12 @@
   import Company from "./company.svelte";
   import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
   import type { MaybePromise } from "@sveltejs/kit";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
   export let booking: TripBooking;
   export let transactionTask: MaybePromise<Transaction | undefined> | undefined;
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let markupsTask: Promise<Markups | undefined> | undefined;
 
@@ -25,7 +25,7 @@
 </script>
 
 <div class="transaction">
-  <h3 typography="title-large" weight="bold">{$i18n.words.transactionInfo}</h3>
+  <h3 typography="title-large" weight="bold">{$t("words.transactionInfo")}</h3>
 
   {#await transactionTask}
     <div class="pending">
@@ -35,23 +35,23 @@
     {#if transaction}
       <div class="content">
         <div>
-          <span typography="label-large">{$i18n.words.transactionType}</span>
+          <span typography="label-large">{$t("words.transactionType")}</span>
           <strong typography="body-large" weight="bold">
-            {$i18n.types[transaction.payment.method]}
+            {$t(`types.${transaction.payment.method}`)}
           </strong>
         </div>
 
         <div>
-          <span typography="label-large">{$i18n.words.paymentType}</span>
+          <span typography="label-large">{$t("words.paymentType")}</span>
           <strong typography="body-large" weight="bold">
-            {$i18n.types[transaction.payment.type]}
+            {$t(`types.${transaction.payment.type}`)}
           </strong>
         </div>
 
         <Company
           company={transaction.beneficiary}
           price={transaction.amounts.beneficiary}
-          title={$i18n.words.provider}
+          title={$t("words.provider")}
         />
 
         <Company
@@ -59,12 +59,12 @@
           price={transaction.amounts.totalAmount}
           breakdownList={booking.price.breakdown}
           {markupsTask}
-          title={$i18n.words.reseller}
+          title={$t("words.reseller")}
         />
       </div>
     {:else}
       <Alert typography="body-medium" type="warning" dismissable={false}>
-        {$i18n.sentences.transactionNotFound}
+        {$t("sentences.transactionNotFound")}
       </Alert>
     {/if}
   {/await}

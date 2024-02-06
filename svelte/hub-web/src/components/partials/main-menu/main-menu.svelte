@@ -4,7 +4,7 @@
   import { page } from "$app/stores";
   import routeConfig from "~/route-config";
   import integrationInstancesClient from "~/integration-instances-client";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import { goto } from "$app/navigation";
   import Icon from "~/components/icons/icon.svelte";
   import JunctionLogo from "./junction-logo.svelte";
@@ -14,7 +14,7 @@
   let compact = false;
 
   const user = getUser();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const transitionTimeMs = 250;
 
   function toggle(): void {
@@ -40,41 +40,41 @@
   $: menuItems = [
     {
       url: routeConfig.routes.tripManagement.routes.book.root,
-      label: $i18n.pages.tripManagement.pages.book.title,
+      label: $t("pages.tripManagement.pages.book.title"),
       icon: "ticket",
     },
     {
       url: routeConfig.routes.tripManagement.routes.orders.root,
-      label: $i18n.pages.tripManagement.pages.orders.title,
+      label: $t("pages.tripManagement.pages.orders.title"),
       icon: "bookings",
       permission: "journey.view",
     },
     {
       url: routeConfig.routes.pay.routes.activity.root,
-      label: $i18n.pages.pay.pages.activity.title,
+      label: $t("pages.pay.pages.activity.title"),
       icon: "activity",
       permission: "transaction.view",
     },
     {
       url: routeConfig.routes.pay.routes.bills.root,
-      label: $i18n.pages.pay.pages.bills.title,
+      label: $t("pages.pay.pages.bills.title"),
       icon: "bill",
       permission: "*",
     },
     "spacer",
     {
       url: routeConfig.routes.knowledgeHub.root,
-      label: $i18n.pages.knowledgeHub.title,
+      label: $t("pages.knowledgeHub.title"),
       icon: "knowledge",
     },
     {
       url: routeConfig.routes.help.routes.customerService.root,
-      label: $i18n.actions.reportAnIssue,
+      label: $t("actions.reportAnIssue"),
       icon: "bug",
     },
     {
       url: routeConfig.routes.help.routes.privacyPolicy.root,
-      label: $i18n.words.help,
+      label: $t("words.help"),
       icon: "information",
       activeMatcher: (pathname): boolean =>
         pathname.startsWith(routeConfig.routes.help.root) &&
@@ -119,11 +119,11 @@
       <button
         typography="body-medium"
         class="item logout"
-        title={$i18n.actions.logout}
+        title={$t("actions.logout")}
         on:click={logout}
       >
         <Icon variant="logout" size="20px" color="var(--color-common-light-strong)" />
-        <span>{$i18n.actions.logout}</span>
+        <span>{$t("actions.logout")}</span>
       </button>
     </li>
 

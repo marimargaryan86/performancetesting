@@ -4,32 +4,32 @@
   import StandardLayout from "~/components/page/standard-layout.svelte";
   import { page } from "$app/stores";
   import { getPageTitle } from "~/utils/page-title";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   let tabs: (Tab & { icon?: string })[];
 
   $: tabs = [
     {
       url: routeConfig.routes.help.routes.privacyPolicy.root,
-      label: $i18n.pages.help.pages.privacyPolicy.title,
+      label: $t("pages.help.pages.privacyPolicy.title"),
       exact: true,
     },
     {
       url: routeConfig.routes.help.routes.termsAndConditions.root,
-      label: $i18n.pages.help.pages.termsAndConditions.title,
+      label: $t("pages.help.pages.termsAndConditions.title"),
       exact: true,
     },
     {
       icon: "headphones",
       url: routeConfig.routes.help.routes.customerService.root,
-      label: $i18n.pages.help.pages.customerService.title,
+      label: $t("pages.help.pages.customerService.title"),
       exact: true,
     },
     {
       url: routeConfig.routes.help.routes.conditionsOfCarriage.root,
-      label: $i18n.pages.help.pages.conditionsOfCarriage.title,
+      label: $t("pages.help.pages.conditionsOfCarriage.title"),
       exact: true,
     },
   ];
@@ -40,11 +40,11 @@
 
 <svelte:head>
   <title>
-    {getPageTitle($i18n.title, $i18n.pages.help.title, activeTab?.label ?? $i18n.words.unknown)}
+    {getPageTitle($t("title"), $t("pages.help.title"), activeTab?.label ?? $t("words.unknown"))}
   </title>
 </svelte:head>
 
-<StandardLayout pageTitle={$i18n.pages.help.title} {tabs} searchQuery="">
+<StandardLayout pageTitle={$t("pages.help.title")} {tabs} searchQuery="">
   {#key $page.url.pathname}
     <div class="container">
       {#if activeTab?.icon}

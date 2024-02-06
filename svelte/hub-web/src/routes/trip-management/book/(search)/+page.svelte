@@ -1,13 +1,13 @@
 <script lang="ts">
   import { getPageTitle } from "~/utils/page-title";
   import TripSearch from "../../components/trip-search/trip-search.svelte";
-  import { getLocaleData } from "~/i18n";
+  import { getTranslator } from "~/i18n";
   import type { ComponentEvents } from "svelte";
   import { manager } from "../../booking-flow";
   import { goto } from "$app/navigation";
   import routeConfig from "~/route-config";
 
-  const i18n = getLocaleData();
+  const t = getTranslator();
 
   async function search(event: ComponentEvents<TripSearch>["search"]): Promise<void> {
     event.detail.pending?.set(true);
@@ -20,10 +20,10 @@
 <svelte:head>
   <title>
     {getPageTitle(
-      $i18n.title,
-      $i18n.pages.tripManagement.title,
-      $i18n.pages.tripManagement.pages.book.title,
-      $i18n.pages.tripManagement.pages.book.pages.search.title,
+      $t("title"),
+      $t("pages.tripManagement.title"),
+      $t("pages.tripManagement.pages.book.title"),
+      $t("pages.tripManagement.pages.book.pages.search.title"),
     )}
   </title>
 </svelte:head>

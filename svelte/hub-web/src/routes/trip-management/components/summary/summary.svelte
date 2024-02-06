@@ -11,7 +11,7 @@
     type PassengerPickerData,
   } from "../trip-search/passenger-picker/passenger-picker.svelte";
   import { createEventDispatcher } from "svelte";
-  import { getLocale, getLocaleData } from "~/i18n";
+  import { getLocale, getTranslator } from "~/i18n";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
@@ -19,7 +19,7 @@
   let collapsible: Collapsible | undefined;
 
   const locale = getLocale();
-  const i18n = getLocaleData();
+  const t = getTranslator();
   const dispatch = createEventDispatcher<{ showFareRules: void }>();
 
   function showFareRules(): void {
@@ -30,16 +30,16 @@
   $: totalPrice = priceQuote?.price.total;
 </script>
 
-<Collapsible bind:this={collapsible} title={$i18n.words.summary}>
+<Collapsible bind:this={collapsible} title={$t("words.summary")}>
   <div class="details">
     {#if priceQuote}
       <p typography="label-large">
-        {$i18n.words.passenger.plural}
-        <span weight="bold">{getPassengersPresentation(passengers, $i18n)}</span>
+        {$t("words.passenger_other")}
+        <span weight="bold">{getPassengersPresentation(passengers, $t)}</span>
       </p>
 
       <p typography="label-large">
-        {$i18n.words.fareBrand[priceQuote.options.length === 1 ? "singular" : "plural"]}
+        {$t("words.fareBrand", { count: priceQuote.options.length })}
 
         <span weight="bold">
           {priceQuote.options.map((item) => item.brandName).join(", ")}
@@ -56,14 +56,14 @@
     <div class="price">
       {#if expanded}
         <div transition:slideFade={{ duration: transitionTimeMs }} class="price-breakdown">
-          <span typography="body-small">{$i18n.sentences.thisPriceIsForAllPassengers}</span>
+          <span typography="body-small">{$t("sentences.thisPriceIsForAllPassengers")}</span>
 
           {#if priceBreakdown}
             <ul>
               {#each priceBreakdown as item}
                 <li>
                   <span typography="label-medium">
-                    {$i18n.priceBreakdownTypes[item.type]}
+                    {$t(`priceBreakdownTypes.${item.type}`)}
                   </span>
                   <span typography="body-small" weight="bold">
                     {formatAmount(item.price, { locale: $locale, sign: true })}
@@ -76,7 +76,7 @@
       {/if}
 
       <div class="total">
-        <span typography="body-large" weight="bold">{$i18n.sentences.totalToPay}</span>
+        <span typography="body-large" weight="bold">{$t("sentences.totalToPay")}</span>
         <em typography="body-large" weight="bold">
           {#if totalPrice}
             {formatAmount(totalPrice, { locale: $locale, sign: true })}
@@ -90,7 +90,7 @@
     {#if expanded}
       <div class="fare-rules-wrapper">
         <p typography="body-xsmall">
-          {#each $i18n.sentences.fareRulesInfo as item}
+          {#each $t("sentences.fareRulesInfo", { returnObjects: true }) as item}
             {#if item.type === "text"}
               {item.value}
             {:else}
