@@ -1405,6 +1405,23 @@ class SimpleOfferSearchResource(models.Resource):
                     "departureAfter": protobuf.protobuf_to_datetime(
                         offer_search.simple_trip.departure_at,
                     ),
+                    "departureBefore": protobuf.protobuf_to_datetime(
+                        offer_search.simple_trip.departure_before,
+                    ),
+                    "returnDepartureAfter": (
+                        protobuf.protobuf_to_datetime(
+                            offer_search.simple_trip.return_departure_at,
+                        )
+                        if offer_search.simple_trip.HasField("return_departure_at")
+                        else None
+                    ),
+                    "returnDepartureBefore": (
+                        protobuf.protobuf_to_datetime(
+                            offer_search.simple_trip.return_departure_before,
+                        )
+                        if offer_search.simple_trip.HasField("return_departure_before")
+                        else None
+                    ),
                     "arrivalBefore": (
                         protobuf.protobuf_to_datetime(
                             offer_search.simple_trip.arrival_at,
