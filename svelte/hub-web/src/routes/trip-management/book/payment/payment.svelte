@@ -33,6 +33,15 @@
       },
     },
   };
+
+  function getCustomerOptions(paymentIntent: PaymentIntent): CustomerOptions | undefined {
+    return paymentIntent?.customerId && paymentIntent.ephemeralKey
+      ? {
+          customer: paymentIntent.customerId,
+          ephemeralKey: paymentIntent.ephemeralKey,
+        }
+      : undefined;
+  }
 </script>
 
 <script lang="ts">
@@ -44,24 +53,27 @@
     type Appearance,
     type StripeElements,
     type StripePaymentElement,
+    type CustomerOptions,
   } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import Dialog from "~/components/ui/dialogues/dialog.svelte";
   import { getLocale, getTranslator } from "~/i18n";
   import type { PaymentIntent } from "../../booking-flow";
+  import { getUser } from "~/utils/permissions";
 
   export let paymentIntent: PaymentIntent | undefined;
 
   const locale = getLocale();
   const t = getTranslator();
+  const user = getUser();
 
-  let dialog: Dialog | undefined = undefined;
-  let stripe: Stripe | undefined = undefined;
-  let stripeElements: StripeElements | undefined = undefined;
-  let stripeContainer: HTMLDivElement | undefined = undefined;
-  let error: string | undefined = undefined;
-  let paymentElement: StripePaymentElement | undefined = undefined;
+  let dialog: Dialog | undefined;
+  let stripe: Stripe | undefined;
+  let stripeElements: StripeElements | undefined;
+  let stripeContainer: HTMLDivElement | undefined;
+  let error: string | undefined;
+  let paymentElement: StripePaymentElement | undefined;
 
   $: if (error) {
     dialog?.open();
@@ -75,11 +87,24 @@
   $: if (browser && paymentElement && stripeContainer) {
     paymentElement.mount(stripeContainer);
   }
+  $: stripeElements?.update({ locale: $locale });
 
   async function createStripe(nextClientSecret: string): Promise<void> {
     stripe = (await loadStripe(env.PUBLIC_STRIPE_KEY ?? "", { locale: $locale })) ?? undefined;
-    stripeElements = stripe?.elements({ appearance, clientSecret: nextClientSecret });
-    paymentElement = stripeElements?.create("payment");
+    stripeElements = stripe?.elements({
+      locale: $locale,
+      appearance,
+      clientSecret: nextClientSecret,
+      customerOptions: paymentIntent ? getCustomerOptions(paymentIntent) : undefined,
+    });
+    paymentElement = stripeElements?.create("payment", {
+      readOnly: paymentIntent?.confirmed,
+      defaultValues: {
+        billingDetails: {
+          email: $user.email,
+        },
+      },
+    });
   }
 
   export async function pay(): Promise<boolean> {
@@ -109,6 +134,8 @@
       error = confirmationResult.error.message;
       return false;
     }
+
+    paymentElement?.update({ readOnly: true });
 
     return true;
   }
