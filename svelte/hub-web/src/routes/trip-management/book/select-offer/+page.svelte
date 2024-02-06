@@ -37,26 +37,26 @@
     type SearchOptionsSettings,
   } from "./search-options.svelte";
   import Offer from "./offer/offer.svelte";
-  import routeConfig from "routeConfig";
+  import routeConfig from "~/route-config";
   import { goto, invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
   import Countdown from "../countdown.svelte";
   import LoadingSkelton from "./loading-skelton.svelte";
-  import type { Offer as OfferModel } from "integration/junction-mobile-api/schemas/offer";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Alert from "components/ui/alert.svelte";
-  import { getSortOffersFunc } from "sorting/offer";
-  import { getFilterOffersFunc } from "filters/offer";
-  import { getOfferDurationM, getVendors } from "utils/offer";
+  import type { Offer as OfferModel } from "~/integration/junction-mobile-api/schemas/offer";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import Alert from "~/components/ui/alert.svelte";
+  import { getSortOffersFunc } from "~/sorting/offer";
+  import { getFilterOffersFunc } from "~/filters/offer";
+  import { getOfferDurationM, getVendors } from "~/utils/offer";
   import { onDestroy, type ComponentEvents } from "svelte";
   import { writable } from "svelte/store";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocaleData } from "~/i18n";
   import { manager, type PartialSelectedOffer } from "../../booking-flow";
   import { browser, dev } from "$app/environment";
   import CollapsibleTripSearch from "../../components/trip-search/collapsible-trip-search.svelte";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import type { PartialOmit } from "utils/common";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import type { PartialOmit } from "~/utils/common";
 
   export let data;
 

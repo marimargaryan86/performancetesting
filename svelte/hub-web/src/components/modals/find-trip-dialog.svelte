@@ -1,13 +1,13 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
-  import { getLocaleData } from "i18n";
-  import Backdrop from "components/ui/backdrop.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import { validatePassengerNameRecord } from "utils/booking";
-  import Icon from "components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
+  import Backdrop from "~/components/ui/backdrop.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import { validatePassengerNameRecord } from "~/utils/booking";
+  import Icon from "~/components/icons/icon.svelte";
   import { goto } from "$app/navigation";
-  import { URLExtended } from "utils/url";
-  import routeConfig from "routeConfig";
+  import { URLExtended } from "~/utils/url";
+  import routeConfig from "~/route-config";
   import { page } from "$app/stores";
 
   const i18n = getLocaleData();

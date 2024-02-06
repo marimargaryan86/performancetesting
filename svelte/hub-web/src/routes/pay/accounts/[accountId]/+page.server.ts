@@ -1,6 +1,6 @@
-import integrationInstances from "integration-instances";
-import type { Account } from "integration/junction-hub-api/schemas/account";
-import type { Balance } from "integration/junction-hub-api/schemas/balance";
+import integrationInstances from "~/integration-instances";
+import type { Account } from "~/integration/junction-hub-api/schemas/account";
+import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
 
 export async function load(event): Promise<{
   balances: Balance[];

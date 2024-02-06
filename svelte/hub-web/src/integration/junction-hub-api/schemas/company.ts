@@ -3,7 +3,7 @@ import {
   enhancedAddressDetailsParser,
   type EnhancedAddressDetails,
   type EnhancedAddressDetailsSchema,
-} from "integration/common/schemas/address";
+} from "~/integration/common/schemas/address";
 import type { IncludedMapping } from "./included";
 import { moneyParser, type Money, type MoneySchema } from "./money";
 

@@ -1,18 +1,18 @@
 <script lang="ts">
-  import Backdrop from "components/ui/backdrop.svelte";
+  import Backdrop from "~/components/ui/backdrop.svelte";
   import Ticket from "../../../components/ticket.svelte";
-  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
   import Passengers from "../../../components/passengers.svelte";
-  import type { OrderPassenger } from "integration/junction-hub-api/schemas/order";
+  import type { OrderPassenger } from "~/integration/junction-hub-api/schemas/order";
   import Itinerary from "../../../components/itinerary.svelte";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
-  import integrationInstancesClient from "integration-instances-client";
+  import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
-  import type { CancellationRequest } from "integration/junction-hub-api/schemas/cancellation";
-  import { getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import type { CancellationRequest } from "~/integration/junction-hub-api/schemas/cancellation";
+  import { getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let passengers: OrderPassenger[];
 

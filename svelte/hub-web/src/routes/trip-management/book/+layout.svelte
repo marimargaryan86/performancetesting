@@ -9,8 +9,8 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import StepView from "components/page/step-view.svelte";
-  import { getLocaleData, type LocaleData } from "i18n";
+  import StepView from "~/components/page/step-view.svelte";
+  import { getLocaleData, type LocaleData } from "~/i18n";
 
   const i18n = getLocaleData();
 

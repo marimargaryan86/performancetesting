@@ -1,15 +1,18 @@
-import type { StatusBadgeValue } from "components/ui/status-badge.svelte";
-import type { PaymentMethod, PaymentType } from "integration/junction-hub-api/schemas/transaction";
-import type { UserRole } from "integration/ory/schemas/authentication";
+import type { StatusBadgeValue } from "~/components/ui/status-badge.svelte";
+import type {
+  PaymentMethod,
+  PaymentType,
+} from "~/integration/junction-hub-api/schemas/transaction";
+import type { UserRole } from "~/integration/ory/schemas/authentication";
 import type { PassengerType } from "../../routes/trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
-import type { ContentElement, WordQuantity } from "i18n";
+import type { ContentElement, WordQuantity } from "~/i18n";
 import type { SortOption } from "../../routes/trip-management/book/select-offer/search-options.svelte";
-import type { PriceBreakdownType } from "integration/common/schemas/price";
+import type { PriceBreakdownType } from "~/integration/common/schemas/price";
 import type {
   Gender,
   PassengerTitle,
   TravelerDocumentType,
-} from "integration/common/schemas/order";
+} from "~/integration/common/schemas/order";
 import type { TripType } from "../../routes/trip-management/components/trip-search/trip-type-picker.svelte";
 
 export default {

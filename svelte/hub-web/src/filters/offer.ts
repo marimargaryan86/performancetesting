@@ -1,12 +1,12 @@
-import { getTimeOfDayM } from "utils/date-time";
+import { getTimeOfDayM } from "~/utils/date-time";
 import {
   getMinStopCount,
   getEarliestDeparture,
   getEarliestArrival,
   getOfferDurationM,
-} from "utils/offer";
+} from "~/utils/offer";
 import type { SearchOptionsData } from "../routes/trip-management/book/select-offer/search-options.svelte";
-import type { Offer } from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
 
 function stopsFulfilled(options: SearchOptionsData, offer: Offer): boolean {
   if (options.stops.includes("direct") && getMinStopCount(offer) > 1) {

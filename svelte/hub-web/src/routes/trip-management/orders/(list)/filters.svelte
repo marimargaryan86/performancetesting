@@ -13,15 +13,15 @@
 </script>
 
 <script lang="ts">
-  import DatePicker from "components/ui/date-picker/date-picker.svelte";
-  import SelectField from "components/ui/select-field.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import { getLocaleData, type LocaleData } from "i18n";
+  import DatePicker from "~/components/ui/date-picker/date-picker.svelte";
+  import SelectField from "~/components/ui/select-field.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import { getLocaleData, type LocaleData } from "~/i18n";
   import {
     bookingStatuses,
     type BookingStatus,
-  } from "integration/junction-hub-api/schemas/booking";
-  import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
+  } from "~/integration/junction-hub-api/schemas/booking";
+  import type { JourneyFilterOptions } from "~/integration/junction-hub-api/schemas/journey";
   import { queryFiltersValid } from "./+page.svelte";
 
   export let filters: JourneyFilterOptions;

@@ -1,7 +1,7 @@
 import { env } from "$env/dynamic/private";
-import junctionMobileApi from "integration/junction-mobile-api/services";
-import junctionHubApi from "integration/junction-hub-api/services";
-import ory from "integration/ory/services";
+import junctionMobileApi from "~/integration/junction-mobile-api/services";
+import junctionHubApi from "~/integration/junction-hub-api/services";
+import ory from "~/integration/ory/services";
 
 const junctionHubCompanyService = new junctionHubApi.CompanyService(env.HUB_API_BASE_URL);
 

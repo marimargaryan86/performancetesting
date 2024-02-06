@@ -1,5 +1,5 @@
-import type { LocaleData } from "i18n";
-import type { CountryModel } from "models/location";
+import type { LocaleData } from "~/i18n";
+import type { CountryModel } from "~/models/location";
 
 export function formatCountryOption(
   lang: LocaleData,

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { getRandomId } from "utils/random";
+  import { getRandomId } from "~/utils/random";
 
   export let id = getRandomId("checkbox");
   export let active = false;

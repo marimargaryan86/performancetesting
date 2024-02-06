@@ -9,8 +9,8 @@
 </script>
 
 <script lang="ts">
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import routeConfig from "routeConfig";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import routeConfig from "~/route-config";
   import Payment from "./payment.svelte";
   import Fees from "./fees.svelte";
   import PassengerEntry, { type PartialPassengerData } from "./passenger-entry.svelte";
@@ -18,19 +18,19 @@
   import Countdown from "../countdown.svelte";
   import { z } from "zod";
   import { goto } from "$app/navigation";
-  import PriceDialog from "components/ui/dialogues/price-dialog.svelte";
+  import PriceDialog from "~/components/ui/dialogues/price-dialog.svelte";
   import Summary from "../../components/summary/summary.svelte";
   import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
-  import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
+  import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
   import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
-  import { getPassengerValidator } from "utils/passenger";
+  import { getPassengerValidator } from "~/utils/passenger";
   import { writable } from "svelte/store";
-  import { formatAmount } from "formatting/currency";
+  import { formatAmount } from "~/formatting/currency";
   import TripBanner from "../../components/trip-banner.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocale, getLocaleData } from "i18n";
-  import type { TripOfferPriceQuoteCompleted } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import type { TripOfferPriceQuoteCompleted } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { manager, markupsModel, type Markups, type PartialMarkups } from "../../booking-flow";
   import { browser } from "$app/environment";
 

@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import paymentIllustrationImg from "assets/images/payment-illustration.png";
+  import paymentIllustrationImg from "~/assets/images/payment-illustration.png";
 
   const appearance: Appearance = {
     theme: "stripe",
@@ -36,7 +36,7 @@
 </script>
 
 <script lang="ts">
-  import routeConfig from "routeConfig";
+  import routeConfig from "~/route-config";
   import { browser } from "$app/environment";
   import {
     loadStripe,
@@ -46,9 +46,9 @@
     type StripePaymentElement,
   } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Dialog from "components/ui/dialogues/dialog.svelte";
-  import { getLocale, getLocaleData } from "i18n";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import Dialog from "~/components/ui/dialogues/dialog.svelte";
+  import { getLocale, getLocaleData } from "~/i18n";
   import type { PaymentIntent } from "../../booking-flow";
 
   export let paymentIntent: PaymentIntent | undefined;

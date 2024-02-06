@@ -36,17 +36,17 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
-  import { writableCookie } from "utils/persistent-store";
-  import StepView from "components/page/step-view.svelte";
-  import routeConfig from "routeConfig";
+  import { writableCookie } from "~/utils/persistent-store";
+  import StepView from "~/components/page/step-view.svelte";
+  import routeConfig from "~/route-config";
   import BeneficiaryDetails from "./beneficiary-details.svelte";
   import BankAccountDetails from "./bank-account-details.svelte";
   import Summary from "./summary.svelte";
-  import { URLExtended } from "utils/url";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import Alert from "components/ui/alert.svelte";
-  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-  import { getPageTitle } from "utils/page-title";
+  import { URLExtended } from "~/utils/url";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import Alert from "~/components/ui/alert.svelte";
+  import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+  import { getPageTitle } from "~/utils/page-title";
 
   export let data;
 

@@ -53,23 +53,23 @@
 
 <script lang="ts">
   import { dev } from "$app/environment";
-  import DatePicker from "components/ui/date-picker/date-picker.svelte";
+  import DatePicker from "~/components/ui/date-picker/date-picker.svelte";
   import PassengerPicker, {
     getDefaultValue,
     passengerPickerData,
   } from "./passenger-picker/passenger-picker.svelte";
-  import TripTypePicker, { type TripType } from "./trip-type-picker.svelte";
-  import AutocompleteField from "components/ui/autocomplete-field.svelte";
-  import SwapIcon from "components/icons/swap-icon.svelte";
-  import { placeModel, type Place } from "integration/junction-mobile-api/schemas/place";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import integrationInstancesClient from "integration-instances-client";
-  import { ensureDefined } from "utils/array";
+  import AutocompleteField from "~/components/ui/autocomplete-field.svelte";
+  import SwapIcon from "~/components/icons/swap-icon.svelte";
+  import { placeModel, type Place } from "~/integration/junction-mobile-api/schemas/place";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import { ensureDefined } from "~/utils/array";
   import { writable, type Writable } from "svelte/store";
-  import { getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
   import { createEventDispatcher } from "svelte";
   import { z } from "zod";
+  import TripTypePicker, { type TripType } from "./trip-type-picker.svelte";
 
   export let data: PartialSearchData = {
     tripType: "one-way",

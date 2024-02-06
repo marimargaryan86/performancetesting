@@ -2,7 +2,7 @@ import {
   coordinatesParser,
   type Coordinates,
   type CoordinatesSchema,
-} from "integration/common/schemas/point";
+} from "~/integration/common/schemas/point";
 import type { TripCandidateSearch, TripCandidateSearchSchema } from "./trip-candidate";
 import { tripOfferPassengerParser } from "./offer-search";
 

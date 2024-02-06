@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { hourFormat } from "utils/date-time";
+  import { hourFormat } from "~/utils/date-time";
   import { afterUpdate, onMount } from "svelte";
-  import { getTimeFormat } from "i18n";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import { getTimeFormat } from "~/i18n";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import type { CalendarDateTime, DateValue } from "@internationalized/date";
 
   export let min: CalendarDateTime | undefined = undefined;

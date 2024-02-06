@@ -2,13 +2,13 @@ import {
   coordinatesSearchableParser,
   type CoordinatesSearchable,
   type CoordinatesSearchableSchema,
-} from "integration/common/schemas/point";
+} from "~/integration/common/schemas/point";
 import {
   tripOfferPassengerParser,
   type TripOfferPassenger,
   type TripOfferPassengerSchema,
 } from "./offer-search";
-import type { LegType, LegTypeSchema } from "integration/common/schemas/leg-type";
+import type { LegType, LegTypeSchema } from "~/integration/common/schemas/leg-type";
 
 export type TripCandidateSearchCriteria = {
   origin: CoordinatesSearchable;

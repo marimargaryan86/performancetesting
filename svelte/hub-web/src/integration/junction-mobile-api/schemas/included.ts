@@ -2,7 +2,7 @@ import {
   legTypeParser,
   type LegType,
   type LegTypeSchema,
-} from "integration/common/schemas/leg-type";
+} from "~/integration/common/schemas/leg-type";
 import {
   offerParser,
   type Offer,
@@ -24,7 +24,7 @@ import {
   cabinClassParser,
   type CabinClass,
   type CabinClassSchema,
-} from "integration/common/schemas/cabin-class";
+} from "~/integration/common/schemas/cabin-class";
 import {
   paymentParser,
   type Payment,

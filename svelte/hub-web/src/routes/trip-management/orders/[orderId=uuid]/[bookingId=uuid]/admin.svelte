@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
   import RefundDialog from "./refund-dialog.svelte";
   import Transaction from "./transaction.svelte";
-  import { getUser, permitted } from "utils/permissions";
-  import type { Transaction as TransactionModel } from "integration/junction-hub-api/schemas/transaction";
+  import { getUser, permitted } from "~/utils/permissions";
+  import type { Transaction as TransactionModel } from "~/integration/junction-hub-api/schemas/transaction";
   import { onMount } from "svelte";
-  import integrationInstancesClient from "integration-instances-client";
+  import integrationInstancesClient from "~/integration-instances-client";
   import type { MaybePromise } from "@sveltejs/kit";
   import Refund from "./refund.svelte";
 

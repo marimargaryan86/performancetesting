@@ -2,10 +2,10 @@
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
-  import { formatAmount } from "formatting/currency";
-  import type { Price } from "integration/common/schemas/price";
-  import { getLocale, getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import { formatAmount } from "~/formatting/currency";
+  import type { Price } from "~/integration/common/schemas/price";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let originalPrice: Price;
   export let newPrice: Price;

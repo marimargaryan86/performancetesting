@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Icon from "components/icons/icon.svelte";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let steps: { label: string; number: number }[];
   export let activeStep: number;

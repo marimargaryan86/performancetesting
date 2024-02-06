@@ -1,29 +1,29 @@
 import { z } from "zod";
 import { PASSENGER_DEFINITIONS } from "./components/trip-search/passenger-picker/passenger-picker.svelte";
-import { resourceStatus } from "integration/common/schemas/resource";
-import { priceModel, type Price } from "integration/common/schemas/price";
-import { paymentModel } from "integration/junction-mobile-api/schemas/payment";
-import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
+import { resourceStatus } from "~/integration/common/schemas/resource";
+import { priceModel, type Price } from "~/integration/common/schemas/price";
+import { paymentModel } from "~/integration/junction-mobile-api/schemas/payment";
+import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
 import * as devalue from "devalue";
 import { Base64 } from "js-base64";
 import type {
   SimpleOfferSearch,
   SimpleOfferSearchCreate,
-} from "integration/junction-mobile-api/schemas/simple-offer-search";
-import integrationInstancesClient from "integration-instances-client";
-import { getRandomAlphaNumericString } from "utils/random";
+} from "~/integration/junction-mobile-api/schemas/simple-offer-search";
+import integrationInstancesClient from "~/integration-instances-client";
+import { getRandomAlphaNumericString } from "~/utils/random";
 import type { RequestEvent } from "@sveltejs/kit";
-import type { Offer, OfferOption } from "integration/junction-mobile-api/schemas/offer";
-import { sleep } from "utils/common";
-import type { TripOfferPriceQuoteCompleted } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+import type { Offer, OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
+import { sleep } from "~/utils/common";
+import type { TripOfferPriceQuoteCompleted } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
 import type {
   Order as OrderModel,
   OrderPassenger,
-} from "integration/junction-mobile-api/schemas/order";
+} from "~/integration/junction-mobile-api/schemas/order";
 import type {
   MarkupsCreate,
   Markups as MarkupsModel,
-} from "integration/junction-mobile-api/schemas/markups";
+} from "~/integration/junction-mobile-api/schemas/markups";
 import { searchDataModel, type SearchData } from "./components/trip-search/trip-search.svelte";
 import { dev } from "$app/environment";
 

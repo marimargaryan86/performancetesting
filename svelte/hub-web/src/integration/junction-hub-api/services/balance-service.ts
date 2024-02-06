@@ -1,4 +1,4 @@
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionHubApiService from "./junction-hub-api-service";
 import {
   balanceParser,

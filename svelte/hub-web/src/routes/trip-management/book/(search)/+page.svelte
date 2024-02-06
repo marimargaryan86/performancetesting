@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { getPageTitle } from "utils/page-title";
+  import { getPageTitle } from "~/utils/page-title";
   import TripSearch from "../../components/trip-search/trip-search.svelte";
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
   import type { ComponentEvents } from "svelte";
   import { manager } from "../../booking-flow";
   import { goto } from "$app/navigation";
-  import routeConfig from "routeConfig";
+  import routeConfig from "~/route-config";
 
   const i18n = getLocaleData();
 

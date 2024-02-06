@@ -1,8 +1,8 @@
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import type { OrderSchema, Order } from "../schemas/order";
 import JunctionHubApiService from "./junction-hub-api-service";
-import { JunctionError } from "integration/common/junction-error";
+import { JunctionError } from "~/integration/common/junction-error";
 
 export default class OrderService extends JunctionHubApiService {
   async get({ session, id }: { session: Session; id: string }): Promise<Order> {

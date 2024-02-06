@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
   import md5 from "md5";
-  import routeConfig from "routeConfig";
-  import { getUser } from "utils/permissions";
+  import routeConfig from "~/route-config";
+  import { getUser } from "~/utils/permissions";
 
   export let transitionTimeMs: number;
   export let compact: boolean;

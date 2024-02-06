@@ -1,4 +1,4 @@
-import type ConversionService from "integration/junction-hub-api/services/conversion-service";
+import type ConversionService from "~/integration/junction-hub-api/services/conversion-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

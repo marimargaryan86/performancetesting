@@ -1,11 +1,11 @@
 <script lang="ts">
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import { formatAmount } from "formatting/currency";
-  import { getLocale, getLocaleData } from "i18n";
-  import type { Price, PriceBreakdown } from "integration/common/schemas/price";
-  import type { Company } from "integration/junction-hub-api/schemas/company";
-  import type { Markups } from "integration/junction-mobile-api/schemas/markups";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import EntityAvatar from "~/components/ui/entity-avatar.svelte";
+  import { formatAmount } from "~/formatting/currency";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import type { Price, PriceBreakdown } from "~/integration/common/schemas/price";
+  import type { Company } from "~/integration/junction-hub-api/schemas/company";
+  import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
 
   export let company: Company | undefined;
   export let title: string;

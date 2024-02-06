@@ -1,14 +1,14 @@
 <script lang="ts">
-  import SelectField from "components/ui/select-field.svelte";
+  import SelectField from "~/components/ui/select-field.svelte";
   import Section from "./section.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import type { CountryModel } from "models/location";
-  import { formatCountryOption } from "formatting/location";
-  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-  import countryData from "data/country-data";
-  import currencyData from "data/currency-data";
-  import Icon from "components/icons/icon.svelte";
-  import { getLocaleData } from "i18n";
+  import TextField from "~/components/ui/text-field.svelte";
+  import type { CountryModel } from "~/models/location";
+  import { formatCountryOption } from "~/formatting/location";
+  import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+  import countryData from "~/data/country-data";
+  import currencyData from "~/data/currency-data";
+  import Icon from "~/components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
 
   export let data: BeneficiaryPut;
 

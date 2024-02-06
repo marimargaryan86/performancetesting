@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
 
   let className: string | undefined = undefined;
   export { className as class };

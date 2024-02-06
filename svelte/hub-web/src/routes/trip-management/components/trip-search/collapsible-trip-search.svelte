@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Collapsible from "components/ui/collapsible.svelte";
+  import Collapsible from "~/components/ui/collapsible.svelte";
   import { getPassengersPresentation } from "./passenger-picker/passenger-picker.svelte";
-  import { getLocale, getLocaleData } from "i18n";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import type { SearchData } from "./trip-search.svelte";
 
   export let searchData: SearchData;

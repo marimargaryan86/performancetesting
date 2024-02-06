@@ -19,14 +19,14 @@
 </script>
 
 <script lang="ts">
-  import type { OrderPassenger } from "integration/junction-mobile-api/schemas/order";
-  import { getAge } from "utils/date-time";
+  import type { OrderPassenger } from "~/integration/junction-mobile-api/schemas/order";
+  import { getAge } from "~/utils/date-time";
   import {
     PASSENGER_DEFINITIONS,
     getPassengerFullLabel,
   } from "./trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocaleData, type LocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import { getLocaleData, type LocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let passengers: OrderPassenger[];
   export let orderCreatedAt: Date = new Date();

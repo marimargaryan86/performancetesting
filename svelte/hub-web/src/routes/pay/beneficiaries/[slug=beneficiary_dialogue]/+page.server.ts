@@ -1,9 +1,9 @@
 import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
-import integrationInstances from "integration-instances";
-import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-import type { Account } from "integration/junction-hub-api/schemas/account";
+import integrationInstances from "~/integration-instances";
+import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+import type { Account } from "~/integration/junction-hub-api/schemas/account";
 
 function getBeneficiaryData(event: RequestEvent): BeneficiaryPut | undefined {
   const cookieData = event.cookies.get("beneficiary-data");

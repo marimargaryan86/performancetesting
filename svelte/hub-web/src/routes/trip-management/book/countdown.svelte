@@ -9,12 +9,12 @@
 </script>
 
 <script lang="ts">
-  import Icon from "components/icons/icon.svelte";
-  import Alert from "components/ui/alert.svelte";
-  import { getLocaleData } from "i18n";
+  import Icon from "~/components/icons/icon.svelte";
+  import Alert from "~/components/ui/alert.svelte";
+  import { getLocaleData } from "~/i18n";
   import { onDestroy, onMount } from "svelte";
-  import { sleep } from "utils/common";
-  import { getTimeDeltaS } from "utils/date-time";
+  import { sleep } from "~/utils/common";
+  import { getTimeDeltaS } from "~/utils/date-time";
 
   export let expiresAt: Date;
   export let show = false;

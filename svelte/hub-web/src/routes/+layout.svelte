@@ -1,22 +1,22 @@
 <script lang="ts">
-  import "assets/css/reset.css";
-  import "assets/css/common.css";
-  import "assets/css/colors.css";
-  import "assets/css/effects.css";
-  import "assets/css/typography.css";
-  import "assets/css/button.css";
-  import "assets/css/table.css";
-  import MainMenu from "components/partials/main-menu/main-menu.svelte";
+  import "~/assets/css/reset.css";
+  import "~/assets/css/common.css";
+  import "~/assets/css/colors.css";
+  import "~/assets/css/effects.css";
+  import "~/assets/css/typography.css";
+  import "~/assets/css/button.css";
+  import "~/assets/css/table.css";
+  import MainMenu from "~/components/partials/main-menu/main-menu.svelte";
   import { browser } from "$app/environment";
-  import { getTimeDeltaMs } from "utils/date-time";
+  import { getTimeDeltaMs } from "~/utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
-  import integrationInstancesClient from "integration-instances-client";
+  import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
-  import { setLocale, setLocaleData, type Locale, setTimeFormat } from "i18n";
+  import { setLocale, setLocaleData, type Locale, setTimeFormat } from "~/i18n";
   import { invalidateAll } from "$app/navigation";
-  import type { User } from "integration/ory/schemas/authentication";
-  import { setUser } from "utils/permissions";
-  import { setQueryStore } from "stores/query-store";
+  import type { User } from "~/integration/ory/schemas/authentication";
+  import { setUser } from "~/utils/permissions";
+  import { setQueryStore } from "~/stores/query-store";
   import { page } from "$app/stores";
 
   export let data;

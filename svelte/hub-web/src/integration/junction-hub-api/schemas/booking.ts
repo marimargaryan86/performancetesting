@@ -1,18 +1,18 @@
-import type { CabinClass, CabinClassSchema } from "integration/common/schemas/cabin-class";
+import type { CabinClass, CabinClassSchema } from "~/integration/common/schemas/cabin-class";
 import type { BookingCancellation, BookingCancellationSchema } from "./cancellation";
 import type { IncludedMapping } from "./included";
-import type { LegType, LegTypeSchema } from "integration/common/schemas/leg-type";
+import type { LegType, LegTypeSchema } from "~/integration/common/schemas/leg-type";
 import type { Order, OrderSchema } from "./order";
 import {
   offerSegmentLegParser,
   type OfferSegmentLeg,
   type OfferSegmentLegSchema,
-} from "integration/common/schemas/offer-segment-leg";
+} from "~/integration/common/schemas/offer-segment-leg";
 import {
   routeIdentifiersParser,
   type RouteIdentifiers,
   type RouteIdentifiersSchema,
-} from "integration/common/schemas/route-identifier";
+} from "~/integration/common/schemas/route-identifier";
 import {
   priceParser,
   type PriceSchema,
@@ -20,7 +20,7 @@ import {
   type PriceBreakdown,
   type PriceBreakdownSchema,
   priceBreakdownParser,
-} from "integration/common/schemas/price";
+} from "~/integration/common/schemas/price";
 import type { Transaction, TransactionSchema } from "./transaction";
 import type { Refund, RefundSchema } from "./refund";
 

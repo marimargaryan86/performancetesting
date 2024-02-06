@@ -1,10 +1,10 @@
 <script lang="ts">
-  import StandardLayout from "components/page/standard-layout.svelte";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
   import UserManuals from "./user-manuals.svelte";
   import Videos from "./videos.svelte";
   import Faq from "./faq.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocaleData } from "~/i18n";
 
   const i18n = getLocaleData();
 </script>

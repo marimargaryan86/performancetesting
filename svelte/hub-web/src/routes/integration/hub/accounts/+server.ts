@@ -1,4 +1,4 @@
-import integrationInstances from "integration-instances";
+import integrationInstances from "~/integration-instances";
 import accountService from "./account-service";
 import { serverServiceFactory } from "../../framework";
 

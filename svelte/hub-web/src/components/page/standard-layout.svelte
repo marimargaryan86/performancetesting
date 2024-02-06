@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Tabs, { type Tab } from "components/ui/tabs.svelte";
+  import Tabs, { type Tab } from "~/components/ui/tabs.svelte";
   import BreadCrumbs, { type BreadCrumb } from "./bread-crumbs.svelte";
-  import FilterIcon from "components/icons/filter-icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
-  import SearchField from "components/ui/search-field.svelte";
+  import FilterIcon from "~/components/icons/filter-icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
+  import SearchField from "~/components/ui/search-field.svelte";
 
   export let breadCrumbs: BreadCrumb[] | undefined = undefined;
   export let pageTitle = "";

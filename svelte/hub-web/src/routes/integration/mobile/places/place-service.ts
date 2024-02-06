@@ -1,4 +1,4 @@
-import type PlaceService from "integration/junction-mobile-api/services/place-service";
+import type PlaceService from "~/integration/junction-mobile-api/services/place-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

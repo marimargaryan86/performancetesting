@@ -1,6 +1,6 @@
-import integrationInstances from "integration-instances";
-import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
-import type { PaginatedData } from "models/common";
+import integrationInstances from "~/integration-instances";
+import type { Transaction } from "~/integration/junction-hub-api/schemas/transaction";
+import type { PaginatedData } from "~/models/common";
 import { LIST_TRANSACTIONS_LIMIT, LIST_TRANSACTIONS_SORT } from "./+page.svelte";
 
 export function load(event): {

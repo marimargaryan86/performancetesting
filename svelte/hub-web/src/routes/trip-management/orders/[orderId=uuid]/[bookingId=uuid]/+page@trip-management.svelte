@@ -1,18 +1,18 @@
 <script lang="ts">
-  import type { BreadCrumb } from "components/page/bread-crumbs.svelte";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import routeConfig from "routeConfig";
-  import { getDestination, getOrigin } from "utils/booking";
+  import type { BreadCrumb } from "~/components/page/bread-crumbs.svelte";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import routeConfig from "~/route-config";
+  import { getDestination, getOrigin } from "~/utils/booking";
   import Passengers from "../../../components/passengers.svelte";
   import Ticket from "../../../components/ticket.svelte";
   import Itinerary from "../../../components/itinerary.svelte";
-  import StatusBadge from "components/ui/status-badge.svelte";
-  import { getUser, permitted } from "utils/permissions";
+  import StatusBadge from "~/components/ui/status-badge.svelte";
+  import { getUser, permitted } from "~/utils/permissions";
   import Admin from "./admin.svelte";
-  import { formatAmount } from "formatting/currency";
+  import { formatAmount } from "~/formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocale, getLocaleData } from "i18n";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocale, getLocaleData } from "~/i18n";
   import Price from "../../../components/price.svelte";
 
   export let data;

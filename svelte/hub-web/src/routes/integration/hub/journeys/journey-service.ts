@@ -1,4 +1,4 @@
-import type JourneyService from "integration/junction-hub-api/services/journey-service";
+import type JourneyService from "~/integration/junction-hub-api/services/journey-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

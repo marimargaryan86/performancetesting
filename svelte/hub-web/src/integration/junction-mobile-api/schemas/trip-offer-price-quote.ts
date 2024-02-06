@@ -5,7 +5,7 @@ import {
   type PriceSchema,
   type PriceBreakdown,
   priceBreakdownParser,
-} from "integration/common/schemas/price";
+} from "~/integration/common/schemas/price";
 import {
   applicableToParser,
   type ApplicableTo,

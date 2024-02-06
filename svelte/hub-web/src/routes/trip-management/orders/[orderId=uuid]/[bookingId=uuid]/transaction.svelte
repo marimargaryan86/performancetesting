@@ -1,14 +1,14 @@
 <script lang="ts">
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import Alert from "components/ui/alert.svelte";
-  import integrationInstancesClient from "integration-instances-client";
-  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-  import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import Alert from "~/components/ui/alert.svelte";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
+  import type { Transaction } from "~/integration/junction-hub-api/schemas/transaction";
   import { onMount } from "svelte";
   import Company from "./company.svelte";
-  import type { Markups } from "integration/junction-mobile-api/schemas/markups";
+  import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
   import type { MaybePromise } from "@sveltejs/kit";
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
 
   export let booking: TripBooking;
   export let transactionTask: MaybePromise<Transaction | undefined> | undefined;

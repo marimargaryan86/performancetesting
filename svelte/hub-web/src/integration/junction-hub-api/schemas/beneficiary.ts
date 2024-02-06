@@ -1,4 +1,4 @@
-import type { Partialize, Require } from "integration/ts-helpers";
+import type { Partialize, Require } from "~/integration/ts-helpers";
 import {
   enhancedAddressDetailsParser,
   type AddressSchema,
@@ -6,7 +6,7 @@ import {
   type EnhancedAddressDetailsSchema,
   type Address,
   addressParser,
-} from "integration/common/schemas/address";
+} from "~/integration/common/schemas/address";
 import type { Currency, CurrencySchema } from "./currency";
 import type { Account, AccountSchema } from "./account";
 import type { IncludedMapping } from "./included";

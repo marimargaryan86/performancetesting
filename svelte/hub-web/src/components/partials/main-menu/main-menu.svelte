@@ -1,14 +1,14 @@
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import Account from "./account.svelte";
   import { page } from "$app/stores";
-  import routeConfig from "routeConfig";
-  import integrationInstancesClient from "integration-instances-client";
-  import { getLocaleData } from "i18n";
+  import routeConfig from "~/route-config";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import { getLocaleData } from "~/i18n";
   import { goto } from "$app/navigation";
-  import Icon from "components/icons/icon.svelte";
+  import Icon from "~/components/icons/icon.svelte";
   import JunctionLogo from "./junction-logo.svelte";
-  import { type Action, getUser, permitted } from "utils/permissions";
+  import { type Action, getUser, permitted } from "~/utils/permissions";
   import LanguageSelect from "./language-select.svelte";
 
   let compact = false;

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getPageTitle } from "utils/page-title";
+  import { getPageTitle } from "~/utils/page-title";
   import Passengers from "../../../components/passengers.svelte";
   import Ticket from "../../../components/ticket.svelte";
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
 
   export let data;
 

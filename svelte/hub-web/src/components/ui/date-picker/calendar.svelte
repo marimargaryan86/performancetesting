@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import { isToday, getLocalTimeZone } from "@internationalized/date";
   import { createDatePicker, melt } from "@melt-ui/svelte";
 

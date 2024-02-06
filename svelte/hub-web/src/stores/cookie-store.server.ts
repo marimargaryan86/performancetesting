@@ -1,7 +1,7 @@
 import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import type { RequestEvent } from "@sveltejs/kit";
-import type { Session, SessionMeta } from "integration/ory/schemas/authentication";
+import type { Session, SessionMeta } from "~/integration/ory/schemas/authentication";
 import jwt from "jsonwebtoken";
 import * as devalue from "devalue";
 

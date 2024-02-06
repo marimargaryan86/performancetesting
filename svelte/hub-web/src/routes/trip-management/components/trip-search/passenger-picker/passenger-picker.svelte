@@ -82,14 +82,14 @@
 </script>
 
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import { clickOutside } from "directives/click-outside";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import { clickOutside } from "~/directives/click-outside";
   import PassengerCounter from "./passenger-counter.svelte";
   import { scale } from "svelte/transition";
   import { z } from "zod";
-  import { slideFade } from "transitions/slide-fade";
-  import { ensureDefined } from "utils/array";
-  import { getLocaleData, type LocaleData, type Quantity } from "i18n";
+  import { slideFade } from "~/transitions/slide-fade";
+  import { ensureDefined } from "~/utils/array";
+  import { getLocaleData, type LocaleData, type Quantity } from "~/i18n";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;

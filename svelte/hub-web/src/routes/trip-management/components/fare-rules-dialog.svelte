@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import Backdrop from "components/ui/backdrop.svelte";
-  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { getLocaleData } from "i18n";
+  import Backdrop from "~/components/ui/backdrop.svelte";
+  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import { getLocaleData } from "~/i18n";
 
   export let priceQuote: TripOfferPriceQuote;
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getHexColor, getInitials } from "utils/common";
+  import { getHexColor, getInitials } from "~/utils/common";
 
   export let name: string | undefined = undefined;
   export let imageUrl: string | undefined = undefined;

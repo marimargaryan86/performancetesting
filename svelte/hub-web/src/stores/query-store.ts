@@ -1,7 +1,7 @@
 import { goto } from "$app/navigation";
 import { getContext, setContext } from "svelte";
 import { get, writable, type Writable } from "svelte/store";
-import { URLExtended } from "utils/url";
+import { URLExtended } from "~/utils/url";
 
 /**
  * Set the query store context

@@ -1,14 +1,14 @@
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import CurrencyFlag from "components/icons/currency-flag.svelte";
-  import { formatAmount } from "formatting/currency";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import CurrencyFlag from "~/components/icons/currency-flag.svelte";
+  import { formatAmount } from "~/formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import routeConfig from "routeConfig";
-  import type { Balance } from "integration/junction-hub-api/schemas/balance";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocale, getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import routeConfig from "~/route-config";
+  import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let data;
 

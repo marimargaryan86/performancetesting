@@ -1,4 +1,4 @@
-import type { PaginatedData } from "models/common";
+import type { PaginatedData } from "~/models/common";
 import {
   userParser,
   type User,
@@ -8,7 +8,7 @@ import {
   userProfileParser,
 } from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 
 export default class UserService extends JunctionHubApiService {
   async find({

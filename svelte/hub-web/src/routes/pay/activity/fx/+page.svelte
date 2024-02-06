@@ -3,14 +3,14 @@
 </script>
 
 <script lang="ts">
-  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
-  import integrationInstancesClient from "integration-instances-client";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocale, getLocaleData } from "i18n";
-  import StatusBadge from "components/ui/status-badge.svelte";
+  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import StatusBadge from "~/components/ui/status-badge.svelte";
   import { writable } from "svelte/store";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
 
   export let data;
 

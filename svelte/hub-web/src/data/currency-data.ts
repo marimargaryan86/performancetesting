@@ -1,4 +1,4 @@
-import type { Currency } from "integration/junction-hub-api/schemas/currency";
+import type { Currency } from "~/integration/junction-hub-api/schemas/currency";
 
 const list = [
   { code: "AED", name: "UAE Dirham", minorUnits: 2 },

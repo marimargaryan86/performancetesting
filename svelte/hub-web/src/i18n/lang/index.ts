@@ -1,4 +1,4 @@
-import type { Locale, LocaleData } from "i18n";
+import type { Locale, LocaleData } from "~/i18n";
 import en from "./en";
 import sv from "./sv";
 import es from "./es";

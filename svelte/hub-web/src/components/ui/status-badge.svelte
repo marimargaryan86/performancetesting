@@ -45,7 +45,7 @@
 </script>
 
 <script lang="ts">
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
 
   export let value: StatusBadgeValue;
 

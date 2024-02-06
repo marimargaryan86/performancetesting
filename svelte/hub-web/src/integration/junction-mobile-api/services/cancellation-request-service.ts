@@ -1,4 +1,4 @@
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import {
   cancellationRequestParsers,
@@ -7,7 +7,7 @@ import {
   type CancellationRequestSchema,
 } from "../schemas/cancellation";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
-import { JunctionError } from "integration/common/junction-error";
+import { JunctionError } from "~/integration/common/junction-error";
 
 export default class CancellationRequestService extends JunctionMobileApiService {
   async create({

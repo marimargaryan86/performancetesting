@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { formatDuration } from "formatting/date-time";
-  import { getTimeDeltaS } from "utils/date-time";
+  import { formatDuration } from "~/formatting/date-time";
+  import { getTimeDeltaS } from "~/utils/date-time";
   import Collapsible from "../collapsible.svelte";
   import { createEventDispatcher } from "svelte";
-  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import { getLegsFromPriceQuote } from "utils/offer";
-  import { getLocale, getLocaleData } from "i18n";
-  import { formatStopCount } from "formatting/trip";
+  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import EntityAvatar from "~/components/ui/entity-avatar.svelte";
+  import { getLegsFromPriceQuote } from "~/utils/offer";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import { formatStopCount } from "~/formatting/trip";
 
   export let priceQuote: TripOfferPriceQuote;
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createDatePicker, melt } from "@melt-ui/svelte";
-  import { getLocale } from "i18n/index";
-  import { slideFade } from "transitions/slide-fade";
+  import { getLocale } from "~/i18n/index";
+  import { slideFade } from "~/transitions/slide-fade";
   import {
     toCalendarDateTime,
     toCalendarDate,
@@ -13,7 +13,7 @@
   } from "@internationalized/date";
 
   import Calendar from "./calendar.svelte";
-  import Icon from "components/icons/icon.svelte";
+  import Icon from "~/components/icons/icon.svelte";
   import { scale } from "svelte/transition";
   import TimePicker from "./time-picker.svelte";
   import { writable } from "svelte/store";

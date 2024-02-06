@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { getLocaleData } from "i18n";
-  import { getPageTitle } from "utils/page-title";
+  import { getLocaleData } from "~/i18n";
+  import { getPageTitle } from "~/utils/page-title";
 
   const i18n = getLocaleData();
 </script>

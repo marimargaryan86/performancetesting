@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { formatAmount } from "formatting/currency";
-  import { getLocale, getLocaleData } from "i18n";
-  import type { Markups } from "integration/junction-mobile-api/schemas/markups";
+  import { formatAmount } from "~/formatting/currency";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
 
   export let markups: Markups;
 

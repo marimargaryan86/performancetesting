@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from "svelte";
   import Dialog from "./dialog.svelte";
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
 
   let dialog: Dialog | undefined = undefined;
 

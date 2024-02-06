@@ -1,8 +1,8 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { PaginatedData } from "models/common";
-import { JunctionError, ensureJunctionError } from "integration/common/junction-error";
+import type { PaginatedData } from "~/models/common";
+import { JunctionError, ensureJunctionError } from "~/integration/common/junction-error";
 import { z } from "zod";
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import {
   orderParser,
   type Order,

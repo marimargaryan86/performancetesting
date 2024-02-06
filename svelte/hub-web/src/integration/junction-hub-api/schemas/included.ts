@@ -12,7 +12,7 @@ import {
   cabinClassParser,
   type CabinClass,
   type CabinClassSchema,
-} from "integration/common/schemas/cabin-class";
+} from "~/integration/common/schemas/cabin-class";
 import {
   bookingCancellationParser,
   type BookingCancellation,
@@ -27,7 +27,7 @@ import {
   legTypeParser,
   type LegType,
   type LegTypeSchema,
-} from "integration/common/schemas/leg-type";
+} from "~/integration/common/schemas/leg-type";
 import { orderParser, type Order, type OrderSchema } from "./order";
 import { transactionParser, type Transaction, type TransactionSchema } from "./transaction";
 import { refundParser, type Refund, type RefundSchema } from "./refund";

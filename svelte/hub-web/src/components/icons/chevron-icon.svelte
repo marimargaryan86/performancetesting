@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import type { Direction } from "models/spatial";
+  import type { Direction } from "~/models/spatial";
 
   const directionMapping: Record<Direction, number> = {
     right: 0,

@@ -1,4 +1,4 @@
-import type CompanyService from "integration/junction-hub-api/services/company-service";
+import type CompanyService from "~/integration/junction-hub-api/services/company-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

@@ -2,10 +2,10 @@ import {
   enhancedAddressDetailsParser,
   type EnhancedAddressDetails,
   type EnhancedAddressDetailsSchema,
-} from "integration/common/schemas/address";
+} from "~/integration/common/schemas/address";
 import type { IncludedMapping } from "./included";
 import type { Order, OrderSchema } from "./order";
-import type { DateRange } from "models/date-time";
+import type { DateRange } from "~/models/date-time";
 import type { BookingStatus } from "../schemas/booking";
 
 export type ContactDetails = {

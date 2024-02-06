@@ -1,4 +1,4 @@
-import type BookingService from "integration/junction-hub-api/services/booking-service";
+import type BookingService from "~/integration/junction-hub-api/services/booking-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

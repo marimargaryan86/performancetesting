@@ -1,13 +1,13 @@
 <script lang="ts" generics="TValue">
   /* global TValue */
   import { writable } from "svelte/store";
-  import { slideFade } from "transitions/slide-fade";
-  import { keyboard, type KeyboardParams } from "directives/keyboard";
-  import { clickOutside } from "directives/click-outside";
+  import { slideFade } from "~/transitions/slide-fade";
+  import { keyboard, type KeyboardParams } from "~/directives/keyboard";
+  import { clickOutside } from "~/directives/click-outside";
   import { scale } from "svelte/transition";
   import type { MaybePromise } from "@sveltejs/kit";
   import TextField from "./text-field.svelte";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
 
   export let value: TValue | undefined;
   export let required = false;

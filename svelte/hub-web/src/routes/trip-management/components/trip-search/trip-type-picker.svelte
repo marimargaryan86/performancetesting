@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
 
   export const tripTypes = ["one-way", "round-trip"] as const;
   export type TripType = (typeof tripTypes)[number];
@@ -8,8 +8,8 @@
 <script lang="ts">
   import { scale } from "svelte/transition";
   import { createSelect, melt } from "@melt-ui/svelte";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import Icon from "components/icons/icon.svelte";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let value: TripType = "one-way";
 

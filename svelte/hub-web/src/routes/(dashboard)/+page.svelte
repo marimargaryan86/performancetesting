@@ -1,12 +1,12 @@
 <script lang="ts">
-  import routeConfig from "routeConfig";
-  import { getLocaleData } from "i18n";
-  import Card from "components/ui/card.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import FindTripDialog from "components/modals/find-trip-dialog.svelte";
-  import TripGraphicOne from "assets/images/trip-graphic-1.png";
-  import TripGraphicTwo from "assets/images/trip-graphic-2.png";
-  import SearchingGraphic from "assets/images/searching.png";
+  import routeConfig from "~/route-config";
+  import { getLocaleData } from "~/i18n";
+  import Card from "~/components/ui/card.svelte";
+  import { getPageTitle } from "~/utils/page-title";
+  import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
+  import TripGraphicOne from "~/assets/images/trip-graphic-1.png";
+  import TripGraphicTwo from "~/assets/images/trip-graphic-2.png";
+  import SearchingGraphic from "~/assets/images/searching.png";
 
   const i18n = getLocaleData();
 

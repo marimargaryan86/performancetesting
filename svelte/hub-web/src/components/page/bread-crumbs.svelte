@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
 
   export let items: BreadCrumb[];
 </script>

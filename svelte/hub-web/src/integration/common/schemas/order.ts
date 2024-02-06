@@ -1,8 +1,8 @@
-import type { Order as MobileOrder } from "integration/junction-mobile-api/schemas/order";
-import type { Order as HubOrder } from "integration/junction-hub-api/schemas/order";
-import type { TripBooking as MobileTripBooking } from "integration/junction-mobile-api/schemas/booking";
-import type { TripBooking as HubTripBooking } from "integration/junction-hub-api/schemas/booking";
-import { ensureDefined } from "utils/array";
+import type { Order as MobileOrder } from "~/integration/junction-mobile-api/schemas/order";
+import type { Order as HubOrder } from "~/integration/junction-hub-api/schemas/order";
+import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
+import type { TripBooking as HubTripBooking } from "~/integration/junction-hub-api/schemas/booking";
+import { ensureDefined } from "~/utils/array";
 
 type Order = MobileOrder | HubOrder;
 type TripBooking = MobileTripBooking | HubTripBooking;

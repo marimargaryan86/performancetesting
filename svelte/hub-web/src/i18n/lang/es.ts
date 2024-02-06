@@ -1,4 +1,4 @@
-import type { LocaleData } from "i18n";
+import type { LocaleData } from "~/i18n";
 
 export default {
   title: "Junction Hub",

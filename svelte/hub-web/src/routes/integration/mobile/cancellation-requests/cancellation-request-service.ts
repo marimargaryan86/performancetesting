@@ -1,5 +1,5 @@
-import type { CancellationRequestCreate } from "integration/junction-mobile-api/schemas/cancellation";
-import type CancellationRequestService from "integration/junction-mobile-api/services/cancellation-request-service";
+import type { CancellationRequestCreate } from "~/integration/junction-mobile-api/schemas/cancellation";
+import type CancellationRequestService from "~/integration/junction-mobile-api/services/cancellation-request-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

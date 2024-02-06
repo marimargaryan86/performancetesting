@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import integrationInstances from "integration-instances";
-import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-import type { Markups } from "integration/junction-mobile-api/schemas/markups";
+import integrationInstances from "~/integration-instances";
+import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
+import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
 
 export async function load(
   event,

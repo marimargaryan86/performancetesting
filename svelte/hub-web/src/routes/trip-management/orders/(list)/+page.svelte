@@ -62,34 +62,34 @@
 </script>
 
 <script lang="ts">
-  import NotFoundGraphic from "assets/images/not-found.png";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import { getOrderStatus } from "integration/common/schemas/order";
-  import type { Order } from "integration/junction-hub-api/schemas/order";
-  import type { Price } from "integration/common/schemas/price";
-  import routeConfig from "routeConfig";
-  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
-  import integrationInstancesClient from "integration-instances-client";
-  import type JourneyService from "integration/junction-hub-api/services/journey-service";
+  import NotFoundGraphic from "~/assets/images/not-found.png";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import { getOrderStatus } from "~/integration/common/schemas/order";
+  import type { Order } from "~/integration/junction-hub-api/schemas/order";
+  import type { Price } from "~/integration/common/schemas/price";
+  import routeConfig from "~/route-config";
+  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import type JourneyService from "~/integration/junction-hub-api/services/journey-service";
   import type {
     JourneyFilterOptions,
     JourneyFilterOptionsQuery,
-  } from "integration/junction-hub-api/schemas/journey";
+  } from "~/integration/junction-hub-api/schemas/journey";
   import Filters from "./filters.svelte";
-  import { ensureDefined } from "utils/array";
-  import { bookingStatuses } from "integration/junction-hub-api/schemas/booking";
-  import { parseDateRange } from "utils/date-time";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocale, getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
-  import { getQueryStore } from "stores/query-store";
+  import { ensureDefined } from "~/utils/array";
+  import { bookingStatuses } from "~/integration/junction-hub-api/schemas/booking";
+  import { parseDateRange } from "~/utils/date-time";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
+  import { getQueryStore } from "~/stores/query-store";
   import { writable } from "svelte/store";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
-  import { formatAmount } from "formatting/currency";
-  import StatusBadge from "components/ui/status-badge.svelte";
-  import { validatePassengerNameRecord } from "utils/booking";
-  import FindTripDialog from "components/modals/find-trip-dialog.svelte";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
+  import { formatAmount } from "~/formatting/currency";
+  import StatusBadge from "~/components/ui/status-badge.svelte";
+  import { validatePassengerNameRecord } from "~/utils/booking";
+  import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
 
   export let data;
 

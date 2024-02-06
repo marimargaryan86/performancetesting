@@ -1,5 +1,5 @@
-import integrationInstances from "integration-instances";
-import type { Order } from "integration/junction-hub-api/schemas/order";
+import integrationInstances from "~/integration-instances";
+import type { Order } from "~/integration/junction-hub-api/schemas/order";
 
 export function load(event): { order: Promise<Order> } {
   return {

@@ -28,17 +28,17 @@
 </script>
 
 <script lang="ts">
-  import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import { formatAmount } from "formatting/currency";
-  import { formatDuration } from "formatting/date-time";
+  import EntityAvatar from "~/components/ui/entity-avatar.svelte";
+  import { formatAmount } from "~/formatting/currency";
+  import { formatDuration } from "~/formatting/date-time";
   import AlternativeFares from "./alternative-fares.svelte";
   import { createEventDispatcher } from "svelte";
-  import { getTimeDeltaS } from "utils/date-time";
-  import type { Offer, OfferOption } from "integration/junction-mobile-api/schemas/offer";
-  import type { Price } from "integration/common/schemas/price";
-  import { ensureDefined } from "utils/array";
-  import { getLocale, getLocaleData, type Locale } from "i18n";
-  import { formatStopCount } from "formatting/trip";
+  import { getTimeDeltaS } from "~/utils/date-time";
+  import type { Offer, OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
+  import type { Price } from "~/integration/common/schemas/price";
+  import { ensureDefined } from "~/utils/array";
+  import { getLocale, getLocaleData, type Locale } from "~/i18n";
+  import { formatStopCount } from "~/formatting/trip";
 
   export let offer: Offer;
   export let selectedOptionIds: string[] | undefined;

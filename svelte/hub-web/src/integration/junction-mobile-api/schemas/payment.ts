@@ -1,4 +1,4 @@
-import { priceParser, type Price, type PriceSchema } from "integration/common/schemas/price";
+import { priceParser, type Price, type PriceSchema } from "~/integration/common/schemas/price";
 import { z } from "zod";
 
 export const paymentModel = z.object({

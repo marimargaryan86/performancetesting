@@ -1,6 +1,6 @@
 import * as devalue from "devalue";
 import { error, type MaybePromise, type RequestEvent } from "@sveltejs/kit";
-import { ensureJunctionError } from "integration/common/junction-error";
+import { ensureJunctionError } from "~/integration/common/junction-error";
 import { browser } from "$app/environment";
 import { z } from "zod";
 

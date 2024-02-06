@@ -1,10 +1,10 @@
 <script lang="ts" generics="TType extends HTMLInputAttributes['type'] = 'text'">
   /* global TType */
-  import Icon from "components/icons/icon.svelte";
-  import { getLocale } from "i18n";
-  import { slideFade } from "transitions/slide-fade";
+  import Icon from "~/components/icons/icon.svelte";
+  import { getLocale } from "~/i18n";
+  import { slideFade } from "~/transitions/slide-fade";
   import { createEventDispatcher } from "svelte";
-  import { getRandomId } from "utils/random";
+  import { getRandomId } from "~/utils/random";
   import type { AriaRole, HTMLInputAttributes } from "svelte/elements";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };

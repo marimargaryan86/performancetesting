@@ -1,4 +1,4 @@
-import { getTicketsZip } from "utils/ticket-manager.server";
+import { getTicketsZip } from "~/utils/ticket-manager.server";
 
 export async function GET(event): Promise<Response> {
   const { orderId, bookingId } = event.params;

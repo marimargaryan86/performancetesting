@@ -1,4 +1,4 @@
-import type { DateRange } from "models/date-time";
+import type { DateRange } from "~/models/date-time";
 
 export function getZeroTimeDate(date?: Date): Date {
   const nextDate = new Date(date ?? new Date());

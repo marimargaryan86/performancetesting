@@ -38,15 +38,15 @@
 </script>
 
 <script lang="ts">
-  import { roundCurrency } from "utils/money";
-  import { slideFade } from "transitions/slide-fade";
+  import { roundCurrency } from "~/utils/money";
+  import { slideFade } from "~/transitions/slide-fade";
   import Collapsible from "../../components/collapsible.svelte";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import SelectField from "components/ui/select-field.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import { formatAmount } from "formatting/currency";
-  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { getLocale, getLocaleData } from "i18n";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import SelectField from "~/components/ui/select-field.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import { formatAmount } from "~/formatting/currency";
+  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import { getLocale, getLocaleData } from "~/i18n";
   import type { Markups, PartialMarkups } from "../../booking-flow";
   import type { z } from "zod";
 

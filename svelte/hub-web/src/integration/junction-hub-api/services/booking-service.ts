@@ -1,8 +1,8 @@
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { TripBooking, TripBookingSchema } from "../schemas/booking";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
-import { JunctionError } from "integration/common/junction-error";
+import { JunctionError } from "~/integration/common/junction-error";
 
 export default class BookingService extends JunctionHubApiService {
   async get({ session, id }: { session: Session; id: string }): Promise<TripBooking> {

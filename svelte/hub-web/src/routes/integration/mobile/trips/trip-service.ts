@@ -1,5 +1,5 @@
-import type TripService from "integration/junction-mobile-api/services/trip-service";
-import type { TripCandidateSearchCreate } from "integration/junction-mobile-api/schemas/trip-candidate";
+import type TripService from "~/integration/junction-mobile-api/services/trip-service";
+import type { TripCandidateSearchCreate } from "~/integration/junction-mobile-api/schemas/trip-candidate";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

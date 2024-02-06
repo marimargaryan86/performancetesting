@@ -3,9 +3,9 @@ import {
   getEarliestDeparture,
   getOfferDurationS,
   getLowestPrice,
-} from "utils/offer";
+} from "~/utils/offer";
 import type { SearchOptionsData } from "../routes/trip-management/book/select-offer/search-options.svelte";
-import type { Offer } from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
 
 function getArrivalDelta(a: Offer, b: Offer): number {
   return getEarliestArrival(a).getTime() - getEarliestArrival(b).getTime();

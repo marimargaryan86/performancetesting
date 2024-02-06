@@ -2,7 +2,7 @@ import {
   enhancedAddressDetailsParser,
   type EnhancedAddressDetails,
   type EnhancedAddressDetailsSchema,
-} from "integration/common/schemas/address";
+} from "~/integration/common/schemas/address";
 import type { TripBooking, TripBookingSchema } from "./booking";
 import type { IncludedMapping } from "./included";
 import type { Journey, JourneySchema } from "./journey";
@@ -10,7 +10,7 @@ import type {
   Gender,
   PassengerTitle,
   TravelerDocumentType,
-} from "integration/common/schemas/order";
+} from "~/integration/common/schemas/order";
 
 export type TravelerDocument = {
   type?: TravelerDocumentType;

@@ -1,4 +1,4 @@
-import type { LocaleData } from "i18n";
+import type { LocaleData } from "~/i18n";
 
 export function formatStopCount(count: number, locale: LocaleData): string {
   const stops = count - 1;

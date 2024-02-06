@@ -1,6 +1,6 @@
 <script lang="ts">
   import TextField from "./text-field.svelte";
-  import { validateAndGetDate, validateDay, validateMonth, validateYear } from "utils/date-time";
+  import { validateAndGetDate, validateDay, validateMonth, validateYear } from "~/utils/date-time";
 
   export let placeholder = "DD/MM/YYYY";
   export let label: string | undefined = undefined;

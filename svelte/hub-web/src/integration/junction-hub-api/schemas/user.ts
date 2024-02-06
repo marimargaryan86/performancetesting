@@ -2,7 +2,7 @@ import {
   enhancedAddressDetailsParser,
   type EnhancedAddressDetails,
   type EnhancedAddressDetailsSchema,
-} from "integration/common/schemas/address";
+} from "~/integration/common/schemas/address";
 
 export type User = {
   id: string;

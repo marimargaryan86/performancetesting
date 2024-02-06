@@ -33,27 +33,27 @@
 
 <script lang="ts">
   import type { z } from "zod";
-  import DateTextField from "components/ui/date-text-field.svelte";
-  import SelectField from "components/ui/select-field.svelte";
-  import TextField from "components/ui/text-field.svelte";
+  import DateTextField from "~/components/ui/date-text-field.svelte";
+  import SelectField from "~/components/ui/select-field.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
   import type {
     OrderPassenger,
     TravelerDocument,
-  } from "integration/junction-mobile-api/schemas/order";
+  } from "~/integration/junction-mobile-api/schemas/order";
   import Collapsible from "../../components/collapsible.svelte";
-  import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import type { Require } from "integration/ts-helpers";
+  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type { Require } from "~/integration/ts-helpers";
   import {
     getPassengerFullLabel,
     PASSENGER_DEFINITIONS,
     type PassengerPickerData,
   } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocale, getLocaleData, type Locale, type LocaleData } from "i18n";
+  import { getLocale, getLocaleData, type Locale, type LocaleData } from "~/i18n";
   import type {
     Gender,
     TravelerDocumentType,
     PassengerTitle,
-  } from "integration/common/schemas/order";
+  } from "~/integration/common/schemas/order";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;

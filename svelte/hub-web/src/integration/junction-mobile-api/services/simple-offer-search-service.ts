@@ -1,4 +1,4 @@
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import {
   simpleOffserSearchParser,
@@ -6,7 +6,7 @@ import {
   type SimpleOfferSearchCreate,
   type SimpleOfferSearchSchema,
 } from "../schemas/simple-offer-search";
-import type { PaginatedData } from "models/common";
+import type { PaginatedData } from "~/models/common";
 import type { Offer, OfferSchema } from "../schemas/offer";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import {

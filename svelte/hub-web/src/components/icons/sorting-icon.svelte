@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DirectionY } from "models/spatial";
+  import type { DirectionY } from "~/models/spatial";
 
   export let color: {
     inactive?: string;

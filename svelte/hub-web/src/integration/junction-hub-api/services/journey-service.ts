@@ -1,9 +1,9 @@
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { PaginatedData } from "models/common";
+import type { PaginatedData } from "~/models/common";
 import type { Journey, JourneySchema } from "../schemas/journey";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
-import type { JourneyFilterOptions } from "integration/junction-hub-api/schemas/journey";
+import type { JourneyFilterOptions } from "~/integration/junction-hub-api/schemas/journey";
 
 export default class JourneyService extends JunctionHubApiService {
   async find({

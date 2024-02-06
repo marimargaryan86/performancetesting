@@ -1,5 +1,5 @@
 import { clientServiceFactory } from "../../framework";
-import type SettingsFlowService from "integration/ory/services/settings-flow-service";
+import type SettingsFlowService from "~/integration/ory/services/settings-flow-service";
 import type { RouteId } from "./$types";
 
 const factory = clientServiceFactory<SettingsFlowService, RouteId>(

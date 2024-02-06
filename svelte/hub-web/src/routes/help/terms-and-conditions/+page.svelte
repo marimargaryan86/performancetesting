@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getLocaleData } from "i18n";
+  import { getLocaleData } from "~/i18n";
 
   const i18n = getLocaleData();
 </script>

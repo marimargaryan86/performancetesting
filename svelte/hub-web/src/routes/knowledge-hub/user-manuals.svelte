@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { getLocaleData } from "i18n";
-  import UserManualImage from "assets/images/user-manual.png";
-  import Icon from "components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
+  import UserManualImage from "~/assets/images/user-manual.png";
+  import Icon from "~/components/icons/icon.svelte";
 
   const i18n = getLocaleData();
 

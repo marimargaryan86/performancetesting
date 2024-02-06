@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { formatAmount } from "formatting/currency";
-  import { getLocale, getLocaleData } from "i18n";
-  import type { Refund } from "integration/junction-hub-api/schemas/refund";
-  import { slideFade } from "transitions/slide-fade";
-  import { pricesEqual } from "utils/money";
+  import { formatAmount } from "~/formatting/currency";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import type { Refund } from "~/integration/junction-hub-api/schemas/refund";
+  import { slideFade } from "~/transitions/slide-fade";
+  import { pricesEqual } from "~/utils/money";
 
   export let refund: Refund;
 

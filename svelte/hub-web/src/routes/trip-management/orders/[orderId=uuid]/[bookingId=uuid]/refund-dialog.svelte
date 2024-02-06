@@ -44,15 +44,15 @@
 </script>
 
 <script lang="ts">
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import { getLocaleData } from "i18n";
-  import integrationInstancesClient from "integration-instances-client";
-  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-  import type { Refund, RefundPut } from "integration/junction-hub-api/schemas/refund";
-  import type { Transaction } from "integration/junction-hub-api/schemas/transaction";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import { getLocaleData } from "~/i18n";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
+  import type { Refund, RefundPut } from "~/integration/junction-hub-api/schemas/refund";
+  import type { Transaction } from "~/integration/junction-hub-api/schemas/transaction";
   import { writable } from "svelte/store";
-  import { slideFade } from "transitions/slide-fade";
+  import { slideFade } from "~/transitions/slide-fade";
   import { z } from "zod";
 
   export let transaction: Transaction;

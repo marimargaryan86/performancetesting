@@ -2,14 +2,14 @@ import {
   offerSegmentLegParser,
   type OfferSegmentLeg,
   type OfferSegmentLegSchema,
-} from "integration/common/schemas/offer-segment-leg";
+} from "~/integration/common/schemas/offer-segment-leg";
 import type { IncludedMapping } from "./included";
 import {
   routeIdentifiersParser,
   type RouteIdentifiers,
   type RouteIdentifiersSchema,
-} from "integration/common/schemas/route-identifier";
-import type { LegType, LegTypeSchema } from "integration/common/schemas/leg-type";
+} from "~/integration/common/schemas/route-identifier";
+import type { LegType, LegTypeSchema } from "~/integration/common/schemas/leg-type";
 import {
   priceParser,
   type Price,
@@ -17,8 +17,8 @@ import {
   type PriceBreakdownSchema,
   type PriceSchema,
   priceBreakdownParser,
-} from "integration/common/schemas/price";
-import type { CabinClass, CabinClassSchema } from "integration/common/schemas/cabin-class";
+} from "~/integration/common/schemas/price";
+import type { CabinClass, CabinClassSchema } from "~/integration/common/schemas/cabin-class";
 
 export type OfferSegmentDetailAmenity = "unspecified" | "unavailable" | "available" | "included";
 

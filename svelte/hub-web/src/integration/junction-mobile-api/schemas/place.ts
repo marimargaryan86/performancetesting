@@ -2,7 +2,7 @@ import {
   coordinatesParser,
   type CoordinatesSchema,
   coordinatesModel,
-} from "integration/common/schemas/point";
+} from "~/integration/common/schemas/point";
 import { z } from "zod";
 
 const placeType = z.enum([

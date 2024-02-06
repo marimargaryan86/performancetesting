@@ -3,8 +3,8 @@
 </script>
 
 <script lang="ts">
-  import Icon from "components/icons/icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
+  import Icon from "~/components/icons/icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
 
   export let type: AlertType = "success";
   export let show = true;

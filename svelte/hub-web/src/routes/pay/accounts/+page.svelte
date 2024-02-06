@@ -4,14 +4,14 @@
 
 <script lang="ts">
   import { dev } from "$app/environment";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
-  import { getLocaleData } from "i18n";
-  import integrationInstancesClient from "integration-instances-client";
-  import routeConfig from "routeConfig";
-  import { getPageTitle } from "utils/page-title";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import EntityAvatar from "~/components/ui/entity-avatar.svelte";
+  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import { getLocaleData } from "~/i18n";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import routeConfig from "~/route-config";
+  import { getPageTitle } from "~/utils/page-title";
 
   export let data;
 

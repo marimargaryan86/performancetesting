@@ -1,6 +1,6 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { Session } from "integration/ory/schemas/authentication";
-import type { Price } from "integration/common/schemas/price";
+import type { Session } from "~/integration/ory/schemas/authentication";
+import type { Price } from "~/integration/common/schemas/price";
 import { paymentParser, type Payment, type PaymentSchema } from "../schemas/payment";
 
 export default class PaymentService extends JunctionMobileApiService {

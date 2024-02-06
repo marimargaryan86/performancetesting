@@ -1,8 +1,8 @@
-import integrationInstances from "integration-instances";
-import type { Order } from "integration/junction-mobile-api/schemas/order";
+import integrationInstances from "~/integration-instances";
+import type { Order } from "~/integration/junction-mobile-api/schemas/order";
 import { redirect } from "@sveltejs/kit";
-import routeConfig from "routeConfig";
-import type { Markups } from "integration/junction-mobile-api/schemas/markups";
+import routeConfig from "~/route-config";
+import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
 import { getCookie } from "../../booking-flow";
 
 export async function load(event): Promise<{

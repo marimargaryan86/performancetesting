@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import { clickOutside } from "directives/click-outside";
-  import { getLocale, type Locale } from "i18n";
-  import languages from "i18n/lang/languages";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import { clickOutside } from "~/directives/click-outside";
+  import { getLocale, type Locale } from "~/i18n";
+  import languages from "~/i18n/lang/languages";
   import { scale } from "svelte/transition";
 
   export let compact: boolean;

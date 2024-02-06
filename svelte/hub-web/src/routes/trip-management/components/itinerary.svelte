@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-  import type { TripBooking as MobileTripBooking } from "integration/junction-mobile-api/schemas/booking";
-  import type { TripBooking as HubTripBooking } from "integration/junction-hub-api/schemas/booking";
+  import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
+  import type { TripBooking as HubTripBooking } from "~/integration/junction-hub-api/schemas/booking";
 
   type TripBooking = MobileTripBooking | HubTripBooking;
 
@@ -24,13 +24,13 @@
 </script>
 
 <script lang="ts">
-  import { formatDuration } from "formatting/date-time";
-  import { getTimeDeltaS } from "utils/date-time";
-  import EntityAvatar from "components/ui/entity-avatar.svelte";
-  import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
-  import { getLocale, getLocaleData } from "i18n";
-  import { formatStopCount } from "formatting/trip";
-  import Icon from "components/icons/icon.svelte";
+  import { formatDuration } from "~/formatting/date-time";
+  import { getTimeDeltaS } from "~/utils/date-time";
+  import EntityAvatar from "~/components/ui/entity-avatar.svelte";
+  import type { OfferSegmentLeg } from "~/integration/common/schemas/offer-segment-leg";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import { formatStopCount } from "~/formatting/trip";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let bookings: TripBooking[];
 

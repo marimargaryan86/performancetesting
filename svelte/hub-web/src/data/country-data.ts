@@ -1,4 +1,4 @@
-import type { CountryModel } from "models/location";
+import type { CountryModel } from "~/models/location";
 
 const list = [
   { name: "Afghanistan", phoneCode: "93", code: "AF" },

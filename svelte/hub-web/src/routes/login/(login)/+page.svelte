@@ -1,16 +1,16 @@
 <script lang="ts">
-  import JunctionLogo from "components/icons/junction-logo.svelte";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import Checkbox from "components/ui/checkbox.svelte";
+  import JunctionLogo from "~/components/icons/junction-logo.svelte";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import Checkbox from "~/components/ui/checkbox.svelte";
   import { writable } from "svelte/store";
-  import integrationInstancesClient from "integration-instances-client";
-  import routeConfig from "routeConfig";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import routeConfig from "~/route-config";
   import { goto, invalidateAll } from "$app/navigation";
-  import { slideFade } from "transitions/slide-fade";
-  import { getPageTitle } from "utils/page-title";
+  import { slideFade } from "~/transitions/slide-fade";
+  import { getPageTitle } from "~/utils/page-title";
   import { page } from "$app/stores";
-  import { sleep } from "utils/common";
+  import { sleep } from "~/utils/common";
 
   export let data;
 

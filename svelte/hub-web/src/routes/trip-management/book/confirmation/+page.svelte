@@ -11,18 +11,18 @@
 </script>
 
 <script lang="ts">
-  import routeConfig from "routeConfig";
-  import Alert, { type AlertType } from "components/ui/alert.svelte";
+  import routeConfig from "~/route-config";
+  import Alert, { type AlertType } from "~/components/ui/alert.svelte";
   import Passengers from "../../components/passengers.svelte";
   import Price from "../../components/price.svelte";
   import Overview from "./overview.svelte";
   import Itinerary from "../../components/itinerary.svelte";
-  import { ensureDefined } from "utils/array";
-  import { getOrderStatus, type OrderBookingStatus } from "integration/common/schemas/order";
+  import { ensureDefined } from "~/utils/array";
+  import { getOrderStatus, type OrderBookingStatus } from "~/integration/common/schemas/order";
   import Fees from "./fees.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let data;
 

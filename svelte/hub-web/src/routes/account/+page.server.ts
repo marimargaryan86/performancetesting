@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
-import integrationInstances from "integration-instances";
-import type { SettingsFlow } from "integration/ory/schemas/settings-flow";
-import { cookieStore } from "stores/cookie-store.server";
+import integrationInstances from "~/integration-instances";
+import type { SettingsFlow } from "~/integration/ory/schemas/settings-flow";
+import { cookieStore } from "~/stores/cookie-store.server";
 
 export async function load(event): Promise<{ flow: SettingsFlow }> {
   const session = event.locals.session;

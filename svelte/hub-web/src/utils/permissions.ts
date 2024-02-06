@@ -1,4 +1,4 @@
-import type { User, UserRole } from "integration/ory/schemas/authentication";
+import type { User, UserRole } from "~/integration/ory/schemas/authentication";
 import { getContext, setContext } from "svelte";
 import type { Readable, Writable } from "svelte/store";
 

@@ -1,5 +1,5 @@
 import JunctionMobileApiService from "./junction-mobile-api-service";
-import type { Session } from "integration/ory/schemas/authentication";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import {
   tripOfferPriceQuoteParser,
   type TripOfferPriceQuoteCreate,
@@ -7,7 +7,7 @@ import {
   type TripOfferPriceQuoteSchema,
 } from "../schemas/trip-offer-price-quote";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
-import { JunctionError } from "integration/common/junction-error";
+import { JunctionError } from "~/integration/common/junction-error";
 
 export default class OfferService extends JunctionMobileApiService {
   async create({

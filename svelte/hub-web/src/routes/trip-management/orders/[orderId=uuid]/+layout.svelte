@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { BreadCrumb } from "components/page/bread-crumbs.svelte";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import type { Tab } from "components/ui/tabs.svelte";
-  import { getLocaleData } from "i18n";
-  import routeConfig from "routeConfig";
+  import type { BreadCrumb } from "~/components/page/bread-crumbs.svelte";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import type { Tab } from "~/components/ui/tabs.svelte";
+  import { getLocaleData } from "~/i18n";
+  import routeConfig from "~/route-config";
 
   export let data;
 

@@ -1,5 +1,5 @@
-import type { Locale } from "i18n";
-import type { Session, User } from "integration/ory/schemas/authentication";
+import type { Locale } from "~/i18n";
+import type { Session, User } from "~/integration/ory/schemas/authentication";
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces

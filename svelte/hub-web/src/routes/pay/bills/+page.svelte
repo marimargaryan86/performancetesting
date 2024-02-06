@@ -3,19 +3,19 @@
 </script>
 
 <script lang="ts">
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import Switch from "components/ui/switch.svelte";
-  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
-  import integrationInstancesClient from "integration-instances-client";
-  import type { Bill } from "integration/junction-hub-api/schemas/bill";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import Switch from "~/components/ui/switch.svelte";
+  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import type { Bill } from "~/integration/junction-hub-api/schemas/bill";
   import { match as matchUuid } from "../../../params/uuid";
-  import { getLocale, getLocaleData } from "i18n";
+  import { getLocale, getLocaleData } from "~/i18n";
   import { browser } from "$app/environment";
-  import { getPageTitle } from "utils/page-title";
-  import { formatAmount } from "formatting/currency";
+  import { getPageTitle } from "~/utils/page-title";
+  import { formatAmount } from "~/formatting/currency";
   import { writable } from "svelte/store";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
 
   export let data;
 

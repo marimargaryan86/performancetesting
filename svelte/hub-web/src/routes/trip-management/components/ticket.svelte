@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Icon from "components/icons/icon.svelte";
-  import { getLocaleData } from "i18n";
+  import Icon from "~/components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
 
   let titleExt: string | undefined = undefined;
   export { titleExt as title };

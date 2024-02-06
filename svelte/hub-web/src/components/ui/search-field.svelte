@@ -1,7 +1,7 @@
 <script lang="ts">
   import TextField from "./text-field.svelte";
-  import { getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   let placeholderExt: string | undefined = undefined;
   export { placeholderExt as placeholder };

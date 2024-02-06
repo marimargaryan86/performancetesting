@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Tab } from "components/ui/tabs.svelte";
-  import routeConfig from "routeConfig";
-  import StandardLayout from "components/page/standard-layout.svelte";
+  import type { Tab } from "~/components/ui/tabs.svelte";
+  import routeConfig from "~/route-config";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
   import { page } from "$app/stores";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocaleData } from "i18n";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocaleData } from "~/i18n";
 
   const i18n = getLocaleData();
 

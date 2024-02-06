@@ -1,10 +1,10 @@
-import type { PriceBreakdown } from "integration/common/schemas/price";
+import type { PriceBreakdown } from "~/integration/common/schemas/price";
 import { ensureDefined } from "./array";
 import { getMaxDate, getMinDate, getTimeDeltaMs } from "./date-time";
-import type { Offer } from "integration/junction-mobile-api/schemas/offer";
+import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
 import { summarizePrices } from "./money";
-import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
-import type { OfferSegmentLeg } from "integration/common/schemas/offer-segment-leg";
+import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+import type { OfferSegmentLeg } from "~/integration/common/schemas/offer-segment-leg";
 
 export function getLowestPrice(offer: Offer): number {
   return Math.min(

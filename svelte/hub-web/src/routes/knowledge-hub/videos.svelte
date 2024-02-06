@@ -10,11 +10,11 @@
 </script>
 
 <script lang="ts">
-  import { getLocaleData } from "i18n";
-  import { ensureDefined } from "utils/array";
-  import Card from "components/ui/card.svelte";
+  import { getLocaleData } from "~/i18n";
+  import { ensureDefined } from "~/utils/array";
+  import Card from "~/components/ui/card.svelte";
   import VideoPlayer from "./video-player.svelte";
-  import Icon from "components/icons/icon.svelte";
+  import Icon from "~/components/icons/icon.svelte";
 
   const i18n = getLocaleData();
 

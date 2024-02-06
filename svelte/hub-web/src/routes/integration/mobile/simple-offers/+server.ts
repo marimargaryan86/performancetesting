@@ -1,4 +1,4 @@
-import integrationInstancesServer from "integration-instances";
+import integrationInstancesServer from "~/integration-instances";
 import { serverServiceFactory } from "../../framework";
 import simpleOfferService from "./simple-offer-service";
 

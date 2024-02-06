@@ -1,12 +1,12 @@
 <script lang="ts" generics="TValue">
   /* global TValue */
-  import type { DirectionY } from "models/spatial";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import type { DirectionY } from "~/models/spatial";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import TextField from "./text-field.svelte";
   import { scale } from "svelte/transition";
-  import { clickOutside } from "directives/click-outside";
+  import { clickOutside } from "~/directives/click-outside";
   import { createEventDispatcher } from "svelte";
-  import { keyboard, type KeyboardParams } from "directives/keyboard";
+  import { keyboard, type KeyboardParams } from "~/directives/keyboard";
 
   let className: string | undefined = undefined;
 

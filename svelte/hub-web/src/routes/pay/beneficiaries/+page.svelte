@@ -4,17 +4,17 @@
 
 <script lang="ts">
   import { dev } from "$app/environment";
-  import { capitalize } from "utils/common";
-  import routeConfig from "routeConfig";
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import { scrollLoad, type ScrollLoadFunc } from "directives/scroll-load";
-  import integrationInstancesClient from "integration-instances-client";
-  import currencyData from "data/currency-data";
-  import { getPageTitle } from "utils/page-title";
-  import Icon from "components/icons/icon.svelte";
+  import { capitalize } from "~/utils/common";
+  import routeConfig from "~/route-config";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import currencyData from "~/data/currency-data";
+  import { getPageTitle } from "~/utils/page-title";
+  import Icon from "~/components/icons/icon.svelte";
   import { writable } from "svelte/store";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { slideFade } from "transitions/slide-fade";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import { slideFade } from "~/transitions/slide-fade";
 
   export let data;
 

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { TripBooking } from "integration/junction-hub-api/schemas/booking";
-  import routeConfig from "routeConfig";
-  import { getOrigin, getDestination } from "utils/booking";
+  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
+  import routeConfig from "~/route-config";
+  import { getOrigin, getDestination } from "~/utils/booking";
   import CancellationDialog from "./cancellation-dialog.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import { getLocale, getLocaleData } from "i18n";
-  import { ensureDefined } from "utils/array";
-  import StatusBadge from "components/ui/status-badge.svelte";
-  import { formatAmount } from "formatting/currency";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import { ensureDefined } from "~/utils/array";
+  import StatusBadge from "~/components/ui/status-badge.svelte";
+  import { formatAmount } from "~/formatting/currency";
 
   export let data;
 

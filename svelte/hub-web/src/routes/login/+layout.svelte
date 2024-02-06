@@ -1,5 +1,5 @@
 <script lang="ts">
-  import passengersImage from "assets/images/passengers.png";
+  import passengersImage from "~/assets/images/passengers.png";
 </script>
 
 <main>

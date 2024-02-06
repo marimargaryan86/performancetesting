@@ -1,4 +1,4 @@
-import type { TripOfferPriceQuote } from "integration/junction-mobile-api/schemas/trip-offer-price-quote";
+import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
 import { z } from "zod";
 
 const countryCodesValidator = z.object({

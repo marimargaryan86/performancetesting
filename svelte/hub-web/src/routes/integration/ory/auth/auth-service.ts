@@ -1,5 +1,5 @@
 import { clientServiceFactory } from "../../framework";
-import type LoginFlowService from "integration/ory/services/login-flow-service";
+import type LoginFlowService from "~/integration/ory/services/login-flow-service";
 import type { RouteId } from "./$types";
 
 type Service = {

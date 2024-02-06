@@ -1,4 +1,4 @@
-import type CurrencyService from "integration/junction-hub-api/services/currency-service";
+import type CurrencyService from "~/integration/junction-hub-api/services/currency-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
 

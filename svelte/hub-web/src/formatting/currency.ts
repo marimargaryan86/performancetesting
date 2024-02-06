@@ -1,5 +1,5 @@
-import type { Locale } from "i18n";
-import type { Price } from "integration/common/schemas/price";
+import type { Locale } from "~/i18n";
+import type { Price } from "~/integration/common/schemas/price";
 
 export function formatAmount(
   money: Price,

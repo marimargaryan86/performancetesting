@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  import type { UiNodeGroup } from "integration/ory/schemas/ui-node";
+  import type { UiNodeGroup } from "~/integration/ory/schemas/ui-node";
 
   function getOnClick(func: string): () => void {
     // eslint-disable-next-line no-eval
@@ -16,16 +16,16 @@
 </script>
 
 <script lang="ts">
-  import StandardLayout from "components/page/standard-layout.svelte";
-  import TextField from "components/ui/text-field.svelte";
+  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
   import { writable } from "svelte/store";
-  import integrationInstancesClient from "integration-instances-client";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import { getPageTitle } from "utils/page-title";
-  import { getUser } from "utils/permissions";
-  import { getLocaleData } from "i18n";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import { getPageTitle } from "~/utils/page-title";
+  import { getUser } from "~/utils/permissions";
+  import { getLocaleData } from "~/i18n";
   import { goto, invalidateAll } from "$app/navigation";
-  import routeConfig from "routeConfig";
+  import routeConfig from "~/route-config";
 
   export let data;
 

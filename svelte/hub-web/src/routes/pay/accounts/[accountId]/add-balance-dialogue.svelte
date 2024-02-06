@@ -1,17 +1,17 @@
 <script lang="ts">
-  import CurrencyFlag from "components/icons/currency-flag.svelte";
-  import LoadingIcon from "components/icons/loading-icon.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import { portal } from "directives/portal";
+  import CurrencyFlag from "~/components/icons/currency-flag.svelte";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import { portal } from "~/directives/portal";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
-  import type { Balance } from "integration/junction-hub-api/schemas/balance";
-  import type { Currency } from "integration/junction-hub-api/schemas/currency";
-  import integrationInstancesClient from "integration-instances-client";
-  import currencyData from "data/currency-data";
+  import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
+  import type { Currency } from "~/integration/junction-hub-api/schemas/currency";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import currencyData from "~/data/currency-data";
   import { writable } from "svelte/store";
-  import { getLocaleData } from "i18n";
-  import Icon from "components/icons/icon.svelte";
+  import { getLocaleData } from "~/i18n";
+  import Icon from "~/components/icons/icon.svelte";
 
   export let accountId: string;
   export let exclude: Balance[];

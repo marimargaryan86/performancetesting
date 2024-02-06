@@ -1,4 +1,4 @@
-import type { Price } from "integration/common/schemas/price";
+import type { Price } from "~/integration/common/schemas/price";
 
 export function pricesEqual(a: Price, b: Price): boolean {
   return a.amount === b.amount && a.currency === b.currency;

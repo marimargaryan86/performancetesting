@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { capitalize } from "utils/common";
-  import type { BeneficiaryPut } from "integration/junction-hub-api/schemas/beneficiary";
-  import integrationInstancesClient from "integration-instances-client";
-  import countryData from "data/country-data";
-  import currencyData from "data/currency-data";
+  import { capitalize } from "~/utils/common";
+  import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+  import integrationInstancesClient from "~/integration-instances-client";
+  import countryData from "~/data/country-data";
+  import currencyData from "~/data/currency-data";
 
   export let data: BeneficiaryPut;
   export let error: string | undefined = undefined;

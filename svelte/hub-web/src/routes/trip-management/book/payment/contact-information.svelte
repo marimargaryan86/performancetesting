@@ -37,14 +37,14 @@
 
 <script lang="ts">
   import { z } from "zod";
-  import SelectField from "components/ui/select-field.svelte";
-  import TextField from "components/ui/text-field.svelte";
-  import { formatCountryOption, formatCountryPhoneOption } from "formatting/location";
-  import type { CountryModel } from "models/location";
+  import SelectField from "~/components/ui/select-field.svelte";
+  import TextField from "~/components/ui/text-field.svelte";
+  import { formatCountryOption, formatCountryPhoneOption } from "~/formatting/location";
+  import type { CountryModel } from "~/models/location";
   import Collapsible from "../../components/collapsible.svelte";
-  import type { ContactDetails } from "integration/junction-mobile-api/schemas/journey";
-  import countryData from "data/country-data";
-  import { getLocaleData } from "i18n";
+  import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
+  import countryData from "~/data/country-data";
+  import { getLocaleData } from "~/i18n";
 
   export let data: ContactDetails;
   export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;

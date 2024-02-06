@@ -6,10 +6,10 @@
 
 <script lang="ts">
   import { dev } from "$app/environment";
-  import ChevronIcon from "components/icons/chevron-icon.svelte";
-  import { formatAmount } from "formatting/currency";
-  import { getLocale, getLocaleData } from "i18n";
-  import type { OfferOption } from "integration/junction-mobile-api/schemas/offer";
+  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import { formatAmount } from "~/formatting/currency";
+  import { getLocale, getLocaleData } from "~/i18n";
+  import type { OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
 

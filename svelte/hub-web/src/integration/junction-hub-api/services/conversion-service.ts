@@ -1,9 +1,9 @@
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { PaginatedData } from "models/common";
-import type { Session } from "integration/ory/schemas/authentication";
+import type { PaginatedData } from "~/models/common";
+import type { Session } from "~/integration/ory/schemas/authentication";
 import type { Conversion, ConversionSchema } from "../schemas/conversion";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
-import { JunctionError } from "integration/common/junction-error";
+import { JunctionError } from "~/integration/common/junction-error";
 
 export default class ConversionService extends JunctionHubApiService {
   async find({
