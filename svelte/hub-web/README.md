@@ -87,8 +87,58 @@ yarn run lint
 yarn run check
 ```
 
+# Running Tests
+
+## Unit Tests
+
 - Feel free to contribute and run unit tests:
 
 ```bash
 yarn run test:unit
 ```
+
+## E2E Tests
+
+`Playwright` is an end-to-end test library designed to automate cross-browser web testing. `Playwright` supports all modern rendering engines including `Chromium`, `WebKit`, and `Firefox`.
+
+### Run tests in the browser
+
+```bash
+yarn run test:e2e
+```
+
+This command will execute the tests as per the configuration in the `playwright.config.ts` file. Make sure your local development server (e.g., for SvelteKit) is running on `http://localhost:5173` when you execute the tests.
+
+```bash
+npx playwright test --headed
+```
+
+### Updating Playwright
+
+```bash
+yarn add -D @playwright/test@latest
+```
+
+# Useful Commands (MacOS)
+
+## Clear Browser Cache
+
+To see the most recent changes in your browser, you should clear your browser's cache or manually force refresh the website by using these keyboard shortcuts on your computer: The command will clear your web browser's cache:
+
+```
+[COMMAND] + [OPTION] + [E]
+```
+
+# Delete Browser Cookies
+
+```
+[COMMAND] + [SHIFT] + [DELETE]
+```
+
+## Reload Web Browser
+
+```
+[COMMAND] + R
+```
+
+- Note: this command only works on Safari browsers
