@@ -25,6 +25,7 @@ import type {
   Markups as MarkupsModel,
 } from "integration/junction-mobile-api/schemas/markups";
 import { searchDataModel, type SearchData } from "./components/trip-search/trip-search.svelte";
+import { dev } from "$app/environment";
 
 export const markupsModel: z.ZodType<Omit<MarkupsCreate, "orderId">> = z.object({
   serviceFee: priceModel.refine((value) => value.amount >= 0, {
@@ -193,6 +194,8 @@ async function search(data: SearchData): Promise<SimpleOfferSearch> {
         outbound: data.outbound,
         destination: data.destination.coordinates,
         origin: data.origin.coordinates,
+        // TODO(2024-02-02/mekwall): Remove dev flag when feature goes live
+        windowH: dev ? data.windowH : undefined,
       },
       passengers: parsePassengers(data.passengers),
       allowedSegmentTypes: ["rail"],

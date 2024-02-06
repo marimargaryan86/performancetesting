@@ -663,6 +663,8 @@ export default {
             select: {
               title: "Select",
               subTitle: "Select an offer",
+              earlier: "Earlier",
+              later: "Later",
             },
             payment: {
               title: "Payment",

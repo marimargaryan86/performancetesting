@@ -10,10 +10,10 @@
   const i18n = getLocaleData();
 
   async function search(event: ComponentEvents<TripSearch>["search"]): Promise<void> {
-    event.detail.pending.set(true);
+    event.detail.pending?.set(true);
     await manager.search(event.detail.data);
     await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root);
-    event.detail.pending.set(false);
+    event.detail.pending?.set(false);
   }
 </script>
 

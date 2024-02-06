@@ -67,3 +67,7 @@ export type RecursivePartial<T> = {
 export type PartiallyPartial<TObject extends object, TRequired extends keyof TObject> = {
   [key in TRequired]: TObject[key];
 } & { [key in Exclude<keyof TObject, TRequired>]?: TObject[key] };
+
+export type PartialOmit<TType extends object, TKeys extends keyof TType> = Omit<TType, TKeys> & {
+  [key in TKeys]?: TType[key];
+};

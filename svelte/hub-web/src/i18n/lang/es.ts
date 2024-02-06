@@ -717,6 +717,8 @@ export default {
             select: {
               title: "Seleccionar",
               subTitle: "Seleccione una oferta",
+              earlier: "Antes",
+              later: "Después",
             },
             payment: {
               title: "Pagar",

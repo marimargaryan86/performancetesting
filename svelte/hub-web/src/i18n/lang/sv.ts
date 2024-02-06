@@ -654,6 +654,8 @@ export default {
             select: {
               title: "Välj",
               subTitle: "Välj ett erbjudande",
+              earlier: "Tidigare",
+              later: "Senare",
             },
             payment: {
               title: "Betalning",

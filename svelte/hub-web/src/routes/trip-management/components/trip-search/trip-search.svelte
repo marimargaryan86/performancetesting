@@ -1,4 +1,7 @@
 <script lang="ts" context="module">
+  export const SEARCH_WINDOW_H = 2;
+  export const SEARCH_WINDOW_DELTA_MS = 3600000 * SEARCH_WINDOW_H;
+
   export const searchDataModel = z
     .object({
       origin: z.object(placeModel.shape, { required_error: "Origin is mandatory" }),
@@ -7,6 +10,7 @@
         .date({ coerce: true, required_error: "Departure date is mandatory" })
         .refine((value) => value > new Date(), "Outbound date can't be in the past"),
       inbound: z.date({ coerce: true }).optional(),
+      windowH: z.number().min(0).default(SEARCH_WINDOW_H),
       passengers: passengerPickerData,
     })
     .refine((value) => !value.inbound || value.inbound > value.outbound, {

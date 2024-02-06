@@ -1,4 +1,7 @@
 <script lang="ts" context="module">
+  type Direction = "earlier" | "later";
+  type PendingType = Direction | "initial";
+
   function getSortAndFilteringFunc(
     options: SearchOptionsData,
   ): (offers: OfferModel[]) => OfferModel[] {
@@ -25,7 +28,10 @@
 </script>
 
 <script lang="ts">
-  import TripSearch from "../../components/trip-search/trip-search.svelte";
+  import TripSearch, {
+    SEARCH_WINDOW_DELTA_MS,
+    SEARCH_WINDOW_H,
+  } from "../../components/trip-search/trip-search.svelte";
   import SearchOptions, {
     type SearchOptionsData,
     type SearchOptionsSettings,
@@ -47,8 +53,10 @@
   import { getPageTitle } from "utils/page-title";
   import { getLocaleData } from "i18n";
   import { manager, type PartialSelectedOffer } from "../../booking-flow";
-  import { browser } from "$app/environment";
+  import { browser, dev } from "$app/environment";
   import CollapsibleTripSearch from "../../components/trip-search/collapsible-trip-search.svelte";
+  import ChevronIcon from "components/icons/chevron-icon.svelte";
+  import type { PartialOmit } from "utils/common";
 
   export let data;
 
@@ -66,8 +74,8 @@
   let offerPollController: AbortController | undefined;
 
   const i18n = getLocaleData();
-  const offersPending = writable(true);
   const selectOfferPending = writable(false);
+  let offersPending: PendingType | undefined = "initial";
 
   $: offerSearchId = data.bookingSession.offerSearch.id;
   $: getOffers(offerSearchId);
@@ -78,7 +86,6 @@
       return;
     }
 
-    $offersPending = true;
     offers = [];
     offerPollController?.abort();
     offerPollController = new AbortController();
@@ -93,7 +100,7 @@
       durationM: searchOptionsSettings.durationSpanM.start,
     };
 
-    $offersPending = false;
+    offersPending = undefined;
   }
 
   async function select(event: ComponentEvents<Offer>["select"]): Promise<void> {
@@ -127,12 +134,44 @@
     }
   }
 
-  async function search(event: ComponentEvents<TripSearch>["search"]): Promise<void> {
-    event.detail.pending.set(true);
+  async function search(
+    pendingType: PendingType,
+    event: CustomEvent<PartialOmit<ComponentEvents<TripSearch>["search"]["detail"], "pending">>,
+  ): Promise<void> {
+    offers = [];
+    offersPending = pendingType;
+    event.detail.pending?.set(true);
     await manager.search(event.detail.data);
     await invalidateAll();
-    event.detail.pending.set(false);
+    event.detail.pending?.set(false);
   }
+
+  async function fetchMore(direction: Direction): Promise<void> {
+    if (offersPending) {
+      return;
+    }
+
+    const nextOutbound = new Date(data.bookingSession.searchData.outbound);
+    nextOutbound.setHours(
+      nextOutbound.getHours() + (direction === "earlier" ? -SEARCH_WINDOW_H : SEARCH_WINDOW_H),
+    );
+
+    data.bookingSession.searchData = {
+      ...data.bookingSession.searchData,
+      outbound: nextOutbound,
+    };
+
+    await search(
+      direction,
+      new CustomEvent("search", { detail: { data: data.bookingSession.searchData } }),
+    );
+  }
+
+  // Hide earlier button if search window is in the past
+  $: showEarlierButton =
+    data.bookingSession.searchData.outbound.getTime() - new Date().getTime() >
+    SEARCH_WINDOW_DELTA_MS;
+  $: showLaterButton = true;
 
   onDestroy(() => {
     if (browser) {
@@ -154,7 +193,7 @@
 
 <div class="search-wrapper">
   <CollapsibleTripSearch searchData={data.bookingSession.searchData}>
-    <TripSearch data={data.bookingSession.searchData} on:search={search} />
+    <TripSearch data={data.bookingSession.searchData} on:search={search.bind(search, "initial")} />
   </CollapsibleTripSearch>
 </div>
 
@@ -163,8 +202,28 @@
 
   <div class="scroll">
     <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />
-
     <ul class="offer-result">
+      {#if dev}
+        <!-- TODO(2024-02-02/mekwall): Remove dev flag when feature goes live -->
+        {#if showEarlierButton}
+          <li class="earlier">
+            <button
+              on:click={fetchMore.bind(fetchMore, "earlier")}
+              disabled={Boolean(offersPending)}
+            >
+              <span typography="label-medium" weight="bold">
+                {$i18n.pages.tripManagement.pages.book.pages.select.earlier}
+              </span>
+              {#if offersPending === "earlier"}
+                <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
+              {:else}
+                <ChevronIcon direction="up" color="var(--color-common-light-text-link)" />
+              {/if}
+            </button>
+          </li>
+        {/if}
+      {/if}
+
       {#each sortAndFilter(offers) as offer (offer.id)}
         <li>
           <Offer
@@ -186,7 +245,7 @@
         {/if}
       {/each}
 
-      {#if $offersPending}
+      {#if offersPending}
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
         <li><LoadingSkelton /></li>
@@ -197,6 +256,24 @@
             <span typography="body-medium">{$i18n.sentences.noTripsFound}</span>
           </Alert>
         </li>
+      {/if}
+
+      {#if dev}
+        <!-- TODO(2024-02-02/mekwall): Remove dev flag when feature goes live -->
+        {#if showLaterButton}
+          <li class="later">
+            <button on:click={fetchMore.bind(fetchMore, "later")} disabled={Boolean(offersPending)}>
+              <span typography="label-medium" weight="bold">
+                {$i18n.pages.tripManagement.pages.book.pages.select.later}
+              </span>
+              {#if offersPending === "later"}
+                <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
+              {:else}
+                <ChevronIcon direction="down" color="var(--color-common-light-text-link)" />
+              {/if}
+            </button>
+          </li>
+        {/if}
       {/if}
     </ul>
   </div>
@@ -287,6 +364,27 @@
     align-self: flex-start;
     width: 100%;
     max-width: var(--result-width);
+  }
+
+  .earlier > button,
+  .later > button {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 16px;
+    color: var(--color-common-light-text-link);
+    background-color: var(--color-common-background-light-main);
+    border-color: transparent;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background-color 300ms ease;
+  }
+
+  .earlier > button:hover,
+  .later > button:hover {
+    background-color: var(--color-common-background-light-hover);
   }
 
   .actions {
