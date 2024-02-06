@@ -187,8 +187,10 @@ async def _do_offer_search(
                 timeout=timeout.total_seconds(),
             )
 
-    except aio.AioRpcError:
-        _logger.exception("Provider offer search failed")
+    except aio.AioRpcError as ex:
+        if ex.code() != StatusCode.UNIMPLEMENTED:
+            _logger.exception("Provider offer search failed")
+
         _failed.labels(provider_id=provider.identifier).inc()
         response = providers_pb2.SearchOffersResponse()
         status = "nok"
