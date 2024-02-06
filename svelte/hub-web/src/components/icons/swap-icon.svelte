@@ -2,6 +2,8 @@
   export let color: string = "var(--color-main-primary-500)";
   export let size: number = 24;
 
+  const mask = 'url("/images/icons/swap-directions.svg")';
+
   let flipped = true;
 
   function flipFlop(): void {
@@ -10,25 +12,18 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<svg
-  width={size}
-  height={size}
-  viewBox="0 0 24 24"
-  fill="none"
+<div
+  style:mask-image={mask}
+  style:-webkit-mask-image={mask}
+  style:--size={size}
+  style:background-color={color}
+  style:width="{size}px"
+  style:height="{size}px"
   class="swap-icon"
   class:flipped
-  xmlns="http://www.w3.org/2000/svg"
   on:click={flipFlop}
   on:keypress
->
-  <path
-    d="M8 13L4 17M4 17L8 21M4 17L20 17M16 11L20 7M20 7L16 3M20 7L4 7"
-    stroke={color}
-    stroke-width="1.5"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-</svg>
+/>
 
 <style>
   .swap-icon {

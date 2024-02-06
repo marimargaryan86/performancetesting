@@ -30,12 +30,13 @@
   export let includeTime = false;
 
   let timePicker: TimePicker | undefined;
+  $: scrollToSelectedTime = timePicker?.scrollToSelected;
 
   const timeZone = getLocalTimeZone();
 
   const value = writable<DateValue | undefined>(getValue());
   $: externalValue, ($value = getValue());
-  $: $value, timePicker?.scrollToSelected("smooth");
+  $: $value, scrollToSelectedTime?.("smooth");
   $: updateExternalValue($value);
 
   function getValue(): DateValue | undefined {

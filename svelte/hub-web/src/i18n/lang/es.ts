@@ -103,8 +103,8 @@ export default {
     manageTrip: "Gestionar un viaje",
     passengerNameRecord: "Número de referencia",
     optional: "Opcional",
-    roundtrip: "Ida y vuelta",
-    oneWay: "De una sola mano",
+    inbound: "Entrante",
+    outbound: "Saliente",
   },
   actions: {
     logout: "Cerrar sesión",
@@ -329,6 +329,10 @@ export default {
       plural: "Jóvenes",
       singular: "Jóven",
     },
+  },
+  tripTypes: {
+    "round-trip": "Ida y vuelta",
+    "one-way": "De una sola mano",
   },
   types: {
     "bank-transfer": "Transferencia bancaria",

@@ -10,6 +10,7 @@ import type {
   PassengerTitle,
   TravelerDocumentType,
 } from "integration/common/schemas/order";
+import type { TripType } from "../../routes/trip-management/components/trip-search/trip-type-picker.svelte";
 
 export default {
   title: "Junction Hub",
@@ -114,8 +115,8 @@ export default {
     manageTrip: "Manage a Trip",
     passengerNameRecord: "Reference number",
     optional: "Optional",
-    roundtrip: "Roundtrip",
-    oneWay: "One-way",
+    inbound: "Inbound",
+    outbound: "Outbound",
   },
   actions: {
     logout: "Logout",
@@ -314,6 +315,10 @@ export default {
       singular: "Youth",
     },
   } satisfies Record<PassengerType, WordQuantity>,
+  tripTypes: {
+    "one-way": "One way",
+    "round-trip": "Round trip",
+  } satisfies Record<TripType, string>,
   types: {
     "bank-transfer": "Bank Transfer",
     card: "Card",

@@ -103,8 +103,8 @@ export default {
     manageTrip: "Hantera en resa",
     passengerNameRecord: "Referensnummer",
     optional: "Frivillig",
-    roundtrip: "Tur och retur",
-    oneWay: "Enkel",
+    inbound: "Inkommande",
+    outbound: "Utgående",
   },
   actions: {
     logout: "Logga ut",
@@ -303,6 +303,10 @@ export default {
       plural: "Ungdomar",
       singular: "Ungdom",
     },
+  },
+  tripTypes: {
+    "round-trip": "Tur och retur",
+    "one-way": "Enkel",
   },
   types: {
     "bank-transfer": "Banktransaktion",

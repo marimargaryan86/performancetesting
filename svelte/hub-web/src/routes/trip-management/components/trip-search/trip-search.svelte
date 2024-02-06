@@ -2,24 +2,44 @@
   export const SEARCH_WINDOW_H = 2;
   export const SEARCH_WINDOW_DELTA_MS = 3600000 * SEARCH_WINDOW_H;
 
+  const searchDataBaseModel = z.object({
+    origin: z.object(placeModel.shape, { required_error: "Origin is mandatory" }),
+    destination: z.object(placeModel.shape, { required_error: "Destination is mandatory" }),
+    passengers: passengerPickerData,
+    windowH: z.number().min(0).default(SEARCH_WINDOW_H),
+    outbound: z
+      .date({ coerce: true, required_error: "Departure date is mandatory" })
+      .refine((value) => value >= new Date(), "Departure date can't be in the past"),
+  });
+
+  type RequiredFields = keyof Pick<SearchData, "tripType" | "passengers">;
+  const searchDataOneWayModel = searchDataBaseModel.extend({
+    tripType: z.literal("one-way" satisfies TripType),
+  });
+  type SearchDataOneWay = z.infer<typeof searchDataOneWayModel>;
+  type PartialSearchDataOneWay = Partial<Omit<SearchDataOneWay, RequiredFields>> &
+    Pick<SearchDataOneWay, RequiredFields>;
+
+  const searchDataRoundTripModel = searchDataBaseModel.extend({
+    tripType: z.literal("round-trip" satisfies TripType),
+    outbound: z
+      .date({ coerce: true, required_error: "Outbound date is mandatory" })
+      .refine((value) => value > new Date(), "Outbound date can't be in the past"),
+    inbound: z.date({ coerce: true, required_error: "Inbound date is mandatory" }),
+  });
+  type SearchDataRoundTrip = z.infer<typeof searchDataRoundTripModel>;
+  type PartialSearchDataRoundTrip = Partial<Omit<SearchDataRoundTrip, RequiredFields>> &
+    Pick<SearchDataRoundTrip, RequiredFields>;
+
   export const searchDataModel = z
-    .object({
-      origin: z.object(placeModel.shape, { required_error: "Origin is mandatory" }),
-      destination: z.object(placeModel.shape, { required_error: "Destination is mandatory" }),
-      outbound: z
-        .date({ coerce: true, required_error: "Departure date is mandatory" })
-        .refine((value) => value > new Date(), "Outbound date can't be in the past"),
-      inbound: z.date({ coerce: true }).optional(),
-      windowH: z.number().min(0).default(SEARCH_WINDOW_H),
-      passengers: passengerPickerData,
-    })
-    .refine((value) => !value.inbound || value.inbound > value.outbound, {
+    .discriminatedUnion("tripType", [searchDataOneWayModel, searchDataRoundTripModel])
+    .refine((value) => value.tripType !== "round-trip" || value.inbound > value.outbound, {
       message: "Inbound date must be after outbound date",
       path: ["inbound"],
     });
   export type SearchData = z.infer<typeof searchDataModel>;
-  export type PartialSearchData = Omit<Partial<SearchData>, "passengers"> &
-    Pick<SearchData, "passengers">;
+  export type PartialSearchData = PartialSearchDataOneWay | PartialSearchDataRoundTrip;
+
   export type SearchDataError = z.ZodFormattedError<SearchData>;
 
   export function formatPlace(place?: Place): string {
@@ -32,11 +52,13 @@
 </script>
 
 <script lang="ts">
+  import { dev } from "$app/environment";
   import DatePicker from "components/ui/date-picker/date-picker.svelte";
   import PassengerPicker, {
     getDefaultValue,
     passengerPickerData,
   } from "./passenger-picker/passenger-picker.svelte";
+  import TripTypePicker, { type TripType } from "./trip-type-picker.svelte";
   import AutocompleteField from "components/ui/autocomplete-field.svelte";
   import SwapIcon from "components/icons/swap-icon.svelte";
   import { placeModel, type Place } from "integration/junction-mobile-api/schemas/place";
@@ -50,6 +72,7 @@
   import { z } from "zod";
 
   export let data: PartialSearchData = {
+    tripType: "one-way",
     passengers: getDefaultValue(),
   };
   let errors: SearchDataError | undefined = undefined;
@@ -78,7 +101,11 @@
   }
 </script>
 
-<form class="trip-search" on:submit|preventDefault={search}>
+<form
+  class="trip-search"
+  class:extended={data.tripType === "round-trip"}
+  on:submit|preventDefault={search}
+>
   <AutocompleteField
     label={$i18n.words.from}
     required
@@ -106,13 +133,24 @@
   />
 
   <DatePicker
-    label={$i18n.words.depart}
+    label={data.tripType === "one-way" ? $i18n.words.depart : $i18n.words.outbound}
     bind:value={data.outbound}
     error={errors?.outbound?._errors}
     required
     min={today}
     includeTime
   />
+
+  {#if data.tripType === "round-trip"}
+    <DatePicker
+      label={$i18n.words.inbound}
+      bind:value={data.inbound}
+      error={errors && "inbound" in errors ? errors.inbound?._errors : undefined}
+      required
+      min={today}
+      includeTime
+    />
+  {/if}
 
   <button variant="primary">
     {#if $pending}
@@ -122,7 +160,13 @@
     {/if}
   </button>
 
-  <PassengerPicker bind:passengers={data.passengers} error={errors?.passengers?._errors} />
+  <div class="settings">
+    {#if dev}
+      <TripTypePicker bind:value={data.tripType} />
+    {/if}
+
+    <PassengerPicker bind:passengers={data.passengers} error={errors?.passengers?._errors} />
+  </div>
 </form>
 
 <style>
@@ -137,11 +181,21 @@
     border-radius: 16px;
   }
 
+  .trip-search.extended {
+    grid-template-columns: 1fr max-content 1fr 1fr 1fr max-content;
+  }
+
   .trip-search > :global(.autocomplete-field),
   .trip-search > :global(.date-picker) {
     --label-font-size: 14px;
     --label-font-weight: 600;
     --label-font-family: "Inter";
+  }
+
+  .settings {
+    display: flex;
+    grid-column: 1 / -1;
+    gap: 24px;
   }
 
   .trip-search > button[variant] {

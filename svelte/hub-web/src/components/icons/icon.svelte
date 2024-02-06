@@ -37,7 +37,8 @@
     | "seat"
     | "ticket"
     | "download"
-    | "pdf";
+    | "pdf"
+    | "swap-directions";
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 

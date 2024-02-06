@@ -27,7 +27,7 @@
           month: "short",
         })}
 
-        {#if searchData.inbound}
+        {#if searchData.tripType === "round-trip"}
           - {searchData.inbound.toLocaleDateString($locale, {
             weekday: "short",
             day: "numeric",
@@ -35,7 +35,7 @@
           })}
         {/if}
         ·
-        {searchData.inbound ? $i18n.words.roundtrip : $i18n.words.oneWay}
+        {$i18n.tripTypes[searchData.tripType]}
         ·
         {getPassengersPresentation(searchData.passengers, $i18n)}
       </div>
