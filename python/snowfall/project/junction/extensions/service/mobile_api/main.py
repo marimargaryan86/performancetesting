@@ -89,6 +89,7 @@ async def _get_httpx_auth_and_middlewares(
                     private_key=app.settings.junction_private_key,
                     algorithm="RS256",
                 ),
+                on_error=handlers.forbidden_error_handler,
             ),
         ]
     else:

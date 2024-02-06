@@ -1,4 +1,5 @@
 import dataclasses
+import typing
 from collections.abc import Awaitable, Callable
 
 import jwt as jwtlib
@@ -8,6 +9,11 @@ from starlette.middleware import base
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.transport.http import auth
+
+OnErrorHandler: typing.TypeAlias = typing.Callable[
+    [requests.HTTPConnection, authentication.AuthenticationError],
+    Awaitable[responses.Response],
+]
 
 
 class AuthenticationBackend(authentication.AuthenticationBackend):
@@ -89,10 +95,12 @@ class HubHackBackend(base.BaseHTTPMiddleware):
         app: applications.Starlette,
         jwt_auth: auth.TemporaryTokenAuth,
         jwt_encoder: jwt.Encoder,
+        on_error: OnErrorHandler,
     ):
         super().__init__(app)
         self._jwt = jwt_auth
         self._encoder = jwt_encoder
+        self._on_error = on_error
 
     async def dispatch(
         self,
@@ -102,7 +110,12 @@ class HubHackBackend(base.BaseHTTPMiddleware):
         if not isinstance(request.user, stdlib_auth.AuthenticatedUser):
             return await call_next(request)
 
-        with self._jwt.temporary(self._generate_jwt(request.user)):
+        try:
+            jwt_token = self._generate_jwt(request.user)
+        except authentication.AuthenticationError as exc:
+            return await self._on_error(request, exc)
+
+        with self._jwt.temporary(jwt_token):
             return await call_next(request)
 
     def _generate_jwt(self, user: stdlib_auth.AuthenticatedUser) -> str:

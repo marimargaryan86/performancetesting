@@ -243,6 +243,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         }
       }
@@ -273,6 +276,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -355,6 +361,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         }
       },
@@ -401,6 +410,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         }
       }
@@ -444,6 +456,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -481,6 +496,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -499,6 +517,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -561,6 +582,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         }
       },
@@ -604,6 +628,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -649,6 +676,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -667,6 +697,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -712,6 +745,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -767,6 +803,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "operationId": "post-push-notifications-tokens",
@@ -813,6 +852,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -851,6 +893,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -894,6 +939,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -953,6 +1001,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -971,6 +1022,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1039,6 +1093,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1101,6 +1158,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1185,6 +1245,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1227,6 +1290,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1329,6 +1395,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1366,6 +1435,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "422": {
             "$ref": "./../client_api/openapi.json#/components/responses/UnprocessableEntity"
@@ -1463,6 +1535,9 @@
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "./../client_api/openapi.json#/components/responses/NotFound"
           }
@@ -1505,6 +1580,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "422": {
             "$ref": "./../client_api/openapi.json#/components/responses/UnprocessableEntity"
@@ -1563,6 +1641,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1627,6 +1708,9 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1672,6 +1756,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "422": {
             "$ref": "./../client_api/openapi.json#/components/responses/UnprocessableEntity"
@@ -1764,6 +1851,9 @@
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "./../client_api/openapi.json#/components/responses/NotFound"
           }
@@ -1839,6 +1929,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1887,6 +1980,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -1924,6 +2020,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -1989,6 +2088,9 @@
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "./../client_api/openapi.json#/components/responses/NotFound"
           }
@@ -2041,6 +2143,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "operationId": "get-places",
@@ -2080,11 +2185,14 @@
           "400": {
             "$ref": "./../client_api/openapi.json#/components/responses/BadRequest"
           },
-          "404": {
-            "$ref": "./../client_api/openapi.json#/components/responses/NotFound"
-          },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "./../client_api/openapi.json#/components/responses/NotFound"
           }
         },
         "operationId": "get-places-id",
@@ -2102,6 +2210,9 @@
           },
           "400": {
             "$ref": "./../client_api/openapi.json#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2154,6 +2265,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "operationId": "get-verification-code-id",
@@ -2180,6 +2294,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2229,6 +2346,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2278,6 +2398,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2335,6 +2458,9 @@
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "./../client_api/openapi.json#/components/responses/NotFound"
           }
@@ -2371,6 +2497,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         }
       },
@@ -2394,6 +2523,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2450,6 +2582,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "operationId": "get-users-me-preferences",
@@ -2469,6 +2604,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2522,6 +2660,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2593,6 +2734,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -2633,6 +2777,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
@@ -2696,6 +2843,9 @@
           },
           "401": {
             "$ref": "./../client_api/openapi.json#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "./../client_api/openapi.json#/components/responses/Forbidden"
           }
         },
         "requestBody": {
