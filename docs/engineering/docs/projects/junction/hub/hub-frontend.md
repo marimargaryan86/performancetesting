@@ -106,6 +106,12 @@ Consult a team member for specific values
 
 #### Run Development Servers
 
+See the [docs for installing the `ory` CLI](https://www.ory.sh/docs/guides/cli/installation). On macOS it's:
+
+  ```bash
+  brew install ory/tap/cli
+  ```
+
 For local development, enable the development mode:
 
   ```bash
@@ -120,7 +126,7 @@ For local development, enable the development mode:
 
 _Alternatively, you may point your `.env` file to a deployed ORY instance and skip this step._
 
-:::tip
+:::
 
 ## 4. Install Dependencies
 
@@ -135,7 +141,7 @@ Inside of the hub project directory `svelte/hub-web/` install project dependenci
 Then, open a new terminal and start a local development server:
 
   ```bash
-  yarn run dev
+  yarn dev
   ```
 
 ## 5. Staging Changes
@@ -143,7 +149,7 @@ Then, open a new terminal and start a local development server:
 Ensure code quality by formatting, linting, and running checks before commits:
 
   ```bash
-  yarn run format
-  yarn run lint
-  yarn run check
+  yarn format
+  yarn lint
+  yarn check
   ```
