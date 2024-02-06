@@ -19,10 +19,9 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_models_pb2,
 )
-from snowfall.project.junction.plus.service.plus_webhooks.models import (
-    ServicePermissions,
-)
 from snowfall.stdlib.format.protobuf import datetime_to_protobuf, slug_to_enum_value
+
+_SERVICE_ACCESS_PERMISSION = "flight_stats_alerts"
 
 
 class Alerts(endpoints.HTTPEndpoint):
@@ -99,10 +98,13 @@ class Alerts(endpoints.HTTPEndpoint):
             except errors_adapter.NotFoundError:
                 continue
 
-            permissions = await configuration_vectors_client.get_permissions(
-                reseller_id=subscriber.reseller_id,
+            should_notify = await _has_subscriber_permission(
+                permission_ref=_SERVICE_ACCESS_PERMISSION,
+                configuration_vectors_client=configuration_vectors_client,
+                subscriber=subscriber,
             )
-            if ServicePermissions.flight_stats_alerts.value not in permissions:
+
+            if not should_notify:
                 continue
 
             notification_event = notifications_models_pb2.NotificationEvent(
@@ -119,3 +121,16 @@ class Alerts(endpoints.HTTPEndpoint):
             await notification_event_publisher_client.publish(notification_event)
 
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+async def _has_subscriber_permission(
+    permission_ref: str,
+    configuration_vectors_client: configuration_vectors.Client,
+    subscriber: notifications_models_pb2.Subscriber,
+) -> bool:
+    permissions = await configuration_vectors_client.get_permissions(
+        reseller_id=subscriber.reseller_id,
+    )
+    permission_refs = [permission.ref for permission in permissions]
+
+    return permission_ref in permission_refs

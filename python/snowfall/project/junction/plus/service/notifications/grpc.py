@@ -6,6 +6,9 @@ from grpc import StatusCode, aio
 from snowfall.project.junction.plus.service.notifications.models import (
     permissions as config_vector_models,
 )
+from snowfall.project.junction.plus.service.notifications.models import (
+    permissions as permission_models,
+)
 from snowfall.project.junction.plus.service.notifications.notifications import (
     ConfigurationVectorRepository,
     MonitoringRuleRepository,
@@ -282,6 +285,9 @@ class ConfigurationVectorService(
         request: notifications_pb2.UpdatePermissionsRequest,
         context: aio.ServicerContext,
     ) -> notifications_pb2.UpdatePermissionsResponse:
+        if not self._is_valid_request(request):
+            await context.abort(StatusCode.INVALID_ARGUMENT)
+
         permissions_to_add = [
             update.ref for update in request.updates if update.enabled
         ]
@@ -301,6 +307,13 @@ class ConfigurationVectorService(
         return notifications_pb2.UpdatePermissionsResponse(
             is_success=update_status,
         )
+
+    def _is_valid_request(
+        self,
+        request: notifications_pb2.UpdatePermissionsRequest,
+    ) -> bool:
+        valid_values = [ref.value for ref in permission_models.PermissionRefs]
+        return all(update.ref in valid_values for update in request.updates)
 
 
 class MonitoringRuleService(

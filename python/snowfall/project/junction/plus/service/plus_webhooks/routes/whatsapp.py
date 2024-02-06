@@ -16,13 +16,12 @@ from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_pb2,
 )
 from snowfall.project.junction.plus.service.plus_webhooks import chatbot_handlers
-from snowfall.project.junction.plus.service.plus_webhooks.models import (
-    ServicePermissions,
-)
 from snowfall.stdlib.v1.phone_number_pb2 import PhoneNumber
 
 message_maximum_length = 1600
 message_split_point = 1300
+
+_SERVICE_ACCESS_PERMISSION = "whatsapp_chatbot"
 
 
 class IncomingMessages(endpoints.HTTPEndpoint):
@@ -43,7 +42,7 @@ class IncomingMessages(endpoints.HTTPEndpoint):
             "mobile_phone.e164_number",
         )
 
-        if ServicePermissions.whatsapp_chatbot.value not in cv.permissions:
+        if _SERVICE_ACCESS_PERMISSION not in cv.permissions:
             raise errors.UnprocessableEntityError
 
         try:
