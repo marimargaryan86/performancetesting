@@ -1,5 +1,6 @@
 import secrets
 from collections.abc import AsyncIterator, Mapping, Sequence
+from typing import Any
 from unittest import mock
 
 import httpx
@@ -79,6 +80,40 @@ def ory_users() -> Sequence[identities_pb2.Identity]:
         identities_pb2.Identity(id="37b82d2f-dba3-469e-9076-12b15777d1f5"),
         identities_pb2.Identity(id="dc33945e-40b9-4227-ae9a-81c68a3a592a"),
     ]
+
+
+@pytest.fixture()
+def mock_identity(ory_users: Sequence[identities_pb2.Identity]) -> dict[str, Any]:
+    return {
+        "id": ory_users[0].id,
+        "traits": {"email": "test@test.com"},
+        "metadata_public": {
+            "role": "reseller-admin",
+            "reseller_id": "some-reseller-id",
+        },
+        "verifiable_addresses": [
+            {
+                "id": "c6cea2a7-f419-42fe-a610-456bea02aab5",
+                "value": "docs@example.org",
+                "verified": False,
+                "via": "email",
+                "status": "pending",
+                "created_at": "2022-02-24T13:38:05.28581Z",
+                "updated_at": "2022-02-24T13:38:05.28581Z",
+            },
+        ],
+        "recovery_addresses": [
+            {
+                "id": "21ff90e1-a9a9-491e-8194-774172420989",
+                "value": "docs@example.org",
+                "via": "email",
+                "created_at": "2022-02-24T13:38:05.29565Z",
+                "updated_at": "2022-02-24T13:38:05.29565Z",
+            },
+        ],
+        "created_at": "2022-02-24T13:38:05.27892Z",
+        "updated_at": "2022-02-24T13:38:05.27892Z",
+    }
 
 
 @pytest.fixture()

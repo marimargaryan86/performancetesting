@@ -23,6 +23,7 @@ METADATA_PUBLIC = MappingProxyType(
         "reseller_id": "mock",
     },
 )
+USER_EMAIL = "foobar@example.com"
 
 
 @pytest.fixture()
@@ -137,7 +138,7 @@ class TestDictClient(object):
             metadata=dict(identity.metadata_public),
         )
 
-        assert identity.email == "foobar@example.com"
+        assert identity.email == USER_EMAIL
         assert dict(identity.metadata_public.items()) == METADATA_PUBLIC
 
     async def test_create_identity_failure(
@@ -156,13 +157,15 @@ class TestDictClient(object):
         updated_metadata: Mapping[str, str],
     ) -> None:
         identity = _get_identities()[0]
+
         identity = await identities_client.update_ory_identity(
             identifier=identity.id,
-            email=identity.email,
+            email=USER_EMAIL,
             metadata=updated_metadata,
         )
 
         assert identity.id == IDENTITIES[0]
+        assert identity.email == USER_EMAIL
         assert dict(identity.metadata_public.items()) == updated_metadata
 
     async def test_update_identity_not_found(
@@ -230,7 +233,7 @@ class TestGrpcClient(object):
         )
 
         assert identity.id == IDENTITIES[0]
-        assert identity.email == "foobar@example.com"
+        assert identity.email == USER_EMAIL
         assert dict(identity.metadata_public.items()) == METADATA_PUBLIC
 
     async def test_create_ory_identity_invalid_arguments(
@@ -265,10 +268,11 @@ class TestGrpcClient(object):
         identity = _get_identities()[0]
         identity = await identities_client.update_ory_identity(
             identifier=identity.id,
-            email=identity.email,
+            email=USER_EMAIL,
             metadata=updated_metadata,
         )
 
+        assert identity.email == USER_EMAIL
         assert identity.id == IDENTITIES[0]
         assert dict(identity.metadata_public.items()) == updated_metadata
 
@@ -305,6 +309,6 @@ def _generate_identities(identifier: str) -> identities_pb2.Identity:
     metadata_public.update(METADATA_PUBLIC)
     return identities_pb2.Identity(
         id=identifier,
-        email="foobar@example.com",
+        email=USER_EMAIL,
         metadata_public=metadata_public,
     )

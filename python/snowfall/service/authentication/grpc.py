@@ -371,9 +371,11 @@ class IdentitiesService(
                 self._create_identity_protobuf_model(identity)
                 for identity in identities.identities
             ],
-            next_page_token=cursor.marshal(identities.next_page_token)
-            if identities.next_page_token
-            else "",
+            next_page_token=(
+                cursor.marshal(identities.next_page_token)
+                if identities.next_page_token
+                else ""
+            ),
         )
 
     async def UpdateIdentity(  # type: ignore[override] # noqa: N802

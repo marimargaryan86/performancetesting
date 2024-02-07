@@ -102,6 +102,30 @@ class Users(object):
             request=request.starlette_request,
         )
 
+    async def patch(
+        self,
+        request: messages.Request,
+    ) -> responses.Response:
+        check_permission(
+            "user.edit",
+            request.starlette_request.user.permissions,
+        )
+
+        body = await request_helpers.flatten_request(request.starlette_request)
+
+        user_id = request.path_params["userId"]
+
+        user = await self._identities_client.update_ory_identity(
+            identifier=user_id,
+            email=body["email"],
+            metadata={"role": body["role"], "reseller_id": body["reseller"]},
+        )
+
+        return await messages.create_response(
+            body=models.Body(data=resources.UserResource.from_proto(user)),
+            request=request.starlette_request,
+        )
+
 
 class UserInformation(endpoints.HTTPEndpoint):
     async def get(

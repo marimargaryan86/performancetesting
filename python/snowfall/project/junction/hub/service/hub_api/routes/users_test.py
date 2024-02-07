@@ -61,6 +61,35 @@ async def test_delete_user(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
+async def test_update_identity(
+    client: httpx.AsyncClient,
+    mock_create_user_payload: Any,
+    mock_identity: dict[str, Any],
+) -> None:
+    payload = mock_create_user_payload(
+        email=mock_identity["traits"]["email"],
+        role=mock_identity["metadata_public"]["role"],
+        reseller_id=mock_identity["metadata_public"]["reseller_id"],
+    )
+    response = await client.patch(
+        url="/users/{0}".format(mock_identity["id"]),
+        json={"data": payload},
+        headers={"Content-Type": "application/vnd.api+json"},
+    )
+
+    response_data = response.json()["data"]
+
+    assert response_data["id"] == mock_identity["id"]
+    assert response_data["attributes"]["email"] == mock_identity["traits"]["email"]
+    assert (
+        response_data["attributes"]["role"] == mock_identity["metadata_public"]["role"]
+    )
+    assert (
+        response_data["relationships"]["reseller"]["data"]["id"]
+        == mock_identity["metadata_public"]["reseller_id"]
+    )
+
+
 class TestUserDataIncludesCompanyAndContacts(object):
     async def test_user_data_includes_company_and_contacts(
         self,

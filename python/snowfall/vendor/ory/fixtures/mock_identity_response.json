@@ -7,7 +7,7 @@
     "traits": {
         "email": "test@test.com"
     },
-    "metadata_public": {"role": "reseller-admin"},
+    "metadata_public": {"role": "reseller-admin", "reseller_id": "some-ressler-id"},
     "verifiable_addresses": [
         {
             "id": "c6cea2a7-f419-42fe-a610-456bea02aab5",

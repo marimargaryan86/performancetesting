@@ -131,6 +131,7 @@ class DictClient(Client):
             raise NotFoundError()
 
         identity.metadata_public.update(metadata)
+        identity.email = email
 
         return identity
 

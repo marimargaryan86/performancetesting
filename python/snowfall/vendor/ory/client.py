@@ -89,7 +89,10 @@ class OryClient(object):
 
         return models.Identity(**response.json())
 
-    async def update_identity(self, identity: models.Identity) -> models.Identity:
+    async def update_identity(
+        self,
+        identity: models.Identity,
+    ) -> models.Identity:
         operations = [
             {
                 "op": "replace",
@@ -98,6 +101,14 @@ class OryClient(object):
             }
             for meta_key, meta_value in identity.metadata_public.items()
         ]
+        if identity.traits.email:
+            operations.append(
+                {
+                    "op": "replace",
+                    "path": "/traits/email",
+                    "value": identity.traits.email,
+                },
+            )
         response = await self._client.patch(
             url="/admin/identities/{0}".format(identity.identifier),
             json=operations,

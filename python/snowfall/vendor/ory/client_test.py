@@ -1,5 +1,6 @@
 import datetime
 from collections.abc import Mapping
+from types import MappingProxyType
 from typing import Any
 
 import aiofiles
@@ -11,6 +12,14 @@ import pytest_httpx
 
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.vendor.ory import client, models
+
+UPDATED_METADATA_PUBLIC = MappingProxyType(
+    {
+        "role": "reseller-admin",
+        "reseller_id": "some-reseller-id",
+    },
+)
+UPDATED_EMAIL = "new@email.com"
 
 
 async def _load_json_fixture(
@@ -102,6 +111,27 @@ class TestClient(object):
         assert (
             identity.metadata_public["role"]
             == mock_identity_response["metadata_public"]["role"]
+        )
+
+    async def test_update_identity(
+        self,
+        mock_identity_response: dict[str, Any],
+        ory_client: client.OryClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(method="PATCH", json=mock_identity_response)
+
+        identity = models.Identity(**mock_identity_response)
+
+        updated_identity = await ory_client.update_identity(identity)
+
+        assert updated_identity.traits.email == identity.traits.email
+        assert (
+            updated_identity.metadata_public["reseller_id"]
+            == identity.metadata_public["reseller_id"]
+        )
+        assert (
+            updated_identity.metadata_public["role"] == identity.metadata_public["role"]
         )
 
     async def test_delete_identity(
