@@ -718,3 +718,29 @@ flowchart LR
     PN-->IAU[In App Users]
     Resellers-->UVR[Travellers via Resellers]
 ```
+
+### Enable Junction Plus features depending on reseller
+
+The Plus features such as CO2 emissions, OTFP, Visa requirements, etc could be anabled or disabled per reseller. The Plus features are displayed on HUB for each reseller and they can be enabled and disabled individually. Some of them can also be enabled by default.
+
+The Configuration Vector database stores the permissions for the reseller i.e. weather the reseller will be able to use the feature or not. In the backend we use Consol to get the reseller's config data which includes what features they have enabled (opted in). This is inline with the process of reading reseller config information from the database, in other parts of Junction. Consul will then push this information to the services to update their local environment variables.
+There are 3 types of services in Plus.
+
+* API services which are manually called
+* Scheduled services
+* Webhooks that are triggered externally.
+
+Consul will take care to push the updated permissions to all these services as it is running in the nomad cluster.
+
+For a detailed diagram please refer the comments section of the epic: https://git.snowfall.se/groups/junction/junction-platform/-/epics/66
+
+**The Flow:**
+
+Reseller updates their settings  via Junction Hub and this gets stored in the Configuration Vector (DB). When the backend stores/updates the config settings in the Configuration Vector, it also pushes the permissions to  Consol. Consul will then cause the services to refresh itself and in that way its environment variables are updated.
+When these services get a call to use the Plus features, each service will read their environment variables to determine whether that feature has been enabled/ has the resellers have been opted in for.
+
+**Implementation:**
+
+In the backend the ConfigurationVectorService gRPC service has a GetPermissions and UpdatePermissions method for getting and updating the reseller permissions. In the database, the permissions will be stored as a key:value pair i.e.  the key is the reseller_id and the permissions, the value, is in an array of features. If the feature name appears in the array then that reseller has permission to use that features. If the feature name is absent for a reseller_id then that feature is disabled for that reseller.
+
+In the frontend, The hub will display the features for a reseller, with the enable and disable switch against each feature. Once the features are selected and saved, the UI will call the endpoint /plus-services-access/resellers/\{resellerId\} to send the permissions. The endpoint will access the relevant adapter to call the ConfigurationVectorService gRPC service to save the permissions into the ConfigurationVector database.
