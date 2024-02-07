@@ -189,7 +189,8 @@
   }
 
   .dialog-toggle {
-    align-self: center;
+    display: flex;
+    align-items: center;
     padding: 0;
     background-color: transparent;
     border: 0;
