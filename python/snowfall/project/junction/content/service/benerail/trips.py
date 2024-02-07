@@ -80,7 +80,11 @@ class Transformer(object):
         self,
         results: Sequence[adapter.TripWithOffers] | Sequence[adapter.TripWithTripOffer],
     ) -> Sequence[trips_pb2.Result]:
-        trip_results = []
+        trip_results: list[trips_pb2.Result] = []
+
+        if not results:
+            return trip_results
+
         passengers = (
             results[0].trip_offer.passengers
             if isinstance(results[0], adapter.TripWithTripOffer)
