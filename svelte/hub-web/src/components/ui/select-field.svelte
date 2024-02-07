@@ -5,7 +5,7 @@
   import TextField from "./text-field.svelte";
   import { scale } from "svelte/transition";
   import { clickOutside } from "~/directives/click-outside";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, type ComponentEvents } from "svelte";
   import { keyboard, type KeyboardParams } from "~/directives/keyboard";
 
   let className: string | undefined = undefined;
@@ -38,7 +38,7 @@
     scrollToOption();
   }
 
-  function input(event: CustomEvent<HTMLInputElement>): void {
+  function input(event: ComponentEvents<TextField>["input"]): void {
     value = undefined;
     open();
     filter(event.detail.value);

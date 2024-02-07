@@ -31,6 +31,7 @@
   import TripSearch, {
     SEARCH_WINDOW_DELTA_MS,
     SEARCH_WINDOW_H,
+    type SearchData,
   } from "../../components/trip-search/trip-search.svelte";
   import SearchOptions, {
     type SearchOptionsData,
@@ -56,7 +57,6 @@
   import { browser, dev } from "$app/environment";
   import CollapsibleTripSearch from "../../components/trip-search/collapsible-trip-search.svelte";
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
-  import type { PartialOmit } from "~/utils/common";
 
   export let data;
 
@@ -136,14 +136,18 @@
 
   async function search(
     pendingType: PendingType,
-    event: CustomEvent<PartialOmit<ComponentEvents<TripSearch>["search"]["detail"], "pending">>,
+    event: ComponentEvents<TripSearch>["search"],
   ): Promise<void> {
+    event.detail.pending.set(true);
+    await searchAux(pendingType, event.detail.data);
+    event.detail.pending.set(false);
+  }
+
+  async function searchAux(pendingType: PendingType, nextData: SearchData): Promise<void> {
     offers = [];
     offersPending = pendingType;
-    event.detail.pending?.set(true);
-    await manager.search(event.detail.data);
+    await manager.search(nextData);
     await invalidateAll();
-    event.detail.pending?.set(false);
   }
 
   async function fetchMore(direction: Direction): Promise<void> {
@@ -161,10 +165,7 @@
       outbound: nextOutbound,
     };
 
-    await search(
-      direction,
-      new CustomEvent("search", { detail: { data: data.bookingSession.searchData } }),
-    );
+    await searchAux(direction, data.bookingSession.searchData);
   }
 
   // Hide earlier button if search window is in the past

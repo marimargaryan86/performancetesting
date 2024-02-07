@@ -44,30 +44,3 @@ export function getHexColor(value: string): string {
 export function capitalize(value: string): string {
   return `${value[0]?.toUpperCase()}${value.substring(1)}`;
 }
-
-export type FlattenedObject_<
-  T extends Record<string, unknown>,
-  TKey = keyof T,
-> = TKey extends string
-  ? T[TKey] extends Record<string, unknown>
-    ? `${TKey}.${FlattenedObject_<Required<T[TKey]>>}`
-    : TKey
-  : never;
-
-export type FlattenedObject<T extends Record<string, unknown>> = FlattenedObject_<Required<T>>;
-
-export type RecursivePartial<T> = {
-  [P in keyof T]?: T[P] extends (infer U)[]
-    ? RecursivePartial<U>[]
-    : T[P] extends object
-      ? RecursivePartial<T[P]>
-      : T[P];
-};
-
-export type PartiallyPartial<TObject extends object, TRequired extends keyof TObject> = {
-  [key in TRequired]: TObject[key];
-} & { [key in Exclude<keyof TObject, TRequired>]?: TObject[key] };
-
-export type PartialOmit<TType extends object, TKeys extends keyof TType> = Omit<TType, TKeys> & {
-  [key in TKeys]?: TType[key];
-};

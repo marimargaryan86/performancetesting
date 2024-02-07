@@ -32,7 +32,7 @@
   import { formatAmount } from "$lib/formatting/currency";
   import { formatDuration } from "$lib/formatting/date-time";
   import AlternativeFares from "./alternative-fares.svelte";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, type ComponentEvents } from "svelte";
   import { getTimeDeltaS } from "~/utils/date-time";
   import type { Offer, OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
   import type { Price } from "~/integration/common/schemas/price";
@@ -71,7 +71,7 @@
     });
   }
 
-  function selectOption(event: CustomEvent<OfferOption>): void {
+  function selectOption(event: ComponentEvents<AlternativeFares>["select"]): void {
     const nextSelectedOptions = offer.groups
       .map((group) => {
         if (group.options.find((option) => option.id === event.detail.id)) {

@@ -1,5 +1,6 @@
 <script lang="ts" generics="TValue">
   /* global TValue */
+  import type { ComponentEvents } from "svelte";
   import { writable } from "svelte/store";
   import { slideFade } from "~/transitions/slide-fade";
   import { keyboard, type KeyboardParams } from "~/directives/keyboard";
@@ -29,7 +30,7 @@
   $: hoveredIndex = value ? items.indexOf(value) : -1;
   $: expanded = items.length || $pending;
 
-  async function search(event: CustomEvent<HTMLInputElement>): Promise<void> {
+  async function search(event: ComponentEvents<TextField>["input"]): Promise<void> {
     $pending = true;
     value = undefined;
 

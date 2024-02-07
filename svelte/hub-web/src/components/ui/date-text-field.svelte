@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ComponentEvents } from "svelte";
   import TextField from "./text-field.svelte";
   import { validateAndGetDate, validateDay, validateMonth, validateYear } from "~/utils/date-time";
 
@@ -11,7 +12,7 @@
   let currentErrors: string[];
   let valueStr = value?.toLocaleDateString("en-GB") ?? "";
 
-  function update(event: CustomEvent<HTMLInputElement>): void {
+  function update(event: ComponentEvents<TextField>["input"]): void {
     const erase = event.detail.value.length < valueStr.length;
     const nextValue = event.detail.value.replace(/\//g, "");
 

@@ -10,6 +10,7 @@
   import JunctionLogo from "./junction-logo.svelte";
   import { type Action, getUser, permitted } from "~/utils/permissions";
   import LanguageSelect from "./language-select.svelte";
+  import type { ComponentProps } from "svelte";
 
   let compact = false;
 
@@ -30,7 +31,7 @@
     | {
         url: string;
         label: string;
-        icon: Icon["$$prop_def"]["variant"];
+        icon: ComponentProps<Icon>["variant"];
         activeMatcher?: (pathname: string) => boolean;
         permission?: Action;
       }

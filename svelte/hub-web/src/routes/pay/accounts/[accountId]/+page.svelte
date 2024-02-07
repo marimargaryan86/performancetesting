@@ -5,10 +5,10 @@
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import StandardLayout from "~/components/page/standard-layout.svelte";
   import routeConfig from "~/route-config";
-  import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
   import { getPageTitle } from "~/utils/page-title";
   import { getLocale, getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
+  import type { ComponentEvents } from "svelte";
 
   export let data;
 
@@ -33,7 +33,7 @@
     dialogue.open();
   }
 
-  function addBalances(event: CustomEvent<Balance[]>): void {
+  function addBalances(event: ComponentEvents<AddBalanceDialogue>["addbalances"]): void {
     data.balances = [...event.detail, ...data.balances];
   }
 </script>
