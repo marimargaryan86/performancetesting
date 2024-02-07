@@ -26,7 +26,7 @@
   import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
   import { getPassengerValidator } from "~/utils/passenger";
   import { writable } from "svelte/store";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import TripBanner from "../../components/trip-banner.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import { getLocale, getTranslator } from "~/i18n";
@@ -257,7 +257,7 @@
       </div>
       <em typography="body-large" weight="bold">
         {#if priceQuote?.price.total}
-          {formatAmount(priceQuote?.price.total, { locale: $locale, sign: true })}
+          {formatAmount(priceQuote?.price.total, $locale, { sign: true })}
         {:else}
           <LoadingIcon size="14px" />
         {/if}

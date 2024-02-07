@@ -29,8 +29,8 @@
 
 <script lang="ts">
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
-  import { formatAmount } from "~/formatting/currency";
-  import { formatDuration } from "~/formatting/date-time";
+  import { formatAmount } from "$lib/formatting/currency";
+  import { formatDuration } from "$lib/formatting/date-time";
   import AlternativeFares from "./alternative-fares.svelte";
   import { createEventDispatcher } from "svelte";
   import { getTimeDeltaS } from "~/utils/date-time";
@@ -156,7 +156,7 @@
             <span>
               <em typography="label-medium">{$t("sentences.startingAt")}</em>
               <strong typography="title-large" weight="bold">
-                {formatAmount(totalPrice, { locale: $locale, sign: true })}
+                {formatAmount(totalPrice, $locale, { sign: true })}
               </strong>
             </span>
 

@@ -44,7 +44,7 @@
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import SelectField from "~/components/ui/select-field.svelte";
   import TextField from "~/components/ui/text-field.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { getLocale, getTranslator } from "~/i18n";
   import type { Markups, PartialMarkups } from "../../booking-flow";
@@ -157,19 +157,17 @@
           <li>
             <span typography="label-medium">{$t("words.serviceFee")}</span>
             <span typography="body-small" weight="bold">
-              {formatAmount(
-                { currency, amount: calculatedServiceFeeAmount },
-                { locale: $locale, sign: true },
-              )}
+              {formatAmount({ currency, amount: calculatedServiceFeeAmount }, $locale, {
+                sign: true,
+              })}
             </span>
           </li>
           <li>
             <span typography="label-medium">{$t("words.agencyMarkup")}</span>
             <span typography="body-small" weight="bold">
-              {formatAmount(
-                { currency, amount: calculatedAgencyMarkupAmount },
-                { locale: $locale, sign: true },
-              )}
+              {formatAmount({ currency, amount: calculatedAgencyMarkupAmount }, $locale, {
+                sign: true,
+              })}
             </span>
           </li>
         </ul>
@@ -180,10 +178,7 @@
       <span typography="body-large" weight="bold">{$t("sentences.totalToCollect")}</span>
       <em typography="body-large" weight="bold">
         {#if priceQuote?.price}
-          {formatAmount(
-            { currency, amount: totalToCollectAmount },
-            { locale: $locale, sign: true },
-          )}
+          {formatAmount({ currency, amount: totalToCollectAmount }, $locale, { sign: true })}
         {:else}
           <LoadingIcon size="16px" />
         {/if}

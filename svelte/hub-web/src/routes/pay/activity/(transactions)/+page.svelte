@@ -13,7 +13,7 @@
   import { getLocale, getTranslator } from "~/i18n";
   import { writable } from "svelte/store";
   import { slideFade } from "~/transitions/slide-fade";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
 
   export let data;
@@ -84,14 +84,14 @@
           <EntityAvatar name={item.payer.name} size="24px" /> {item.payer.name}
         {/if}
       </x-td>
-      <x-td>{formatAmount(item.amounts.quotation, { locale: $locale, sign: true })}</x-td>
+      <x-td>{formatAmount(item.amounts.quotation, $locale, { sign: true })}</x-td>
       <x-td class="company">
         {#if item.beneficiary}
           <EntityAvatar name={item.beneficiary.name} size="24px" /> {item.beneficiary.name}
         {/if}
       </x-td>
-      <x-td>{formatAmount(item.amounts.beneficiary, { locale: $locale, sign: true })}</x-td>
-      <x-td>{formatAmount(item.sales.margin, { locale: $locale, sign: true })}</x-td>
+      <x-td>{formatAmount(item.amounts.beneficiary, $locale, { sign: true })}</x-td>
+      <x-td>{formatAmount(item.sales.margin, $locale, { sign: true })}</x-td>
       <x-td>{item.invoiceReference ?? "Unknown"}</x-td>
     </x-tr>
   {/each}

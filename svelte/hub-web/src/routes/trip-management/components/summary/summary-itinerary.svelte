@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatDuration } from "~/formatting/date-time";
+  import { formatDuration } from "$lib/formatting/date-time";
   import { getTimeDeltaS } from "~/utils/date-time";
   import Collapsible from "../collapsible.svelte";
   import { createEventDispatcher } from "svelte";

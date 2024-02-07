@@ -12,7 +12,7 @@
   import { getLocale, getTranslator } from "~/i18n";
   import { browser } from "$app/environment";
   import { getPageTitle } from "~/utils/page-title";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { writable } from "svelte/store";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import { slideFade } from "~/transitions/slide-fade";
@@ -97,7 +97,7 @@
         <x-td>{bill.updatedAt?.toLocaleDateString($locale) ?? $t("words.notAvailable")}</x-td>
         <x-td>
           {#if bill.amounts.total}
-            {formatAmount(bill.amounts.total, { locale: $locale, sign: true })}
+            {formatAmount(bill.amounts.total, $locale, { sign: true })}
           {/if}
         </x-td>
         <x-tactions>

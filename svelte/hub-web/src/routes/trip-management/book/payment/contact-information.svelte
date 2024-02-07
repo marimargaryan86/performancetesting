@@ -39,7 +39,7 @@
   import { z } from "zod";
   import SelectField from "~/components/ui/select-field.svelte";
   import TextField from "~/components/ui/text-field.svelte";
-  import { formatCountryOption, formatCountryPhoneOption } from "~/formatting/location";
+  import { formatCountryOption, formatCountryPhoneOption } from "$lib/formatting/location";
   import type { CountryModel } from "~/models/location";
   import Collapsible from "../../components/collapsible.svelte";
   import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";

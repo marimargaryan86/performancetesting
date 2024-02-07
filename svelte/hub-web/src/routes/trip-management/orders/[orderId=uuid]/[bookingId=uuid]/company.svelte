@@ -1,7 +1,7 @@
 <script lang="ts">
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "~/i18n";
   import type { Price, PriceBreakdown } from "~/integration/common/schemas/price";
   import type { Company } from "~/integration/junction-hub-api/schemas/company";
@@ -53,7 +53,7 @@
         {#each breakdownList as breakdown}
           <span>{$t(`priceBreakdownTypes.${breakdown.type}`)}</span>
           <strong>
-            {formatAmount(breakdown.price, { locale: $locale })}
+            {formatAmount(breakdown.price, $locale)}
             <em typography="body-xsmall">{breakdown.price.currency}</em>
           </strong>
         {/each}
@@ -66,7 +66,7 @@
           {#if markups}
             <span>{$t("words.markup")}</span>
             <strong>
-              {formatAmount(markups.agencyMarkup, { locale: $locale })}
+              {formatAmount(markups.agencyMarkup, $locale)}
               <em typography="body-xsmall">{markups.agencyMarkup.currency}</em>
             </strong>
           {/if}
@@ -79,7 +79,7 @@
         <LoadingIcon size="16px" />
       {:then total}
         <strong>
-          {formatAmount(total, { locale: $locale })}
+          {formatAmount(total, $locale)}
           <em typography="body-xsmall">{total.currency}</em>
         </strong>
       {/await}

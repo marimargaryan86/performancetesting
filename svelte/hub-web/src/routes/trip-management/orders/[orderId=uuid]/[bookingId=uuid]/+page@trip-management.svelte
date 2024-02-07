@@ -9,7 +9,7 @@
   import StatusBadge from "~/components/ui/status-badge.svelte";
   import { getUser, permitted } from "~/utils/permissions";
   import Admin from "./admin.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import Fees from "../../../book/confirmation/fees.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import { getLocale, getTranslator } from "~/i18n";
@@ -104,7 +104,7 @@
           <strong>{$t("words.total")}</strong>
           <span>
             {data.booking.refund.refunded.reseller
-              ? formatAmount(data.booking.refund.refunded.reseller, { locale: $locale, sign: true })
+              ? formatAmount(data.booking.refund.refunded.reseller, $locale, { sign: true })
               : $t("words.notAvailable")}
           </span>
         </div>

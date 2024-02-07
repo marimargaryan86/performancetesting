@@ -42,7 +42,7 @@
   import Checkbox from "~/components/ui/checkbox.svelte";
   import RangeField from "~/components/ui/range-field.svelte";
   import SelectField from "~/components/ui/select-field.svelte";
-  import { formatDuration } from "~/formatting/date-time";
+  import { formatDuration } from "$lib/formatting/date-time";
   import { getTranslator, type Translator } from "~/i18n";
 
   export let data: SearchOptionsData;

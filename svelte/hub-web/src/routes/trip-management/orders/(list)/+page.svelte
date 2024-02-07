@@ -86,7 +86,7 @@
   import { writable } from "svelte/store";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import { slideFade } from "~/transitions/slide-fade";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import StatusBadge from "~/components/ui/status-badge.svelte";
   import { validatePassengerNameRecord } from "~/utils/booking";
   import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
@@ -216,7 +216,7 @@
             {departureAt.date.toLocaleDateString($locale, { timeZone: departureAt.timeZone })}
           </x-td>
           <x-td weight="bold">{getPassengerNames(order).join(", ")}</x-td>
-          <x-td>{formatAmount(totalPrice, { locale: $locale, sign: true })}</x-td>
+          <x-td>{formatAmount(totalPrice, $locale, { sign: true })}</x-td>
           <x-td>
             {#if bookingStatus}<StatusBadge value={bookingStatus} />{/if}
           </x-td>

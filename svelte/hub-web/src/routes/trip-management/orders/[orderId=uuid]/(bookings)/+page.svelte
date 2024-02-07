@@ -7,7 +7,7 @@
   import { getLocale, getTranslator } from "~/i18n";
   import { ensureDefined } from "~/utils/array";
   import StatusBadge from "~/components/ui/status-badge.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
 
   export let data;
 
@@ -110,7 +110,7 @@
 
       <x-td weight="bold">{origin?.name ?? $t("words.unknown")}</x-td>
       <x-td weight="bold">{destination?.name ?? $t("words.unknown")}</x-td>
-      <x-td>{formatAmount(booking.price.total, { locale: $locale, sign: true })}</x-td>
+      <x-td>{formatAmount(booking.price.total, $locale, { sign: true })}</x-td>
       <x-td><StatusBadge value={booking.status} /></x-td>
 
       {#if showCancellationColumn}

@@ -3,7 +3,7 @@
   import Section from "./section.svelte";
   import TextField from "~/components/ui/text-field.svelte";
   import type { CountryModel } from "~/models/location";
-  import { formatCountryOption } from "~/formatting/location";
+  import { formatCountryOption } from "$lib/formatting/location";
   import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
   import countryData from "~/data/country-data";
   import currencyData from "~/data/currency-data";

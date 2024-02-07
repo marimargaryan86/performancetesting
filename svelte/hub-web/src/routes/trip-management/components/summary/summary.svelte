@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { slideFade } from "~/transitions/slide-fade";
   import { getTotalPriceBreakdown } from "~/utils/offer";
   import Collapsible from "../collapsible.svelte";
@@ -66,7 +66,7 @@
                     {$t(`priceBreakdownTypes.${item.type}`)}
                   </span>
                   <span typography="body-small" weight="bold">
-                    {formatAmount(item.price, { locale: $locale, sign: true })}
+                    {formatAmount(item.price, $locale, { sign: true })}
                   </span>
                 </li>
               {/each}
@@ -79,7 +79,7 @@
         <span typography="body-large" weight="bold">{$t("sentences.totalToPay")}</span>
         <em typography="body-large" weight="bold">
           {#if totalPrice}
-            {formatAmount(totalPrice, { locale: $locale, sign: true })}
+            {formatAmount(totalPrice, $locale, { sign: true })}
           {:else}
             <LoadingIcon size="16px" />
           {/if}

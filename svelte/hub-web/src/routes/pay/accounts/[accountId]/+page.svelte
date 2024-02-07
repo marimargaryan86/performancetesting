@@ -1,7 +1,7 @@
 <script lang="ts">
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
   import CurrencyFlag from "~/components/icons/currency-flag.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import AddBalanceDialogue from "./add-balance-dialogue.svelte";
   import StandardLayout from "~/components/page/standard-layout.svelte";
   import routeConfig from "~/route-config";
@@ -71,10 +71,7 @@
 
           <span>
             <strong typography="body-large" weight="bold">
-              {formatAmount(
-                { currency: balance.currencyId, amount: balance.amount },
-                { locale: $locale },
-              )}
+              {formatAmount({ currency: balance.currencyId, amount: balance.amount }, $locale)}
             </strong>
             <span typography="body-small">{balance.currency}</span>
           </span>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "~/i18n";
   import type { Price } from "~/integration/common/schemas/price";
   import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
@@ -25,14 +25,14 @@
     <li>
       <span>{$t(`priceBreakdownTypes.base-fare`)} + {$t("priceBreakdownTypes.tax")}</span>
       <strong weight="bold">
-        {formatAmount(totalPrice, { locale: $locale, sign: true })}
+        {formatAmount(totalPrice, $locale, { sign: true })}
       </strong>
     </li>
 
     <li typography="body-xlarge" weight="bold">
       <span>{$t("sentences.totalPaid")}</span>
       <strong>
-        {formatAmount(totalPrice, { locale: $locale, sign: true })}
+        {formatAmount(totalPrice, $locale, { sign: true })}
       </strong>
     </li>
   </ul>

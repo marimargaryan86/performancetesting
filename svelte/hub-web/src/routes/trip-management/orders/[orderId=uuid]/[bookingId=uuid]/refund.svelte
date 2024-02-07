@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "~/i18n";
   import type { Refund } from "~/integration/junction-hub-api/schemas/refund";
   import { slideFade } from "~/transitions/slide-fade";
@@ -27,7 +27,7 @@
       <li class="amount" typography="body-medium">
         <strong>{$t("sentences.toUs")}</strong>
         <span weight="bold" class:negative={refund.refunded.us.amount < 0}>
-          {formatAmount(refund.refunded.us, { locale: $locale, sign: true })}
+          {formatAmount(refund.refunded.us, $locale, { sign: true })}
         </span>
       </li>
     {/if}
@@ -36,7 +36,7 @@
       <li class="amount" typography="body-medium">
         <strong>{$t("sentences.toUs")} <em>({$t("sentences.payerCurrency")})</em></strong>
         <span weight="bold" class:negative={usInPayerCurrency.amount < 0}>
-          {formatAmount(usInPayerCurrency, { locale: $locale, sign: true })}
+          {formatAmount(usInPayerCurrency, $locale, { sign: true })}
         </span>
       </li>
     {/if}
@@ -45,7 +45,7 @@
       <li class="amount" typography="body-medium">
         <strong>{$t("sentences.toReseller")}</strong>
         <span weight="bold" class:negative={refund.refunded.reseller.amount < 0}>
-          {formatAmount(refund.refunded.reseller, { locale: $locale, sign: true })}
+          {formatAmount(refund.refunded.reseller, $locale, { sign: true })}
         </span>
       </li>
     {/if}
@@ -54,7 +54,7 @@
       <li class="amount" typography="body-medium">
         <strong>{$t("words.refundPosition")}</strong>
         <span weight="bold" class:negative={refund.refundPosition.amount < 0}>
-          {formatAmount(refund.refundPosition, { locale: $locale, sign: true })}
+          {formatAmount(refund.refundPosition, $locale, { sign: true })}
         </span>
       </li>
     {/if}

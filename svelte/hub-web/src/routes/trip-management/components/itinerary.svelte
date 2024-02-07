@@ -24,7 +24,7 @@
 </script>
 
 <script lang="ts">
-  import { formatDuration } from "~/formatting/date-time";
+  import { formatDuration } from "$lib/formatting/date-time";
   import { getTimeDeltaS } from "~/utils/date-time";
   import EntityAvatar from "~/components/ui/entity-avatar.svelte";
   import type { OfferSegmentLeg } from "~/integration/common/schemas/offer-segment-leg";

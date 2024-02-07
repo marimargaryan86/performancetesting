@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "~/i18n";
   import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
 
@@ -15,13 +15,13 @@
       <li>
         <span typography="label-medium">{$t("words.serviceFee")}</span>
         <span typography="body-small" weight="bold">
-          {formatAmount(markups.serviceFee, { locale: $locale, sign: true })}
+          {formatAmount(markups.serviceFee, $locale, { sign: true })}
         </span>
       </li>
       <li>
         <span typography="label-medium">{$t("words.agencyMarkup")}</span>
         <span typography="body-small" weight="bold">
-          {formatAmount(markups.agencyMarkup, { locale: $locale, sign: true })}
+          {formatAmount(markups.agencyMarkup, $locale, { sign: true })}
         </span>
       </li>
     </ul>
@@ -30,7 +30,7 @@
   <div class="total">
     <span typography="body-xlarge" weight="bold">{$t("sentences.totalToCollect")}</span>
     <em typography="body-xlarge" weight="bold" class="total-amount">
-      {formatAmount(markups.totalToCollect, { locale: $locale, sign: true })}
+      {formatAmount(markups.totalToCollect, $locale, { sign: true })}
     </em>
   </div>
 </div>

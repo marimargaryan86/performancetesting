@@ -2,7 +2,7 @@
   import { createEventDispatcher, onDestroy, onMount } from "svelte";
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import type { Price } from "~/integration/common/schemas/price";
   import { getLocale, getTranslator } from "~/i18n";
   import Icon from "~/components/icons/icon.svelte";
@@ -49,8 +49,8 @@
     <p typography="body-medium">
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html $t("sentences.priceChangeInfo", {
-        originalPrice: formatAmount(originalPrice, { locale: $locale, sign: true }),
-        newPrice: formatAmount(newPrice, { locale: $locale, sign: true }),
+        originalPrice: formatAmount(originalPrice, $locale, { sign: true }),
+        newPrice: formatAmount(newPrice, $locale, { sign: true }),
       })}
     </p>
 

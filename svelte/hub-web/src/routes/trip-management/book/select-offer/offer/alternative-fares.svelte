@@ -7,7 +7,7 @@
 <script lang="ts">
   import { dev } from "$app/environment";
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
-  import { formatAmount } from "~/formatting/currency";
+  import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "~/i18n";
   import type { OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
   import { createEventDispatcher } from "svelte";
@@ -66,7 +66,7 @@
           <hr />
 
           <span typography="body-medium" weight="bold">
-            {formatAmount(option.price.total, { locale: $locale, sign: true })}
+            {formatAmount(option.price.total, $locale, { sign: true })}
           </span>
 
           <button
