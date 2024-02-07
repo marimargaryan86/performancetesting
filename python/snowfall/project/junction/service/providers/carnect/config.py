@@ -7,6 +7,7 @@ from snowfall.stdlib.service import application
 
 _DEFAULT_TTL_IN_MINUTES = 45
 _DEFAULT_API_TIMEOUT_IN_SECONDS = 30
+_RESERVATION_TIMEOUT_IN_SECONDS = 130
 
 
 class CarnectConfig(pydantic.BaseModel):
@@ -32,3 +33,12 @@ class PricingSettings(application.Settings, CarnectConfig):
 
 class Settings(CarnectConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+
+
+class OrderSettings(application.Settings, CarnectConfig):
+    amqp_dsn: pydantic.AmqpDsn
+    redis_dsn: pydantic.RedisDsn
+    ttl: datetime.timedelta = datetime.timedelta(
+        seconds=_RESERVATION_TIMEOUT_IN_SECONDS,
+    )
+    storage_dsn: service.AnyDsn

@@ -198,6 +198,20 @@ class AsyncSoapClient(object):
         )
         return self.parser.from_bytes(response, self.config.output)
 
+    async def send_and_get_raw(
+        self,
+        rq_object: Any,
+        headers: Mapping[str, str] | None = None,
+    ) -> tuple[Any, bytes]:
+        rq_content = self.prepare_payload(rq_object)
+        headers = self.prepare_headers(headers or {})
+        response = await self.transport.post(
+            self.config.location,
+            rq_content=rq_content,
+            headers=headers,
+        )
+        return self.parser.from_bytes(response, self.config.output), response
+
     def prepare_headers(self, headers: Mapping[str, str]) -> dict[str, str]:
         """Prepare request headers according to the service configuration.
 

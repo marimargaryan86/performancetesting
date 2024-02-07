@@ -3,6 +3,7 @@ from google.protobuf import message
 from snowfall.project.junction.provider import meta, service
 from snowfall.project.junction.service.providers.carnect import (
     config,
+    orders,
     pricing,
     simple_offers,
 )
@@ -32,5 +33,10 @@ if __name__ == "__main__":
             name="pricing",
             callback=pricing.price_quotes,
             settings_class=config.PricingSettings,
+        ),
+        service.Command(
+            name="orders",
+            callback=orders.orders,
+            settings_class=config.OrderSettings,
         ),
     )

@@ -49,8 +49,9 @@ async def test_reservation(
     res_rq.veh_pref_code(offer_id_context)
     _init_test_driver(res_rq.primary_driver())
 
+    reservation, _ = await carnect_client.reservation(res_rq)
     res_adapter = ReservationAdapter(
-        await carnect_client.reservation(res_rq),
+        reservation,
     )
 
     assert res_adapter.is_success(), res_adapter.get_error()

@@ -147,7 +147,7 @@ class CarnectClient(object):
     async def reservation(
         self,
         rq_builder: ReservationBuilder,
-    ) -> ServiceSoapGetVehReservationOutput:
+    ) -> tuple[ServiceSoapGetVehReservationOutput, bytes]:
         if self._config.is_test:
             # Test env requirements:
             # http://doc.carnect.com/ota2007/getting_started.html#test-reservations
@@ -155,7 +155,7 @@ class CarnectClient(object):
             rq_builder.primary_driver().given_name("Test")
             rq_builder.primary_driver().email("testcheck@carnect.com")
 
-        return await self._reservation_client.send(
+        return await self._reservation_client.send_and_get_raw(
             rq_object=ServiceSoapGetVehReservationInput(
                 body=ServiceSoapGetVehReservationInput.Body(
                     veh_res_rq=rq_builder.build(),

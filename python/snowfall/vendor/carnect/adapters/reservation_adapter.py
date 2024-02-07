@@ -29,7 +29,7 @@ class ReservationAdapter(BaseAdapter):
         return get_warning_text(self._rs.warnings) if self._rs else None
 
     def get_id_context(self) -> str | None:
-        reservation = self._reservation()
+        reservation = self.reservation()
 
         if reservation and reservation.veh_segment_core:
             conf_ids = reservation.veh_segment_core.conf_id
@@ -40,7 +40,7 @@ class ReservationAdapter(BaseAdapter):
         return None
 
     def get_unique_id(self) -> str | None:
-        reservation = self._reservation()
+        reservation = self.reservation()
 
         if reservation and reservation.veh_segment_core:
             conf_ids = reservation.veh_segment_core.conf_id
@@ -51,7 +51,7 @@ class ReservationAdapter(BaseAdapter):
 
         return None
 
-    def _reservation(self) -> VehicleReservationType | None:
+    def reservation(self) -> VehicleReservationType | None:
         if self._rs and self._rs.veh_res_rscore:
             return self._rs.veh_res_rscore.veh_reservation
 
