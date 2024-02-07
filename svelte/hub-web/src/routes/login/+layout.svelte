@@ -1,14 +1,10 @@
-<script lang="ts">
-  import passengersImage from "~/assets/images/passengers.png";
-</script>
-
 <main>
   <section class="intro">
     <!-- TODO: Add i18n -->
     <h2 typography="display-medium" weight="bold">Your hub for all things travel related</h2>
     <h3 typography="body-large">Junction Hub will be the place to make and view bookings</h3>
 
-    <img src={passengersImage} alt="" />
+    <img src="/images/illustrations/passengers.png" alt="" />
   </section>
 
   <slot />

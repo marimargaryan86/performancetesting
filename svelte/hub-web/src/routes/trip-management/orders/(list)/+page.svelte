@@ -62,7 +62,6 @@
 </script>
 
 <script lang="ts">
-  import NotFoundGraphic from "~/assets/images/not-found.png";
   import StandardLayout from "~/components/page/standard-layout.svelte";
   import { getOrderStatus } from "~/integration/common/schemas/order";
   import type { Order } from "~/integration/junction-hub-api/schemas/order";
@@ -238,7 +237,7 @@
   {:else}
     <div class="not-found-wrapper">
       <div class="not-found-container">
-        <img src={NotFoundGraphic} alt="" />
+        <img src="/images/illustrations/not-found.png" alt="" />
         <h3 typography="headline-large" weight="bold">{$t("sentences.noTripsFound")}</h3>
         <pre typography="body-large">{$t("sentences.noTripsFoundMessage")}</pre>
       </div>

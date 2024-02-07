@@ -4,9 +4,6 @@
   import Card from "~/components/ui/card.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
-  import TripGraphicOne from "~/assets/images/trip-graphic-1.png";
-  import TripGraphicTwo from "~/assets/images/trip-graphic-2.png";
-  import SearchingGraphic from "~/assets/images/searching.png";
 
   const t = getTranslator();
 
@@ -33,11 +30,10 @@
       <Card variant="horizontal">
         <div slot="media" class="media trip-graphic">
           <img
-            src={TripGraphicOne}
+            src="/images/illustrations/trip-graphic-1.png"
             alt="Depiction of destinations and date range."
-            class="trip-graphic-1"
           />
-          <img src={TripGraphicTwo} alt="Depiction of ticket prices." class="trip-graphic-2" />
+          <img src="/images/illustrations/trip-graphic-2.png" alt="Depiction of ticket prices." />
         </div>
         <div slot="content" class="content">
           <h3 typography="headline-small" weight="bold">{$t("words.bookTrip")}</h3>
@@ -56,7 +52,7 @@
 
       <Card variant="horizontal" theme="dark">
         <div slot="media" class="media searching-graphic-wrapper">
-          <img src={SearchingGraphic} alt="" class="media searching-graphic" />
+          <img src="/images/illustrations/searching.png" alt="" />
         </div>
         <div slot="content" class="content alt">
           <h3 typography="headline-small" weight="bold">{$t("words.manageTrip")}</h3>
@@ -158,15 +154,15 @@
     justify-content: space-evenly;
   }
 
+  .media.trip-graphic > img,
+  .media.searching-graphic-wrapper > img {
+    margin: 16px;
+  }
+
   .media.searching-graphic-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .searching-graphic {
-    width: 178px;
-    height: 192px;
   }
 
   .content {

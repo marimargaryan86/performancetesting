@@ -1,6 +1,4 @@
 <script lang="ts" context="module">
-  import paymentIllustrationImg from "~/assets/images/payment-illustration.png";
-
   const appearance: Appearance = {
     theme: "stripe",
     variables: {
@@ -147,7 +145,7 @@
 
 <Dialog bind:this={dialog}>
   <div class="dialog">
-    <img src={paymentIllustrationImg} alt="" />
+    <img src="/images/illustrations/payment.png" alt="" />
     <div>
       <h3 typography="display-small" weight="bold">{$t("sentences.paymentDeclined")}</h3>
       <p typography="body-medium">{error ?? $t("sentences.anUnexpectedErrorOccurred")}</p>

@@ -1,11 +1,4 @@
 <script lang="ts">
-  import "~/assets/css/reset.css";
-  import "~/assets/css/common.css";
-  import "~/assets/css/colors.css";
-  import "~/assets/css/effects.css";
-  import "~/assets/css/typography.css";
-  import "~/assets/css/button.css";
-  import "~/assets/css/table.css";
   import MainMenu from "~/components/partials/main-menu/main-menu.svelte";
   import { browser } from "$app/environment";
   import { getTimeDeltaMs } from "~/utils/date-time";

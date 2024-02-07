@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getTranslator } from "~/i18n";
-  import UserManualImage from "~/assets/images/user-manual.png";
   import Icon from "~/components/icons/icon.svelte";
 
   const t = getTranslator();
@@ -25,7 +24,7 @@
         </p>
         <Icon variant="download" color="var(--color-main-primary-500)" />
       </div>
-      <img src={UserManualImage} alt="user-manual" />
+      <img src="/images/illustrations/user-manual.png" alt="" />
     </a>
   </div>
 </section>
