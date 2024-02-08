@@ -254,6 +254,18 @@ async def _http(app: application.Application[Settings]) -> None:
         errors.ForbiddenError,
         handlers.forbidden_error_handler,
     )
+    asgi_app.add_exception_handler(
+        identities.AlreadyExistsError,
+        handlers.conflict_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        identities.NotFoundError,
+        handlers.not_found_error_handler,
+    )
+    asgi_app.add_exception_handler(
+        identities.InvalidArgumentError,
+        handlers.unprocessable_entity_error_handler,
+    )
 
     await starlette.serve(
         starlette_app=asgi_app,
