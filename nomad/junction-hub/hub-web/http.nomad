@@ -122,6 +122,7 @@ job "junction-hub-hub-web-http" {
         change_mode = "restart"
         data        = <<EOH
 {{ with secret "kv/data/${var.environment}/hub-web" }}
+JWT_SECRET={{ .Data.data.jwt_secret }}
 PUBLIC_STRIPE_KEY={{ .Data.data.public_stripe_key }}
 PUBLIC_SMARTLOOK_PROJECT_KEY={{ .Data.data.public_smartlook_project_key }}
 {{ end }}

@@ -47,13 +47,13 @@ function createCookie<TValue>(
 
       try {
         // JSON.stringify since jsonwebtoken doesn't allow a custom parser.
-        return devalue.parse(JSON.stringify(jwt.verify(value, env.JWT_SECRET)));
+        return devalue.parse(JSON.stringify(jwt.verify(value, env.JWT_SECRET as string)));
       } catch {
         return undefined;
       }
     },
     set: (value, event, optionsOverride): string => {
-      const encoded = jwt.sign(devalue.stringify(value), env.JWT_SECRET);
+      const encoded = jwt.sign(devalue.stringify(value), env.JWT_SECRET as string);
 
       event.cookies.set(name, encoded, { ...options, ...optionsOverride });
 
