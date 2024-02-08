@@ -112,6 +112,7 @@ class NotificationsConsumer(object):
         raw_data = await self._booking_storage.get(storage_path)
         all_results = booking.RawStorageData.parse_from_storage(raw_data)
         all_results.tickets = list(ticket_urls)
+        all_results.updated_at = datetime.datetime.now(datetime.UTC)
 
         await self._booking_storage.put(
             storage_path,

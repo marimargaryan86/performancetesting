@@ -218,7 +218,7 @@ class BookingCreationHandler(object):
                     currency=booking_offer_details.currency,
                 ).protobuf(),
                 trip_result=models_pb2.TripBooking(
-                    provider_booking_reference=create_booking_response.booking_res.response_result.dnr,
+                    provider_booking_reference=create_booking_response.booking_res.response_result.identifier,
                     record_locator=create_booking_response.booking_res.response_result.dnr,
                     created_at=protobuf.datetime_to_protobuf(
                         datetime.datetime.now(tz=datetime.UTC),
@@ -522,49 +522,47 @@ class BookingCancellationHandler(object):
     def __init__(
         self,
         benerail_client: client.BenerailClient,
+        booking_storage: filesystem.Storage,
     ) -> None:
         self._client = benerail_client
         self._logger = stdout.get_logger()
+        self._storage = booking_storage
 
-    async def cancel_booking(
-        self,
-        provider_booking_reference: str,
-    ) -> bookings_pb2.BookingCancellation:
+    async def cancel_booking(self, booking_id: str) -> bookings_pb2.BookingCancellation:
         session_token = string.uuid()
 
         try:
-            return await self._cancel_booking(
-                provider_booking_reference,
-                session_token,
-            )
-        except (errors.HttpError, BenerailError):
+            return await self._cancel_booking(booking_id, session_token)
+        except errors.HttpError:
             self._logger.exception(
                 "Booking cancellation failed",
-                provider_booking_reference=provider_booking_reference,
+                booking_id=booking_id,
                 session_token=session_token,
             )
 
             return bookings_pb2.BookingCancellation(
-                provider_booking_reference=provider_booking_reference,
+                provider_booking_reference=booking_id,
                 status=bookings_pb2.BookingCancellation.STATUS_REFUND_FAILED,
             )
 
     async def _cancel_booking(  # noqa: WPS217
         self,
-        provider_booking_reference: str,
+        booking_id: str,
         session_token: str,
     ) -> bookings_pb2.BookingCancellation:
+        booking_raw = await self._storage.get(pathlib.Path(booking_id))
+        all_results = RawStorageData.parse_from_storage(booking_raw)
         dialogue_res = await self._client.dialogue.create_dialogue(
-            from_dnr=provider_booking_reference,
+            from_dnr=all_results.booking.response_result.dnr,
             session_token=session_token,
         )
         if not dialogue_res.response_result.booking:
             raise BenerailError("Booking resource is missing from the dialogue")
 
-        booking_id = dialogue_res.response_result.booking.identifier
+        new_booking_id = dialogue_res.response_result.booking.identifier
         booking_res = (
             await self._client.bookings_client.get_booking(
-                booking_id=booking_id,
+                booking_id=new_booking_id,
                 session_token=session_token,
             )
         )[0]
@@ -605,7 +603,7 @@ class BookingCancellationHandler(object):
             session_token=session_token,
         )
         refund_offer_res = await self._client.orders_client.accept_refund_offer(
-            booking_id=booking_id,
+            booking_id=new_booking_id,
             order_id=refund_order_res.response_result.identifier,
             refund_offer_id=refund_offer_res.response_result.identifier,
             etag=refund_offer_res.etag,
@@ -614,7 +612,7 @@ class BookingCancellationHandler(object):
 
         # Retrieve the order again (with updated payment resource)
         refund_order_res = await self._client.orders_client.get_order(
-            booking_id=booking_id,
+            booking_id=new_booking_id,
             order_id=refund_order_res.response_result.identifier,
             session_token=session_token,
         )
@@ -623,13 +621,13 @@ class BookingCancellationHandler(object):
             raise BenerailError("Payment resource is missing from the refund order")
 
         payment_res = await self._client.payments_client.get_payment_resource(
-            booking_id=booking_id,
+            booking_id=new_booking_id,
             order_id=refund_order_res.response_result.identifier,
             payment_id=refund_order_res.response_result.payment.identifier,
             session_token=session_token,
         )
         payment_res = await self._client.payments_client.confirm_order_payment(
-            booking_id=booking_id,
+            booking_id=new_booking_id,
             order_id=refund_order_res.response_result.identifier,
             payment_id=payment_res.response_result.identifier,
             etag=payment_res.etag,

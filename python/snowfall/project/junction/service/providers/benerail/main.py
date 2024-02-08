@@ -62,6 +62,7 @@ async def _bookings_factory(
     )
     cancellation_handler = booking.BookingCancellationHandler(
         benerail_client=benerail_client,
+        booking_storage=storage,
     )
 
     return bookings.Implementation(
