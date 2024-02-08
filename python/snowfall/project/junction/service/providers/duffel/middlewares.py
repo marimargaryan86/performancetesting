@@ -23,6 +23,9 @@ class SignatureValidationMiddleware(BaseHTTPMiddleware):
         request: requests.Request,
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
     ) -> responses.Response:
+        if request.scope["path"].endswith("/health"):
+            return await call_next(request)
+
         resolved_request = await resolve_request(request)
         await self._validator.authenticate(resolved_request)
         return await call_next(resolved_request)
