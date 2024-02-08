@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import dataclasses
+import time
 from collections.abc import Awaitable, Mapping, Sequence
 from collections.abc import Set as AbstractSet
 from typing import ClassVar, NamedTuple
@@ -705,13 +706,23 @@ class CreateCancellationTaskHandler(object):
         self,
         coro: Awaitable[bookings_pb2.CancelBookingResponse],
     ) -> bookings_pb2.CancelBookingResponse:
+        start = time.perf_counter()
+        failed = False
+
         try:
             cancellation_response = await coro
         except aio.AioRpcError as err:
+            failed = True
             if err.code() != StatusCode.UNIMPLEMENTED:
                 self._logger.exception("Cancellation failed")
 
             raise _ProviderCancellationFailedError from err
+        finally:
+            self._logger.info(
+                "booking cancellation performed",
+                failed=failed,
+                execution_time=time.perf_counter() - start,
+            )
 
         failed_by_status = (
             cancellation_response.cancellation.status

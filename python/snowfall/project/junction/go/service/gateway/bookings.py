@@ -57,7 +57,10 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         provider = await self._providers.find_by_id(ids.provider_id)
 
         if not provider:
-            return context.abort(StatusCode.UNAVAILABLE)
+            return context.abort(
+                StatusCode.UNAVAILABLE,
+                "Provider is unavailable",
+            )
 
         if not provider.booking_capabilities.supports_cancellation:
             return context.abort(StatusCode.UNIMPLEMENTED)
