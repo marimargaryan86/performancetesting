@@ -1,33 +1,49 @@
+svelte:setup:
+  stage: setup
+  interruptible: true
+  script:
+    - docker login -u "${CI_DEPENDENCY_PROXY_USER}" -p "${CI_DEPENDENCY_PROXY_PASSWORD}" "${CI_DEPENDENCY_PROXY_SERVER}"
+    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - docker buildx build --cache-to type=inline --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG} --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/svelte:${CI_DEFAULT_BRANCH} --pull --push --compress -f ".gitlab/svelte.Dockerfile" -t "${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg "NODE_VERSION=$(cat .node-version)" .gitlab/
+  needs: []
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  tags:
+    - shell
+
 .svelte:lint:
   stage: test
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:20-bullseye-slim
+  image: "${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG}"
   interruptible: true
   before_script:
-    - cd "${PROJECT_PATH}"
-    - echo 'yarn-offline-mirror ".yarn-cache/"' >> .yarnrc
-    - echo 'yarn-offline-mirror-pruning true' >> .yarnrc
-    - yarn install
+    - cd svelte/
+    - yarn install --immutable --refresh-lockfile
+    - cd "${PROJECT_NAME}"
   script:
-    - yarn run lint
-    - yarn run check
-    - yarn run vitest --run
-    - yarn run build
+    - yarn workspace "@snowfall/${PROJECT_NAME}" lint
+    - yarn workspace "@snowfall/${PROJECT_NAME}" check
+    - yarn workspace "@snowfall/${PROJECT_NAME}" vitest
+    - yarn workspace "@snowfall/${PROJECT_NAME}" build
   cache:
-    paths:
-      - "${PROJECT_PATH}/.yarn-cache/"
+    - key:
+        files:
+          - svelte/yarn.lock
+      paths:
+        - svelte/.yarn/cache/
+  needs:
+    - "svelte:setup"
   rules:
     - if: $CI_MERGE_REQUEST_IID
       changes:
-        - "${PROJECT_PATH}/**/*"
+        - "svelte/${PROJECT_NAME}/**/*"
         - "svelte/.gitlab-ci.yml"
+        - "svelte/yarn.lock"
+        - "svelte/package.json"
+
   tags:
     - docker
 
 svelte:lint-hub-web:
   extends: .svelte:lint
-  cache:
-    key:
-      files:
-        - "svelte/hub-web/yarn.lock"
   variables:
-    PROJECT_PATH: svelte/hub-web
+    PROJECT_NAME: hub-web

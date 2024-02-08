@@ -102,11 +102,15 @@ def custom_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]
         name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
     )
 
+    with open(".node-version", encoding="utf-8") as version_file:  # noqa: FURB101,PTH123
+        node_version = version_file.read().strip()
+
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         **{
             **kwargs,
             "image_tags": ["{build_args.VERSION}"],
             "repository": repository.replace("//", "/").strip("/"),
+            "extra_build_args": ["NODE_VERSION={0}".format(node_version)],
         },
     )
 

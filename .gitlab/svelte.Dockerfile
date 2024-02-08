@@ -1,0 +1,4 @@
+ARG REGISTRY
+ARG NODE_VERSION
+FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim
+RUN corepack enable

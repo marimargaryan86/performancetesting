@@ -1,0 +1,16 @@
+{
+  "packageManager": "yarn@4.0.2",
+  "name": "@snowfall/monorepo",
+  "private": true,
+  "workspaces": [
+    "hub-web"
+  ],
+  "scripts": {
+    "hub:build": "yarn workspace @snowfall/hub-web build",
+    "hub:check": "yarn workspace @snowfall/hub-web check",
+    "hub:dev": "yarn workspace @snowfall/hub-web dev",
+    "hub:lint": "yarn workspace @snowfall/hub-web lint",
+    "hub:test": "yarn workspace @snowfall/hub-web test",
+    "hub:vitest": "yarn workspace @snowfall/hub-web vitest --run"
+  }
+}

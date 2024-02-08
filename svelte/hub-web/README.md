@@ -5,18 +5,28 @@ This is a server side rendered SvelteKit application that allows users to intera
 ## Onboarding
 
 - Install [Homebrew](https://brew.sh/)
+
   - via [Snowfall's Engineering Onboarding resources](https://engineering.snowfalltravel.com/docs/monorepo/getting-started)
+
   ```bash
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   ```
-- Install [Node.js](https://nodejs.org/en), preferably a long term support version
-  - Node Version Manager, [nvm](https://github.com/nvm-sh/nvm) is recommended
-- Install [Yarn package manager](https://yarnpkg.com/)
+
+- Install a Node version manager that supports using the `.node-version` file. We recommend using [fnm](https://github.com/Schniz/fnm):
+
   ```bash
-  brew install yarn
+  brew install fnm
   ```
+
+- Enable [`corepack`](https://nodejs.org/api/corepack.html) for Node. This will automatically install [Yarn](https://yarnpkg.com/) for you when you run it for the first time:
+
+  ```bash
+  corepack enable
+  ```
+
 - Sign up for ORY `dev` environment credentials [here](https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/ui)
 - (_Optional_) Install ORY client
+
   ```bash
   brew install ory/tap/cli
   ```

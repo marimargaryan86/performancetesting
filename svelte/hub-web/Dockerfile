@@ -1,16 +1,21 @@
 ARG REGISTRY
-FROM ${REGISTRY}node:20-bullseye-slim AS build
+ARG NODE_VERSION
+FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim AS build
+RUN corepack enable
 WORKDIR /app
-COPY package.json yarn.lock svelte.config.js vite.config.ts ./
-RUN yarn install --frozen-lockfile
-COPY . .
-RUN yarn run build && cp package.json yarn.lock build/
-WORKDIR /app/build
-RUN yarn install --frozen-lockfile --production=true && rm yarn.lock
+COPY svelte/package.json svelte/yarn.lock svelte/.yarnrc.yml ./
+COPY svelte/hub-web/package.json svelte/hub-web/svelte.config.js svelte/hub-web/vite.config.ts ./hub-web/
+RUN yarn install --immutable
+COPY svelte/hub-web ./hub-web
+RUN yarn workspace @snowfall/hub-web build \
+    && rm -rf node_modules \
+    && yarn workspaces focus --production -A \
+    && cp -r node_modules hub-web/build/node_modules \
+    && cp hub-web/package.json hub-web/build/
 
-FROM ${REGISTRY}node:20-bullseye-slim AS runtime
+FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim AS runtime
 WORKDIR /app
-COPY --from=build /app/build /app
+COPY --from=build /app/hub-web/build /app
 ARG VERSION "dev"
 ENV VERSION $VERSION
 LABEL vendor="Snowfall Limited"
