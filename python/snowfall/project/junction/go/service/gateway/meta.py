@@ -1,3 +1,5 @@
+import asyncio
+
 from grpc import aio
 
 from snowfall.project.junction.go.service.gateway import providers
@@ -32,4 +34,15 @@ class Service(service.Service, meta_pb2_grpc.MetaServiceServicer):
                 )
                 async for provider in self._providers.all_()
             ],
+        )
+
+    async def Sleep(  # type: ignore[override] # noqa: N802
+        self,
+        request: meta_pb2.SleepRequest,
+        context: aio.ServicerContext,
+    ) -> meta_pb2.SleepResponse:
+        await asyncio.sleep(request.duration_seconds)
+
+        return meta_pb2.SleepResponse(
+            text="Have a great day and thanks for the hard work!",
         )

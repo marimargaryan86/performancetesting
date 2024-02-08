@@ -6,6 +6,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service MetaService {
   rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {}
+  rpc Sleep(SleepRequest) returns (SleepResponse) {}
 }
 
 message ListProvidersRequest {}
@@ -18,4 +19,12 @@ message Provider {
   string id = 1;
   string name = 2;
   bool is_healthy = 3;
+}
+
+message SleepRequest {
+  sint32 duration_seconds = 1;
+}
+
+message SleepResponse {
+  string text = 1;
 }
