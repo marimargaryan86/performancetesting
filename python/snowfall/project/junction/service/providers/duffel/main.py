@@ -4,6 +4,7 @@ from snowfall.project.junction.service.providers.duffel import (
     offers,
     orders,
     pricing,
+    webhook,
 )
 from snowfall.project.junction.service.providers.duffel.booking import Transformer
 from snowfall.project.junction.service.providers.duffel.constant import PROVIDER_ID
@@ -51,5 +52,10 @@ if __name__ == "__main__":
             name="orders",
             callback=orders.orders,
             settings_class=orders.OrdersSettings,
+        ),
+        service.Command(
+            name="webhooks",
+            callback=webhook.serve,
+            settings_class=webhook.WebhookSettings,
         ),
     )
