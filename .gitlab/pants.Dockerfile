@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 && apt-get update && apt-get install -y --no-install-recommends \
     consul-template=0.36.0-1 \
     docker-ce-cli \
+    docker-buildx-plugin \
     nomad=1.7.3-1 \
     /tmp/oasdiff.deb \
 && rm -rf /var/lib/apt/lists/* /tmp/oasdiff.deb \
