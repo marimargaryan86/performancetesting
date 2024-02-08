@@ -1,6 +1,7 @@
 import abc
 from collections.abc import Sequence
 
+from google.protobuf import json_format
 from pydantic import BaseModel
 
 from snowfall.project.junction.plus.adapter import errors
@@ -17,7 +18,13 @@ from snowfall.project.junction.plus.service.notifications.v1 import (
 
 class PermissionUpdate(BaseModel):
     enabled: bool
+    ref: str
+
+
+class Permission(BaseModel):
+    enabled: bool = False
     name: str
+    ref: str
 
 
 class Client(abc.ABC):
@@ -47,7 +54,7 @@ class Client(abc.ABC):
     async def get_permissions(
         self,
         reseller_id: str,
-    ) -> list[notifications_models_pb2.Permission]:
+    ) -> list[Permission]:
         """Update Reseller configuration vector."""
 
     @abc.abstractmethod
@@ -112,7 +119,7 @@ class DictClient(Client):
     async def get_permissions(
         self,
         reseller_id: str,
-    ) -> list[notifications_models_pb2.Permission]:
+    ) -> list[Permission]:
         configuration_vector = next(
             filter(
                 lambda cv: cv.reseller_id == reseller_id,
@@ -125,7 +132,7 @@ class DictClient(Client):
             raise errors.NotFoundError()
 
         return [
-            notifications_models_pb2.Permission(
+            Permission(
                 ref=ref,
                 name="Permission Name",
                 enabled=True,
@@ -149,14 +156,11 @@ class DictClient(Client):
         if not configuration_vector:
             raise errors.NotFoundError()
 
-        permissions_to_add = [update.name for update in updates if update.enabled]
-        permissions_to_remove = [
-            update.name for update in updates if not update.enabled
-        ]
-        updated_permissions = set(
-            list(set(configuration_vector.permissions) - set(permissions_to_remove))
-            + list(permissions_to_add),
-        )
+        permissions_to_add = [update.ref for update in updates if update.enabled]
+        permissions_to_remove = [update.ref for update in updates if not update.enabled]
+        updated_permissions = set(configuration_vector.permissions) - set(
+            permissions_to_remove,
+        ) | set(permissions_to_add)
 
         configuration_vector.ClearField("permissions")
         configuration_vector.permissions.extend(updated_permissions)
@@ -225,7 +229,7 @@ class GrpcClient(Client):
     async def get_permissions(
         self,
         reseller_id: str,
-    ) -> list[notifications_models_pb2.Permission]:
+    ) -> list[Permission]:
         request = notifications_grpc_pb2.GetPermissionsRequest(
             reseller_id=reseller_id,
         )
@@ -239,7 +243,10 @@ class GrpcClient(Client):
             )
         )
 
-        return list(response.permissions)
+        return [
+            Permission(**json_format.MessageToDict(permission))
+            for permission in response.permissions
+        ]
 
     async def update_permissions(
         self,

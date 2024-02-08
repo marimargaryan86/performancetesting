@@ -2,6 +2,7 @@ __dependents_rules__((
     "*",
     (
         "python/snowfall/project/junction/extensions/service/mobile_api/**",
+        "python/snowfall/project/junction/hub/service/hub_api/**",
         "protobuf/snowfall/project/junction/plus/**",
         "python/snowfall/project/junction/plus/**",
     ),

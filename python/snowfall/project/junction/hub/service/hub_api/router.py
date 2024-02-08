@@ -16,6 +16,7 @@ from snowfall.project.junction.hub.service.hub_api.routes import (
     go_orders,
     go_resellers,
     payments,
+    plus_services_access,
     refunds,
     transactions,
     users,
@@ -249,6 +250,12 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/resellers",
             go_resellers.Resellers,
             name="Resellers",
+        ),
+        integration.route(
+            "/resellers/plus-services-access/{resellerId}",
+            plus_services_access.PlusServicesAccess,
+            name="PlusServicesAccess",
+            methods=["PATCH", "GET"],
         ),
         integration.route(
             "/resellers/{resellerId}",

@@ -13,6 +13,12 @@ from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
 from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
+from snowfall.project.junction.plus.adapter import (
+    configuration_vectors as config_vector_adapter,
+)
+from snowfall.project.junction.plus.service.notifications.v1.grpc_pb2_grpc import (
+    ConfigurationVectorServiceStub,
+)
 from snowfall.project.pay.adapter import (
     accounts as accounts_adapter,
 )
@@ -69,6 +75,7 @@ class Settings(starlette.Settings):
     resellers_address: str
     stripe_api_key: str
     credit_card_address: str
+    notifications_address: str
 
 
 class _Channels(NamedTuple):
@@ -79,6 +86,7 @@ class _Channels(NamedTuple):
     refunds: aio.Channel
     resellers: aio.Channel
     credit_card_payments: aio.Channel
+    configuration_vectors: aio.Channel
 
 
 async def _http(app: application.Application[Settings]) -> None:
@@ -117,6 +125,10 @@ async def _http(app: application.Application[Settings]) -> None:
             grpc_factory.make_insecure_channel(
                 app,
                 app.settings.credit_card_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.notifications_address,
             ),
         ),
     )
@@ -202,6 +214,11 @@ async def _http(app: application.Application[Settings]) -> None:
                 credit_card_payment_client=credit_card_payment.GrpcClient(
                     CreditCardPaymentServiceStub(
                         channels.credit_card_payments,
+                    ),
+                ),
+                config_vectors_client=config_vector_adapter.GrpcClient(
+                    ConfigurationVectorServiceStub(
+                        channels.configuration_vectors,
                     ),
                 ),
             ),

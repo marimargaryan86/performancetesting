@@ -18,6 +18,7 @@ from snowfall.project.junction.go.service.resellers.v1 import (
     models_pb2 as reseller_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
+from snowfall.project.junction.plus.adapter import configuration_vectors
 from snowfall.project.pay.service.companies.v1 import (
     models_pb2 as companies_models_pb2,
 )
@@ -1221,5 +1222,24 @@ class UsersProfileResource(models.Resource):
                     for contact in contacts
                 ],
                 "permissions": {},
+            },
+        )
+
+
+class PlusServiceAccess(models.Resource):
+    api_type: ClassVar[str] = "plus-services-access"
+
+    @classmethod
+    def from_dict(
+        cls,
+        permission: configuration_vectors.Permission,
+    ) -> PlusServiceAccess:
+        return cls(
+            id=permission.ref,
+            type=PlusServiceAccess.api_type,
+            attributes={
+                "ref": permission.ref,
+                "displayName": permission.name,
+                "enabled": permission.enabled,
             },
         )

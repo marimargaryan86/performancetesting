@@ -12,6 +12,12 @@ from snowfall.adapter import identities
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
+from snowfall.project.junction.plus.adapter import (
+    configuration_vectors as config_vector_adapter,
+)
+from snowfall.project.junction.plus.service.notifications.v1 import (
+    models_pb2 as notifications_models_pb2,
+)
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import (
     accounts,
@@ -428,6 +434,7 @@ def _create_app(
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
     credit_card_payment_client: credit_card_payment.Client,
+    config_vector_client: config_vector_adapter.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -447,6 +454,7 @@ def _create_app(
                 refunds_client=refunds_client,
                 resellers_client=resellers_client,
                 credit_card_payment_client=credit_card_payment_client,
+                config_vectors_client=config_vector_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -501,6 +509,21 @@ async def users_client(
 
 
 @pytest.fixture()
+async def config_vector_client() -> config_vector_adapter.Client:
+    return config_vector_adapter.DictClient(
+        configuration_vectors=[
+            notifications_models_pb2.ConfigurationVector(
+                id="649d74da91449640d4db8357",
+                reseller_id="04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                email="test@example.com",
+                search_url="https://test_url",
+                permissions=["flight_stats_alerts", "whatsapp_chatbot"],
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
 def app(
     orders_client: orders.Client,
     companies_client: companies.Client,
@@ -517,6 +540,7 @@ def app(
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
     credit_card_payment_client: credit_card_payment.Client,
+    config_vector_client: config_vector_adapter.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -534,6 +558,7 @@ def app(
         refunds_client=refunds_client,
         resellers_client=resellers_client,
         credit_card_payment_client=credit_card_payment_client,
+        config_vector_client=config_vector_client,
     )
 
 
@@ -554,6 +579,7 @@ def users_app(
     refunds_client: refunds.Client,
     resellers_client: resellers.Client,
     credit_card_payment_client: credit_card_payment.Client,
+    config_vector_client: config_vector_adapter.Client,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -571,4 +597,5 @@ def users_app(
         refunds_client=refunds_client,
         resellers_client=resellers_client,
         credit_card_payment_client=credit_card_payment_client,
+        config_vector_client=config_vector_client,
     )

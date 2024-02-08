@@ -3349,6 +3349,97 @@
         ],
         "description": "Delete a Reseller."
       }
+    },
+    "/resellers/plus-services-access/{resellerId}": {
+      "get": {
+        "summary": "Get reseller access configuration for plus services",
+        "tags": [
+          "resellers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "minItems": 0,
+                      "items": {
+                        "$ref": "#/components/schemas/PlusServiceAccess"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "operationId": "get-resellers-plus-services-access-id",
+        "description": "Get reseller access configuration to plus services",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/resellerId"
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update reseller access configuration to plus services",
+        "tags": [
+          "resellers"
+        ],
+        "operationId": "patch-resellers-plus-services-access-id",
+        "description": "Update reseller access configuration to plus services",
+        "responses": {
+          "204": {
+            "description": "Reseller access configuration to plus services are updated"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/resellerId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PlusServiceAccess"
+                    }
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -7585,6 +7676,52 @@
             }
           }
         ]
+      },
+      "PlusServiceAccess": {
+        "title": "Access to plus services",
+        "description": "Enable/disable access to plus services.",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "flight_stats_alerts",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "plus-services-access"
+            ],
+            "example": "plus-services-access"
+          },
+          "attributes": {
+            "properties": {
+              "ref": {
+                "type": "string",
+                "example": "flight_stats_alerts"
+              },
+              "displayName": {
+                "type": "string",
+                "example": "Flight Stats Alerts",
+                "readOnly": true
+              },
+              "enabled": {
+                "type": "boolean",
+                "example": true
+              }
+            },
+            "required": [
+              "ref",
+              "displayName",
+              "enabled"
+            ]
+          }
+        }
       }
     },
     "securitySchemes": {
