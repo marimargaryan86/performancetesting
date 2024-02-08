@@ -1,4 +1,6 @@
-python_sources()
+python_sources(
+    dependencies=["python/snowfall/project/junction/go/service/orders/html_templates"]
+)
 python_tests(name="tests")
 python_test_utils(name="test_utils")
 python_image(
