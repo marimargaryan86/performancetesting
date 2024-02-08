@@ -92,19 +92,6 @@ job "junction-providers-duffel-webhooks" {
       }
     }
 
-    service {
-      name = "duffel-webhooks-${var.environment}"
-      port = "prometheus"
-      tags = ["metrics"]
-
-      check {
-        type     = "http"
-        path     = "/"
-        interval = "30s"
-        timeout  = "4s"
-      }
-    }
-
     task "webhooks" {
       driver = "docker"
       vault {
@@ -124,9 +111,9 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["http", "prometheus"]
+        ports = ["http"]
         args = [
-          "http",
+          "webhooks",
         ]
 
         auth {
@@ -137,11 +124,10 @@ EOH
       }
 
       env {
-        ENV_NAME        = "${var.environment}"
-        HTTP_ADDRESS    = "0.0.0.0"
-        HTTP_PORT       = "${NOMAD_PORT_http}"
-        SENTRY_DSN      = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
-        PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        ENV_NAME     = "${var.environment}"
+        HTTP_ADDRESS = "0.0.0.0"
+        HTTP_PORT    = "${NOMAD_PORT_http}"
+        SENTRY_DSN   = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
       }
     }
   }
