@@ -89,7 +89,7 @@ class NotificationsConsumer(object):
         time_passed = datetime.datetime.now(datetime.UTC) - created_at
 
         if time_passed > _RETRY_TTL:
-            self._logger.error(
+            self._logger.warning(
                 "Ticket retrieval limit reached",
                 booking_id=message.body.booking_id,
             )
