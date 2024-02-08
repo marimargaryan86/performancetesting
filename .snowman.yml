@@ -46,6 +46,8 @@ commits:
       - "openapi/junction/plus_poc_api"
       - "protobuf/snowfall/project/junction/plus"
       - "python/snowfall/project/junction/plus"
+    junction/fti:
+      - "svelte/fti-web"
     protobuf/stdlib:
       - "protobuf/snowfall/stdlib"
     python/stdlib:
