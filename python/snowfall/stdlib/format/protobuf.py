@@ -24,7 +24,6 @@ from snowfall.stdlib.v1 import date_pb2, datetime_pb2
 if TYPE_CHECKING:
     from google.protobuf.internal import enum_type_wrapper
 
-
 _Proto = TypeVar("_Proto", bound=message.Message)
 
 
@@ -201,12 +200,19 @@ def apply_field_mask(
     field_mask: field_mask_pb2.FieldMask,
     source: _Proto,
     destination: _Proto,
+    *,
+    replace_message_field: bool = False,
+    replace_repeated_field: bool = False,
 ) -> _Proto:
     if not field_mask.paths:
         return copy.deepcopy(source)
 
     destination = copy.deepcopy(destination)
 
-    field_mask.MergeMessage(source, destination)
-
+    field_mask.MergeMessage(
+        source,
+        destination,
+        replace_message_field=replace_message_field,
+        replace_repeated_field=replace_repeated_field,
+    )
     return destination

@@ -45,14 +45,13 @@ class Resellers(endpoints.HTTPEndpoint):
         client: resellers.Client = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-
         reseller = await client.create_reseller(
             models_pb2.Reseller(
                 name=body["name"],
                 company_id=body["company"],
                 default_currency=body["currency"],
                 provider_ids=body["providers"],
-                parent_reseller_ids=body["parentResellers"],
+                parent_reseller_ids=body.get("parentResellers", []),
             ),
         )
 

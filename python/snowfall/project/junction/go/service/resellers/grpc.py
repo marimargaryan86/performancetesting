@@ -21,6 +21,7 @@ from snowfall.vendor.consul.client import ConsulClient
 
 _PROVIDERS_KEY = "{0}/providers/reseller-providers"
 _CURRENCIES_KEY = "{0}/client-api/reseller-currencies"
+_COMPANIES_KEY = "{0}/client-api/reseller-pay-companies"
 
 
 class ResellerService(
@@ -41,6 +42,7 @@ class ResellerService(
         self._client = consul_client
         self._reseller_providers_key = _PROVIDERS_KEY.format(environment)
         self._reseller_currencies_key = _CURRENCIES_KEY.format(environment)
+        self._reseller_companies_key = _COMPANIES_KEY.format(environment)
         self._company_client = company_client
         self._currency_client = currency_client
         self._promote_task: asyncio.Task[None] | None = None
@@ -163,7 +165,14 @@ class ResellerService(
             request.update_mask,
             request.reseller,
             reseller,
+            replace_repeated_field=True,
         )
+
+        if not request.reseller.default_currency:
+            new_reseller.default_currency = reseller.default_currency
+
+        if not request.reseller.company_id:
+            new_reseller.company_id = reseller.company_id
 
         await self._repository.upsert(new_reseller)
 
@@ -188,8 +197,13 @@ class ResellerService(
 
         reseller_config_updated = await self._update_resellers_config(resellers)
         currencies_config_updated = await self._update_currencies_config(resellers)
+        companies_config_updated = await self._update_companies_config(resellers)
 
-        if not currencies_config_updated or not reseller_config_updated:
+        if (  # noqa: WPS337
+            not currencies_config_updated
+            or not reseller_config_updated
+            or not companies_config_updated
+        ):
             raise ValueError("No config updated")
 
     async def _schedule_promote_reseller_config(self) -> None:
@@ -236,5 +250,21 @@ class ResellerService(
 
         return await self._client.put_key(
             self._reseller_currencies_key,
-            json.dumps(reseller_currencies_mapping).encode(),
+            json.dumps(reseller_currencies_mapping, indent=4, sort_keys=True).encode(),
+        )
+
+    async def _update_companies_config(
+        self,
+        resellers: Sequence[models_pb2.Reseller],
+    ) -> bool:
+        reseller_companies_mapping = json.loads(
+            await self._client.get_key(self._reseller_companies_key),
+        )
+
+        for reseller in resellers:
+            reseller_companies_mapping[reseller.id] = reseller.company_id
+
+        return await self._client.put_key(
+            self._reseller_companies_key,
+            json.dumps(reseller_companies_mapping, indent=4, sort_keys=True).encode(),
         )
