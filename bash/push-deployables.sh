@@ -32,7 +32,7 @@ for e in "${ENVIRONMENTS[@]}"; do
 				echo "${docker_image}" >"${repo_path}/image.txt"
 
 				echo "docker: logging in to ${CI_REGISTRY}..."
-				docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+				docker login -u "${PIPELINE_REGISTRY_USER}" -p "${PIPELINE_REGISTRY_USER}" "${CI_REGISTRY}"
 				echo "docker: pulling \"${docker_image}\"..."
 				docker pull "${docker_image}"
 				echo "docker: tagging \"${docker_image}\" as \"${docker_image%:*}:latest\"..."
