@@ -147,7 +147,7 @@ class NotificationsConsumer(object):
                 booking_id=message.body.booking_id,
             )
             await self._create_fetch_booked_ticket_support_ticket(message)
-            await message.nack()
+            await message.ack()
         else:
             await message.requeue()
 
