@@ -1,6 +1,10 @@
 dayjs.extend(window.dayjs_plugin_utc);
 dayjs.extend(window.dayjs_plugin_timezone);
 
+Handlebars.registerHelper('format_fares', function (trips) {
+  return trips.map((trip) => trip.fare.marketingName).join(" + ");
+})
+
 Handlebars.registerHelper('format_money', function (money) {
   return new Intl.NumberFormat(navigator.language, { style: 'currency', currency: money.currencyCode }).format(money.units)
 })
@@ -31,28 +35,48 @@ window.onload = () => {
   const source = document.getElementById("journey-template").innerHTML;
   const journeyTemplate = Handlebars.compile(source, {strict: true});
 
-  function inject_journeys(departureDate, journeys) {
+  function inject_journeys(departureDate, journeys, providers) {
+    providersMap = {}
+
+    providers.forEach(function (provider, i) {
+      providersMap[provider.id] = provider.name;
+    })
+
     let htmlString = "";
     journeys.forEach(function (journey, i) {
-      console.log(journey)
-      htmlString += journeyTemplate({journey: journey, departureDate: departureDate});
+      htmlString += journeyTemplate({journey: journey, departureDate: departureDate, providers: providersMap});
     });
     const dom = new DOMParser().parseFromString(htmlString, "text/html");
     container.append(dom.firstChild)
   }
 
-  function fetch_trips(departureDate, task_id) {
-    fetch("/trips/"+task_id, {
+  function fetch_providers(departureDate, task_id) {
+    fetch("/providers", {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
       },
     })
     .then((response) => {
       return response.json()
     })
     .then((body) => {
-      inject_journeys(departureDate, body.results)
+      fetch_trips(departureDate, task_id, body.providers)
+    })
+  }
+
+  function fetch_trips(departureDate, task_id, providers) {
+    fetch("/trips/"+task_id, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+      },
+    })
+    .then((response) => {
+      return response.json()
+    })
+    .then((body) => {
+      inject_journeys(departureDate, body.results, providers)
 
       if (!body.isInProgress) {
         loader.classList.add("invisible");
@@ -60,7 +84,7 @@ window.onload = () => {
       }
 
       setTimeout(() => {
-        fetch_trips(departureDate, task_id);
+        fetch_trips(departureDate, task_id, providers);
       }, "1000");
     });
   }
@@ -80,6 +104,7 @@ window.onload = () => {
     fetch("/trips", {
       method: "POST",
       headers: {
+        "Accept": "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -105,7 +130,7 @@ window.onload = () => {
       return response.json()
     })
     .then((body) => {
-      fetch_trips(departureDate, body.id)
+      fetch_providers(departureDate, body.id)
     });
   }
 
