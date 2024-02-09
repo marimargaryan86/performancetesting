@@ -1,17 +1,26 @@
 import secrets
-from collections.abc import AsyncIterator, Mapping, Sequence
-from typing import Any
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping, Sequence
 from unittest import mock
 
 import httpx
 import pytest
+from google.protobuf import struct_pb2
+from motor import core
 from starlette import applications, middleware
 from starlette.middleware import authentication as auth_middleware
 
 from snowfall.adapter import identities
 from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders, resellers
-from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
+from snowfall.project.junction.hub.service.hub_api import (
+    bootstrap,
+    permissions,
+    repository,
+    router,
+)
+from snowfall.project.junction.hub.service.hub_api.v1 import (
+    models_pb2 as hub_models_pb2,
+)
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors as config_vector_adapter,
 )
@@ -50,6 +59,10 @@ from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
 from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
 
 RESELLER_ID = "effb6d65-2ddc-4a26-9b57-af79d44254cb"
+IDENTITIY_IDS = (
+    "37b82d2f-dba3-469e-9076-12b15777d1f5",
+    "dc33945e-40b9-4227-ae9a-81c68a3a592a",
+)
 
 
 async def mock_cookie_to_user(cookie: str) -> stdlib_auth.User:
@@ -57,8 +70,18 @@ async def mock_cookie_to_user(cookie: str) -> stdlib_auth.User:
         identifier="foo",
         email="foo@example.com",
         metadata={
-            "reseller_id": RESELLER_ID,
             "role": "snowfall-admin",
+        },
+    )
+
+
+async def mock_cookie_to_reseller_user(cookie: str) -> stdlib_auth.User:
+    return stdlib_auth.User(
+        identifier="foo",
+        email="foo@example.com",
+        metadata={
+            "reseller_id": RESELLER_ID,
+            "role": "reseller-admin",
         },
     )
 
@@ -80,53 +103,35 @@ def orders_client() -> orders.Client:
     )
 
 
+def _generate_identity(
+    identifier: str,
+    reseller_id: str | None = None,
+) -> identities_pb2.Identity:
+    metadata_public = struct_pb2.Struct()
+    if reseller_id:
+        metadata_public.update({"role": "reseller-admin", "reseller_id": reseller_id})
+    else:
+        metadata_public.update({"role": "snowfall-admin"})
+    return identities_pb2.Identity(
+        id=identifier,
+        email="foobar@example.com",
+        metadata_public=metadata_public,
+    )
+
+
 @pytest.fixture()
-def ory_users() -> Sequence[identities_pb2.Identity]:
+def ory_identities() -> Sequence[identities_pb2.Identity]:
     return [
-        identities_pb2.Identity(id="37b82d2f-dba3-469e-9076-12b15777d1f5"),
-        identities_pb2.Identity(id="dc33945e-40b9-4227-ae9a-81c68a3a592a"),
+        _generate_identity(IDENTITIY_IDS[0], RESELLER_ID),
+        _generate_identity(IDENTITIY_IDS[1]),
     ]
 
 
 @pytest.fixture()
-def mock_identity(ory_users: Sequence[identities_pb2.Identity]) -> dict[str, Any]:
-    return {
-        "id": ory_users[0].id,
-        "traits": {"email": "test@test.com"},
-        "metadata_public": {
-            "role": "reseller-admin",
-            "reseller_id": "some-reseller-id",
-        },
-        "verifiable_addresses": [
-            {
-                "id": "c6cea2a7-f419-42fe-a610-456bea02aab5",
-                "value": "docs@example.org",
-                "verified": False,
-                "via": "email",
-                "status": "pending",
-                "created_at": "2022-02-24T13:38:05.28581Z",
-                "updated_at": "2022-02-24T13:38:05.28581Z",
-            },
-        ],
-        "recovery_addresses": [
-            {
-                "id": "21ff90e1-a9a9-491e-8194-774172420989",
-                "value": "docs@example.org",
-                "via": "email",
-                "created_at": "2022-02-24T13:38:05.29565Z",
-                "updated_at": "2022-02-24T13:38:05.29565Z",
-            },
-        ],
-        "created_at": "2022-02-24T13:38:05.27892Z",
-        "updated_at": "2022-02-24T13:38:05.27892Z",
-    }
-
-
-@pytest.fixture()
 def identities_client(
-    ory_users: Sequence[identities_pb2.Identity],
+    ory_identities: Sequence[identities_pb2.Identity],
 ) -> identities.Client:
-    return identities.DictClient(ory_users)
+    return identities.DictClient(ory_identities)
 
 
 @pytest.fixture()
@@ -418,6 +423,29 @@ def credit_card_payment_client() -> credit_card_payment.Client:
     return credit_card_payment.DictClient()
 
 
+@pytest.fixture()
+async def user() -> hub_models_pb2.User:
+    return hub_models_pb2.User(
+        id=string.uuid(),
+        ory_identity_id=IDENTITIY_IDS[0],
+        reseller_id=RESELLER_ID,
+    )
+
+
+@pytest.fixture()
+async def users_repository(
+    mongo_client: core.AgnosticClient,
+    user: hub_models_pb2.User,
+) -> repository.UsersRepository:
+    users_repository = repository.UsersRepository(
+        collection=mongo_client.test.users,
+    )
+
+    await users_repository.insert(user)
+
+    return users_repository
+
+
 def _create_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
@@ -435,6 +463,8 @@ def _create_app(
     resellers_client: resellers.Client,
     credit_card_payment_client: credit_card_payment.Client,
     config_vector_client: config_vector_adapter.Client,
+    users_repository: repository.UsersRepository,
+    cookie_to_user: Callable[[str], Awaitable[stdlib_auth.User]],
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -455,6 +485,7 @@ def _create_app(
                 resellers_client=resellers_client,
                 credit_card_payment_client=credit_card_payment_client,
                 config_vectors_client=config_vector_client,
+                users_repository=users_repository,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -462,7 +493,7 @@ def _create_app(
             middleware.Middleware(
                 auth_middleware.AuthenticationMiddleware,
                 backend=authentication.CookieAuthenticationBackend(
-                    cookie_to_user=mock_cookie_to_user,
+                    cookie_to_user=cookie_to_user,
                 ),
                 on_error=handlers.auth_error_handler,
             ),
@@ -541,6 +572,7 @@ def app(
     resellers_client: resellers.Client,
     credit_card_payment_client: credit_card_payment.Client,
     config_vector_client: config_vector_adapter.Client,
+    users_repository: repository.UsersRepository,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -559,6 +591,8 @@ def app(
         resellers_client=resellers_client,
         credit_card_payment_client=credit_card_payment_client,
         config_vector_client=config_vector_client,
+        users_repository=users_repository,
+        cookie_to_user=mock_cookie_to_user,
     )
 
 
@@ -580,6 +614,7 @@ def users_app(
     resellers_client: resellers.Client,
     credit_card_payment_client: credit_card_payment.Client,
     config_vector_client: config_vector_adapter.Client,
+    users_repository: repository.UsersRepository,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -598,4 +633,6 @@ def users_app(
         resellers_client=resellers_client,
         credit_card_payment_client=credit_card_payment_client,
         config_vector_client=config_vector_client,
+        users_repository=users_repository,
+        cookie_to_user=mock_cookie_to_reseller_user,
     )

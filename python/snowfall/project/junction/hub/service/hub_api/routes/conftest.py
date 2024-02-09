@@ -146,9 +146,9 @@ def mock_create_user_payload() -> Callable[[str, str, str], dict[str, Any]]:
 
 
 def _mock_create_user_payload(
+    reseller_id: str | None = None,
     email: str = "example@test.com",
     role: str = "reseller-admin",
-    reseller_id: str = "mock_reseller_id",
 ) -> dict[str, Any]:
     return {
         "type": "users",
@@ -158,10 +158,14 @@ def _mock_create_user_payload(
         },
         "relationships": {
             "reseller": {
-                "data": {
-                    "id": reseller_id,
-                    "type": "resellers",
-                },
+                "data": (
+                    {
+                        "id": reseller_id,
+                        "type": "resellers",
+                    }
+                    if reseller_id
+                    else None
+                ),
             },
         },
     }

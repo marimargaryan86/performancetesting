@@ -5,7 +5,7 @@ from starlette import status
 
 
 async def test_create_payment_for_new_customer(
-    client: AsyncClient,
+    users_client: AsyncClient,
     update_ory_identity: Any,
     stripe_customer: Any,
     stripe_ephemeral_key: Any,
@@ -19,7 +19,7 @@ async def test_create_payment_for_new_customer(
         },
     }
 
-    response = await client.post(
+    response = await users_client.post(
         url="/payments",
         json={"data": payload},
         headers={"Content-Type": "application/vnd.api+json"},

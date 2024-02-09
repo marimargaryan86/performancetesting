@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package snowfall.project.junction.hub.service.hub_api.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/hub/service/hub_api/v1";
+
+message User {
+  string id = 1;
+  string ory_identity_id = 2;
+  string reseller_id = 3;
+}

@@ -4,6 +4,7 @@ from starlette import routing
 
 from snowfall.adapter import identities
 from snowfall.project.junction.go.adapter import resellers
+from snowfall.project.junction.hub.service.hub_api import repository
 from snowfall.project.junction.hub.service.hub_api.routes import (
     accounts,
     balances,
@@ -29,6 +30,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     user_handler = users.Users(
         _identities_client=dependencies[identities.Client],  # type: ignore[type-abstract]
         _resellers_client=dependencies[resellers.Client],  # type: ignore[type-abstract]
+        _users_repository=dependencies[repository.UsersRepository],
     )
 
     return [

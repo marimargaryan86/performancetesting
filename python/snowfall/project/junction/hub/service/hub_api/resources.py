@@ -1165,7 +1165,7 @@ class UserResource(models.Resource):
     ) -> UserResource:
         metadata = dict(identity.metadata_public.items())
         role = metadata.get("role", "")
-        reseller_id = str(metadata.get("reseller_id", ""))
+        reseller_id = metadata.get("reseller_id", "")
         return cls(
             id=identity.id,
             type=UserResource.api_type,
@@ -1177,7 +1177,7 @@ class UserResource(models.Resource):
                 "reseller": {
                     _RELATIONSHIPS_FIELD: (
                         models.ResourceIdentifier(
-                            id=reseller_id,
+                            id=str(reseller_id),
                             type=ResellerResource.api_type,
                         )
                         if reseller_id

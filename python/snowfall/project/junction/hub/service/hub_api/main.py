@@ -1,9 +1,13 @@
 import asyncio
+import random
+from collections.abc import Sequence
 from typing import NamedTuple
 
 import httpx
+import pydantic
 import stripe
 from grpc import aio
+from motor import motor_asyncio
 from starlette import middleware
 from starlette.middleware import authentication as auth_middleware
 
@@ -12,7 +16,12 @@ from snowfall.adapter import identities
 from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
-from snowfall.project.junction.hub.service.hub_api import bootstrap, permissions, router
+from snowfall.project.junction.hub.service.hub_api import (
+    bootstrap,
+    permissions,
+    repository,
+    router,
+)
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors as config_vector_adapter,
 )
@@ -76,6 +85,7 @@ class Settings(starlette.Settings):
     stripe_api_key: str
     credit_card_address: str
     notifications_address: str
+    mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
 class _Channels(NamedTuple):
@@ -91,6 +101,11 @@ class _Channels(NamedTuple):
 
 async def _http(app: application.Application[Settings]) -> None:
     stripe.api_key = app.settings.stripe_api_key
+
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
     authentication_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.authentication_address,
@@ -220,6 +235,9 @@ async def _http(app: application.Application[Settings]) -> None:
                     ConfigurationVectorServiceStub(
                         channels.configuration_vectors,
                     ),
+                ),
+                users_repository=repository.UsersRepository(
+                    collection=mongo.hub.users,
                 ),
             ),
         ),
