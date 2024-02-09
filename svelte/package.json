@@ -3,7 +3,8 @@
   "name": "@snowfall/monorepo",
   "private": true,
   "workspaces": [
-    "hub-web"
+    "hub-web",
+    "fti-web"
   ],
   "scripts": {
     "hub:build": "yarn workspace @snowfall/hub-web build",
@@ -11,6 +12,12 @@
     "hub:dev": "yarn workspace @snowfall/hub-web dev",
     "hub:lint": "yarn workspace @snowfall/hub-web lint",
     "hub:test": "yarn workspace @snowfall/hub-web test",
-    "hub:vitest": "yarn workspace @snowfall/hub-web vitest --run"
+    "hub:vitest": "yarn workspace @snowfall/hub-web vitest --run",
+    "fti:build": "yarn workspace @snowfall/fti-web build",
+    "fti:check": "yarn workspace @snowfall/fti-web check",
+    "fti:dev": "yarn workspace @snowfall/fti-web dev",
+    "fti:lint": "yarn workspace @snowfall/fti-web lint",
+    "fti:test": "yarn workspace @snowfall/fti-web test",
+    "fti:vitest": "yarn workspace @snowfall/fti-web vitest --run"
   }
 }

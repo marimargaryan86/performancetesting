@@ -1,0 +1,154 @@
+{
+  "routes": [
+    {
+      "source": "JFK",
+      "destination": "LAX",
+      "distance": 2465,
+      "airline": "American Airlines"
+    },
+    {
+      "source": "LHR",
+      "destination": "CDG",
+      "distance": 344,
+      "airline": "British Airways"
+    },
+    {
+      "source": "HND",
+      "destination": "ICN",
+      "distance": 742,
+      "airline": "Japan Airlines"
+    },
+    {
+      "source": "SFO",
+      "destination": "ORD",
+      "distance": 1846,
+      "airline": "United Airlines"
+    },
+    {
+      "source": "DXB",
+      "destination": "JFK",
+      "distance": 6950,
+      "airline": "Emirates"
+    },
+    {
+      "source": "LAX",
+      "destination": "LAS",
+      "distance": 236,
+      "airline": "Southwest Airlines"
+    },
+    {
+      "source": "ORD",
+      "destination": "DFW",
+      "distance": 802,
+      "airline": "American Airlines"
+    },
+    {
+      "source": "ATL",
+      "destination": "MCO",
+      "distance": 404,
+      "airline": "Delta Air Lines"
+    },
+    {
+      "source": "LGA",
+      "destination": "BOS",
+      "distance": 184,
+      "airline": "JetBlue Airways"
+    },
+    {
+      "source": "SEA",
+      "destination": "SFO",
+      "distance": 679,
+      "airline": "Alaska Airlines"
+    },
+    {
+      "source": "MIA",
+      "destination": "FLL",
+      "distance": 21,
+      "airline": "Spirit Airlines"
+    },
+    {
+      "source": "DEN",
+      "destination": "PHX",
+      "distance": 602,
+      "airline": "Southwest Airlines"
+    },
+    {
+      "source": "IAH",
+      "destination": "ATL",
+      "distance": 696,
+      "airline": "United Airlines"
+    },
+    {
+      "source": "LAS",
+      "destination": "SFO",
+      "distance": 414,
+      "airline": "Southwest Airlines"
+    },
+    {
+      "source": "MCO",
+      "destination": "JFK",
+      "distance": 944,
+      "airline": "JetBlue Airways"
+    },
+    {
+      "source": "CDG",
+      "destination": "FRA",
+      "distance": 394,
+      "airline": "Air France"
+    },
+    {
+      "source": "LHR",
+      "destination": "AMS",
+      "distance": 369,
+      "airline": "KLM"
+    },
+    {
+      "source": "MAD",
+      "destination": "BCN",
+      "distance": 505,
+      "airline": "Iberia"
+    },
+    {
+      "source": "FRA",
+      "destination": "MUC",
+      "distance": 308,
+      "airline": "Lufthansa"
+    },
+    {
+      "source": "BCN",
+      "destination": "MAD",
+      "distance": 505,
+      "airline": "Vueling"
+    },
+    {
+      "source": "AMS",
+      "destination": "CDG",
+      "distance": 394,
+      "airline": "Air France"
+    },
+    {
+      "source": "MUC",
+      "destination": "FRA",
+      "distance": 308,
+      "airline": "Lufthansa"
+    },
+    {
+      "source": "CPH",
+      "destination": "OSL",
+      "distance": 372,
+      "airline": "SAS"
+    },
+    {
+      "source": "ARN",
+      "destination": "HEL",
+      "distance": 397,
+      "airline": "Finnair"
+    },
+    {
+      "source": "OSL",
+      "destination": "CPH",
+      "distance": 372,
+      "airline": "SAS"
+    }
+  ]
+}
