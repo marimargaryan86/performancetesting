@@ -7,7 +7,7 @@ pants:setup:
   interruptible: true
   script:
     - docker login -u "${CI_DEPENDENCY_PROXY_USER}" -p "${CI_DEPENDENCY_PROXY_PASSWORD}" "${CI_DEPENDENCY_PROXY_SERVER}"
-    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - docker login -u "${PIPELINE_REGISTRY_USER}" -p "${PIPELINE_REGISTRY_USER_PASSWORD}" "${CI_REGISTRY}"
     - docker buildx build --cache-to type=inline --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG} --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/pants:${CI_DEFAULT_BRANCH} --pull --push --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg "PANTS_VERSION=$(grep pants_version pants.toml | cut -d'"' -f 2)" .gitlab/
   needs: []
   rules:

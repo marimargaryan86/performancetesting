@@ -47,7 +47,7 @@ allow-breaking-changes:
   interruptible: true
   before_script:
     - set -euo pipefail
-    - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
+    - docker login -u "${PIPELINE_REGISTRY_USER}" -p "${PIPELINE_REGISTRY_USER_PASSWORD}" "${CI_REGISTRY}"
     - docker pull "${CI_REGISTRY_IMAGE}/service/snowman:latest"
   script:
     - IS_BREAKING=$(docker run --rm "${CI_REGISTRY_IMAGE}/service/snowman:latest" parse "${CI_MERGE_REQUEST_TITLE}" 2>&1 | grep Breaking | cut -d ' ' -f2)
@@ -93,8 +93,8 @@ misc:validate:
     NOMAD_VAR_docker_image: "${CI_REGISTRY_IMAGE}"
     NOMAD_VAR_environment: "foobar"
     NOMAD_VAR_registry_address: "${CI_REGISTRY}"
-    NOMAD_VAR_registry_password: "${CI_REGISTRY_PASSWORD}"
-    NOMAD_VAR_registry_username: "${CI_REGISTRY_USER}"
+    NOMAD_VAR_registry_password: "${PIPELINE_REGISTRY_USER_PASSWORD}"
+    NOMAD_VAR_registry_username: "${PIPELINE_REGISTRY_USER}"
 
 schedule:post-git-changelog:
   stage: schedule
