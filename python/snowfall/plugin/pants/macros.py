@@ -102,6 +102,34 @@ def custom_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]
         name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
     )
 
+    docker_image(  # type: ignore[name-defined]  # noqa: F821
+        **{
+            **kwargs,
+            "image_tags": ["{build_args.VERSION}"],
+            "repository": repository.replace("//", "/").strip("/"),
+        },
+    )
+
+
+def svelte_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]  # noqa: ANN001,ANN003
+    if str(build_file_dir().parent) != "svelte":  # type: ignore[name-defined]  # noqa: F821
+        raise NotImplementedError(
+            "only direct children of <repo root>/svelte/ are currently supported",
+        )
+
+    folder_name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
+    repository = "{base_url}/{prefix}/{namespace}/{name}".format(
+        base_url=env("CI_PROJECT_PATH", ""),  # type: ignore[name-defined]  # noqa: F821
+        prefix=prefix or "",
+        namespace="-".join(
+            [
+                part.replace("_", "-")
+                for part in build_file_dir().parent.parts[1:]  # type: ignore[name-defined]  # noqa: F821
+            ],
+        ),
+        name=build_file_dir().name.replace("_", "-"),  # type: ignore[name-defined]  # noqa: F821
+    )
+
     with open(".node-version", encoding="utf-8") as version_file:  # noqa: FURB101,PTH123
         node_version = version_file.read().strip()
 
@@ -111,6 +139,32 @@ def custom_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]
             "image_tags": ["{build_args.VERSION}"],
             "repository": repository.replace("//", "/").strip("/"),
             "extra_build_args": ["NODE_VERSION={0}".format(node_version)],
+            "instructions": [
+                "ARG REGISTRY",
+                "ARG NODE_VERSION",
+                "FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim AS build",
+                "RUN corepack enable",
+                "WORKDIR /app",
+                "COPY svelte/package.json svelte/yarn.lock svelte/.yarnrc.yml ./",
+                "COPY svelte/{0}/package.json svelte/{0}/svelte.config.js svelte/{0}/vite.config.ts ./{0}/".format(
+                    folder_name,
+                ),
+                "RUN yarn install --immutable",
+                "COPY svelte/{0} ./{0}".format(folder_name),
+                "RUN yarn workspace @snowfall/{0} build \\".format(folder_name),
+                "&& rm -rf node_modules \\",
+                "&& yarn workspaces focus --production -A \\",
+                "&& cp -r node_modules {0}/build/node_modules \\".format(folder_name),
+                "&& cp {0}/package.json {0}/build/".format(folder_name),
+                "FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim AS runtime",
+                "WORKDIR /app",
+                "COPY --from=build /app/{0}/build /app".format(folder_name),
+                'ARG VERSION "dev"',
+                "ENV VERSION $VERSION",
+                'LABEL vendor="Snowfall Limited"',
+                "LABEL com.snowfalltravel.version=$VERSION",
+                'CMD ["node", "/app"]',
+            ],
         },
     )
 
