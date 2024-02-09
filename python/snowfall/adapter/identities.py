@@ -115,6 +115,15 @@ class DictClient(Client):
         page_token: str | None = None,
         identifiers: Sequence[str] | None = None,
     ) -> identities_pb2.ListIdentitiesResponse:
+        if identifiers:
+            return identities_pb2.ListIdentitiesResponse(
+                identities=[
+                    identity
+                    for identity_id, identity in self._identities.items()
+                    if identity_id in identifiers
+                ],
+            )
+
         return identities_pb2.ListIdentitiesResponse(
             identities=list(self._identities.values()),
         )

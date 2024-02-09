@@ -187,6 +187,16 @@ class TestDictClient(object):
 
         assert len(identities_response.identities) == 2
 
+    async def test_list_identities_by_ids(
+        self,
+        identities_client: identities.Client,
+    ) -> None:
+        identities_response = await identities_client.list_ory_identities(
+            identifiers=[IDENTITIES[0]],
+        )
+
+        assert len(identities_response.identities) == 1
+
     async def test_delete_identity(
         self,
         identities_client: identities.Client,
