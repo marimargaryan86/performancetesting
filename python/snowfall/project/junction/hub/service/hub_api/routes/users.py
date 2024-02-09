@@ -2,7 +2,7 @@ import asyncio
 import dataclasses
 
 import lagom
-from starlette import endpoints, exceptions, requests, responses, status
+from starlette import endpoints, requests, responses, status
 
 from snowfall.adapter import identities as identities_adapter
 from snowfall.project.junction.go.adapter import resellers
@@ -29,8 +29,12 @@ class Users(object):
 
     async def view(self, request: messages.Request) -> responses.Response:
         check_permission("user.view", request.starlette_request.user.permissions)
-
-        raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+        user_id = request.path_params["userId"]
+        user = await self._identities_client.get_ory_identity(identifier=user_id)
+        return await messages.create_response(
+            body=models.Body(data=resources.UserResource.from_proto(user)),
+            request=request.starlette_request,
+        )
 
     async def delete(self, request: messages.Request) -> responses.Response:
         check_permission("user.delete", request.starlette_request.user.permissions)
@@ -46,7 +50,6 @@ class Users(object):
 
     async def list_(self, request: messages.Request) -> responses.Response:
         check_permission("user.view", request.starlette_request.user.permissions)
-
         return models.JsonApiResponse(
             models.Body(
                 data=[],

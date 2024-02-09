@@ -1,3 +1,4 @@
+import copy
 from collections.abc import Sequence
 from typing import Any
 
@@ -68,6 +69,26 @@ async def test_create_user(
             response_reseller_id = user["relationships"]["reseller"]["data"]["id"]
             assert response_reseller_id
             assert hub_user.reseller_id == response_reseller_id
+
+
+async def test_get_user(
+    client: httpx.AsyncClient,
+    ory_identities: Sequence[identities_pb2.Identity],
+) -> None:
+    ory_user = copy.copy(ory_identities[0])
+    response = await client.get(
+        "/users/{0}".format(ory_user.id),
+        headers={"Content-Type": "application/vnd.api+json"},
+    )
+
+    response_data = response.json()["data"]
+    assert response_data["id"] == ory_user.id
+    assert response_data["attributes"]["email"] == ory_user.email
+    assert response_data["attributes"]["role"] == ory_user.metadata_public["role"]
+    assert (
+        response_data["relationships"]["reseller"]["data"]["id"]
+        == ory_identities[0].metadata_public["reseller_id"]
+    )
 
 
 async def test_delete_user(

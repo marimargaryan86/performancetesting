@@ -157,6 +157,20 @@ class TestClient(object):
 
         assert len(identities.identities) == 2
 
+    async def test_get_identity(
+        self,
+        mock_identity_response: dict[str, Any],
+        ory_client: client.OryClient,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.add_response(method="GET", json=mock_identity_response)
+
+        response = await ory_client.get_identity(
+            identifier=mock_identity_response["id"],
+        )
+
+        assert response.identifier == mock_identity_response["id"]
+
     async def test_list_identities_by_ids(
         self,
         httpx_mock: pytest_httpx.HTTPXMock,
