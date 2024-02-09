@@ -40,7 +40,7 @@
 
   $: menuItems = [
     {
-      url: routeConfig.routes.tripManagement.routes.book.root,
+      url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
       label: $t("pages.tripManagement.pages.book.title"),
       icon: "ticket",
     },

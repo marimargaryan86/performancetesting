@@ -43,14 +43,14 @@
     OrderPassenger,
     TravelerDocument,
   } from "~/integration/junction-mobile-api/schemas/order";
-  import Collapsible from "../../components/collapsible.svelte";
+  import Collapsible from "../../../components/collapsible.svelte";
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import type { Require } from "~/integration/ts-helpers";
   import {
     getPassengerFullLabel,
     PASSENGER_DEFINITIONS,
     type PassengerPickerData,
-  } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
+  } from "../../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { getLocale, getTranslator, type Locale, type Translator } from "~/i18n";
   import type {
     Gender,

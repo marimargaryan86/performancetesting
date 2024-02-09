@@ -13,10 +13,10 @@
 <script lang="ts">
   import routeConfig from "~/route-config";
   import Alert, { type AlertType } from "~/components/ui/alert.svelte";
-  import Passengers from "../../components/passengers.svelte";
-  import Price from "../../components/price.svelte";
+  import Passengers from "../../../components/passengers.svelte";
+  import Price from "../../../components/price.svelte";
   import Overview from "./overview.svelte";
-  import Itinerary from "../../components/itinerary.svelte";
+  import Itinerary from "../../../components/itinerary.svelte";
   import { ensureDefined } from "~/utils/array";
   import { getOrderStatus, type OrderBookingStatus } from "~/integration/common/schemas/order";
   import Fees from "./fees.svelte";
@@ -99,7 +99,11 @@
 
 <div class="actions">
   <div class="wrapper">
-    <a variant="primary" size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
+    <a
+      variant="primary"
+      size="small"
+      href={routeConfig.routes.tripManagement.routes.book.routes.train.root}
+    >
       {$t("sentences.newSearch")}
     </a>
   </div>

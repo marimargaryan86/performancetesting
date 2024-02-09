@@ -3,7 +3,7 @@ import type { Order } from "~/integration/junction-mobile-api/schemas/order";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "~/route-config";
 import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
-import { getCookie } from "../../booking-flow";
+import { getCookie } from "../../../booking-flow";
 
 export async function load(event): Promise<{
   order: Order;
@@ -27,6 +27,6 @@ export async function load(event): Promise<{
 
     return { order, markups };
   } catch {
-    throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
+    throw redirect(303, routeConfig.routes.tripManagement.routes.book.routes.train.root);
   }
 }

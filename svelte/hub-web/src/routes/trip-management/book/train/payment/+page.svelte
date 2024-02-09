@@ -19,19 +19,19 @@
   import { z } from "zod";
   import { goto } from "$app/navigation";
   import PriceDialog from "~/components/ui/dialogues/price-dialog.svelte";
-  import Summary from "../../components/summary/summary.svelte";
-  import type { PassengerPickerData } from "../../components/trip-search/passenger-picker/passenger-picker.svelte";
+  import Summary from "../../../components/summary/summary.svelte";
+  import type { PassengerPickerData } from "../../../components/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
   import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
-  import FareRulesDialog from "../../components/fare-rules-dialog.svelte";
+  import FareRulesDialog from "../../../components/fare-rules-dialog.svelte";
   import { getPassengerValidator } from "~/utils/passenger";
   import { writable } from "svelte/store";
   import { formatAmount } from "$lib/formatting/currency";
-  import TripBanner from "../../components/trip-banner.svelte";
+  import TripBanner from "../../../components/trip-banner.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import { getLocale, getTranslator } from "~/i18n";
   import type { TripOfferPriceQuoteCompleted } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import { manager, markupsModel, type Markups, type PartialMarkups } from "../../booking-flow";
+  import { manager, markupsModel, type Markups, type PartialMarkups } from "../../../booking-flow";
   import { browser } from "$app/environment";
 
   export let data;
@@ -95,7 +95,7 @@
   }
 
   function cancel(): void {
-    goto(routeConfig.routes.tripManagement.routes.book.routes.select.root);
+    goto(routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root);
   }
 
   async function createOrder(): Promise<boolean> {
@@ -175,7 +175,9 @@
         return;
       }
 
-      await goto(routeConfig.routes.tripManagement.routes.book.routes.confirmation.root);
+      await goto(
+        routeConfig.routes.tripManagement.routes.book.routes.train.routes.confirmation.root,
+      );
     } finally {
       $pending = false;
     }
@@ -246,7 +248,7 @@
     <a
       variant="outline"
       size="small"
-      href={routeConfig.routes.tripManagement.routes.book.routes.select.root}
+      href={routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root}
     >
       {$t("actions.previous")}
     </a>

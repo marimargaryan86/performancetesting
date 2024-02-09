@@ -2,7 +2,7 @@ import { redirect } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
 import routeConfig from "~/route-config";
 import type { UserProfile } from "~/integration/junction-hub-api/schemas/user";
-import { getCookie, type BookingSessionSelect } from "../../booking-flow";
+import { getCookie, type BookingSessionSelect } from "../../../booking-flow";
 
 export async function load(event): Promise<{
   bookingSession: BookingSessionSelect;
@@ -16,6 +16,6 @@ export async function load(event): Promise<{
       }),
     };
   } catch {
-    throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
+    throw redirect(303, routeConfig.routes.tripManagement.routes.book.routes.train.root);
   }
 }

@@ -40,14 +40,14 @@
 <script lang="ts">
   import { roundCurrency } from "~/utils/money";
   import { slideFade } from "~/transitions/slide-fade";
-  import Collapsible from "../../components/collapsible.svelte";
+  import Collapsible from "../../../components/collapsible.svelte";
   import LoadingIcon from "~/components/icons/loading-icon.svelte";
   import SelectField from "~/components/ui/select-field.svelte";
   import TextField from "~/components/ui/text-field.svelte";
   import { formatAmount } from "$lib/formatting/currency";
   import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
   import { getLocale, getTranslator } from "~/i18n";
-  import type { Markups, PartialMarkups } from "../../booking-flow";
+  import type { Markups, PartialMarkups } from "../../../booking-flow";
   import type { z } from "zod";
 
   export let priceQuote: TripOfferPriceQuote | undefined = undefined;

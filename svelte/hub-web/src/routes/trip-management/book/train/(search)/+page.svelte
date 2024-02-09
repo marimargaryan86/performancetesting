@@ -1,9 +1,9 @@
 <script lang="ts">
   import { getPageTitle } from "~/utils/page-title";
-  import TripSearch from "../../components/trip-search/trip-search.svelte";
+  import TripSearch from "../../../components/trip-search/trip-search.svelte";
   import { getTranslator } from "~/i18n";
   import type { ComponentEvents } from "svelte";
-  import { manager } from "../../booking-flow";
+  import { manager } from "../../../booking-flow";
   import { goto } from "$app/navigation";
   import routeConfig from "~/route-config";
 
@@ -12,7 +12,7 @@
   async function search(event: ComponentEvents<TripSearch>["search"]): Promise<void> {
     event.detail.pending?.set(true);
     await manager.search(event.detail.data);
-    await goto(routeConfig.routes.tripManagement.routes.book.routes.select.root);
+    await goto(routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root);
     event.detail.pending?.set(false);
   }
 </script>

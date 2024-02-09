@@ -19,9 +19,26 @@ export default {
               root: `${this.root}/book`,
               get routes() {
                 return {
-                  select: { root: `${this.root}/select-offer` },
-                  payment: { root: `${this.root}/payment` },
-                  confirmation: { root: `${this.root}/confirmation` },
+                  train: {
+                    root: `${this.root}/train`,
+                    get routes() {
+                      return {
+                        select: { root: `${this.root}/select-offer` },
+                        payment: { root: `${this.root}/payment` },
+                        confirmation: { root: `${this.root}/confirmation` },
+                      } as const;
+                    },
+                  },
+                  car: {
+                    root: `${this.root}/car`,
+                    get routes() {
+                      return {
+                        select: { root: `${this.root}/select-offer` },
+                        payment: { root: `${this.root}/payment` },
+                        confirmation: { root: `${this.root}/confirmation` },
+                      } as const;
+                    },
+                  },
                 } as const;
               },
             },

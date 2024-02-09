@@ -157,7 +157,11 @@
       <Icon variant="search" size="20px" />
       {$t("actions.findTrip")}
     </button>
-    <a variant="primary" size="small" href={routeConfig.routes.tripManagement.routes.book.root}>
+    <a
+      variant="primary"
+      size="small"
+      href={routeConfig.routes.tripManagement.routes.book.routes.train.root}
+    >
       <Icon variant="plus" size="20px" />
       {$t("actions.newOrder")}
     </a>

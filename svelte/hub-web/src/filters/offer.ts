@@ -5,7 +5,7 @@ import {
   getEarliestArrival,
   getOfferDurationM,
 } from "~/utils/offer";
-import type { SearchOptionsData } from "../routes/trip-management/book/select-offer/search-options.svelte";
+import type { SearchOptionsData } from "../routes/trip-management/book/train/select-offer/search-options.svelte";
 import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
 
 function stopsFulfilled(options: SearchOptionsData, offer: Offer): boolean {
@@ -45,7 +45,7 @@ function vendorsFulfilled(options: SearchOptionsData, offer: Offer): boolean {
     group.detailsList.map((details) => details.vendor),
   );
 
-  return Boolean(options.vendors.find((item) => vendors.includes(item)));
+  return Boolean(options.vendors.find((item: string) => vendors.includes(item)));
 }
 
 export function getFilterOffersFunc(options: SearchOptionsData): (offer: Offer) => boolean {

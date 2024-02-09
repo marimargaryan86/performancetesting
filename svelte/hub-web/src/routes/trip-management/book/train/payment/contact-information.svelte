@@ -41,7 +41,7 @@
   import TextField from "~/components/ui/text-field.svelte";
   import { formatCountryOption, formatCountryPhoneOption } from "$lib/formatting/location";
   import type { CountryModel } from "~/models/location";
-  import Collapsible from "../../components/collapsible.svelte";
+  import Collapsible from "../../../components/collapsible.svelte";
   import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
   import countryData from "~/data/country-data";
   import { getTranslator } from "~/i18n";

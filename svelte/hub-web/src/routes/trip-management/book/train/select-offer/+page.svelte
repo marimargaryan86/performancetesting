@@ -32,7 +32,7 @@
     SEARCH_WINDOW_DELTA_MS,
     SEARCH_WINDOW_H,
     type SearchData,
-  } from "../../components/trip-search/trip-search.svelte";
+  } from "../../../components/trip-search/trip-search.svelte";
   import SearchOptions, {
     type SearchOptionsData,
     type SearchOptionsSettings,
@@ -53,9 +53,9 @@
   import { writable } from "svelte/store";
   import { getPageTitle } from "~/utils/page-title";
   import { getTranslator } from "~/i18n";
-  import { manager, type PartialSelectedOffer } from "../../booking-flow";
+  import { manager, type PartialSelectedOffer } from "../../../booking-flow";
   import { browser, dev } from "$app/environment";
-  import CollapsibleTripSearch from "../../components/trip-search/collapsible-trip-search.svelte";
+  import CollapsibleTripSearch from "../../../components/trip-search/collapsible-trip-search.svelte";
   import ChevronIcon from "~/components/icons/chevron-icon.svelte";
 
   export let data;
@@ -128,7 +128,7 @@
       }
 
       await manager.selectOffer(data.bookingSession, offer, options);
-      await goto(routeConfig.routes.tripManagement.routes.book.routes.payment.root);
+      await goto(routeConfig.routes.tripManagement.routes.book.routes.train.routes.payment.root);
     } finally {
       $selectOfferPending = false;
     }

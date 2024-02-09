@@ -6,7 +6,7 @@ import type {
 } from "~/integration/junction-hub-api/schemas/transaction";
 import type { UserRole } from "~/integration/ory/schemas/authentication";
 import type { PassengerType } from "../../routes/trip-management/components/trip-search/passenger-picker/passenger-picker.svelte";
-import type { SortOption } from "../../routes/trip-management/book/select-offer/search-options.svelte";
+import type { SortOption } from "../../routes/trip-management/book/train/select-offer/search-options.svelte";
 import type { PriceBreakdownType } from "~/integration/common/schemas/price";
 import type {
   Gender,

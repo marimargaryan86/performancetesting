@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "~/route-config";
-import { getCookie, type BookingSessionSearch } from "../../booking-flow";
+import { getCookie, type BookingSessionSearch } from "../../../booking-flow";
 
 export function load(event): {
   bookingSession: BookingSessionSearch;
@@ -10,6 +10,6 @@ export function load(event): {
       bookingSession: getCookie("search", event),
     };
   } catch (err) {
-    throw redirect(303, routeConfig.routes.tripManagement.routes.book.root);
+    throw redirect(303, routeConfig.routes.tripManagement.routes.book.routes.train.root);
   }
 }

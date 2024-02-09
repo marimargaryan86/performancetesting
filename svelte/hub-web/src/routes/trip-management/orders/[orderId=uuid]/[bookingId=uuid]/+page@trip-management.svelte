@@ -10,7 +10,7 @@
   import { getUser, permitted } from "~/utils/permissions";
   import Admin from "./admin.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import Fees from "../../../book/confirmation/fees.svelte";
+  import Fees from "../../../book/train/confirmation/fees.svelte";
   import { getPageTitle } from "~/utils/page-title";
   import { getLocale, getTranslator } from "~/i18n";
   import Price from "../../../components/price.svelte";

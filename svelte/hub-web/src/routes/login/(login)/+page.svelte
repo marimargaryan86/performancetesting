@@ -89,7 +89,7 @@
       if (result.state === "success") {
         const redirect =
           result.user.role === "reseller-admin" || result.user.role === "reseller-user"
-            ? routeConfig.routes.tripManagement.routes.book.root
+            ? routeConfig.routes.tripManagement.routes.book.routes.train.root
             : routeConfig.root;
 
         return await goto(redirect, { invalidateAll: true });

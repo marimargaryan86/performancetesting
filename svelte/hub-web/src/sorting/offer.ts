@@ -4,7 +4,7 @@ import {
   getOfferDurationS,
   getLowestPrice,
 } from "~/utils/offer";
-import type { SearchOptionsData } from "../routes/trip-management/book/select-offer/search-options.svelte";
+import type { SearchOptionsData } from "../routes/trip-management/book/train/select-offer/search-options.svelte";
 import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
 
 function getArrivalDelta(a: Offer, b: Offer): number {
