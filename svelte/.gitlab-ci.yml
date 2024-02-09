@@ -30,6 +30,7 @@ svelte:setup:
           - svelte/yarn.lock
       paths:
         - svelte/.yarn/cache/
+      when: always
   needs:
     - "svelte:setup"
   rules:
