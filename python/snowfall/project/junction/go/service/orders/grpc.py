@@ -4,6 +4,7 @@ import more_itertools
 from google.protobuf import json_format
 from grpc import StatusCode, aio
 
+from snowfall.project.junction.go.service.gateway.v1 import meta_pb2, meta_pb2_grpc
 from snowfall.project.junction.go.service.orders import bookings, smtp
 from snowfall.project.junction.go.service.orders.amqp import OrderProducer
 from snowfall.project.junction.go.service.orders.orders import (
@@ -53,6 +54,7 @@ class OrderService(
         default_page_size: int,
         environment: str,
         refund_client: refunds_adapter.Client,
+        gateway_meta: meta_pb2_grpc.MetaServiceStub,
     ):
         self._default_page_size = default_page_size
         self._journeys = journeys
@@ -67,6 +69,7 @@ class OrderService(
         self._refund_client = refund_client
         self._environment = environment
         self._smtp_client = smtp_client
+        self._gateway_meta = gateway_meta
         self._logger = stdout.get_logger()
 
     def get_name(self) -> str:
@@ -415,4 +418,19 @@ class OrderService(
 
         return orders_pb2.UpdateBookingCancellationResponse(
             booking_cancellation=booking_cancellation,
+        )
+
+    async def Sleep(  # type: ignore[override] # noqa: N802
+        self,
+        request: orders_pb2.SleepRequest,
+        context: aio.ServicerContext,
+    ) -> orders_pb2.SleepResponse:
+        response = await self._gateway_meta.Sleep(
+            request=meta_pb2.SleepRequest(
+                duration_seconds=request.duration_seconds,
+            ),
+        )
+
+        return orders_pb2.SleepResponse(
+            text=response.text,
         )

@@ -10,7 +10,10 @@ from motor import motor_asyncio
 
 from snowfall.project.junction.go.adapter import orders as orders_adapter
 from snowfall.project.junction.go.adapter import passenger_name_records
-from snowfall.project.junction.go.service.gateway.v1 import bookings_pb2_grpc
+from snowfall.project.junction.go.service.gateway.v1 import (
+    bookings_pb2_grpc,
+    meta_pb2_grpc,
+)
 from snowfall.project.junction.go.service.orders import (
     bookings,
     importer,
@@ -132,6 +135,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         app.settings.grpc_port,
         [
             OrderService(
+                gateway_meta=meta_pb2_grpc.MetaServiceStub(
+                    gateway_channel,
+                ),
                 journeys=orders.JourneyRepository(
                     collection=mongo.orders.journeys,
                     passenger_name_records=passenger_name_records_client,

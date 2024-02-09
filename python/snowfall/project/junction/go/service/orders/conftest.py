@@ -20,6 +20,7 @@ from snowfall.project.junction.go.service.resellers.v1 import (
     resellers_pb2,
     resellers_pb2_grpc,
 )
+from snowfall.project.junction.service.gateway.v1 import meta_pb2_grpc
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
@@ -202,5 +203,6 @@ async def order_service_tester(
             cancellation_task_producer=mock.create_autospec(producer.Producer),
             smtp_client=mock.create_autospec(smtp.EmailClient),
             environment="test",
+            gateway_meta=mock.create_autospec(meta_pb2_grpc.MetaServiceStub),
         ),
     )

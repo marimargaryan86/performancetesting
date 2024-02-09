@@ -27,6 +27,15 @@ service OrderService {
   rpc ListBookingCancellations(ListBookingCancellationsRequest) returns (ListBookingCancellationsResponse) {}
   rpc HandleCancellationTicketCompleted(HandleCancellationTicketCompletedRequest) returns (HandleCancellationTicketCompletedResponse) {}
   rpc UpdateBookingCancellation(UpdateBookingCancellationRequest) returns (UpdateBookingCancellationResponse) {}
+  rpc Sleep(SleepRequest) returns (SleepResponse) {}
+}
+
+message SleepRequest {
+  sint32 duration_seconds = 1;
+}
+
+message SleepResponse {
+  string text = 1;
 }
 
 message CreateJourneyRequest {
