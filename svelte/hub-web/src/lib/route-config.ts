@@ -69,6 +69,21 @@ export default {
           } as const;
         },
       },
+      adminControls: {
+        root: "/admin-controls",
+        get routes() {
+          return {
+            users: {
+              root: `${this.root}/users`,
+              get routes() {
+                return {
+                  create: { root: `${this.root}/create` },
+                } as const;
+              },
+            },
+          } as const;
+        },
+      },
       login: {
         root: "/login",
         get routes() {

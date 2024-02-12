@@ -20,6 +20,8 @@ const BASE_PERMISSIONS = {
   "transaction.add": 2 ** 12,
   "user.view": 2 ** 13,
   "user.add": 2 ** 14,
+  "users.view": 2 ** 15,
+  "users.add": 2 ** 16,
 };
 
 const PERMISSIONS = {

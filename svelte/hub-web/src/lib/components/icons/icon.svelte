@@ -23,6 +23,7 @@
     | "knowledge"
     | "lock"
     | "logout"
+    | "password"
     | "passenger"
     | "payment"
     | "phone"
@@ -38,7 +39,8 @@
     | "ticket"
     | "download"
     | "pdf"
-    | "swap-directions";
+    | "swap-directions"
+    | "user";
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 

@@ -160,6 +160,7 @@ export default {
     bookTrip: "Book Trip",
     findTrip: "Find Trip",
     modifySearch: "Modify Search",
+    addUser: "Add User",
   },
   sentences: {
     priceChange: "Price change",
@@ -345,6 +346,28 @@ export default {
     unspecified: "Unspecified",
   } satisfies Record<StatusBadgeValue, string>,
   pages: {
+    adminControls: {
+      title: "Admin Controls",
+      pages: {
+        users: {
+          title: "Users",
+          pages: {
+            create: {
+              title: "Add User",
+              subTitle: "Create a new user",
+            },
+            update: {
+              title: "Update User",
+              subTitle: "Update user information",
+            },
+            delete: {
+              title: "Delete User",
+              subTitle: "Delete a user",
+            },
+          },
+        },
+      },
+    },
     dashboard: {
       title: "Dashboard",
       intro: "<strong>Welcome to</strong><span>Junction Hub</span>",

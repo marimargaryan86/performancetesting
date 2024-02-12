@@ -18,7 +18,7 @@
   const t = getTranslator();
   const transitionTimeMs = 250;
 
-  function toggle(): void {
+  function toggleSidebar(): void {
     compact = !compact;
   }
 
@@ -27,53 +27,94 @@
     await goto(routeConfig.routes.login.root, { invalidateAll: true });
   }
 
-  let menuItems: (
-    | {
-        url: string;
-        label: string;
-        icon: ComponentProps<Icon>["variant"];
-        activeMatcher?: (pathname: string) => boolean;
-        permission?: Action;
-      }
-    | "spacer"
-  )[];
+  type MenuItemSpacer = { type: "spacer" };
+
+  type MenuItemLink = {
+    type: "link";
+    url: string;
+    label: string;
+    icon: ComponentProps<Icon>["variant"];
+    activeMatcher?: (pathname: string) => boolean;
+    permission?: Action;
+  };
+
+  type MenuItemParent = {
+    type: "parent";
+    url?: string;
+    label: string;
+    icon: ComponentProps<Icon>["variant"];
+    activeMatcher?: (pathname: string) => boolean;
+    permission?: Action;
+    children: MenuItem[];
+    expanded?: boolean;
+  };
+
+  type MenuItem = MenuItemSpacer | MenuItemLink | MenuItemParent;
+
+  let menuItems: MenuItem[];
 
   $: menuItems = [
     {
+      type: "link",
       url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
       label: $t("pages.tripManagement.pages.book.title"),
       icon: "ticket",
     },
     {
+      type: "link",
       url: routeConfig.routes.tripManagement.routes.orders.root,
       label: $t("pages.tripManagement.pages.orders.title"),
       icon: "bookings",
       permission: "journey.view",
     },
     {
+      type: "link",
       url: routeConfig.routes.pay.routes.activity.root,
       label: $t("pages.pay.pages.activity.title"),
       icon: "activity",
       permission: "transaction.view",
     },
     {
+      type: "link",
       url: routeConfig.routes.pay.routes.bills.root,
       label: $t("pages.pay.pages.bills.title"),
       icon: "bill",
       permission: "*",
     },
-    "spacer",
     {
+      type: "parent",
+      label: $t("pages.adminControls.title"),
+      icon: "password",
+      permission: "users.view",
+      children: [
+        {
+          type: "link",
+          icon: "user",
+          url: routeConfig.routes.adminControls.routes.users.root,
+          label: $t("pages.adminControls.pages.users.title"),
+          permission: "users.view",
+          activeMatcher: (pathname): boolean =>
+            pathname.startsWith(routeConfig.routes.adminControls.routes.users.root),
+        },
+      ],
+    },
+    {
+      type: "spacer",
+    },
+    {
+      type: "link",
       url: routeConfig.routes.knowledgeHub.root,
       label: $t("pages.knowledgeHub.title"),
       icon: "knowledge",
     },
     {
+      type: "link",
       url: routeConfig.routes.help.routes.customerService.root,
       label: $t("actions.reportAnIssue"),
       icon: "bug",
     },
     {
+      type: "link",
       url: routeConfig.routes.help.routes.privacyPolicy.root,
       label: $t("words.help"),
       icon: "information",
@@ -82,6 +123,12 @@
         pathname !== routeConfig.routes.help.routes.customerService.root,
     },
   ];
+
+  function toggleSubmenu(item: MenuItemParent): void {
+    item.expanded = !item.expanded;
+    // Create a new array (needed to detect change to trigger reactivity)
+    menuItems = [...menuItems];
+  }
 </script>
 
 <div
@@ -96,25 +143,114 @@
 
   <ul>
     {#each menuItems as item}
-      {#if item === "spacer"}
+      <!-- Handle Spacer -->
+      {#if item.type === "spacer"}
         <li class="spacer" />
-      {:else if !item.permission || permitted($user, item.permission)}
-        {@const active = item.activeMatcher
-          ? item.activeMatcher($page.url.pathname)
-          : $page.url.pathname.startsWith(item.url)}
-
-        <li>
-          <a href={item.url} typography="body-medium" class:active class="item" title={item.label}>
-            <Icon
-              variant={item.icon}
-              color="var({active ? '--color-main-primary-500' : '--color-common-light-strong'})"
-              size="20px"
-            />
-            <span>{item.label}</span>
-          </a>
-        </li>
+      {:else}
+        <!-- Handle parent navbar items with no children (link to routes) -->
+        {#if !item.permission || permitted($user, item.permission)}
+          {#if item.type === "link"}
+            {@const active = item.activeMatcher
+              ? item.activeMatcher($page.url.pathname)
+              : $page.url.pathname.startsWith(item.url)}
+            <li>
+              <a
+                href={item.url}
+                typography="body-medium"
+                class:active
+                class="item"
+                title={item.label}
+              >
+                <Icon
+                  variant={item.icon}
+                  color="var({active ? '--color-main-primary-500' : '--color-common-light-strong'})"
+                  size="20px"
+                />
+                <span>{item.label}</span>
+              </a>
+            </li>
+          {:else if item.type === "parent" && item.url}
+            <!-- Handle parent items that link to routes AND have children -->
+            {@const active =
+              item.url && item.activeMatcher
+                ? item.activeMatcher($page.url.pathname)
+                : $page.url.pathname.startsWith(item.url)}
+            <li>
+              <a
+                href={item.url}
+                typography="body-medium"
+                class:active
+                class="item"
+                title={item.label}
+                on:click={toggleSubmenu.bind(toggleSubmenu, item)}
+              >
+                <Icon
+                  variant={item.icon}
+                  color="var(--{active ? 'color-main-primary-500' : 'color-common-light-strong'})"
+                  size="20px"
+                />
+                <span>{item.label}</span>
+              </a>
+              <button on:click|stopPropagation={toggleSubmenu.bind(toggleSubmenu, item)}>
+                <ChevronIcon
+                  color="var(--color-main-neutral-400)"
+                  direction={item.expanded ? "up" : "down"}
+                />
+              </button>
+            </li>
+          {:else if item.type === "parent" && !item.url}
+            <!-- Handle parent items with children that do not themselves link to any URL -->
+            <li>
+              <button
+                typography="body-medium"
+                class="item"
+                title={item.label}
+                on:click={toggleSubmenu.bind(toggleSubmenu, item)}
+              >
+                <Icon variant={item.icon} color="var(--'color-common-light-strong'})" size="20px" />
+                <span>{item.label}</span>
+                <ChevronIcon
+                  color="var(--color-main-neutral-400)"
+                  direction={item.expanded ? "up" : "down"}
+                />
+              </button>
+            </li>
+            {#if item.expanded}
+              <!-- Handle child submenu items-->
+              {#each item.children as subItem}
+                {#if subItem.type === "link"}
+                  {#if !subItem.permission || permitted($user, subItem.permission)}
+                    {@const active = item.activeMatcher
+                      ? item.activeMatcher($page.url.pathname)
+                      : $page.url.pathname.startsWith(subItem.url)}
+                    <li class="submenu-item">
+                      <a
+                        href={subItem.url}
+                        typography="body-medium"
+                        class:active
+                        class="item"
+                        title={subItem.label}
+                      >
+                        <Icon
+                          variant={subItem.icon}
+                          color="var({active
+                            ? '--color-main-primary-500'
+                            : '--color-common-light-strong'})"
+                          size="20px"
+                        />
+                        <span>{subItem.label}</span>
+                      </a>
+                    </li>
+                  {/if}
+                {/if}
+              {/each}
+            {/if}
+          {/if}
+        {/if}
       {/if}
     {/each}
+
+    <!-- Bottom Section of navbar-->
 
     <li>
       <button
@@ -135,7 +271,7 @@
 
   <Account {compact} {transitionTimeMs} />
 
-  <button class="toggle" on:click={toggle}>
+  <button class="toggle" on:click={toggleSidebar}>
     <ChevronIcon color="var(--color-common-dark-strong)" direction={compact ? "right" : "left"} />
   </button>
 </div>
@@ -195,6 +331,10 @@
     border: 0;
     border-radius: 8px;
     cursor: pointer;
+  }
+
+  .submenu-item {
+    padding-left: 35px;
   }
 
   .item > :global(.icon) {

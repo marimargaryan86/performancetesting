@@ -154,6 +154,7 @@ export default {
     bookTrip: "Reservar viaje",
     findTrip: "Buscar viaje",
     modifySearch: "Modificar búsqueda",
+    addUser: "Agregar Usuario",
   },
   sentences: {
     priceChange: "Cambio de precio",
@@ -371,6 +372,28 @@ export default {
     },
     account: {
       title: "Configuraciones de la cuenta",
+    },
+    adminControls: {
+      title: "Controles de Administrador",
+      pages: {
+        users: {
+          title: "Usuarios",
+          pages: {
+            create: {
+              title: "Agregar Usuario",
+              subTitle: "Crear un nuevo usuario",
+            },
+            update: {
+              title: "Actualizar Usuario",
+              subTitle: "Actualizar la información del usuario",
+            },
+            delete: {
+              title: "Eliminar Usuario",
+              subTitle: "Eliminar un usuario",
+            },
+          },
+        },
+      },
     },
     help: {
       title: "Ayuda",

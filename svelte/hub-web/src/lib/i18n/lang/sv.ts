@@ -154,6 +154,7 @@ export default {
     bookTrip: "Boka resa",
     findTrip: "Hitta resa",
     modifySearch: "Ändra sökning",
+    addUser: "Lägg till användare",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -339,6 +340,28 @@ export default {
     unspecified: "Ospecificerad",
   },
   pages: {
+    adminControls: {
+      title: "Administratörskontroll",
+      pages: {
+        users: {
+          title: "Användare",
+          pages: {
+            create: {
+              title: "Lägg till användare",
+              subTitle: "Skapa en ny användare",
+            },
+            update: {
+              title: "Uppdatera användare",
+              subTitle: "Uppdatera användarinformation",
+            },
+            delete: {
+              title: "Ta bort användare",
+              subTitle: "Ta bort en användare",
+            },
+          },
+        },
+      },
+    },
     dashboard: {
       title: "Instrumentbräda",
       intro: "<strong>Välkommen till</strong><span>Junction Hub</span>",
