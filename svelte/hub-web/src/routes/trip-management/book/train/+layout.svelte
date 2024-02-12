@@ -9,7 +9,6 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import StepView from "~/components/page/step-view.svelte";
   import { getTranslator, type LocaleData } from "~/i18n";
 
   const t = getTranslator();
@@ -41,8 +40,6 @@
 <div class="header">
   <h1 typography="headline-medium" weight="bold">{title}</h1>
 </div>
-
-<StepView {steps} {activeStep} />
 
 <div class="content">
   <slot />

@@ -308,6 +308,7 @@
   .search-wrapper {
     position: relative;
     background-color: #ffffff;
+    border-top: var(--color-common-line-soft) 1px solid;
   }
 
   .search-wrapper::after {
