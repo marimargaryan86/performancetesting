@@ -149,11 +149,13 @@ def svelte_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]
                 "COPY svelte/{0}/package.json svelte/{0}/svelte.config.js svelte/{0}/vite.config.ts ./{0}/".format(
                     folder_name,
                 ),
-                "RUN yarn install --immutable",
+                "RUN yarn workspaces focus @snowfall/{0}".format(folder_name),
                 "COPY svelte/{0} ./{0}".format(folder_name),
                 "RUN yarn workspace @snowfall/{0} build \\".format(folder_name),
                 "&& rm -rf node_modules \\",
-                "&& yarn workspaces focus --production -A \\",
+                "&& yarn workspaces focus --production -A @snowfall/{0} \\".format(
+                    folder_name,
+                ),
                 "&& cp -r node_modules {0}/build/node_modules \\".format(folder_name),
                 "&& cp {0}/package.json {0}/build/".format(folder_name),
                 "FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim AS runtime",
