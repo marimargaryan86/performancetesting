@@ -62,33 +62,33 @@
 </script>
 
 <script lang="ts">
-  import StandardLayout from "~/components/page/standard-layout.svelte";
+  import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import { getOrderStatus } from "~/integration/common/schemas/order";
   import type { Order } from "~/integration/junction-hub-api/schemas/order";
   import type { Price } from "~/integration/common/schemas/price";
-  import routeConfig from "~/route-config";
-  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import routeConfig from "$lib/route-config";
+  import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
   import type JourneyService from "~/integration/junction-hub-api/services/journey-service";
   import type {
     JourneyFilterOptions,
     JourneyFilterOptionsQuery,
   } from "~/integration/junction-hub-api/schemas/journey";
-  import Filters from "./filters.svelte";
-  import { ensureDefined } from "~/utils/array";
+  import Filters from "$lib/components/pages/trip-management/orders/filters.svelte";
+  import { ensureDefined } from "$lib/utils/array";
   import { bookingStatuses } from "~/integration/junction-hub-api/schemas/booking";
-  import { parseDateRange } from "~/utils/date-time";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getTranslator } from "~/i18n";
-  import Icon from "~/components/icons/icon.svelte";
-  import { getQueryStore } from "~/stores/query-store";
+  import { parseDateRange } from "$lib/utils/date-time";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getLocale, getTranslator } from "$lib/i18n";
+  import Icon from "$lib/components/icons/icon.svelte";
+  import { getQueryStore } from "$lib/stores/query-store";
   import { writable } from "svelte/store";
-  import LoadingIcon from "~/components/icons/loading-icon.svelte";
-  import { slideFade } from "~/transitions/slide-fade";
+  import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
+  import { slideFade } from "$lib/transitions/slide-fade";
   import { formatAmount } from "$lib/formatting/currency";
-  import StatusBadge from "~/components/ui/status-badge.svelte";
-  import { validatePassengerNameRecord } from "~/utils/booking";
-  import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
+  import StatusBadge from "$lib/components/ui/status-badge.svelte";
+  import { validatePassengerNameRecord } from "$lib/utils/booking";
+  import FindTripDialog from "$lib/components/modals/find-trip-dialog.svelte";
 
   export let data;
 

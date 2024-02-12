@@ -1,6 +1,6 @@
 import integrationInstances from "~/integration-instances";
 import type { Journey } from "~/integration/junction-hub-api/schemas/journey";
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 import { LIST_JOURNEYS_LIMIT, LIST_JOURNEYS_SORT, queryFiltersGetter } from "./+page.svelte";
 
 export function load(event): { journeys: Promise<PaginatedData<Journey>> } {

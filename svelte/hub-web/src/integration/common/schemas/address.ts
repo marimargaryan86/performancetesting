@@ -1,4 +1,4 @@
-import { ensureDefined } from "~/utils/array";
+import { ensureDefined } from "$lib/utils/array";
 
 export type AddressSchema = {
   addressLines?: string[];

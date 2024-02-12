@@ -9,8 +9,8 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import Icon from "~/components/icons/icon.svelte";
-  import Backdrop from "~/components/ui/backdrop.svelte";
+  import Icon from "$lib/components/icons/icon.svelte";
+  import Backdrop from "$lib/components/ui/backdrop.svelte";
 
   let backdrop: Backdrop | undefined;
   let video: YouTubeVideo | undefined;

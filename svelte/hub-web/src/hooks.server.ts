@@ -1,11 +1,11 @@
 import { redirect, type Handle, type MaybePromise } from "@sveltejs/kit";
-import routeConfig from "~/route-config";
+import routeConfig from "$lib/route-config";
 import * as Sentry from "@sentry/sveltekit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { env } from "$env/dynamic/private";
-import { cookieStore } from "~/stores/cookie-store.server";
-import type { Locale } from "~/i18n";
-import languageData from "~/i18n/lang";
+import { cookieStore } from "$lib/stores/cookie-store.server";
+import type { Locale } from "$lib/i18n";
+import languageData from "$lib/i18n/lang";
 
 // Environment variable check
 if (!env.JWT_SECRET) {

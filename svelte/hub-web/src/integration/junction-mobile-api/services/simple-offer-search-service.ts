@@ -6,7 +6,7 @@ import {
   type SimpleOfferSearchCreate,
   type SimpleOfferSearchSchema,
 } from "../schemas/simple-offer-search";
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 import type { Offer, OfferSchema } from "../schemas/offer";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import {

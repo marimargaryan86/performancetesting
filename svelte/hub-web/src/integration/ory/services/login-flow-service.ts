@@ -1,4 +1,4 @@
-import { getCookiesFromHeaders } from "~/utils/cookies";
+import { getCookiesFromHeaders } from "$lib/utils/cookies";
 import type { AuthenticatorAssurenceLevel } from "../schemas/common";
 import { loginFlowParser, type LoginFlow, type LoginFlowSchema } from "../schemas/login-flow";
 import OryService from "./ory-service";

@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
 import type { RecoveryFlow } from "~/integration/ory/schemas/recovery-flow";
-import { cookieStore } from "~/stores/cookie-store.server";
+import { cookieStore } from "$lib/stores/cookie-store.server";
 
 export async function load(event): Promise<{ flow: RecoveryFlow }> {
   const recovery = cookieStore.recoveryToken.get(event);

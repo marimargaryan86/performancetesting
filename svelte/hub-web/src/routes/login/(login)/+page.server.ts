@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
 import type { LoginFlow } from "~/integration/ory/schemas/login-flow";
-import { cookieStore } from "~/stores/cookie-store.server";
+import { cookieStore } from "$lib/stores/cookie-store.server";
 
 export async function load(event): Promise<{ flow: LoginFlow }> {
   const login = cookieStore.loginToken.get(event);

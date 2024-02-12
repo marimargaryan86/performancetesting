@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { getTranslator } from "~/i18n";
-  import Icon from "~/components/icons/icon.svelte";
+  import { getTranslator } from "$lib/i18n";
+  import Icon from "$lib/components/icons/icon.svelte";
 
   const t = getTranslator();
 

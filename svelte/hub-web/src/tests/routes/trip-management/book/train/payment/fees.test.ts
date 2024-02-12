@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   type FeeType,
   calcFeeAmount,
-} from "../../../../../../routes/trip-management/book/train/payment/fees.svelte";
+} from "$lib/components/pages/trip-management/booking-flow-train/payment/fees.svelte";
 
 describe("calcFeeAmount", () => {
   it("calculates flat-rate fee correctly by rounding the input amount", () => {

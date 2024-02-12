@@ -17,7 +17,8 @@ const config = {
     alias: {
       "~/integration-instances-client": "src/integration-instances.client.ts",
       "~/integration-instances": "src/integration-instances.server.ts",
-      "~": "src",
+      "~/data": "src/data",
+      "~/integration": "src/integration",
     },
   },
 };

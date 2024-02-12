@@ -1,9 +1,9 @@
 <script lang="ts">
-  import routeConfig from "~/route-config";
-  import { getTranslator } from "~/i18n";
-  import Card from "~/components/ui/card.svelte";
-  import { getPageTitle } from "~/utils/page-title";
-  import FindTripDialog from "~/components/modals/find-trip-dialog.svelte";
+  import routeConfig from "$lib/route-config";
+  import { getTranslator } from "$lib/i18n";
+  import Card from "$lib/components/ui/card.svelte";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import FindTripDialog from "$lib/components/modals/find-trip-dialog.svelte";
 
   const t = getTranslator();
 

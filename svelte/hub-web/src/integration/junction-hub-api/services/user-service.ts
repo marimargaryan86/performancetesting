@@ -1,4 +1,4 @@
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 import {
   userParser,
   type User,

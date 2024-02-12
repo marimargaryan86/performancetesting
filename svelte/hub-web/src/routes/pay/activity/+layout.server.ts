@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { permitted } from "~/utils/permissions";
+import { permitted } from "$lib/utils/permissions";
 
 export function load(event): void {
   const user = event.locals.user;

@@ -7,7 +7,7 @@ import {
   type TripCandidateSearchCreate,
 } from "../schemas/trip-candidate";
 import type { Offer, OfferSchema } from "../schemas/offer";
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 
 export default class TripService extends JunctionMobileApiService {

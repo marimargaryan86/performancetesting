@@ -1,0 +1,588 @@
+/* eslint-disable camelcase */
+import type { LocaleData } from "$lib/i18n";
+
+export default {
+  title: "Junction Hub",
+  roles: {
+    "reseller-admin": "Återförsäljare - administratör",
+    "reseller-user": "Återförsäljare",
+    "snowfall-admin": "Snowfall - administratör",
+    "snowfall-user": "Snowfall",
+  },
+  words: {
+    yes: "Ja",
+    no: "Nej",
+    help: "Hjälp",
+    unknown: "Okänd",
+    notAvailable: "Otillgänglig",
+    subAccounts: "Underkonton",
+    balances: "Saldon",
+    from: "Från",
+    to: "Till",
+    depart: "Avgå",
+    passenger_one: "Resenär",
+    passenger_other: "Resenärer",
+    fareRules: "Färdregler",
+    stop_zero: "Direkt",
+    stop_one: "Stopp",
+    stop_other: "$t(words.stop_one)",
+    stopCounter_zero: "$t(words.stop_zero)",
+    stopCounter: "{{count}} $t(words.stop, lowercase)",
+    departureTime: "Avgångstid",
+    departure: "Avgång",
+    arrival: "Ankomst",
+    journeyDuration: "Restid",
+    railwayOperators: "Tågoperatörer",
+    alternativeFares: "Resealternativ",
+    selected: "Vald",
+    dateRange: "Datumintervall",
+    none: "Ingen",
+    title: "Titel",
+    firstName: "Förnamn",
+    lastName: "Efternamn",
+    birthdayDate: "Födelsedatum",
+    gender: "Kön",
+    documentType: "ID-handlingstyp",
+    documentNumber: "ID-handlingsnummer",
+    expiryDate: "Utgångsdatum",
+    issueDate: "Utfärdandedatum",
+    issuingCountry: "Utfärdande land",
+    nationality: "Nationalitet",
+    residenceCountryCode: "Bostadslandskod",
+    summary: "Sammanfattning",
+    fareBrand_one: "Klass",
+    fareBrand_other: "Klasser",
+    itinerary: "Resplan",
+    fee_one: "Avgift",
+    fee_other: "Avgifter",
+    serviceFee: "Serviceavgift",
+    agencyMarkup: "Byråpåslag",
+    paymentMethod: "Betalningssätt",
+    contactInformation: "Kontaktinformation",
+    countryCode: "Landskod",
+    phoneNumber: "Telefonnummer",
+    email: "E-post",
+    addressLine1: "Adressrad 1",
+    addressLine2: "Adressrad 2",
+    city: "Stad",
+    country: "Land",
+    postcode: "Postnummer",
+    error: "Fel",
+    success: "Lyckad",
+    warning: "Varning",
+    status: "Status",
+    passengerDetails: "Passagerarinformation",
+    itineraryDetails: "Resplandetaljer",
+    tripDuration: "Restid",
+    orderReference: "Beställningsreferens",
+    cancellation: "Annullering",
+    reservationNumber: "Reservationsnummer",
+    orderDetails: "Beställningsdetaljer",
+    booking: "Bokning",
+    bookingStatus: "Bokningsstatus",
+    cancellationStatus: "Avbokningsstatus",
+    refund: "Återbetalning",
+    total: "Totalt",
+    transactionInfo: "Transaktionsinfo",
+    transactionType: "Transaktionstyp",
+    paymentType: "Betalningssätt",
+    provider: "Leverantör",
+    reseller: "Återfösäljare",
+    markup: "Pålägg",
+    refundPosition: "Återbetalningsposition",
+    withoutAmounts: "Utan belopp",
+    withAmounts: "Med belopp",
+    amount: "Belopp",
+    refundReference: "Återbetalningsreferens",
+    bookTrip: "Boka en resa",
+    manageTrip: "Hantera en resa",
+    passengerNameRecord: "Referensnummer",
+    optional: "Frivillig",
+    inbound: "Inkommande",
+    outbound: "Utgående",
+  },
+  actions: {
+    logout: "Logga ut",
+    continue: "Fortsätt",
+    cancel: "Avbryt",
+    reportAnIssue: "Felrapportera",
+    click: "Klicka",
+    goToLogin: "Gå till login",
+    search: "Sök",
+    newOrder: "Ny Beställning",
+    download: "Ladda ner",
+    addBalance: "Lägg till saldo",
+    addBalances: "Lägg till saldon",
+    add: "Lägg till",
+    addDate: "Lägg till datum",
+    returnToBookings: "Återgå till bokningar",
+    sortBy: "Sortera på",
+    selectAll: "Välj alla",
+    clearAll: "Rensa alla",
+    bookNow: "Boka nu",
+    viewFareRules: "Visa färdregler",
+    clear: "Rensa",
+    select: "Välj",
+    enterFirstName: "Ange förnamn",
+    enterLastName: "Ange efternamn",
+    enterDocumentNumber: "Ange ID-handlingsnummer",
+    enterIssuingCountry: "Ange utfärdande land",
+    enterNationality: "Ange nationalitet",
+    enterResidenceCountryCode: "Ange bostadslandskod",
+    enterAmount: "Ange belopp",
+    selectFeeType: "Välj avgiftstyp",
+    tryAgain: "Försök igen",
+    enterPhoneNumber: "Ange telefonnummer",
+    enterEmail: "Ange E-post",
+    enterAddressLine1: "Ange adressrad 1",
+    enterAddressLine2: "Ange adressrad 2",
+    enterCity: "Ange stad",
+    selectCountry: "Välj land",
+    enterPostcode: "Ange postnummer",
+    next: "Nästa",
+    previous: "Föregående",
+    book: "Boka",
+    downloadTickets: "Ladda ned biljetter",
+    cancelBooking: "Annullera bokning",
+    goBack: "Gå tillbaka",
+    view: "Visa",
+    cancelRequest: "Avboka",
+    refundWithNoAmount: "Återbetala utan belopp",
+    calculateRefundPosition: "Beräkna återbetalningsposition",
+    issueRefund: "Utfärda återbetalning",
+    enterRefundReference: "Ange återbetalningsreferens",
+    bookTrip: "Boka resa",
+    findTrip: "Hitta resa",
+    modifySearch: "Ändra sökning",
+  },
+  sentences: {
+    priceChange: "Prisändring",
+    priceChangeInfo:
+      'Vi har upptäckt en prisändring; ursprungspriset var <strong typography="body-medium" weight="bold">{{originalPrice}}</strong> och det nya priset är <strong typography="body-medium" weight="bold">{{newPrice}}</strong>. Vill du fortsätta?',
+    areYouSure: "Är du säker?",
+    copiedToClipboard: "Kopierad till urklipp",
+    noBalancesFound: "Inga saldon funna",
+    findABalance: "Sök saldo",
+    cityOrStation: "Stad eller station",
+    noTripsMatchesTheFilterCriteria: "Inga resor matchar filterkriterierna",
+    noTripsFound: "Inga resor hittades",
+    timeRemaining: "Återstående tid",
+    timeRemainingInfo:
+      '{{timeLeft}} min kvar att <strong weight="bold">slutföra</strong> din bokning',
+    startingAt: "Från",
+    loadingTripDetails: "Laddar resedetailjer...",
+    thisPriceIsForAllPassengers: "Detta pris gäller för alla passagerare",
+    totalToPay: "Summa att betala",
+    fareRulesInfo: [
+      {
+        type: "text",
+        value:
+          "Priser är inte garanterade förrän full betalning har mottagits och biljetter har utfärdats. Se alla tillämpliga",
+      },
+      { type: "fareRulesButton", value: "Färdregler" },
+      { type: "text", value: "och" },
+      { type: "fareRulesButton", value: "Bagageinformation" },
+    ],
+    totalToCollect: "Totalt att samla in",
+    paymentDeclined: "Betalning nekad",
+    anUnexpectedErrorOccurred: "Ett oväntat fel inträffade",
+    paymentInfo: [
+      { type: "text", value: "Genom att boka din biljett accepterar du Snowfalls" },
+      { type: "toc", value: "T&C" },
+      { type: "text", value: "transportörens" },
+      { type: "coc", value: "transportvillkor" },
+      { type: "text", value: "och vår" },
+      { type: "privacy", value: "integritetspolicy" },
+    ],
+    oopsSomethingWentWrong: "Hoppsan, något gick snett :(",
+    theOrderWasCreatedSuccessfully: "Skapande av beställningen lyckades",
+    theOrderWasCreatedWithErrors: "Beställningen skapades felaktigt",
+    theOrderIsInAPendingState: "Beställningen är i väntande tillstånd",
+    yourOrderHasBeenCreated: "Din beställning har skapats",
+    totalPaid: "Totalt betalt belopp",
+    newSearch: "Ny sökning",
+    youAreCancellingThisBooking: "Du avbokar denna bokning",
+    rulesAndFees: "Regler och avgifter",
+    pleaseReviewTheFollowingRules:
+      "Läs igenom följande regler innan du avbokar, inklusive eventuella tillämpliga avgifter.",
+    doYouWishToContinue: "Vill du fortsätta?",
+    thisCannotBeUndone: "Detta kan inte göras ogjort.",
+    cancellationRequestReceived: "Avbokningsbegäran mottagen",
+    cancellationRequestFailed: "Avbokningsbegäran misslyckades",
+    cancellationRequestInfo:
+      "Vi har tagit emot din begäran om avbokning. En medlem av vårt supportteam kommer att kontakta dig inom kort med ytterligare information.",
+    contactSnowfallSupport: "Du kan kontakta Snowfallsupport på",
+    transactionNotFound: "Transaktionen hittades ej",
+    toUs: "Till oss",
+    payerCurrency: "Betalarens valuta",
+    toReseller: "Till återförsäljaren",
+    createRefundWithoutAmounts: "Är du säker på att du vill göra en återbetalning utan belopp?",
+    resellerHowMuchWeGiveBack: "Återförsäljare - hur mycket vi ger tillbaka",
+    providerHowMuchWeGetBack: "Leverantör - hur mycket vi får tillbaka",
+    refundReferenceInfo:
+      "Återbetalningen måste hanteras manuellt, vänligen gör det och ange återbetalningsreferensen ovan",
+    bookTrip:
+      "Sök, boka och betala för multimodalt innehåll från tusentals leverantörer och operatörer – i en enda bokning.",
+    manageTrip:
+      "Hämta din resa för att ändra eller avboka bokningar, visa/skriva ut resplan och mycket mer.",
+    passengerNameRecordPlaceholder: "Till exempel: 9A2FDF56",
+    passengerLastNamePlaceholder: "Som på din bokningsbekräftelse",
+    passengerNameRecordError: "Din referens är en sekvens av åtta bokstäver och/eller siffror.",
+    noTripsFoundMessage:
+      "Se till att du har angett rätt referensnummer.\nFörsök igen eller kontakta supporten.",
+  },
+  tableHeaders: {
+    id: "ID",
+    orderId: "BeställningsID",
+    createdDate: "Skapad datum",
+    updatedDate: "Uppdaterad datum",
+    owedToUs: "Skyldig oss",
+    reconciledQuestion: "Försonad?",
+    orderReference: "Beställningsreferens",
+    ticket: "Biljett",
+    tickets: "Biljett(er)",
+    departureDate: "Avgångsdatum",
+    passengers: "Passagerare",
+    totalPrice: "Totalt Pris",
+    bookingStatus: "Bokningsstatus",
+    cancellationStatus: "Avbokningsstatus",
+    refundStatus: "Återbetalningsstatus",
+    transactionType: "Transaktionstyp",
+    paymentType: "Betalningssätt",
+    payer: "Betalare",
+    beneficiary: "Förmånstagare",
+    whatWeOwe: "Vad vi är skyldiga",
+    salesProfit: "Försäljningsvinst",
+    reference: "Referens",
+    settlement: "Uppgörelse",
+    from: "Från",
+    to: "Till",
+    quoteRate: "Offertkurs",
+    transactionRate: "Transaktionskurs",
+    fxDelta: "FX-delta",
+    fxBuffer: "FX-buffert",
+    status: "Status",
+    booking: "Bokning",
+    origin: "Ursprung",
+    destination: "Destination",
+  },
+  gender: {
+    female: "Kvinna",
+    male: "Man",
+    unspecified: "Ospecificerad",
+  },
+  documentTypes: {
+    passport: "Pass",
+  },
+  passengerTitle: {
+    miss: "Fröken",
+    mr: "Herr",
+    mrs: "Fru",
+    ms: "Fröken",
+    unspecified: "Ospecificerad",
+  },
+  passengerTypes: {
+    adult_one: "Vuxen",
+    adult_other: "Vuxna",
+    child_one: "Barn",
+    child_other: "Barn",
+    senior_one: "Senior",
+    senior_other: "Seniorer",
+    youth_one: "Ungdom",
+    youth_other: "Ungdomar",
+  },
+  tripTypes: {
+    "round-trip": "Tur och retur",
+    "one-way": "Enkel",
+  },
+  types: {
+    "bank-transfer": "Banktransaktion",
+    card: "Kort",
+    invoice: "Faktura",
+    transactional: "Transaktionell",
+    unspecified: "Ospecificerad",
+  },
+  priceBreakdownTypes: {
+    "base-fare": "Grundavgift",
+    "company-mark-up": "Företagspåslag",
+    "reseller-mark-up": "Återförsäljarpåslag",
+    "service-mark-up": "Servicepåslag",
+    tax: "Skatter",
+  },
+  sortOptions: {
+    "earliest-arrival": "Tidigast ankomst",
+    "earliest-departure": "Tidigast avgång",
+    "latest-arrival": "Senast ankomst",
+    "latest-departure": "Senast avgång",
+    "lowest-price": "Lägsta pris",
+    fastest: "Snabbast",
+  },
+  statuses: {
+    confirmed: "Bekräftad",
+    "no-refund": "Ingen Återbetalning",
+    "not-ticketed": "Inga Biljetter",
+    "refund-due": "Återbetalning Förfaller",
+    "refund-failed": "Återbetalning Misslyckades",
+    "refund-issued": "Återbetalning Utfärdad",
+    cancelled: "Avbokad",
+    completed: "Klar",
+    deleted: "Borttagen",
+    error: "Felaktig",
+    executed: "Utförd",
+    failed: "Misslyckad",
+    mixed: "Blandad",
+    pending: "Utvärderas",
+    rejected: "Avvisad",
+    submitted: "Inlämnad",
+    succeeded: "Lyckad",
+    unknown: "Okänd",
+    unspecified: "Ospecificerad",
+  },
+  pages: {
+    dashboard: {
+      title: "Instrumentbräda",
+      intro: "<strong>Välkommen till</strong><span>Junction Hub</span>",
+    },
+    help: {
+      title: "Hjälp",
+      pages: {
+        privacyPolicy: {
+          title: "Integritetspolicy",
+          content: `
+<p>Vi tror på att skydda slutkundens integritet. Se vår integritetspolicy på (infoga hyperlänk till webbplatsens sekretesspolicy) och vänligen gör din integritetspolicy tillgänglig för slutkunden eftersom detta kommer att gälla för deras bokning.</p>
+<h2 typography="body-large" weight="bold">Skadeersättning</h2>
+<p>Du samtycker till att försvara oss och/eller våra respektive leverantörer och någon av deras tjänstemän, direktörer, anställda och agenter från och mot alla anspråk, orsaker till åtgärder, krav, återkrav, förluster, skadestånd, böter, straff eller andra kostnader eller utgifter av något slag eller slag, inklusive men inte begränsat till rimliga juridiska avgifter och redovisningsavgifter, som tas ut av tredje part som ett resultat av:</p>
+<ul>
+  <li>- Ditt brott mot detta avtal eller de dokument som hänvisas till häri;</li>
+  <li>- Ditt brott mot någon lag eller tredje parts rättigheter; eller</li>
+  <li>- Din användning av Booking Hub.</li>
+</ul>
+<h2 typography="body-large" weight="bold">Valutaomvandlare, pris och betalning</h2>
+<p>Priserna för resetjänster är dynamiska och kan ändras ofta när som helst. Prisändringar kommer inte att påverka bokningar som redan lämnats, förutom där det har skett ett uppenbart fel. Vi gör allt vi kan för att säkerställa att priserna vi visar är korrekta och tillgängliga. Snowfall tar inget ansvar för bokningar till ett felaktigt pris där felet rimligen var (eller borde ha varit) uppenbart vid bokningstillfället, eller på grund av Snowfalls underlåtenhet att iaktta rimlig försiktighet.</p>
+<p>Priserna som visas via vår tjänst kan inkludera skatter. Sådana skatter kan inkludera belopp förknippade med mervärdesskatt, skatt på varor och tjänster, försäljningsskatt, uthyrningsskatt och andra skatter av liknande karaktär.</p>
+<p>I vissa jurisdiktioner, där så är tillämpligt, kan slutkunden också vara ansvarig för att betala lokala skatter som åläggs av lokala skattemyndigheter (såsom stadsskatter eller turistskatter etc). Vi kommer att meddela dig om eventuella lokala skatter som kommer att betalas av slutkunden innan bokningen slutförs, där sådana skatter har meddelats oss av reseleverantören.</p>
+<p>Beloppet för lokala skatter kan ändras mellan bokningsdatum och vistelsedatum. Om skatterna har ändrats vid resedatumet kan slutkunden bli skyldig att betala skatt till den högre skattesatsen.</p>
+<p>Betalning sker endast direkt till Snowfall Limited på uppdrag av reseleverantören.</p>
+<p>Reseleverantören kräver vanligtvis betalning i förskott; det kan tas eller förauktoriseras när bokningen görs, och det kommer vanligtvis inte att återbetalas. Innan du gör en bokning, vänligen notera de individuella bokningsvillkoren som gäller.</p>
+<p>Vi kan komma att lagra slutkundens betalningsmetod för framtida transaktioner om du har fått deras medgivande att göra det.</p>
+<p>Som nämnts ovan accepterar du de tillämpliga policyerna som visas i bokningsprocessen. Du hittar varje reseleverantörs avbokningspolicy och alla andra policyer (om ålderskrav, kort som accepteras etc.) i det finstilta och/eller i bekräftelsemejlet eller biljetten (om tillämpligt).</p>
+<p>Eftersom du gör en bokning för någon annans räkning, accepterar du ansvaret för att erhålla deras tillstånd innan du ger oss deras personuppgifter.</p>
+<h2 typography="body-large" weight="bold">Avbokningar och återbetalningar</h2>
+<p>Avbokningsavgifterna som tillämpas på bokningen är föremål för den specifika policy som fastställts av respektive leverantör. Dessa avgifter kommer att variera beroende på leverantörens villkor och villkor, och vi ansvarar inte för deras beslut. Även om vi strävar efter att tillhandahålla korrekt och snabb återbetalningshantering tar vi inget ansvar för tredje parts leverantörs åtgärder eller policyer. Eventuella tvister eller problem relaterade till avbokningar, återbetalningar eller associerade avgifter ska lösas direkt med den enskilda leverantören.</p>
+<h2 typography="body-large" weight="bold">Kontouppsägning</h2>
+<p>Efter eget gottfinnande kan vi säga upp kontoinnehavare som anses vara upprepade intrång. Vi kan också efter eget gottfinnande begränsa åtkomsten till bokningshubben och/eller avsluta konton för användare som gör intrång i andras immateriella rättigheter, oavsett om det förekommer upprepade intrång eller inte.</p>
+<h2 typography="body-large" weight="bold">Allmänt</h2>
+<p>Om någon del av detta avtal visar sig vara ogiltig, olaglig eller omöjlig att verkställa, kommer giltigheten, lagligheten och verkställbarheten av de återstående bestämmelserna inte på något sätt att påverkas eller försämras. Vårt misslyckande eller försening med att upprätthålla någon bestämmelse i detta avtal vid något tillfälle avsäger oss inte vår rätt att genomdriva samma eller någon annan bestämmelse häri i framtiden. Detta avtal (och alla andra villkor som hänvisas till häri) utgör hela avtalet mellan dig och oss med avseende på bokningshubben och det ersätter all tidigare eller samtidig kommunikation och förslag, oavsett om det är elektroniskt, muntligt eller skriftligt, mellan slutkunden och oss med avseende på bokningshubben.</p>
+<p>Tillgång till denna bokningshub är villkorad av ditt samtycke till att all information som finns i den och alla frågor som uppstår mellan dig och oss kommer att styras av lagarna i England och Wales. Det är också villkorat av ditt samtycke att varje tvist som uppstår mellan dig och oss kommer att vara föremål för den exklusiva jurisdiktionen för domstolarna i England och Wales.</p>
+<p>Alla rättigheter som inte uttryckligen beviljas häri är förbehållna.</p>
+<h2 typography="body-large" weight="bold">Kontakt</h2>
+<p>Alla kommentarer, frågor och förfrågningar som rör vår användning av Din information ska riktas till <a href="mailto:legal@snowfalltravel.com">legal@snowfalltravel.com</a></p>`,
+        },
+        termsAndConditions: {
+          title: "Villkor",
+          content: `
+<h2 typography="body-large" weight="bold">Användarvillkor för bokning</h2>
+<p>Dessa bokningsvillkor (”Villkoren”) gäller för bokningar gjorda via Junctions onlineklientportal (”Bokningshubben”) som ägs och drivs av Snowfall Limited, ett företag registrerat i England (företagsnummer: 12356236, 10-12 East Parade, Leeds, West Yorkshire, LS1 2BH). Bokningshubben tillhandahålls för att hjälpa till att göra bokningar och/eller på annat sätt göra transaktioner med reseleverantörer. Denna tjänst erbjuds till dig, agenten, under förutsättning att du godkänner, utan ändringar, av alla villkor, villkor och meddelanden som gemensamt anges i dessa villkor, användarvillkoren för Junction Client Booking Hub och villkoren för Snowfall Travel-webbplatsen för Användning och integritetspolicyn (sammantaget "avtalet"). När du gör en bokning via Booking Hub samtycker du till att vara bunden av detta avtal. Dessa villkor kompletterar villkoren för alla avtal som du kan ha med oss, men endast med avseende på bokningar som underlättas genom bokningshubben. I händelse av en direkt konflikt mellan dessa villkor och andra avtal som du kan ha med oss, kommer dessa villkor att styra informationen om bokningen. Termen "Du" hänvisar till kundtjänstagenten som gör bokningen för slutkundens räkning.</p>
+<p>Läs avtalet noggrant. Vi förbehåller oss rätten att när som helst, efter eget gottfinnande, ändra eller på annat sätt modifiera avtalet utan föregående meddelande.</p>
+<h2 typography="body-large" weight="bold">Användarvillkor</h2>
+<p>Som ett villkor för din användning av bokningshubben garanterar du att (i) du är minst 18 år gammal; (ii) Du har den juridiska behörigheten att skapa en bindande rättslig förpliktelse; (iii) Du kommer att använda bokningshubben för att endast boka i enlighet med tillämpliga villkor och policyer; (iv) Du kommer endast att använda bokningscentralen för att göra reservationer för en annan person för vilken du är juridiskt behörig att agera; (v) Du kommer att informera sådana andra personer om de villkor och villkor som gäller för de reservationer du har gjort för deras räkning, inklusive alla regler och begränsningar som är tillämpliga på dem; (vi) all information som tillhandahålls av dig på bokningshubben är sann, korrekt, aktuell och fullständig, och (vii) om du har ett konto kommer du att skydda din kontoinformation och kommer att övervaka och vara helt ansvarig för all användning av ditt konto av dig och någon annan än dig. Vi förbehåller oss rätten att efter eget gottfinnande neka någon åtkomst till bokningshubben och de tjänster vi erbjuder, när som helst och av vilken anledning som helst, inklusive, men inte begränsat till, för brott mot dessa villkor.</p>
+<h2 typography="body-large" weight="bold">Förbjudna aktiviteter</h2>
+<p>The content and information on the Booking Hub (including, but not limited to, price and availability of travel services), as well as the infrastructure used to provide such content and information, is proprietary to us or our suppliers and providers. You agree not to: make any speculative, false, or fraudulent reservation or any reservation in anticipation of demand; access, monitor or copy any content or information of this Website using any robot, spider, scraper or other automated means or any manual process for any purpose without our express written permission; violate the restrictions in any robot exclusion headers on this Website or bypass or circumvent other measures employed to prevent or limit access to this Website; take any action that imposes, or may impose, in our discretion, an unreasonable or disproportionately large load on our infrastructure; deep-link to any portion of this Website (including, without limitation, the purchase path for any travel services) for any purpose without our express written permission; or “frame”, “mirror” or otherwise incorporate any part of the Booking Hub into any other Website without our prior written authorisation.</p>
+<h2 typography="body-large" weight="bold">Bedrägeri</h2>
+<p>Om ett konto visar upprepade tecken på bedrägeri, missbruk, umgänge med en statligt sanktionerad person eller enhet eller annan misstänkt aktivitet kan vi begära extra information från dig.</p>
+<p>Efter granskning av den informationen och om vi rimligen drar slutsatsen att en bokning eller ett konto är associerat med misstänkt aktivitet, kan vi:</p>
+<ul>
+  <li>- Avbryt alla bokningar som är kopplade till ditt namn, din e-postadress eller ditt konto;</li>
+  <li>- Stäng alla associerade konton;</li>
+  <li>- Vidta rättsliga åtgärder, inklusive att försöka hålla dig ansvarig för eventuell förlust.</li>
+</ul>
+<p>Vänligen kontakta oss om annullering av en bokning eller stängning av ett konto om du tror att ett misstag har inträffat.</p>
+<h2 typography="body-large" weight="bold">Göra resebokningar</h2>
+<p>Alla resetjänster som du kan hitta och/eller boka via Booking Hub tillhandahålls av tredjepartsleverantörer. Vi är inte ansvariga och har inget ansvar gentemot dig eller slutkunden med avseende på sådana bokningar. Identiteten för den relevanta reseleverantören och de villkor som styr och gäller för bokningen kommer att meddelas dig vid bokningstillfället och du bör se till att du läser och förstår dem till fullo innan du slutför bokningen och kommunicerar dem till slutkund. Du bekräftar att ett brott mot villkoren som meddelats Dig av reseleverantören kan resultera i annullering av biljetter, avbokning av hotellbokningar etc. och medföra ytterligare avgifter för slutkunden.</p>
+<h2 typography="body-large" weight="bold">Begränsningar och undantag från ansvar</h2>
+<p>När vi driver bokningshubben underlättar vi endast bokningar med tredje part och tar inget ansvar för att tillhandahålla några resealternativ som visas på bokningshubben eller för arrangemang som gjorts med någon tredje part på uppdrag av slutkunden som ett resultat av användningen av Bokningsnav. Eventuella problem och/eller skillnader som kan uppstå med bokning(ar) måste lösas med relevant reseleverantör. I den maximala utsträckning som lagen tillåter, accepterar vi inget ansvar för eventuella felaktigheter eller utelämnanden i innehållet som visas på eller via bokningshubben eller någon Guds handling, olycka, förseningar eller någon speciell, exemplarisk, straffbar, indirekt, tillfällig eller följdförlust eller skada av något slag (inklusive, utan begränsning, förlorad vinst eller förlorade besparingar), oavsett om de är baserade på kontrakt, skadestånd (inklusive vårdslöshet), strikt ansvar eller annat, som ådras dig eller slutkunden till följd av eller i samband med Din åtkomst till, användning av eller oförmåga att få tillgång till eller användning av bokningshubben eller något innehåll som finns däri.</p>
+<p>Vårt maximala samlade ansvar gentemot dig och/eller slutkunden som härrör från eller i samband med dessa villkor eller din tillgång till, användning av eller oförmåga att få tillgång till eller använda, bokningshubben ska begränsas till den maximala omfattning som tillåts av lag. De nuvarande villkoren tillhandahåller hela omfattningen av våra skyldigheter och ansvar med avseende på bokningshubben. Ingenting i dessa villkor ska begränsa eller utesluta (a) vårt ansvar med avseende på dödsfall eller personskada orsakad av vår vårdslöshet eller för vårt bedrägeri eller bedrägliga felaktiga framställningar; (b) något annat ansvar som inte kan uteslutas enligt lag; eller (c) slutkundens lagstadgade rättigheter.</p>`,
+        },
+        customerService: {
+          title: "Kundtjänst",
+          content: `
+<p>Kontakta oss med din begäran om specialiserad hjälp</p>
+<p><a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a></p>`,
+        },
+        conditionsOfCarriage: {
+          title: "Transportvillkor",
+          content: `
+<p>Tågoperatörsvillkor. Din bokning av tågbiljetter/tågkort är föremål för transportvillkoren för en eller flera järnvägsoperatörer. Vänligen välj och se de transportvillkor som gäller för din resa.</p>`,
+        },
+      },
+    },
+    account: {
+      title: "Kontoinställningar",
+    },
+    knowledgeHub: {
+      title: "Kunskapshub",
+      userManuals: {
+        title: "Användarmanualer",
+        description:
+          "Hitta allt du behöver för att komma åt och börja använda Junction Hub med vår användbara användarhandbok.",
+        userManual: "Junction Hub - Användarhandbok",
+      },
+      videos: {
+        title: "Videohandledning",
+        description:
+          "Lär känna Junction Hub på bara några minuter med våra snabba videohandledningar.",
+        items: [
+          {
+            title: "Sök efter en resa",
+            description: "Ta reda på hur du söker efter tågresor i Junction Hub.",
+            id: "qMTv6kNAIEU",
+            lengthS: 60,
+          },
+          {
+            title: "Välj ett erbjudande",
+            description:
+              "Ta reda på hur du väljer ett erbjudande för din kunds bokning i Junction Hub.",
+            id: "JdfyhZU3kQg",
+            lengthS: 69,
+          },
+          {
+            title: "Lägg till passagerarinformation",
+            description:
+              "Ta reda på hur du lägger till passagerarinformation till en tågbokning i Junction Hub.",
+            id: "Zcidy7py-xY",
+            lengthS: 37,
+          },
+          {
+            title: "Totalt att betala, lägg till provision och se prisregler",
+            description:
+              "Ta reda på hur du visar bokningssaldon, biljettpriser och lägger till avgifter och provisioner.",
+            id: "pB05rIT8N3I",
+            lengthS: 63,
+          },
+          {
+            title: "Bekräfta en bokning",
+            description:
+              "Ta reda på hur du gör en betalning med ditt byråkort och bekräfta en bokning i Junction Hub.",
+            id: "OQMqh6fCczo",
+            lengthS: 69,
+          },
+          {
+            title: "Kontrollera orderstatus",
+            description:
+              "Ta reda på hur du kan se alla dina befintliga beställningar, kontrollera deras status och ladda ner dina kunders biljetter i Junction Hub.",
+            id: "2ZHcdPvcJ-U",
+            lengthS: 47,
+          },
+        ],
+      },
+      faq: {
+        title: "Vanliga frågor",
+        items: [
+          {
+            question: "Vilka tågoperatörer är tillgängliga via Junction Hub?",
+            answer:
+              "Junction Hub ger dig tillgång till en mängd järnvägsresor över hela Europa, ombord på operatörer som Eurostar, SNCF, Thalys, Deutsche Bahn med flera.",
+          },
+          {
+            question: "Kan jag se och jämföra olika restider och priser på ett ställe?",
+            answer:
+              "Genom att söka i Junction Hub kan du enkelt se alla tillgängliga avgångar för dina valda resedatum och jämföra de olika pristyperna och priserna för dina kunders räkning.",
+          },
+          {
+            question: "Vilka betalningsalternativ accepteras?",
+            answer: "För närvarande görs alla bokningsbetalningar med ditt byråkreditkort.",
+          },
+          {
+            question: "Hur avbokar jag bokningar i Junction Hub?",
+            answer:
+              "För att avboka en bokning måste du göra en begäran om avbokning. Ta en titt på vår användarguide, eller titta på vår korta videohandledning, för mer information om hur du avbokar en bokning i Junction Hub.",
+          },
+          {
+            question: "Hur kommer jag åt kundernas tågbiljetter?",
+            answer:
+              'Navigera till fliken "Beställningar", där du kan se alla befintliga beställningar och deras status. För att ladda ner dina kunders biljetter, välj deras beställning och klicka på länken "Ladda ner biljett".',
+          },
+          {
+            question: "Hur kontaktar jag kundsupport?",
+            answer:
+              "Snowfalls supportteam finns till hands för att hjälpa dig om du har några problem. Skicka ett e-postmeddelande till support@snowfalltravel.com.",
+          },
+        ],
+      },
+    },
+    pay: {
+      title: "Pay",
+      pages: {
+        accounts: {
+          title: "Konton",
+        },
+        activity: {
+          title: "Aktivitet",
+          pages: {
+            transactions: {
+              title: "Transaktioner",
+            },
+            conversions: {
+              title: "FX",
+            },
+          },
+        },
+        bills: {
+          title: "Räkningar",
+        },
+      },
+    },
+    tripManagement: {
+      title: "Resehantering",
+      pages: {
+        book: {
+          title: "Boka",
+          pages: {
+            search: {
+              title: "Sök",
+              subTitle: "Sök efter erbjudanden",
+            },
+            select: {
+              title: "Välj",
+              subTitle: "Välj ett erbjudande",
+              earlier: "Tidigare",
+              later: "Senare",
+            },
+            payment: {
+              title: "Betalning",
+              subTitle: "Betalning",
+            },
+            confirmation: {
+              title: "Bekräftelse",
+              subTitle: "Bekräftelse",
+            },
+          },
+        },
+        orders: {
+          title: "Beställningar",
+          pages: {
+            bookings: {
+              title: "Bokningar",
+            },
+            details: {
+              title: "Detaljer",
+            },
+          },
+        },
+      },
+    },
+  },
+  ory: {
+    formGroups: {
+      default: "Standard",
+      password: "Uppdatera lösenord",
+      oidc: "OIDC",
+      profile: "Allmänt",
+      link: "Länk",
+      code: "Kod",
+      totp: "Tvåfaktorsautentisering",
+      lookup_secret: "Återställningskoder",
+      webauthn: "Säkerhetsnycklar",
+    },
+  },
+} satisfies LocaleData;

@@ -1,0 +1,74 @@
+<script lang="ts">
+  import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
+  import { slideFade } from "$lib/transitions/slide-fade";
+
+  let className: string | undefined = undefined;
+  export { className as class };
+  export let expandedOnMount = false;
+  export let transitionTimeMs = 300;
+  export let title = "";
+
+  let expanded = expandedOnMount;
+
+  export function close(): void {
+    expanded = false;
+  }
+
+  export function open(): void {
+    expanded = true;
+  }
+
+  export function toggle(): void {
+    if (expanded) {
+      close();
+    } else {
+      open();
+    }
+  }
+</script>
+
+<div class:collapsible={true} class={className}>
+  <button class="toggle" on:click={toggle}>
+    <slot name="title" {expanded} {transitionTimeMs}>
+      <span typography="title-medium" weight="bold">{title}</span>
+    </slot>
+
+    <ChevronIcon size="20px" direction={expanded ? "up" : "down"} />
+  </button>
+
+  {#if expanded}
+    <div class="content" transition:slideFade={{ duration: transitionTimeMs }}>
+      <slot {expanded} {transitionTimeMs} />
+    </div>
+  {/if}
+
+  <slot name="content-after" {expanded} {transitionTimeMs} />
+</div>
+
+<style>
+  .collapsible {
+    --x-padding: var(--padding, 24px 40px);
+    --x-border-radius: var(--border-radius, 16px);
+    --x-background-color: var(--background-color, var(--color-common-background-light-main));
+
+    display: flex;
+    flex-flow: column;
+    gap: 16px;
+    padding: var(--x-padding);
+    color: var(--color-text-light-strong);
+    background-color: var(--x-background-color);
+    border-radius: var(--x-border-radius);
+  }
+
+  .toggle {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    color: var(--color-main-primary-900);
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+</style>

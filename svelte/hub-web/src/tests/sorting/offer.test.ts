@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
-import { getSortOffersFunc } from "~/sorting/offer";
-import type { SearchOptionsData } from "../../routes/trip-management/book/train/select-offer/search-options.svelte";
+import { getSortOffersFunc } from "$lib/sorting/offer";
+import type { SearchOptionsData } from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
 
 const foo = {
   groups: [

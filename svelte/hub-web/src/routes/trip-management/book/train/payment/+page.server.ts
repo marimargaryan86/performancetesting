@@ -1,8 +1,11 @@
 import { redirect } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
-import routeConfig from "~/route-config";
+import routeConfig from "$lib/route-config";
 import type { UserProfile } from "~/integration/junction-hub-api/schemas/user";
-import { getCookie, type BookingSessionSelect } from "../../../booking-flow";
+import {
+  getCookie,
+  type BookingSessionSelect,
+} from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
 
 export async function load(event): Promise<{
   bookingSession: BookingSessionSelect;

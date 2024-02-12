@@ -5,16 +5,16 @@
 </script>
 
 <script lang="ts">
-  import { scrollLoad, type ScrollLoadFunc } from "~/directives/scroll-load";
+  import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
   import type TransactionService from "~/integration/junction-hub-api/services/transaction-service";
-  import EntityAvatar from "~/components/ui/entity-avatar.svelte";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getTranslator } from "~/i18n";
+  import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getLocale, getTranslator } from "$lib/i18n/index.js";
   import { writable } from "svelte/store";
-  import { slideFade } from "~/transitions/slide-fade";
+  import { slideFade } from "$lib/transitions/slide-fade";
   import { formatAmount } from "$lib/formatting/currency";
-  import LoadingIcon from "~/components/icons/loading-icon.svelte";
+  import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
 
   export let data;
 

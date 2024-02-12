@@ -1,5 +1,5 @@
-import type { Locale, LocaleData, TimeFormat } from "~/i18n";
-import lang from "~/i18n/lang";
+import type { Locale, LocaleData, TimeFormat } from "$lib/i18n";
+import lang from "$lib/i18n/lang";
 import type { User } from "~/integration/ory/schemas/authentication";
 
 export function load(event): {

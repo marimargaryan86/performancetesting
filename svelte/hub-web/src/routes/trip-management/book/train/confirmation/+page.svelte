@@ -11,18 +11,18 @@
 </script>
 
 <script lang="ts">
-  import routeConfig from "~/route-config";
-  import Alert, { type AlertType } from "~/components/ui/alert.svelte";
-  import Passengers from "../../../components/passengers.svelte";
-  import Price from "../../../components/price.svelte";
-  import Overview from "./overview.svelte";
-  import Itinerary from "../../../components/itinerary.svelte";
-  import { ensureDefined } from "~/utils/array";
+  import routeConfig from "$lib/route-config";
+  import Alert, { type AlertType } from "$lib/components/ui/alert.svelte";
+  import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
+  import Price from "$lib/components/pages/trip-management/booking-flow-train/price.svelte";
+  import Overview from "$lib/components/pages/trip-management/booking-flow-train/confirmation/overview.svelte";
+  import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
+  import { ensureDefined } from "$lib/utils/array";
   import { getOrderStatus, type OrderBookingStatus } from "~/integration/common/schemas/order";
-  import Fees from "./fees.svelte";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getTranslator } from "~/i18n";
-  import Icon from "~/components/icons/icon.svelte";
+  import Fees from "$lib/components/pages/trip-management/booking-flow-train/confirmation/fees.svelte";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getTranslator } from "$lib/i18n/index.js";
+  import Icon from "$lib/components/icons/icon.svelte";
 
   export let data;
 

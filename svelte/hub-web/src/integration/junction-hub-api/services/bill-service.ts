@@ -1,6 +1,6 @@
 import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 import { billParser, type Bill, type BillSchema } from "../schemas/bill";
 
 export default class BillService extends JunctionHubApiService {

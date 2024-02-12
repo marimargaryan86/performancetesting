@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateAndGetDate, validateDay, validateMonth, validateYear } from "~/utils/date-time";
+import { validateAndGetDate, validateDay, validateMonth, validateYear } from "$lib/utils/date-time";
 
 describe("validateDay", () => {
   it("should return a valid tuple with a valid day string", () => {

@@ -1,15 +1,15 @@
 <script lang="ts">
-  import MainMenu from "~/components/partials/main-menu/main-menu.svelte";
+  import MainMenu from "$lib/components/partials/main-menu/main-menu.svelte";
   import { browser } from "$app/environment";
-  import { getTimeDeltaMs } from "~/utils/date-time";
+  import { getTimeDeltaMs } from "$lib/utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
-  import { setTranslator, type Locale, setTimeFormat } from "~/i18n";
+  import { setTranslator, type Locale, setTimeFormat } from "$lib/i18n/index.js";
   import { invalidateAll } from "$app/navigation";
   import type { User } from "~/integration/ory/schemas/authentication";
-  import { setUser } from "~/utils/permissions";
-  import { setQueryStore } from "~/stores/query-store";
+  import { setUser } from "$lib/utils/permissions";
+  import { setQueryStore } from "$lib/stores/query-store";
   import { page } from "$app/stores";
   import i18next from "i18next";
 

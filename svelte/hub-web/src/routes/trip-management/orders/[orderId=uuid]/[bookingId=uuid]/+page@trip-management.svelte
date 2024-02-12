@@ -1,19 +1,19 @@
 <script lang="ts">
-  import type { BreadCrumb } from "~/components/page/bread-crumbs.svelte";
-  import StandardLayout from "~/components/page/standard-layout.svelte";
-  import routeConfig from "~/route-config";
-  import { getDestination, getOrigin } from "~/utils/booking";
-  import Passengers from "../../../components/passengers.svelte";
-  import Ticket from "../../../components/ticket.svelte";
-  import Itinerary from "../../../components/itinerary.svelte";
-  import StatusBadge from "~/components/ui/status-badge.svelte";
-  import { getUser, permitted } from "~/utils/permissions";
-  import Admin from "./admin.svelte";
+  import type { BreadCrumb } from "$lib/components/page/bread-crumbs.svelte";
+  import StandardLayout from "$lib/components/page/standard-layout.svelte";
+  import routeConfig from "$lib/route-config";
+  import { getDestination, getOrigin } from "$lib/utils/booking";
+  import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
+  import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
+  import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
+  import StatusBadge from "$lib/components/ui/status-badge.svelte";
+  import { getUser, permitted } from "$lib/utils/permissions";
+  import Admin from "$lib/components/pages/trip-management/orders/admin.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import Fees from "../../../book/train/confirmation/fees.svelte";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getTranslator } from "~/i18n";
-  import Price from "../../../components/price.svelte";
+  import Fees from "$lib/components/pages/trip-management/booking-flow-train/confirmation/fees.svelte";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getLocale, getTranslator } from "$lib/i18n";
+  import Price from "$lib/components/pages/trip-management/booking-flow-train/price.svelte";
 
   export let data;
 

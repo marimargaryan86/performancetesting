@@ -36,17 +36,17 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { goto } from "$app/navigation";
-  import { writableCookie } from "~/utils/persistent-store";
-  import StepView from "~/components/page/step-view.svelte";
-  import routeConfig from "~/route-config";
-  import BeneficiaryDetails from "./beneficiary-details.svelte";
-  import BankAccountDetails from "./bank-account-details.svelte";
-  import Summary from "./summary.svelte";
-  import { URLExtended } from "~/utils/url";
-  import StandardLayout from "~/components/page/standard-layout.svelte";
-  import Alert from "~/components/ui/alert.svelte";
+  import { writableCookie } from "$lib/utils/persistent-store";
+  import StepView from "$lib/components/page/step-view.svelte";
+  import routeConfig from "$lib/route-config";
+  import BeneficiaryDetails from "$lib/components/pages/pay/beneficiaries/beneficiary-details.svelte";
+  import BankAccountDetails from "$lib/components/pages/pay/beneficiaries/bank-account-details.svelte";
+  import Summary from "$lib/components/pages/pay/beneficiaries/summary.svelte";
+  import { URLExtended } from "$lib/utils/url";
+  import StandardLayout from "$lib/components/page/standard-layout.svelte";
+  import Alert from "$lib/components/ui/alert.svelte";
   import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
-  import { getPageTitle } from "~/utils/page-title";
+  import { getPageTitle } from "$lib/utils/page-title";
 
   export let data;
 

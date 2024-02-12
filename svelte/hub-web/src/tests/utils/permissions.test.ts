@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { permitted } from "../../utils/permissions";
+import { permitted } from "$lib/utils/permissions";
 import type { User } from "~/integration/ory/schemas/authentication";
 
 const adminUser: User = {

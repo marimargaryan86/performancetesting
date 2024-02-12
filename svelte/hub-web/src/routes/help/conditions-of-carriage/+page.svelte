@@ -70,7 +70,7 @@
 </script>
 
 <script lang="ts">
-  import { getTranslator } from "~/i18n";
+  import { getTranslator } from "$lib/i18n";
 
   const t = getTranslator();
 </script>

@@ -9,7 +9,7 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import { getTranslator, type LocaleData } from "~/i18n";
+  import { getTranslator, type LocaleData } from "$lib/i18n";
 
   const t = getTranslator();
 

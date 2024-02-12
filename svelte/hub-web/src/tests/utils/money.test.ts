@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { roundCurrency } from "~/utils/money";
+import { roundCurrency } from "$lib/utils/money";
 
 describe("roundCurrency", () => {
   it("rounds 1.005 to 1.01 (addressing floating point precision issue)", () => {

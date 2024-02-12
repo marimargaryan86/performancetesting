@@ -5,8 +5,8 @@ import {
 } from "~/integration/common/schemas/address";
 import type { IncludedMapping } from "./included";
 import type { Order, OrderSchema } from "./order";
-import type { DateRange } from "~/models/date-time";
-import type { BookingStatus } from "../schemas/booking";
+import type { DateRange } from "$lib/models/date-time";
+import type { BookingStatus } from "./booking";
 
 export type ContactDetails = {
   email: string;

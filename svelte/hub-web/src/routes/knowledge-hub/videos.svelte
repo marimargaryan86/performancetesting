@@ -10,11 +10,11 @@
 </script>
 
 <script lang="ts">
-  import { getTranslator } from "~/i18n";
-  import { ensureDefined } from "~/utils/array";
-  import Card from "~/components/ui/card.svelte";
+  import { getTranslator } from "$lib/i18n";
+  import { ensureDefined } from "$lib/utils/array";
+  import Card from "$lib/components/ui/card.svelte";
   import VideoPlayer from "./video-player.svelte";
-  import Icon from "~/components/icons/icon.svelte";
+  import Icon from "$lib/components/icons/icon.svelte";
 
   const t = getTranslator();
 

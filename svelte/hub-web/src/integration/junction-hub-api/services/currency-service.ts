@@ -1,7 +1,7 @@
 import type { Session } from "~/integration/ory/schemas/authentication";
 import JunctionHubApiService from "./junction-hub-api-service";
 import { currencyParser, type Currency, type CurrencySchema } from "../schemas/currency";
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 
 export default class CurrencyService extends JunctionHubApiService {
   async find({

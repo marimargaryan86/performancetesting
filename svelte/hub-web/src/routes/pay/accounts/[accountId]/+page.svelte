@@ -1,13 +1,13 @@
 <script lang="ts">
-  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
-  import CurrencyFlag from "~/components/icons/currency-flag.svelte";
+  import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
+  import CurrencyFlag from "$lib/components/icons/currency-flag.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import AddBalanceDialogue from "./add-balance-dialogue.svelte";
-  import StandardLayout from "~/components/page/standard-layout.svelte";
-  import routeConfig from "~/route-config";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getLocale, getTranslator } from "~/i18n";
-  import Icon from "~/components/icons/icon.svelte";
+  import AddBalanceDialogue from "$lib/components/pages/pay/accounts/add-balance-dialogue.svelte";
+  import StandardLayout from "$lib/components/page/standard-layout.svelte";
+  import routeConfig from "$lib/route-config";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getLocale, getTranslator } from "$lib/i18n";
+  import Icon from "$lib/components/icons/icon.svelte";
   import type { ComponentEvents } from "svelte";
 
   export let data;

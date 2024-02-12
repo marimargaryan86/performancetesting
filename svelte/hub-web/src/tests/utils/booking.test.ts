@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validatePassengerNameRecord } from "~/utils/booking";
+import { validatePassengerNameRecord } from "$lib/utils/booking";
 
 describe("validatePassengerNameRecord", () => {
   it("should return `true` for valid reference numbers", () => {

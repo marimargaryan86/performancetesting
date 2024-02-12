@@ -32,31 +32,34 @@
     SEARCH_WINDOW_DELTA_MS,
     SEARCH_WINDOW_H,
     type SearchData,
-  } from "../../../components/trip-search/trip-search.svelte";
+  } from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
   import SearchOptions, {
     type SearchOptionsData,
     type SearchOptionsSettings,
-  } from "./search-options.svelte";
-  import Offer from "./offer/offer.svelte";
-  import routeConfig from "~/route-config";
+  } from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
+  import Offer from "$lib/components/pages/trip-management/booking-flow-train/select-offer/offer/offer.svelte";
+  import routeConfig from "$lib/route-config";
   import { goto, invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
-  import Countdown from "../countdown.svelte";
-  import LoadingSkelton from "./loading-skelton.svelte";
+  import Countdown from "$lib/components/pages/trip-management/booking-flow-train/countdown.svelte";
+  import LoadingSkelton from "$lib/components/pages/trip-management/booking-flow-train/select-offer/loading-skelton.svelte";
   import type { Offer as OfferModel } from "~/integration/junction-mobile-api/schemas/offer";
-  import LoadingIcon from "~/components/icons/loading-icon.svelte";
-  import Alert from "~/components/ui/alert.svelte";
-  import { getSortOffersFunc } from "~/sorting/offer";
-  import { getFilterOffersFunc } from "~/filters/offer";
-  import { getOfferDurationM, getVendors } from "~/utils/offer";
+  import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
+  import Alert from "$lib/components/ui/alert.svelte";
+  import { getSortOffersFunc } from "$lib/sorting/offer";
+  import { getFilterOffersFunc } from "$lib/filters/offer";
+  import { getOfferDurationM, getVendors } from "$lib/utils/offer";
   import { onDestroy, type ComponentEvents } from "svelte";
   import { writable } from "svelte/store";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getTranslator } from "~/i18n";
-  import { manager, type PartialSelectedOffer } from "../../../booking-flow";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getTranslator } from "$lib/i18n/index.js";
+  import {
+    manager,
+    type PartialSelectedOffer,
+  } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
   import { browser, dev } from "$app/environment";
-  import CollapsibleTripSearch from "../../../components/trip-search/collapsible-trip-search.svelte";
-  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
+  import CollapsibleTripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/collapsible-trip-search.svelte";
+  import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
 
   export let data;
 

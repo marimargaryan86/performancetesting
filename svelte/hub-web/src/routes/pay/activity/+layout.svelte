@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Tab } from "~/components/ui/tabs.svelte";
+  import type { Tab } from "$lib/components/ui/tabs.svelte";
   import { page } from "$app/stores";
-  import routeConfig from "~/route-config";
-  import StandardLayout from "~/components/page/standard-layout.svelte";
-  import { getTranslator } from "~/i18n";
-  import { ensureDefined } from "~/utils/array";
+  import routeConfig from "$lib/route-config";
+  import StandardLayout from "$lib/components/page/standard-layout.svelte";
+  import { getTranslator } from "$lib/i18n";
+  import { ensureDefined } from "$lib/utils/array";
 
   const t = getTranslator();
 

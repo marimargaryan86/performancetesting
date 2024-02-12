@@ -1,4 +1,4 @@
-import { URLExtended } from "~/utils/url";
+import { URLExtended } from "$lib/utils/url";
 import { throwIfError } from "./junction-error";
 import type { Session } from "~/integration/ory/schemas/authentication";
 

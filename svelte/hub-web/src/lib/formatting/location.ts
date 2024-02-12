@@ -1,5 +1,5 @@
-import type { Translator } from "~/i18n";
-import type { CountryModel } from "~/models/location";
+import type { Translator } from "$lib/i18n";
+import type { CountryModel } from "$lib/models/location";
 
 export function formatCountryOption(
   translator: Translator,

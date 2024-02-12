@@ -1,6 +1,9 @@
 import { redirect } from "@sveltejs/kit";
-import routeConfig from "~/route-config";
-import { getCookie, type BookingSessionSearch } from "../../../booking-flow";
+import routeConfig from "$lib/route-config";
+import {
+  getCookie,
+  type BookingSessionSearch,
+} from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
 
 export function load(event): {
   bookingSession: BookingSessionSearch;

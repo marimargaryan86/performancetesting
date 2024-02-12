@@ -1,4 +1,4 @@
-import { getCookiesFromHeaders } from "~/utils/cookies";
+import { getCookiesFromHeaders } from "$lib/utils/cookies";
 import {
   recoveryFlowParser,
   type RecoveryFlow,

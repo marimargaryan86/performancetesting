@@ -1,4 +1,4 @@
-import { URLExtended } from "~/utils/url";
+import { URLExtended } from "$lib/utils/url";
 
 export default abstract class OryService {
   private readonly baseUrl: string;

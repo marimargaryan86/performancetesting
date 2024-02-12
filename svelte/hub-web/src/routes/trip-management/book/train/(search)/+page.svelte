@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { getPageTitle } from "~/utils/page-title";
-  import TripSearch from "../../../components/trip-search/trip-search.svelte";
-  import { getTranslator } from "~/i18n";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import TripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
+  import { getTranslator } from "$lib/i18n";
   import type { ComponentEvents } from "svelte";
-  import { manager } from "../../../booking-flow";
+  import { manager } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
   import { goto } from "$app/navigation";
-  import routeConfig from "~/route-config";
+  import routeConfig from "$lib/route-config";
 
   const t = getTranslator();
 

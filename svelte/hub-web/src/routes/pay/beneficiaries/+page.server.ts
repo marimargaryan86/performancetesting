@@ -1,6 +1,6 @@
 import integrationInstances from "~/integration-instances";
 import type { Beneficiary } from "~/integration/junction-hub-api/schemas/beneficiary";
-import type { PaginatedData } from "~/models/common";
+import type { PaginatedData } from "$lib/models/common";
 import { LIST_BENEFICIARIES_LIMIT } from "./+page.svelte";
 
 export function load(event): {

@@ -1,13 +1,13 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import LoadingIcon from "~/components/icons/loading-icon.svelte";
-  import TextField from "~/components/ui/text-field.svelte";
+  import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
+  import TextField from "$lib/components/ui/text-field.svelte";
   import integrationInstancesClient from "~/integration-instances-client";
-  import routeConfig from "~/route-config";
+  import routeConfig from "$lib/route-config";
   import { writable } from "svelte/store";
-  import { slideFade } from "~/transitions/slide-fade";
-  import { getPageTitle } from "~/utils/page-title";
-  import { getTranslator } from "~/i18n/index";
+  import { slideFade } from "$lib/transitions/slide-fade";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import { getTranslator } from "$lib/i18n/index";
 
   export let data;
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { getPageTitle } from "~/utils/page-title";
-  import Passengers from "../../../components/passengers.svelte";
-  import Ticket from "../../../components/ticket.svelte";
-  import { getTranslator } from "~/i18n";
+  import { getPageTitle } from "$lib/utils/page-title";
+  import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
+  import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
+  import { getTranslator } from "$lib/i18n/index.js";
 
   export let data;
 

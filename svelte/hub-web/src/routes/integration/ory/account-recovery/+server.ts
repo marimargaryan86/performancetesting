@@ -1,5 +1,5 @@
 import integrationInstances from "~/integration-instances";
-import { cookieStore } from "~/stores/cookie-store.server";
+import { cookieStore } from "$lib/stores/cookie-store.server";
 import { serverServiceFactory } from "../../framework";
 import accountRecoveryService from "./account-recovery-service";
 

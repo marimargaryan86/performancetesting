@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ChevronIcon from "~/components/icons/chevron-icon.svelte";
-  import { getTranslator } from "~/i18n";
-  import { slideFade } from "~/transitions/slide-fade";
+  import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
+  import { getTranslator } from "$lib/i18n";
+  import { slideFade } from "$lib/transitions/slide-fade";
 
   const t = getTranslator();
 

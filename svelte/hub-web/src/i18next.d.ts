@@ -1,4 +1,4 @@
-import type { LocaleData } from "~/i18n";
+import type { LocaleData } from "$lib/i18n";
 
 declare module "i18next" {
   interface CustomTypeOptions {
