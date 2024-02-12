@@ -231,6 +231,7 @@
             {offer}
             selected={selected.offerId === offer.id}
             selectedOptionIds={selected.offerId === offer.id ? selected.optionIds : undefined}
+            pending={$selectOfferPending}
             on:select={select}
           />
         </li>

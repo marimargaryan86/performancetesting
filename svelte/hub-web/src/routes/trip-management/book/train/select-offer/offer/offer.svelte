@@ -38,10 +38,12 @@
   import type { Price } from "~/integration/common/schemas/price";
   import { ensureDefined } from "~/utils/array";
   import { getLocale, getTranslator, type Locale } from "~/i18n";
+  import LoadingIcon from "~/components/icons/loading-icon.svelte";
 
   export let offer: Offer;
   export let selectedOptionIds: string[] | undefined;
   export let selected: boolean;
+  export let pending: boolean;
 
   const locale = getLocale();
   const t = getTranslator();
@@ -162,6 +164,10 @@
 
             <button size="x-small" variant="outline" on:click={selectOffer}>
               {$t("actions.bookNow")}
+
+              {#if selected && pending}
+                <LoadingIcon color="var(--color-main-primary-500)" />
+              {/if}
             </button>
           </div>
         {/if}
