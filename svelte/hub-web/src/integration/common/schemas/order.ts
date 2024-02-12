@@ -1,15 +1,13 @@
-import type { Order as MobileOrder } from "~/integration/junction-mobile-api/schemas/order";
-import type { Order as HubOrder } from "~/integration/junction-hub-api/schemas/order";
-import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
-import type { TripBooking as HubTripBooking } from "~/integration/junction-hub-api/schemas/booking";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import { ensureDefined } from "$lib/utils/array";
 
-type Order = MobileOrder | HubOrder;
-type TripBooking = MobileTripBooking | HubTripBooking;
+type Order = MobileSchemas.Order | HubSchemas.Order;
+type TripBooking = MobileSchemas.TripBooking | HubSchemas.TripBooking;
 
 export type OrderBookingStatus = TripBooking["status"] | "mixed";
 export type OrderCancellationStatus = NonNullable<TripBooking["cancellation"]>["status"] | "mixed";
-export type OrderRefundStatus = NonNullable<HubTripBooking["refund"]>["status"] | "mixed";
+export type OrderRefundStatus = NonNullable<HubSchemas.TripBooking["refund"]>["status"] | "mixed";
 
 export type TravelerDocumentType = "passport";
 export type Gender = "unspecified" | "male" | "female";

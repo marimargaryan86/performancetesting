@@ -1,19 +1,11 @@
 /* eslint-disable camelcase */
-import type { StatusBadgeValue } from "$lib/components/ui/status-badge.svelte";
-import type {
-  PaymentMethod,
-  PaymentType,
-} from "~/integration/junction-hub-api/schemas/transaction";
-import type { UserRole } from "~/integration/ory/schemas/authentication";
-import type { PassengerType } from "$lib/components/pages/trip-management/booking-flow-train/trip-search/passenger-picker/passenger-picker.svelte";
-import type { SortOption } from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
-import type { PriceBreakdownType } from "~/integration/common/schemas/price";
-import type {
-  Gender,
-  PassengerTitle,
-  TravelerDocumentType,
-} from "~/integration/common/schemas/order";
-import type { TripType } from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-type-picker.svelte";
+import type { StatusBadgeValue } from "$lib/models/status-badge";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+import type * as OrySchemas from "~/integration/ory/schemas";
+import type { PassengerType } from "$lib/models/passenger";
+import type { SortOption } from "$lib/utils/offer";
+import type * as CommonSchemas from "~/integration/common/schemas";
+import type { TripType } from "$lib/models/trip-offer-search";
 
 export default {
   title: "Junction Hub",
@@ -22,7 +14,7 @@ export default {
     "reseller-user": "Reseller user",
     "snowfall-admin": "Snowfall admin",
     "snowfall-user": "Snowfall user",
-  } satisfies Record<UserRole, string>,
+  } satisfies Record<OrySchemas.UserRole, string>,
   words: {
     yes: "Yes",
     no: "No",
@@ -284,17 +276,17 @@ export default {
     female: "Female",
     male: "Male",
     unspecified: "Unspecified",
-  } satisfies Record<Gender, string>,
+  } satisfies Record<CommonSchemas.Gender, string>,
   documentTypes: {
     passport: "Passport",
-  } satisfies Record<TravelerDocumentType, string>,
+  } satisfies Record<CommonSchemas.TravelerDocumentType, string>,
   passengerTitle: {
     miss: "Miss",
     mr: "Mr",
     mrs: "Mrs",
     ms: "Ms",
     unspecified: "Unspecified",
-  } satisfies Record<PassengerTitle, string>,
+  } satisfies Record<CommonSchemas.PassengerTitle, string>,
   passengerTypes: {
     adult_one: "Adult",
     adult_other: "Adults",
@@ -315,14 +307,14 @@ export default {
     invoice: "Invoice",
     transactional: "Transactional",
     unspecified: "Unspecified",
-  } satisfies Record<PaymentType | PaymentMethod, string>,
+  } satisfies Record<HubSchemas.PaymentType | HubSchemas.PaymentMethod, string>,
   priceBreakdownTypes: {
     "base-fare": "Base fare",
     "company-mark-up": "Company mark-up",
     "reseller-mark-up": "Reseller mark-up",
     "service-mark-up": "Service mark-up",
     tax: "Taxes",
-  } satisfies Record<PriceBreakdownType, string>,
+  } satisfies Record<CommonSchemas.PriceBreakdownType, string>,
   sortOptions: {
     "earliest-arrival": "Earliest arrival",
     "earliest-departure": "Earliest departure",

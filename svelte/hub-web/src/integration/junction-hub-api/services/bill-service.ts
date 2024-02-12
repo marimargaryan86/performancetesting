@@ -1,4 +1,4 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "$lib/models/common";
 import { billParser, type Bill, type BillSchema } from "../schemas/bill";
@@ -10,7 +10,7 @@ export default class BillService extends JunctionHubApiService {
     limit = 100,
     filter,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
     filter?: {
@@ -36,13 +36,19 @@ export default class BillService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: Session; id: string }): Promise<Bill> {
+  async get({ session, id }: { session: OrySchemas.Session; id: string }): Promise<Bill> {
     const resp = await this.makeRequest<{ data: BillSchema }>(`/bills/${id}`, { session });
 
     return billParser.toModel(resp.json.data);
   }
 
-  async toggleReconciliation({ session, bill }: { session: Session; bill: Bill }): Promise<Bill> {
+  async toggleReconciliation({
+    session,
+    bill,
+  }: {
+    session: OrySchemas.Session;
+    bill: Bill;
+  }): Promise<Bill> {
     const resp = await this.makeRequest<{
       data: BillSchema;
     }>(`/bills/${bill.id}`, {

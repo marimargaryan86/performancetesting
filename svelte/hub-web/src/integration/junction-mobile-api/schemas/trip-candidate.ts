@@ -1,26 +1,21 @@
-import {
-  coordinatesSearchableParser,
-  type CoordinatesSearchable,
-  type CoordinatesSearchableSchema,
-} from "~/integration/common/schemas/point";
+import * as CommonSchemas from "~/integration/common/schemas";
 import {
   tripOfferPassengerParser,
   type TripOfferPassenger,
   type TripOfferPassengerSchema,
 } from "./offer-search";
-import type { LegType, LegTypeSchema } from "~/integration/common/schemas/leg-type";
 
 export type TripCandidateSearchCriteria = {
-  origin: CoordinatesSearchable;
-  destination: CoordinatesSearchable;
+  origin: CommonSchemas.CoordinatesSearchable;
+  destination: CommonSchemas.CoordinatesSearchable;
   departureAfter: Date;
   departureBefore?: Date;
   maximumConnections?: number;
 };
 
 export type TripCandidateSearchCriteriaSchema = {
-  origin: CoordinatesSearchableSchema;
-  destination: CoordinatesSearchableSchema;
+  origin: CommonSchemas.CoordinatesSearchableSchema;
+  destination: CommonSchemas.CoordinatesSearchableSchema;
   departureAfter: string;
   departureBefore?: string;
   maximumConnections?: number;
@@ -28,15 +23,15 @@ export type TripCandidateSearchCriteriaSchema = {
 
 export const tripCandidateSearchCriteriaParser = {
   toModel: (data: TripCandidateSearchCriteriaSchema): TripCandidateSearchCriteria => ({
-    origin: coordinatesSearchableParser.toModel(data.origin),
-    destination: coordinatesSearchableParser.toModel(data.destination),
+    origin: CommonSchemas.coordinatesSearchableParser.toModel(data.origin),
+    destination: CommonSchemas.coordinatesSearchableParser.toModel(data.destination),
     departureAfter: new Date(data.departureAfter),
     departureBefore: data.departureBefore ? new Date(data.departureBefore) : undefined,
     maximumConnections: data.maximumConnections,
   }),
   toSchema: (data: TripCandidateSearchCriteria): TripCandidateSearchCriteriaSchema => ({
-    origin: coordinatesSearchableParser.toSchema(data.origin),
-    destination: coordinatesSearchableParser.toSchema(data.destination),
+    origin: CommonSchemas.coordinatesSearchableParser.toSchema(data.origin),
+    destination: CommonSchemas.coordinatesSearchableParser.toSchema(data.destination),
     departureAfter: data.departureAfter.toISOString(),
     departureBefore: data.departureBefore?.toISOString(),
     maximumConnections: data.maximumConnections,
@@ -49,7 +44,7 @@ export type TripCandidateSearch = {
   status: "unspecified" | "pending" | "processing" | "completed" | "failed";
   criteria: TripCandidateSearchCriteria[];
   passengers: TripOfferPassenger[];
-  allowedSegmentTypes?: LegType["id"][];
+  allowedSegmentTypes?: CommonSchemas.LegType["id"][];
 };
 
 export type TripCandidateSearchSchema = {
@@ -62,7 +57,7 @@ export type TripCandidateSearchSchema = {
     passengers: TripOfferPassengerSchema[];
   };
   relationships?: {
-    allowedSegmentTypes?: { data: Pick<LegTypeSchema, "id" | "type">[] };
+    allowedSegmentTypes?: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type">[] };
   };
   links: { self: string };
 };

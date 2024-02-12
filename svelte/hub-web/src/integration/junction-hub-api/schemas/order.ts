@@ -1,19 +1,10 @@
-import {
-  enhancedAddressDetailsParser,
-  type EnhancedAddressDetails,
-  type EnhancedAddressDetailsSchema,
-} from "~/integration/common/schemas/address";
 import type { TripBooking, TripBookingSchema } from "./booking";
 import type { IncludedMapping } from "./included";
 import type { Journey, JourneySchema } from "./journey";
-import type {
-  Gender,
-  PassengerTitle,
-  TravelerDocumentType,
-} from "~/integration/common/schemas/order";
+import * as CommonSchemas from "~/integration/common/schemas";
 
 export type TravelerDocument = {
-  type?: TravelerDocumentType;
+  type?: CommonSchemas.TravelerDocumentType;
   number?: string;
   expiryDate?: Date;
   issueDate?: Date;
@@ -25,7 +16,7 @@ export type TravelerDocument = {
 };
 
 export type TravelerDocumentSchema = {
-  documentType?: TravelerDocumentType;
+  documentType?: CommonSchemas.TravelerDocumentType;
   documentNumber?: string;
   documentIssueCountry?: string;
   documentExpirationDate?: string;
@@ -51,8 +42,8 @@ export const travelerDocumentParser = {
 export type OrderPassenger = {
   firstName: string;
   lastName: string;
-  title: PassengerTitle;
-  gender: Gender;
+  title: CommonSchemas.PassengerTitle;
+  gender: CommonSchemas.Gender;
   birthDate: Date;
   travelerDocument?: TravelerDocument;
 };
@@ -60,8 +51,8 @@ export type OrderPassenger = {
 export type OrderPassengerSchema = {
   firstName: string;
   lastName: string;
-  title: PassengerTitle;
-  gender: Gender;
+  title: CommonSchemas.PassengerTitle;
+  gender: CommonSchemas.Gender;
   dateOfBirth: string;
   travelerDocument?: TravelerDocumentSchema | null;
 };
@@ -83,7 +74,7 @@ export type Order = {
   id: string;
   createdAt: Date;
   passengers: OrderPassenger[];
-  residenceAddress?: Required<Omit<EnhancedAddressDetails, "state">>;
+  residenceAddress?: Required<Omit<CommonSchemas.EnhancedAddressDetails, "state">>;
   journeyId: string;
   journey?: Journey;
   bookingIds: string[];
@@ -96,7 +87,7 @@ export type OrderSchema = {
   attributes: {
     createdAt: string;
     passengers: OrderPassengerSchema[];
-    residenceAddress?: Required<Omit<EnhancedAddressDetailsSchema, "state">>;
+    residenceAddress?: Required<Omit<CommonSchemas.EnhancedAddressDetailsSchema, "state">>;
   };
   relationships: {
     journey: { data: Pick<JourneySchema, "id" | "type"> };
@@ -115,7 +106,7 @@ export const orderParser = {
       createdAt: new Date(data.attributes.createdAt),
       passengers: data.attributes.passengers.map(orderPassengerParser.toModel),
       residenceAddress: data.attributes.residenceAddress
-        ? (enhancedAddressDetailsParser.toModel(
+        ? (CommonSchemas.enhancedAddressDetailsParser.toModel(
             data.attributes.residenceAddress,
           ) as Order["residenceAddress"])
         : undefined,

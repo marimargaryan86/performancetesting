@@ -1,62 +1,16 @@
-<script lang="ts" context="module">
-  const refundDataModel = z.discriminatedUnion("type", [
-    z.object({
-      type: z.literal("automatic"),
-      externalReference: z.string().trim().min(1).optional(),
-      us: z.number().min(0),
-      reseller: z.number().min(0),
-    }),
-    z.object({
-      type: z.literal("manual"),
-      externalReference: z.string().trim().min(1),
-      us: z.number().min(0).optional(),
-      reseller: z.number().min(0).optional(),
-    }),
-  ]);
-
-  type RefundData = z.infer<typeof refundDataModel>;
-
-  function getRefundPutData(data: RefundData, transaction: Transaction): RefundPut {
-    return data.type === "automatic"
-      ? {
-          type: "automatic",
-          transactionId: transaction.id,
-          invoiceReference: transaction.invoiceReference ?? "",
-          externalReference: data.externalReference,
-          received: true,
-          refunded: {
-            reseller: {
-              currency: transaction.amounts.quotation.currency,
-              amount: data.reseller ?? 0,
-            },
-            us: {
-              currency: transaction.amounts.beneficiary.currency,
-              amount: data.us ?? 0,
-            },
-          },
-          note: "",
-        }
-      : {
-          type: "manual",
-          externalReference: data.externalReference,
-        };
-  }
-</script>
-
 <script lang="ts">
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";
   import { getTranslator } from "$lib/i18n";
   import integrationInstancesClient from "~/integration-instances-client";
-  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
-  import type { Refund, RefundPut } from "~/integration/junction-hub-api/schemas/refund";
-  import type { Transaction } from "~/integration/junction-hub-api/schemas/transaction";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import { writable } from "svelte/store";
   import { slideFade } from "$lib/transitions/slide-fade";
-  import { z } from "zod";
+  import type { z } from "zod";
+  import { refundDataModel, type RefundData, getRefundPutData } from "$lib/models/refund";
 
-  export let transaction: Transaction;
-  export let booking: TripBooking;
+  export let transaction: HubSchemas.Transaction;
+  export let booking: HubSchemas.TripBooking;
 
   let errors: z.ZodFormattedError<z.infer<typeof refundDataModel>> | undefined;
   let refundType: "with-amount" | "no-amount" = "no-amount";
@@ -74,7 +28,7 @@
   }
   $: refundData, (refundDataDirty = refundData.type === "automatic");
 
-  function getDefaultRefundData(refund?: Refund): RefundData {
+  function getDefaultRefundData(refund?: HubSchemas.Refund): RefundData {
     return refund?.status === "failed"
       ? { type: "manual", externalReference: "" }
       : {

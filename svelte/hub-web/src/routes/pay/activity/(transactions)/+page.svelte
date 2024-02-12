@@ -10,7 +10,7 @@
   import type TransactionService from "~/integration/junction-hub-api/services/transaction-service";
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
-  import { getLocale, getTranslator } from "$lib/i18n/index.js";
+  import { getLocale, getTranslator } from "$lib/i18n";
   import { writable } from "svelte/store";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { formatAmount } from "$lib/formatting/currency";

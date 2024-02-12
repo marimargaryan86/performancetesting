@@ -1,24 +1,5 @@
-import {
-  offerSegmentLegParser,
-  type OfferSegmentLeg,
-  type OfferSegmentLegSchema,
-} from "~/integration/common/schemas/offer-segment-leg";
 import type { IncludedMapping } from "./included";
-import {
-  routeIdentifiersParser,
-  type RouteIdentifiers,
-  type RouteIdentifiersSchema,
-} from "~/integration/common/schemas/route-identifier";
-import type { LegType, LegTypeSchema } from "~/integration/common/schemas/leg-type";
-import {
-  priceParser,
-  type Price,
-  type PriceBreakdown,
-  type PriceBreakdownSchema,
-  type PriceSchema,
-  priceBreakdownParser,
-} from "~/integration/common/schemas/price";
-import type { CabinClass, CabinClassSchema } from "~/integration/common/schemas/cabin-class";
+import * as CommonSchemas from "~/integration/common/schemas";
 
 export type OfferSegmentDetailAmenity = "unspecified" | "unavailable" | "available" | "included";
 
@@ -63,7 +44,7 @@ export type TripOfferOptionDetails = {
   detailsId: string;
   details?: TripOfferGroupDetails;
   cabinClassId: string;
-  cabinClass?: CabinClass;
+  cabinClass?: CommonSchemas.CabinClass;
 };
 
 export type TripOfferOptionDetailsSchema = {
@@ -75,7 +56,7 @@ export type TripOfferOptionDetailsSchema = {
   };
   relationships: {
     details: { data: Pick<TripOfferGroupDetailsSchema, "id" | "type"> };
-    cabinClass: { data: Pick<CabinClassSchema, "id" | "type"> };
+    cabinClass: { data: Pick<CommonSchemas.CabinClassSchema, "id" | "type"> };
   };
   links: { self: string };
 };
@@ -102,33 +83,33 @@ export const tripOfferOptionDetailsParser = {
 
 export type TripOfferGroupDetails = {
   id: string;
-  legs: OfferSegmentLeg[];
+  legs: CommonSchemas.OfferSegmentLeg[];
   vendor: string;
   operator?: string;
-  routeIdentifiers: RouteIdentifiers;
+  routeIdentifiers: CommonSchemas.RouteIdentifiers;
   sequences: {
     trip: number;
     segment: number;
   };
   legTypeId: string;
-  legType?: LegType;
+  legType?: CommonSchemas.LegType;
 };
 
 export type TripOfferGroupDetailsSchema = {
   id: string;
   type: "trip-offer-group-details";
   attributes: {
-    legs: OfferSegmentLegSchema[];
+    legs: CommonSchemas.OfferSegmentLegSchema[];
     vendor: string;
     operator: string | null;
-    routeIdentifiers: RouteIdentifiersSchema;
+    routeIdentifiers: CommonSchemas.RouteIdentifiersSchema;
     sequences: {
       trip: number;
       segment: number;
     };
   };
   relationships: {
-    legType: { data: Pick<LegTypeSchema, "id" | "type"> };
+    legType: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type"> };
   };
   links: { self: string };
 };
@@ -142,10 +123,12 @@ export const tripOfferGroupDetailsParser = {
 
     return {
       id: data.id,
-      legs: data.attributes.legs.map(offerSegmentLegParser.toModel),
+      legs: data.attributes.legs.map(CommonSchemas.offerSegmentLegParser.toModel),
       vendor: data.attributes.vendor,
       operator: data.attributes.operator ?? undefined,
-      routeIdentifiers: routeIdentifiersParser.toModel(data.attributes.routeIdentifiers),
+      routeIdentifiers: CommonSchemas.routeIdentifiersParser.toModel(
+        data.attributes.routeIdentifiers,
+      ),
       sequences: { ...data.attributes.sequences },
       legTypeId,
       legType: included?.legTypes?.find(({ id }) => id === legTypeId),
@@ -192,8 +175,8 @@ export const tripOfferOptionPenaltyBaggageAllowanceParser = {
 export type OfferOption = {
   id: string;
   price: {
-    total: Price;
-    breakdown: PriceBreakdown[];
+    total: CommonSchemas.Price;
+    breakdown: CommonSchemas.PriceBreakdown[];
   };
   brandName: string;
   baggageAllowance: TripOfferOptionPenaltyBaggageAllowance[];
@@ -205,8 +188,8 @@ export type OfferOptionSchema = {
   id: string;
   type: "offer-options";
   attributes: {
-    price: PriceSchema;
-    priceBreakdown?: PriceBreakdownSchema[];
+    price: CommonSchemas.PriceSchema;
+    priceBreakdown?: CommonSchemas.PriceBreakdownSchema[];
     brandName: string;
     baggageAllowances: TripOfferOptionPenaltyBaggageAllowanceSchema[];
   };
@@ -223,11 +206,11 @@ export const offerOptionParser = {
     return {
       id: data.id,
       price: {
-        total: priceParser.toModel(data.attributes.price),
+        total: CommonSchemas.priceParser.toModel(data.attributes.price),
         breakdown:
           data.attributes.priceBreakdown
             ?.filter((pb) => pb.breakdownType !== "service-mark-up")
-            ?.map(priceBreakdownParser.toModel) ?? [],
+            ?.map(CommonSchemas.priceBreakdownParser.toModel) ?? [],
       },
       brandName: data.attributes.brandName,
       baggageAllowance: data.attributes.baggageAllowances.map(

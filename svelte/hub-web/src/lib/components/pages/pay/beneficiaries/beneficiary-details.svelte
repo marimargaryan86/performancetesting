@@ -4,13 +4,12 @@
   import Section from "./section.svelte";
   import type { CountryModel } from "$lib/models/location";
   import { formatCountryOption } from "$lib/formatting/location";
-  import type { Account } from "~/integration/junction-hub-api/schemas/account";
-  import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import countryData from "~/data/country-data";
   import { getTranslator } from "$lib/i18n";
 
-  export let data: BeneficiaryPut;
-  export let accounts: Account[];
+  export let data: HubSchemas.BeneficiaryPut;
+  export let accounts: HubSchemas.Account[];
 
   const t = getTranslator();
 
@@ -19,7 +18,7 @@
   $: accountIds = accounts.map((a) => a.id);
   $: data = updateCountry(country);
 
-  function updateCountry(nextCountry?: CountryModel): BeneficiaryPut {
+  function updateCountry(nextCountry?: CountryModel): HubSchemas.BeneficiaryPut {
     if (!nextCountry) {
       return data;
     }

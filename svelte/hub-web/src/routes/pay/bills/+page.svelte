@@ -7,8 +7,8 @@
   import Switch from "$lib/components/ui/switch.svelte";
   import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
-  import type { Bill } from "~/integration/junction-hub-api/schemas/bill";
-  import { match as matchUuid } from "../../../params/uuid";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+  import { match as matchUuid } from "~/params/uuid";
   import { getLocale, getTranslator } from "$lib/i18n";
   import { browser } from "$app/environment";
   import { getPageTitle } from "$lib/utils/page-title";
@@ -63,7 +63,7 @@
     return { depleted: !nextBills.cursor };
   };
 
-  async function toggleReconciliation(bill: Bill): Promise<void> {
+  async function toggleReconciliation(bill: HubSchemas.Bill): Promise<void> {
     await integrationInstancesClient.hub.bills.toggleReconciliation({ bill });
 
     bill.reconciled = !bill.reconciled;

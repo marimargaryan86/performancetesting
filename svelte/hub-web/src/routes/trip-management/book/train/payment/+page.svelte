@@ -1,40 +1,26 @@
-<script lang="ts" context="module">
-  function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
-    return (Object.keys(passengers) as unknown as (keyof PassengerPickerData)[]).flatMap((type) =>
-      Array(passengers[type])
-        .fill(undefined)
-        .map<PartialPassengerData>(() => ({ type })),
-    );
-  }
-</script>
-
 <script lang="ts">
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import routeConfig from "$lib/route-config";
   import Payment from "$lib/components/pages/trip-management/booking-flow-train/payment/payment.svelte";
   import Fees from "$lib/components/pages/trip-management/booking-flow-train/payment/fees.svelte";
-  import PassengerEntry, {
-    type PartialPassengerData,
-  } from "$lib/components/pages/trip-management/booking-flow-train/payment/passenger-entry.svelte";
-  import ContactInformation, {
-    contactDetailsModel,
-  } from "$lib/components/pages/trip-management/booking-flow-train/payment/contact-information.svelte";
+  import PassengerEntry from "$lib/components/pages/trip-management/booking-flow-train/payment/passenger-entry.svelte";
+  import type { PartialPassengerData } from "$lib/models/passenger";
+  import ContactInformation from "$lib/components/pages/trip-management/booking-flow-train/payment/contact-information.svelte";
+  import { contactDetailsModel } from "$lib/models/contact-details";
   import Countdown from "$lib/components/pages/trip-management/booking-flow-train/countdown.svelte";
   import { z } from "zod";
   import { goto } from "$app/navigation";
   import PriceDialog from "$lib/components/ui/dialogues/price-dialog.svelte";
   import Summary from "$lib/components/pages/trip-management/booking-flow-train/summary/summary.svelte";
-  import type { PassengerPickerData } from "$lib/components/pages/trip-management/booking-flow-train/trip-search/passenger-picker/passenger-picker.svelte";
   import { onDestroy } from "svelte";
-  import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
   import FareRulesDialog from "$lib/components/pages/trip-management/booking-flow-train/fare-rules-dialog.svelte";
-  import { getPassengerValidator } from "$lib/utils/passenger";
+  import { getDefaultPassengers, getPassengerValidator } from "$lib/utils/passenger";
   import { writable } from "svelte/store";
   import { formatAmount } from "$lib/formatting/currency";
   import TripBanner from "$lib/components/pages/trip-management/booking-flow-train/trip-banner.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
-  import { getLocale, getTranslator } from "$lib/i18n/index.js";
-  import type { TripOfferPriceQuoteCompleted } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import { getLocale, getTranslator } from "$lib/i18n";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import {
     manager,
     markupsModel,
@@ -49,7 +35,7 @@
   let payment: Payment | undefined;
   let bookingData: {
     passengers: PartialPassengerData[];
-    contact: ContactDetails;
+    contact: MobileSchemas.ContactDetails;
   } = {
     passengers: getDefaultPassengers(data.bookingSession.searchData.passengers),
     contact: {
@@ -71,7 +57,7 @@
     | undefined = undefined;
   let markups: PartialMarkups = data.bookingSession.markups ?? {};
   let priceQuotePollController: AbortController | undefined;
-  let priceQuote: TripOfferPriceQuoteCompleted | undefined;
+  let priceQuote: MobileSchemas.TripOfferPriceQuoteCompleted | undefined;
 
   $: priceQuoteId = data.bookingSession.priceQuote.id;
   $: updatePriceQuote(priceQuoteId);

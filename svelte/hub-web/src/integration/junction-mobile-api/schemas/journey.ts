@@ -1,32 +1,32 @@
-import {
-  enhancedAddressDetailsParser,
-  type EnhancedAddressDetails,
-  type EnhancedAddressDetailsSchema,
-} from "~/integration/common/schemas/address";
+import * as CommonSchemas from "~/integration/common/schemas";
 import type { IncludedMapping } from "./included";
 import type { Order, OrderSchema } from "./order";
 
 export type ContactDetails = {
   email: string;
-  address: Required<Omit<EnhancedAddressDetails, "state">>;
+  address: Required<Omit<CommonSchemas.EnhancedAddressDetails, "state">>;
   phone: string;
 };
 
 export type ContactDetailsSchema = {
   email: string;
-  address: Required<Omit<EnhancedAddressDetailsSchema, "state">>;
+  address: Required<Omit<CommonSchemas.EnhancedAddressDetailsSchema, "state">>;
   phoneNumber: string;
 };
 
 export const contactDetailsParser = {
   toModel: (data: ContactDetailsSchema): ContactDetails => ({
     email: data.email,
-    address: enhancedAddressDetailsParser.toModel(data.address) as ContactDetails["address"],
+    address: CommonSchemas.enhancedAddressDetailsParser.toModel(
+      data.address,
+    ) as ContactDetails["address"],
     phone: data.phoneNumber,
   }),
   toSchema: (data: ContactDetails): ContactDetailsSchema => ({
     email: data.email,
-    address: enhancedAddressDetailsParser.toSchema(data.address) as ContactDetailsSchema["address"],
+    address: CommonSchemas.enhancedAddressDetailsParser.toSchema(
+      data.address,
+    ) as ContactDetailsSchema["address"],
     phoneNumber: data.phone,
   }),
 };

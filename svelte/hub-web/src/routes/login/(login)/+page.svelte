@@ -11,7 +11,7 @@
   import { getPageTitle } from "$lib/utils/page-title";
   import { page } from "$app/stores";
   import { sleep } from "$lib/utils/common";
-  import { getTranslator } from "$lib/i18n/index.js";
+  import { getTranslator } from "$lib/i18n";
 
   export let data;
 

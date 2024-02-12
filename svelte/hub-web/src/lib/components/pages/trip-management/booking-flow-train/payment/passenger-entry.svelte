@@ -1,67 +1,26 @@
-<script lang="ts" context="module">
-  const passengerGenders: Gender[] = ["unspecified", "male", "female"];
-  const travelerDocumentTypes: TravelerDocumentType[] = ["passport"];
-
-  export type PartialPassengerData = Omit<Partial<OrderPassenger>, "document"> & {
-    type: keyof PassengerPickerData;
-    document?: Require<Partial<TravelerDocument>, "countryCodes">;
-  };
-
-  function formatTitleOption(translator: Translator, option?: PassengerTitle): string {
-    return option ? translator(`passengerTitle.${option}`) : "";
-  }
-
-  function formatGenderOption(translator: Translator, option?: Gender): string {
-    return option ? translator(`gender.${option}`) : "";
-  }
-
-  function formatTravelerDocumentOption(
-    translator: Translator,
-    option?: TravelerDocumentType,
-  ): string {
-    return option ? translator(`documentTypes.${option}`) : translator("words.none");
-  }
-
-  function getPassengerTitles(locale: Locale): PassengerTitle[] {
-    const base: PassengerTitle[] = ["unspecified", "mr", "mrs", "miss"];
-
-    if (locale === "es-ES" || locale === "sv") {
-      return base;
-    }
-
-    // Only add ms for English locale
-    return [...base, "ms"];
-  }
-</script>
-
 <script lang="ts">
   import type { z } from "zod";
   import DateTextField from "$lib/components/ui/date-text-field.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";
-  import type {
-    OrderPassenger,
-    TravelerDocument,
-  } from "~/integration/junction-mobile-api/schemas/order";
   import Collapsible from "../collapsible.svelte";
-  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
-  import type { Require } from "~/integration/ts-helpers";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
+  import { getLocale, getTranslator } from "$lib/i18n";
   import {
     getPassengerFullLabel,
-    PASSENGER_DEFINITIONS,
-    type PassengerPickerData,
-  } from "$lib/components/pages/trip-management/booking-flow-train/trip-search/passenger-picker/passenger-picker.svelte";
-  import { getLocale, getTranslator, type Locale, type Translator } from "$lib/i18n";
-  import type {
-    Gender,
-    TravelerDocumentType,
-    PassengerTitle,
-  } from "~/integration/common/schemas/order";
+    formatTitleOption,
+    getPassengerTitles,
+    PASSENGER_GENDERS,
+    type PartialPassengerData,
+    formatGenderOption,
+    TRAVELER_DOCUMENT_TYPES,
+    formatTravelerDocumentOption,
+  } from "$lib/models/passenger";
 
   export let passengerNumber: number;
   export let passenger: PartialPassengerData;
-  export let errors: z.ZodFormattedError<OrderPassenger> | undefined = undefined;
-  export let required: TripOfferPriceQuote["required"];
+  export let errors: z.ZodFormattedError<MobileSchemas.OrderPassenger> | undefined = undefined;
+  export let required: MobileSchemas.TripOfferPriceQuote["required"];
 
   const locale = getLocale();
   const t = getTranslator();
@@ -82,7 +41,7 @@
       {passengerNumber}
     </strong>
     <span typography="title-small">
-      {getPassengerFullLabel(PASSENGER_DEFINITIONS[passenger.type], $t)}
+      {getPassengerFullLabel(passenger.type, $t)}
     </span>
   </h2>
 
@@ -124,7 +83,7 @@
     />
 
     <SelectField
-      options={passengerGenders}
+      options={PASSENGER_GENDERS}
       formatter={formatGenderOption.bind(formatGenderOption, $t)}
       bind:value={passenger.gender}
       placeholder={$t("actions.select")}
@@ -136,7 +95,7 @@
     {#if required.length}
       <SelectField
         bind:value={document.type}
-        options={[undefined, ...travelerDocumentTypes]}
+        options={[undefined, ...TRAVELER_DOCUMENT_TYPES]}
         formatter={formatTravelerDocumentOption.bind(formatTravelerDocumentOption, $t)}
         placeholder={$t("actions.select")}
         label={$t("words.documentType")}

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import type { Refund } from "~/integration/junction-hub-api/schemas/refund";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { pricesEqual } from "$lib/utils/money";
 
-  export let refund: Refund;
+  export let refund: HubSchemas.Refund;
 
   const locale = getLocale();
   const t = getTranslator();

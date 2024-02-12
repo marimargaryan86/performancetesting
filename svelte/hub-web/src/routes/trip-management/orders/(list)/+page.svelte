@@ -1,83 +1,20 @@
 <script lang="ts" context="module">
-  export function queryFiltersGetter(value: JourneyFilterOptionsQuery): JourneyFilterOptions {
-    return {
-      bookingStatus: bookingStatuses.find((item) => item === value.bookingStatus),
-      createdAtRange: parseDateRange(value["createdAt[from]"], value["createdAt[to]"]),
-      departureAtRange: parseDateRange(value["departureAt[from]"], value["departureAt[to]"]),
-      passengerLastName:
-        value.passengerLastName === undefined || value.passengerLastName.length > 2
-          ? value.passengerLastName
-          : undefined,
-      passengerNameRecord:
-        value.passengerNameRecord === undefined ||
-        validatePassengerNameRecord(value.passengerNameRecord)
-          ? value.passengerNameRecord
-          : undefined,
-    };
-  }
-  export function queryFiltersValid(value: JourneyFilterOptions): {
-    [key in keyof JourneyFilterOptions]?: boolean;
-  } {
-    return {
-      passengerLastName:
-        value.passengerLastName === undefined || value.passengerLastName.length > 2,
-      passengerNameRecord:
-        value.passengerNameRecord === undefined ||
-        validatePassengerNameRecord(value.passengerNameRecord),
-    };
-  }
-
   export const LIST_JOURNEYS_LIMIT = 20;
   export const LIST_JOURNEYS_SORT: Parameters<JourneyService["find"]>[0]["sort"] = "-createdAt";
-
-  function getOrderDepartureDate(order: Order): { date: Date; timeZone: string } {
-    const departureLeg = order.bookings
-      .flatMap((booking) => booking.detailsList.flatMap((details) => details.legs))
-      .sort((a, b) => {
-        return a.departureAt.getTime() - b.departureAt.getTime();
-      })[0];
-
-    if (!departureLeg) {
-      throw new Error("Unknown departure date");
-    }
-
-    return {
-      date: departureLeg.departureAt,
-      timeZone: departureLeg.origin.timeZone,
-    };
-  }
-
-  function getPassengerNames(order: Order): string[] {
-    return order.passengers.map((passenger) => `${passenger.firstName} ${passenger.lastName}`);
-  }
-
-  function getTotalPrice(order: Order): Price {
-    const prices = order.bookings.flatMap((booking) => booking.price.total);
-
-    return prices.reduce((prev, curr) => ({
-      amount: prev.amount + curr.amount,
-      currency: curr.currency,
-    }));
-  }
 </script>
 
 <script lang="ts">
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
-  import { getOrderStatus } from "~/integration/common/schemas/order";
-  import type { Order } from "~/integration/junction-hub-api/schemas/order";
-  import type { Price } from "~/integration/common/schemas/price";
+  import * as CommonSchemas from "~/integration/common/schemas";
   import routeConfig from "$lib/route-config";
   import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
   import type JourneyService from "~/integration/junction-hub-api/services/journey-service";
-  import type {
-    JourneyFilterOptions,
-    JourneyFilterOptionsQuery,
-  } from "~/integration/junction-hub-api/schemas/journey";
-  import Filters from "$lib/components/pages/trip-management/orders/filters.svelte";
+  import Filters, {
+    queryFiltersGetter,
+    queryFiltersValid,
+  } from "$lib/components/pages/trip-management/orders/filters.svelte";
   import { ensureDefined } from "$lib/utils/array";
-  import { bookingStatuses } from "~/integration/junction-hub-api/schemas/booking";
-  import { parseDateRange } from "$lib/utils/date-time";
   import { getPageTitle } from "$lib/utils/page-title";
   import { getLocale, getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
@@ -87,8 +24,8 @@
   import { slideFade } from "$lib/transitions/slide-fade";
   import { formatAmount } from "$lib/formatting/currency";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
-  import { validatePassengerNameRecord } from "$lib/utils/booking";
   import FindTripDialog from "$lib/components/modals/find-trip-dialog.svelte";
+  import { getTotalPrice, getOrderDepartureDate, getPassengerNames } from "$lib/utils/order";
 
   export let data;
 
@@ -188,9 +125,9 @@
       </x-thead>
 
       {#each orders as order (order.id)}
-        {@const cancellationStatus = getOrderStatus.cancellation(order)}
-        {@const refundStatus = getOrderStatus.refund(order)}
-        {@const bookingStatus = getOrderStatus.booking(order)}
+        {@const cancellationStatus = CommonSchemas.getOrderStatus.cancellation(order)}
+        {@const refundStatus = CommonSchemas.getOrderStatus.refund(order)}
+        {@const bookingStatus = CommonSchemas.getOrderStatus.booking(order)}
         {@const totalPrice = getTotalPrice(order)}
         {@const hasTickets = Boolean(order.bookings.flatMap((item) => item.ticketUrls).length)}
         {@const departureAt = getOrderDepartureDate(order)}

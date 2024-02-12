@@ -1,26 +1,24 @@
 <script lang="ts">
   import Backdrop from "$lib/components/ui/backdrop.svelte";
   import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
-  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
   import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
-  import type { OrderPassenger } from "~/integration/junction-hub-api/schemas/order";
   import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
   import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
-  import type { CancellationRequest } from "~/integration/junction-hub-api/schemas/cancellation";
   import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 
-  export let passengers: OrderPassenger[];
+  export let passengers: HubSchemas.OrderPassenger[];
 
   const t = getTranslator();
   const dispatch = createEventDispatcher<{ success: void }>();
 
   let backdrop: Backdrop | undefined;
-  let booking: TripBooking | undefined = undefined;
+  let booking: HubSchemas.TripBooking | undefined = undefined;
   let state: "info" | "rules" | "confirm" | "done" | "failed";
 
   const pending = writable(false);
@@ -29,7 +27,7 @@
     ? booking.operatorBookingReferences.join(", ")
     : undefined;
 
-  async function performCancel(): Promise<CancellationRequest | undefined> {
+  async function performCancel(): Promise<HubSchemas.CancellationRequest | undefined> {
     if ($pending) {
       return;
     }
@@ -84,7 +82,7 @@
     }
   }
 
-  export function open(nextBooking: TripBooking): void {
+  export function open(nextBooking: HubSchemas.TripBooking): void {
     booking = nextBooking;
     state = "info";
     backdrop?.open();

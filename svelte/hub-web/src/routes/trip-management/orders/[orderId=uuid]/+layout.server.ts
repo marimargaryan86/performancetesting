@@ -1,7 +1,7 @@
 import integrationInstances from "~/integration-instances";
-import type { Order } from "~/integration/junction-hub-api/schemas/order";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 
-export function load(event): { order: Promise<Order> } {
+export function load(event): { order: Promise<HubSchemas.Order> } {
   return {
     order: integrationInstances.junctionHubApi.orders.get({
       session: event.locals.session,

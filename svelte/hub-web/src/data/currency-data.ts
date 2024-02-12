@@ -1,4 +1,4 @@
-import type { Currency } from "~/integration/junction-hub-api/schemas/currency";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 
 const list = [
   { code: "AED", name: "UAE Dirham", minorUnits: 2 },
@@ -36,7 +36,7 @@ const list = [
 
 const mapping = Object.fromEntries(list.map((currency) => [currency.code, currency])) as Record<
   string,
-  Currency
+  HubSchemas.Currency
 >;
 
 export default { list, mapping };

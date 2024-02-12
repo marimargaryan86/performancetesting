@@ -1,6 +1,4 @@
 <script lang="ts" context="module">
-  import type { Direction } from "$lib/models/spatial";
-
   const directionMapping: Record<Direction, number> = {
     right: 0,
     down: 90,
@@ -10,6 +8,8 @@
 </script>
 
 <script lang="ts">
+  import type { Direction } from "$lib/models/spatial";
+
   export let color = "var(--color-common-light-strong)";
   export let direction: Direction = "right";
   export let size = "16px";

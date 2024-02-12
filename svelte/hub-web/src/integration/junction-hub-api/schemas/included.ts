@@ -9,11 +9,6 @@ import {
   tripBookingParser,
 } from "./booking";
 import {
-  cabinClassParser,
-  type CabinClass,
-  type CabinClassSchema,
-} from "~/integration/common/schemas/cabin-class";
-import {
   bookingCancellationParser,
   type BookingCancellation,
   type BookingCancellationSchema,
@@ -23,11 +18,7 @@ import { contactParser, type Contact, type ContactSchema } from "./contact";
 import { conversionParser, type Conversion, type ConversionSchema } from "./conversion";
 import { currencyParser, type Currency, type CurrencySchema } from "./currency";
 import { journeyParser, type Journey, type JourneySchema } from "./journey";
-import {
-  legTypeParser,
-  type LegType,
-  type LegTypeSchema,
-} from "~/integration/common/schemas/leg-type";
+import * as CommonSchemas from "~/integration/common/schemas";
 import { orderParser, type Order, type OrderSchema } from "./order";
 import { transactionParser, type Transaction, type TransactionSchema } from "./transaction";
 import { refundParser, type Refund, type RefundSchema } from "./refund";
@@ -45,8 +36,8 @@ type IncludedBind = {
   tripBookingDetails: { schema: TripBookingDetailsSchema; model: TripBookingDetails };
   tripBookings: { schema: TripBookingSchema; model: TripBooking };
   journeys: { schema: JourneySchema; model: Journey };
-  cabinClasses: { schema: CabinClassSchema; model: CabinClass };
-  legTypes: { schema: LegTypeSchema; model: LegType };
+  cabinClasses: { schema: CommonSchemas.CabinClassSchema; model: CommonSchemas.CabinClass };
+  legTypes: { schema: CommonSchemas.LegTypeSchema; model: CommonSchemas.LegType };
   refunds: { schema: RefundSchema; model: Refund };
 };
 
@@ -80,8 +71,8 @@ const parserMapping: {
   tripBookingDetails: { type: "trip-booking-details", parser: tripBookingDetailsParser },
   tripBookings: { type: "trip-bookings", parser: tripBookingParser },
   journeys: { type: "journeys", parser: journeyParser },
-  cabinClasses: { type: "cabin-classes", parser: cabinClassParser },
-  legTypes: { type: "leg-types", parser: legTypeParser },
+  cabinClasses: { type: "cabin-classes", parser: CommonSchemas.cabinClassParser },
+  legTypes: { type: "leg-types", parser: CommonSchemas.legTypeParser },
   refunds: { type: "refunds", parser: refundParser },
 };
 

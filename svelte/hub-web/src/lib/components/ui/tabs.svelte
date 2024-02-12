@@ -1,13 +1,6 @@
-<script lang="ts" context="module">
-  export interface Tab {
-    url: string;
-    label: string;
-    exact?: boolean;
-  }
-</script>
-
 <script lang="ts">
   import { page } from "$app/stores";
+  import type { Tab } from "$lib/models/ui";
 
   export let items: Tab[];
 </script>

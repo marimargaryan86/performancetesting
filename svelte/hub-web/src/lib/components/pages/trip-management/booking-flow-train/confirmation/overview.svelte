@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { Order } from "~/integration/junction-mobile-api/schemas/order";
-  import { getOrderStatus } from "~/integration/common/schemas/order";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
+  import * as CommonSchemas from "~/integration/common/schemas";
   import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
   import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
 
-  export let order: Order;
+  export let order: MobileSchemas.Order;
 
   const t = getTranslator();
 </script>
@@ -21,7 +21,7 @@
     </span>
     <div>
       <span typography="body-xsmall">{$t("words.status")}</span>
-      <StatusBadge value={getOrderStatus.booking(order) ?? "unknown"} />
+      <StatusBadge value={CommonSchemas.getOrderStatus.booking(order) ?? "unknown"} />
     </div>
   </div>
 </div>

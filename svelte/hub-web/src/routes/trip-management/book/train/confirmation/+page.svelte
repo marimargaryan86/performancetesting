@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  function getAlertType(status: OrderBookingStatus): AlertType {
+  function getAlertType(status: CommonSchemas.OrderBookingStatus): AlertType {
     if (status === "confirmed") {
       return "success";
     } else if (status === "error" || status === "cancelled" || status === "rejected") {
@@ -12,16 +12,17 @@
 
 <script lang="ts">
   import routeConfig from "$lib/route-config";
-  import Alert, { type AlertType } from "$lib/components/ui/alert.svelte";
+  import Alert from "$lib/components/ui/alert.svelte";
+  import type { AlertType } from "$lib/models/ui";
   import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
   import Price from "$lib/components/pages/trip-management/booking-flow-train/price.svelte";
   import Overview from "$lib/components/pages/trip-management/booking-flow-train/confirmation/overview.svelte";
   import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
   import { ensureDefined } from "$lib/utils/array";
-  import { getOrderStatus, type OrderBookingStatus } from "~/integration/common/schemas/order";
+  import * as CommonSchemas from "~/integration/common/schemas";
   import Fees from "$lib/components/pages/trip-management/booking-flow-train/confirmation/fees.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
-  import { getTranslator } from "$lib/i18n/index.js";
+  import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
 
   export let data;
@@ -31,7 +32,7 @@
   $: hasTickets = Boolean(
     data.order.bookings.flatMap((item) => item.ticketUrls).filter(ensureDefined).length,
   );
-  $: orderStatus = getOrderStatus.booking(data.order);
+  $: orderStatus = CommonSchemas.getOrderStatus.booking(data.order);
   $: alertType = orderStatus ? getAlertType(orderStatus) : "warning";
 </script>
 

@@ -1,12 +1,6 @@
-<script lang="ts" context="module">
-  export interface BreadCrumb {
-    url: string;
-    label: string;
-  }
-</script>
-
 <script lang="ts">
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
+  import type { BreadCrumb } from "$lib/models/ui";
 
   export let items: BreadCrumb[];
 </script>

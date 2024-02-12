@@ -1,10 +1,9 @@
 import integrationInstances from "~/integration-instances";
-import type { Account } from "~/integration/junction-hub-api/schemas/account";
-import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 
 export async function load(event): Promise<{
-  balances: Balance[];
-  account: Account;
+  balances: HubSchemas.Balance[];
+  account: HubSchemas.Account;
 }> {
   const { accountId } = event.params;
   const session = event.locals.session;

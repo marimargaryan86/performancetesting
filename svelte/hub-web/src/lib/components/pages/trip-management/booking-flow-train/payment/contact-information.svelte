@@ -1,53 +1,17 @@
-<script lang="ts" context="module">
-  export const contactDetailsModel: z.ZodType<ContactDetails> = z.object({
-    email: z.string().email().trim(),
-    address: z.object({
-      street: z.object({
-        line1: z.string().trim().min(1),
-        line2: z
-          .union([z.string().trim().length(0), z.string().trim().min(1)])
-          .optional()
-          .transform((val) => (val?.length ? val : undefined)),
-      }),
-      countryCode: z.string().trim().min(1),
-      postalCode: z.string().trim().min(1),
-      city: z.string().trim().min(1),
-    }),
-    phone: z.string().trim().min(1),
-  });
-
-  function findCountry(query: string, country?: CountryModel): boolean {
-    const queryLower = query.toLowerCase().replaceAll("+", "").trim();
-
-    return Boolean(
-      country?.code.toLowerCase().includes(queryLower) ||
-        country?.name.toLowerCase().includes(queryLower) ||
-        country?.phoneCode.toLowerCase().includes(queryLower),
-    );
-  }
-
-  function getPhoneNumber(phone: string): { country?: CountryModel; number: string } {
-    const formattedPhone = phone.replaceAll(/[+\s]/g, "");
-    const country = countryData.list.find((item) => formattedPhone.startsWith(item.phoneCode));
-    const number = country ? formattedPhone.slice(country.phoneCode.length) : phone;
-
-    return { country, number };
-  }
-</script>
-
 <script lang="ts">
-  import { z } from "zod";
+  import type { z } from "zod";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";
   import { formatCountryOption, formatCountryPhoneOption } from "$lib/formatting/location";
   import type { CountryModel } from "$lib/models/location";
   import Collapsible from "../collapsible.svelte";
-  import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import countryData from "~/data/country-data";
   import { getTranslator } from "$lib/i18n";
+  import { findCountry, getPhoneNumber } from "$lib/utils/country";
 
-  export let data: ContactDetails;
-  export let errors: z.ZodFormattedError<ContactDetails> | undefined = undefined;
+  export let data: MobileSchemas.ContactDetails;
+  export let errors: z.ZodFormattedError<MobileSchemas.ContactDetails> | undefined = undefined;
 
   const t = getTranslator();
 

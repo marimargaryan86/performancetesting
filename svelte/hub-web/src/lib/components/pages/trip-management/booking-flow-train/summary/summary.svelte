@@ -1,19 +1,16 @@
 <script lang="ts">
-  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { formatAmount } from "$lib/formatting/currency";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { getTotalPriceBreakdown } from "$lib/utils/offer";
   import Collapsible from "../collapsible.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import SummaryItinerary from "./summary-itinerary.svelte";
-  import {
-    getPassengersPresentation,
-    type PassengerPickerData,
-  } from "../trip-search/passenger-picker/passenger-picker.svelte";
+  import { getPassengersPresentation, type PassengerPickerData } from "$lib/models/passenger";
   import { createEventDispatcher } from "svelte";
   import { getLocale, getTranslator } from "$lib/i18n";
 
-  export let priceQuote: TripOfferPriceQuote | undefined = undefined;
+  export let priceQuote: MobileSchemas.TripOfferPriceQuote | undefined = undefined;
   export let passengers: PassengerPickerData;
 
   let collapsible: Collapsible | undefined;

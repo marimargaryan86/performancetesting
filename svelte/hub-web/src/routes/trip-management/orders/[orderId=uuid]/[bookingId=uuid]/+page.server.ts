@@ -1,11 +1,13 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
-import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
-import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
-export async function load(
-  event,
-): Promise<{ booking: TripBooking; markups?: Markups; bookingNo: number }> {
+export async function load(event): Promise<{
+  booking: HubSchemas.TripBooking;
+  markups?: MobileSchemas.Markups;
+  bookingNo: number;
+}> {
   const [booking, markups] = await Promise.all([
     integrationInstances.junctionHubApi.bookings
       .get({

@@ -1,12 +1,12 @@
 <script lang="ts" context="module">
-  import type { UiNodeGroup } from "~/integration/ory/schemas/ui-node";
+  import type * as OrySchemas from "~/integration/ory/schemas";
 
   function getOnClick(func: string): () => void {
     // eslint-disable-next-line no-eval
     return eval(func);
   }
 
-  const groupOrder: Exclude<UiNodeGroup, "default">[] = [
+  const groupOrder: Exclude<OrySchemas.UiNodeGroup, "default">[] = [
     "profile",
     "password",
     "lookup_secret",
@@ -23,7 +23,7 @@
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
   import { getUser } from "$lib/utils/permissions";
-  import { getTranslator } from "$lib/i18n/index.js";
+  import { getTranslator } from "$lib/i18n";
   import { goto, invalidateAll } from "$app/navigation";
   import routeConfig from "$lib/route-config";
 

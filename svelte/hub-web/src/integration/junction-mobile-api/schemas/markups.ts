@@ -1,4 +1,4 @@
-import { priceParser, type Price, type PriceSchema } from "~/integration/common/schemas/price";
+import * as CommonSchemas from "~/integration/common/schemas";
 import type { Order, OrderSchema } from "./order";
 import type { IncludedMapping } from "./included";
 
@@ -6,9 +6,9 @@ export type Markups = {
   id: string;
   createdAt: Date;
   updatedAt: Date;
-  serviceFee: Price;
-  agencyMarkup: Price;
-  totalToCollect: Price;
+  serviceFee: CommonSchemas.Price;
+  agencyMarkup: CommonSchemas.Price;
+  totalToCollect: CommonSchemas.Price;
   orderId: string;
   order?: Order;
 };
@@ -17,9 +17,9 @@ export type MarkupsSchema = {
   id: string;
   type: "markups";
   attributes: {
-    serviceFee: PriceSchema;
-    agencyMarkup: PriceSchema;
-    totalToCollect: PriceSchema;
+    serviceFee: CommonSchemas.PriceSchema;
+    agencyMarkup: CommonSchemas.PriceSchema;
+    totalToCollect: CommonSchemas.PriceSchema;
     createdAt: string;
     updatedAt: string;
   };
@@ -45,9 +45,9 @@ export const markupsParser = {
       id: data.id,
       createdAt: new Date(data.attributes.createdAt),
       updatedAt: new Date(data.attributes.updatedAt),
-      serviceFee: priceParser.toModel(data.attributes.serviceFee),
-      agencyMarkup: priceParser.toModel(data.attributes.agencyMarkup),
-      totalToCollect: priceParser.toModel(data.attributes.totalToCollect),
+      serviceFee: CommonSchemas.priceParser.toModel(data.attributes.serviceFee),
+      agencyMarkup: CommonSchemas.priceParser.toModel(data.attributes.agencyMarkup),
+      totalToCollect: CommonSchemas.priceParser.toModel(data.attributes.totalToCollect),
       orderId,
       order: included?.orders?.find(({ id }) => id === orderId),
     };
@@ -55,9 +55,9 @@ export const markupsParser = {
   toCreateSchema: (data: MarkupsCreate): MarkupsCreateSchema => ({
     type: "markups",
     attributes: {
-      agencyMarkup: priceParser.toSchema(data.agencyMarkup),
-      serviceFee: priceParser.toSchema(data.serviceFee),
-      totalToCollect: priceParser.toSchema(data.totalToCollect),
+      agencyMarkup: CommonSchemas.priceParser.toSchema(data.agencyMarkup),
+      serviceFee: CommonSchemas.priceParser.toSchema(data.serviceFee),
+      totalToCollect: CommonSchemas.priceParser.toSchema(data.totalToCollect),
     },
     relationships: { order: { data: { id: data.orderId, type: "orders" } } },
   }),

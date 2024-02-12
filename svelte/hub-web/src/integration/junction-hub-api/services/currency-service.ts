@@ -1,4 +1,4 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import { currencyParser, type Currency, type CurrencySchema } from "../schemas/currency";
 import type { PaginatedData } from "$lib/models/common";
@@ -9,7 +9,7 @@ export default class CurrencyService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<Currency>> {

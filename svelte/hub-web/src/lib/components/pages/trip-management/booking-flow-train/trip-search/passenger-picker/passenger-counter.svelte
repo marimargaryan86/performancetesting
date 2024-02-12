@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MAX_TOTAL_COUNT } from "./passenger-picker.svelte";
+  import { MAX_TOTAL_COUNT } from "$lib/models/passenger";
 
   export let label: string;
   export let count: number;

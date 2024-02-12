@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import Backdrop from "$lib/components/ui/backdrop.svelte";
-  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getTranslator } from "$lib/i18n";
 
-  export let priceQuote: TripOfferPriceQuote;
+  export let priceQuote: MobileSchemas.TripOfferPriceQuote;
 
   const t = getTranslator();
 

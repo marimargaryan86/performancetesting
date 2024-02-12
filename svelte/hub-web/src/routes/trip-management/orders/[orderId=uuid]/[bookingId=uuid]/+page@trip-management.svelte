@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { BreadCrumb } from "$lib/components/page/bread-crumbs.svelte";
+  import type { BreadCrumb } from "$lib/models/ui";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import routeConfig from "$lib/route-config";
   import { getDestination, getOrigin } from "$lib/utils/booking";

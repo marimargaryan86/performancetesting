@@ -6,7 +6,7 @@
   import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
   import { getPageTitle } from "$lib/utils/page-title";
-  import { getLocale, getTranslator } from "$lib/i18n/index.js";
+  import { getLocale, getTranslator } from "$lib/i18n";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
   import { writable } from "svelte/store";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";

@@ -8,7 +8,7 @@
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
   import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
-  import { getTranslator } from "$lib/i18n/index.js";
+  import { getTranslator } from "$lib/i18n";
   import integrationInstancesClient from "~/integration-instances-client";
   import routeConfig from "$lib/route-config";
   import { getPageTitle } from "$lib/utils/page-title";

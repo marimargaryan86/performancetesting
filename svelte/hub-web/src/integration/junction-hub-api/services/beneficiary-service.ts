@@ -1,4 +1,4 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "$lib/models/common";
 import {
@@ -14,7 +14,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<Beneficiary>> {
@@ -32,7 +32,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: Session; id: string }): Promise<Beneficiary> {
+  async get({ session, id }: { session: OrySchemas.Session; id: string }): Promise<Beneficiary> {
     const resp = await this.makeRequest<{ data: BeneficiarySchema }>(`/beneficiaries/${id}`, {
       session,
     });
@@ -44,7 +44,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     session,
     data,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     data: BeneficiaryPut;
   }): Promise<Beneficiary> {
     const resp = await this.makeRequest<{ data: BeneficiarySchema }>("/beneficiaries", {
@@ -61,7 +61,7 @@ export default class BeneficiaryService extends JunctionHubApiService {
     id,
     data,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     id: string;
     data: BeneficiaryPut;
   }): Promise<Beneficiary> {

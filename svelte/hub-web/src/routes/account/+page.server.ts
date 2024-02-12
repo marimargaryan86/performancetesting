@@ -1,14 +1,14 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
-import type { SettingsFlow } from "~/integration/ory/schemas/settings-flow";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import { cookieStore } from "$lib/stores/cookie-store.server";
 
-export async function load(event): Promise<{ flow: SettingsFlow }> {
+export async function load(event): Promise<{ flow: OrySchemas.SettingsFlow }> {
   const session = event.locals.session;
   const userSettings = cookieStore.userSettingsToken.get(event);
 
   let cookies: Record<string, string> | undefined;
-  let flow: SettingsFlow | undefined;
+  let flow: OrySchemas.SettingsFlow | undefined;
 
   if (userSettings) {
     try {

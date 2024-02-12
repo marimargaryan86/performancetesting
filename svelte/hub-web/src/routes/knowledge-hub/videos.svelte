@@ -1,20 +1,9 @@
-<script lang="ts" context="module">
-  function getDuration(lengthS: number): string {
-    const minutes = Math.floor(lengthS / 60);
-    const seconds = lengthS % 60;
-
-    return [minutes ? `${minutes}m` : undefined, seconds ? `${seconds}s` : undefined]
-      .filter(ensureDefined)
-      .join(" ");
-  }
-</script>
-
 <script lang="ts">
   import { getTranslator } from "$lib/i18n";
-  import { ensureDefined } from "$lib/utils/array";
   import Card from "$lib/components/ui/card.svelte";
   import VideoPlayer from "./video-player.svelte";
   import Icon from "$lib/components/icons/icon.svelte";
+  import { formatDuration } from "$lib/formatting/date-time";
 
   const t = getTranslator();
 
@@ -45,7 +34,7 @@
         <svelte:fragment slot="content">
           <span class="chip" typography="body-medium">
             <Icon variant="clock-outlined" size="16px" color="var(--color-main-primary-500)" />
-            {getDuration(video.lengthS)}
+            {formatDuration(video.lengthS, { second: true })}
           </span>
 
           <div class="info">

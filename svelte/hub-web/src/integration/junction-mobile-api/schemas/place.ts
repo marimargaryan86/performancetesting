@@ -1,8 +1,4 @@
-import {
-  coordinatesParser,
-  type CoordinatesSchema,
-  coordinatesModel,
-} from "~/integration/common/schemas/point";
+import * as CommonSchemas from "~/integration/common/schemas";
 import { z } from "zod";
 
 const placeType = z.enum([
@@ -29,7 +25,7 @@ export const placeModel = z.object({
   id: z.string(),
   types: z.array(placeType),
   name: z.string(),
-  coordinates: coordinatesModel,
+  coordinates: CommonSchemas.coordinatesModel,
   country: z.object({
     code: z.string(),
     name: z.string().optional(),
@@ -45,7 +41,7 @@ export type Place = z.infer<typeof placeModel>;
 export type PlaceSchema = {
   id: string;
   type: "places";
-  attributes: CoordinatesSchema & {
+  attributes: CommonSchemas.CoordinatesSchema & {
     name: string;
     countryCode: string;
     countryName?: string;
@@ -64,7 +60,7 @@ export const placeParser = {
     id: data.id,
     types: data.relationships.types.data.map(placeTypeParser.toModel),
     name: data.attributes.name,
-    coordinates: coordinatesParser.toModel(data.attributes),
+    coordinates: CommonSchemas.coordinatesParser.toModel(data.attributes),
     country: {
       code: data.attributes.countryCode,
       name: data.attributes.countryName,

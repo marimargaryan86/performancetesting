@@ -1,10 +1,12 @@
-import type { Price } from "~/integration/common/schemas/price";
+import type * as CommonSchemas from "~/integration/common/schemas";
 
-export function pricesEqual(a: Price, b: Price): boolean {
+export function pricesEqual(a: CommonSchemas.Price, b: CommonSchemas.Price): boolean {
   return a.amount === b.amount && a.currency === b.currency;
 }
 
-export function summarizePrices(...prices: [Price, ...Price[]]): Price {
+export function summarizePrices(
+  ...prices: [CommonSchemas.Price, ...CommonSchemas.Price[]]
+): CommonSchemas.Price {
   if (new Set(prices.flatMap((price) => price.currency)).size !== 1) {
     throw new Error("Currencies do not match");
   }

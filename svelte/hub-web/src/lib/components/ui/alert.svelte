@@ -1,9 +1,6 @@
-<script lang="ts" context="module">
-  export type AlertType = "success" | "error" | "warning";
-</script>
-
 <script lang="ts">
   import Icon from "$lib/components/icons/icon.svelte";
+  import type { AlertType } from "$lib/models/ui";
   import { slideFade } from "$lib/transitions/slide-fade";
 
   export let type: AlertType = "success";

@@ -1,4 +1,4 @@
-import { priceParser, type Price, type PriceSchema } from "~/integration/common/schemas/price";
+import * as CommonSchemas from "~/integration/common/schemas";
 import { z } from "zod";
 
 export const paymentModel = z.object({
@@ -21,7 +21,7 @@ export type PaymentSchema = {
 };
 
 export type PaymentCreateSchema = Pick<PaymentSchema, "type"> & {
-  attributes: PriceSchema;
+  attributes: CommonSchemas.PriceSchema;
 };
 
 export const paymentParser = {
@@ -31,9 +31,9 @@ export const paymentParser = {
     ephemeralKey: data.attributes.ephemeralKey,
     customerId: data.attributes.customerId,
   }),
-  toCreateSchema: (data: Price): PaymentCreateSchema => ({
+  toCreateSchema: (data: CommonSchemas.Price): PaymentCreateSchema => ({
     type: "payments",
-    attributes: priceParser.toSchema(data),
+    attributes: CommonSchemas.priceParser.toSchema(data),
   }),
 };
 

@@ -2,10 +2,9 @@ import * as devalue from "devalue";
 import type { RequestEvent } from "./$types";
 import { error } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
-import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
-import type { Account } from "~/integration/junction-hub-api/schemas/account";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 
-function getBeneficiaryData(event: RequestEvent): BeneficiaryPut | undefined {
+function getBeneficiaryData(event: RequestEvent): HubSchemas.BeneficiaryPut | undefined {
   const cookieData = event.cookies.get("beneficiary-data");
 
   return cookieData
@@ -14,8 +13,8 @@ function getBeneficiaryData(event: RequestEvent): BeneficiaryPut | undefined {
 }
 
 export async function load(event): Promise<{
-  beneficiary: BeneficiaryPut;
-  accounts: Promise<Account[]>;
+  beneficiary: HubSchemas.BeneficiaryPut;
+  accounts: Promise<HubSchemas.Account[]>;
 }> {
   const session = event.locals.session;
   const accounts = integrationInstances.junctionHubApi.accounts

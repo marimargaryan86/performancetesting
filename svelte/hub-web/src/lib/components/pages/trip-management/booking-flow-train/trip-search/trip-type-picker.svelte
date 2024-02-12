@@ -1,14 +1,10 @@
-<script lang="ts" context="module">
-  export const tripTypes = ["one-way", "round-trip"] as const;
-  export type TripType = (typeof tripTypes)[number];
-</script>
-
 <script lang="ts">
   import { scale } from "svelte/transition";
   import { createSelect, melt } from "@melt-ui/svelte";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import Icon from "$lib/components/icons/icon.svelte";
   import { getTranslator } from "$lib/i18n";
+  import { TRIP_TYPES, type TripType } from "$lib/models/trip-offer-search";
 
   export let value: TripType = "one-way";
 
@@ -54,7 +50,7 @@
 
   {#if $open}
     <ul class="options" use:melt={$menu} transition:scale={{ duration: 150, start: 0.8 }}>
-      {#each [...tripTypes] as item}
+      {#each [...TRIP_TYPES] as item}
         <li
           typography="body-medium"
           class="option"

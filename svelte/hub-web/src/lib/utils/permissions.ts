@@ -1,4 +1,4 @@
-import type { User, UserRole } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import { getContext, setContext } from "svelte";
 import type { Readable, Writable } from "svelte/store";
 
@@ -44,7 +44,7 @@ function getPermission(...actions: Action[]): number {
 /**
  * Mapping between the user role and its permissions.
  */
-const ROLE_MAPPING: Record<UserRole, number> = {
+const ROLE_MAPPING: Record<OrySchemas.UserRole, number> = {
   "snowfall-admin": getPermission("*"),
   "snowfall-user": getPermission(
     "journey.view",
@@ -89,7 +89,7 @@ const ROLE_MAPPING: Record<UserRole, number> = {
  * @param actions Actions that the user must be permitted to perform
  * @returns true if the user is permitted, otherwise false
  */
-export function permitted(user: User, ...actions: Action[]): boolean {
+export function permitted(user: OrySchemas.User, ...actions: Action[]): boolean {
   const permission = getPermission(...actions);
 
   return (permission & ROLE_MAPPING[user.role]) === permission;
@@ -100,7 +100,7 @@ export function permitted(user: User, ...actions: Action[]): boolean {
  * @param user The signed in user
  * @returns A writable store for the signed in user
  */
-export function setUser(user: Writable<User>): Writable<User> {
+export function setUser(user: Writable<OrySchemas.User>): Writable<OrySchemas.User> {
   return setContext("user", user);
 }
 
@@ -108,6 +108,6 @@ export function setUser(user: Writable<User>): Writable<User> {
  * Get the currently signed in user
  * @returns The currently signed in user
  */
-export function getUser(): Readable<User> {
+export function getUser(): Readable<OrySchemas.User> {
   return getContext("user");
 }

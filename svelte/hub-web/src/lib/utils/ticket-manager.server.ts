@@ -2,10 +2,10 @@ import integrationInstances from "~/integration-instances";
 import JSZip from "jszip";
 import { extension } from "mime-types";
 import { ensureDefined } from "$lib/utils/array";
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 
 type TicketsZipParams = {
-  session: Session;
+  session: OrySchemas.Session;
   orderId: string;
   bookingId?: string;
 };

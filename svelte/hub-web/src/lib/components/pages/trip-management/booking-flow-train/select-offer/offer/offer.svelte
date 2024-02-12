@@ -1,46 +1,17 @@
-<script lang="ts" context="module">
-  function formatTime(time: Date, timeZone: string, locale: Locale): string {
-    return time.toLocaleTimeString(locale, {
-      timeZone,
-      minute: "2-digit",
-      hour: "2-digit",
-    });
-  }
-
-  function getTotalPrice(options: OfferOption[]): Price {
-    return options.reduce<Price>(
-      (prev, curr) => (prev.amount < curr.price.total.amount ? prev : curr.price.total),
-      options[0]?.price.total ?? { amount: 0, currency: "EUR" },
-    );
-  }
-
-  function getCheapestOption(options: OfferOption[]): OfferOption {
-    const initialOption = options[0];
-
-    if (!initialOption) {
-      throw new Error("No options available");
-    }
-
-    return options.reduce((prev, curr) => {
-      return prev.price.total.amount <= curr.price.total.amount ? prev : curr;
-    }, initialOption);
-  }
-</script>
-
 <script lang="ts">
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import { formatDuration } from "$lib/formatting/date-time";
+  import { formatDuration, formatTime } from "$lib/formatting/date-time";
   import AlternativeFares from "./alternative-fares.svelte";
   import { createEventDispatcher, type ComponentEvents } from "svelte";
   import { getTimeDeltaS } from "$lib/utils/date-time";
-  import type { Offer, OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
-  import type { Price } from "~/integration/common/schemas/price";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { ensureDefined } from "$lib/utils/array";
-  import { getLocale, getTranslator, type Locale } from "$lib/i18n";
+  import { getLocale, getTranslator } from "$lib/i18n";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
+  import { getCheapestOption, getTotalPrice } from "$lib/utils/offer";
 
-  export let offer: Offer;
+  export let offer: MobileSchemas.Offer;
   export let selectedOptionIds: string[] | undefined;
   export let selected: boolean;
   export let pending: boolean;
@@ -127,7 +98,7 @@
                   <div class="route">
                     <span class="circle" />
                     <span class="time" typography="label-large" weight="bold">
-                      {formatTime(leg.departureAt, leg.origin.timeZone, $locale)}
+                      {formatTime(leg.departureAt, $locale, { timeZone: leg.origin.timeZone })}
                     </span>
                     <span class="location" typography="label-large" weight="bold">
                       {leg.origin.name}
@@ -141,7 +112,7 @@
 
                     <span class="circle" />
                     <span class="time" typography="label-large" weight="bold">
-                      {formatTime(leg.arrivalAt, leg.destination.timeZone, $locale)}
+                      {formatTime(leg.arrivalAt, $locale, { timeZone: leg.destination.timeZone })}
                     </span>
                     <span class="location" typography="label-large" weight="bold">
                       {leg.destination.name}

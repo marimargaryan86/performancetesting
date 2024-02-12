@@ -1,49 +1,16 @@
-<script lang="ts" context="module">
-  const sortOptions = [
-    "lowest-price",
-    "fastest",
-    "earliest-departure",
-    "latest-departure",
-    "earliest-arrival",
-    "latest-arrival",
-  ] as const;
-  export type SortOption = (typeof sortOptions)[number];
-
-  type StopValue = "direct";
-  type TimeSpan = { start: number; end: number };
-
-  export type SearchOptionsData = {
-    sortBy: SortOption;
-    stops: StopValue[];
-    departureSpanM: TimeSpan;
-    arrivalSpanM: TimeSpan;
-    durationM: number;
-    vendors: string[];
-  };
-
-  export type SearchOptionsSettings = {
-    durationSpanM: { start: number; end: number };
-    vendors: string[];
-  };
-
-  function formatTime(minutes: number): string {
-    const hours = Math.floor(minutes / 60);
-    const minute = minutes % 60;
-
-    return `${hours < 10 ? 0 : ""}${hours}:${minute < 10 ? 0 : ""}${minute}`;
-  }
-
-  function getFormatSortOptionFunc(translator: Translator): (value?: SortOption) => string {
-    return (value) => translator(`sortOptions.${value ? value : "lowest-price"}`);
-  }
-</script>
-
 <script lang="ts">
   import Checkbox from "$lib/components/ui/checkbox.svelte";
   import RangeField from "$lib/components/ui/range-field.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import { formatDuration } from "$lib/formatting/date-time";
-  import { getTranslator, type Translator } from "$lib/i18n";
+  import { getTranslator } from "$lib/i18n";
+  import {
+    getFormatSortOptionFunc,
+    OFFER_SORT_OPTIONS,
+    type SearchOptionsData,
+    type SearchOptionsSettings,
+    formatTime,
+  } from "$lib/utils/offer";
 
   export let data: SearchOptionsData;
   export let settings: SearchOptionsSettings;
@@ -64,7 +31,11 @@
 <div class="search-options">
   <div class="sort">
     <h3 typography="label-large">{$t("actions.sortBy")}</h3>
-    <SelectField options={sortOptions} bind:value={data.sortBy} formatter={formatSortOption} />
+    <SelectField
+      options={OFFER_SORT_OPTIONS}
+      bind:value={data.sortBy}
+      formatter={formatSortOption}
+    />
   </div>
 
   <hr />

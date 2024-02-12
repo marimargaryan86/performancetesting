@@ -2,7 +2,7 @@ import type CompanyService from "./company-service";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "$lib/models/common";
 import { ensureDefined } from "$lib/utils/array";
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import {
   transactionParser,
   type Transaction,
@@ -22,7 +22,7 @@ export default class TransactionService extends JunctionHubApiService {
 
   private async getCompanies(data: {
     data: TransactionSchema[];
-    session: Session;
+    session: OrySchemas.Session;
   }): Promise<Company[]> {
     const companyIds = new Set(
       data.data
@@ -49,7 +49,7 @@ export default class TransactionService extends JunctionHubApiService {
     sort,
     filter,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
     sort?: "createdAt" | "-createdAt";
@@ -84,7 +84,7 @@ export default class TransactionService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: Session; id: string }): Promise<Transaction> {
+  async get({ session, id }: { session: OrySchemas.Session; id: string }): Promise<Transaction> {
     const resp = await this.makeRequest<{ data: TransactionSchema }>(`/transactions/${id}`, {
       session,
     });

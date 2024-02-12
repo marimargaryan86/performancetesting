@@ -1,5 +1,5 @@
 import type { Locale } from "$lib/i18n";
-import type { Session, User } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
@@ -7,9 +7,9 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      user?: User;
+      user?: OrySchemas.User;
       sessionExpiresAt?: Date;
-      session: Session;
+      session: OrySchemas.Session;
       locale: Locale;
     }
     // interface PageData {}

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  type FeeType,
-  calcFeeAmount,
-} from "$lib/components/pages/trip-management/booking-flow-train/payment/fees.svelte";
+import { type FeeType, calcFeeAmount } from "$lib/utils/fees";
 
 describe("calcFeeAmount", () => {
   it("calculates flat-rate fee correctly by rounding the input amount", () => {

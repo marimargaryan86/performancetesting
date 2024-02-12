@@ -1,34 +1,33 @@
 <script lang="ts" context="module">
   function getPassengerLabel(
-    passenger: OrderPassenger,
+    passenger: MobileSchemas.OrderPassenger,
     createdAt: Date,
     translator: Translator,
   ): string {
     const age = getAge(passenger.birthDate, createdAt);
 
-    const def = Object.values(PASSENGER_DEFINITIONS).find((item) => {
-      if (item.span.from <= age) {
-        return age <= (item.span.to ?? Number.MAX_SAFE_INTEGER);
+    const def = Object.entries(PASSENGER_DEFINITIONS).find(([, val]) => {
+      if (val.span.from <= age) {
+        return age <= (val.span.to ?? Number.MAX_SAFE_INTEGER);
       }
 
       return false;
     });
 
-    return def ? getPassengerFullLabel(def, translator) : translator("words.unknown");
+    return def
+      ? getPassengerFullLabel(def[0] as keyof typeof PASSENGER_DEFINITIONS, translator)
+      : translator("words.unknown");
   }
 </script>
 
 <script lang="ts">
-  import type { OrderPassenger } from "~/integration/junction-mobile-api/schemas/order";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getAge } from "$lib/utils/date-time";
-  import {
-    PASSENGER_DEFINITIONS,
-    getPassengerFullLabel,
-  } from "./trip-search/passenger-picker/passenger-picker.svelte";
+  import { PASSENGER_DEFINITIONS, getPassengerFullLabel } from "$lib/models/passenger";
   import { getTranslator, type Translator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
 
-  export let passengers: OrderPassenger[];
+  export let passengers: MobileSchemas.OrderPassenger[];
   export let orderCreatedAt: Date = new Date();
 
   const t = getTranslator();

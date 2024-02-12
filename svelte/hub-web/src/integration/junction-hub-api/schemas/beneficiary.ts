@@ -1,12 +1,5 @@
 import type { Partialize, Require } from "~/integration/ts-helpers";
-import {
-  enhancedAddressDetailsParser,
-  type AddressSchema,
-  type EnhancedAddressDetails,
-  type EnhancedAddressDetailsSchema,
-  type Address,
-  addressParser,
-} from "~/integration/common/schemas/address";
+import * as CommonSchemas from "~/integration/common/schemas";
 import type { Currency, CurrencySchema } from "./currency";
 import type { Account, AccountSchema } from "./account";
 import type { IncludedMapping } from "./included";
@@ -16,7 +9,7 @@ export type BankDetailsBase = {
   bicSwift?: string;
   accountType: "checking" | "savings";
   paymentType: "priority" | "regular";
-  address: Require<Address, "street" | "countryCode">;
+  address: Require<CommonSchemas.Address, "street" | "countryCode">;
 };
 
 export type BankDetailsAba = {
@@ -37,7 +30,7 @@ export type BankDetailsBaseSchema = {
   bicSwift?: string | null;
   accountType: "checking" | "savings";
   paymentTypes: "priority" | "regular";
-  address: Require<AddressSchema, "addressLines" | "countryCode">;
+  address: Require<CommonSchemas.AddressSchema, "addressLines" | "countryCode">;
 };
 
 export type BankDetailsAbaSchema = {
@@ -58,7 +51,7 @@ export const bankDetailsParser = {
       name: data.name,
       accountType: data.accountType,
       paymentType: data.paymentTypes,
-      address: addressParser.toModel(data.address) as BankDetailsBase["address"],
+      address: CommonSchemas.addressParser.toModel(data.address) as BankDetailsBase["address"],
       bicSwift: data.bicSwift ?? undefined,
     };
 
@@ -82,7 +75,9 @@ export const bankDetailsParser = {
       name: data.name,
       accountType: data.accountType,
       paymentTypes: data.paymentType,
-      address: addressParser.toSchema(data.address) as BankDetailsBaseSchema["address"],
+      address: CommonSchemas.addressParser.toSchema(
+        data.address,
+      ) as BankDetailsBaseSchema["address"],
       bicSwift: "bicSwift" in data ? data.bicSwift ?? null : undefined,
     };
 
@@ -105,7 +100,7 @@ export type Beneficiary = {
   id: string;
   bankAccountHolderName: string;
   email: string;
-  address: Require<EnhancedAddressDetails, "street" | "countryCode">;
+  address: Require<CommonSchemas.EnhancedAddressDetails, "street" | "countryCode">;
   bankDetails: BankDetails;
   currencyId: string;
   currency?: Currency;
@@ -121,7 +116,10 @@ export type BeneficiarySchema = {
   attributes: {
     bankAccountHolderName: string;
     email: string;
-    beneficiaryAddress: Require<EnhancedAddressDetailsSchema, "addressLines" | "countryCode">;
+    beneficiaryAddress: Require<
+      CommonSchemas.EnhancedAddressDetailsSchema,
+      "addressLines" | "countryCode"
+    >;
     bankDetails: BankDetailsSchema;
   };
   relationships: {
@@ -140,7 +138,7 @@ export const beneficiaryParser = {
     return {
       id: data.id,
       bankAccountHolderName: data.attributes.bankAccountHolderName,
-      address: enhancedAddressDetailsParser.toModel(
+      address: CommonSchemas.enhancedAddressDetailsParser.toModel(
         data.attributes.beneficiaryAddress,
       ) as Beneficiary["address"],
       email: data.attributes.email,
@@ -156,7 +154,7 @@ export const beneficiaryParser = {
     attributes: {
       bankAccountHolderName: data.bankAccountHolderName,
       email: data.email,
-      beneficiaryAddress: enhancedAddressDetailsParser.toSchema(
+      beneficiaryAddress: CommonSchemas.enhancedAddressDetailsParser.toSchema(
         data.address,
       ) as BeneficiaryPutSchema["attributes"]["beneficiaryAddress"],
       bankDetails: bankDetailsParser.toSchema(data.bankDetails),

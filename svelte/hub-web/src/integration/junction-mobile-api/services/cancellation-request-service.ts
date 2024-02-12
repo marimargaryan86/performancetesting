@@ -1,4 +1,4 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionMobileApiService from "./junction-mobile-api-service";
 import {
   cancellationRequestParsers,
@@ -14,7 +14,7 @@ export default class CancellationRequestService extends JunctionMobileApiService
     session,
     data,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     data: CancellationRequestCreate;
   }): Promise<CancellationRequest> {
     const resp = await this.makeRequest<{ data: CancellationRequestSchema }>(
@@ -29,7 +29,13 @@ export default class CancellationRequestService extends JunctionMobileApiService
     return cancellationRequestParsers.toModel(resp.json.data);
   }
 
-  async get({ id, session }: { session: Session; id: string }): Promise<CancellationRequest> {
+  async get({
+    id,
+    session,
+  }: {
+    session: OrySchemas.Session;
+    id: string;
+  }): Promise<CancellationRequest> {
     const resp = await this.makeRequest<{
       data: CancellationRequestSchema;
       included?: IncludedSchemas;

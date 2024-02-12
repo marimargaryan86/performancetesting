@@ -1,11 +1,4 @@
-import {
-  priceParser,
-  type Price,
-  type PriceBreakdownSchema,
-  type PriceSchema,
-  type PriceBreakdown,
-  priceBreakdownParser,
-} from "~/integration/common/schemas/price";
+import * as CommonSchemas from "~/integration/common/schemas";
 import {
   applicableToParser,
   type ApplicableTo,
@@ -38,7 +31,7 @@ export type TripOfferOptionPenalty = {
   refundable: boolean;
   conditionsApply?: boolean;
   applicability: "before" | "after";
-  price?: Price;
+  price?: CommonSchemas.Price;
 };
 
 export type TripOfferOptionPenaltySchema = {
@@ -48,7 +41,7 @@ export type TripOfferOptionPenaltySchema = {
   refundable: boolean;
   conditionsApply?: boolean;
   applicability: "before" | "after";
-  price: PriceSchema | null;
+  price: CommonSchemas.PriceSchema | null;
 };
 
 export const tripOfferOptionPenaltyParser = {
@@ -59,7 +52,7 @@ export const tripOfferOptionPenaltyParser = {
     refundable: data.refundable,
     conditionsApply: data.conditionsApply,
     applicability: data.applicability,
-    price: data.price ? priceParser.toModel(data.price) : undefined,
+    price: data.price ? CommonSchemas.priceParser.toModel(data.price) : undefined,
   }),
 };
 
@@ -77,8 +70,8 @@ export type TripOfferPriceQuote = {
   id: string;
   expiresAt: Date;
   price: {
-    total?: Price;
-    breakdown: PriceBreakdown[];
+    total?: CommonSchemas.Price;
+    breakdown: CommonSchemas.PriceBreakdown[];
   };
   penalties: TripOfferOptionPenalty[];
   required: RequiredFields[];
@@ -93,8 +86,8 @@ export type TripOfferPriceQuote = {
 export type TripOfferPriceQuoteCompleted = Omit<TripOfferPriceQuote, "status" | "price"> & {
   status: "completed";
   price: {
-    total: Price;
-    breakdown: PriceBreakdown[];
+    total: CommonSchemas.Price;
+    breakdown: CommonSchemas.PriceBreakdown[];
   };
 };
 
@@ -103,8 +96,8 @@ export type TripOfferPriceQuoteSchema = {
   type: "trip-offer-price-quotes";
   attributes: {
     expiresAt: string;
-    price: PriceSchema | null;
-    priceBreakdown?: PriceBreakdownSchema[] | null;
+    price: CommonSchemas.PriceSchema | null;
+    priceBreakdown?: CommonSchemas.PriceBreakdownSchema[] | null;
     penalties: TripOfferOptionPenaltySchema[];
     required: RequiredFields[];
     rules: OfferSegmentDetailRuleSchema[];
@@ -139,11 +132,13 @@ export const tripOfferPriceQuoteParser = {
       id: data.id,
       expiresAt: new Date(data.attributes.expiresAt),
       price: {
-        total: data.attributes.price ? priceParser.toModel(data.attributes.price) : undefined,
+        total: data.attributes.price
+          ? CommonSchemas.priceParser.toModel(data.attributes.price)
+          : undefined,
         breakdown:
           data.attributes.priceBreakdown
             ?.filter((pb) => pb.breakdownType !== "service-mark-up")
-            ?.map(priceBreakdownParser.toModel) ?? [],
+            ?.map(CommonSchemas.priceBreakdownParser.toModel) ?? [],
       },
       penalties: data.attributes.penalties.map(tripOfferOptionPenaltyParser.toModel),
       required: data.attributes.required,

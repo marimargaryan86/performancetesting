@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TripBooking } from "~/integration/junction-hub-api/schemas/booking";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import routeConfig from "$lib/route-config";
   import { getOrigin, getDestination } from "$lib/utils/booking";
   import CancellationDialog from "$lib/components/pages/trip-management/orders/cancellation-dialog.svelte";
@@ -28,7 +28,7 @@
     statusColumns > 0 ? ` repeat(${statusColumns}, min-content)` : ""
   }`;
 
-  function cancelBooking(booking: TripBooking): void {
+  function cancelBooking(booking: HubSchemas.TripBooking): void {
     cancellationDialog?.open(booking);
   }
 

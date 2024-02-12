@@ -3,12 +3,12 @@
   import { scale } from "svelte/transition";
   import Backdrop from "../backdrop.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import type { Price } from "~/integration/common/schemas/price";
+  import type * as CommonSchemas from "~/integration/common/schemas";
   import { getLocale, getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
 
-  export let originalPrice: Price;
-  export let newPrice: Price;
+  export let originalPrice: CommonSchemas.Price;
+  export let newPrice: CommonSchemas.Price;
 
   let backdrop: Backdrop | undefined = undefined;
 

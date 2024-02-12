@@ -1,9 +1,10 @@
 import integrationInstances from "~/integration-instances";
-import type { Journey } from "~/integration/junction-hub-api/schemas/journey";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 import type { PaginatedData } from "$lib/models/common";
-import { LIST_JOURNEYS_LIMIT, LIST_JOURNEYS_SORT, queryFiltersGetter } from "./+page.svelte";
+import { LIST_JOURNEYS_LIMIT, LIST_JOURNEYS_SORT } from "./+page.svelte";
+import { queryFiltersGetter } from "$lib/components/pages/trip-management/orders/filters.svelte";
 
-export function load(event): { journeys: Promise<PaginatedData<Journey>> } {
+export function load(event): { journeys: Promise<PaginatedData<HubSchemas.Journey>> } {
   const filter = queryFiltersGetter(Object.fromEntries(event.url.searchParams));
 
   return {

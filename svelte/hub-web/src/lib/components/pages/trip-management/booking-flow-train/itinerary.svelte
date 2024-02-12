@@ -1,13 +1,10 @@
 <script lang="ts" context="module">
-  import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
-  import type { TripBooking as HubTripBooking } from "~/integration/junction-hub-api/schemas/booking";
-
-  type TripBooking = MobileTripBooking | HubTripBooking;
+  type TripBooking = MobileSchemas.TripBooking | HubSchemas.TripBooking;
 
   function getOrigDestLegs(booking: TripBooking):
     | {
-        originLeg: OfferSegmentLeg;
-        destinationLeg: OfferSegmentLeg;
+        originLeg: CommonSchemas.OfferSegmentLeg;
+        destinationLeg: CommonSchemas.OfferSegmentLeg;
       }
     | undefined {
     const originLegs = booking.detailsList[0]?.legs;
@@ -27,9 +24,11 @@
   import { formatDuration } from "$lib/formatting/date-time";
   import { getTimeDeltaS } from "$lib/utils/date-time";
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
-  import type { OfferSegmentLeg } from "~/integration/common/schemas/offer-segment-leg";
+  import type * as CommonSchemas from "~/integration/common/schemas";
   import { getLocale, getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
   export let bookings: TripBooking[];
 

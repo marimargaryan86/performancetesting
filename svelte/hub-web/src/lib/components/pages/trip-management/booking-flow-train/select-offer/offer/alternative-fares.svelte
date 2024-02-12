@@ -1,26 +1,21 @@
-<script lang="ts" context="module">
-  function sortOptions(a: OfferOption, b: OfferOption): number {
-    return a.price.total.amount - b.price.total.amount;
-  }
-</script>
-
 <script lang="ts">
   import { dev } from "$app/environment";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import type { OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
+  import { sortOptions } from "$lib/sorting/offer";
 
-  export let options: OfferOption[];
-  export let selectedOptions: OfferOption[];
+  export let options: MobileSchemas.OfferOption[];
+  export let selectedOptions: MobileSchemas.OfferOption[];
 
   let expanded = false;
 
   const locale = getLocale();
   const t = getTranslator();
-  const dispatch = createEventDispatcher<{ select: OfferOption }>();
+  const dispatch = createEventDispatcher<{ select: MobileSchemas.OfferOption }>();
 
   function open(): void {
     expanded = true;
@@ -38,7 +33,7 @@
     }
   }
 
-  function select(option: OfferOption): void {
+  function select(option: MobileSchemas.OfferOption): void {
     dispatch("select", option);
   }
 </script>

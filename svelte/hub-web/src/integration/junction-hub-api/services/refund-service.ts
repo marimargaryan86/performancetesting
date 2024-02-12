@@ -1,4 +1,4 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "$lib/models/common";
 import {
@@ -18,7 +18,7 @@ export default class RefundService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<Refund>> {
@@ -39,7 +39,7 @@ export default class RefundService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: Session; id: string }): Promise<Refund> {
+  async get({ session, id }: { session: OrySchemas.Session; id: string }): Promise<Refund> {
     const resp = await this.makeRequest<{ data: RefundSchema }>(`/refunds/${id}`, {
       session,
     });
@@ -52,7 +52,7 @@ export default class RefundService extends JunctionHubApiService {
     data,
     id,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     data: RefundPut;
     id: string;
   }): Promise<Refund> {
@@ -70,7 +70,7 @@ export default class RefundService extends JunctionHubApiService {
     refundId,
     data,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     refundId: string;
     data: RefundPositionCreate;
   }): Promise<RefundPosition> {

@@ -1,16 +1,8 @@
-<script lang="ts" context="module">
-  type YouTubeVideo = {
-    title: string;
-    description: string;
-    id: string;
-    lengthS: number;
-  };
-</script>
-
 <script lang="ts">
   import { page } from "$app/stores";
   import Icon from "$lib/components/icons/icon.svelte";
   import Backdrop from "$lib/components/ui/backdrop.svelte";
+  import type { YouTubeVideo } from "$lib/models/youtube";
 
   let backdrop: Backdrop | undefined;
   let video: YouTubeVideo | undefined;

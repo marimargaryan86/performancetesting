@@ -1,5 +1,6 @@
-import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import { z } from "zod";
+import type { PartialPassengerData, PassengerPickerData } from "$lib/models/passenger";
 
 const countryCodesValidator = z.object({
   issue: z
@@ -45,7 +46,7 @@ const passengerValidator = z.object({
 export type PassengerValidator = z.infer<typeof passengerValidator>;
 
 export function getPassengerValidator(
-  requiredFields: TripOfferPriceQuote["required"],
+  requiredFields: MobileSchemas.TripOfferPriceQuote["required"],
 ): typeof passengerValidator {
   const nextPassengerValidator: Partial<Record<keyof PassengerValidator, z.ZodTypeAny>> = {};
   const nextDocumentValidator: Partial<Record<keyof DocumentValidator, z.ZodTypeAny>> = {};
@@ -82,4 +83,12 @@ export function getPassengerValidator(
   }
 
   return passengerValidator;
+}
+
+export function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
+  return (Object.keys(passengers) as unknown as (keyof PassengerPickerData)[]).flatMap((type) =>
+    Array(passengers[type])
+      .fill(undefined)
+      .map<PartialPassengerData>(() => ({ type })),
+  );
 }

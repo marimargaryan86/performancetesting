@@ -1,91 +1,11 @@
-<script lang="ts" context="module">
-  export type PassengerType = "senior" | "adult" | "youth" | "child";
-
-  export const MAX_TOTAL_COUNT = 9;
-  export const PASSENGER_DEFINITIONS: Record<
-    keyof PassengerPickerData,
-    { type: PassengerType; span: { from: number; to?: number } }
-  > = {
-    seniors65: { type: "senior", span: { from: 65 } },
-    seniors60: { type: "senior", span: { from: 60, to: 64 } },
-    adults: { type: "adult", span: { from: 26, to: 59 } },
-    youths15: { type: "youth", span: { from: 15, to: 25 } },
-    youths12: { type: "youth", span: { from: 12, to: 14 } },
-    children6: { type: "child", span: { from: 6, to: 11 } },
-    children4: { type: "child", span: { from: 4, to: 5 } },
-    children0: { type: "child", span: { from: 0, to: 3 } },
-  };
-
-  export function getPassengerFullLabel(
-    def: (typeof PASSENGER_DEFINITIONS)[keyof PassengerPickerData],
-    translator: Translator,
-    count = 1,
-  ): string {
-    return `${translator(`passengerTypes.${def.type}`, { count })} (${def.span.from}${
-      def.span.to === undefined ? "+" : `-${def.span.to}`
-    })`;
-  }
-
-  export const passengerPickerData = z
-    .object({
-      seniors65: z.number().min(0),
-      seniors60: z.number().min(0),
-      adults: z.number().min(0),
-      youths15: z.number().min(0),
-      youths12: z.number().min(0),
-      children6: z.number().min(0),
-      children4: z.number().min(0),
-      children0: z.number().min(0),
-    })
-    .superRefine((arg, ctx) => {
-      if (Object.values(arg).reduce((prev, curr) => prev + curr, 0) === 0) {
-        ctx.addIssue({ message: "At least one passenger is mandatory", code: "custom" });
-      }
-    });
-
-  export type PassengerPickerData = z.infer<typeof passengerPickerData>;
-
-  export function getPassengersPresentation(
-    passengers: PassengerPickerData,
-    translator: Translator,
-  ): string {
-    return Object.entries(PASSENGER_DEFINITIONS)
-      .map(([key, val]) => {
-        const type = key as keyof PassengerPickerData;
-
-        if (!passengers[type]) {
-          return undefined;
-        }
-
-        return `${passengers[type]} ${getPassengerFullLabel(val, translator, passengers[type])}`;
-      })
-      .filter(ensureDefined)
-      .join(", ");
-  }
-
-  export function getDefaultValue(): PassengerPickerData {
-    return {
-      adults: 1,
-      children0: 0,
-      children4: 0,
-      children6: 0,
-      seniors60: 0,
-      seniors65: 0,
-      youths12: 0,
-      youths15: 0,
-    };
-  }
-</script>
-
 <script lang="ts">
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import { clickOutside } from "$lib/directives/click-outside";
   import PassengerCounter from "./passenger-counter.svelte";
   import { scale } from "svelte/transition";
-  import { z } from "zod";
   import { slideFade } from "$lib/transitions/slide-fade";
-  import { ensureDefined } from "$lib/utils/array";
-  import { getTranslator, type Translator } from "$lib/i18n";
+  import { getTranslator } from "$lib/i18n";
+  import { getPassengerFullLabel, type PassengerPickerData } from "$lib/models/passenger";
 
   export let passengers: PassengerPickerData;
   export let error: string | string[] | boolean = false;
@@ -139,7 +59,7 @@
       <div class="counters">
         {#each passengerKeys as key}
           <PassengerCounter
-            label={getPassengerFullLabel(PASSENGER_DEFINITIONS[key], $t)}
+            label={getPassengerFullLabel(key, $t)}
             bind:count={passengers[key]}
             {totalCount}
           />

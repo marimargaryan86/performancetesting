@@ -1,6 +1,6 @@
 import { URLExtended } from "$lib/utils/url";
 import { throwIfError } from "./junction-error";
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 
 /**
  * This abstract base class is a foundational service layer for making RESTful
@@ -49,7 +49,7 @@ export default abstract class JunctionService {
       queryParams?: Record<string, string | number | undefined>;
       headers?: Record<string, string>;
       data?: unknown;
-      session: Session;
+      session: OrySchemas.Session;
     },
   ): Promise<Omit<Response, "json"> & { json: TResp }> {
     const resp = await fetch(

@@ -1,10 +1,10 @@
 import integrationInstances from "~/integration-instances";
-import type { Conversion } from "~/integration/junction-hub-api/schemas/conversion";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 import type { PaginatedData } from "$lib/models/common";
 import { LIST_CONVERSIONS_LIMIT } from "./+page.svelte";
 
 export function load(event): {
-  conversions: Promise<PaginatedData<Conversion>>;
+  conversions: Promise<PaginatedData<HubSchemas.Conversion>>;
 } {
   return {
     conversions: integrationInstances.junctionHubApi.conversions.find({

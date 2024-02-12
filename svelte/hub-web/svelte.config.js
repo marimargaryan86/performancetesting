@@ -19,6 +19,7 @@ const config = {
       "~/integration-instances": "src/integration-instances.server.ts",
       "~/data": "src/data",
       "~/integration": "src/integration",
+      "~/params": "src/params",
     },
   },
 };

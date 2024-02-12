@@ -1,16 +1,16 @@
 <script lang="ts">
   import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import type { Price } from "~/integration/common/schemas/price";
-  import type { TripBooking as MobileTripBooking } from "~/integration/junction-mobile-api/schemas/booking";
-  import type { TripBooking as HubTripBooking } from "~/integration/junction-hub-api/schemas/booking";
+  import type * as CommonSchemas from "~/integration/common/schemas";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
-  export let bookings: MobileTripBooking[] | HubTripBooking[];
+  export let bookings: MobileSchemas.TripBooking[] | HubSchemas.TripBooking[];
 
   const locale = getLocale();
   const t = getTranslator();
 
-  $: totalPrice = bookings.reduce<Price>(
+  $: totalPrice = bookings.reduce<CommonSchemas.Price>(
     (prev, curr) => ({
       currency: curr.price.total.currency,
       amount: prev.amount + curr.price.total.amount,

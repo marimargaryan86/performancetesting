@@ -1,10 +1,10 @@
 import integrationInstances from "~/integration-instances";
-import type { Transaction } from "~/integration/junction-hub-api/schemas/transaction";
+import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 import type { PaginatedData } from "$lib/models/common";
 import { LIST_TRANSACTIONS_LIMIT, LIST_TRANSACTIONS_SORT } from "./+page.svelte";
 
 export function load(event): {
-  transactions: Promise<PaginatedData<Transaction>>;
+  transactions: Promise<PaginatedData<HubSchemas.Transaction>>;
 } {
   return {
     transactions: integrationInstances.junctionHubApi.transactions.find({

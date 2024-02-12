@@ -3,12 +3,12 @@
   import { getTimeDeltaS } from "$lib/utils/date-time";
   import Collapsible from "../collapsible.svelte";
   import { createEventDispatcher } from "svelte";
-  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
   import { getLegsFromPriceQuote } from "$lib/utils/offer";
   import { getLocale, getTranslator } from "$lib/i18n";
 
-  export let priceQuote: TripOfferPriceQuote;
+  export let priceQuote: MobileSchemas.TripOfferPriceQuote;
 
   const locale = getLocale();
   const t = getTranslator();

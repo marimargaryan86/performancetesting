@@ -1,26 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { permitted } from "$lib/utils/permissions";
-import type { User } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 
-const adminUser: User = {
+const adminUser: OrySchemas.User = {
   id: "0001",
   email: "admin@example.com",
   role: "snowfall-admin",
 };
 
-const snowfallUser: User = {
+const snowfallUser: OrySchemas.User = {
   id: "0002",
   email: "user@example.com",
   role: "snowfall-user",
 };
 
-const resellerUser: User = {
+const resellerUser: OrySchemas.User = {
   id: "0003",
   email: "reseller.user@example.com",
   role: "reseller-user",
 };
 
-const resellerAdmin: User = {
+const resellerAdmin: OrySchemas.User = {
   id: "0004",
   email: "reseller.admin@example.com",
   role: "reseller-admin",

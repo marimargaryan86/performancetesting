@@ -1,40 +1,5 @@
 <script lang="ts" context="module">
-  const feeTypes = ["flat-rate", "percentage"] as const;
-  export type FeeType = (typeof feeTypes)[number];
-
   const FALLBACK_CURRENCY = "EUR";
-
-  /**
-   * Given the markup fee type, raw input amount, and the baseline total price,
-   * this returns the correct fee amount. Applies rounding to percentage-based
-   * fees.
-   *
-   * @param {FeeType} type - Supported values are "flat-rate" or "percentage".
-   * @param {number} inputAmount - The amount on which the fee is calculated.
-   * @param {number} baselineAmount - When calculating a percentage, this is the baseline amount.
-   * @returns {number} - The calculated fee rounded to the nearest hundredth. Returns `NaN` for unsupported fee types.
-   *
-   * @example
-   * calcFeeAmount("flat-rate", 150.42, 0);        // returns 150.42
-   * calcFeeAmount("percentage", 2, 1000);         // returns 20
-   * calcFeeAmount("unsupported-type", 200, 1000); // returns NaN, should an incorrect type be passed
-   */
-  export function calcFeeAmount(
-    type: FeeType,
-    inputAmount: number,
-    baselineAmount: number,
-  ): number {
-    switch (type) {
-      case "flat-rate":
-        return roundCurrency(inputAmount);
-
-      case "percentage":
-        return roundCurrency((inputAmount / 100) * baselineAmount);
-
-      default:
-        return NaN;
-    }
-  }
 </script>
 
 <script lang="ts">
@@ -45,15 +10,16 @@
   import SelectField from "$lib/components/ui/select-field.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getLocale, getTranslator } from "$lib/i18n";
   import type {
     Markups,
     PartialMarkups,
   } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
   import type { z } from "zod";
+  import { FEE_TYPES, calcFeeAmount, type FeeType } from "$lib/utils/fees";
 
-  export let priceQuote: TripOfferPriceQuote | undefined = undefined;
+  export let priceQuote: MobileSchemas.TripOfferPriceQuote | undefined = undefined;
   export let markups: PartialMarkups;
   export let errors: z.ZodFormattedError<Markups> | undefined;
 
@@ -61,8 +27,8 @@
   const t = getTranslator();
 
   let collapsible: Collapsible | undefined;
-  let serviceFeeType: FeeType = feeTypes[0];
-  let agencyMarkupType: FeeType = feeTypes[0];
+  let serviceFeeType: FeeType = FEE_TYPES[0];
+  let agencyMarkupType: FeeType = FEE_TYPES[0];
   let serviceFeeAmount = markups.serviceFee?.amount ?? 0;
   let agencyMarkupAmount = markups.agencyMarkup?.amount ?? 0;
 
@@ -127,7 +93,7 @@
 
       <SelectField
         formatter={formatFeeType}
-        options={feeTypes}
+        options={FEE_TYPES}
         bind:value={serviceFeeType}
         placeholder={$t("actions.selectFeeType")}
         label="&nbsp;"
@@ -145,7 +111,7 @@
 
       <SelectField
         formatter={formatFeeType}
-        options={feeTypes}
+        options={FEE_TYPES}
         bind:value={agencyMarkupType}
         placeholder={$t("actions.selectFeeType")}
         label="&nbsp;"

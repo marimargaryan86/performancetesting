@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
+import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import { getSortOffersFunc } from "$lib/sorting/offer";
-import type { SearchOptionsData } from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
+import type { SearchOptionsData } from "$lib/utils/offer";
 
 const foo = {
   groups: [
@@ -19,7 +19,7 @@ const foo = {
       ],
     },
   ],
-} as unknown as Offer;
+} as unknown as MobileSchemas.Offer;
 
 const bar = {
   groups: [
@@ -37,7 +37,7 @@ const bar = {
       ],
     },
   ],
-} as unknown as Offer;
+} as unknown as MobileSchemas.Offer;
 
 const baz = {
   groups: [
@@ -55,7 +55,7 @@ const baz = {
       ],
     },
   ],
-} as unknown as Offer;
+} as unknown as MobileSchemas.Offer;
 
 describe("getSortOffersFunc", () => {
   const earliestArrival = { sortBy: "earliest-arrival" } as SearchOptionsData;
@@ -90,8 +90,8 @@ describe("getSortOffersFunc", () => {
   });
 
   it("throws an error with invalid sort options", () => {
-    const offerA = { id: "foo" } as Offer;
-    const offerB = { id: "bar" } as Offer;
+    const offerA = { id: "foo" } as MobileSchemas.Offer;
+    const offerB = { id: "bar" } as MobileSchemas.Offer;
     const invalidSort = getSortOffersFunc(invalid);
 
     expect(() => invalidSort(offerA, offerB)).toThrowError("Unknown sort parameter");

@@ -1,13 +1,13 @@
 import { error } from "@sveltejs/kit";
 import integrationInstances from "~/integration-instances";
-import type { RecoveryFlow } from "~/integration/ory/schemas/recovery-flow";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import { cookieStore } from "$lib/stores/cookie-store.server";
 
-export async function load(event): Promise<{ flow: RecoveryFlow }> {
+export async function load(event): Promise<{ flow: OrySchemas.RecoveryFlow }> {
   const recovery = cookieStore.recoveryToken.get(event);
 
   let cookies: Record<string, string> | undefined;
-  let flow: RecoveryFlow | undefined;
+  let flow: OrySchemas.RecoveryFlow | undefined;
 
   if (recovery) {
     try {

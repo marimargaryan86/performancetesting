@@ -3,15 +3,15 @@ import {
   getEarliestDeparture,
   getOfferDurationS,
   getLowestPrice,
+  type SearchOptionsData,
 } from "$lib/utils/offer";
-import type { SearchOptionsData } from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
-import type { Offer } from "~/integration/junction-mobile-api/schemas/offer";
+import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
-function getArrivalDelta(a: Offer, b: Offer): number {
+function getArrivalDelta(a: MobileSchemas.Offer, b: MobileSchemas.Offer): number {
   return getEarliestArrival(a).getTime() - getEarliestArrival(b).getTime();
 }
 
-function getDepartureDelta(a: Offer, b: Offer): number {
+function getDepartureDelta(a: MobileSchemas.Offer, b: MobileSchemas.Offer): number {
   return getEarliestDeparture(a).getTime() - getEarliestDeparture(b).getTime();
 }
 
@@ -23,7 +23,7 @@ function getDepartureDelta(a: Offer, b: Offer): number {
  * See `svelte/hub-web/src/tests/sorting/offer.test.ts` for more context.
  *
  * @param {SearchOptionsData} options - The search options containing the sort criteria.
- * @returns {(a: Offer, b: Offer) => number} - A comparator function that can be used in array sort.
+ * @returns {(a: MobileSchemas.Offer, b: MobileSchemas.Offer) => number} - A comparator function that can be used in array sort.
  *
  * @throws {Error} Throws an error if an unknown sorting parameter is provided.
  *
@@ -32,7 +32,9 @@ function getDepartureDelta(a: Offer, b: Offer): number {
  * const offers = [...]; // Array of Offer objects
  * const sortedOffers = offers.sort(getSortOffersFunc(searchOptions));
  */
-export function getSortOffersFunc(options: SearchOptionsData): (a: Offer, b: Offer) => number {
+export function getSortOffersFunc(
+  options: SearchOptionsData,
+): (a: MobileSchemas.Offer, b: MobileSchemas.Offer) => number {
   return (a, b) => {
     if (options.sortBy === "earliest-arrival") {
       return getArrivalDelta(a, b);
@@ -56,4 +58,8 @@ export function getSortOffersFunc(options: SearchOptionsData): (a: Offer, b: Off
 
     throw new Error("Unknown sort parameter");
   };
+}
+
+export function sortOptions(a: MobileSchemas.OfferOption, b: MobileSchemas.OfferOption): number {
+  return a.price.total.amount - b.price.total.amount;
 }

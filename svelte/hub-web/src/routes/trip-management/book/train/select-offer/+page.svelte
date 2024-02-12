@@ -1,58 +1,34 @@
 <script lang="ts" context="module">
   type Direction = "earlier" | "later";
   type PendingType = Direction | "initial";
-
-  function getSortAndFilteringFunc(
-    options: SearchOptionsData,
-  ): (offers: OfferModel[]) => OfferModel[] {
-    return (offers): OfferModel[] =>
-      offers.filter(getFilterOffersFunc(options)).sort(getSortOffersFunc(options));
-  }
-
-  function getSearchOptionSettings(offers?: OfferModel[]): SearchOptionsSettings {
-    if (!offers?.length) {
-      return { durationSpanM: { start: 0, end: 0 }, vendors: [] };
-    }
-
-    const durations = offers.map((item) => getOfferDurationM(item));
-    const vendors = Array.from(new Set(offers.flatMap((item) => getVendors(item))));
-
-    return {
-      durationSpanM: {
-        start: durations.length ? Math.min(...durations) : 0,
-        end: durations.length ? Math.max(...durations) : 0,
-      },
-      vendors,
-    };
-  }
 </script>
 
 <script lang="ts">
-  import TripSearch, {
+  import TripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
+  import {
     SEARCH_WINDOW_DELTA_MS,
     SEARCH_WINDOW_H,
     type SearchData,
-  } from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
-  import SearchOptions, {
-    type SearchOptionsData,
-    type SearchOptionsSettings,
-  } from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
+  } from "$lib/models/trip-offer-search";
+  import SearchOptions from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
   import Offer from "$lib/components/pages/trip-management/booking-flow-train/select-offer/offer/offer.svelte";
   import routeConfig from "$lib/route-config";
   import { goto, invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
   import Countdown from "$lib/components/pages/trip-management/booking-flow-train/countdown.svelte";
   import LoadingSkelton from "$lib/components/pages/trip-management/booking-flow-train/select-offer/loading-skelton.svelte";
-  import type { Offer as OfferModel } from "~/integration/junction-mobile-api/schemas/offer";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import Alert from "$lib/components/ui/alert.svelte";
-  import { getSortOffersFunc } from "$lib/sorting/offer";
-  import { getFilterOffersFunc } from "$lib/filters/offer";
-  import { getOfferDurationM, getVendors } from "$lib/utils/offer";
+  import {
+    getSearchOptionSettings,
+    getSortAndFilteringFunc,
+    type SearchOptionsData,
+  } from "$lib/utils/offer";
   import { onDestroy, type ComponentEvents } from "svelte";
   import { writable } from "svelte/store";
   import { getPageTitle } from "$lib/utils/page-title";
-  import { getTranslator } from "$lib/i18n/index.js";
+  import { getTranslator } from "$lib/i18n";
   import {
     manager,
     type PartialSelectedOffer,
@@ -64,7 +40,7 @@
   export let data;
 
   let selected: PartialSelectedOffer = data.bookingSession.selectedOffer ?? {};
-  let offers: OfferModel[] = [];
+  let offers: MobileSchemas.Offer[] = [];
   let searchOptionsSettings = getSearchOptionSettings(offers);
   let searchOptions: SearchOptionsData = {
     sortBy: "lowest-price",

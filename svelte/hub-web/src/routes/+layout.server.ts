@@ -1,9 +1,9 @@
 import type { Locale, LocaleData, TimeFormat } from "$lib/i18n";
 import lang from "$lib/i18n/lang";
-import type { User } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 
 export function load(event): {
-  user?: User;
+  user?: OrySchemas.User;
   authenticated: boolean;
   sessionExpiresAt?: Date;
   locale: Locale;

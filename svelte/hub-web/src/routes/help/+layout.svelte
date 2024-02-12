@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Tab } from "$lib/components/ui/tabs.svelte";
+  import type { Tab } from "$lib/models/ui";
   import routeConfig from "$lib/route-config";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import { page } from "$app/stores";

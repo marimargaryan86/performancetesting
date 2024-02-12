@@ -1,22 +1,18 @@
-import {
-  coordinatesParser,
-  type Coordinates,
-  type CoordinatesSchema,
-} from "~/integration/common/schemas/point";
+import * as CommonSchemas from "~/integration/common/schemas";
 import type { TripCandidateSearch, TripCandidateSearchSchema } from "./trip-candidate";
 import { tripOfferPassengerParser } from "./offer-search";
 
 export type SimpleOfferSearchCriteria = {
-  origin: Coordinates;
-  destination: Coordinates;
+  origin: CommonSchemas.Coordinates;
+  destination: CommonSchemas.Coordinates;
   outbound: Date;
   inbound?: Date;
   windowH?: number;
 };
 
 export type SimpleOfferSearchCriteriaSchema = {
-  origin: CoordinatesSchema;
-  destination: CoordinatesSchema;
+  origin: CommonSchemas.CoordinatesSchema;
+  destination: CommonSchemas.CoordinatesSchema;
   departureAfter: string;
   departureBefore?: string | null;
   arrivalBefore?: string | null;
@@ -33,8 +29,8 @@ export const simpleOfferSearchCriteriaParser = {
       : undefined;
 
     return {
-      origin: coordinatesParser.toModel(data.origin),
-      destination: coordinatesParser.toModel(data.destination),
+      origin: CommonSchemas.coordinatesParser.toModel(data.origin),
+      destination: CommonSchemas.coordinatesParser.toModel(data.destination),
       outbound: new Date(data.departureAfter),
       inbound: data.returnDepartureAfter ? new Date(data.returnDepartureAfter) : undefined,
       windowH,
@@ -50,8 +46,8 @@ export const simpleOfferSearchCriteriaParser = {
     inboundBefore?.setHours(inboundBefore.getHours() + (data.windowH ?? 0));
 
     return {
-      origin: coordinatesParser.toSchema(data.origin),
-      destination: coordinatesParser.toSchema(data.destination),
+      origin: CommonSchemas.coordinatesParser.toSchema(data.origin),
+      destination: CommonSchemas.coordinatesParser.toSchema(data.destination),
       departureAfter: outboundAfter.toISOString(),
       departureBefore: outboundBefore?.toISOString(),
       returnDepartureAfter: inboundAfter?.toISOString(),

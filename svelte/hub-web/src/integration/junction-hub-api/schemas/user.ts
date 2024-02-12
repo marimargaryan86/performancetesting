@@ -1,8 +1,4 @@
-import {
-  enhancedAddressDetailsParser,
-  type EnhancedAddressDetails,
-  type EnhancedAddressDetailsSchema,
-} from "~/integration/common/schemas/address";
+import * as CommonSchemas from "~/integration/common/schemas";
 
 export type User = {
   id: string;
@@ -24,7 +20,7 @@ export type UserProfile = {
   id: string;
   company: {
     name: string;
-    address: EnhancedAddressDetails;
+    address: CommonSchemas.EnhancedAddressDetails;
   };
   contacts: {
     firstName: string;
@@ -40,7 +36,7 @@ export type UserProfileSchema = {
   attributes: {
     company: {
       name: string;
-      address: EnhancedAddressDetailsSchema;
+      address: CommonSchemas.EnhancedAddressDetailsSchema;
     };
     contacts: {
       firstName: string;
@@ -56,7 +52,7 @@ export const userProfileParser = {
     id: data.id,
     company: {
       name: data.attributes.company.name,
-      address: enhancedAddressDetailsParser.toModel(data.attributes.company.address),
+      address: CommonSchemas.enhancedAddressDetailsParser.toModel(data.attributes.company.address),
     },
     contacts: data.attributes.contacts.map((item) => ({
       firstName: item.firstName,

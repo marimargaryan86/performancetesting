@@ -1,9 +1,7 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "$lib/models/common";
-import type { Journey, JourneySchema } from "../schemas/journey";
-import { parseIncluded, type IncludedSchemas } from "../schemas/included";
-import type { JourneyFilterOptions } from "~/integration/junction-hub-api/schemas/journey";
+import * as Schemas from "../schemas";
 
 export default class JourneyService extends JunctionHubApiService {
   async find({
@@ -13,15 +11,15 @@ export default class JourneyService extends JunctionHubApiService {
     sort = "id",
     filter,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
     sort?: "id" | "-id" | "reference" | "-reference" | "createdAt" | "-createdAt";
-    filter?: JourneyFilterOptions;
-  }): Promise<PaginatedData<Journey>> {
+    filter?: Schemas.JourneyFilterOptions;
+  }): Promise<PaginatedData<Schemas.Journey>> {
     const resp = await this.makeRequest<{
-      data: JourneySchema[];
-      included?: IncludedSchemas;
+      data: Schemas.JourneySchema[];
+      included?: Schemas.IncludedSchemas;
       links: { next: string };
     }>("/journeys", {
       session,
@@ -47,7 +45,7 @@ export default class JourneyService extends JunctionHubApiService {
       },
     });
 
-    const parsed = parseIncluded([...(resp.json.included ?? []), ...resp.json.data]);
+    const parsed = Schemas.parseIncluded([...(resp.json.included ?? []), ...resp.json.data]);
 
     return {
       data: parsed.journeys ?? [],

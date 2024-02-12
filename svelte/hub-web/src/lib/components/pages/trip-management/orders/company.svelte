@@ -3,23 +3,23 @@
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
   import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import type { Price, PriceBreakdown } from "~/integration/common/schemas/price";
-  import type { Company } from "~/integration/junction-hub-api/schemas/company";
-  import type { Markups } from "~/integration/junction-mobile-api/schemas/markups";
+  import type * as CommonSchemas from "~/integration/common/schemas";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
-  export let company: Company | undefined;
+  export let company: HubSchemas.Company | undefined;
   export let title: string;
-  export let price: Price;
-  export let breakdownList: PriceBreakdown[] | undefined = undefined;
-  export let markupsTask: Promise<Markups | undefined> | undefined = undefined;
+  export let price: CommonSchemas.Price;
+  export let breakdownList: CommonSchemas.PriceBreakdown[] | undefined = undefined;
+  export let markupsTask: Promise<MobileSchemas.Markups | undefined> | undefined = undefined;
 
   const locale = getLocale();
   const t = getTranslator();
 
   async function getTotal(
-    nextPrice: Price,
-    nextMarkupsTask?: Promise<Markups | undefined>,
-  ): Promise<Price> {
+    nextPrice: CommonSchemas.Price,
+    nextMarkupsTask?: Promise<MobileSchemas.Markups | undefined>,
+  ): Promise<CommonSchemas.Price> {
     if (!nextMarkupsTask) {
       return nextPrice;
     }

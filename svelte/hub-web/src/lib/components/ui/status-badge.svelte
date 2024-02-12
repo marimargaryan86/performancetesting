@@ -1,57 +1,12 @@
-<script lang="ts" context="module">
-  export type StatusBadgeVariant = "ok" | "warn" | "error";
-  export type StatusBadgeValue =
-    | "confirmed"
-    | "error"
-    | "rejected"
-    | "no-refund"
-    | "refund-due"
-    | "refund-issued"
-    | "refund-failed"
-    | "pending"
-    | "submitted"
-    | "succeeded"
-    | "not-ticketed"
-    | "cancelled"
-    | "unspecified"
-    | "executed"
-    | "failed"
-    | "completed"
-    | "deleted"
-    | "mixed"
-    | "unknown";
-
-  const statusMapping = {
-    confirmed: "ok",
-    completed: "ok",
-    executed: "ok",
-    succeeded: "ok",
-    error: "error",
-    rejected: "error",
-    deleted: "error",
-    failed: "error",
-    "refund-failed": "error",
-    pending: "warn",
-    submitted: "warn",
-    "no-refund": "warn",
-    "refund-due": "warn",
-    "refund-issued": "warn",
-    "not-ticketed": "warn",
-    mixed: "warn",
-    cancelled: "warn",
-    unspecified: "warn",
-    unknown: "warn",
-  } satisfies Record<StatusBadgeValue, StatusBadgeVariant>;
-</script>
-
 <script lang="ts">
   import { getTranslator } from "$lib/i18n";
+  import { STATUS_BADGE_MAPPING, type StatusBadgeValue } from "$lib/models/status-badge";
 
   export let value: StatusBadgeValue;
 
   const t = getTranslator();
 
-  $: variant = statusMapping[value];
+  $: variant = STATUS_BADGE_MAPPING[value];
 </script>
 
 <span

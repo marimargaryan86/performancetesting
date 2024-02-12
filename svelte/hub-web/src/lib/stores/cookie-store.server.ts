@@ -1,7 +1,7 @@
 import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import type { RequestEvent } from "@sveltejs/kit";
-import type { Session, SessionMeta } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import jwt from "jsonwebtoken";
 import * as devalue from "devalue";
 
@@ -71,6 +71,6 @@ export const cookieStore = {
   userSettingsToken: createCookie<{ id: string; cookies: Record<string, string> }>(
     "user-settings-token",
   ),
-  sessionToken: createCookie<Session>("session-token"),
-  sessionMetaToken: createCookie<SessionMeta>("session-meta-token"),
+  sessionToken: createCookie<OrySchemas.Session>("session-token"),
+  sessionMetaToken: createCookie<OrySchemas.SessionMeta>("session-meta-token"),
 };

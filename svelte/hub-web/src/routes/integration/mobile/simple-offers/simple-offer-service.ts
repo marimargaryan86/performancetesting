@@ -1,14 +1,14 @@
 import type SimpleOfferSearchService from "~/integration/junction-mobile-api/services/simple-offer-search-service";
 import { clientServiceFactory } from "../../framework";
 import type { RouteId } from "./$types";
-import type { SimpleOfferSearchCreate } from "~/integration/junction-mobile-api/schemas/simple-offer-search";
+import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
 const factory = clientServiceFactory<SimpleOfferSearchService, RouteId>(
   "/integration/mobile/simple-offers",
 );
 
 export default factory({
-  create: (params: { data: SimpleOfferSearchCreate }) => [params],
+  create: (params: { data: MobileSchemas.SimpleOfferSearchCreate }) => [params],
   get: (params: { id: string }) => [params],
   findOffers: (params: { id: string }) => [params],
 });

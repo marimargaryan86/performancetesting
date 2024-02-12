@@ -4,13 +4,13 @@
   import TextField from "$lib/components/ui/text-field.svelte";
   import type { CountryModel } from "$lib/models/location";
   import { formatCountryOption } from "$lib/formatting/location";
-  import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import countryData from "~/data/country-data";
   import currencyData from "~/data/currency-data";
   import Icon from "$lib/components/icons/icon.svelte";
   import { getTranslator } from "$lib/i18n";
 
-  export let data: BeneficiaryPut;
+  export let data: HubSchemas.BeneficiaryPut;
 
   const t = getTranslator();
 
@@ -18,7 +18,7 @@
 
   $: data = updateCountry(country);
 
-  function updateCountry(nextCountry?: CountryModel): BeneficiaryPut {
+  function updateCountry(nextCountry?: CountryModel): HubSchemas.BeneficiaryPut {
     if (!nextCountry) {
       return data;
     }

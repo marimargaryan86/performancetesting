@@ -45,7 +45,7 @@
   import { URLExtended } from "$lib/utils/url";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import Alert from "$lib/components/ui/alert.svelte";
-  import type { BeneficiaryPut } from "~/integration/junction-hub-api/schemas/beneficiary";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import { getPageTitle } from "$lib/utils/page-title";
 
   export let data;
@@ -53,7 +53,7 @@
   let stepComponent: BeneficiaryDetails | BankAccountDetails | Summary | undefined;
   let error: string | undefined = undefined;
 
-  const beneficiary = writableCookie<BeneficiaryPut>({
+  const beneficiary = writableCookie<HubSchemas.BeneficiaryPut>({
     key: "beneficiary-data",
     value: data.beneficiary,
   });

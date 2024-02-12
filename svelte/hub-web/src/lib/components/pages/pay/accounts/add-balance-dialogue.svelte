@@ -5,8 +5,7 @@
   import { portal } from "$lib/directives/portal";
   import { createEventDispatcher } from "svelte";
   import { fade, fly } from "svelte/transition";
-  import type { Balance } from "~/integration/junction-hub-api/schemas/balance";
-  import type { Currency } from "~/integration/junction-hub-api/schemas/currency";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import integrationInstancesClient from "~/integration-instances-client";
   import currencyData from "~/data/currency-data";
   import { writable } from "svelte/store";
@@ -14,7 +13,7 @@
   import Icon from "$lib/components/icons/icon.svelte";
 
   export let accountId: string;
-  export let exclude: Balance[];
+  export let exclude: HubSchemas.Balance[];
 
   const t = getTranslator();
 
@@ -32,12 +31,12 @@
     inputRef.focus();
   }
 
-  let value: Currency[] = [];
+  let value: HubSchemas.Currency[] = [];
   let searchQuery = "";
   let visible = false;
   let inputRef: TextField<"text">;
 
-  const dispatch = createEventDispatcher<{ addbalances: Balance[] }>();
+  const dispatch = createEventDispatcher<{ addbalances: HubSchemas.Balance[] }>();
   const pending = writable(false);
 
   $: filteredBalances = currencyData.list.filter(

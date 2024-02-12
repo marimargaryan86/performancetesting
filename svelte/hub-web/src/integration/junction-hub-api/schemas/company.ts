@@ -1,16 +1,12 @@
 import type { Account, AccountSchema } from "./account";
-import {
-  enhancedAddressDetailsParser,
-  type EnhancedAddressDetails,
-  type EnhancedAddressDetailsSchema,
-} from "~/integration/common/schemas/address";
+import * as CommonSchemas from "~/integration/common/schemas";
 import type { IncludedMapping } from "./included";
 import { moneyParser, type Money, type MoneySchema } from "./money";
 
 export type Company = {
   id: string;
   name: string;
-  address: EnhancedAddressDetails;
+  address: CommonSchemas.EnhancedAddressDetails;
   markups: {
     fx: number;
     processing: number;
@@ -30,7 +26,7 @@ export type CompanySchema = {
   type: "companies";
   attributes: {
     name: string;
-    address: EnhancedAddressDetailsSchema;
+    address: CommonSchemas.EnhancedAddressDetailsSchema;
     fxMarkup: number;
     processingMarkup: number;
     salesMarkup: number;
@@ -50,7 +46,7 @@ export const companyParser = {
     return {
       id: data.id,
       name: data.attributes.name,
-      address: enhancedAddressDetailsParser.toModel(data.attributes.address),
+      address: CommonSchemas.enhancedAddressDetailsParser.toModel(data.attributes.address),
       markups: {
         fx: data.attributes.fxMarkup,
         processing: data.attributes.processingMarkup,

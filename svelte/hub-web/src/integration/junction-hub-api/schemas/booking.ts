@@ -1,26 +1,7 @@
-import type { CabinClass, CabinClassSchema } from "~/integration/common/schemas/cabin-class";
 import type { BookingCancellation, BookingCancellationSchema } from "./cancellation";
 import type { IncludedMapping } from "./included";
-import type { LegType, LegTypeSchema } from "~/integration/common/schemas/leg-type";
 import type { Order, OrderSchema } from "./order";
-import {
-  offerSegmentLegParser,
-  type OfferSegmentLeg,
-  type OfferSegmentLegSchema,
-} from "~/integration/common/schemas/offer-segment-leg";
-import {
-  routeIdentifiersParser,
-  type RouteIdentifiers,
-  type RouteIdentifiersSchema,
-} from "~/integration/common/schemas/route-identifier";
-import {
-  priceParser,
-  type PriceSchema,
-  type Price,
-  type PriceBreakdown,
-  type PriceBreakdownSchema,
-  priceBreakdownParser,
-} from "~/integration/common/schemas/price";
+import * as CommonSchemas from "~/integration/common/schemas";
 import type { Transaction, TransactionSchema } from "./transaction";
 import type { Refund, RefundSchema } from "./refund";
 
@@ -43,14 +24,14 @@ export type TripBookingDetails = {
   cabinClassName: string;
   vendor: string;
   operator?: string;
-  routeIdentifiers: RouteIdentifiers;
-  legs: OfferSegmentLeg[];
+  routeIdentifiers: CommonSchemas.RouteIdentifiers;
+  legs: CommonSchemas.OfferSegmentLeg[];
   bookingId: string;
   booking?: TripBooking;
   cabinClassId: string;
-  cabinClass?: CabinClass;
+  cabinClass?: CommonSchemas.CabinClass;
   legTypeId: string;
-  legType?: LegType;
+  legType?: CommonSchemas.LegType;
 };
 
 export type TripBookingDetailsSchema = {
@@ -60,13 +41,13 @@ export type TripBookingDetailsSchema = {
     cabinClassName: string;
     vendor: string;
     operator: string | null;
-    routeIdentifiers: RouteIdentifiersSchema;
-    legs: OfferSegmentLegSchema[];
+    routeIdentifiers: CommonSchemas.RouteIdentifiersSchema;
+    legs: CommonSchemas.OfferSegmentLegSchema[];
   };
   relationships: {
     booking: { data: Pick<TripBookingSchema, "id" | "type"> };
-    cabinClass: { data: Pick<CabinClassSchema, "id" | "type"> };
-    legType: { data: Pick<LegTypeSchema, "id" | "type"> };
+    cabinClass: { data: Pick<CommonSchemas.CabinClassSchema, "id" | "type"> };
+    legType: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type"> };
   };
   links: { self: string };
 };
@@ -82,8 +63,10 @@ export const tripBookingDetailsParser = {
       cabinClassName: data.attributes.cabinClassName,
       vendor: data.attributes.vendor,
       operator: data.attributes.operator ?? undefined,
-      routeIdentifiers: routeIdentifiersParser.toModel(data.attributes.routeIdentifiers),
-      legs: data.attributes.legs.map(offerSegmentLegParser.toModel),
+      routeIdentifiers: CommonSchemas.routeIdentifiersParser.toModel(
+        data.attributes.routeIdentifiers,
+      ),
+      legs: data.attributes.legs.map(CommonSchemas.offerSegmentLegParser.toModel),
       bookingId,
       booking: included?.tripBookings?.find(({ id }) => id === bookingId),
       cabinClassId,
@@ -112,8 +95,8 @@ export type BookingStatusSchema = {
 export type TripBooking = {
   id: string;
   price: {
-    total: Price;
-    breakdown: PriceBreakdown[];
+    total: CommonSchemas.Price;
+    breakdown: CommonSchemas.PriceBreakdown[];
   };
   operatorBookingReferences: string[];
   externalReference: string;
@@ -136,8 +119,8 @@ export type TripBookingSchema = {
   id: string;
   type: "trip-bookings";
   attributes: {
-    totalPrice: PriceSchema;
-    priceBreakdown?: PriceBreakdownSchema[];
+    totalPrice: CommonSchemas.PriceSchema;
+    priceBreakdown?: CommonSchemas.PriceBreakdownSchema[];
     operatorBookingReferences: string[];
     externalReference: string;
     rules?: OfferSegmentDetailRuleSchema[];
@@ -165,11 +148,11 @@ export const tripBookingParser = {
     return {
       id: data.id,
       price: {
-        total: priceParser.toModel(data.attributes.totalPrice),
+        total: CommonSchemas.priceParser.toModel(data.attributes.totalPrice),
         breakdown:
           data.attributes.priceBreakdown
             ?.filter((pb) => pb.breakdownType !== "service-mark-up")
-            ?.map(priceBreakdownParser.toModel) ?? [],
+            ?.map(CommonSchemas.priceBreakdownParser.toModel) ?? [],
       },
       operatorBookingReferences: data.attributes.operatorBookingReferences,
       externalReference: data.attributes.externalReference,

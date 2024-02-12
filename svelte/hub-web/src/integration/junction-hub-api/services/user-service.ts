@@ -8,7 +8,7 @@ import {
   userProfileParser,
 } from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 
 export default class UserService extends JunctionHubApiService {
   async find({
@@ -16,7 +16,7 @@ export default class UserService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<User>> {
@@ -30,13 +30,13 @@ export default class UserService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: Session; id: string }): Promise<User> {
+  async get({ session, id }: { session: OrySchemas.Session; id: string }): Promise<User> {
     const resp = await this.makeRequest<{ data: UserSchema }>(`/users/${id}`, { session });
 
     return userParser.toModel(resp.json.data);
   }
 
-  async getProfile({ session }: { session: Session }): Promise<UserProfile> {
+  async getProfile({ session }: { session: OrySchemas.Session }): Promise<UserProfile> {
     const resp = await this.makeRequest<{ data: UserProfileSchema }>("/users/me", { session });
 
     return userProfileParser.toModel(resp.json.data);

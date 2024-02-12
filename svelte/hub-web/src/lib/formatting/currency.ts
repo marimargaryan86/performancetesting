@@ -1,8 +1,8 @@
 import type { Locale } from "$lib/i18n";
-import type { Price } from "~/integration/common/schemas/price";
+import type * as CommonSchemas from "~/integration/common/schemas";
 
 export function formatAmount(
-  money: Price,
+  money: CommonSchemas.Price,
   locale: Locale,
   {
     sign = false,

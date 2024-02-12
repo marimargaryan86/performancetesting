@@ -1,42 +1,26 @@
 import { z } from "zod";
-import { PASSENGER_DEFINITIONS } from "./trip-search/passenger-picker/passenger-picker.svelte";
-import { resourceStatus } from "~/integration/common/schemas/resource";
-import { priceModel, type Price } from "~/integration/common/schemas/price";
-import { paymentModel } from "~/integration/junction-mobile-api/schemas/payment";
-import type { ContactDetails } from "~/integration/junction-mobile-api/schemas/journey";
+import { PASSENGER_DEFINITIONS } from "$lib/models/passenger";
+import * as CommonSchemas from "~/integration/common/schemas";
 import * as devalue from "devalue";
 import { Base64 } from "js-base64";
-import type {
-  SimpleOfferSearch,
-  SimpleOfferSearchCreate,
-} from "~/integration/junction-mobile-api/schemas/simple-offer-search";
 import integrationInstancesClient from "~/integration-instances-client";
 import { getRandomAlphaNumericString } from "$lib/utils/random";
 import type { RequestEvent } from "@sveltejs/kit";
-import type { Offer, OfferOption } from "~/integration/junction-mobile-api/schemas/offer";
 import { sleep } from "$lib/utils/common";
-import type { TripOfferPriceQuoteCompleted } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
-import type {
-  Order as OrderModel,
-  OrderPassenger,
-} from "~/integration/junction-mobile-api/schemas/order";
-import type {
-  MarkupsCreate,
-  Markups as MarkupsModel,
-} from "~/integration/junction-mobile-api/schemas/markups";
-import { searchDataModel, type SearchData } from "./trip-search/trip-search.svelte";
+import * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
+import { searchDataModel, type SearchData } from "$lib/models/trip-offer-search";
 import { dev } from "$app/environment";
 
-export const markupsModel: z.ZodType<Omit<MarkupsCreate, "orderId">> = z.object({
-  serviceFee: priceModel.refine((value) => value.amount >= 0, {
+export const markupsModel: z.ZodType<Omit<MobileSchemas.MarkupsCreate, "orderId">> = z.object({
+  serviceFee: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
     message: "Amount must be greater than or equal to 0",
     path: ["amount"],
   }),
-  agencyMarkup: priceModel.refine((value) => value.amount >= 0, {
+  agencyMarkup: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
     message: "Amount must be greater than or equal to 0",
     path: ["amount"],
   }),
-  totalToCollect: priceModel.refine((value) => value.amount >= 0, {
+  totalToCollect: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
     message: "Amount must be greater than or equal 0",
     path: ["amount"],
   }),
@@ -46,21 +30,21 @@ export type PartialMarkups = Partial<Markups>;
 
 const offerSearchModel = z.object({
   id: z.string().uuid(),
-  status: resourceStatus,
+  status: CommonSchemas.resourceStatus,
   expiresAt: z.date(),
 });
 
 const selectedOfferModel = z.object({
   offerId: z.string().uuid(),
   optionIds: z.array(z.string()),
-  originalPrice: priceModel,
+  originalPrice: CommonSchemas.priceModel,
 });
 type SelectedOffer = z.infer<typeof selectedOfferModel>;
 export type PartialSelectedOffer = Partial<SelectedOffer>;
 
 const priceQuoteModel = z.object({
   id: z.string().uuid(),
-  status: resourceStatus,
+  status: CommonSchemas.resourceStatus,
   expiresAt: z.date(),
 });
 
@@ -69,7 +53,7 @@ const orderModel = z.object({
 });
 type Order = z.infer<typeof orderModel>;
 
-const paymentIntentModel = paymentModel.extend({
+const paymentIntentModel = MobileSchemas.paymentModel.extend({
   confirmed: z.boolean(),
 });
 export type PaymentIntent = z.infer<typeof paymentIntentModel>;
@@ -176,7 +160,7 @@ function getBirthDate(age: number): Date {
 
 function parsePassengers(
   passengers: SearchData["passengers"],
-): SimpleOfferSearchCreate["passengers"] {
+): MobileSchemas.SimpleOfferSearchCreate["passengers"] {
   const parsedDates = Object.fromEntries(
     Object.entries(PASSENGER_DEFINITIONS).map(([key, val]) => [key, getBirthDate(val.span.from)]),
   );
@@ -186,7 +170,7 @@ function parsePassengers(
   );
 }
 
-async function search(data: SearchData): Promise<SimpleOfferSearch> {
+async function search(data: SearchData): Promise<MobileSchemas.SimpleOfferSearch> {
   const sessionToken = getRandomAlphaNumericString(32);
   const offerSearch = await integrationInstancesClient.mobile.simpleOfferService.create({
     data: {
@@ -212,7 +196,7 @@ async function* getOffersAux(
   offerSearchId: string,
   signal: AbortSignal,
   offerIds: string[],
-): AsyncGenerator<Offer> {
+): AsyncGenerator<MobileSchemas.Offer> {
   const offerSearch = await integrationInstancesClient.mobile.simpleOfferService.get({
     id: offerSearchId,
   });
@@ -235,19 +219,22 @@ async function* getOffersAux(
   }
 }
 
-function getOffers(offerSearchId: string, signal: AbortSignal): AsyncGenerator<Offer> {
+function getOffers(
+  offerSearchId: string,
+  signal: AbortSignal,
+): AsyncGenerator<MobileSchemas.Offer> {
   return getOffersAux(offerSearchId, signal, []);
 }
 
 async function selectOffer(
   session: BookingSessionSearch,
-  offer: Offer,
-  options: OfferOption[],
+  offer: MobileSchemas.Offer,
+  options: MobileSchemas.OfferOption[],
 ): Promise<void> {
   const selectedOffer: SelectedOffer = {
     offerId: offer.id,
     optionIds: options.map(({ id }) => id),
-    originalPrice: options.reduce<Price>(
+    originalPrice: options.reduce<CommonSchemas.Price>(
       (prev, curr) => ({
         currency: curr.price.total.currency,
         amount: prev.amount + curr.price.total.amount,
@@ -281,7 +268,7 @@ async function getPriceQuote(
   session: BookingSessionSelect,
   priceQuoteId: string,
   signal: AbortSignal,
-): Promise<TripOfferPriceQuoteCompleted> {
+): Promise<MobileSchemas.TripOfferPriceQuoteCompleted> {
   const priceQuote = await integrationInstancesClient.mobile.offers.get({ id: priceQuoteId });
 
   setCookie("select", { ...session, priceQuote });
@@ -295,7 +282,7 @@ async function getPriceQuote(
   }
 
   if (priceQuote.status === "completed" && priceQuote.price.total) {
-    return priceQuote as TripOfferPriceQuoteCompleted;
+    return priceQuote as MobileSchemas.TripOfferPriceQuoteCompleted;
   }
 
   throw new Error("Price quote failed");
@@ -303,7 +290,7 @@ async function getPriceQuote(
 
 async function getPayment(
   session: BookingSessionSelect,
-  priceQuote: TripOfferPriceQuoteCompleted,
+  priceQuote: MobileSchemas.TripOfferPriceQuoteCompleted,
 ): Promise<PaymentIntent> {
   const paymentIntent = await integrationInstancesClient.mobile.payments.create({
     data: priceQuote.price.total,
@@ -319,12 +306,12 @@ async function getPayment(
 async function createOrder(
   session: BookingSessionSelect,
   data: {
-    contact: ContactDetails;
-    passengers: OrderPassenger[];
+    contact: MobileSchemas.ContactDetails;
+    passengers: MobileSchemas.OrderPassenger[];
     payment: PaymentIntent;
-    priceQuote: TripOfferPriceQuoteCompleted;
+    priceQuote: MobileSchemas.TripOfferPriceQuoteCompleted;
   },
-): Promise<OrderModel> {
+): Promise<MobileSchemas.Order> {
   const order = await integrationInstancesClient.mobile.orders.create({
     data: {
       contact: data.contact,
@@ -343,7 +330,7 @@ async function createMarkups(
   session: BookingSessionSelect,
   order: Order,
   data: Markups,
-): Promise<MarkupsModel> {
+): Promise<MobileSchemas.Markups> {
   const markups = await integrationInstancesClient.mobile.orders.createMarkups({
     data: { ...data, orderId: order.id },
   });

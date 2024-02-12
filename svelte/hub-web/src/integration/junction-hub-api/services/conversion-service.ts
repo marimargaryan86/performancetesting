@@ -1,6 +1,6 @@
 import JunctionHubApiService from "./junction-hub-api-service";
 import type { PaginatedData } from "$lib/models/common";
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import type { Conversion, ConversionSchema } from "../schemas/conversion";
 import { parseIncluded, type IncludedSchemas } from "../schemas/included";
 import { JunctionError } from "~/integration/common/junction-error";
@@ -11,7 +11,7 @@ export default class ConversionService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<Conversion>> {
@@ -36,7 +36,7 @@ export default class ConversionService extends JunctionHubApiService {
     };
   }
 
-  async get({ session, id }: { session: Session; id: string }): Promise<Conversion> {
+  async get({ session, id }: { session: OrySchemas.Session; id: string }): Promise<Conversion> {
     const resp = await this.makeRequest<{ data: ConversionSchema; included?: IncludedSchemas }>(
       `/conversions/${id}`,
       { session, queryParams: { include: "transactions" } },

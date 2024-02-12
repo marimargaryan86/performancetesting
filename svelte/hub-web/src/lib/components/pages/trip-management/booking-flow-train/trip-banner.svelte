@@ -1,14 +1,11 @@
 <script lang="ts">
-  import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas/trip-offer-price-quote";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { getLegsFromPriceQuote } from "$lib/utils/offer";
-  import {
-    getPassengersPresentation,
-    type PassengerPickerData,
-  } from "./trip-search/passenger-picker/passenger-picker.svelte";
+  import { getPassengersPresentation, type PassengerPickerData } from "$lib/models/passenger";
   import { getLocale, getTranslator } from "$lib/i18n";
 
-  export let priceQuote: TripOfferPriceQuote;
+  export let priceQuote: MobileSchemas.TripOfferPriceQuote;
   export let passengers: PassengerPickerData;
 
   const locale = getLocale();

@@ -1,9 +1,9 @@
 <script lang="ts">
   import Collapsible from "$lib/components/ui/collapsible.svelte";
-  import { getPassengersPresentation } from "./passenger-picker/passenger-picker.svelte";
+  import { getPassengersPresentation } from "$lib/models/passenger";
   import { getLocale, getTranslator } from "$lib/i18n";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
-  import type { SearchData } from "./trip-search.svelte";
+  import type { SearchData } from "$lib/models/trip-offer-search";
 
   export let searchData: SearchData;
 

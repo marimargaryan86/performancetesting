@@ -1,9 +1,4 @@
 import {
-  legTypeParser,
-  type LegType,
-  type LegTypeSchema,
-} from "~/integration/common/schemas/leg-type";
-import {
   offerParser,
   type Offer,
   type OfferSchema,
@@ -20,11 +15,7 @@ import {
   type TripOfferOptionDetails,
   tripOfferOptionDetailsParser,
 } from "./offer";
-import {
-  cabinClassParser,
-  type CabinClass,
-  type CabinClassSchema,
-} from "~/integration/common/schemas/cabin-class";
+import * as CommonSchemas from "~/integration/common/schemas";
 import {
   paymentParser,
   type Payment,
@@ -62,9 +53,9 @@ type IncludedBind = {
   groups: { schema: OfferGroupSchema; model: OfferGroup };
   offerOptions: { schema: OfferOptionSchema; model: OfferOption };
   tripOfferGroupDetails: { schema: TripOfferGroupDetailsSchema; model: TripOfferGroupDetails };
-  legTypes: { schema: LegTypeSchema; model: LegType };
+  legTypes: { schema: CommonSchemas.LegTypeSchema; model: CommonSchemas.LegType };
   tripOfferOptionDetails: { schema: TripOfferOptionDetailsSchema; model: TripOfferOptionDetails };
-  cabinClasses: { schema: CabinClassSchema; model: CabinClass };
+  cabinClasses: { schema: CommonSchemas.CabinClassSchema; model: CommonSchemas.CabinClass };
   payments: { schema: PaymentSchema; model: Payment };
   vouchers: { schema: VoucherSchema; model: Voucher };
   orders: { schema: OrderSchema; model: Order };
@@ -98,12 +89,12 @@ const parserMapping: {
   groups: { type: "offer-groups", parser: offerGroupParser },
   offerOptions: { type: "offer-options", parser: offerOptionParser },
   tripOfferGroupDetails: { type: "trip-offer-group-details", parser: tripOfferGroupDetailsParser },
-  legTypes: { type: "leg-types", parser: legTypeParser },
+  legTypes: { type: "leg-types", parser: CommonSchemas.legTypeParser },
   tripOfferOptionDetails: {
     type: "trip-offer-option-details",
     parser: tripOfferOptionDetailsParser,
   },
-  cabinClasses: { type: "cabin-classes", parser: cabinClassParser },
+  cabinClasses: { type: "cabin-classes", parser: CommonSchemas.cabinClassParser },
   payments: { type: "payments", parser: paymentParser },
   vouchers: { type: "vouchers", parser: voucherParser },
   orders: { type: "orders", parser: orderParser },

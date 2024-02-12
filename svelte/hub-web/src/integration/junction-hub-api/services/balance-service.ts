@@ -1,4 +1,4 @@
-import type { Session } from "~/integration/ory/schemas/authentication";
+import type * as OrySchemas from "~/integration/ory/schemas";
 import JunctionHubApiService from "./junction-hub-api-service";
 import {
   balanceParser,
@@ -14,7 +14,7 @@ export default class BalanceService extends JunctionHubApiService {
     cursor,
     limit = 100,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     accountId: string;
     cursor?: string;
     limit?: number;
@@ -32,7 +32,7 @@ export default class BalanceService extends JunctionHubApiService {
     accountId,
     data,
   }: {
-    session: Session;
+    session: OrySchemas.Session;
     accountId: string;
     data: BalanceAdd;
   }): Promise<Balance> {
