@@ -18,6 +18,7 @@
 
   export let expiresAt: Date;
   export let show = false;
+  export let type: "offer-search" | "price-quote";
 
   const t = getTranslator();
 
@@ -63,7 +64,11 @@
   <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
   <strong typography="body-medium" weight="bold">{$t("sentences.timeRemaining")}</strong>
   <span typography="body-medium">
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html $t("sentences.timeRemainingInfo", { timeLeft })}
+    <!-- eslint-disable svelte/no-at-html-tags -->
+    {#if type === "offer-search"}
+      {@html $t("sentences.offerSearchTimeRemainingInfo", { timeLeft })}
+    {:else}
+      {@html $t("sentences.priceQuoteTimeRemainingInfo", { timeLeft })}
+    {/if}
   </span>
 </Alert>

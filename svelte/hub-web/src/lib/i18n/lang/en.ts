@@ -174,8 +174,10 @@ export default {
     noTripsMatchesTheFilterCriteria: "No trips matches the filter criteria",
     noTripsFound: "No trips found",
     timeRemaining: "Time remaining",
-    timeRemainingInfo:
+    priceQuoteTimeRemainingInfo:
       '{{timeLeft}} mins to <strong weight="bold">complete</strong> your booking' satisfies `${string}{{timeLeft}}${string}`,
+    offerSearchTimeRemainingInfo:
+      '{{timeLeft}} mins to <strong weight="bold">select</strong> your offer' satisfies `${string}{{timeLeft}}${string}`,
     startingAt: "From",
     loadingTripDetails: "Loading trip details...",
     thisPriceIsForAllPassengers: "This price is for all passengers",

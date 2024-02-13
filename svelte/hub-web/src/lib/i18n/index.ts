@@ -8,7 +8,8 @@ export type Locale = (typeof languages)[number]["locale"];
 export type LocaleData = typeof en & {
   sentences: {
     priceChangeInfo: `${string}{{originalPrice}}${string}{{newPrice}}${string}`;
-    timeRemainingInfo: `${string}{{timeLeft}}${string}`;
+    priceQuoteTimeRemainingInfo: `${string}{{timeLeft}}${string}`;
+    offerSearchTimeRemainingInfo: `${string}{{timeLeft}}${string}`;
   };
 };
 export type TimeFormat = "12hour" | "24hour";

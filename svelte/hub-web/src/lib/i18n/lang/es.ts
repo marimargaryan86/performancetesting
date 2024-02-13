@@ -168,8 +168,10 @@ export default {
     noTripsMatchesTheFilterCriteria: "Ningún viaje coincide con los criterios del filtro",
     noTripsFound: "No se encontraron viajes",
     timeRemaining: "Tiempo restante",
-    timeRemainingInfo:
+    priceQuoteTimeRemainingInfo:
       '{{timeLeft}} minutos para <strong weight="bold">completar</strong> su reservación',
+    offerSearchTimeRemainingInfo:
+      '{{timeLeft}} minutos para <strong weight="bold">seleccionar</strong> su oferta',
     startingAt: "De",
     loadingTripDetails: "Cargando detalles del viaje...",
     thisPriceIsForAllPassengers: "Precio para todos pasajeros.",

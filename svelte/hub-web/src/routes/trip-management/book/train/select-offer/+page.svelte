@@ -178,7 +178,7 @@
 </div>
 
 <div class="content">
-  <Countdown expiresAt={data.bookingSession.offerSearch.expiresAt} show />
+  <Countdown expiresAt={data.bookingSession.offerSearch.expiresAt} type="offer-search" show />
 
   <div class="scroll">
     <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />

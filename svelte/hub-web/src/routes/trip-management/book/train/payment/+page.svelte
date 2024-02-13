@@ -211,7 +211,7 @@
     <TripBanner {priceQuote} passengers={data.bookingSession.searchData.passengers} />
   {/if}
 
-  <Countdown expiresAt={data.bookingSession.priceQuote.expiresAt} show />
+  <Countdown expiresAt={data.bookingSession.priceQuote.expiresAt} type="price-quote" show />
 
   <div class="wrapper">
     <div class="column passengers">

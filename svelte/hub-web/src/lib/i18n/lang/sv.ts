@@ -168,8 +168,10 @@ export default {
     noTripsMatchesTheFilterCriteria: "Inga resor matchar filterkriterierna",
     noTripsFound: "Inga resor hittades",
     timeRemaining: "Återstående tid",
-    timeRemainingInfo:
+    priceQuoteTimeRemainingInfo:
       '{{timeLeft}} min kvar att <strong weight="bold">slutföra</strong> din bokning',
+    offerSearchTimeRemainingInfo:
+      '{{timeLeft}} min kvar att <strong weight="bold">välja</strong> ditt erbjudande',
     startingAt: "Från",
     loadingTripDetails: "Laddar resedetailjer...",
     thisPriceIsForAllPassengers: "Detta pris gäller för alla passagerare",
