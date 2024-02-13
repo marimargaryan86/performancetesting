@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { dev } from "$app/environment";
   import Checkbox from "$lib/components/ui/checkbox.svelte";
   import RangeField from "$lib/components/ui/range-field.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
@@ -52,26 +53,29 @@
 
   <hr />
 
-  <div class="departure-time">
-    <h3 typography="label-large">{$t("words.departureTime")}</h3>
-    <div>
-      <h4 typography="label-medium" weight="bold">{$t("words.departure")}</h4>
-      <span typography="body-small">
-        {formatTime(data.departureSpanM.start)} - {formatTime(data.departureSpanM.end)}
-      </span>
-      <RangeField bind:value={data.departureSpanM} min={0} max={1440} />
+  <!-- TODO: Enable everywhere when time window searches is supposed to be released -->
+  {#if !dev}
+    <div class="departure-time">
+      <h3 typography="label-large">{$t("words.departureTime")}</h3>
+      <div>
+        <h4 typography="label-medium" weight="bold">{$t("words.departure")}</h4>
+        <span typography="body-small">
+          {formatTime(data.departureSpanM.start)} - {formatTime(data.departureSpanM.end)}
+        </span>
+        <RangeField bind:value={data.departureSpanM} min={0} max={1440} />
+      </div>
+
+      <div>
+        <h4 typography="label-medium" weight="bold">{$t("words.arrival")}</h4>
+        <span typography="body-small">
+          {formatTime(data.arrivalSpanM.start)} - {formatTime(data.arrivalSpanM.end)}
+        </span>
+        <RangeField bind:value={data.arrivalSpanM} min={0} max={1440} />
+      </div>
     </div>
 
-    <div>
-      <h4 typography="label-medium" weight="bold">{$t("words.arrival")}</h4>
-      <span typography="body-small">
-        {formatTime(data.arrivalSpanM.start)} - {formatTime(data.arrivalSpanM.end)}
-      </span>
-      <RangeField bind:value={data.arrivalSpanM} min={0} max={1440} />
-    </div>
-  </div>
-
-  <hr />
+    <hr />
+  {/if}
 
   <div class="duration">
     <h3 typography="label-large">{$t("words.journeyDuration")}</h3>
