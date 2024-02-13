@@ -1,5 +1,8 @@
 <script lang="ts">
+  import DetailedSection from "./components/detailed-section.svelte";
   import ExploreSection from "./components/explore-section.svelte";
+  import PackagesSection from "./components/packages-section.svelte";
+  import TravelWeatherSection from "./components/travel-weather-section.svelte";
   import WhyBook from "./components/why-book.svelte";
   import SearchBox from "./search-box.svelte";
   let searchType: string = "flights";
@@ -46,7 +49,10 @@
 </div>
 <div class="page">
   <ExploreSection />
+  <PackagesSection />
+  <DetailedSection />
   <WhyBook />
+  <TravelWeatherSection />
 </div>
 
 <style>
@@ -60,6 +66,7 @@
     background-position: 0rem -20rem;
     background-size: cover;
     background-repeat: no-repeat;
+    padding-top: 100px;
   }
   .title {
     font-family: "Plus Jakarta Sans", sans-serif;

@@ -1,7 +1,9 @@
 <script>
-  import { page } from "$app/stores";
-  import logo from "$lib/images/svelte-logo.svg";
+  import logo from "/icons/bigxtra-logo.svg";
   import github from "$lib/images/github.svg";
+  import FaHeart from "svelte-icons/fa/FaHeart.svelte";
+  import FaUser from "svelte-icons/fa/FaUser.svelte";
+  import FaPhoneAlt from "svelte-icons/fa/FaPhoneAlt.svelte";
 </script>
 
 <header>
@@ -12,36 +14,54 @@
   </div>
 
   <nav>
-    <svg viewBox="0 0 2 3" aria-hidden="true">
-      <path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
-    </svg>
-    <ul>
+    <!-- Doesn't go anywhere -->
+    <!-- <ul>
       <li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
-        <a href="/">Home</a>
+        <a href="/">Destinations</a>
       </li>
       <li aria-current={$page.url.pathname === "/about" ? "page" : undefined}>
-        <a href="/about">About</a>
+        <a href="/about">Holiday types</a>
       </li>
-      <li aria-current={$page.url.pathname.startsWith("/sverdle") ? "page" : undefined}>
-        <a href="/sverdle">Sverdle</a>
+      <li aria-current={$page.url.pathname === "/about" ? "page" : undefined}>
+        <a href="/about">Offers</a>
       </li>
-    </ul>
-    <svg viewBox="0 0 2 3" aria-hidden="true">
-      <path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
-    </svg>
+      <li aria-current={$page.url.pathname === "/about" ? "page" : undefined}>
+        <a href="/about">Hotels</a>
+      </li>
+      <li aria-current={$page.url.pathname === "/about" ? "page" : undefined}>
+        <a href="/about">Car Rental</a>
+      </li>
+    </ul> -->
   </nav>
 
-  <div class="corner">
+  <div class="side-buttons">
     <a href="https://github.com/sveltejs/kit">
       <img src={github} alt="GitHub" />
     </a>
+    <div class="icon">
+      <FaHeart />
+    </div>
+    <div class="icon">
+      <FaUser />
+    </div>
+    <div class="phone-box">
+      <div class="icon">
+        <FaPhoneAlt />
+      </div>
+      <p>123-456-7890</p>
+    </div>
   </div>
 </header>
 
 <style>
   header {
+    position: fixed;
     display: flex;
     justify-content: space-between;
+    width: 80%;
+    margin: 0 auto;
+    padding: 30px 0;
+    left: 10%;
   }
 
   .corner {
@@ -58,8 +78,8 @@
   }
 
   .corner img {
-    width: 2em;
-    height: 2em;
+    width: 6em;
+    height: 3em;
     object-fit: contain;
   }
 
@@ -69,17 +89,7 @@
     --background: rgba(255, 255, 255, 0.7);
   }
 
-  svg {
-    width: 2em;
-    height: 3em;
-    display: block;
-  }
-
-  path {
-    fill: var(--background);
-  }
-
-  ul {
+  /* ul {
     position: relative;
     padding: 0;
     margin: 0;
@@ -88,11 +98,11 @@
     justify-content: center;
     align-items: center;
     list-style: none;
-    background: var(--background);
     background-size: contain;
-  }
+    gap: 16px;
+  } */
 
-  li {
+  /* li {
     position: relative;
     height: 100%;
   }
@@ -107,23 +117,50 @@
     left: calc(50% - var(--size));
     border: var(--size) solid transparent;
     border-top: var(--size) solid var(--color-theme-1);
-  }
+  } */
 
-  nav a {
+  /* nav a {
     display: flex;
     height: 100%;
     align-items: center;
     padding: 0 0.5rem;
-    color: var(--color-text);
+    color: white;
     font-weight: 700;
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     text-decoration: none;
     transition: color 0.2s linear;
-  }
+  } */
 
   a:hover {
     color: var(--color-theme-1);
+  }
+
+  .side-buttons {
+    display: flex;
+    height: auto;
+    width: auto;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .phone-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid white;
+    color: white;
+    padding: 16px 18px;
+  }
+
+  .phone-box p {
+    margin: 0;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    color: white;
   }
 </style>

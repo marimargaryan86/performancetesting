@@ -41,6 +41,7 @@
     border: 1px solid var(--Stroke-colour, #e4e4e4);
     background: #00a8cd;
     padding: 20px 32px;
+    height: 344px;
   }
   .tv-logo {
     width: 100px;
@@ -58,6 +59,15 @@
     width: -webkit-fill-available;
     padding: 18px 16px;
   }
+
+  .help-label {
+    color: #fff;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+    padding: 6px 0;
+  }
   .tv-input::placeholder {
     color: #fff;
   }
@@ -68,9 +78,11 @@
     font-weight: 700;
     line-height: normal;
     padding-top: 16px;
+    margin: 0;
   }
   .tv-label {
     color: white;
+    margin: 16px 0 20px 0;
   }
   .find-order {
     border-radius: 4px;

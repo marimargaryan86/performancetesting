@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <div class="why-book-banner">
   <p class="features">Key Features</p>
   <p class="heading">Why you should book with us?</p>
@@ -19,6 +16,44 @@
         fill="white"
       />
     </svg>
+  </div>
+  <div class="why-book">
+    <div class="book-item">
+      <div class="book-item-icon">
+        <img src="/icons/tour-icon.svg" alt="tour-icon" />
+      </div>
+      <div class="book-item-content">
+        <div class="book-item--title">Personalised Tours</div>
+        <div class="book-item--desc">We cater to your interests, preferences, and schedule</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-item-icon">
+        <img src="/icons/holiday-icon.svg" alt="holiday-icon" />
+      </div>
+      <div class="book-item-content">
+        <div class="book-item--title">Holiday Packages</div>
+        <div class="book-item--desc">Stress-free planning with unbeatable value.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-item-icon">
+        <img src="/icons/flight-icon.svg" alt="flight-icon" />
+      </div>
+      <div class="book-item-content">
+        <div class="book-item--title">Cheap Flights</div>
+        <div class="book-item--desc">Unlock incredible savings when you book with us.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-item-icon">
+        <img src="/icons/professional-icon.svg" alt="professional-icon" />
+      </div>
+      <div class="book-item-content">
+        <div class="book-item--title">Travel professionals</div>
+        <div class="book-item--desc">Over 20 years of experience in the travel industry.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -50,5 +85,50 @@
 
   .icon {
     text-align: center;
+  }
+
+  .why-book {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    gap: 16px;
+    width: calc(100% - 230px);
+    margin: 48px auto 0;
+  }
+
+  .book-item {
+    display: flex;
+    border-radius: 8px;
+    background: #fff;
+    padding: 32px 24px;
+  }
+
+  .book-item-content {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+  }
+
+  .book-item--title {
+    color: var(--Text-Dark-Text);
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    text-transform: capitalize;
+    padding-bottom: 8px;
+  }
+
+  .book-item--desc {
+    color: #a6a6a6;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 24px;
+  }
+
+  .book-item-icon {
+    width: 50px;
+    color: #ea7121;
   }
 </style>
