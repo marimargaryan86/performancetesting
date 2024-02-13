@@ -29,7 +29,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.benerail import client
 from snowfall.vendor.benerail.models import types
 from snowfall.vendor.benerail.models.dialogue import dialogue, passenger
-from snowfall.vendor.benerail.models.trip_offers import link, offer
+from snowfall.vendor.benerail.models.trip_offers import link, offer, summary
 from snowfall.vendor.benerail.models.trip_offers import response as t_o_response
 from snowfall.vendor.benerail.models.trips import trips
 
@@ -362,12 +362,13 @@ class BenerailAdapter(object):
             return
 
         for trip_offer in collection.response_result.trip_offers:
-            summary = trip_offer.summary
-
-            if summary is None:
+            if trip_offer.summary is None:
                 continue
 
-            if summary.bookable_status.status_value not in _NON_BOOKABLE_STATES:
+            if (  # noqa: WPS337
+                trip_offer.summary.bookable_status.status_value
+                not in _NON_BOOKABLE_STATES
+            ):
                 yield trip_offer
 
     async def _get_trip_offers(
@@ -459,48 +460,26 @@ class BenerailOffersAdapter(BenerailAdapter):
         trip_offer_responses = trip_offer_responses_with_passengers.trip_offer_responses
         passengers_info = trip_offer_responses_with_passengers.passengers_info
 
-        if not trip_offer_responses or not passengers_info:
+        if not all((trip_offer_responses, passengers_info)):
             return
 
-        trip_id_offer_ids = tuple(
-            (
-                trip_offer_res.response_result.trip.identifier,
-                tuple(
-                    offer_link.identifier
-                    for offer_link in trip_offer_res.response_result.offers
-                ),
-            )
-            for trip_offer_res in trip_offer_responses
-        )
-
-        offers, excluded_ids = await self._get_offers(
-            offer_ids=(
-                offer_id for _, offer_ids in trip_id_offer_ids for offer_id in offer_ids
+        expires_at_dt = datetime.datetime.now(datetime.UTC) + self._ttl
+        trip_map = await self._get_trip_map(
+            trip_ids=tuple(
+                trip_offer_res.response_result.trip.identifier
+                for trip_offer_res in trip_offer_responses
             ),
             session_token=search_task.session_token,
         )
 
-        offer_map = {offer_info.identifier: offer_info for offer_info in offers}
-
-        trip_map = await self._get_trip_map(
-            trip_ids=(trip_id for trip_id, _ in trip_id_offer_ids),
-            session_token=search_task.session_token,
-        )
-
-        expires_at_dt = datetime.datetime.now(datetime.UTC) + self._ttl
-
-        for trip_id, offer_ids in trip_id_offer_ids:
-            offer_ids_filtered = [
-                offer_id for offer_id in offer_ids if offer_id not in excluded_ids
-            ]
-
+        for trip_offer_response in trip_offer_responses:
+            trip_id = trip_offer_response.response_result.trip.identifier
             try:
                 trip = trip_map[trip_id]
             except KeyError:
                 self._logger.warning(
-                    "Trip info not found, skipping offers",
-                    offer_ids=offer_ids_filtered,
-                    trip_id=trip_id,
+                    "Trip info not found, skipping trip offer",
+                    trip_offer_response=trip_offer_response,
                 )
 
                 continue
@@ -512,9 +491,9 @@ class BenerailOffersAdapter(BenerailAdapter):
 
             offer_protos = []
 
-            for offer_id in offer_ids_filtered:
+            for offer_obj in trip_offer_response.response_result.offers:
                 offer_model = await self._parse_offer(
-                    offer_obj=offer_map[offer_id],
+                    offer_summary=offer_obj.summary,
                     offer_segment_ids=segment_ids,
                 )
 
@@ -528,10 +507,10 @@ class BenerailOffersAdapter(BenerailAdapter):
                             search_task.outbound_departure_datetime
                         ),
                         comfort_class_value=helper_functions.get_comfort_class_value(
-                            offer_obj=offer_map[offer_id],
+                            offer_obj.summary,
                         ),
-                        flexibility_value=(
-                            offer_map[offer_id].flexibility.flexibility_value
+                        flexibility_value=helper_functions.get_flexibility_value(
+                            offer_obj.summary,
                         ),
                     ),
                     expires_at=expires_at_dt,
@@ -636,18 +615,13 @@ class BenerailOffersAdapter(BenerailAdapter):
 
     async def _parse_offer(
         self,
-        offer_obj: offer.Offer,
+        offer_summary: summary.OfferSummary,
         offer_segment_ids: Sequence[str],
     ) -> offer_models_pb2.Offer:
-        comfort_class_value = helper_functions.get_comfort_class_value(offer_obj)
-
-        price_proto = money.from_string(
-            string_amount=str(offer_obj.price.amount),
-            currency=money.Currency(
-                offer_obj.price.currency.upper(),
-            ),
-        ).protobuf()
-
+        flexibility_value = helper_functions.get_flexibility_value(offer_summary)
+        comfort_class_value = helper_functions.get_comfort_class_value(
+            offer_summary,
+        )
         if comfort_class_value:
             try:
                 comfort_class_name = await self._resolve_rcode_title(
@@ -657,6 +631,13 @@ class BenerailOffersAdapter(BenerailAdapter):
                 comfort_class_name = comfort_class_value
         else:
             comfort_class_name = ""
+
+        price_proto = money.from_string(
+            string_amount=str(offer_summary.price_with_optional_parts.amount),
+            currency=money.Currency(
+                offer_summary.price_with_optional_parts.currency.upper(),
+            ),
+        ).protobuf()
 
         return offer_models_pb2.Offer(
             id=string.uuid(),
@@ -683,7 +664,7 @@ class BenerailOffersAdapter(BenerailAdapter):
             ],
             brand_name=helper_functions.get_brand_name(
                 comfort_class_name=comfort_class_name,
-                flexibility_value=offer_obj.flexibility.flexibility_value,
+                flexibility_value=flexibility_value,
             ),
         )
 

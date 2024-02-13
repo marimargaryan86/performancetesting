@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from gettext import gettext as _
 
 from snowfall.vendor.benerail.models.enumeration import rcode
-from snowfall.vendor.benerail.models.trip_offers import offer
+from snowfall.vendor.benerail.models.trip_offers import offer, summary
 from snowfall.vendor.benerail.models.trips import trips
 
 _FLEXIBILITY_NAMES = types.MappingProxyType(
@@ -51,9 +51,16 @@ def offer_matches(
     return flexibility_value == offer_obj.flexibility.flexibility_value
 
 
-def get_comfort_class_value(offer_obj: offer.Offer) -> str:
-    if offer_obj.comfort_class and offer_obj.comfort_class.comfort_class_value:
-        return str(offer_obj.comfort_class.comfort_class_value)
+def get_comfort_class_value(obj: offer.Offer | summary.OfferSummary) -> str:
+    if obj.comfort_class and obj.comfort_class.comfort_class_value:
+        return str(obj.comfort_class.comfort_class_value)
+
+    return ""
+
+
+def get_flexibility_value(obj: offer.Offer | summary.OfferSummary) -> str:
+    if obj.flexibility and obj.flexibility.flexibility_value:
+        return str(obj.flexibility.flexibility_value)
 
     return ""
 
