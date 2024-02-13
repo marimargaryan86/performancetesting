@@ -24,7 +24,11 @@ class WebhookSignatureValidator(object):
     # rewritten to support starlette requests
     async def _validate_signature(self, request: requests.Request) -> bool:
         raw_payload = await request.body()
-        raw_signature = request.headers["X-Duffel-Signature"]
+        raw_signature = request.headers.get("X-Duffel-Signature")
+
+        if not raw_signature:
+            return False
+
         pairs = [x.split("=") for x in raw_signature.split(",")]  # noqa: WPS111
         t = pairs[0][1]  # noqa: WPS111
         v1 = pairs[1][1]  # noqa: WPS111
