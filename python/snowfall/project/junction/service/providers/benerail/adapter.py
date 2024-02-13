@@ -638,11 +638,16 @@ class BenerailOffersAdapter(BenerailAdapter):
         else:
             comfort_class_name = ""
 
+        try:
+            currency = money.Currency(
+                offer_summary.price_with_optional_parts.currency.upper(),
+            )
+        except ValueError:
+            currency = money.Currency("EUR")
+
         price_proto = money.from_string(
             string_amount=str(offer_summary.price_with_optional_parts.amount),
-            currency=money.Currency(
-                offer_summary.price_with_optional_parts.currency.upper(),
-            ),
+            currency=currency,
         ).protobuf()
 
         return offer_models_pb2.Offer(
