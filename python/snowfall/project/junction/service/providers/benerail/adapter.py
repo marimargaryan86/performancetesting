@@ -523,7 +523,11 @@ class BenerailOffersAdapter(BenerailAdapter):
                 id=string.uuid(),
                 expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
                 offers=offer_protos,
-                segments=await self._parse_segments(trip, segment_ids),
+                segments=await self._parse_segments(
+                    trip,
+                    segment_ids,
+                    search_task.trip_sequence,
+                ),
                 provider_id=str(PROVIDER_ID),
             )
 
@@ -544,6 +548,7 @@ class BenerailOffersAdapter(BenerailAdapter):
         self,
         trip: trips.Trip,
         segment_ids: Sequence[str],
+        trip_sequence: int,
     ) -> list[offer_models_pb2.OfferSegment]:
         segments = []
         timed_legs = [leg for leg in trip.trip_legs if isinstance(leg, trips.TimedLeg)]
@@ -558,6 +563,7 @@ class BenerailOffersAdapter(BenerailAdapter):
                     ),
                     vendor=await self._get_train_type(leg),
                     type=models_pb2.Schedule.TYPE_RAIL,
+                    trip_sequence=trip_sequence,
                 ),
             )
 

@@ -4695,6 +4695,18 @@
             "format": "date-time",
             "example": "2019-08-24T14:15:22Z",
             "nullable": true
+          },
+          "returnDepartureBefore": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z",
+            "nullable": true
+          },
+          "returnDepartureAfter": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z",
+            "nullable": true
           }
         },
         "required": [

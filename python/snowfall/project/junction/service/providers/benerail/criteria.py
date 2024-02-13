@@ -23,6 +23,7 @@ class SearchCriteria(object):
     destination: str
     passenger_dobs: Sequence[datetime.date]
     outbound_departure_datetime: datetime.datetime
+    trip_sequence: int
     session_token: str
 
 
@@ -119,5 +120,6 @@ class SearchCriteriaGenerator(object):
             outbound_departure_datetime=protobuf.protobuf_to_datetime(
                 search_task.criteria.outbound_departure_datetime,
             ),
+            trip_sequence=1,
             session_token=search_task.criteria.br_session_token,
         )

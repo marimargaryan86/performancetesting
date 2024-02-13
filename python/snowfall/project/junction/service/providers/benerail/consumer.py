@@ -5,6 +5,8 @@ import math
 import pathlib
 from collections.abc import AsyncIterator
 
+from google.protobuf import timestamp_pb2
+
 from snowfall.project.junction.go.service.offers.v1 import (
     amqp_pb2 as offers_amqp_pb2,
 )
@@ -60,6 +62,7 @@ class NotificationsConsumer(object):
         self._notifier = notifier
         self._zendesk_client = zendesk_client
         self._zendesk_booked_ticket_group_id = zendesk_booked_ticket_group_id
+
         self._logger = stdout.get_logger()
         self._use_mobile_tickets = use_mobile_tickets
 
@@ -80,6 +83,7 @@ class NotificationsConsumer(object):
             )
         except errors.HttpError:
             self._logger.exception("Failed to fetch the booking")
+
             return await self._handle_no_fulfillment(message)
 
         booking_res.set_etags(etag_data)
@@ -395,6 +399,7 @@ class SimpleSearchConsumer(object):
                 outbound_departure_datetime=protobuf.protobuf_to_datetime(
                     trip_offer_search.search.departure_at,
                 ),
+                trip_sequence=_get_trip_sequence(trip_offer_search),
                 session_token=trip_offer_search.session_token,
             )
             offer_groups = self._adapter.gather_search_results(search_criteria)
@@ -427,3 +432,16 @@ def _find_nearest_provider_place(
         stations,
         key=functools.partial(_calculate_distance, coords),
     ).identifier
+
+
+def _get_trip_sequence(
+    trip_offer_search: offers_amqp_pb2.SimpleTripOfferSearchTask,
+) -> int:
+    return_departure_at: timestamp_pb2.Timestamp | None = (
+        trip_offer_search.search.return_departure_at
+    )
+    return_departure_before: timestamp_pb2.Timestamp | None = (
+        trip_offer_search.search.return_departure_before
+    )
+
+    return 2 if return_departure_at or return_departure_before else 1
