@@ -11,6 +11,7 @@
   import { type Action, getUser, permitted } from "$lib/utils/permissions";
   import LanguageSelect from "./language-select.svelte";
   import type { ComponentProps } from "svelte";
+  import { slide } from "svelte/transition";
 
   let compact = false;
 
@@ -46,7 +47,7 @@
     activeMatcher?: (pathname: string) => boolean;
     permission?: Action;
     children: MenuItem[];
-    expanded?: boolean;
+    expanded: boolean;
   };
 
   type MenuItem = MenuItemSpacer | MenuItemLink | MenuItemParent;
@@ -97,6 +98,7 @@
             pathname.startsWith(routeConfig.routes.adminControls.routes.users.root),
         },
       ],
+      expanded: false,
     },
     {
       type: "spacer",
@@ -214,37 +216,40 @@
                   direction={item.expanded ? "up" : "down"}
                 />
               </button>
+
+              {#if item.expanded}
+                <ul class="sub-menu" transition:slide={{ duration: 200 }}>
+                  <!-- Handle child submenu items-->
+                  {#each item.children as subItem}
+                    {#if subItem.type === "link"}
+                      {#if !subItem.permission || permitted($user, subItem.permission)}
+                        {@const active = item.activeMatcher
+                          ? item.activeMatcher($page.url.pathname)
+                          : $page.url.pathname.startsWith(subItem.url)}
+                        <li>
+                          <a
+                            href={subItem.url}
+                            typography="body-medium"
+                            class:active
+                            class="item"
+                            title={subItem.label}
+                          >
+                            <Icon
+                              variant={subItem.icon}
+                              color="var({active
+                                ? '--color-main-primary-500'
+                                : '--color-common-light-strong'})"
+                              size="20px"
+                            />
+                            <span>{subItem.label}</span>
+                          </a>
+                        </li>
+                      {/if}
+                    {/if}
+                  {/each}
+                </ul>
+              {/if}
             </li>
-            {#if item.expanded}
-              <!-- Handle child submenu items-->
-              {#each item.children as subItem}
-                {#if subItem.type === "link"}
-                  {#if !subItem.permission || permitted($user, subItem.permission)}
-                    {@const active = item.activeMatcher
-                      ? item.activeMatcher($page.url.pathname)
-                      : $page.url.pathname.startsWith(subItem.url)}
-                    <li class="submenu-item">
-                      <a
-                        href={subItem.url}
-                        typography="body-medium"
-                        class:active
-                        class="item"
-                        title={subItem.label}
-                      >
-                        <Icon
-                          variant={subItem.icon}
-                          color="var({active
-                            ? '--color-main-primary-500'
-                            : '--color-common-light-strong'})"
-                          size="20px"
-                        />
-                        <span>{subItem.label}</span>
-                      </a>
-                    </li>
-                  {/if}
-                {/if}
-              {/each}
-            {/if}
           {/if}
         {/if}
       {/if}
@@ -333,8 +338,13 @@
     cursor: pointer;
   }
 
-  .submenu-item {
+  .sub-menu {
     padding-left: 35px;
+    transition: padding-left 200ms ease;
+  }
+
+  .compact .sub-menu {
+    padding-left: 0;
   }
 
   .item > :global(.icon) {
