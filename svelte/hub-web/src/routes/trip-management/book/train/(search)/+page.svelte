@@ -6,12 +6,14 @@
   import { manager } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
   import { goto } from "$app/navigation";
   import routeConfig from "$lib/route-config";
+  import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
 
+  const featureTools = getFeatureTools();
   const t = getTranslator();
 
   async function search(event: ComponentEvents<TripSearch>["search"]): Promise<void> {
     event.detail.pending?.set(true);
-    await manager.search(event.detail.data);
+    await manager.search(event.detail.data, $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS));
     await goto(routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root);
     event.detail.pending?.set(false);
   }

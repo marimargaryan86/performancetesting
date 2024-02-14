@@ -15,7 +15,11 @@ export const tripOfferPassengerParser = {
     birthDate: new Date(data.dateOfBirth),
   }),
   toSchema: (data: TripOfferPassenger): TripOfferPassengerSchema => ({
-    dateOfBirth: data.birthDate.toLocaleDateString("sv-SE"),
+    dateOfBirth: data.birthDate.toLocaleDateString("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }),
   }),
 };
 

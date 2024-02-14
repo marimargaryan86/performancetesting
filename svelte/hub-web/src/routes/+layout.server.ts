@@ -1,5 +1,7 @@
+import { env } from "$env/dynamic/private";
 import type { Locale, LocaleData, TimeFormat } from "$lib/i18n";
 import lang from "$lib/i18n/lang";
+import { getAvailableFeatures, type Features } from "$lib/utils/feature-flags";
 import type * as OrySchemas from "~/integration/ory/schemas";
 
 export function load(event): {
@@ -9,6 +11,7 @@ export function load(event): {
   locale: Locale;
   localeData: LocaleData;
   timeFormat: TimeFormat;
+  features: Features;
 } {
   const { locale } = event.locals;
   const localeData = lang[locale];
@@ -18,8 +21,10 @@ export function load(event): {
   const timeFormat =
     formattedTime.includes("AM") || formattedTime.includes("PM") ? "12hour" : "24hour";
 
+  const features = getAvailableFeatures(env.ENV_NAME, event.locals.user);
+
   if (!event.locals.session) {
-    return { authenticated: false, locale, localeData, timeFormat };
+    return { authenticated: false, locale, localeData, timeFormat, features };
   }
 
   return {
@@ -29,5 +34,6 @@ export function load(event): {
     locale,
     localeData,
     timeFormat,
+    features,
   };
 }

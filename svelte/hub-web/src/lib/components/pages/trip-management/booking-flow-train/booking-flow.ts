@@ -9,7 +9,6 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { sleep } from "$lib/utils/common";
 import * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import { searchDataModel, type SearchData } from "$lib/models/trip-offer-search";
-import { dev } from "$app/environment";
 
 export const markupsModel: z.ZodType<Omit<MobileSchemas.MarkupsCreate, "orderId">> = z.object({
   serviceFee: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
@@ -170,7 +169,10 @@ function parsePassengers(
   );
 }
 
-async function search(data: SearchData): Promise<MobileSchemas.SimpleOfferSearch> {
+async function search(
+  data: SearchData,
+  useWindow: boolean,
+): Promise<MobileSchemas.SimpleOfferSearch> {
   const sessionToken = getRandomAlphaNumericString(32);
   const offerSearch = await integrationInstancesClient.mobile.simpleOfferService.create({
     data: {
@@ -178,8 +180,7 @@ async function search(data: SearchData): Promise<MobileSchemas.SimpleOfferSearch
         outbound: data.outbound,
         destination: data.destination.coordinates,
         origin: data.origin.coordinates,
-        // TODO(2024-02-02/mekwall): Remove dev flag when feature goes live
-        windowH: dev ? data.windowH : undefined,
+        windowH: useWindow ? data.windowH : undefined,
       },
       passengers: parsePassengers(data.passengers),
       allowedSegmentTypes: ["rail"],

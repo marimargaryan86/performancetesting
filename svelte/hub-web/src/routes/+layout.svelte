@@ -12,6 +12,8 @@
   import { setQueryStore } from "$lib/stores/query-store";
   import { page } from "$app/stores";
   import i18next from "i18next";
+  import { Feature, getFeatureTools, setFeatures } from "$lib/utils/feature-flags";
+  import DevTools from "$lib/components/partials/dev-tools.svelte";
 
   export let data;
 
@@ -20,6 +22,8 @@
   $: $locale = data.locale;
   $: $localeData = data.localeData;
 
+  const features = setFeatures(data.features);
+  const featureTools = getFeatureTools();
   const queryStore = setQueryStore($page.url.searchParams);
   const user = setUser(writable<OrySchemas.User>(data.user));
   const timeFormat = setTimeFormat(writable(data.timeFormat));
@@ -28,6 +32,7 @@
   let prevLocale = data.locale;
 
   $: i18next.changeLanguage(data.locale);
+  $: $features = data.features;
   $: $queryStore = Object.fromEntries($page.url.searchParams);
   $: $timeFormat = data.timeFormat;
   $: $user = data.user as unknown as OrySchemas.User;
@@ -73,6 +78,10 @@
   </main>
 {:else}
   <slot />
+{/if}
+
+{#if $featureTools.hasFeature(Feature.DEV_TOOLS)}
+  <DevTools />
 {/if}
 
 <style>

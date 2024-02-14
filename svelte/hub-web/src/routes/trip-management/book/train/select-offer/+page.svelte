@@ -33,9 +33,10 @@
     manager,
     type PartialSelectedOffer,
   } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
-  import { browser, dev } from "$app/environment";
+  import { browser } from "$app/environment";
   import CollapsibleTripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/collapsible-trip-search.svelte";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
+  import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
 
   export let data;
 
@@ -52,6 +53,7 @@
   };
   let offerPollController: AbortController | undefined;
 
+  const featureTools = getFeatureTools();
   const t = getTranslator();
   const selectOfferPending = writable(false);
   let offersPending: PendingType | undefined = "initial";
@@ -125,7 +127,7 @@
   async function searchAux(pendingType: PendingType, nextData: SearchData): Promise<void> {
     offers = [];
     offersPending = pendingType;
-    await manager.search(nextData);
+    await manager.search(nextData, $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS));
     await invalidateAll();
   }
 
@@ -183,8 +185,7 @@
   <div class="scroll">
     <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />
     <ul class="offer-result">
-      {#if dev}
-        <!-- TODO(2024-02-02/mekwall): Remove dev flag when feature goes live -->
+      {#if $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
         {#if showEarlierButton}
           <li class="earlier">
             <button
@@ -239,8 +240,7 @@
         </li>
       {/if}
 
-      {#if dev}
-        <!-- TODO(2024-02-02/mekwall): Remove dev flag when feature goes live -->
+      {#if $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
         {#if showLaterButton}
           <li class="later">
             <button on:click={fetchMore.bind(fetchMore, "later")} disabled={Boolean(offersPending)}>
