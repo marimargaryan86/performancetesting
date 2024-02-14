@@ -4102,6 +4102,12 @@
           },
           "wifi": {
             "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "unlimitedMileage": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
+          },
+          "airConditioner": {
+            "$ref": "#/components/schemas/OfferSegmentDetailAmenity"
           }
         },
         "required": [
@@ -4130,6 +4136,67 @@
         "required": [
           "availability"
         ]
+      },
+      "VehicleInformation": {
+        "title": "Offer Segment Detail Amenities",
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg",
+            "readOnly": true,
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "example": "Fiat 500, 3 doors, manual or similar model",
+            "readOnly": true,
+            "nullable": true
+          },
+          "seatsCount": {
+            "type": "integer",
+            "example": 4,
+            "readOnly": true,
+            "nullable": true
+          },
+          "doorsCount": {
+            "type": "integer",
+            "example": 2,
+            "readOnly": true,
+            "nullable": true
+          },
+          "transmission": {
+            "type": "string",
+            "example": "Manual",
+            "readOnly": true,
+            "nullable": true
+          },
+          "fuelType": {
+            "type": "string",
+            "example": "Unspecified",
+            "readOnly": true,
+            "nullable": true
+          },
+          "baggageQuantity": {
+            "type": "integer",
+            "example": 3,
+            "readOnly": true,
+            "nullable": true
+          },
+          "driveType": {
+            "type": "string",
+            "example": "Unspecified",
+            "readOnly": true,
+            "nullable": true
+          },
+          "class": {
+            "type": "string",
+            "example": "1B",
+            "readOnly": true,
+            "nullable": true
+          }
+        }
       },
       "TripOfferSearch": {
         "title": "Trip Offer Search",
@@ -5046,6 +5113,9 @@
                   },
                   "amenities": {
                     "$ref": "#/components/schemas/OfferSegmentDetailAmenities"
+                  },
+                  "vehicle":  {
+                    "$ref": "#/components/schemas/VehicleInformation"
                   }
                 }
               },

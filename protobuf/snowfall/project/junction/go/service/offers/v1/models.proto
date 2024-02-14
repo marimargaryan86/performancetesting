@@ -205,6 +205,8 @@ message SegmentAmenities {
   SegmentAmenity food = 3;
   SegmentAmenity power = 4;
   SegmentAmenity wifi = 5;
+  SegmentAmenity unlimited_mileage = 6;
+  SegmentAmenity air_conditioner = 7;
 }
 
 message OfferSegmentDetails {
@@ -213,6 +215,7 @@ message OfferSegmentDetails {
   snowfall.project.junction.go.v1.CabinClass cabin_class = 2;
   repeated BaggageAllowance baggage_allowances = 5;
   SegmentAmenities amenities = 6;
+  VehicleInformation vehicle = 7;
   // meal
 }
 
@@ -230,6 +233,18 @@ message OfferSegment {
   uint32 segment_sequence = 10;
   // direction?
   // docsRequired?
+}
+
+message VehicleInformation {
+  string image_url = 1;
+  string model = 2;
+  uint32 seats_count = 3;
+  uint32 doors_count = 4;
+  string transmission = 5;
+  string fuel_type = 6;
+  uint32 baggage_quantity = 7;
+  string drive_type = 8;
+  string class = 9;
 }
 
 message Vehicle {
