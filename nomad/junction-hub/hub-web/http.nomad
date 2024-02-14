@@ -78,8 +78,19 @@ job "junction-hub-hub-web-http" {
       tags = [
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.browserXssFilter=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.contentsecuritypolicy=default-src 'self' https://fonts.googleapis.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://sentry.snowfall.se https://js.stripe.com https://*.smartlook.com https://*.smartlook.cloud; connect-src 'self' https://sentry.snowfall.se https://js.stripe.com https://*.smartlook.com https://*.smartlook.cloud; img-src 'self' data: blob: https://www.gravatar.com https://img.youtube.com; font-src 'self' data: https://fonts.gstatic.com https://www.slant.co; frame-src 'self' https://js.stripe.com https://www.youtube.com https://*.smartlook.com https://*.smartlook.cloud",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.contenttypenosniff=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.customresponseheaders.Permissions-Policy=geolocation=(self), payment=(self)",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.forceSTSHeader=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.framedeny=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.referrerpolicy=strict-origin-when-cross-origin",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.stsincludesubdomains=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.stspreload=true",
+        "traefik.http.middlewares.hub-web-${var.environment}-headers.headers.stsseconds=63072000",
+        "traefik.http.routers.hub-web-${var.environment}.middlewares=hub-web-${var.environment}-headers",
         "traefik.http.routers.hub-web-${var.environment}.entrypoints=${var.traefik_entrypoints}",
-        "traefik.http.routers.hub-web-${var.environment}.rule=Host(`${var.traefik_host_URL}`)",
+        "traefik.http.routers.hub-web-${var.environment}.rule=Host(`${var.traefik_host_URL}`)"
       ]
 
       connect {
