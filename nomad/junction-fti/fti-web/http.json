@@ -1,0 +1,17 @@
+{
+    "development": {
+        "variables": {
+            "count": 1,
+            "traefik_entrypoints": "websecure",
+            "traefik_host_URL": "bigxtra.junction.dev"
+        }
+    },
+    "production": {
+        "deploy": false,
+        "variables": {}
+    },
+    "sandbox": {
+        "deploy": false,
+        "variables": {}
+    }
+}
