@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+from typing import Literal, TypeGuard
 
 import stripe
 
@@ -51,12 +52,15 @@ class Stripe(interfaces.CreditCardProvider):
         payment: credit_card_models_pb2.CreditCardPayment,
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Create payment intent in stripe."""
+        if not self._is_valid_capture_method(payment.capture_method):
+            raise ValueError
+
         intent_money = money.from_protobuf(payment.amount)
         payment_intent = stripe.PaymentIntent.create(
             amount=intent_money.amount,
             currency=intent_money.currency.code,
             capture_method=payment.capture_method,
-            customer=payment.credit_card_holder_id or None,
+            customer=payment.credit_card_holder_id or "",
             automatic_payment_methods={
                 "enabled": payment.enable_automatic_payment_method,
             },
@@ -240,3 +244,9 @@ class Stripe(interfaces.CreditCardProvider):
                 currency=money.Currency(stripe_refund["currency"].upper()),
             ).protobuf(),
         )
+
+    def _is_valid_capture_method(
+        self,
+        value: str,
+    ) -> TypeGuard[Literal["automatic", "automatic_async", "manual"]]:
+        return value in {"automatic", "automatic_async", "manual"}

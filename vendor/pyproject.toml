@@ -433,6 +433,7 @@ ignore = [
   "Q001",    # Single quote multiline found but double quotes preferred. Incompatible with Ruff's formatter.
   "Q002",    # Single quote docstring found but double quotes preferred. Incompatible with Ruff's formatter.
   "Q003",    # Change outer quotes to avoid escaping inner quotes. Incompatible with Ruff's formatter.
+  "RUF027",  # Possible f-string without an `f` prefix
   "TD003",   # Missing issue link on the line following this TODO
   "TRY003",  # Avoid specifying long messages outside the exception class # TODO: fix
   "UP004",   # Class inherits from `object`

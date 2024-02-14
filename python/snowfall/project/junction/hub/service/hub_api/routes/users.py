@@ -181,7 +181,9 @@ class UserInformation(endpoints.HTTPEndpoint):
             company=company,
             contacts=contacts.contacts,
         )
-        data.attributes["permissions"].update(request.user.permissions)
+
+        if data.attributes is not None:
+            data.attributes["permissions"].update(request.user.permissions)
 
         return await messages.create_response(
             body=models.Body(data=data),
