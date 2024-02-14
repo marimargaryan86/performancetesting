@@ -137,7 +137,6 @@ message SearchOffersRequest {
     snowfall.stdlib.v1.DateTime departure_at = 3;
     snowfall.stdlib.v1.DateTime arrival_at = 4;
     snowfall.project.junction.v1.SegmentType type = 5;
-    // @todo: add vendor and operator information
   }
   message Trip {
     repeated Segment segments = 1;
