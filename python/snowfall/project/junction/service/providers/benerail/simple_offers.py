@@ -194,7 +194,7 @@ def create_criteria_time_windows(
     inbound_timestamps = []
     departure_at = normalize_datetime(
         protobuf.protobuf_to_datetime(search.departure_at),
-    ).replace(hour=0)
+    )
 
     outbound_timestamps = find_time_windows(
         departure_before=protobuf.protobuf_to_datetime(search.departure_before)
