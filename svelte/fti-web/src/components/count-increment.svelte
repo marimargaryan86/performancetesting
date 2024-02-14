@@ -32,15 +32,15 @@
   .passenger-count {
     display: flex;
     align-items: center;
-    border-radius: 40px;
-    background: var(--FTI-Colours-FTI-Grey, #eee);
-    padding: 5px 15px;
     height: 44px;
+    padding: 5px 15px;
+    background: var(--fti-colours-grey, #eeeeee);
+    border-radius: 40px;
   }
 
   .inc-button {
-    border: none;
     padding: 0;
+    border: none;
   }
 
   .inc-button:hover {
@@ -54,16 +54,15 @@
 
   .passenger-value {
     width: 14px;
-    padding: 0 20px;
-    text-align: center;
-    background-color: var(--FTI-Colours-FTI-Grey, #eee);
     margin: 0;
-    color: var(--Text-Dark-Text, #1c1c1c);
-    text-align: center;
-    font-family: "Plus Jakarta Sans";
-    font-size: 18px;
-    font-style: normal;
+    padding: 0 20px;
+    color: var(--text-dark-text, #1c1c1c);
     font-weight: 500;
+    font-size: 18px;
+    font-family: "Plus Jakarta Sans";
+    font-style: normal;
     line-height: normal;
+    text-align: center;
+    background-color: var(--fti-colours-grey, #eeeeee);
   }
 </style>

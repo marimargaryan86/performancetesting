@@ -13,7 +13,44 @@
       description:
         "This package includes a scheduled flight with a renowned airline from/to Germany and back. You will be staying 7 nights in a 4-star Canareef Maldives Resort in the Sunrise Beach Villa with all inclusive. We offer a 15-minute jet lag massage as well as a complimentary drink upon arrival.",
     },
+    {
+      name: "Canareef Resort Maldives",
+      location: " Maldives - Addu Atoll / Herathera",
+      length: "7 nights",
+      stars: 4,
+      price: "£1,800",
+      description:
+        "This package includes a scheduled flight with a renowned airline from/to Germany and back. You will be staying 7 nights in a 4-star Canareef Maldives Resort in the Sunrise Beach Villa with all inclusive. We offer a 15-minute jet lag massage as well as a complimentary drink upon arrival.",
+    },
+    {
+      name: "Canareef Resort Maldives",
+      location: " Maldives - Addu Atoll / Herathera",
+      length: "7 nights",
+      stars: 4,
+      price: "£1,800",
+      description:
+        "This package includes a scheduled flight with a renowned airline from/to Germany and back. You will be staying 7 nights in a 4-star Canareef Maldives Resort in the Sunrise Beach Villa with all inclusive. We offer a 15-minute jet lag massage as well as a complimentary drink upon arrival.",
+    },
+    {
+      name: "Canareef Resort Maldives",
+      location: " Maldives - Addu Atoll / Herathera",
+      length: "7 nights",
+      stars: 4,
+      price: "£1,800",
+      description:
+        "This package includes a scheduled flight with a renowned airline from/to Germany and back. You will be staying 7 nights in a 4-star Canareef Maldives Resort in the Sunrise Beach Villa with all inclusive. We offer a 15-minute jet lag massage as well as a complimentary drink upon arrival.",
+    },
   ];
+
+  const handleScroll = ({ detail }: { detail: boolean }): void => {
+    const container = document.querySelector(".detailed-section");
+    if (container) {
+      container.scrollBy({
+        left: detail ? 941 : -941,
+        behavior: "smooth",
+      });
+    }
+  };
 </script>
 
 <div class="detailed-section">
@@ -27,7 +64,7 @@
           {item.name}
         </p>
         <div class="item-buttons">
-          <ArrowsComponent />
+          <ArrowsComponent on:scroll={handleScroll} />
         </div>
       </div>
       <div class="item-location-header">
@@ -84,41 +121,46 @@
 <style>
   .detailed-section {
     display: flex;
-    background: #f2fbff;
-    padding: 100px 175px;
     flex-direction: row;
     gap: 70px;
+    padding: 100px 175px;
+    overflow-x: scroll;
+    background: #f2fbff;
   }
+
   .item-container {
     width: 75%;
   }
+
   .tv-label p {
     color: #0078ff;
+    font-weight: 700;
     font-size: 18px;
     font-style: normal;
-    font-weight: 700;
     line-height: normal;
     text-transform: capitalize;
   }
+
   .item-label {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
+    justify-content: space-between;
     width: 100%;
+    margin-top: 20px;
   }
+
   .item-buttons {
     display: flex;
     gap: 8px;
   }
+
   .item-title {
-    color: var(--Text-Dark-Text, #1c1c1c);
-    font-family: "Plus Jakarta Sans";
+    margin: 0;
+    color: var(--text-dark-text, #1c1c1c);
+    font-weight: 700;
     font-size: 40px;
     font-style: normal;
-    font-weight: 700;
     line-height: normal;
-    margin: 0;
   }
 
   .item-location-header {
@@ -127,27 +169,29 @@
     align-items: center;
     margin: 10px 0;
   }
+
   .item-location {
     display: flex;
     gap: 8px;
-    color: var(--Text-Dark-Text, #1c1c1c);
-    font-style: normal;
+    color: var(--text-dark-text, #1c1c1c);
     font-weight: 600;
+    font-style: normal;
     line-height: normal;
   }
+
   .location-icon {
     width: 14px;
   }
+
   .trip-length {
     display: flex;
     gap: 8px;
     overflow: hidden;
-    color: var(--Text-Dark-Text, #1c1c1c);
-    text-overflow: ellipsis;
-    font-family: "Plus Jakarta Sans";
-    font-style: normal;
+    color: var(--text-dark-text, #1c1c1c);
     font-weight: 600;
+    font-style: normal;
     line-height: normal;
+    text-overflow: ellipsis;
   }
 
   .image-grid {
@@ -181,10 +225,10 @@
   }
 
   .item-description-title {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    color: var(--text-dark-text, #1c1c1c);
+    font-weight: 700;
     font-size: 36px;
     font-style: normal;
-    font-weight: 700;
     line-height: 48px;
     text-transform: capitalize;
   }
@@ -194,13 +238,13 @@
   }
 
   .item-description-desc {
+    margin-top: 16px;
     color: #1c1c1c;
+    font-weight: 400;
     font-size: 18px;
     font-style: normal;
-    font-weight: 400;
     line-height: 28px;
     letter-spacing: 0.3px;
-    margin-top: 16px;
   }
 
   .item-price p {
@@ -208,17 +252,17 @@
   }
 
   .explore-button {
-    border-radius: 8px;
-    background: #ea7121;
+    padding: 18px;
     color: white;
-    padding: 18px 18px;
-    border: none;
-    font-size: 16px;
     font-weight: 500;
+    font-size: 16px;
+    background: #ea7121;
+    border: none;
+    border-radius: 8px;
   }
 
   .bold {
-    font-weight: 700;
     padding: 0 2px;
+    font-weight: 700;
   }
 </style>

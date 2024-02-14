@@ -7,8 +7,11 @@
     "All",
     "Family Holidays",
     "Cruises",
+    "Couples",
     "City Breaks",
     "All Inclusive",
+    "Tours",
+    "Adventures",
     "Beach Holidays",
   ];
 
@@ -54,6 +57,16 @@
       like: true,
     },
   ];
+
+  let setContainerScroll = ({ detail }: { detail: boolean }): void => {
+    const container = document.querySelector(".package-results");
+    const delta = detail ? 300 : -300;
+    if (container) {
+      const currentScroll = container.scrollLeft;
+      const newScroll = currentScroll + delta;
+      container.scrollTo({ left: newScroll, behavior: "smooth" });
+    }
+  };
 </script>
 
 <div class="packages-container">
@@ -64,7 +77,7 @@
         <button class="category-button" class:active={category === activeFilter}>{category}</button>
       {/each}
     </div>
-    <ArrowsComponent />
+    <ArrowsComponent on:scroll={setContainerScroll} />
   </div>
   <div class="package-results">
     {#each results as result}
@@ -86,73 +99,75 @@
       </div>
     {/each}
   </div>
+  <div class="button-container">
+    <button class="packages-button">See all packages</button>
+  </div>
 </div>
 
 <style>
   .packages-container {
-    width: calc(100% - 230px);
-    margin: 0 auto 120px;
     display: flex;
     flex-direction: column;
+    width: calc(100% - 230px);
+    margin: 0 auto 120px;
   }
 
   .packages-container h2 {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    color: var(--text-dark-text, #1c1c1c);
+    font-weight: 700;
     font-size: 36px;
     font-style: normal;
-    font-weight: 700;
     line-height: 44px; /* 122.222% */
   }
 
   .packages-filter-container {
     display: flex;
-
     padding-bottom: 40px;
   }
 
   .packages-filter {
-    flex-grow: 1;
     display: flex;
+    flex-grow: 1;
     gap: 16px;
   }
 
   .category-button {
-    border-radius: 4px;
-    background: #f6f5f5;
-    color: var(--Text-Dark-Text);
+    padding: 12px 22px;
+    color: var(--text-dark-text);
+    font-weight: 400;
     font-size: 14px;
     font-style: normal;
-    font-weight: 400;
     line-height: normal;
+    background: #f6f5f5;
     border: none;
-    padding: 12px 22px;
+    border-radius: 4px;
   }
 
   .category-button.active {
+    background: rgb(234 113 33 / 0.08);
     border: 1px solid #ea7121;
-
-    background: rgba(234, 113, 33, 0.08);
   }
 
   .package-results {
     display: flex;
     gap: 20px;
+    overflow-x: scroll;
   }
 
   .package-card {
-    border-radius: 8px;
-    border: 1px solid var(--Dark-stroke, #c1b5b5);
     position: relative;
+    border: 1px solid var(--dark-stroke, #c1b5b5);
+    border-radius: 8px;
   }
 
   .heart-button {
     position: absolute;
     top: 20px;
     right: 20px;
+    width: 42px;
+    color: #ea7121;
     background: none;
     border: none;
-    color: #ea7121;
-    width: 42px;
   }
 
   .heart-button:hover {
@@ -166,30 +181,48 @@
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
+
   .card-content {
-    padding: 20px 24px;
     position: relative;
+    padding: 20px 24px;
   }
+
   .price-box {
-    border-radius: 4px;
-    background: #ea7121;
-    color: white;
-    padding: 8px 16px;
     position: absolute;
     top: -36px;
     right: 20px;
-    height: 48px;
     display: flex;
     align-items: center;
+    height: 48px;
+    padding: 8px 16px;
+    color: white;
+    background: #ea7121;
+    border-radius: 4px;
   }
+
   .price-box p {
+    margin: 0;
     font-weight: 300;
     font-size: 16px;
-    margin: 0;
   }
+
   .bold {
+    padding-left: 4px;
     font-weight: 600;
     font-size: 22px;
-    padding-left: 4px;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+    margin: 32px 0;
+  }
+
+  .packages-button {
+    width: 15%;
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid #1c1c1c;
+    border-radius: 4px;
   }
 </style>

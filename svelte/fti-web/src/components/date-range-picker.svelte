@@ -82,7 +82,7 @@
   }
 
   .weekday-label {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    color: var(--text-dark-text, #1c1c1c);
     font-family: "Plus Jakarta Sans";
     font-size: 10px;
     font-style: normal;
@@ -102,7 +102,7 @@
     align-items: center;
   }
   .day-item[data-selected] {
-    background: var(--Text-Dark-Text, #1c1c1c);
+    background: var(--text-dark-text, #1c1c1c);
     color: white;
     border-radius: 50%;
   }

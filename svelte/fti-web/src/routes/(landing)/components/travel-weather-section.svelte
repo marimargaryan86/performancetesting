@@ -4,12 +4,12 @@
   import FaRegHeart from "svelte-icons/fa/FaRegHeart.svelte";
   let activeFilter = "All";
   let categories = [
-    "All",
-    "Family Holidays",
-    "Cruises",
-    "City Breaks",
-    "All Inclusive",
-    "Beach Holidays",
+    "Any Weather",
+    "Cold ❄️ -10-9ºC",
+    "Cool ☁️ 10-15ºC ",
+    "Warm ⛅ 16-24ºC",
+    "Hot ☀️ 25-30ºC",
+    "Very Hot 🔥 31ºC+",
   ];
 
   let results = [
@@ -89,6 +89,9 @@
           <FaRegHeart />
         </button>
         <div class="card-content">
+          <div class="price-box">
+            <p>from<span class="bold">&nbsp;{result.price}</span>pp</p>
+          </div>
           <h3>{result.name}</h3>
           <div class="weather-box">
             <div class="sun">
@@ -113,27 +116,27 @@
 
 <style>
   .packages-container {
-    width: calc(100% - 230px);
-    margin: 80px auto 120px;
     display: flex;
     flex-direction: column;
+    width: calc(100% - 230px);
+    margin: 80px auto 120px;
   }
 
   .packages-container h2 {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    margin-bottom: 5px;
+    color: var(--text-dark-text, #1c1c1c);
+    font-weight: 700;
     font-size: 42px;
     font-style: normal;
-    font-weight: 700;
     line-height: normal;
     text-transform: capitalize;
-    margin-bottom: 5px;
   }
 
   .description-bar {
     display: flex;
     gap: 20px;
     align-items: center;
-    margin: 8px 0 22px 0;
+    margin: 8px 0 22px;
   }
 
   .description {
@@ -160,21 +163,20 @@
   }
 
   .category-button {
-    border-radius: 4px;
-    background: #f6f5f5;
-    color: var(--Text-Dark-Text);
+    padding: 12px 22px;
+    color: var(--text-dark-text);
+    font-weight: 400;
     font-size: 14px;
     font-style: normal;
-    font-weight: 400;
     line-height: normal;
+    background: #f6f5f5;
     border: none;
-    padding: 12px 22px;
+    border-radius: 4px;
   }
 
   .category-button.active {
+    background: rgb(234 113 33 / 0.08);
     border: 1px solid #ea7121;
-
-    background: rgba(234, 113, 33, 0.08);
   }
 
   .package-results {
@@ -184,36 +186,35 @@
   }
 
   .package-card {
-    border-radius: 8px;
-    border: 1px solid var(--Dark-stroke, #c1b5b5);
     position: relative;
+    border: 1px solid var(--dark-stroke, #c1b5b5);
+    border-radius: 8px;
   }
 
   .temperature-box {
     position: absolute;
     top: 20px;
     left: 20px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.4);
     color: white;
+    background: rgb(0 0 0 / 0.4);
+    border-radius: 8px;
   }
 
   .temperature-box p {
-    font-weight: 300;
-    font-size: 18px;
     margin: 0;
     padding: 12px 16px;
     font-weight: 500;
+    font-size: 18px;
   }
 
   .heart-button {
     position: absolute;
     top: 20px;
     right: 20px;
+    width: 42px;
+    color: #ea7121;
     background: none;
     border: none;
-    color: #ea7121;
-    width: 42px;
   }
 
   .heart-button:hover {
@@ -227,13 +228,16 @@
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
+
   .card-content {
-    padding: 20px 24px 42px;
     position: relative;
+    padding: 20px 24px 42px;
   }
+
   .card-content h3 {
     margin: 6px 0 8px;
   }
+
   .weather-box {
     display: flex;
   }
@@ -245,25 +249,52 @@
     align-items: center;
     margin-right: 20px;
   }
+
   .rain {
     flex-grow: 1;
   }
+
   .icon {
     width: 18px;
     height: 18px;
     color: #1c1b1f;
   }
-  .explore-button {
-    border-radius: 8px;
-    background: #ea7121;
+
+  .price-box {
+    position: absolute;
+    top: -27px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 2px 8px;
     color: white;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    border: none;
-    padding: 12px 18px;
-    top: 12px;
+    background: #ea7121;
+    border-radius: 4px;
+  }
+
+  .price-box p {
+    margin: 0;
+    font-weight: 300;
+    font-size: 12px;
+  }
+
+  .bold {
+    padding-left: 4px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .explore-button {
     position: relative;
+    top: 12px;
+    padding: 12px 18px;
+    color: var(--text-dark-text);
+    font-weight: 500;
+    font-size: 16px;
+    font-style: normal;
+    line-height: normal;
+    border: 1px solid var(--text-dark-text);
+    border-radius: 8px;
   }
 </style>

@@ -65,7 +65,7 @@
   }
 
   .passenger-type p {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    color: var(--text-dark-text, #1c1c1c);
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -78,7 +78,7 @@
   }
 
   .room-counter p {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    color: var(--text-dark-text, #1c1c1c);
     font-size: 18px;
     font-style: normal;
     font-weight: 600;
@@ -86,7 +86,7 @@
   }
 
   .room-heading {
-    color: var(--Text-Dark-Text, #1c1c1c);
+    color: var(--text-dark-text, #1c1c1c);
     font-size: 16px;
     font-style: normal;
     font-weight: 600;
@@ -102,7 +102,7 @@
 
   .apply {
     width: 100%;
-    background: var(--Text-Dark-Text, #1c1c1c);
+    background: var(--text-dark-text, #1c1c1c);
     color: white;
     border: none;
     height: 61px;

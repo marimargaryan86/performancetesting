@@ -4,11 +4,11 @@
   import FaRegCalendarAlt from "svelte-icons/fa/FaRegCalendarAlt.svelte";
   import FaUsers from "svelte-icons/fa/FaUsers.svelte";
   import FaSearch from "svelte-icons/fa/FaSearch.svelte";
-  import OriginAirportSelect from "./components/origin-airport-select.svelte";
-  import PassengerSelectionBox from "./components/passenger-selection-box.svelte";
-  import CalendarSelect from "./components/calendar-select.svelte";
-  import DestinationSelect from "./components/destination-select.svelte";
-  import RoomsSelect from "./components/rooms-select.svelte";
+  import OriginAirportSelect from "./origin-airport-select.svelte";
+  import PassengerSelectionBox from "./passenger-selection-box.svelte";
+  import CalendarSelect from "./calendar-select.svelte";
+  import DestinationSelect from "./destination-select.svelte";
+  import RoomsSelect from "./rooms-select.svelte";
 
   export let searchType: string;
 
@@ -145,107 +145,121 @@
 
 <style>
   .search-panel {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 20px 25px 35px;
     display: flex;
     flex-direction: column;
+    padding: 20px 25px 35px;
+    background-color: #ffffff;
+    border-radius: 0 10px 10px;
   }
+
   .return-journey {
     display: flex;
     margin: 15px 0 30px;
   }
+
   .return-journey label {
+    margin-right: 15px;
+    margin-left: 7.5px;
+    font-weight: 400;
     font-size: 16px;
     font-style: normal;
-    font-weight: 400;
     line-height: normal;
-    margin-left: 7.5px;
-    margin-right: 15px;
   }
+
   .search-container {
     position: relative;
     display: flex;
-    gap: 20px;
     flex: 1;
+    gap: 20px;
   }
+
+  .label {
+    color: #1c1c1c;
+    font-weight: 500;
+    font-size: 16px;
+  }
+
   .search-section {
-    display: flex;
-    gap: 30px;
-    margin-bottom: 12px;
-    align-items: center;
-    border-right: 1px solid #1c1c1c;
-    margin: 0 10px;
-    flex-basis: 22.5%;
     position: relative;
+    display: flex;
+    flex-basis: 22.5%;
+    gap: 30px;
+    align-items: center;
+    margin: 0 10px;
+    margin-bottom: 12px;
+    border-right: 1px solid #1c1c1c;
   }
+
   .search-section:last-child {
-    border-right: none;
     flex-basis: 10%;
+    border-right: none;
   }
+
   .search-section > .label {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
+
   .people-section,
   .hotel-section {
     border: none;
   }
+
   .icon {
     width: 18px;
     height: 18px;
     color: #1c1b1f;
   }
-  .label {
-    font-weight: 500;
-    font-size: 16px;
-    color: #1c1c1c;
-  }
+
   .label-container {
     display: flex;
     gap: 8px;
     align-items: center;
   }
+
   .label p {
     margin: 0;
   }
-  .location-input {
-    border: none;
 
-    padding: 8px 0;
-    font-size: 16px;
-    color: #1c1c1c;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+  .location-input {
     width: 90%;
-  }
-  .desc {
-    font-size: 16px;
+    padding: 8px 0;
     color: #1c1c1c;
-    opacity: 0.5;
-    line-height: 25px;
-    color: var(--Text-Grey-Text, #818181);
-    font-style: normal;
     font-weight: 400;
-    line-height: normal;
-  }
-  .booking-search {
-    background: var(--Text-Dark-Text, #1c1c1c);
-    color: white;
-    border: none;
-    border-radius: 2px;
-    padding: 16px 22px;
     font-size: 16px;
+    font-style: normal;
+    line-height: normal;
+    border: none;
+  }
+
+  .desc {
+    color: #1c1c1c;
+    color: var(--text-grey-text, #818181);
+    font-weight: 400;
+    font-size: 16px;
+    font-style: normal;
+    line-height: 25px;
+    line-height: normal;
+    opacity: 0.5;
+  }
+
+  .booking-search {
     display: flex;
     gap: 4px;
     align-items: center;
+    padding: 16px 22px;
+    color: white;
+    font-size: 16px;
+    background: var(--text-dark-text, #1c1c1c);
+    border: none;
+    border-radius: 2px;
   }
 
   .border {
     border-right: 1px solid #1c1c1c;
   }
+
   .booking-search > .icon {
     width: 18px;
     color: white;
@@ -258,7 +272,7 @@
   .people-label,
   .hotel-label,
   .date-label {
-    border: none;
     background: none;
+    border: none;
   }
 </style>

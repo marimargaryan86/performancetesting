@@ -1,11 +1,11 @@
 <script>
   import "./styles.css";
   import "./../assets/css/colors.css";
-  import Header from "./Header.svelte";
+  import Navigation from "./navigation.svelte";
 </script>
 
 <div class="app">
-  <Header />
+  <Navigation />
 
   <main>
     <slot />
@@ -13,7 +13,8 @@
 
   <footer>
     <p>
-      visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
+      Something broken? <a href="mailto:nathan.l@snowfalltravel.com">Email Nathan</a> I'll see what I
+      can do to fix it :)
     </p>
   </footer>
 </div>
@@ -22,6 +23,7 @@
   * {
     font-family: "Plus Jakarta Sans", sans-serif;
   }
+
   .app {
     display: flex;
     flex-direction: column;
@@ -43,16 +45,16 @@
   footer {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     padding: 12px;
   }
 
   footer a {
-    font-weight: bold;
+    font-weight: 700;
   }
 
-  @media (min-width: 480px) {
+  @media (width >= 480px) {
     footer {
       padding: 12px 0;
     }

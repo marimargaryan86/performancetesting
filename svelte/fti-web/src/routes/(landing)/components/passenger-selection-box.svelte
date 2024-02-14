@@ -29,14 +29,14 @@
 <style>
   .dropdown {
     position: absolute;
-    box-shadow: 0px 0px 29.7px 0px rgba(0, 0, 0, 0.1);
-    background: #fff;
     top: 110px;
+    left: -36px;
     display: flex;
     flex-direction: column;
-    left: -36px;
     width: 150%;
     padding: 32px;
+    background: #ffffff;
+    box-shadow: 0 0 29.7px 0 rgb(0 0 0 / 0.1);
   }
 
   .passenger-selection {
@@ -47,28 +47,27 @@
   }
 
   .passenger-type p {
-    color: var(--Text-Dark-Text, #1c1c1c);
-    font-family: "Plus Jakarta Sans";
+    color: var(--text-dark-text, #1c1c1c);
+    font-weight: 400;
     font-size: 18px;
     font-style: normal;
-    font-weight: 400;
     line-height: normal;
   }
 
   .apply-container {
     display: flex;
-    gap: 6px;
     flex-shrink: 0;
+    gap: 6px;
   }
 
   .apply {
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    background: var(--Text-Dark-Text, #1c1c1c);
-    color: white;
-    border: none;
     height: 61px;
     padding: 10px;
-    justify-content: center;
-    align-items: center;
+    color: white;
+    background: var(--text-dark-text, #1c1c1c);
+    border: none;
   }
 </style>

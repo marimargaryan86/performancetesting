@@ -23,8 +23,8 @@
         <img src="/icons/tour-icon.svg" alt="tour-icon" />
       </div>
       <div class="book-item-content">
-        <div class="book-item--title">Personalised Tours</div>
-        <div class="book-item--desc">We cater to your interests, preferences, and schedule</div>
+        <div class="book-item-title">Personalised Tours</div>
+        <div class="book-item-desc">We cater to your interests, preferences, and schedule</div>
       </div>
     </div>
     <div class="book-item">
@@ -32,8 +32,8 @@
         <img src="/icons/holiday-icon.svg" alt="holiday-icon" />
       </div>
       <div class="book-item-content">
-        <div class="book-item--title">Holiday Packages</div>
-        <div class="book-item--desc">Stress-free planning with unbeatable value.</div>
+        <div class="book-item-title">Holiday Packages</div>
+        <div class="book-item-desc">Stress-free planning with unbeatable value.</div>
       </div>
     </div>
     <div class="book-item">
@@ -41,8 +41,8 @@
         <img src="/icons/flight-icon.svg" alt="flight-icon" />
       </div>
       <div class="book-item-content">
-        <div class="book-item--title">Cheap Flights</div>
-        <div class="book-item--desc">Unlock incredible savings when you book with us.</div>
+        <div class="book-item-title">Cheap Flights</div>
+        <div class="book-item-desc">Unlock incredible savings when you book with us.</div>
       </div>
     </div>
     <div class="book-item">
@@ -50,8 +50,8 @@
         <img src="/icons/professional-icon.svg" alt="professional-icon" />
       </div>
       <div class="book-item-content">
-        <div class="book-item--title">Travel professionals</div>
-        <div class="book-item--desc">Over 20 years of experience in the travel industry.</div>
+        <div class="book-item-title">Travel professionals</div>
+        <div class="book-item-desc">Over 20 years of experience in the travel industry.</div>
       </div>
     </div>
   </div>
@@ -59,28 +59,30 @@
 
 <style>
   .why-book-banner {
-    background: #00a8cd;
     padding: 70px 0;
+    background: #00a8cd;
   }
+
   .features {
+    margin: 0 0 15px;
     color: white;
-    text-align: center;
+    font-weight: 400;
     font-size: 20px;
     font-style: normal;
-    font-weight: 400;
     line-height: normal;
-    text-transform: capitalize;
-    margin: 0 0 15px 0;
-  }
-  .heading {
-    color: white;
     text-align: center;
+    text-transform: capitalize;
+  }
+
+  .heading {
+    margin: 0 0 30px;
+    color: white;
+    font-weight: 600;
     font-size: 40px;
     font-style: normal;
-    font-weight: 600;
     line-height: normal;
+    text-align: center;
     text-transform: capitalize;
-    margin: 0 0 30px 0;
   }
 
   .icon {
@@ -89,18 +91,18 @@
 
   .why-book {
     display: flex;
-    justify-content: space-around;
-    margin-top: 30px;
     gap: 16px;
+    justify-content: space-around;
     width: calc(100% - 230px);
     margin: 48px auto 0;
+    margin-top: 30px;
   }
 
   .book-item {
     display: flex;
-    border-radius: 8px;
-    background: #fff;
     padding: 32px 24px;
+    background: #ffffff;
+    border-radius: 8px;
   }
 
   .book-item-content {
@@ -109,21 +111,21 @@
     margin-left: 20px;
   }
 
-  .book-item--title {
-    color: var(--Text-Dark-Text);
+  .book-item-title {
+    padding-bottom: 8px;
+    color: var(--text-dark-text);
+    font-weight: 600;
     font-size: 18px;
     font-style: normal;
-    font-weight: 600;
     line-height: normal;
     text-transform: capitalize;
-    padding-bottom: 8px;
   }
 
-  .book-item--desc {
+  .book-item-desc {
     color: #a6a6a6;
+    font-weight: 300;
     font-size: 14px;
     font-style: normal;
-    font-weight: 300;
     line-height: 24px;
   }
 

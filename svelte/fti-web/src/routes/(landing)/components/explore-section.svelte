@@ -4,11 +4,11 @@
 <div class="explore-section">
   <div class="tv-number">
     <img class="tv-logo" src="/images/sonnen-logo.png" alt="Sonnen" />
-    <p class="tv-title">Got a TV order number?</p>
+    <p class="tv-title">Got a TV offer number?</p>
     <p class="tv-label">You can watch our TV channel on sonnenklarTV</p>
-    <input class="tv-input" type="text" placeholder="Enter your TV order number" />
-    <p class="help-label">Need help finding your order number?</p>
-    <button class="find-order">Find Order</button>
+    <input class="tv-input" type="text" placeholder="E.g: BE3294" />
+    <p class="help-label">Need help finding an offer number?</p>
+    <button class="find-order">Find Offer</button>
   </div>
   <div class="top-deals">
     <p class="title">Explore our top deals of the week</p>
@@ -16,11 +16,11 @@
     <button class="explore-deals">Explore</button>
   </div>
   <div class="holidays">
-    <div class="holiday holiday--cruise">
+    <div class="holiday holiday-cruise">
       <p>Ocean Cruises</p>
       <button>Explore</button>
     </div>
-    <div class="holiday holiday--inclusive">
+    <div class="holiday holiday-inclusive">
       <p>All Inclusive</p>
       <button>Explore</button>
     </div>
@@ -30,142 +30,159 @@
 <style>
   .explore-section {
     display: flex;
-    align-items: center;
-    padding: 32px 120px;
     gap: 16px;
+    align-items: center;
     height: 385px;
+    padding: 32px 120px;
   }
+
   .tv-number {
     flex-basis: 35%;
-    border-radius: 8px;
-    border: 1px solid var(--Stroke-colour, #e4e4e4);
-    background: #00a8cd;
-    padding: 20px 32px;
     height: 344px;
+    padding: 20px 32px;
+    background: #00a8cd;
+    border: 1px solid var(--stroke-colour, #e4e4e4);
+    border-radius: 8px;
   }
+
   .tv-logo {
     width: 100px;
     filter: brightness(0) invert(1);
   }
+
   .tv-input {
-    border-radius: 4px;
-    border: 1px solid #fff;
-    background: rgba(255, 255, 255, 0.25);
-    color: #fff;
+    width: fill-available;
+    padding: 18px 16px;
+    color: #ffffff;
+    font-weight: 500;
     font-size: 18px;
     font-style: normal;
-    font-weight: 500;
     line-height: normal;
-    width: -webkit-fill-available;
-    padding: 18px 16px;
+    background: rgb(255 255 255 / 0.25);
+    border: 1px solid #ffffff;
+    border-radius: 4px;
   }
 
   .help-label {
-    color: #fff;
+    padding: 6px 0;
+    color: #ffffff;
+    font-weight: 300;
     font-size: 16px;
     font-style: normal;
-    font-weight: 300;
     line-height: normal;
-    padding: 6px 0;
+    text-decoration: underline;
   }
+
   .tv-input::placeholder {
-    color: #fff;
+    color: #ffffff;
   }
+
   .tv-title {
-    color: #fff;
+    margin: 0;
+    padding-top: 16px;
+    color: #ffffff;
+    font-weight: 700;
     font-size: 24px;
     font-style: normal;
-    font-weight: 700;
     line-height: normal;
-    padding-top: 16px;
-    margin: 0;
   }
+
   .tv-label {
+    margin: 16px 0 20px;
     color: white;
-    margin: 16px 0 20px 0;
   }
+
   .find-order {
-    border-radius: 4px;
-    font-weight: 500;
-    background: #fff;
-    border: none;
-    padding: 15px 32px;
     width: 100%;
-  }
-  .top-deals {
-    background: url("/images/top-deals.jpg") no-repeat center center;
-    flex-basis: 35%;
-    padding: 32px;
-    height: 320px;
+    padding: 15px 32px;
+    font-weight: 500;
+    background: #ffffff;
+    border: none;
     border-radius: 4px;
-    display: flex;
-    flex-direction: column;
   }
+
+  .top-deals {
+    display: flex;
+    flex-basis: 35%;
+    flex-direction: column;
+    height: 320px;
+    padding: 32px;
+    background: url("/images/top-deals.jpg") no-repeat center center;
+    border-radius: 4px;
+  }
+
   .top-deals p {
     margin: 0;
   }
+
   .top-deals .title {
-    color: #fff;
+    padding-bottom: 16px;
+    color: #ffffff;
+    font-weight: 700;
     font-size: 36px;
     font-style: normal;
-    font-weight: 700;
     line-height: normal;
-    padding-bottom: 16px;
   }
+
   .top-deals .tag {
-    color: #fff;
+    flex-grow: 1;
+    color: #ffffff;
+    font-weight: 300;
     font-size: 16px;
     font-style: normal;
-    font-weight: 300;
     line-height: normal;
-    flex-grow: 1;
   }
+
   button {
-    border-radius: 4px;
-    background: #fff;
-    border: none;
     padding: 14px 12px;
+    background: #ffffff;
+    border: none;
+    border-radius: 4px;
   }
 
   .explore-deals {
-    border-radius: 4px;
-    background: #fff;
-    border: none;
-    padding: 14px 12px;
-    width: 150px;
     align-self: flex-end;
+    width: 150px;
+    padding: 14px 12px;
+    background: #ffffff;
+    border: none;
+    border-radius: 4px;
   }
+
   .holidays {
     display: flex;
-    flex-direction: column;
     flex-basis: 25%;
+    flex-direction: column;
     gap: 16px;
     height: 100%;
   }
+
   .holiday {
-    height: 35.25%;
-    border-radius: 4px;
-    padding: 24px 32px;
     display: flex;
     flex-direction: column;
+    height: 35.25%;
+    padding: 24px 32px;
+    border-radius: 4px;
   }
 
   .holiday p {
-    color: #fff;
-    font-family: "Plus Jakarta Sans";
+    color: #ffffff;
+    font-weight: 700;
     font-size: 28px;
     font-style: normal;
-    font-weight: 700;
     line-height: normal;
   }
+
   .holiday button {
     align-self: flex-end;
   }
-  .holiday--cruise {
+
+  .holiday-cruise {
     background: url("/images/ocean-cruises.jpeg") no-repeat center center;
     background-size: cover;
   }
-  .holiday--inclusive {
+
+  .holiday-inclusive {
     background: url("/images/inclusive-holidays.jpeg") no-repeat center center;
     background-size: cover;
   }

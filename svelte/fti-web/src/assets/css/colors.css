@@ -1,5 +1,6 @@
 :root {
-  --Text-Black-Text: #000000;
-  --FTI-Colours-FTI-Grey: #eeeeee;
-  --Text-Dark-Text: #1c1c1c;
+  --text-black-text: #000000;
+  --fti-colours-grey: #eeeeee;
+  --text-dark-text: #1c1c1c;
+  --stroke-colour: #e4e4e4;
 }
