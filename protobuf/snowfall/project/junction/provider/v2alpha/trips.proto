@@ -21,8 +21,6 @@ message Location {
   string ref = 1;
   string name = 2;
   snowfall.stdlib.v1.LatLng coordinates = 3;
-  // @todo: add timezone? It's easy for us to retrieve from coordinates while
-  // the provider might not have this information, complicating the API.
 }
 
 message Stop {
