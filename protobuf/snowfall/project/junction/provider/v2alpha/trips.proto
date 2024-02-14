@@ -49,6 +49,8 @@ message Segment {
       string marketing_name = 2;
     }
     Seating seating = 1;
+    // @todo(bolmis): add baggage allowance
+    // @todo(bolmis): add amenities
   }
   repeated Passenger passengers = 9;
   message Vehicle {
