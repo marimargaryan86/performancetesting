@@ -20,10 +20,12 @@
     type SearchDataError,
   } from "$lib/models/trip-offer-search";
   import { formatPlace } from "$lib/formatting/location";
+  import { getClosestFullHour } from "$lib/utils/date-time";
 
   export let data: PartialSearchData = {
     tripType: "one-way",
     passengers: getDefaultValue(),
+    outbound: getClosestFullHour(true),
   };
   let errors: SearchDataError | undefined = undefined;
 

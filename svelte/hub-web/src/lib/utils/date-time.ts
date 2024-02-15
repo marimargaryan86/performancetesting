@@ -173,3 +173,19 @@ export const hourFormat = {
     return { value: n, label: `${n2 < 10 ? "0" : ""}${n2}:00${n < 12 || n === 24 ? "AM" : "PM"}` };
   }),
 };
+
+export function getClosestFullHour(onlyInFuture = true): Date {
+  const now = new Date();
+  const minutes = now.getMinutes();
+  const addToHour = !onlyInFuture && minutes < 30 ? 0 : 1;
+
+  // Reset minutes, seconds, and milliseconds to 0
+  now.setMinutes(0, 0, 0);
+  if (addToHour) {
+    // Don´t worry about the new hours being more than 23
+    // It will automatically roll over to the next day
+    now.setHours(now.getHours() + addToHour);
+  }
+
+  return now;
+}
