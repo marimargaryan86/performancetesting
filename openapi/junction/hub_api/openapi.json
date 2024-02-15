@@ -242,7 +242,7 @@
     },
     "/users": {
       "get": {
-        "summary": "List users",
+        "summary": "List Users",
         "tags": [
           "users"
         ],
@@ -263,18 +263,25 @@
             "content": {
               "application/vnd.api+json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "uniqueItems": true,
-                      "items": {
-                        "$ref": "#/components/schemas/User"
-                      }
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/User"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
                     }
-                  },
-                  "required": [
-                    "data"
                   ]
                 }
               }

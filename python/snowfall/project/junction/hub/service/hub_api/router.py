@@ -36,7 +36,7 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
     return [
         routes.to_route(
             "/users",
-            user_handler.list_,
+            user_handler.list,
             name="ListUsers",
         ),
         routes.to_route(

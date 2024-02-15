@@ -48,3 +48,14 @@ class TestUsersRepository(object):
         result = await users_repository.find_by_id(user.id)
 
         assert not result
+
+    async def test_find_by_reseller_ids(
+        self,
+        user: models_pb2.User,
+        users_repository: repository.UsersRepository,
+    ) -> None:
+        result = await users_repository.find_by_reseller_ids([user.reseller_id])
+        users = [user async for user in result]
+
+        assert users
+        assert len(users) == 1

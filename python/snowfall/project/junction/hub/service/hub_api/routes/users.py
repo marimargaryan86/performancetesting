@@ -48,17 +48,52 @@ class Users(object):
 
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
-    async def list_(self, request: messages.Request) -> responses.Response:
+    async def list(self, request: messages.Request) -> responses.Response:
         check_permission("user.view", request.starlette_request.user.permissions)
-        return models.JsonApiResponse(
-            models.Body(
-                data=[],
+
+        pagination = pagination_helpers.get_pagination(request.starlette_request)
+
+        user_reseller_id = request.starlette_request.user.metadata.get(
+            "reseller_id",
+            "",
+        )
+        if user_reseller_id:
+            # TODO(justin.k): handle retrieving child resellers
+            users_result = await self._users_repository.find_by_reseller_ids(
+                [user_reseller_id],
+            )
+            identity_ids = [user.ory_identity_id async for user in users_result]
+            response = await self._identities_client.list_ory_identities(
+                page_size=pagination.limit,
+                page_token=pagination.cursor,
+                identifiers=(
+                    identity_ids
+                    if identity_ids
+                    else [request.starlette_request.user.identifier]
+                ),
+            )
+        else:
+            response = await self._identities_client.list_ory_identities(
+                page_size=pagination.limit,
+                page_token=pagination.cursor,
+            )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=[
+                    resources.UserResource.from_proto(identity)
+                    for identity in filter(
+                        self._check_valid_identity,
+                        response.identities,
+                    )
+                ],
                 links=pagination_helpers.get_next_url(
                     request.starlette_request.url_for("ListUsers"),
-                    "",
-                    request.pagination,
+                    response.next_page_token,
+                    pagination,
                 ),
             ),
+            request=request.starlette_request,
         )
 
     async def post(
@@ -156,6 +191,13 @@ class Users(object):
         )
 
         await self._users_repository.insert(new_user)
+
+    def _check_valid_identity(
+        self,
+        identity: identities_pb2.Identity,
+    ) -> bool:
+        metadata = dict(identity.metadata_public.items())
+        return bool(metadata.get("role", False))
 
 
 class UserInformation(endpoints.HTTPEndpoint):

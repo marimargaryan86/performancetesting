@@ -171,6 +171,29 @@ async def test_update_user(  # noqa: WPS218
         assert hub_user.reseller_id == reseller_id
 
 
+async def test_list_users(
+    client: httpx.AsyncClient,
+) -> None:
+    response = await client.get("/users")
+    users = response.json()["data"]
+
+    assert response.status_code == status.HTTP_200_OK
+    assert len(users) == 2
+    for user in users:
+        assert user["id"] in conftest.IDENTITIY_IDS
+
+
+async def test_list_users_for_reseller_user(
+    users_client: httpx.AsyncClient,
+) -> None:
+    response = await users_client.get("/users")
+    users = response.json()["data"]
+
+    assert response.status_code == status.HTTP_200_OK
+    assert len(users) == 1
+    assert users[0]["id"] == conftest.IDENTITIY_IDS[0]
+
+
 class TestUserDataIncludesCompanyAndContacts(object):
     async def test_user_data_includes_company_and_contacts(
         self,
