@@ -8,6 +8,7 @@ omit = ["*_pb2.py", "*_pb2_grpc.py"]
 include_namespace_packages = true
 skip_empty = true
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+precision = 2
 
 [tool.coverage.run]
 branch = true
