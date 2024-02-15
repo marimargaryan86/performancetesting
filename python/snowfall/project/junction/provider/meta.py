@@ -12,6 +12,7 @@ class MetaImplementation(object):
     identifier: uuid.UUID
     name: str
     booking_capabilities: meta_pb2.BookingCapabilities | None = None
+    trip_search_capabilities: meta_pb2.TripSearchCapabilities | None = None
 
 
 class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
@@ -20,10 +21,12 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
         provider_id: uuid.UUID,
         provider_name: str,
         booking_capabilities: meta_pb2.BookingCapabilities | None = None,
+        trip_search_capabilities: meta_pb2.TripSearchCapabilities | None = None,
     ):
         self._provider_id = str(provider_id)
         self._provider_name = provider_name
         self._booking_capabilities = booking_capabilities
+        self._trip_search_capabilities = trip_search_capabilities
 
     def get_name(self) -> str:
         return meta_pb2.DESCRIPTOR.services_by_name["MetaService"].full_name
@@ -38,6 +41,7 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
     ) -> meta_pb2.GetCapabilitiesResponse:
         return meta_pb2.GetCapabilitiesResponse(
             booking_capabilities=self._booking_capabilities,
+            trip_search_capabilities=self._trip_search_capabilities,
         )
 
     async def GetIdentity(  # type: ignore[override] # noqa: N802
