@@ -78,6 +78,13 @@ export default {
               get routes() {
                 return {
                   create: { root: `${this.root}/create` },
+                  update: {
+                    root: `${this.root}/update`,
+                    user: <TUserId extends string>(userId: TUserId) =>
+                      ({
+                        root: `${this.root}/${userId}`,
+                      }) as const,
+                  },
                 } as const;
               },
             },

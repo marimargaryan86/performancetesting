@@ -22,6 +22,7 @@ const BASE_PERMISSIONS = {
   "user.add": 2 ** 14,
   "users.view": 2 ** 15,
   "users.add": 2 ** 16,
+  "users.edit": 2 ** 17,
 };
 
 const PERMISSIONS = {
