@@ -1,6 +1,4 @@
 <script>
-  import "./styles.css";
-  import "./../assets/css/colors.css";
   import Navigation from "./navigation.svelte";
 </script>
 
