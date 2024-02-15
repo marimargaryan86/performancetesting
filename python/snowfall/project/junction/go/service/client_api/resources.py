@@ -381,12 +381,49 @@ class OfferSegmentAmenity(models.BaseModel):
         )
 
 
+class VehicleInformation(models.BaseModel):
+    image_url: str | None = pydantic.Field(alias="imageUrl")
+    model: str | None
+    seats_count: int | None = pydantic.Field(alias="seatsCount")
+    doors_count: int | None = pydantic.Field(alias="doorsCount")
+    transmission: str | None
+    fuel_type: str | None = pydantic.Field(alias="fuelType")
+    baggage_quantity: int | None = pydantic.Field(alias="baggageQuantity")
+    drive_type: str | None = pydantic.Field(alias="driveType")
+    car_class: str | None = pydantic.Field(alias="carClass")
+
+    @classmethod
+    def from_proto(
+        cls,
+        vehicle_information: offer_models_pb2.VehicleInformation,
+    ) -> VehicleInformation:
+        return cls(
+            imageUrl=vehicle_information.image_url or None,
+            model=vehicle_information.model or None,
+            seatsCount=vehicle_information.seats_count
+            if vehicle_information.HasField("seats_count")
+            else None,
+            doorsCount=vehicle_information.doors_count
+            if vehicle_information.HasField("doors_count")
+            else None,
+            transmission=vehicle_information.transmission or None,
+            fuelType=vehicle_information.fuel_type or None,
+            baggageQuantity=vehicle_information.baggage_quantity
+            if vehicle_information.HasField("baggage_quantity")
+            else None,
+            driveType=vehicle_information.drive_type or None,
+            carClass=vehicle_information.car_class or None,
+        )
+
+
 class OfferSegmentAmenities(models.BaseModel):
     beverage: OfferSegmentAmenity
     entertainment: OfferSegmentAmenity
     food: OfferSegmentAmenity
     power: OfferSegmentAmenity
     wifi: OfferSegmentAmenity
+    unlimited_mileage: OfferSegmentAmenity = pydantic.Field(alias="unlimitedMileage")
+    air_conditioner: OfferSegmentAmenity = pydantic.Field(alias="airConditioner")
 
     @classmethod
     def from_proto(
@@ -399,6 +436,10 @@ class OfferSegmentAmenities(models.BaseModel):
             food=OfferSegmentAmenity.from_proto(amenities.food),
             power=OfferSegmentAmenity.from_proto(amenities.power),
             wifi=OfferSegmentAmenity.from_proto(amenities.wifi),
+            unlimitedMileage=OfferSegmentAmenity.from_proto(
+                amenities.unlimited_mileage,
+            ),
+            airConditioner=OfferSegmentAmenity.from_proto(amenities.air_conditioner),
         )
 
 
@@ -421,6 +462,7 @@ class TripOfferOptionDetailsResource(models.Resource):
                     for baggage in details.baggage_allowances
                 ],
                 "amenities": OfferSegmentAmenities.from_proto(details.amenities),
+                "vehicle": VehicleInformation.from_proto(details.vehicle),
             },
             relationships={
                 "details": {

@@ -4190,7 +4190,7 @@
             "readOnly": true,
             "nullable": true
           },
-          "class": {
+          "carClass": {
             "type": "string",
             "example": "1B",
             "readOnly": true,

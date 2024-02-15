@@ -284,6 +284,8 @@ def _parse_offer(
                     type=_get_cabin_class_type(veh_avail),
                     marketing_name="Snowfall",
                 ),
+                amenities=_get_amenities(veh_avail),
+                vehicle=_get_vehicle_information(veh_avail),
                 baggage_allowances=[
                     offer_models_pb2.BaggageAllowance(
                         free=_is_baggage_free(veh_avail),
@@ -319,6 +321,108 @@ def _parse_segment(
         vendor=vendor,
         type=models_pb2.Schedule.TYPE_CAR,
     )
+
+
+def _get_amenities(veh_avail: CarnectVehAvail) -> offer_models_pb2.SegmentAmenities:
+    amenities = offer_models_pb2.SegmentAmenities()
+
+    veh_avail_air_condition = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.air_condition_ind",
+        default=False,
+    )
+
+    if veh_avail_air_condition:
+        amenities.air_conditioner.availability = (
+            offer_models_pb2.SegmentAmenity.TYPE_INCLUDED
+        )
+
+    try:
+        is_unlimited = (
+            veh_avail.veh_avail_core.rental_rate[0].rate_distance[0].unlimited  # type: ignore[union-attr] # noqa: WPS219
+        )
+    except (IndexError, AttributeError):
+        is_unlimited = False
+
+    if is_unlimited:
+        amenities.unlimited_mileage.availability = (
+            offer_models_pb2.SegmentAmenity.TYPE_INCLUDED
+        )
+    else:
+        amenities.unlimited_mileage.availability = (
+            offer_models_pb2.SegmentAmenity.TYPE_UNAVAILABLE
+        )
+
+    return amenities
+
+
+def _get_vehicle_information(
+    veh_avail: CarnectVehAvail,
+) -> offer_models_pb2.VehicleInformation:
+    image_url = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.picture_url",
+        None,
+    )
+    model = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.veh_make_model.name",
+        None,
+    )
+    seats_count = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.passenger_quantity",
+        None,
+    )
+    doors_count = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.veh_type.door_count",
+        None,
+    )
+    transmission = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.transmission_type.value",
+        None,
+    )
+    fuel_type = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.fuel_type.value",
+        None,
+    )
+    baggage_quantity = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.baggage_quantity",
+        None,
+    )
+    drive_type = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.drive_type.value",
+        None,
+    )
+    car_class = get_optional_value(
+        veh_avail,
+        "veh_avail_core.vehicle.vendor_car_type",
+        None,
+    )
+
+    return offer_models_pb2.VehicleInformation(
+        image_url=image_url,
+        model=model,
+        seats_count=_convert_to_integer(seats_count),
+        doors_count=_convert_to_integer(doors_count),
+        transmission=transmission,
+        fuel_type=fuel_type,
+        baggage_quantity=_convert_to_integer(baggage_quantity),
+        drive_type=drive_type,
+        car_class=car_class,
+    )
+
+
+def _convert_to_integer(value: str | None) -> int | None:
+    try:
+        return int(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
 
 
 def _get_leg(

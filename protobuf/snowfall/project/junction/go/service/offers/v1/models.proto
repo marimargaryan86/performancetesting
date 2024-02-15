@@ -236,15 +236,15 @@ message OfferSegment {
 }
 
 message VehicleInformation {
-  string image_url = 1;
-  string model = 2;
-  uint32 seats_count = 3;
-  uint32 doors_count = 4;
-  string transmission = 5;
-  string fuel_type = 6;
-  uint32 baggage_quantity = 7;
-  string drive_type = 8;
-  string class = 9;
+  optional string image_url = 1;
+  optional string model = 2;
+  optional uint32 seats_count = 3;
+  optional uint32 doors_count = 4;
+  optional string transmission = 5;
+  optional string fuel_type = 6;
+  optional uint32 baggage_quantity = 7;
+  optional string drive_type = 8;
+  optional string car_class = 9;
 }
 
 message Vehicle {
