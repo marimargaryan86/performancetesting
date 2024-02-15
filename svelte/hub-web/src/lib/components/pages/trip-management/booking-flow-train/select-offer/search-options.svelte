@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { dev } from "$app/environment";
   import Checkbox from "$lib/components/ui/checkbox.svelte";
   import RangeField from "$lib/components/ui/range-field.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import { formatDuration } from "$lib/formatting/date-time";
   import { getTranslator } from "$lib/i18n";
+  import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
   import {
     getFormatSortOptionFunc,
     OFFER_SORT_OPTIONS,
@@ -17,6 +17,7 @@
   export let settings: SearchOptionsSettings;
 
   const t = getTranslator();
+  const featureTools = getFeatureTools();
 
   $: formatSortOption = getFormatSortOptionFunc($t);
 
@@ -53,8 +54,7 @@
 
   <hr />
 
-  <!-- TODO: Enable everywhere when time window searches is supposed to be released -->
-  {#if !dev}
+  {#if !$featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
     <div class="departure-time">
       <h3 typography="label-large">{$t("words.departureTime")}</h3>
       <div>
