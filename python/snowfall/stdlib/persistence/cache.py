@@ -31,7 +31,7 @@ def async_cache_ttl(
             return await cached(
                 *args,
                 **kwargs,
-                time_salt=int(time.time() / ttl.total_seconds()) if ttl else 0,
+                time_salt=int(time.monotonic() / ttl.total_seconds()) if ttl else 0,
             )
 
         return wrapper

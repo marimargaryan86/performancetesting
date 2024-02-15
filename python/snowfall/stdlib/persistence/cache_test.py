@@ -1,12 +1,12 @@
-import asyncio
 from datetime import timedelta
 from unittest import mock
+
+import freezegun
 
 from snowfall.stdlib.persistence.cache import async_cache_ttl
 
 
 async def async_function(param: int) -> int:
-    await asyncio.sleep(0.1)
     return param
 
 
@@ -23,6 +23,7 @@ class TestCache(object):
     async def test_cache_with_different_params(self) -> None:
         async_function_mock = mock.AsyncMock(wraps=async_function)
         decorated_async_function = async_cache_ttl()(async_function_mock)
+
         result1 = await decorated_async_function(1)
         result2 = await decorated_async_function(2)
         assert result1 != result2
@@ -33,8 +34,10 @@ class TestCache(object):
         decorated_async_function = async_cache_ttl(ttl=timedelta(seconds=2))(
             async_function_mock,
         )
-        await decorated_async_function(1)
-        await decorated_async_function(1)
-        await asyncio.sleep(2)
-        await decorated_async_function(1)
-        assert async_function_mock.call_count == 2
+
+        with freezegun.freeze_time() as frozen_datetime:
+            await decorated_async_function(1)
+            await decorated_async_function(1)
+            frozen_datetime.tick(timedelta(seconds=3))
+            await decorated_async_function(1)
+            assert async_function_mock.call_count == 2
