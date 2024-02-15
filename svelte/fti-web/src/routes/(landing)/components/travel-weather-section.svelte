@@ -2,6 +2,7 @@
   import FaSun from "svelte-icons/fa/FaSun.svelte";
   import FaCloudRain from "svelte-icons/fa/FaCloudRain.svelte";
   import FaRegHeart from "svelte-icons/fa/FaRegHeart.svelte";
+  import ArrowsComponent from "components/arrows-component.svelte";
   let activeFilter = "All";
   let categories = [
     "Any Weather",
@@ -10,6 +11,21 @@
     "Warm ⛅ 16-24ºC",
     "Hot ☀️ 25-30ºC",
     "Very Hot 🔥 31ºC+",
+  ];
+
+  const months: string[] = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   let results = [
@@ -53,7 +69,85 @@
       image: "/images/beach.jpeg",
       like: true,
     },
+    {
+      name: "London, England",
+      description: "10 nights, 4 star hotel, flights included",
+      stars: 5,
+      price: "£1,000",
+      image: "/images/bigben.jpeg",
+      like: true,
+    },
+    {
+      name: "Paris, France",
+      description: "10 nights, 4 star hotel, flights included",
+      stars: 5,
+      price: "£1,000",
+      image: "/images/eiffel.jpg",
+      like: true,
+    },
+    {
+      name: "New York, USA",
+      description: "10 nights, 4 star hotel, flights included",
+      stars: 5,
+      price: "£1,000",
+      image: "/images/newyork.jpeg",
+      like: true,
+    },
+    {
+      name: "Sydney, Australia",
+      description: "10 nights, 4 star hotel, flights included",
+      stars: 5,
+      price: "£1,000",
+      image: "/images/sydney.webp",
+      like: true,
+    },
+    {
+      name: "Tokyo, Japan",
+      description: "10 nights, 4 star hotel, flights included",
+      stars: 5,
+      price: "£1,000",
+      image: "/images/tokyo.jpg",
+      like: true,
+    },
+    {
+      name: "Cairo, Egypt",
+      description: "7 nights, 5 star hotel, flights included",
+      stars: 4,
+      price: "£1,200",
+      image: "/images/greece.jpeg",
+      like: true,
+    },
+    {
+      name: "Graz, Austria",
+      description: "10 nights, all inclusive, flights included",
+      stars: 5,
+      price: "£1,500",
+      image: "/images/beach.jpeg",
+      like: false,
+    },
+    {
+      name: "Cancun, Mexico",
+      description: "3 nights, 4 star hotel, flights included",
+      stars: 4,
+      price: "£500",
+      image: "/images/sand.jpeg",
+      like: false,
+    },
+    {
+      name: "Santorini, Greece",
+      description: "7 nights, 5 star hotel, flights included",
+      stars: 4,
+      price: "£2,000",
+      image: "/images/greece.jpeg",
+      like: true,
+    },
   ];
+
+  let page = 1;
+
+  function setContainerScroll({ detail }: { detail: boolean }): void {
+    page += detail ? 1 : -1;
+  }
 </script>
 
 <div class="packages-container">
@@ -63,12 +157,16 @@
       Let our handy tool help you decide where to head for your next sunshine fix.
     </p>
     <div class="when-dropdown">
-      <label for="when">When</label>
-      <input type="date" id="when" />
+      <label for="when">When?</label>
+      <select class="when-input">
+        {#each months as month}
+          <option value={month}>{month}</option>
+        {/each}
+      </select>
     </div>
     <div class="where-dropdown">
-      <label for="where">Where</label>
-      <input type="text" id="where" placeholder="Anywhere" />
+      <label for="where">Where?</label>
+      <input class="where-input" type="text" id="where" placeholder="Anywhere" />
     </div>
   </div>
   <div class="packages-filter-container">
@@ -77,9 +175,13 @@
         <button class="category-button" class:active={category === activeFilter}>{category}</button>
       {/each}
     </div>
+    <div class="arrow-buttons">
+      <ArrowsComponent on:scroll={setContainerScroll} />
+    </div>
   </div>
+  {page}
   <div class="package-results">
-    {#each results as result}
+    {#each results.slice((page - 1) * 6, page * 6) as result}
       <div class="package-card">
         <img class="package-image" src={result.image} alt={result.name} />
         <div class="temperature-box">
@@ -154,6 +256,8 @@
   }
 
   .packages-filter-container {
+    display: flex;
+    justify-content: space-between;
     padding-bottom: 40px;
   }
 
@@ -183,6 +287,40 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+  }
+
+  .where-dropdown label,
+  .when-dropdown label {
+    color: var(--text-dark-text);
+    font-weight: 500;
+    font-size: 14px;
+    font-style: normal;
+    line-height: normal;
+    opacity: 0.3;
+  }
+
+  .when-input {
+    margin: 4px 0;
+    padding: 12px 8px;
+    font-size: 16px;
+    background: #ffffff;
+    border: 1px solid #a7a7a7;
+    border-radius: 4px;
+  }
+
+  .where-input {
+    margin: 4px 0;
+    padding: 12px 8px;
+    background: #ffffff;
+    border: 1px solid #a7a7a7;
+    border-radius: 4px;
+  }
+
+  .where-input::placeholder,
+  .when-input {
+    color: black;
+    font-size: 15px;
+    font-family: "Plus Jakarta Sans", sans-serif;
   }
 
   .package-card {

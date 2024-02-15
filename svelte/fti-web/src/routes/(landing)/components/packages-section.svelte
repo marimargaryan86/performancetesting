@@ -60,7 +60,7 @@
 
   let setContainerScroll = ({ detail }: { detail: boolean }): void => {
     const container = document.querySelector(".package-results");
-    const delta = detail ? 300 : -300;
+    const delta = detail ? 352 : -352;
     if (container) {
       const currentScroll = container.scrollLeft;
       const newScroll = currentScroll + delta;
@@ -156,6 +156,7 @@
 
   .package-card {
     position: relative;
+    width: calc(33vw - 90px);
     border: 1px solid var(--dark-stroke, #c1b5b5);
     border-radius: 8px;
   }
@@ -175,7 +176,8 @@
   }
 
   .package-image {
-    width: 332px;
+    /* width: calc((100% / 3) - 332px); */
+    width: calc(33vw - 90px);
     height: 340px;
     object-fit: cover;
     border-top-left-radius: 8px;
@@ -224,5 +226,9 @@
     background: none;
     border: 1px solid #1c1c1c;
     border-radius: 4px;
+  }
+
+  .packages-button:hover {
+    cursor: pointer;
   }
 </style>

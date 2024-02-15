@@ -10,11 +10,11 @@
     },
     {
       label: "Adults Only",
-      icon: "/icons/diamond-icon.svg",
+      icon: "/icons/diamond.svg",
     },
     {
       label: "Tours",
-      icon: "/icons/compass-icon.svg",
+      icon: "/icons/compass.svg",
     },
     {
       label: "City Breaks",
@@ -130,7 +130,7 @@
     display: flex;
     flex-direction: row;
     gap: 4px;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
   }
 
@@ -141,6 +141,10 @@
     font-size: 16px;
     font-style: normal;
     line-height: 16.8px;
+  }
+
+  .label-column img {
+    margin: 13px 0;
   }
 
   .region-columns {

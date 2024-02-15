@@ -14,17 +14,17 @@
         "This package includes a scheduled flight with a renowned airline from/to Germany and back. You will be staying 7 nights in a 4-star Canareef Maldives Resort in the Sunrise Beach Villa with all inclusive. We offer a 15-minute jet lag massage as well as a complimentary drink upon arrival.",
     },
     {
-      name: "Canareef Resort Maldives",
-      location: " Maldives - Addu Atoll / Herathera",
-      length: "7 nights",
-      stars: 4,
-      price: "£1,800",
+      name: "Mayan Adventure Tour",
+      location: "Chichén Itzá",
+      length: "14 nights",
+      stars: 3,
+      price: "£1,550",
       description:
-        "This package includes a scheduled flight with a renowned airline from/to Germany and back. You will be staying 7 nights in a 4-star Canareef Maldives Resort in the Sunrise Beach Villa with all inclusive. We offer a 15-minute jet lag massage as well as a complimentary drink upon arrival.",
+        "This package includes a full filled adventure around the beautiful Quintana Roo district of Mexicos Eastern coast. Journeying around the stunning Mayan architecture you’ll have the trip of a lifetime experiencing the culture and colours of Mexico. Flights included and room upgrades available.",
     },
     {
-      name: "Canareef Resort Maldives",
-      location: " Maldives - Addu Atoll / Herathera",
+      name: "Seine Comtesse",
+      location: " Flusskreuzfahrt - Normandie / Paris",
       length: "7 nights",
       stars: 4,
       price: "£1,800",
@@ -234,7 +234,7 @@
   }
 
   .item-description-content {
-    flex-basis: 70%;
+    flex-basis: 65%;
   }
 
   .item-description-desc {
@@ -252,10 +252,10 @@
   }
 
   .explore-button {
-    padding: 18px;
+    padding: 14px 18px;
     color: white;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 14px;
     background: #ea7121;
     border: none;
     border-radius: 8px;

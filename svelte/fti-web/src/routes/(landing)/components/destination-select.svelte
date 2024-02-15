@@ -90,22 +90,23 @@
 <style>
   .dropdown {
     position: absolute;
-    box-shadow: 0px 0px 29.7px 0px rgba(0, 0, 0, 0.1);
-    background: #fff;
     top: 110px;
+    left: -36px;
     display: flex;
     flex-direction: column;
-    left: -36px;
     width: 150%;
     padding: 16px 10px;
+    background: #ffffff;
+    box-shadow: 0 0 29.7px 0 rgb(0 0 0 / 0.1);
   }
 
   .place-label {
     display: flex;
+    gap: 10px;
     align-items: center;
     border-bottom: 1px solid #f2f2f2;
-    gap: 10px;
   }
+
   .icon {
     width: 16px;
   }

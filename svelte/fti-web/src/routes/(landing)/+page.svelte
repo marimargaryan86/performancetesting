@@ -5,7 +5,7 @@
   import TravelWeatherSection from "./components/travel-weather-section.svelte";
   import WhyBook from "./components/why-book.svelte";
   import SearchBox from "./components/search-box.svelte";
-  let searchType: string = "flights";
+  let searchType: string = "combo";
 </script>
 
 <div class="landing-header">

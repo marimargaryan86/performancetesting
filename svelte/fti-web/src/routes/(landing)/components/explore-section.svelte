@@ -17,11 +17,11 @@
   </div>
   <div class="holidays">
     <div class="holiday holiday-cruise">
-      <p>Ocean Cruises</p>
+      <p>Packages under €250pp</p>
       <button>Explore</button>
     </div>
     <div class="holiday holiday-inclusive">
-      <p>All Inclusive</p>
+      <p>All-inclusive Holidays</p>
       <button>Explore</button>
     </div>
   </div>
@@ -168,13 +168,14 @@
   .holiday p {
     color: #ffffff;
     font-weight: 700;
-    font-size: 28px;
+    font-size: 22px;
     font-style: normal;
     line-height: normal;
   }
 
   .holiday button {
     align-self: flex-end;
+    padding: 12px 16px;
   }
 
   .holiday-cruise {

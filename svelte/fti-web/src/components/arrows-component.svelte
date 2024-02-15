@@ -24,6 +24,7 @@
   .filter-buttons {
     display: flex;
     gap: 8px;
+    align-items: center;
   }
 
   .filter-button {
