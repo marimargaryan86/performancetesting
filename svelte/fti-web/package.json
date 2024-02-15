@@ -13,7 +13,6 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@fontsource/fira-mono": "^4.5.10",
     "@melt-ui/pp": "^0.3.0",
     "@melt-ui/svelte": "^0.72.0",
     "@neoconfetti/svelte": "^1.0.0",
