@@ -36,7 +36,7 @@ pants:setup:
         mkdir -p "${path}"
       }
 
-      nuke_if_too_big "${PANTS_NAMED_CACHES_DIR}" 2048
+      nuke_if_too_big "${PANTS_NAMED_CACHES_DIR}" 4098
   artifacts:
     paths:
       - .pants.d/pants.log
@@ -85,9 +85,8 @@ pants:test:
   extends: .pants
   stage: test
   interruptible: true
-  parallel: 3
   script:
-    - 'pants test --shard="$((${CI_NODE_INDEX}-1))/${CI_NODE_TOTAL}" --pytest-args="--disable-socket --allow-unix-socket" ::'
+    - 'pants test --pytest-args="--disable-socket --allow-unix-socket" ::'
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
