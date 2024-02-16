@@ -56,15 +56,25 @@ class Stripe(interfaces.CreditCardProvider):
             raise ValueError
 
         intent_money = money.from_protobuf(payment.amount)
-        payment_intent = stripe.PaymentIntent.create(
-            amount=intent_money.amount,
-            currency=intent_money.currency.code,
-            capture_method=payment.capture_method,
-            customer=payment.credit_card_holder_id or "",
-            automatic_payment_methods={
-                "enabled": payment.enable_automatic_payment_method,
-            },
-        )
+        if payment.credit_card_holder_id:
+            payment_intent = stripe.PaymentIntent.create(
+                amount=intent_money.amount,
+                currency=intent_money.currency.code,
+                capture_method=payment.capture_method,
+                customer=payment.credit_card_holder_id,
+                automatic_payment_methods={
+                    "enabled": payment.enable_automatic_payment_method,
+                },
+            )
+        else:
+            payment_intent = stripe.PaymentIntent.create(
+                amount=intent_money.amount,
+                currency=intent_money.currency.code,
+                capture_method=payment.capture_method,
+                automatic_payment_methods={
+                    "enabled": payment.enable_automatic_payment_method,
+                },
+            )
 
         payment.id = payment_intent.id
         payment.secret = payment_intent.client_secret or ""
