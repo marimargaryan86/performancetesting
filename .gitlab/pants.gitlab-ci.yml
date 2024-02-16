@@ -95,7 +95,7 @@ pants:test:
         coverage_format: cobertura
         path: dist/coverage/python/coverage.xml
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULED_JOB == "daily-test-coverage"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
     - if: '$CI_MERGE_REQUEST_IID'
