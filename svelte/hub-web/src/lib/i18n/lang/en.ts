@@ -383,7 +383,7 @@ export default {
         privacyPolicy: {
           title: "Privacy Policy",
           content: `
-<p>We believe in protecting the end customer’s privacy. Please see our privacy policy at (insert hyperlink to Website Privacy Policy) and please make your privacy policy available to the end customer as this will apply to their booking.</p>
+<p>We believe in protecting the end customer’s privacy. Please see our <a href="https://snowfalltravel.com/privacy-policy">privacy policy</a> and please make your privacy policy available to the end customer as this will apply to their booking.</p>
 <h2 typography="body-large" weight="bold">Indemnification</h2>
 <p>You agree to defend us, and/or our respective suppliers and any of their officers, directors, employees, and agents from and against any claims, causes of action, demands, recoveries, losses, damages, fines, penalties or other costs or expenses of any kind or nature including but not limited to reasonable legal and accounting fees, brought by third parties as a result of:</p>
 <ul>
