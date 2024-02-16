@@ -58,6 +58,10 @@ class CancelReservationRqBuilder(object):
             ],
         )
 
+    def surname(self, surname: str) -> None:
+        if self._rq.veh_cancel_rqcore and self._rq.veh_cancel_rqcore.person_name:
+            self._rq.veh_cancel_rqcore.person_name.surname = surname
+
     def unique_id_and_surname(self, unique_id: str, surname: str) -> None:
         self._rq.veh_cancel_rqcore = CancelInfoRqtype(
             [

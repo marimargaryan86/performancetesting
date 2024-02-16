@@ -4,6 +4,7 @@
     "variables": {
       "count": 1,
       "provider_company_id": "ecb66326-b796-41a7-8658-d0c0f91eb912",
+      "bucket": "junction-provider-data-development",
       "api_base_url": "https://ota2007a.micronnexus-staging.com/service.asmx"
     }
   },
@@ -12,6 +13,7 @@
     "variables": {
       "count": 2,
       "provider_company_id": "",
+      "bucket": "junction-provider-data-production",
       "api_base_url": "https://ota2007a.carhire-solutions.com/service.asmx"
     }
   },
@@ -20,6 +22,7 @@
     "variables": {
       "count": 1,
       "provider_company_id": "",
+      "bucket": "junction-provider-data-sandbox",
       "api_base_url": "https://ota2007a.micronnexus-staging.com/service.asmx"
     }
   }

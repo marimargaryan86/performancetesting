@@ -42,6 +42,10 @@ class VehRetResRqBuilder(object):
         self._veh_ret_res_rqcore().person_name = person_name.get()
         return person_name
 
+    def surname(self, surname: str) -> None:
+        if self._rq.veh_ret_res_rqcore and self._rq.veh_ret_res_rqcore.person_name:
+            self._rq.veh_ret_res_rqcore.person_name.surname = surname
+
     def _veh_ret_res_rqcore(self) -> VehicleRetrieveResRqcoreType:
         if not self._rq.veh_ret_res_rqcore:
             self._rq.veh_ret_res_rqcore = VehicleRetrieveResRqcoreType()

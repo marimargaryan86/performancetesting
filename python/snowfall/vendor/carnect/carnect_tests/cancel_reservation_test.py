@@ -23,7 +23,7 @@ async def test_cancel_by_unique_id(
     person_name.surname("Jones")
 
     rs_adapter = CancelReservationAdapter(
-        await carnect_client.cancel_reservation(rq.build()),
+        await carnect_client.cancel_reservation(rq),
     )
     assert rs_adapter.is_success(), rs_adapter.get_error()
     assert rs_adapter.cancel_info() is not None
@@ -41,7 +41,7 @@ async def test_cancel_by_id_context(
     cancel_info_type.get_person_name().surname("Test")
 
     rs_adapter = CancelReservationAdapter(
-        await carnect_client.cancel_reservation(rq.build()),
+        await carnect_client.cancel_reservation(rq),
     )
     assert rs_adapter.is_success(), rs_adapter.get_error()
     assert rs_adapter.cancel_info() is not None

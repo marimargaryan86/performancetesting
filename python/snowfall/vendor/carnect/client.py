@@ -2,6 +2,10 @@ from typing import Any
 
 import httpx
 
+from snowfall.vendor.carnect.builders import (
+    cancel_reservation_builder,
+    veh_ret_res_builder,
+)
 from snowfall.vendor.carnect.builders.reservation_builder import ReservationBuilder
 from snowfall.vendor.carnect.config import Config
 from snowfall.vendor.carnect.models.service import (
@@ -31,11 +35,9 @@ from snowfall.vendor.carnect.models.service import (
     ServiceSoapGetVehRetReservationInput,
     ServiceSoapGetVehRetReservationOutput,
     VehAvailRateRq,
-    VehCancelResRq,
     VehLocationSearchRq,
     VehLocDetailRq,
     VehRateRuleRq,
-    VehRetResRq,
 )
 from snowfall.vendor.carnect.soap.soap_client import (
     AsyncSoapClient,
@@ -124,22 +126,36 @@ class CarnectClient(object):
 
     async def cancel_reservation(
         self,
-        rq: VehCancelResRq,
+        cancel_rq_builder: cancel_reservation_builder.CancelReservationRqBuilder,
     ) -> ServiceSoapGetVehCancelReservationOutput:
+        if self._config.is_test:
+            # Test env requirements:
+            # http://doc.carnect.com/ota2007/getting_started.html#test-reservations
+            cancel_rq_builder.surname("Test")
+
         return await self._cancel_reservation_client.send(
             rq_object=ServiceSoapGetVehCancelReservationInput(
-                body=ServiceSoapGetVehCancelReservationInput.Body(veh_cancel_res_rq=rq),
+                body=ServiceSoapGetVehCancelReservationInput.Body(
+                    veh_cancel_res_rq=cancel_rq_builder.build(),
+                ),
             ),
             headers=self._get_headers(ServiceSoapGetVehCancelReservation.soap_action),
         )
 
     async def retrieve_reservation(
         self,
-        rq: VehRetResRq,
+        rq_builder: veh_ret_res_builder.VehRetResRqBuilder,
     ) -> ServiceSoapGetVehRetReservationOutput:
+        if self._config.is_test:
+            # Test env requirements:
+            # http://doc.carnect.com/ota2007/getting_started.html#test-reservations
+            rq_builder.surname("Test")
+
         return await self._veh_ret_res_client.send(
             rq_object=ServiceSoapGetVehRetReservationInput(
-                body=ServiceSoapGetVehRetReservationInput.Body(veh_ret_res_rq=rq),
+                body=ServiceSoapGetVehRetReservationInput.Body(
+                    veh_ret_res_rq=rq_builder.build(),
+                ),
             ),
             headers=self._get_headers(ServiceSoapGetVehRetReservation.soap_action),
         )

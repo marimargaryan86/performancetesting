@@ -1,3 +1,5 @@
+import datetime
+
 from snowfall.vendor.carnect.adapters.common import (
     BaseAdapter,
     get_error_text,
@@ -55,4 +57,26 @@ class ReservationAdapter(BaseAdapter):
         if self._rs and self._rs.veh_res_rscore:
             return self._rs.veh_res_rscore.veh_reservation
 
+        return None
+
+    def get_status(self) -> str | None:
+        if self._rs and self._rs.veh_res_rscore:
+            return self._rs.veh_res_rscore.reservation_status
+
+        return None
+
+    def get_timestamp(self) -> datetime.datetime | None:
+        if self._rs and self._rs.time_stamp:
+            return datetime.datetime(
+                day=self._rs.time_stamp.day,
+                month=self._rs.time_stamp.month,
+                year=self._rs.time_stamp.year,
+                hour=self._rs.time_stamp.hour,
+                minute=self._rs.time_stamp.minute,
+                second=self._rs.time_stamp.second,
+                microsecond=self._rs.time_stamp.microsecond,
+                tzinfo=datetime.timezone(
+                    datetime.timedelta(minutes=float(self._rs.time_stamp.offset or 0)),
+                ),
+            )
         return None

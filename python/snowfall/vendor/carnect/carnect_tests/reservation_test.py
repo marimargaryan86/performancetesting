@@ -58,9 +58,9 @@ async def test_reservation(
     id_context = res_adapter.get_id_context()
     assert id_context is not None
 
-    cancel_rq = _build_cancel_rq(carnect_config, id_context, "Test")
+    cancel_rq_builder = _build_cancel_rq(carnect_config, id_context, "Test")
     cancel_adapter = CancelReservationAdapter(
-        await carnect_client.cancel_reservation(cancel_rq.build()),
+        await carnect_client.cancel_reservation(cancel_rq_builder),
     )
     assert cancel_adapter.is_success(), cancel_adapter.get_error()
 

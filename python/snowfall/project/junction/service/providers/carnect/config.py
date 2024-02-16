@@ -33,6 +33,7 @@ class PricingSettings(application.Settings, CarnectConfig):
 
 class Settings(CarnectConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+    storage_dsn: service.AnyDsn
 
 
 class OrderSettings(application.Settings, CarnectConfig):

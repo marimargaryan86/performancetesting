@@ -1,20 +1,226 @@
 import datetime
 import pathlib
+import types
+import uuid
+
+from xsdata.formats.dataclass import parsers
+from xsdata.formats.dataclass.parsers import config as parsers_config
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
+from snowfall.project.junction.provider.v1 import bookings_pb2
 from snowfall.project.junction.service.providers.carnect import adapter, cache
-from snowfall.stdlib import money
+from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.carnect import client
 from snowfall.vendor.carnect import config as carnect_settings
-from snowfall.vendor.carnect.adapters import reservation_adapter
-from snowfall.vendor.carnect.builders import reservation_builder
+from snowfall.vendor.carnect.adapters import (
+    cancel_reservation_adapter,
+    reservation_adapter,
+    veh_ret_res_adapter,
+)
+from snowfall.vendor.carnect.builders import (
+    cancel_reservation_builder,
+    reservation_builder,
+    veh_ret_res_builder,
+)
 from snowfall.vendor.carnect.models import service
 
 _DEFAULT_LANGUAGE = "en"
+
+_STATUS_MAP = types.MappingProxyType({
+    "Pending": bookings_pb2.Booking.STATUS_PENDING,
+    "Confirmed": bookings_pb2.Booking.STATUS_CONFIRMED,
+    "Failed": bookings_pb2.Booking.STATUS_ERROR,
+    None: bookings_pb2.Booking.STATUS_ERROR,
+})
+
+
+def parse_reservation_output_from_raw(
+    response: bytes,
+) -> service.ServiceSoapGetVehReservationOutput:
+    parser = parsers.XmlParser(
+        config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
+    )
+    return parser.from_bytes(response, service.ServiceSoapGetVehReservationOutput)
+
+
+class Transformer(object):
+    def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
+        self._provider_id = str(provider_identifier)
+        self._provider_name = provider_name
+
+    async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
+        response = parse_reservation_output_from_raw(raw)
+        res_adapter = reservation_adapter.ReservationAdapter(response)
+        reservation = res_adapter.reservation()
+        timestamp = res_adapter.get_timestamp()
+        status = res_adapter.get_status()
+        booking_status = _STATUS_MAP.get(status, bookings_pb2.Booking.STATUS_CANCELLED)
+
+        try:
+            vendor_reference = reservation.veh_segment_core.vendor.value  # type: ignore[union-attr]
+        except AttributeError:
+            vendor_reference = ""
+
+        return bookings_pb2.Booking(
+            id=str(res_adapter.get_id_context()),
+            status=booking_status,
+            provider=bookings_pb2.Booking.Provider(
+                id=self._provider_id,
+                name=self._provider_name,
+            ),
+            trip=bookings_pb2.Booking.Trip(
+                record_locator=res_adapter.get_unique_id() or "",
+                operator_booking_references=[vendor_reference],
+            ),
+            created_at=protobuf.datetime_to_protobuf(timestamp) if timestamp else None,
+        )
+
+
+class _CarnectCancellationError(Exception):
+    """Raised when there is a Carnect-related issue."""
+
+
+class BookingCancellationHandler(object):
+    def __init__(
+        self,
+        carnect_client: client.CarnectClient,
+        carnect_config: carnect_settings.Config,
+    ) -> None:
+        self._client = carnect_client
+        self._carnect_config = carnect_config
+        self._logger = stdout.get_logger()
+
+    async def cancel_booking(
+        self,
+        provider_booking_reference: str,
+    ) -> bookings_pb2.BookingCancellation:
+        try:
+            rs_adapter = await self._cancel_booking(provider_booking_reference)
+        except (errors.HttpError, _CarnectCancellationError, ValueError):
+            self._logger.exception(
+                "Booking cancellation failed",
+                provider_booking_reference=provider_booking_reference,
+            )
+
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=provider_booking_reference,
+                status=bookings_pb2.BookingCancellation.STATUS_REFUND_FAILED,
+            )
+
+        try:
+            amount = await self._get_refunded_us(rs_adapter, provider_booking_reference)
+        except (adapter.FieldMissingError, _CarnectCancellationError):
+            self._logger.exception(
+                "Failed to get total amount",
+                provider_booking_reference=provider_booking_reference,
+            )
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=provider_booking_reference,
+                status=bookings_pb2.BookingCancellation.STATUS_REFUND_FAILED,
+            )
+
+        return bookings_pb2.BookingCancellation(
+            provider_booking_reference=provider_booking_reference,
+            status=bookings_pb2.BookingCancellation.STATUS_REFUND_DUE,
+            refunded_us=amount.protobuf(),
+        )
+
+    async def _get_refunded_us(
+        self,
+        rs_adapter: cancel_reservation_adapter.CancelReservationAdapter,
+        provider_booking_reference: str,
+    ) -> money.Money:
+        fees = adapter.get_optional_value(
+            rs_adapter.cancel_info(),
+            "veh_reservation.veh_segment_core.fees.fee",
+            [],
+        )
+        if not fees:
+            raise adapter.FieldMissingError(
+                "Cancellation fee information is missing in cancellation response",
+            )
+
+        if fees[0].amount is None:
+            raise adapter.FieldMissingError(
+                "Cancellation fee amount is missing in cancellation response",
+            )
+
+        if fees[0].currency_code is None:
+            raise adapter.FieldMissingError(
+                "Cancellation fee currency_code is missing in cancellation response",
+            )
+
+        fee = money.from_string(
+            string_amount=str(fees[0].amount),
+            currency=money.Currency(fees[0].currency_code.upper()),
+        )
+
+        amount = money.Money(0, currency=fee.currency)
+        if fee.amount == 0:
+            amount = await self._get_total_amount(provider_booking_reference)
+
+        return amount
+
+    async def _get_total_amount(
+        self,
+        provider_booking_reference: str,
+    ) -> money.Money:
+        builder = veh_ret_res_builder.VehRetResRqBuilder(self._carnect_config)
+
+        id_context, surname = sequence.from_composite_id(provider_booking_reference)
+        builder.unique_id().id_context(id_context)
+        builder.person_name().surname(surname)
+
+        rs_adapter = veh_ret_res_adapter.VehRetResAdapter(
+            await self._client.retrieve_reservation(builder),
+        )
+        if not rs_adapter.is_success():
+            raise _CarnectCancellationError(rs_adapter.get_error())
+
+        rs_core = rs_adapter.rs_core()
+        amount = adapter.get_optional_value(
+            rs_core,
+            "veh_reservation.veh_segment_core.total_charge.estimated_total_amount",
+            None,
+        )
+        currency_code = adapter.get_optional_value(
+            rs_core,
+            "veh_reservation.veh_segment_core.total_charge.currency_code",
+            None,
+        )
+
+        if amount is None:
+            raise adapter.FieldMissingError("missing value: total amount")
+        if currency_code is None:
+            raise adapter.FieldMissingError("missing value: currency code")
+
+        return money.from_string(str(amount), money.Currency(currency_code.upper()))
+
+    async def _cancel_booking(
+        self,
+        provider_booking_reference: str,
+    ) -> cancel_reservation_adapter.CancelReservationAdapter:
+        id_context, surname = sequence.from_composite_id(provider_booking_reference)
+
+        cancel_rq_builder = cancel_reservation_builder.CancelReservationRqBuilder(
+            self._carnect_config,
+        )
+        cancel_info_type = cancel_rq_builder.get_cancel_info_type()
+        unique_id = cancel_info_type.add_unique_id()
+        unique_id.id_context(id_context)
+        cancel_info_type.get_person_name().surname(surname)
+
+        response = await self._client.cancel_reservation(cancel_rq_builder)
+        rs_adapter = cancel_reservation_adapter.CancelReservationAdapter(response)
+
+        if not rs_adapter.is_success():
+            raise _CarnectCancellationError(rs_adapter.get_error())
+
+        return rs_adapter
 
 
 class BookingHandler(object):
@@ -69,9 +275,14 @@ class BookingHandler(object):
 
         # TODO(hovhannes.d): send notification
 
+        provider_booking_reference = sequence.to_composite_id([
+            id_context,
+            task.passengers[0].last_name,
+        ])
+
         try:
             booking = self._res_adapter_to_booking(
-                id_context=id_context,
+                provider_booking_reference=provider_booking_reference,
                 unique_id=res_adapter.get_unique_id(),
                 reservation=reservation,
                 raw_data=raw_data,
@@ -91,7 +302,7 @@ class BookingHandler(object):
         new_booking.MergeFrom(booking)
 
         await self._storage.put(
-            pathlib.Path(id_context),
+            pathlib.Path(provider_booking_reference),
             raw_data,
         )
 
@@ -111,7 +322,7 @@ class BookingHandler(object):
 
     def _res_adapter_to_booking(
         self,
-        id_context: str,
+        provider_booking_reference: str,
         unique_id: str | None,
         reservation: service.VehicleReservationType,
         raw_data: bytes,
@@ -120,7 +331,7 @@ class BookingHandler(object):
             status=models_pb2.Booking.STATUS_CONFIRMED,
             provider_total_price=get_total_price(reservation).protobuf(),
             trip_result=models_pb2.TripBooking(
-                provider_booking_reference=id_context,
+                provider_booking_reference=provider_booking_reference,
                 record_locator=unique_id if unique_id else "",
                 created_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(tz=datetime.UTC),
