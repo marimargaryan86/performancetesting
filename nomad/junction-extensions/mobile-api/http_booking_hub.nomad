@@ -216,7 +216,7 @@ EOH
         PROMETHEUS_PORT           = "${NOMAD_PORT_prometheus}"
         MONGO_DB                  = "booking-hub-mobile-api"
         CLIENT_NAME               = "Snowfall"
-        CREATE_STRIPE_CUSTOMERS   = false
+        CREATE_STRIPE_CUSTOMERS   = true
         SUPPORT_EMAIL             = "support@snowfalltravel.com"
         PLUS_POC_API_ADDRESS      = "${var.plus_poc_api_address}"
         PLUS_POC_ACTIVATED        = var.plus_poc_activated
