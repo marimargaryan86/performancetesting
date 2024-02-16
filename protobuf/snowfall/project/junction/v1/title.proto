@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package snowfall.project.junction.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1";
+
+enum Title {
+  TITLE_UNSPECIFIED = 0;
+  TITLE_MR = 1;
+  TITLE_MRS = 2;
+  TITLE_MISS = 3;
+  TITLE_MS = 4;
+}

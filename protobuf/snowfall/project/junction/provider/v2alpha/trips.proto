@@ -4,17 +4,22 @@ package snowfall.project.junction.provider.v2alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/v1/fare_type.proto";
+import "snowfall/project/junction/v1/gender.proto";
 import "snowfall/project/junction/v1/segment_type.proto";
+import "snowfall/project/junction/v1/title.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 import "snowfall/stdlib/v1/money.proto";
+import "snowfall/stdlib/v1/phone_number.proto";
+import "snowfall/stdlib/v1/postal_address.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/provider/v2alpha";
 
 service TripService {
   rpc SearchTrips(SearchTripsRequest) returns (SearchTripsResponse) {}
   rpc SearchOffers(SearchOffersRequest) returns (SearchOffersResponse) {}
+  rpc BookOffer(BookOfferRequest) returns (BookOfferResponse) {}
 }
 
 message Location {
@@ -167,4 +172,34 @@ message SearchOffersRequest {
 
 message SearchOffersResponse {
   repeated Offer offers = 1;
+}
+
+message Passenger {
+  snowfall.stdlib.v1.Date date_of_birth = 1;
+  string first_name = 2;
+  string last_name = 3;
+  snowfall.project.junction.v1.Title title = 4;
+  snowfall.project.junction.v1.Gender gender = 5;
+  string email = 6;
+  snowfall.stdlib.v1.PhoneNumber phone = 7;
+  snowfall.stdlib.v1.PostalAddress residential_address = 8;
+  message Passport {
+    string document_number = 1;
+    string issue_county = 2;
+    string nationality = 3;
+    string residence_country_code = 4;
+    snowfall.stdlib.v1.Date expires_on = 5;
+    snowfall.stdlib.v1.Date issued_on = 6;
+  }
+  Passport passport = 9;
+}
+
+message BookOfferRequest {
+  string offer_id = 1;
+  repeated Passenger passengers = 2;
+  // @todo(bolmis): add custom config data for the provider
+}
+
+message BookOfferResponse {
+  // @todo(bolmis): booking info
 }

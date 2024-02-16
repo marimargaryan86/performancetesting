@@ -152,6 +152,13 @@ class TripService(service.Service, trips_pb2_grpc.TripServiceServicer):
 
         return await search_function(getattr(request, search_mode), request.passengers)
 
+    async def BookOffer(  # type: ignore[override] # noqa: N802
+        self,
+        request: trips_pb2.BookOfferRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> trips_pb2.BookOfferResponse:
+        raise NotImplementedError
+
     async def _validate_request(
         self,
         request: trips_pb2.SearchTripsRequest | trips_pb2.SearchOffersRequest,
