@@ -97,6 +97,7 @@ export function getFeatures(): Readable<{
 }
 
 export function getAvailableFeatures(environment?: string, user?: OrySchemas.User): Features {
+  // Enable all features for certain envs and when user is a snowfall-admin
   if (
     (environment && ["development", "localhost"].includes(environment)) ||
     user?.role === "snowfall-admin"
@@ -105,7 +106,7 @@ export function getAvailableFeatures(environment?: string, user?: OrySchemas.Use
   }
 
   return {
-    // To enable a flag in production:
-    // [Feature.OFFERS_TIME_WINDOWS]: FEATURES["offers-time-windows"],
+    // Enable the following features in production:
+    [Feature.OFFERS_TIME_WINDOWS]: FEATURES["offers-time-windows"],
   };
 }
