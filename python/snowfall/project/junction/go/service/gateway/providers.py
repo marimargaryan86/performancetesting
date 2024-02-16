@@ -10,6 +10,7 @@ from typing import ClassVar, NamedTuple
 import prometheus_client
 from grpc import aio
 
+from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
 from snowfall.project.junction.provider.v1 import (
     bookings_pb2_grpc,
     meta_pb2,
@@ -100,11 +101,15 @@ class _ProviderWrapper(object):
             meta_pb2.GetCapabilitiesRequest(),
         )
 
+        trip_search_capability = None
+        if capabilities_response.HasField("trip_search_capabilities"):
+            trip_search_capability = capabilities_response.trip_search_capabilities
         self.provider = Provider(
             connection=self.provider.connection,
             identifier=meta_response.id,
             name=meta_response.name,
             booking_capabilities=capabilities_response.booking_capabilities,
+            trip_search_capabilities=trip_search_capability,
         )
 
 
@@ -173,9 +178,26 @@ class Provider(object):
     booking_capabilities: meta_pb2.BookingCapabilities = dataclasses.field(
         default_factory=meta_pb2.BookingCapabilities,
     )
+    trip_search_capabilities: meta_pb2.TripSearchCapabilities | None = None
 
     def marshal_resource_id(self, resource_id: str) -> str:
         return sequence.to_composite_id([self.identifier, resource_id])
+
+    def has_capability_for(
+        self,
+        msg: amqp_pb2.TripOfferSearchTask | amqp_pb2.SimpleTripOfferSearchTask,
+    ) -> bool:
+        if self.trip_search_capabilities is None:
+            # TODO(hovhannes.d): This case is for all the existing providers which
+            #  don't implement capabilities yet.
+            #  When all providers are updated, this block can be removed.
+            return True
+
+        mapping = {
+            amqp_pb2.TripOfferSearchTask: self.trip_search_capabilities.supports_trip_search,
+            amqp_pb2.SimpleTripOfferSearchTask: self.trip_search_capabilities.supports_simple_search,
+        }
+        return mapping.get(msg.__class__, False)
 
 
 class Connection(object):

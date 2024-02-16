@@ -153,6 +153,7 @@ class Queue(
         search_tasks = [
             _do_offer_search(provider, msg, self._timeout, self._simple_search_timeout)
             async for provider in self._providers.all_healthy()
+            if provider.has_capability_for(msg)
         ]
 
         for task in asyncio.as_completed(search_tasks):
