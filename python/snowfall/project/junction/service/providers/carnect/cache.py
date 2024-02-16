@@ -14,6 +14,7 @@ class OfferDetails(redis_repository.RedisRecord):
     departure_at: datetime.datetime
     arrival_at: datetime.datetime
     passengers_count: int
+    driver_age: int
     vendor: str | None
     origin: Coordinates
     destination: Coordinates
@@ -47,6 +48,7 @@ def generate_cache_key(
                 str(search_criteria.origin),
                 str(search_criteria.destination),
                 str(search_criteria.passengers_count),
+                str(search_criteria.driver_age),
                 str(search_criteria.pick_up_datetime),
                 str(search_criteria.return_datetime),
             ),

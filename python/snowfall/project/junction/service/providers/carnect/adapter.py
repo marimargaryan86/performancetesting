@@ -494,6 +494,7 @@ class CarnectOfferMatcher(object):
                 longitude=offer_details.destination.longitude,
             ),
             passengers_count=offer_details.passengers_count,
+            driver_age=offer_details.driver_age,
             pick_up_datetime=protobuf.datetime_to_protobuf_datetime(
                 offer_details.departure_at,
             ),
@@ -533,7 +534,6 @@ class CarnectOfferMatcher(object):
 
         return None
 
-    # 2. Match offers
     def _offer_matches(
         self,
         veh_avail: CarnectVehAvail,
@@ -693,6 +693,7 @@ class CarnectOffersAdapter(object):
                     longitude=search_task.destination.longitude,
                 ),
                 passengers_count=search_task.passengers_count,
+                driver_age=search_task.driver_age,
                 vendor=vendor,
                 cabin_class=cabin_class_type,
                 equipment=equipment,
@@ -719,6 +720,7 @@ def _build_request(
     request.version(_REQ_RESP_VERSION)
     request.rate_query_type(service.RateQueryType.LIVE)
     request.rate_query_parameter_type(_TYPE_GEO_COORDINATES)
+    request.add_driver_age(search_task.driver_age)
     request.add_passenger_quantity(search_task.passengers_count)
     if vendor_code:
         request.add_pref_vendor(vendor_code)

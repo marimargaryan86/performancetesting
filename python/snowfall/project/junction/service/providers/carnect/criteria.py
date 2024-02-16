@@ -2,6 +2,7 @@ from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.time import date_to_age
 
 
 def simple_search_criteria_task_generator(
@@ -15,6 +16,7 @@ def simple_search_criteria_task_generator(
             origin=search.origin.coordinates,
             destination=search.destination.coordinates,
             passengers_count=len(search.passengers),
+            driver_age=_get_driver_age(search.passengers[0]),
             pick_up_datetime=protobuf.datetime_to_protobuf_datetime(
                 protobuf.protobuf_to_datetime(
                     search.departure_at,
@@ -33,3 +35,11 @@ def simple_search_criteria_generator(
     search_task: amqp_pb2.Criteria,
 ) -> amqp_pb2.Criteria:
     return search_task
+
+
+def _get_driver_age(passenger: offers_pb2.Passenger) -> int:
+    return date_to_age(
+        protobuf.protobuf_to_date(
+            passenger.date_of_birth,
+        ),
+    )
