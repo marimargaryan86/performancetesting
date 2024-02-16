@@ -33,6 +33,8 @@ from snowfall.vendor.duffel.builders.offer_request import (
 from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_slice import OfferSliceSegment
 
+_ADULT_AGE = 18
+
 
 def _fares_sort_key(
     elem: PrivateFare,
@@ -132,9 +134,15 @@ class DuffelSearchAdapter(object):
         )
 
         for passenger_age in search_task.criteria.passenger_ages:
-            offer_request_builder.add_passenger(
-                OfferRequestPassenger(age=passenger_age, pax_type=None),
-            )
+            if passenger_age <= _ADULT_AGE:
+                pax_type = "adult"
+                offer_request_builder.add_passenger(
+                    OfferRequestPassenger(pax_type=pax_type),
+                )
+            else:
+                offer_request_builder.add_passenger(
+                    OfferRequestPassenger(age=passenger_age),
+                )
 
         offer_request_builder.add_slice(
             OfferRequestSlice(
