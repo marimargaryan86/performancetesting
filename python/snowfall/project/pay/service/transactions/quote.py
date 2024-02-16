@@ -136,10 +136,6 @@ class Quote(object):
                     base_converted,
                     total_markups,
                     tax_converted,
-                    self._fee_amount.convert(
-                        self._to_currency,
-                        rate,
-                    ),
                 ],
             ),
             "quotation": money.total(
