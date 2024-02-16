@@ -38,7 +38,7 @@ async def get_or_create_stripe_customer(
     else:
         guest = await guests_repository.find_by_id(user_id)
         if not guest:
-            raise exceptions.HTTPException(status.HTTP_502_BAD_GATEWAY)
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
         (
             api_response_user,
             ephemeral_key,
