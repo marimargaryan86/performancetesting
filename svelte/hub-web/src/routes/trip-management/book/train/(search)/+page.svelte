@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { getPageTitle } from "$lib/utils/page-title";
   import TripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
   import { getTranslator } from "$lib/i18n";
   import type { ComponentEvents } from "svelte";
@@ -7,6 +6,7 @@
   import { goto } from "$app/navigation";
   import routeConfig from "$lib/route-config";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
+  import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
 
   const featureTools = getFeatureTools();
   const t = getTranslator();
@@ -19,20 +19,14 @@
   }
 </script>
 
-<svelte:head>
-  <title>
-    {getPageTitle(
-      $t("title"),
-      $t("pages.tripManagement.title"),
-      $t("pages.tripManagement.pages.book.title"),
-      $t("pages.tripManagement.pages.book.pages.search.title"),
-    )}
-  </title>
-</svelte:head>
-
-<div class="search-wrapper">
-  <TripSearch on:search={search} />
-</div>
+<BookingLayout
+  pageTitle={$t("pages.tripManagement.pages.book.pages.search.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.search.subTitle")}
+>
+  <div class="search-wrapper">
+    <TripSearch on:search={search} />
+  </div>
+</BookingLayout>
 
 <style>
   .search-wrapper {

@@ -18,7 +18,6 @@
   import { writable } from "svelte/store";
   import { formatAmount } from "$lib/formatting/currency";
   import TripBanner from "$lib/components/pages/trip-management/booking-flow-train/trip-banner.svelte";
-  import { getPageTitle } from "$lib/utils/page-title";
   import { getLocale, getTranslator } from "$lib/i18n";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import {
@@ -28,6 +27,7 @@
     type PartialMarkups,
   } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
   import { browser } from "$app/environment";
+  import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
 
   export let data;
 
@@ -185,17 +185,6 @@
   });
 </script>
 
-<svelte:head>
-  <title>
-    {getPageTitle(
-      $t("title"),
-      $t("pages.tripManagement.title"),
-      $t("pages.tripManagement.pages.book.title"),
-      $t("pages.tripManagement.pages.book.pages.payment.title"),
-    )}
-  </title>
-</svelte:head>
-
 {#if priceQuote}
   <PriceDialog
     originalPrice={data.bookingSession.selectedOffer.originalPrice}
@@ -206,44 +195,49 @@
   <FareRulesDialog bind:this={fareRulesDialog} {priceQuote} />
 {/if}
 
-<div class="content">
-  {#if priceQuote}
-    <TripBanner {priceQuote} passengers={data.bookingSession.searchData.passengers} />
-  {/if}
+<BookingLayout
+  showActions
+  pageTitle={$t("pages.tripManagement.pages.book.pages.payment.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.payment.subTitle")}
+>
+  <div class="content">
+    {#if priceQuote}
+      <TripBanner {priceQuote} passengers={data.bookingSession.searchData.passengers} />
+    {/if}
 
-  <Countdown expiresAt={data.bookingSession.priceQuote.expiresAt} type="price-quote" show />
+    <Countdown expiresAt={data.bookingSession.priceQuote.expiresAt} type="price-quote" show />
 
-  <div class="wrapper">
-    <div class="column passengers">
-      {#each bookingData.passengers as passenger, idx}
-        <PassengerEntry
-          bind:passenger
-          errors={errors?.passengers?.[idx]}
-          required={priceQuote?.required ?? []}
-          passengerNumber={idx + 1}
+    <div class="wrapper">
+      <div class="column passengers">
+        {#each bookingData.passengers as passenger, idx}
+          <PassengerEntry
+            bind:passenger
+            errors={errors?.passengers?.[idx]}
+            required={priceQuote?.required ?? []}
+            passengerNumber={idx + 1}
+          />
+        {/each}
+      </div>
+
+      <div class="column payment">
+        <Summary
+          {priceQuote}
+          on:showFareRules={fareRulesDialog?.open}
+          passengers={data.bookingSession.searchData.passengers}
         />
-      {/each}
-    </div>
-
-    <div class="column payment">
-      <Summary
-        {priceQuote}
-        on:showFareRules={fareRulesDialog?.open}
-        passengers={data.bookingSession.searchData.passengers}
-      />
-      <Fees {priceQuote} bind:markups errors={errors?.markups} />
-      <Payment bind:this={payment} paymentIntent={data.bookingSession.payment} />
-      <ContactInformation bind:data={bookingData.contact} errors={errors?.contact} />
+        <Fees {priceQuote} bind:markups errors={errors?.markups} />
+        <Payment bind:this={payment} paymentIntent={data.bookingSession.payment} />
+        <ContactInformation bind:data={bookingData.contact} errors={errors?.contact} />
+      </div>
     </div>
   </div>
-</div>
 
-<div class="actions">
-  <div class="wrapper">
+  <svelte:fragment slot="actions">
     <a
       variant="outline"
       size="small"
       href={routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root}
+      class="action"
     >
       {$t("actions.previous")}
     </a>
@@ -261,15 +255,21 @@
       </em>
     </div>
 
-    <button variant="primary" size="small" on:click={book} disabled={!data.bookingSession.payment}>
+    <button
+      variant="primary"
+      size="small"
+      on:click={book}
+      disabled={!data.bookingSession.payment}
+      class="action"
+    >
       {$t("actions.book")}
 
       {#if $pending}
         <LoadingIcon />
       {/if}
     </button>
-  </div>
-</div>
+  </svelte:fragment>
+</BookingLayout>
 
 <style>
   .content {
@@ -314,21 +314,6 @@
     min-width: 432px;
   }
 
-  .actions {
-    position: relative;
-    padding: 16px 24px;
-    background-color: var(--color-common-background-light-main);
-  }
-
-  .actions > .wrapper {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1104px;
-  }
-
   .total {
     display: flex;
     gap: 8px;
@@ -342,20 +327,8 @@
     color: var(--color-main-primary-500);
   }
 
-  .actions::after {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    display: block;
-    width: 100%;
-    height: 10px;
-    background-image: linear-gradient(0deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
-    content: "";
-    pointer-events: none;
-  }
-
-  .actions > .wrapper > button,
-  .actions > .wrapper > a {
+  button.action,
+  a.action {
     width: 140px;
   }
 </style>

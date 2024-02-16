@@ -21,9 +21,9 @@
   import { ensureDefined } from "$lib/utils/array";
   import * as CommonSchemas from "~/integration/common/schemas";
   import Fees from "$lib/components/pages/trip-management/booking-flow-train/confirmation/fees.svelte";
-  import { getPageTitle } from "$lib/utils/page-title";
   import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
+  import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
 
   export let data;
 
@@ -36,79 +36,73 @@
   $: alertType = orderStatus ? getAlertType(orderStatus) : "warning";
 </script>
 
-<svelte:head>
-  <title>
-    {getPageTitle(
-      $t("title"),
-      $t("pages.tripManagement.title"),
-      $t("pages.tripManagement.pages.book.title"),
-      $t("pages.tripManagement.pages.book.pages.confirmation.title"),
-    )}
-  </title>
-</svelte:head>
+<BookingLayout
+  showActions
+  pageTitle={$t("pages.tripManagement.pages.book.pages.confirmation.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.confirmation.subTitle")}
+>
+  <div class="content">
+    <Alert type={alertType}>
+      {#if alertType === "success"}
+        <span class="icon success">
+          <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
+        </span>
+        <span typography="body-medium" weight="bold">{$t("words.success")}</span>
+        <span typography="body-medium">{$t("sentences.theOrderWasCreatedSuccessfully")}</span>
+      {:else if alertType === "error"}
+        <span class="icon error">
+          <Icon color="var(--color-common-dark-strong)" variant="close" />
+        </span>
+        <span typography="body-medium" weight="bold">{$t("words.error")}</span>
+        <span typography="body-medium">{$t("sentences.theOrderWasCreatedWithErrors")}</span>
+      {:else}
+        <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
+        <span typography="body-medium" weight="bold">{$t("words.warning")}</span>
+        <span typography="body-medium">{$t("sentences.theOrderIsInAPendingState")}</span>
+      {/if}
+    </Alert>
 
-<div class="content">
-  <Alert type={alertType}>
-    {#if alertType === "success"}
-      <span class="icon success">
-        <Icon variant="checked" size="16px" color="var(--color-common-dark-strong)" />
-      </span>
-      <span typography="body-medium" weight="bold">{$t("words.success")}</span>
-      <span typography="body-medium">{$t("sentences.theOrderWasCreatedSuccessfully")}</span>
-    {:else if alertType === "error"}
-      <span class="icon error">
-        <Icon color="var(--color-common-dark-strong)" variant="close" />
-      </span>
-      <span typography="body-medium" weight="bold">{$t("words.error")}</span>
-      <span typography="body-medium">{$t("sentences.theOrderWasCreatedWithErrors")}</span>
-    {:else}
-      <Icon variant="alert-triangle" color="var(--color-semantic-warning-600)" />
-      <span typography="body-medium" weight="bold">{$t("words.warning")}</span>
-      <span typography="body-medium">{$t("sentences.theOrderIsInAPendingState")}</span>
-    {/if}
-  </Alert>
+    <div class="scroll">
+      <div class="wrapper">
+        <div class="details">
+          <Overview order={data.order} />
 
-  <div class="scroll">
-    <div class="wrapper">
-      <div class="details">
-        <Overview order={data.order} />
+          {#if hasTickets}
+            <a
+              variant="primary"
+              href={routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id)
+                .routes.tickets.root}
+              download
+            >
+              {$t("actions.downloadTickets")}
+            </a>
+          {/if}
 
-        {#if hasTickets}
-          <a
-            variant="primary"
-            href={routeConfig.routes.tripManagement.routes.orders.routes.order(data.order.id).routes
-              .tickets.root}
-            download
-          >
-            {$t("actions.downloadTickets")}
-          </a>
-        {/if}
+          <Price bookings={data.order.bookings} />
 
-        <Price bookings={data.order.bookings} />
+          {#if data.markups}
+            <Fees markups={data.markups} />
+          {/if}
 
-        {#if data.markups}
-          <Fees markups={data.markups} />
-        {/if}
+          <Passengers passengers={data.order.passengers} />
 
-        <Passengers passengers={data.order.passengers} />
-
-        <Itinerary bookings={data.order.bookings} />
+          <Itinerary bookings={data.order.bookings} />
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="actions">
-  <div class="wrapper">
+  <svelte:fragment slot="actions">
     <a
       variant="primary"
       size="small"
       href={routeConfig.routes.tripManagement.routes.book.routes.train.root}
+      class="action"
     >
       {$t("sentences.newSearch")}
     </a>
-  </div>
-</div>
+  </svelte:fragment>
+</BookingLayout>
 
 <style>
   .content {
@@ -172,33 +166,7 @@
     color: var(--color-main-primary-900);
   }
 
-  .actions {
-    position: relative;
-    padding: 16px 24px;
-    background-color: var(--color-common-background-light-main);
-  }
-
-  .actions > .wrapper {
-    display: flex;
-    gap: 16px;
-    justify-content: flex-end;
-    width: 100%;
-    max-width: 1104px;
-  }
-
-  .actions::after {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    display: block;
-    width: 100%;
-    height: 10px;
-    background-image: linear-gradient(0deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
-    content: "";
-    pointer-events: none;
-  }
-
-  .actions > .wrapper > a {
+  a.action {
     width: 140px;
   }
 </style>

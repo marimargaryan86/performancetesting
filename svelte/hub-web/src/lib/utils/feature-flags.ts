@@ -13,6 +13,7 @@ type FeatureTools = {
 export const enum Feature {
   DEV_TOOLS = "dev-tools",
   OFFERS_TIME_WINDOWS = "offers-time-windows",
+  CAR_RENTAL = "car-rental",
 }
 
 export const FEATURES: Record<
@@ -35,6 +36,12 @@ export const FEATURES: Record<
     description: "Enables time windows in search for offers",
     releaseDate: "2024-02-29",
     removalDate: "2024-05-29",
+  },
+  [Feature.CAR_RENTAL]: {
+    owner: "Mattias Andersson <mandersson@snowfalltravel.com>",
+    description: "Enables car rentals",
+    releaseDate: "2024-03-31",
+    removalDate: "2024-06-30",
   },
 };
 

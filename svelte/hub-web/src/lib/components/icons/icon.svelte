@@ -40,7 +40,9 @@
     | "download"
     | "pdf"
     | "swap-directions"
-    | "user";
+    | "user"
+    | "car"
+    | "train";
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 
