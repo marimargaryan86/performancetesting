@@ -11,6 +11,7 @@
         {"uuid": "30bfba87-7077-4d96-beed-c5769cdc99c7", "service_name": "junction-providers-distribusion-grpc"},
         {"uuid": "5d18e8e1-48e3-4b7c-82b9-62bd97a92f91", "service_name": "junction-providers-duffel-grpc"},
         {"uuid": "7b13cd40-464d-41fc-a71d-f5c63f9817d3", "service_name": "junction-providers-karhoo-grpc"},
+        {"uuid": "da154d59-5f17-411d-bb80-f6237b307509", "service_name": "junction-providers-carnect-grpc"},
         {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "junction-providers-mock-grpc"},
         {"uuid": "a5547dae-9c65-4746-8637-d0601865508e", "service_name": "junction-providers-save-a-train-grpc"}
       ]
