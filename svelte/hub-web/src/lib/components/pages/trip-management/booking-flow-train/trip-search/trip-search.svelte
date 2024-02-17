@@ -151,6 +151,7 @@
   }
 
   .trip-search > button[variant] {
+    width: 56px;
     margin-top: 22px;
     padding-right: 16px;
     padding-left: 16px;
