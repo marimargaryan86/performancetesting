@@ -10,8 +10,8 @@
   import { z } from "zod";
   import integrationInstancesClient from "~/integration-instances-client";
   import {
-    getSearchDataModel,
-    type CarSearchErrors,
+    carSearchDataModel,
+    type CarSearchDataError,
     type PartialCarSearchData,
     type CarSearchData,
   } from "../booking-flow";
@@ -21,11 +21,15 @@
   }>();
   const pending = writable(false);
 
-  export let data: PartialCarSearchData = {
-    dropoffDifferentLocation: false,
-  };
+  let differentDropoff = false;
+  $: if (differentDropoff) {
+    // Reset destination when different dropoff toggles to true
+    data.destination = undefined;
+  }
 
-  let errors: CarSearchErrors | undefined;
+  export let data: PartialCarSearchData = {};
+
+  let errors: CarSearchDataError | undefined;
 
   function search(): void {
     if ($pending) {
@@ -34,17 +38,24 @@
 
     try {
       dispatch("search", {
-        data: getSearchDataModel(!data.dropoffDifferentLocation).parse(data),
+        data: carSearchDataModel.parse({
+          ...data,
+          destination: differentDropoff ? data.destination : data.origin,
+        }),
         pending,
       });
     } catch (err) {
       if (err instanceof z.ZodError) {
         errors = err.format();
+
+        if (!differentDropoff) {
+          clearError("destination");
+        }
       }
     }
   }
 
-  function clearErrors(error: keyof CarSearchData): void {
+  function clearError(error: keyof CarSearchData): void {
     if (errors) {
       delete errors[error];
     }
@@ -56,7 +67,7 @@
 <form
   class="car-search"
   on:submit|preventDefault={search}
-  class:dropoff-different-location={data.dropoffDifferentLocation}
+  class:dropoff-different-location={differentDropoff}
 >
   <AutocompleteField
     bind:value={data.origin}
@@ -68,7 +79,7 @@
     error={errors?.origin?._errors}
   />
 
-  {#if data.dropoffDifferentLocation}
+  {#if differentDropoff}
     <AutocompleteField
       bind:value={data.destination}
       required
@@ -76,7 +87,7 @@
       placeholder="Enter drop-off location"
       autocomplete={integrationInstancesClient.mobile.places.find}
       formatter={formatPlace}
-      error={errors && "destination" in errors ? errors.destination?._errors : undefined}
+      error={errors?.destination?._errors}
     />
   {/if}
 
@@ -105,32 +116,25 @@
 
   <div class="options" typography="body-medium">
     <label>
-      <input type="checkbox" bind:checked={data.dropoffDifferentLocation} />
+      <input type="checkbox" bind:checked={differentDropoff} />
       <span>Drop-off car in a different location</span>
     </label>
 
-    <label>
-      <input type="checkbox" bind:checked={data.driver25to65} />
-      <span>Driver's age: 25-65?</span>
+    <label class="age">
+      <span>Driver's age:</span>
+      <input
+        type="number"
+        bind:value={data.driverAge}
+        typography="body-medium"
+        on:input={clearError.bind(clearError, "driverAge")}
+      />
+
+      {#if errors?.driverAge?._errors}
+        <span class="error" transition:slideFade={{ duration: 300 }}>
+          {errors.driverAge._errors}
+        </span>
+      {/if}
     </label>
-
-    {#if !data.driver25to65}
-      <label class="age">
-        <span>Driver's age:</span>
-        <input
-          type="number"
-          bind:value={data.driversAge}
-          typography="body-medium"
-          on:input={clearErrors.bind(clearErrors, "driversAge")}
-        />
-
-        {#if errors?.driversAge?._errors}
-          <span class="error" transition:slideFade={{ duration: 300 }}>
-            {errors.driversAge._errors}
-          </span>
-        {/if}
-      </label>
-    {/if}
   </div>
 </form>
 
