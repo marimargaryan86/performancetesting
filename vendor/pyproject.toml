@@ -116,7 +116,6 @@ select = [
   "WPS345", # Forbid meaningless math operations with 0 and 1.
   "WPS346", # Forbid double minus operations.
   "WPS347", # Forbid imports that may cause confusion outside of the module.
-  "WPS348", # Forbid starting lines with a dot.
   "WPS349", # Forbid redundant components in a subscript’s slice.
   "WPS350", # Enforce using augmented assign pattern.
   "WPS351", # Forbid unnecessary literals in your code.
