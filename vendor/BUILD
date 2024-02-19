@@ -35,6 +35,7 @@ python_requirements(
         "pyshp": ["shapefile"],
         "pytest-httpx": ["pytest_httpx"],
         "python-dateutil": ["dateutil"],
+        "python-gitlab": ["gitlab"],
         "python-hcl2": ["hcl2"],
         "python-rapidjson": ["rapidjson"],
         "setuptools": ["easy_install", "pkg_resources", "setuptools"],
