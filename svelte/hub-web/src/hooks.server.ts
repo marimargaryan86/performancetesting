@@ -6,6 +6,7 @@ import { env } from "$env/dynamic/private";
 import { cookieStore } from "$lib/stores/cookie-store.server";
 import type { Locale } from "$lib/i18n";
 import languageData from "$lib/i18n/lang";
+import { dev } from "$app/environment";
 
 // Environment variable check
 if (!env.JWT_SECRET) {
@@ -70,9 +71,9 @@ function localeHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<R
     event.cookies.set("locale", locale, {
       path: "/",
       httpOnly: false,
-      secure: false,
+      secure: !dev,
       maxAge: 31536000,
-      sameSite: "lax",
+      sameSite: dev ? "lax" : "strict",
     });
   }
 
