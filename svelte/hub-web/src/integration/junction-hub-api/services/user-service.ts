@@ -6,6 +6,8 @@ import {
   type UserProfile,
   type UserProfileSchema,
   userProfileParser,
+  type UserCreate,
+  type UserUpdate,
 } from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type * as OrySchemas from "~/integration/ory/schemas";
@@ -20,13 +22,14 @@ export default class UserService extends JunctionHubApiService {
     cursor?: string;
     limit?: number;
   }): Promise<PaginatedData<User>> {
-    const resp = await this.makeRequest<{ data: UserSchema[] }>("/users", {
+    const resp = await this.makeRequest<{ data: UserSchema[]; links: { next: string } }>("/users", {
       session,
       queryParams: { "page[cursor]": cursor, "page[limit]": limit },
     });
 
     return {
       data: resp.json.data.map(userParser.toModel),
+      cursor: UserService.getCursor(resp.json),
     };
   }
 
@@ -36,9 +39,47 @@ export default class UserService extends JunctionHubApiService {
     return userParser.toModel(resp.json.data);
   }
 
+  async create({
+    session,
+    data,
+  }: {
+    session: OrySchemas.Session;
+    data: UserCreate;
+  }): Promise<User> {
+    const resp = await this.makeRequest<{ data: UserSchema }>("/users", {
+      session,
+      method: "POST",
+      data: { data: userParser.toCreateSchema(data) },
+    });
+
+    return userParser.toModel(resp.json.data);
+  }
+
+  async update({
+    session,
+    id,
+    data,
+  }: {
+    session: OrySchemas.Session;
+    data: UserUpdate;
+    id: string;
+  }): Promise<User> {
+    const resp = await this.makeRequest<{ data: UserSchema }>(`/users/${id}`, {
+      session,
+      method: "PATCH",
+      data: { data: userParser.toUpdateSchema(data) },
+    });
+
+    return userParser.toModel(resp.json.data);
+  }
+
   async getProfile({ session }: { session: OrySchemas.Session }): Promise<UserProfile> {
     const resp = await this.makeRequest<{ data: UserProfileSchema }>("/users/me", { session });
 
     return userProfileParser.toModel(resp.json.data);
+  }
+
+  async remove({ session, id }: { session: OrySchemas.Session; id: string }): Promise<void> {
+    await this.makeRequest(`/users/${id}`, { session, method: "DELETE" });
   }
 }
