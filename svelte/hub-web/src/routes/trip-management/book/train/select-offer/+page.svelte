@@ -80,7 +80,12 @@
       durationM: searchOptionsSettings.durationSpanM.start,
     };
 
+    const prevOffersPending = offersPending;
     offersPending = undefined;
+
+    if (offers.length) {
+      autoFetchMore(prevOffersPending);
+    }
   }
 
   async function select(event: ComponentEvents<Offer>["select"]): Promise<void> {
@@ -146,6 +151,28 @@
     };
 
     await searchAux(direction, data.bookingSession.searchData);
+  }
+
+  function autoFetchMore(pendingType: PendingType | undefined): void | Promise<void> {
+    if (!pendingType || pendingType === "initial") {
+      return;
+    }
+
+    if (
+      pendingType === "earlier" &&
+      data.bookingSession.searchData.outbound.getHours() < SEARCH_WINDOW_H
+    ) {
+      return;
+    }
+
+    if (
+      pendingType === "later" &&
+      data.bookingSession.searchData.outbound.getHours() > 23 - SEARCH_WINDOW_H
+    ) {
+      return;
+    }
+
+    return fetchMore(pendingType);
   }
 
   // Hide earlier button if search window is in the past
