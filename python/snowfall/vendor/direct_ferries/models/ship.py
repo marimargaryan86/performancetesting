@@ -11,5 +11,5 @@ class OnboardFacility(base.CamelCaseBaseModel):
 
 
 class Ship(base.CamelCaseBaseModel):
-    name: str | None
+    name: str
     onboard_facilities: Sequence[OnboardFacility] | None

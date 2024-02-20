@@ -161,7 +161,7 @@ class DfAdapter(object):
                 segments.append(
                     offer_models_pb2.OfferSegment(
                         id=string.uuid(),
-                        vendor=leg_obj.operator.name if leg_obj.operator else "",
+                        vendor=leg_obj.operator.name,
                         type=models_pb2.Schedule.TYPE_FERRY,
                         legs=[
                             offer_models_pb2.OfferSegmentLeg(

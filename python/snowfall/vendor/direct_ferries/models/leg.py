@@ -44,21 +44,21 @@ class LegBase(base.CamelCaseBaseModel):
 
 class Leg(LegBase):
     ticket_reference: str | None
-    operator: operator.Operator | None
+    operator: operator.Operator
     route_name: str | None
     accommodation_message: str | None
-    departure_port_name: str | None
-    departure_port_id: int | None
+    departure_port_name: str
+    departure_port_id: int
     departure_port_code: str
-    arrival_port_name: str | None
-    arrival_port_id: int | None
+    arrival_port_name: str
+    arrival_port_id: int
     arrival_port_code: str
     arrival_date_time: datetime.datetime
     duration_minutes: int | None
     is_accommodation_compulsory: bool | None
     latest_check_in_minutes: int | None
-    ship: ship.Ship | None
-    vehicles: Sequence[vehicle.Vehicle] | None
+    ship: ship.Ship
+    vehicles: Sequence[vehicle.Vehicle]
     passengers: Sequence[passenger.Passenger]
     accommodations: Sequence[Accommodation]
     meals: Any | None

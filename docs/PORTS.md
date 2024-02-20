@@ -65,3 +65,4 @@ The following ports are configured in local environments by default:
 | 50083 | content/benerail       | gRPC Server       |
 | 50084 | bridge                 | gRPC Server       |
 | 50085 | content/ask2go         | gRPC Server       |
+| 50086 | content/direct_ferries | gRPC Server       |
