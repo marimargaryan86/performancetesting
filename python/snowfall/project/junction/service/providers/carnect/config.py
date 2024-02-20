@@ -43,3 +43,5 @@ class OrderSettings(application.Settings, CarnectConfig):
         seconds=_RESERVATION_TIMEOUT_IN_SECONDS,
     )
     storage_dsn: service.AnyDsn
+    smtp_dsn: pydantic.AnyUrl
+    smtp_sender: pydantic.EmailStr

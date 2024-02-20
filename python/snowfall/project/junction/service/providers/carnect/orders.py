@@ -1,9 +1,12 @@
+import aiosmtplib
+
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.service.providers.carnect import (
     booking,
     cache,
     config,
     constants,
+    notifications,
 )
 from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.logging import stdout
@@ -50,6 +53,17 @@ async def orders(
         config=carnect_config,
     )
 
+    email_client = notifications.EmailClient(
+        client=aiosmtplib.SMTP(
+            hostname=app.settings.smtp_dsn.host,
+            port=int(app.settings.smtp_dsn.port or 0) or None,
+            username=app.settings.smtp_dsn.username,
+            password=app.settings.smtp_dsn.password,
+            start_tls=True,
+        ),
+        sender=app.settings.smtp_sender,
+    )
+
     await OrderConsumer(
         consumer_obj=amqp_consumer.Consumer(
             connection=amqp_connection,
@@ -66,6 +80,7 @@ async def orders(
             booking_storage=await app.stack.enter_async_context(
                 filesystem.Storage.from_dsn(app.settings.storage_dsn),
             ),
+            email_client=email_client,
         ),
         price_quote_cache=cache.PricingCache(
             client=redis_client,

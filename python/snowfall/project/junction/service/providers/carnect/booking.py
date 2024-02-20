@@ -8,7 +8,11 @@ from xsdata.formats.dataclass.parsers import config as parsers_config
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.project.junction.provider.v1 import bookings_pb2
-from snowfall.project.junction.service.providers.carnect import adapter, cache
+from snowfall.project.junction.service.providers.carnect import (
+    adapter,
+    cache,
+    notifications,
+)
 from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -29,6 +33,7 @@ from snowfall.vendor.carnect.builders import (
 from snowfall.vendor.carnect.models import service
 
 _DEFAULT_LANGUAGE = "en"
+_STATUS_CONFIRMED = "Confirmed"
 
 _STATUS_MAP = types.MappingProxyType({
     "Pending": bookings_pb2.Booking.STATUS_PENDING,
@@ -229,8 +234,10 @@ class BookingHandler(object):
         carnect_client: client.CarnectClient,
         carnect_config: carnect_settings.Config,
         booking_storage: filesystem.Storage,
+        email_client: notifications.EmailClient,
     ):
         self._client = carnect_client
+        self._email_client = email_client
         self._carnect_config = carnect_config
         self._logger = stdout.get_logger()
         self._storage = booking_storage
@@ -266,6 +273,7 @@ class BookingHandler(object):
                 "Failed to create booking",
                 offer_id=price_quote.quote_id,
                 booking_id=task.booking.id,
+                error=res_adapter.get_error(),
             )
 
             new_booking.status = models_pb2.Booking.STATUS_ERROR
@@ -273,7 +281,16 @@ class BookingHandler(object):
 
             return new_booking
 
-        # TODO(hovhannes.d): send notification
+        if res_adapter.get_status() == _STATUS_CONFIRMED:
+            template = notifications.BookingNotification(task.metadata, res_adapter)
+            try:
+                await self._email_client.send_email_html_template(
+                    mail_to=task.contact_details.email,
+                    subject=template.subject,
+                    body=template.body,
+                )
+            except notifications.EmailNotificationError:
+                self._logger.exception("Failed to send booking notification")
 
         provider_booking_reference = sequence.to_composite_id([
             id_context,

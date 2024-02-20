@@ -94,6 +94,7 @@ job "junction-providers-carnect-orders" {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+SMTP_DSN={{range $index, $service := service "smtp"}}smtp://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}{{end}}
 {{ with secret "kv/data/${var.environment}/carnect" }}
 STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/carnect
 API_USERNAME={{ .Data.data.api_username }}
@@ -122,6 +123,7 @@ EOH
       env {
         ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://df24904b09ff8dafb07d286862fc0bdd@sentry.snowfall.se/214"
+        SMTP_SENDER     = "no-reply@snowfalltravel.com"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         API_BASE_URL    = "${var.api_base_url}"
       }
