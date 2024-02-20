@@ -37,7 +37,7 @@ function createCookie<TValue>(
 } {
   // Prefix with __Secure if it is secure
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#cookie_prefixes
-  const name = secure ? cookieName : `__Secure-${cookieName}`;
+  const name = secure ? `__Secure-${cookieName}` : cookieName;
   const options = { path, secure, httpOnly, sameSite, expires, domain, maxAge, priority };
 
   return {
