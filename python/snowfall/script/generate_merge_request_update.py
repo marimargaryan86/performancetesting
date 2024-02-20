@@ -17,13 +17,13 @@ def time_ago_emoji(updated_at: datetime.datetime) -> str:
         ),
     )
 
-    if diff < datetime.timedelta(days=1):
+    if diff < datetime.timedelta(days=2):
         return "😍"
 
-    if diff < datetime.timedelta(days=3):
+    if diff < datetime.timedelta(days=4):
         return "🙂"
 
-    if diff < datetime.timedelta(days=6):
+    if diff < datetime.timedelta(days=7):
         return "😴"
 
     return "🥶"
