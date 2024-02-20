@@ -19,7 +19,7 @@ type CookieOptions = {
 type CookieOptionsOverride = Pick<CookieOptions, "expires" | "maxAge">;
 
 function createCookie<TValue>(
-  name: string,
+  cookieName: string,
   {
     path = "/",
     secure = !dev,
@@ -35,6 +35,9 @@ function createCookie<TValue>(
   set(value: TValue, event: RequestEvent, optionsOverride?: CookieOptionsOverride): string;
   delete(event: RequestEvent): void;
 } {
+  // Prefix with __Secure if it is secure
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#cookie_prefixes
+  const name = secure ? cookieName : `__Secure-${cookieName}`;
   const options = { path, secure, httpOnly, sameSite, expires, domain, maxAge, priority };
 
   return {
@@ -55,7 +58,10 @@ function createCookie<TValue>(
     set: (value, event, optionsOverride): string => {
       const encoded = jwt.sign(devalue.stringify(value), env.JWT_SECRET as string);
 
-      event.cookies.set(name, encoded, { ...options, ...optionsOverride });
+      event.cookies.set(name, encoded, {
+        ...options,
+        ...optionsOverride,
+      });
 
       return encoded;
     },

@@ -64,14 +64,18 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
  *
  */
 function localeHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
-  let locale = event.cookies.get("locale") as Locale | undefined;
+  const secure = !dev;
+  // Prefix with __Secure if it is secure
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#cookie_prefixes
+  const cookieName = secure ? "locale" : "__Secure-locale";
+  let locale = event.cookies.get(cookieName) as Locale | undefined;
 
   if (!locale || !(locale in languageData)) {
     locale = "en-GB";
-    event.cookies.set("locale", locale, {
+    event.cookies.set(cookieName, locale, {
       path: "/",
       httpOnly: false,
-      secure: !dev,
+      secure,
       maxAge: 31536000,
       sameSite: dev ? "lax" : "strict",
     });
