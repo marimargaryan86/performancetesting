@@ -1,4 +1,5 @@
-import { sleep } from "$lib/utils/common";
+import type { SearchData } from "$lib/booking-manager/booking-manager";
+import { getAge } from "$lib/utils/date-time";
 import { z } from "zod";
 import * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
@@ -23,12 +24,26 @@ export type CarSearchData = z.infer<typeof carSearchDataModel>;
 export type PartialCarSearchData = Partial<CarSearchData>;
 export type CarSearchDataError = z.ZodFormattedError<CarSearchData>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function search(data: CarSearchData): Promise<void> {
-  // TODO: Impl.
-  await sleep(2000);
-}
+export const carSearchDataParser = {
+  toSearchData: (data: CarSearchData): SearchData => {
+    const today = new Date();
 
-export const manager = {
-  search,
+    return {
+      origin: data.origin,
+      destination: data.destination,
+      outbound: data.pickup,
+      inbound: data.dropoff,
+      passengers: [
+        new Date(today.getFullYear() - data.driverAge, today.getMonth(), today.getDate()),
+      ],
+      transportTypes: ["car"],
+    };
+  },
+  fromSearchData: (data: SearchData): CarSearchData => ({
+    origin: data.origin,
+    destination: data.destination,
+    pickup: data.outbound,
+    dropoff: data.inbound as Date,
+    driverAge: getAge(data.passengers[0] as Date),
+  }),
 };

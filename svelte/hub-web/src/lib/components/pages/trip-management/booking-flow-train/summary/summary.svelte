@@ -6,12 +6,15 @@
   import Collapsible from "../collapsible.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import SummaryItinerary from "./summary-itinerary.svelte";
-  import { getPassengersPresentation, type PassengerPickerData } from "$lib/models/passenger";
+  import { getPassengersPresentation } from "$lib/models/passenger";
   import { createEventDispatcher } from "svelte";
   import { getLocale, getTranslator } from "$lib/i18n";
+  import { passengerParser } from "../trip-search-data";
 
+  let passengersExt: Date[];
+  export { passengersExt as passengers };
   export let priceQuote: MobileSchemas.TripOfferPriceQuote | undefined = undefined;
-  export let passengers: PassengerPickerData;
+  $: passengers = passengerParser.fromSearchData(passengersExt);
 
   let collapsible: Collapsible | undefined;
 

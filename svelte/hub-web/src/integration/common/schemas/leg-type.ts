@@ -1,10 +1,12 @@
+export const transportTypes = ["unspecified", "air", "rail", "car"] as const;
+export type TransportType = (typeof transportTypes)[number];
 export type LegType = {
-  id: "unspecified" | "air" | "rail";
+  id: TransportType;
   name: string;
 };
 
 export type LegTypeSchema = {
-  id: "unspecified" | "air" | "rail";
+  id: TransportType;
   type: "leg-types";
   attributes: {
     name: string;

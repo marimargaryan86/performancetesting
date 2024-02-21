@@ -5,7 +5,7 @@ import type * as OrySchemas from "~/integration/ory/schemas";
 import type { PassengerType } from "$lib/models/passenger";
 import type { SortOption } from "$lib/utils/offer";
 import type * as CommonSchemas from "~/integration/common/schemas";
-import type { TripType } from "$lib/models/trip-offer-search";
+import type { TripType } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data";
 
 export default {
   title: "Junction Hub",

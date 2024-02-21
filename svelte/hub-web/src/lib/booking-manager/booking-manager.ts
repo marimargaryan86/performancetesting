@@ -1,14 +1,12 @@
 import { z } from "zod";
-import { PASSENGER_DEFINITIONS } from "$lib/models/passenger";
-import * as CommonSchemas from "~/integration/common/schemas";
-import * as devalue from "devalue";
-import { Base64 } from "js-base64";
-import integrationInstancesClient from "~/integration-instances-client";
-import { getRandomAlphaNumericString } from "$lib/utils/random";
-import type { RequestEvent } from "@sveltejs/kit";
-import { sleep } from "$lib/utils/common";
 import * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
-import { searchDataModel, type SearchData } from "$lib/models/trip-offer-search";
+import * as CommonSchemas from "~/integration/common/schemas";
+import { Base64 } from "js-base64";
+import * as devalue from "devalue";
+import type { RequestEvent } from "@sveltejs/kit";
+import { getRandomAlphaNumericString } from "$lib/utils/random";
+import integrationInstancesClient from "~/integration-instances-client";
+import { sleep } from "$lib/utils/common";
 
 export const markupsModel: z.ZodType<Omit<MobileSchemas.MarkupsCreate, "orderId">> = z.object({
   serviceFee: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
@@ -56,6 +54,17 @@ const paymentIntentModel = MobileSchemas.paymentModel.extend({
   confirmed: z.boolean(),
 });
 export type PaymentIntent = z.infer<typeof paymentIntentModel>;
+
+const searchDataModel = z.object({
+  origin: MobileSchemas.placeModel,
+  destination: MobileSchemas.placeModel,
+  outbound: z.date(),
+  inbound: z.date().optional(),
+  passengers: z.array(z.date()),
+  windowH: z.number().optional(),
+  transportTypes: z.array(z.enum(CommonSchemas.transportTypes)),
+});
+export type SearchData = z.infer<typeof searchDataModel>;
 
 // Validator for the search step of the flow
 const bookingSessionSearchModel = z.object({
@@ -150,25 +159,6 @@ export function setCookie<TStep extends Step>(step: TStep, data: StepDataType<TS
   document.cookie = `booking-session=${encodeSessionCookie(getModel(step), data)}; path=/;`;
 }
 
-function getBirthDate(age: number): Date {
-  const result = new Date();
-  result.setFullYear(result.getFullYear() - age);
-
-  return result;
-}
-
-function parsePassengers(
-  passengers: SearchData["passengers"],
-): MobileSchemas.SimpleOfferSearchCreate["passengers"] {
-  const parsedDates = Object.fromEntries(
-    Object.entries(PASSENGER_DEFINITIONS).map(([key, val]) => [key, getBirthDate(val.span.from)]),
-  );
-
-  return Object.entries(passengers).flatMap(([key, count]) =>
-    Array(count).fill({ birthDate: parsedDates[key] }),
-  );
-}
-
 async function search(
   data: SearchData,
   useWindow: boolean,
@@ -182,8 +172,8 @@ async function search(
         origin: data.origin.coordinates,
         windowH: useWindow ? data.windowH : undefined,
       },
-      passengers: parsePassengers(data.passengers),
-      allowedSegmentTypes: ["rail"],
+      passengers: data.passengers.map((birthDate) => ({ birthDate })),
+      allowedSegmentTypes: data.transportTypes,
       sessionToken,
     },
   });

@@ -15,19 +15,20 @@
   import TripTypePicker from "./trip-type-picker.svelte";
   import {
     searchDataModel,
-    type PartialSearchData,
-    type SearchData,
-    type SearchDataError,
-  } from "$lib/models/trip-offer-search";
+    type PartialTripSearchData,
+    type TripSearchDataError,
+    tripSearchDataParser,
+  } from "../trip-search-data";
   import { formatPlace } from "$lib/formatting/location";
   import { getClosestFullHour } from "$lib/utils/date-time";
+  import type { SearchData } from "$lib/booking-manager/booking-manager";
 
-  export let data: PartialSearchData = {
+  export let data: PartialTripSearchData = {
     tripType: "one-way",
     passengers: getDefaultValue(),
     outbound: getClosestFullHour(true),
   };
-  let errors: SearchDataError | undefined = undefined;
+  let errors: TripSearchDataError | undefined = undefined;
 
   const dispatch = createEventDispatcher<{
     search: { data: SearchData; pending: Writable<boolean> };
@@ -44,7 +45,10 @@
 
   function search(): void {
     try {
-      dispatch("search", { data: searchDataModel.parse(data), pending });
+      dispatch("search", {
+        data: tripSearchDataParser.toSearchData(searchDataModel.parse(data)),
+        pending,
+      });
     } catch (err) {
       if (err instanceof z.ZodError) {
         errors = err.format();

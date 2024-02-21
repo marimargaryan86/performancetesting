@@ -8,8 +8,8 @@
   import {
     SEARCH_WINDOW_DELTA_MS,
     SEARCH_WINDOW_H,
-    type SearchData,
-  } from "$lib/models/trip-offer-search";
+    tripSearchDataParser,
+  } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data.js";
   import SearchOptions from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
   import Offer from "$lib/components/pages/trip-management/booking-flow-train/select-offer/offer/offer.svelte";
   import routeConfig from "$lib/route-config";
@@ -30,7 +30,8 @@
   import {
     manager,
     type PartialSelectedOffer,
-  } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
+    type SearchData,
+  } from "$lib/booking-manager/booking-manager";
   import { browser } from "$app/environment";
   import CollapsibleTripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/collapsible-trip-search.svelte";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
@@ -196,7 +197,7 @@
   <div class="search-wrapper">
     <CollapsibleTripSearch searchData={data.bookingSession.searchData}>
       <TripSearch
-        data={data.bookingSession.searchData}
+        data={tripSearchDataParser.fromSearchData(data.bookingSession.searchData)}
         on:search={search.bind(search, "initial")}
       />
     </CollapsibleTripSearch>

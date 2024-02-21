@@ -4,7 +4,7 @@
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import Icon from "$lib/components/icons/icon.svelte";
   import { getTranslator } from "$lib/i18n";
-  import { TRIP_TYPES, type TripType } from "$lib/models/trip-offer-search";
+  import { TRIP_TYPES, type TripType } from "../trip-search-data";
 
   export let value: TripType = "one-way";
 

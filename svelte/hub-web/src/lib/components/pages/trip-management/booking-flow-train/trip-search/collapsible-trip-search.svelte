@@ -3,9 +3,13 @@
   import { getPassengersPresentation } from "$lib/models/passenger";
   import { getLocale, getTranslator } from "$lib/i18n";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
-  import type { SearchData } from "$lib/models/trip-offer-search";
+  import type { SearchData } from "$lib/booking-manager/booking-manager";
+  import { tripSearchDataParser } from "../trip-search-data";
 
-  export let searchData: SearchData;
+  let searchDataExt: SearchData;
+  export { searchDataExt as searchData };
+
+  $: searchData = tripSearchDataParser.fromSearchData(searchDataExt);
 
   const locale = getLocale();
   const t = getTranslator();

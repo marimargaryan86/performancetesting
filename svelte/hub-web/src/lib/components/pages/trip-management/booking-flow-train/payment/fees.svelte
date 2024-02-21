@@ -12,10 +12,7 @@
   import { formatAmount } from "$lib/formatting/currency";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import type {
-    Markups,
-    PartialMarkups,
-  } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
+  import type { Markups, PartialMarkups } from "$lib/booking-manager/booking-manager";
   import type { z } from "zod";
   import { FEE_TYPES, calcFeeAmount, type FeeType } from "$lib/utils/fees";
 

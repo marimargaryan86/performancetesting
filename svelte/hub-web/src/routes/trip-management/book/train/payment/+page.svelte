@@ -25,9 +25,10 @@
     markupsModel,
     type Markups,
     type PartialMarkups,
-  } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
+  } from "$lib/booking-manager/booking-manager";
   import { browser } from "$app/environment";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
+  import { passengerParser } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data.js";
 
   export let data;
 
@@ -37,7 +38,9 @@
     passengers: PartialPassengerData[];
     contact: MobileSchemas.ContactDetails;
   } = {
-    passengers: getDefaultPassengers(data.bookingSession.searchData.passengers),
+    passengers: getDefaultPassengers(
+      passengerParser.fromSearchData(data.bookingSession.searchData.passengers),
+    ),
     contact: {
       phone: data.profile.contacts[0]?.phone ?? "",
       address: {

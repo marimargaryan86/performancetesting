@@ -57,7 +57,7 @@
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import Dialog from "$lib/components/ui/dialogues/dialog.svelte";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import type { PaymentIntent } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
+  import type { PaymentIntent } from "$lib/booking-manager/booking-manager";
   import { getUser } from "$lib/utils/permissions";
 
   export let paymentIntent: PaymentIntent | undefined;

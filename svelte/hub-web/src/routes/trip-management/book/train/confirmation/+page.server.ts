@@ -2,7 +2,7 @@ import integrationInstances from "~/integration-instances";
 import { redirect } from "@sveltejs/kit";
 import routeConfig from "$lib/route-config";
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
-import { getCookie } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
+import { getCookie } from "$lib/booking-manager/booking-manager";
 
 export async function load(event): Promise<{
   order: MobileSchemas.Order;

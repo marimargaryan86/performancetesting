@@ -14,10 +14,12 @@
     type CarSearchDataError,
     type PartialCarSearchData,
     type CarSearchData,
-  } from "../booking-flow";
+    carSearchDataParser,
+  } from "../car-search-data";
+  import type { SearchData } from "$lib/booking-manager/booking-manager";
 
   const dispatch = createEventDispatcher<{
-    search: { data: CarSearchData; pending: Writable<boolean> };
+    search: { data: SearchData; pending: Writable<boolean> };
   }>();
   const pending = writable(false);
 
@@ -38,10 +40,12 @@
 
     try {
       dispatch("search", {
-        data: carSearchDataModel.parse({
-          ...data,
-          destination: differentDropoff ? data.destination : data.origin,
-        }),
+        data: carSearchDataParser.toSearchData(
+          carSearchDataModel.parse({
+            ...data,
+            destination: differentDropoff ? data.destination : data.origin,
+          }),
+        ),
         pending,
       });
     } catch (err) {

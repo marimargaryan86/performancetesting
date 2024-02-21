@@ -2,7 +2,7 @@
   import TripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
   import { getTranslator } from "$lib/i18n";
   import type { ComponentEvents } from "svelte";
-  import { manager } from "$lib/components/pages/trip-management/booking-flow-train/booking-flow";
+  import { manager } from "$lib/booking-manager/booking-manager";
   import { goto } from "$app/navigation";
   import routeConfig from "$lib/route-config";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
