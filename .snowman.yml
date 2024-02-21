@@ -54,6 +54,8 @@ commits:
       - "python/snowfall/stdlib"
     snowman:
       - "golang/cmd/snowman"
+    svelte:
+      - "svelte"
     vendor/ask2go:
       - "python/snowfall/vendor/ask2go"
     vendor/ba-ndc:
