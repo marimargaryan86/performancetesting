@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/merge_request"
+	"git.snowfall.se/junction/junction/golang/cmd/snowman/task"
 	"git.snowfall.se/junction/junction/golang/stdlib/logging"
 	"git.snowfall.se/junction/junction/golang/stdlib/service"
 	"github.com/getsentry/sentry-go"
@@ -143,6 +144,12 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	if _, err = c.AddFunc("*/10 * * * *", func() {
 		manageMemberships(client, sugar.Named("cron"), snowman, loader, viper.GetString("snowman_hook_url"), viper.GetString("gitlab_webhook_secret"))
+	}); err != nil {
+		return err
+	}
+
+	if _, err = c.AddFunc("0 * * * *", func() {
+		task.ManageInactiveMergeRequests(client, sugar.Named("cron"), snowman)
 	}); err != nil {
 		return err
 	}

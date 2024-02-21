@@ -241,24 +241,22 @@ func verifyProjectSettings(client *gitlab.Client, logger *zap.SugaredLogger, p *
 }
 
 func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User, loader *common.Loader, hookUrl string, hookSecret string) {
-	projects, _, err := client.Projects.ListProjects(&gitlab.ListProjectsOptions{
-		Archived:                 func() *bool { b := false; return &b }(),
-		Membership:               func() *bool { b := true; return &b }(),
-		MinAccessLevel:           func() *gitlab.AccessLevelValue { b := gitlab.AccessLevelValue(40); return &b }(),
-		WithMergeRequestsEnabled: func() *bool { b := true; return &b }(),
+	projectsCh, g := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Project, *gitlab.Response, error) {
+		return client.Projects.ListProjects(&gitlab.ListProjectsOptions{
+			ListOptions:              options,
+			Archived:                 func() *bool { b := false; return &b }(),
+			Membership:               func() *bool { b := true; return &b }(),
+			MinAccessLevel:           func() *gitlab.AccessLevelValue { b := gitlab.AccessLevelValue(40); return &b }(),
+			WithMergeRequestsEnabled: func() *bool { b := true; return &b }(),
+		})
 	})
 
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-
-	for _, p := range projects {
+	for p := range projectsCh {
 		pLogger := logger.With("project", p.ID, "name", p.Name)
 
 		var config common.Configuration
 
-		config, err = loader.Load(p.ID)
+		config, err := loader.Load(p.ID)
 
 		if err != nil {
 			pLogger.Error(err)
@@ -305,5 +303,9 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 				pLogger.Info("Project initialized.")
 			}
 		}
+	}
+
+	if err := g.Wait(); err != nil {
+		logger.Error(err)
 	}
 }
