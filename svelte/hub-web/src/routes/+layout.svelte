@@ -1,6 +1,10 @@
+<script lang="ts" context="module">
+  export const LOCALE_COOKIE = dev ? "locale" : "__Secure-locale";
+</script>
+
 <script lang="ts">
   import MainMenu from "$lib/components/partials/main-menu/main-menu.svelte";
-  import { browser } from "$app/environment";
+  import { browser, dev } from "$app/environment";
   import { getTimeDeltaMs } from "$lib/utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
   import integrationInstancesClient from "~/integration-instances-client";
@@ -50,7 +54,7 @@
   }
 
   function updateLocaleCookie(nextLocale: Locale): void {
-    document.cookie = `locale=${nextLocale}; Path=/; MaxAge=31536000; SameSite=Lax`;
+    document.cookie = `${LOCALE_COOKIE}=${nextLocale}; Path=/; MaxAge=31536000; SameSite=${dev ? "lax" : "strict"}`;
     invalidateAll();
   }
 

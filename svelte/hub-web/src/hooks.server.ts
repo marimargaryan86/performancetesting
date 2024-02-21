@@ -7,6 +7,7 @@ import { cookieStore } from "$lib/stores/cookie-store.server";
 import type { Locale } from "$lib/i18n";
 import languageData from "$lib/i18n/lang";
 import { dev } from "$app/environment";
+import { LOCALE_COOKIE } from "./routes/+layout.svelte";
 
 // Environment variable check
 if (!env.JWT_SECRET) {
@@ -64,18 +65,16 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
  *
  */
 function localeHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
-  const secure = !dev;
   // Prefix with __Secure if it is secure
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#cookie_prefixes
-  const cookieName = secure ? "__Secure-locale" : "locale";
-  let locale = event.cookies.get(cookieName) as Locale | undefined;
+  let locale = event.cookies.get(LOCALE_COOKIE) as Locale | undefined;
 
   if (!locale || !(locale in languageData)) {
     locale = "en-GB";
-    event.cookies.set(cookieName, locale, {
+    event.cookies.set(LOCALE_COOKIE, locale, {
       path: "/",
       httpOnly: false,
-      secure,
+      secure: !dev,
       maxAge: 31536000,
       sameSite: dev ? "lax" : "strict",
     });
