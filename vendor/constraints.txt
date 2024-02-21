@@ -32,6 +32,7 @@
 //     "boto3==1.34.34",
 //     "botocore-stubs==1.34.41",
 //     "botocore==1.34.34",
+//     "check-jsonschema==0.28.0",
 //     "click==8.1.7",
 //     "coverage[toml]==7.4.1",
 //     "cryptography==42.0.2",
@@ -2056,6 +2057,40 @@
           "requires_dists": [],
           "requires_python": ">=3.7.0",
           "version": "3.3.2"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "6611bb1b0994201a1ba71240bca705d3ebd306f8b45f65f09d8f33f786f9b203",
+              "url": "https://files.pythonhosted.org/packages/03/25/6b0434385eb21583c4c8259dd35907df236248caadf2443d955c68eca985/check_jsonschema-0.28.0-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "defd6c5e944f07416170df33f218ab048c87129163601eec7b191fa076e91ca5",
+              "url": "https://files.pythonhosted.org/packages/ce/82/b0f048a5f96d67362ea313759daf4baf92e4e9ee1c416947efa6d3feaf0e/check-jsonschema-0.28.0.tar.gz"
+            }
+          ],
+          "project_name": "check-jsonschema",
+          "requires_dists": [
+            "click-type-test==0.0.7; python_version >= \"3.10\" and extra == \"dev\"",
+            "click<9,>=8",
+            "coverage<8; extra == \"dev\"",
+            "furo==2024.1.29; extra == \"docs\"",
+            "importlib-resources>=1.4.0; python_version < \"3.9\"",
+            "jsonschema<5.0,>=4.18.0",
+            "pytest-xdist<4; extra == \"dev\"",
+            "pytest<9; extra == \"dev\"",
+            "regress>=0.4.0",
+            "requests<3.0",
+            "responses==0.24.1; extra == \"dev\"",
+            "ruamel.yaml==0.18.5",
+            "sphinx-issues<5; extra == \"docs\"",
+            "sphinx<8; extra == \"docs\"",
+            "tomli>=2.0; python_version < \"3.11\""
+          ],
+          "requires_python": ">=3.8",
+          "version": "0.28.0"
         },
         {
           "artifacts": [
@@ -7008,6 +7043,74 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "9cb2869ffdfca5eb3984081ecfbd63313e7722008a7a21eb57a32a59bdfc1e7d",
+              "url": "https://files.pythonhosted.org/packages/e0/3a/6798936458bda826a4c06ff4fbec397a0b6e770ad6fd0110f0d7cbbdd05d/regress-0.4.5-cp311-cp311-musllinux_1_2_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "c39ed2177f4e82c4d1e07c41bbf42203eab33165938aaa6f88b4cf266b61acf1",
+              "url": "https://files.pythonhosted.org/packages/10/8d/4304f046ac38bbc81dcfdecbbaab95e3bab9fa6c6a0caedb97095d7daeea/regress-0.4.5-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b42ac506390aea86f3698918889dd6439ca2dca902f3afdc6d70929d144666ef",
+              "url": "https://files.pythonhosted.org/packages/11/3a/e9f6af3146dec2ded5149e57797a868e6d4aea1b04d4c9e46e1e0f098514/regress-0.4.5.tar.gz"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "1b47e21d62de88ec3f9de9ec53e32f45c29b35a26e1296f121380983316f50a6",
+              "url": "https://files.pythonhosted.org/packages/22/fd/04e4d5bafa13167d283eabb0dddbb4a23834361f590e7f9059ec3ff6fdf3/regress-0.4.5-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "59bc0d5581820b965ca1c2ff9bf5b6cd802a426744fc741399cf5dcc08323253",
+              "url": "https://files.pythonhosted.org/packages/3a/0e/d58de61b8ddaa3dda07479ef9d296f03e67eefdbea9492525337f00a9044/regress-0.4.5-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b91c7c754db0ce84bba60b36151bd9e23a28ca835f2aea4e0561a283ee5c8f8a",
+              "url": "https://files.pythonhosted.org/packages/3c/8f/5a775bbab7d3658006299146b4c8bce7805372d33bd5dede4e1036e451fc/regress-0.4.5-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "6a9011e600f6cb5dd01521800b749068c9a0ddfc31467d8ee0a3e4a6dbc40b04",
+              "url": "https://files.pythonhosted.org/packages/55/42/0fe62f0e8e7537ce59f63c30a545543fad7340bfdf9a76aa8d4025ef4888/regress-0.4.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "e10b669d6182c50313d741f38efcdf5e6bb8e304087b0cdc690ba545b312b59c",
+              "url": "https://files.pythonhosted.org/packages/61/30/fe40af61e32d80bd03f67d059e288865ef4e6ca132a69e8ba5dc21fd5793/regress-0.4.5-cp311-cp311-macosx_10_7_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "3dc283fd83d112307f31e37716c88a63d4f23aee356758d7e42692e6459921dc",
+              "url": "https://files.pythonhosted.org/packages/62/e8/416ade7df5cbf783611b22c156ddb3e0f3f4b26c74093b9562901a01f357/regress-0.4.5-cp311-cp311-macosx_11_0_arm64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "d6c2945d112458a6bd157d7bab59079345bf6d5e8e71f222465818c5817fea0b",
+              "url": "https://files.pythonhosted.org/packages/ae/a3/0ce9b1ff2ca0b20de9a8299980a55d6625e0614c7c1011ede508ec212500/regress-0.4.5-cp311-cp311-musllinux_1_2_i686.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "f2926d16fbf39cd26b4104854ca25fa5c33cbd04f5a97fb1b4809671053fee8f",
+              "url": "https://files.pythonhosted.org/packages/ce/e9/ba2da4f9c28663cceb750bb9993b39f152e329472a63e3b2a225a61024bc/regress-0.4.5-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "327dc0ea7cee35452d6c79fb5e7caaea1d2163681efedac87a1c2c0c227e5a38",
+              "url": "https://files.pythonhosted.org/packages/f8/5c/2380c402a66f3d274cfa00fe1083b1aff9a69cfa17c7d714b3c1480ed4ef/regress-0.4.5-cp311-cp311-musllinux_1_2_aarch64.whl"
+            }
+          ],
+          "project_name": "regress",
+          "requires_dists": [],
+          "requires_python": ">=3.8",
+          "version": "0.4.5"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f",
               "url": "https://files.pythonhosted.org/packages/70/8e/0e2d847013cb52cd35b38c009bb167a1a26b2ce6cd6965bf26b47bc0bf44/requests-2.31.0-py3-none-any.whl"
             },
@@ -7194,6 +7297,72 @@
           ],
           "requires_python": "<4,>=3.6",
           "version": "4.9"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "a013ac02f99a69cdd6277d9664689eb1acba07069f912823177c5eced21a6ada",
+              "url": "https://files.pythonhosted.org/packages/57/db/4b74a29f5fd175aea3ff0d95f8230d9bb8a54e38d963c6f96065b9e2eef3/ruamel.yaml-0.18.5-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "61917e3a35a569c1133a8f772e1226961bf5a1198bea7e23f06a0841dea1ab0e",
+              "url": "https://files.pythonhosted.org/packages/82/43/fa976e03a4a9ae406904489119cd7dd4509752ca692b2e0a19491ca1782c/ruamel.yaml-0.18.5.tar.gz"
+            }
+          ],
+          "project_name": "ruamel-yaml",
+          "requires_dists": [
+            "mercurial>5.7; extra == \"docs\"",
+            "ruamel.yaml.clib>=0.2.7; platform_python_implementation == \"CPython\" and python_version < \"3.13\"",
+            "ruamel.yaml.jinja2>=0.2; extra == \"jinja2\"",
+            "ryd; extra == \"docs\""
+          ],
+          "requires_python": ">=3.7",
+          "version": "0.18.5"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "09b055c05697b38ecacb7ac50bdab2240bfca1a0c4872b0fd309bb07dc9aa3a9",
+              "url": "https://files.pythonhosted.org/packages/e3/41/f62e67ac651358b8f0d60cfb12ab2daf99b1b69eeaa188d0cec809d943a6/ruamel.yaml.clib-0.2.8-cp311-cp311-musllinux_1_1_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "b16420e621d26fdfa949a8b4b47ade8810c56002f5389970db4ddda51dbff248",
+              "url": "https://files.pythonhosted.org/packages/01/b0/4ddef56e9f703d7909febc3a421d709a3482cda25826816ec595b73e3847/ruamel.yaml.clib-0.2.8-cp311-cp311-macosx_13_0_arm64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "beb2e0404003de9a4cab9753a8805a8fe9320ee6673136ed7f04255fe60bb512",
+              "url": "https://files.pythonhosted.org/packages/46/ab/bab9eb1566cd16f060b54055dd39cf6a34bfa0240c53a7218c43e974295b/ruamel.yaml.clib-0.2.8.tar.gz"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "1707814f0d9791df063f8c19bb51b0d1278b8e9a2353abbb676c2f685dee6afe",
+              "url": "https://files.pythonhosted.org/packages/7c/e4/0d19d65e340f93df1c47f323d95fa4b256bb28320290f5fddef90837853a/ruamel.yaml.clib-0.2.8-cp311-cp311-manylinux_2_24_aarch64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "25c515e350e5b739842fc3228d662413ef28f295791af5e5110b543cf0b57d9b",
+              "url": "https://files.pythonhosted.org/packages/a4/f7/22d6b620ed895a05d40802d8281eff924dc6190f682d933d4efff60db3b5/ruamel.yaml.clib-0.2.8-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "bef08cd86169d9eafb3ccb0a39edb11d8e25f3dae2b28f5c52fd997521133069",
+              "url": "https://files.pythonhosted.org/packages/b1/15/971b385c098e8d0d170893f5ba558452bb7b776a0c90658b8f4dd0e3382b/ruamel.yaml.clib-0.2.8-cp311-cp311-macosx_10_9_universal2.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "46d378daaac94f454b3a0e3d8d78cafd78a026b1d71443f4966c696b48a6d899",
+              "url": "https://files.pythonhosted.org/packages/c9/ff/f781eb5e2ae011e586d5426e2086a011cf1e0f59704a6cad1387975c5a62/ruamel.yaml.clib-0.2.8-cp311-cp311-musllinux_1_1_i686.whl"
+            }
+          ],
+          "project_name": "ruamel-yaml-clib",
+          "requires_dists": [],
+          "requires_python": ">=3.6",
+          "version": "0.2.8"
         },
         {
           "artifacts": [
@@ -9875,6 +10044,7 @@
     "boto3==1.34.34",
     "botocore-stubs==1.34.41",
     "botocore==1.34.34",
+    "check-jsonschema==0.28.0",
     "click==8.1.7",
     "coverage[toml]==7.4.1",
     "cryptography==42.0.2",

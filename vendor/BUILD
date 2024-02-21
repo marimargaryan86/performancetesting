@@ -12,6 +12,13 @@ __dependents_rules__(
     ("*", "*"),
 )
 
+pex_binary(
+    name="check-jsonschema",
+    script="check-jsonschema",
+    dependencies=["vendor#check-jsonschema"],
+)
+
+
 python_requirements(
     module_mapping={
         "antlr4-python3-runtime": ["antlr4"],

@@ -6,6 +6,7 @@ shopt -s globstar
 shopt -s nullglob
 
 pants run python/snowfall/script/validate_nomad_build_files.py -- "nomad/"
+pants run vendor:check-jsonschema -- --schemafile nomad/config.schema.json nomad/*/**/*.json
 
 FAILURE=0
 ENVIRONMENTS=("development" "production" "sandbox")

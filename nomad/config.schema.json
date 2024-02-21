@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "development": {
+      "$ref": "#/$defs/environment"
+    },
+    "sandbox": {
+      "$ref": "#/$defs/environment"
+    },
+    "production": {
+      "$ref": "#/$defs/environment"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "development",
+    "sandbox",
+    "production"
+  ],
+  "$defs": {
+    "environment": {
+      "type": "object",
+      "properties": {
+        "deploy": {
+          "type": "boolean",
+          "default": true
+        },
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/variable"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "variable": {
+      "type": [
+        "string",
+        "integer",
+        "boolean",
+        "array",
+        "object"
+      ],
+      "items": {
+        "$ref": "#/$defs/variable"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/variable"
+      }
+    }
+  }
+}
