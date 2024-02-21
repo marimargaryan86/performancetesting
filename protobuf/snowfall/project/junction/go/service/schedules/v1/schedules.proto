@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.junction.go.service.schedules.v1alpha;
+package snowfall.project.junction.go.service.schedules.v1;
 
 import "snowfall/project/junction/go/v1/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/schedules/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/schedules/v1";
 
 service ScheduleService {
   rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse) {}

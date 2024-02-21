@@ -31,7 +31,7 @@ from snowfall.project.junction.go.service.client_api import (
 from snowfall.project.junction.go.service.offers.v1 import grpc_pb2_grpc
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.places.v1 import places_pb2_grpc
-from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
+from snowfall.project.junction.go.service.schedules.v1 import schedules_pb2_grpc
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2_grpc
 from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc
 from snowfall.stdlib.format import jwt

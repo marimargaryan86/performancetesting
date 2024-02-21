@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
     grpc_pb2_grpc as offers_grpc_pb2_grpc,
 )
 from snowfall.project.junction.go.service.planner.v1 import planner_pb2_grpc
-from snowfall.project.junction.go.service.schedules.v1alpha import schedules_pb2_grpc
+from snowfall.project.junction.go.service.schedules.v1 import schedules_pb2_grpc
 from snowfall.project.junction.go.service.trips import cache, orchestrator, trips
 from snowfall.project.junction.go.service.trips.consumer import (
     TripCandidateSearchConsumer,

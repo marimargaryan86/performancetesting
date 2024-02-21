@@ -4,7 +4,7 @@ from snowfall.project.junction.go.service.schedules.schedules import (
     LegRepository,
     ScheduleRepository,
 )
-from snowfall.project.junction.go.service.schedules.v1alpha import (
+from snowfall.project.junction.go.service.schedules.v1 import (
     schedules_pb2,
     schedules_pb2_grpc,
 )
