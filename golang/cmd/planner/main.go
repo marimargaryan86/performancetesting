@@ -130,6 +130,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	planner.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
 		Planner: raptor.NewPlanner(repository, stopsMap, sugar),
 		Stops:   stopsMap,
+		Logger:  sugar,
 	})
 	reflection.Register(grpcServer)
 

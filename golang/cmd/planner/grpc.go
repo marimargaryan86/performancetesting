@@ -9,6 +9,7 @@ import (
 	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
 	"github.com/google/uuid"
 	"github.com/uber/h3-go/v4"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"strings"
@@ -19,6 +20,7 @@ type PlannerServiceServer struct {
 	planner.UnimplementedPlannerServiceServer
 	Planner *raptor.Planner
 	Stops   map[h3.Cell][]*planner.Stop
+	Logger  *zap.SugaredLogger
 }
 
 func difference[T comparable](a, b []T) []T {
@@ -158,6 +160,7 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureBefore, allowedSegmentTypes, maxConnections)
 
 	if err != nil {
+		ps.Logger.Error(err)
 		return &planner.SearchJourneyResponse{}, status.Errorf(codes.Unknown, "raptor returned an error")
 	}
 
