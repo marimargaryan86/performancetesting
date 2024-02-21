@@ -12,11 +12,9 @@
   import LanguageSelect from "./language-select.svelte";
   import type { ComponentProps } from "svelte";
   import { slide } from "svelte/transition";
-  import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
 
   let compact = false;
 
-  const featureTools = getFeatureTools();
   const user = getUser();
   const t = getTranslator();
   const transitionTimeMs = 250;
@@ -57,33 +55,14 @@
   let menuItems: MenuItem[];
 
   $: menuItems = [
-    $featureTools.hasFeature(Feature.CAR_RENTAL)
-      ? {
-          type: "parent",
-          label: $t("pages.tripManagement.pages.book.title"),
-          icon: "ticket",
-          children: [
-            {
-              type: "link",
-              url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
-              label: "Train",
-              icon: "train",
-            },
-            {
-              type: "link",
-              url: routeConfig.routes.tripManagement.routes.book.routes.car.root,
-              label: "Car",
-              icon: "car",
-            },
-          ],
-          expanded: false,
-        }
-      : {
-          type: "link",
-          url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
-          label: $t("pages.tripManagement.pages.book.title"),
-          icon: "ticket",
-        },
+    {
+      type: "link",
+      url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
+      activeMatcher: (pathname): boolean =>
+        pathname.startsWith(routeConfig.routes.tripManagement.routes.book.root),
+      label: $t("pages.tripManagement.pages.book.title"),
+      icon: "ticket",
+    },
     {
       type: "link",
       url: routeConfig.routes.tripManagement.routes.orders.root,

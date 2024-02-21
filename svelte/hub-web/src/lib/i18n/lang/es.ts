@@ -100,6 +100,8 @@ export default {
     optional: "Opcional",
     inbound: "Entrante",
     outbound: "Saliente",
+    earlier: "Antes",
+    later: "Después",
   },
   actions: {
     logout: "Cerrar sesión",
@@ -294,6 +296,10 @@ export default {
     booking: "Reserva",
     origin: "Origen",
     destination: "Destino",
+  },
+  transportTypes: {
+    rail: "Tren",
+    car: "Alquiler de coches",
   },
   gender: {
     female: "Mujer",
@@ -590,23 +596,45 @@ export default {
         book: {
           title: "Crear Reserva",
           pages: {
-            search: {
-              title: "Buscar",
-              subTitle: "buscar ofertas",
+            train: {
+              pages: {
+                search: {
+                  title: "Buscar",
+                  subTitle: "buscar ofertas",
+                },
+                select: {
+                  title: "Seleccionar",
+                  subTitle: "Seleccione una oferta",
+                },
+                payment: {
+                  title: "Pagar",
+                  subTitle: "Pagar",
+                },
+                confirmation: {
+                  title: "Confirmación",
+                  subTitle: "Confirmación",
+                },
+              },
             },
-            select: {
-              title: "Seleccionar",
-              subTitle: "Seleccione una oferta",
-              earlier: "Antes",
-              later: "Después",
-            },
-            payment: {
-              title: "Pagar",
-              subTitle: "Pagar",
-            },
-            confirmation: {
-              title: "Confirmación",
-              subTitle: "Confirmación",
+            car: {
+              pages: {
+                search: {
+                  title: "Buscar",
+                  subTitle: "buscar ofertas",
+                },
+                select: {
+                  title: "Seleccionar",
+                  subTitle: "Seleccione una oferta",
+                },
+                payment: {
+                  title: "Pagar",
+                  subTitle: "Pagar",
+                },
+                confirmation: {
+                  title: "Confirmación",
+                  subTitle: "Confirmación",
+                },
+              },
             },
           },
         },

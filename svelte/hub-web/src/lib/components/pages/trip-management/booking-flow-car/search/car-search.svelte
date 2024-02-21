@@ -148,11 +148,7 @@
     grid-template-columns: 1fr 1fr 1fr max-content;
     gap: 19px 8px;
     align-items: flex-start;
-    max-width: 1154px;
-    padding: 24px;
     color: var(--color-common-light-strong);
-    background: var(--color-common-background-light-main);
-    border-radius: 16px;
     user-select: none;
   }
 

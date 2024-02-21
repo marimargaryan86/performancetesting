@@ -106,6 +106,8 @@ export default {
     optional: "Optional",
     inbound: "Inbound",
     outbound: "Outbound",
+    earlier: "Earlier",
+    later: "Later",
   },
   actions: {
     logout: "Logout",
@@ -275,6 +277,10 @@ export default {
     origin: "Origin",
     destination: "Destination",
   },
+  transportTypes: {
+    rail: "Train",
+    car: "Car Rental",
+  } satisfies Record<Exclude<CommonSchemas.TransportType, "unspecified" | "air">, string>,
   gender: {
     female: "Female",
     male: "Male",
@@ -568,23 +574,45 @@ export default {
         book: {
           title: "Book",
           pages: {
-            search: {
-              title: "Search",
-              subTitle: "Search for offers",
+            train: {
+              pages: {
+                search: {
+                  title: "Search",
+                  subTitle: "Search for offers",
+                },
+                select: {
+                  title: "Select",
+                  subTitle: "Select an offer",
+                },
+                payment: {
+                  title: "Payment",
+                  subTitle: "Payment",
+                },
+                confirmation: {
+                  title: "Confirmation",
+                  subTitle: "Confirmation",
+                },
+              },
             },
-            select: {
-              title: "Select",
-              subTitle: "Select an offer",
-              earlier: "Earlier",
-              later: "Later",
-            },
-            payment: {
-              title: "Payment",
-              subTitle: "Payment",
-            },
-            confirmation: {
-              title: "Confirmation",
-              subTitle: "Confirmation",
+            car: {
+              pages: {
+                search: {
+                  title: "Search",
+                  subTitle: "Search for Car Rental",
+                },
+                select: {
+                  title: "Select",
+                  subTitle: "Select Car",
+                },
+                payment: {
+                  title: "Payment",
+                  subTitle: "Payment",
+                },
+                confirmation: {
+                  title: "Confirmation",
+                  subTitle: "Confirmation",
+                },
+              },
             },
           },
         },

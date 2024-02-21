@@ -200,8 +200,8 @@
 
 <BookingLayout
   showActions
-  pageTitle={$t("pages.tripManagement.pages.book.pages.payment.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.payment.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.payment.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.payment.subTitle")}
 >
   <div class="content">
     {#if priceQuote}

@@ -100,6 +100,8 @@ export default {
     optional: "Frivillig",
     inbound: "Inkommande",
     outbound: "Utgående",
+    earlier: "Tidigare",
+    later: "Senare",
   },
   actions: {
     logout: "Logga ut",
@@ -268,6 +270,10 @@ export default {
     booking: "Bokning",
     origin: "Ursprung",
     destination: "Destination",
+  },
+  transportTypes: {
+    rail: "Tåg",
+    car: "Biluthyrning",
   },
   gender: {
     female: "Kvinna",
@@ -563,23 +569,45 @@ export default {
         book: {
           title: "Boka",
           pages: {
-            search: {
-              title: "Sök",
-              subTitle: "Sök efter erbjudanden",
+            train: {
+              pages: {
+                search: {
+                  title: "Sök",
+                  subTitle: "Sök efter erbjudanden",
+                },
+                select: {
+                  title: "Välj",
+                  subTitle: "Välj ett erbjudande",
+                },
+                payment: {
+                  title: "Betalning",
+                  subTitle: "Betalning",
+                },
+                confirmation: {
+                  title: "Bekräftelse",
+                  subTitle: "Bekräftelse",
+                },
+              },
             },
-            select: {
-              title: "Välj",
-              subTitle: "Välj ett erbjudande",
-              earlier: "Tidigare",
-              later: "Senare",
-            },
-            payment: {
-              title: "Betalning",
-              subTitle: "Betalning",
-            },
-            confirmation: {
-              title: "Bekräftelse",
-              subTitle: "Bekräftelse",
+            car: {
+              pages: {
+                search: {
+                  title: "Sök",
+                  subTitle: "Sök efter erbjudanden",
+                },
+                select: {
+                  title: "Välj",
+                  subTitle: "Välj ett erbjudande",
+                },
+                payment: {
+                  title: "Betalning",
+                  subTitle: "Betalning",
+                },
+                confirmation: {
+                  title: "Bekräftelse",
+                  subTitle: "Bekräftelse",
+                },
+              },
             },
           },
         },

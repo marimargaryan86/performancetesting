@@ -38,8 +38,8 @@
 
 <BookingLayout
   showActions
-  pageTitle={$t("pages.tripManagement.pages.book.pages.confirmation.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.confirmation.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.confirmation.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.confirmation.subTitle")}
 >
   <div class="content">
     <Alert type={alertType}>

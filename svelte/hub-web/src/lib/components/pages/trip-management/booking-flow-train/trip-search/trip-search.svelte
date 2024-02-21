@@ -131,10 +131,6 @@
     grid-template-columns: 1fr max-content 1fr 1fr max-content;
     gap: 8px;
     align-items: flex-start;
-    max-width: 1154px;
-    padding: 24px 24px 16px;
-    background: var(--color-common-background-light-main);
-    border-radius: 16px;
   }
 
   .trip-search.extended {

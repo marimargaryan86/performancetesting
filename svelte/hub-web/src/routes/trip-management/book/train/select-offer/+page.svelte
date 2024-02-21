@@ -191,15 +191,17 @@
 
 <BookingLayout
   showActions={Boolean(selected.offerId && selected.optionIds)}
-  pageTitle={$t("pages.tripManagement.pages.book.pages.select.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.select.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.select.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.select.subTitle")}
 >
-  <div class="search-wrapper">
+  <div class="search-drawer">
     <CollapsibleTripSearch searchData={data.bookingSession.searchData}>
-      <TripSearch
-        data={tripSearchDataParser.fromSearchData(data.bookingSession.searchData)}
-        on:search={search.bind(search, "initial")}
-      />
+      <div class="search-wrapper">
+        <TripSearch
+          data={tripSearchDataParser.fromSearchData(data.bookingSession.searchData)}
+          on:search={search.bind(search, "initial")}
+        />
+      </div>
     </CollapsibleTripSearch>
   </div>
 
@@ -217,7 +219,7 @@
                 disabled={Boolean(offersPending)}
               >
                 <span typography="label-medium" weight="bold">
-                  {$t("pages.tripManagement.pages.book.pages.select.earlier")}
+                  {$t("words.earlier")}
                 </span>
                 {#if offersPending === "earlier"}
                   <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
@@ -272,7 +274,7 @@
                 disabled={Boolean(offersPending)}
               >
                 <span typography="label-medium" weight="bold">
-                  {$t("pages.tripManagement.pages.book.pages.select.later")}
+                  {$t("words.later")}
                 </span>
                 {#if offersPending === "later"}
                   <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
@@ -311,13 +313,13 @@
 </BookingLayout>
 
 <style>
-  .search-wrapper {
+  .search-drawer {
     position: relative;
     background-color: #ffffff;
     border-top: var(--color-common-line-soft) 1px solid;
   }
 
-  .search-wrapper::after {
+  .search-drawer::after {
     position: absolute;
     top: 100%;
     left: 0;
@@ -327,6 +329,13 @@
     background-image: linear-gradient(180deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
     content: "";
     pointer-events: none;
+  }
+
+  .search-wrapper {
+    max-width: 1154px;
+    padding: 16px 24px;
+    background: var(--color-common-background-light-main);
+    border-radius: 16px;
   }
 
   .content {

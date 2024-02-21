@@ -7,6 +7,7 @@
   import routeConfig from "$lib/route-config";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
+  import SearchTabs from "$lib/components/pages/trip-management/search-tabs.svelte";
 
   const featureTools = getFeatureTools();
   const t = getTranslator();
@@ -20,16 +21,27 @@
 </script>
 
 <BookingLayout
-  pageTitle={$t("pages.tripManagement.pages.book.pages.search.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.search.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.car.pages.search.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.car.pages.search.subTitle")}
 >
   <div class="search-wrapper">
+    {#if $featureTools.hasFeature(Feature.CAR_RENTAL)}
+      <SearchTabs active="rail" />
+    {/if}
+
     <TripSearch on:search={search} />
   </div>
 </BookingLayout>
 
 <style>
   .search-wrapper {
-    padding: 24px;
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+    max-width: 1154px;
+    margin: 24px;
+    padding: 16px 24px;
+    background: var(--color-common-background-light-main);
+    border-radius: 16px;
   }
 </style>
