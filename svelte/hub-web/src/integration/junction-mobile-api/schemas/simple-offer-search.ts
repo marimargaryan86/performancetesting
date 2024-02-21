@@ -36,7 +36,19 @@ export const simpleOfferSearchCriteriaParser = {
       windowH,
     };
   },
-  toSchema: (data: SimpleOfferSearchCriteria): SimpleOfferSearchCriteriaSchema => {
+  toSchema: (
+    data: SimpleOfferSearchCriteria,
+    isCarSearch: boolean,
+  ): SimpleOfferSearchCriteriaSchema => {
+    if (isCarSearch) {
+      return {
+        origin: CommonSchemas.coordinatesParser.toSchema(data.origin),
+        destination: CommonSchemas.coordinatesParser.toSchema(data.destination),
+        departureAfter: data.outbound.toISOString(),
+        arrivalBefore: data.inbound?.toISOString(),
+      };
+    }
+
     const outboundAfter = data.outbound;
     const outboundBefore = data.windowH ? new Date(data.outbound) : undefined;
     outboundBefore?.setHours(outboundBefore.getHours() + (data.windowH ?? 0));
@@ -90,19 +102,23 @@ export const simpleOffserSearchParser = {
     allowedSegmentTypes: data.relationships?.allowedSegmentTypes?.data.map(({ id }) => id) ?? [],
     criteria: simpleOfferSearchCriteriaParser.toModel(data.attributes.criteria),
   }),
-  toCreateSchema: (data: SimpleOfferSearchCreate): SimpleOfferSearchCreateSchema => ({
-    type: "simple-offer-searches",
-    attributes: {
-      sessionToken: data.sessionToken,
-      criteria: simpleOfferSearchCriteriaParser.toSchema(data.criteria),
-      passengers: data.passengers.map(tripOfferPassengerParser.toSchema),
-    },
-    relationships: data.allowedSegmentTypes
-      ? {
-          allowedSegmentTypes: {
-            data: data.allowedSegmentTypes.map((id) => ({ id, type: "leg-types" })),
-          },
-        }
-      : undefined,
-  }),
+  toCreateSchema: (data: SimpleOfferSearchCreate): SimpleOfferSearchCreateSchema => {
+    const isCarSearch = Boolean(data.allowedSegmentTypes?.includes("car"));
+
+    return {
+      type: "simple-offer-searches",
+      attributes: {
+        sessionToken: data.sessionToken,
+        criteria: simpleOfferSearchCriteriaParser.toSchema(data.criteria, isCarSearch),
+        passengers: data.passengers.map(tripOfferPassengerParser.toSchema),
+      },
+      relationships: data.allowedSegmentTypes
+        ? {
+            allowedSegmentTypes: {
+              data: data.allowedSegmentTypes.map((id) => ({ id, type: "leg-types" })),
+            },
+          }
+        : undefined,
+    };
+  },
 };

@@ -167,9 +167,10 @@ async function search(
   const offerSearch = await integrationInstancesClient.mobile.simpleOfferService.create({
     data: {
       criteria: {
-        outbound: data.outbound,
-        destination: data.destination.coordinates,
         origin: data.origin.coordinates,
+        destination: data.destination.coordinates,
+        outbound: data.outbound,
+        inbound: data.inbound,
         windowH: useWindow ? data.windowH : undefined,
       },
       passengers: data.passengers.map((birthDate) => ({ birthDate })),
