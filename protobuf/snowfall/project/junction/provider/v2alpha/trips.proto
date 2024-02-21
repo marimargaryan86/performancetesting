@@ -134,7 +134,28 @@ message Offer {
   Price price = 2;
   google.protobuf.Timestamp expires_at = 3;
   repeated Trip trips = 4;
-  // @todo: add more information from PriceQuote
+  enum PassportInformation {
+    // No value specified. Functionally the same as
+    // PASSPORT_INFORMATION_NOT_REQUIRED. This enum should not be used.
+    PASSPORT_INFORMATION_UNSPECIFIED = 0;
+
+    // Informs Junction that passport information is not required
+    // to book this offer.
+    PASSPORT_INFORMATION_NOT_REQUIRED = 1;
+
+    // Informs Junction that passport information is required to book this
+    // offer. Provided fields will be passport number, nationality,
+    // issuing country and expiration date.
+    PASSPORT_INFORMATION_REQUIRED = 2;
+
+    // Informs Junction that passport issue date is also required to book this
+    // offer, in addition to the passport information required by
+    // PASSPORT_INFORMATION_REQUIRED.
+    PASSPORT_INFORMATION_REQUIRED_WITH_ISSUE_DATE = 3;
+  }
+  PassportInformation passport_information = 5;
+  // @todo(bolmis): add penalties
+  // @todo(bolmis): add fare rules
 }
 
 message SearchOffersRequest {
