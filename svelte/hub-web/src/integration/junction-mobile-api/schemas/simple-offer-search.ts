@@ -21,18 +21,26 @@ export type SimpleOfferSearchCriteriaSchema = {
 };
 
 export const simpleOfferSearchCriteriaParser = {
-  toModel: (data: SimpleOfferSearchCriteriaSchema): SimpleOfferSearchCriteria => {
+  toModel: (
+    data: SimpleOfferSearchCriteriaSchema,
+    isCarSearch: boolean,
+  ): SimpleOfferSearchCriteria => {
     const outboundAfter = new Date(data.departureAfter);
     const outboundBefore = data.departureBefore ? new Date(data.departureBefore) : undefined;
     const windowH = outboundBefore
       ? (outboundAfter.getTime() - outboundBefore.getTime()) / 3600000
       : undefined;
+    let inbound = data.returnDepartureAfter ? new Date(data.returnDepartureAfter) : undefined;
+
+    if (isCarSearch) {
+      inbound = data.arrivalBefore ? new Date(data.arrivalBefore) : undefined;
+    }
 
     return {
       origin: CommonSchemas.coordinatesParser.toModel(data.origin),
       destination: CommonSchemas.coordinatesParser.toModel(data.destination),
       outbound: new Date(data.departureAfter),
-      inbound: data.returnDepartureAfter ? new Date(data.returnDepartureAfter) : undefined,
+      inbound,
       windowH,
     };
   },
@@ -94,14 +102,20 @@ export type SimpleOfferSearchCreateSchema = Pick<SimpleOfferSearchSchema, "relat
   };
 
 export const simpleOffserSearchParser = {
-  toModel: (data: SimpleOfferSearchSchema): SimpleOfferSearch => ({
-    id: data.id,
-    status: data.attributes.status,
-    expiresAt: new Date(data.attributes.expiresAt),
-    passengers: data.attributes.passengers.map(tripOfferPassengerParser.toModel),
-    allowedSegmentTypes: data.relationships?.allowedSegmentTypes?.data.map(({ id }) => id) ?? [],
-    criteria: simpleOfferSearchCriteriaParser.toModel(data.attributes.criteria),
-  }),
+  toModel: (data: SimpleOfferSearchSchema): SimpleOfferSearch => {
+    const isCarSearch = Boolean(
+      data.relationships?.allowedSegmentTypes?.data.find((item) => item.id === "car"),
+    );
+
+    return {
+      id: data.id,
+      status: data.attributes.status,
+      expiresAt: new Date(data.attributes.expiresAt),
+      passengers: data.attributes.passengers.map(tripOfferPassengerParser.toModel),
+      allowedSegmentTypes: data.relationships?.allowedSegmentTypes?.data.map(({ id }) => id) ?? [],
+      criteria: simpleOfferSearchCriteriaParser.toModel(data.attributes.criteria, isCarSearch),
+    };
+  },
   toCreateSchema: (data: SimpleOfferSearchCreate): SimpleOfferSearchCreateSchema => {
     const isCarSearch = Boolean(data.allowedSegmentTypes?.includes("car"));
 
