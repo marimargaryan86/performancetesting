@@ -1,5 +1,27 @@
-<script>
+<script lang="ts">
   import Navigation from "./navigation.svelte";
+  import { setTranslator, type Locale } from "$lib/i18n";
+  import { invalidateAll } from "$app/navigation";
+  import { browser } from "$app/environment";
+
+  export let data;
+
+  const { locale, localeData } = setTranslator(data.locale, data.localeData);
+
+  $: $locale = data.locale;
+  $: $localeData = data.localeData;
+
+  let prevLocale = data.locale;
+
+  $: if (browser && prevLocale !== $locale) {
+    prevLocale = $locale;
+    updateLocaleCookie($locale);
+  }
+
+  function updateLocaleCookie(nextLocale: Locale): void {
+    document.cookie = `locale=${nextLocale}; Path=/; MaxAge=31536000; SameSite=lax;`;
+    invalidateAll();
+  }
 </script>
 
 <div class="app">
