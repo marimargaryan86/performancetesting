@@ -21,8 +21,8 @@
 </script>
 
 <BookingLayout
-  pageTitle={$t("pages.tripManagement.pages.book.pages.car.pages.search.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.car.pages.search.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.search.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.search.subTitle")}
 >
   <div class="search-wrapper">
     {#if $featureTools.hasFeature(Feature.CAR_RENTAL)}
