@@ -57,7 +57,7 @@
         {$t("words.subAccounts")}
       </h2>
 
-      <ul class="accounts" data-sveltekit-preload-data="off" use:scrollLoad={{ func: loadMore }}>
+      <ul class="accounts" use:scrollLoad={{ func: loadMore }}>
         {#each accounts as account (account.id)}
           <li>
             <a

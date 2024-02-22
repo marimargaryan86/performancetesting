@@ -59,7 +59,6 @@
       variant="primary"
       size="small"
       href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
-      data-sveltekit-preload-data="off"
       slot="actions"
     >
       Add Beneficiary
@@ -93,7 +92,6 @@
           <x-tactions>
             <a
               href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
-              data-sveltekit-preload-data="off"
               class="action"
             >
               <Icon variant="edit" size="32px" />
