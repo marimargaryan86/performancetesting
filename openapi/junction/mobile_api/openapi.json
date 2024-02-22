@@ -4664,6 +4664,28 @@
           "type"
         ]
       },
+      "GuestIdentifier": {
+        "title": "Guest Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "guests"
+            ],
+            "example": "guests"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
       "MarkupIdentifier": {
         "title": "Markup Identifier",
         "type": "object",
@@ -5114,7 +5136,7 @@
                   "amenities": {
                     "$ref": "#/components/schemas/OfferSegmentDetailAmenities"
                   },
-                  "vehicle":  {
+                  "vehicle": {
                     "$ref": "#/components/schemas/VehicleInformation"
                   }
                 }
@@ -5335,17 +5357,12 @@
                 "properties": {
                   "guest": {
                     "type": "object",
+                    "required": [
+                      "data"
+                    ],
                     "properties": {
-                      "id": {
-                        "type": "string",
-                        "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-                      },
-                      "type": {
-                        "type": "string",
-                        "enum": [
-                          "guests"
-                        ],
-                        "example": "guests"
+                      "data": {
+                        "$ref": "#/components/schemas/GuestIdentifier"
                       }
                     }
                   }

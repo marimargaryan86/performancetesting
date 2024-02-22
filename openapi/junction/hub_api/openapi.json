@@ -4339,6 +4339,9 @@
           },
           "relationships": {
             "type": "object",
+            "required": [
+              "reseller"
+            ],
             "properties": {
               "reseller": {
                 "anyOf": [
