@@ -6,7 +6,7 @@
   import { formatPlace } from "$lib/formatting/location";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { writable, type Writable } from "svelte/store";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { z } from "zod";
   import integrationInstancesClient from "~/integration-instances-client";
   import {
@@ -23,14 +23,9 @@
   }>();
   const pending = writable(false);
 
-  let differentDropoff = false;
-  $: if (differentDropoff) {
-    // Reset destination when different dropoff toggles to true
-    data.destination = undefined;
-  }
-
   export let data: PartialCarSearchData = {};
 
+  let differentDropoff = data.origin?.id !== data.destination?.id;
   let errors: CarSearchDataError | undefined;
 
   function search(): void {
@@ -66,6 +61,19 @@
 
     errors = errors;
   }
+
+  function changeDifferentDropoff(event: Event & { currentTarget: HTMLInputElement }): void {
+    // Clear destination when different dropoff changes to false
+    if (!event.currentTarget.checked) {
+      data.destination = undefined;
+    }
+  }
+
+  onMount(() => {
+    if (!differentDropoff) {
+      data.destination = undefined;
+    }
+  });
 </script>
 
 <form
@@ -120,7 +128,7 @@
 
   <div class="options" typography="body-medium">
     <label>
-      <input type="checkbox" bind:checked={differentDropoff} />
+      <input type="checkbox" bind:checked={differentDropoff} on:change={changeDifferentDropoff} />
       <span>Drop-off car in a different location</span>
     </label>
 

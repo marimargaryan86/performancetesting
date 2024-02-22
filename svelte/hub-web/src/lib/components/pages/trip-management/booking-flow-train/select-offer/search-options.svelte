@@ -52,9 +52,9 @@
     </div>
   </div>
 
-  <hr />
-
   {#if !$featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
+    <hr />
+
     <div class="departure-time">
       <h3 typography="label-large">{$t("words.departureTime")}</h3>
       <div>
@@ -73,9 +73,9 @@
         <RangeField bind:value={data.arrivalSpanM} min={0} max={1440} />
       </div>
     </div>
-
-    <hr />
   {/if}
+
+  <hr />
 
   <div class="duration">
     <h3 typography="label-large">{$t("words.journeyDuration")}</h3>
@@ -89,9 +89,9 @@
     />
   </div>
 
-  <hr />
-
   {#if settings.vendors.length}
+    <hr />
+
     <div class="operators">
       <h3 typography="label-large">{$t("words.railwayOperators")}</h3>
 

@@ -28,7 +28,7 @@
   } from "$lib/booking-manager/booking-manager";
   import { browser } from "$app/environment";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
-  import { passengerParser } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data.js";
+  import { passengerParser } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data";
 
   export let data;
 

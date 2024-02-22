@@ -14,12 +14,9 @@
 
   async function search(event: ComponentEvents<CarSearch>["search"]): Promise<void> {
     event.detail.pending.set(true);
-    try {
-      await manager.search(event.detail.data, false);
-      await goto(routeConfig.routes.tripManagement.routes.book.routes.car.routes.select.root);
-    } finally {
-      event.detail.pending.set(false);
-    }
+    await manager.search(event.detail.data, false);
+    await goto(routeConfig.routes.tripManagement.routes.book.routes.car.routes.select.root);
+    event.detail.pending.set(false);
   }
 </script>
 

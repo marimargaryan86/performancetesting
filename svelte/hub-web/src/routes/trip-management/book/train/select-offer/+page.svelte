@@ -4,17 +4,15 @@
 </script>
 
 <script lang="ts">
-  import TripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
   import {
     SEARCH_WINDOW_DELTA_MS,
     SEARCH_WINDOW_H,
     tripSearchDataParser,
-  } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data.js";
+  } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data";
   import SearchOptions from "$lib/components/pages/trip-management/booking-flow-train/select-offer/search-options.svelte";
   import Offer from "$lib/components/pages/trip-management/booking-flow-train/select-offer/offer/offer.svelte";
   import routeConfig from "$lib/route-config";
   import { goto, invalidateAll } from "$app/navigation";
-  import Countdown from "$lib/components/pages/trip-management/booking-flow-train/countdown.svelte";
   import LoadingSkelton from "$lib/components/pages/trip-management/booking-flow-train/select-offer/loading-skelton.svelte";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
@@ -36,7 +34,7 @@
   import CollapsibleTripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/collapsible-trip-search.svelte";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
-  import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
+  import OfferResultLayout from "$lib/components/pages/trip-management/offer-result-layout.svelte";
 
   export let data;
 
@@ -58,6 +56,7 @@
   const selectOfferPending = writable(false);
   let offersPending: PendingType | undefined = "initial";
 
+  $: searchData = tripSearchDataParser.fromSearchData(data.bookingSession.searchData);
   $: offerSearchId = data.bookingSession.offerSearch.id;
   $: getOffers(offerSearchId);
   $: sortAndFilter = getSortAndFilteringFunc(searchOptions);
@@ -122,7 +121,7 @@
 
   async function search(
     pendingType: PendingType,
-    event: ComponentEvents<TripSearch>["search"],
+    event: ComponentEvents<CollapsibleTripSearch>["search"],
   ): Promise<void> {
     event.detail.pending.set(true);
     await searchAux(pendingType, event.detail.data);
@@ -189,105 +188,91 @@
   });
 </script>
 
-<BookingLayout
+<OfferResultLayout
   showActions={Boolean(selected.offerId && selected.optionIds)}
   pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.select.title")}
   pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.select.subTitle")}
+  expiresAt={data.bookingSession.offerSearch.expiresAt}
+  showCountdown={Boolean(offers.length)}
 >
-  <div class="search-drawer">
-    <CollapsibleTripSearch searchData={data.bookingSession.searchData}>
-      <div class="search-wrapper">
-        <TripSearch
-          data={tripSearchDataParser.fromSearchData(data.bookingSession.searchData)}
-          on:search={search.bind(search, "initial")}
+  <CollapsibleTripSearch
+    {searchData}
+    on:search={search.bind(search, "initial")}
+    slot="search-drawer"
+  />
+
+  <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} slot="search-options" />
+
+  <ul class="offer-result">
+    {#if $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
+      {#if showEarlierButton}
+        <li class="earlier">
+          <button on:click={fetchMore.bind(fetchMore, "earlier")} disabled={Boolean(offersPending)}>
+            <span typography="label-medium" weight="bold">
+              {$t("words.earlier")}
+            </span>
+            {#if offersPending === "earlier"}
+              <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
+            {:else}
+              <ChevronIcon direction="up" color="var(--color-common-light-text-link)" />
+            {/if}
+          </button>
+        </li>
+      {/if}
+    {/if}
+
+    {#each sortAndFilter(offers) as offer (offer.id)}
+      <li>
+        <Offer
+          {offer}
+          selected={selected.offerId === offer.id}
+          selectedOptionIds={selected.offerId === offer.id ? selected.optionIds : undefined}
+          pending={$selectOfferPending}
+          on:select={select}
         />
-      </div>
-    </CollapsibleTripSearch>
-  </div>
+      </li>
+    {:else}
+      {#if offers.length}
+        <li>
+          <Alert type="warning" dismissable={false}>
+            <span typography="body-medium">
+              {$t("sentences.noTripsMatchesTheFilterCriteria")}
+            </span>
+          </Alert>
+        </li>
+      {/if}
+    {/each}
 
-  <div class="content">
-    <Countdown expiresAt={data.bookingSession.offerSearch.expiresAt} type="offer-search" show />
+    {#if offersPending}
+      <li><LoadingSkelton /></li>
+      <li><LoadingSkelton /></li>
+      <li><LoadingSkelton /></li>
+      <li><LoadingSkelton /></li>
+    {:else if !offers.length}
+      <li>
+        <Alert type="warning" dismissable={false}>
+          <span typography="body-medium">{$t("sentences.noTripsFound")}</span>
+        </Alert>
+      </li>
+    {/if}
 
-    <div class="scroll">
-      <SearchOptions bind:data={searchOptions} settings={searchOptionsSettings} />
-      <ul class="offer-result">
-        {#if $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
-          {#if showEarlierButton}
-            <li class="earlier">
-              <button
-                on:click={fetchMore.bind(fetchMore, "earlier")}
-                disabled={Boolean(offersPending)}
-              >
-                <span typography="label-medium" weight="bold">
-                  {$t("words.earlier")}
-                </span>
-                {#if offersPending === "earlier"}
-                  <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
-                {:else}
-                  <ChevronIcon direction="up" color="var(--color-common-light-text-link)" />
-                {/if}
-              </button>
-            </li>
-          {/if}
-        {/if}
-
-        {#each sortAndFilter(offers) as offer (offer.id)}
-          <li>
-            <Offer
-              {offer}
-              selected={selected.offerId === offer.id}
-              selectedOptionIds={selected.offerId === offer.id ? selected.optionIds : undefined}
-              pending={$selectOfferPending}
-              on:select={select}
-            />
-          </li>
-        {:else}
-          {#if offers.length}
-            <li>
-              <Alert type="warning" dismissable={false}>
-                <span typography="body-medium">
-                  {$t("sentences.noTripsMatchesTheFilterCriteria")}
-                </span>
-              </Alert>
-            </li>
-          {/if}
-        {/each}
-
-        {#if offersPending}
-          <li><LoadingSkelton /></li>
-          <li><LoadingSkelton /></li>
-          <li><LoadingSkelton /></li>
-          <li><LoadingSkelton /></li>
-        {:else if !offers.length}
-          <li>
-            <Alert type="warning" dismissable={false}>
-              <span typography="body-medium">{$t("sentences.noTripsFound")}</span>
-            </Alert>
-          </li>
-        {/if}
-
-        {#if $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
-          {#if showLaterButton}
-            <li class="later">
-              <button
-                on:click={fetchMore.bind(fetchMore, "later")}
-                disabled={Boolean(offersPending)}
-              >
-                <span typography="label-medium" weight="bold">
-                  {$t("words.later")}
-                </span>
-                {#if offersPending === "later"}
-                  <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
-                {:else}
-                  <ChevronIcon direction="down" color="var(--color-common-light-text-link)" />
-                {/if}
-              </button>
-            </li>
-          {/if}
-        {/if}
-      </ul>
-    </div>
-  </div>
+    {#if $featureTools.hasFeature(Feature.OFFERS_TIME_WINDOWS)}
+      {#if showLaterButton}
+        <li class="later">
+          <button on:click={fetchMore.bind(fetchMore, "later")} disabled={Boolean(offersPending)}>
+            <span typography="label-medium" weight="bold">
+              {$t("words.later")}
+            </span>
+            {#if offersPending === "later"}
+              <LoadingIcon color="var(--color-common-light-text-link)" size="16px" />
+            {:else}
+              <ChevronIcon direction="down" color="var(--color-common-light-text-link)" />
+            {/if}
+          </button>
+        </li>
+      {/if}
+    {/if}
+  </ul>
 
   <svelte:fragment slot="actions">
     {#if selected.offerId && selected.optionIds}
@@ -310,71 +295,9 @@
       </button>
     {/if}
   </svelte:fragment>
-</BookingLayout>
+</OfferResultLayout>
 
 <style>
-  .search-drawer {
-    position: relative;
-    background-color: #ffffff;
-    border-top: var(--color-common-line-soft) 1px solid;
-  }
-
-  .search-drawer::after {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    display: block;
-    width: 100%;
-    height: 10px;
-    background-image: linear-gradient(180deg, rgb(0 0 0 / 0.05) 0%, rgb(0 0 0 / 0) 100%);
-    content: "";
-    pointer-events: none;
-  }
-
-  .search-wrapper {
-    max-width: 1154px;
-    padding: 16px 24px;
-    background: var(--color-common-background-light-main);
-    border-radius: 16px;
-  }
-
-  .content {
-    --options-width: 240px;
-    --result-width: calc(1152px - var(--options-width) - 72px);
-
-    display: flex;
-    flex-flow: column;
-    flex-grow: 1;
-    width: 100%;
-    padding-top: 24px;
-    overflow: auto;
-  }
-
-  .content > :global(.countdown) {
-    max-width: 1104px;
-    margin: 0 24px 24px;
-  }
-
-  .scroll {
-    --options-width: 240px;
-    --result-width: calc(1152px - var(--options-width) - 72px);
-
-    display: flex;
-    flex-grow: 1;
-    gap: 24px;
-    width: 100%;
-    padding: 0 24px 24px;
-    overflow: auto;
-  }
-
-  .scroll > :global(.search-options) {
-    position: sticky;
-    top: 0;
-    left: 0;
-    flex-shrink: 0;
-    width: var(--options-width);
-  }
-
   .offer-result {
     display: flex;
     flex-flow: column;
