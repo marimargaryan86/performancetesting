@@ -18,6 +18,7 @@
   import i18next from "i18next";
   import { Feature, getFeatureTools, setFeatures } from "$lib/utils/feature-flags";
   import DevTools from "$lib/components/partials/dev-tools.svelte";
+  import { ensureDefined } from "$lib/utils/array";
 
   export let data;
 
@@ -54,7 +55,17 @@
   }
 
   function updateLocaleCookie(nextLocale: Locale): void {
-    document.cookie = `${LOCALE_COOKIE}=${nextLocale}; Path=/; MaxAge=31536000; SameSite=${dev ? "lax" : "strict"}`;
+    document.cookie = [
+      `${LOCALE_COOKIE}=${nextLocale}`,
+      dev ? undefined : `Secure`,
+      "Path=/",
+      "MaxAge=31536000",
+      `SameSite=${dev ? "lax" : "strict"}`,
+    ]
+      .filter(ensureDefined)
+      .join("; ");
+
+    document.cookie = `}`;
     invalidateAll();
   }
 
