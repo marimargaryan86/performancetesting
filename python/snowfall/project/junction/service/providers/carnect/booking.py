@@ -282,12 +282,20 @@ class BookingHandler(object):
             return new_booking
 
         if res_adapter.get_status() == _STATUS_CONFIRMED:
-            template = notifications.BookingNotification(task.metadata, res_adapter)
+            template_path = filesystem.resource_path(
+                "snowfall.project.junction.service.providers.carnect.html_templates",
+                "booking_confirmed.html",
+            )
+            template = notifications.BookingNotification(
+                task,
+                res_adapter,
+                template_path,
+            )
             try:
                 await self._email_client.send_email_html_template(
                     mail_to=task.contact_details.email,
                     subject=template.subject,
-                    body=template.body,
+                    body=await template.get_body(),
                 )
             except notifications.EmailNotificationError:
                 self._logger.exception("Failed to send booking notification")

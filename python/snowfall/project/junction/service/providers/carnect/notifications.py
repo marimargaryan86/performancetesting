@@ -1,10 +1,11 @@
-import datetime
+import pathlib
 from email.mime import multipart, text
 
+import aiofiles
 import aiosmtplib
+import jinja2
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
-from snowfall.project.junction.provider import notifications
 from snowfall.project.junction.service.providers.carnect import adapter
 from snowfall.vendor.carnect.adapters import reservation_adapter
 
@@ -13,28 +14,16 @@ class EmailNotificationError(Exception):
     """General error while sending email notification."""
 
 
-class BookingNotification(notifications.Notification):
-    _template = """
-Reservation created by Junction
-
-Journey ID : {journey_id}
-Order ID : {order_id}
-Booking ID : {booking_id}
-SPNR : {spnr}
-Booking date : {created_at}
-Pickup date : {pickup_date}
-Drop off date : {drop_off_date}
-Start location : {origin}
-Destination location : {destination}
-"""
-
+class BookingNotification(object):
     def __init__(
         self,
-        metadata: amqp_pb2.OrderMetadata,
+        place_order_task: amqp_pb2.PlaceOrderTask,
         res_adapter: reservation_adapter.ReservationAdapter,
+        template: pathlib.Path,
     ):
-        self._meta_data = metadata
+        self._place_order_task = place_order_task
         self._res_adapter = res_adapter
+        self._template = template
 
     @property
     def subject(self) -> str:
@@ -42,8 +31,10 @@ Destination location : {destination}
             identifier=self._res_adapter.get_id_context(),
         )
 
-    @property
-    def template_parameters(self) -> dict[str, str]:
+    async def get_body(self) -> str:
+        async with aiofiles.open(self._template) as template_file:
+            template_content = await template_file.read()
+
         reservation = self._res_adapter.reservation()
         pickup_date = adapter.get_optional_value(
             reservation,
@@ -66,19 +57,22 @@ Destination location : {destination}
             "veh_segment_core.veh_rental_core.return_location.value",
             "N/A",
         )
-        return {
-            "journey_id": self._meta_data.journey_id,
-            "order_id": self._meta_data.order_id,
-            "booking_id": self._meta_data.booking_id,
-            "spnr": self._meta_data.passenger_name_record,
-            "created_at": datetime.datetime.now(
-                tz=datetime.UTC,
-            ).isoformat(timespec="seconds"),
-            "pickup_date": pickup_date,
-            "drop_off_date": drop_off_date,
-            "origin": origin,
-            "destination": destination,
-        }
+        operator = adapter.get_optional_value(
+            reservation,
+            "veh_segment_core.vendor.company_short_name",
+            "N/A",
+        )
+        return jinja2.Template(template_content).render(
+            spnr=self._place_order_task.metadata.passenger_name_record,
+            pickup_date=pickup_date,
+            drop_off_date=drop_off_date,
+            origin=origin,
+            destination=destination,
+            journey_id=self._place_order_task.metadata.journey_id,
+            passengers=self._place_order_task.passengers,
+            operator_reference=self._res_adapter.get_id_context(),
+            operator=operator,
+        )
 
 
 class EmailClient(object):
