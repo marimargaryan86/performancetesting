@@ -16,6 +16,9 @@ export async function load(event): Promise<{
       }),
     };
   } catch {
-    throw redirect(303, routeConfig.routes.tripManagement.routes.book.routes.train.root);
+    throw redirect(
+      303,
+      routeConfig.routes.tripManagement.routes.book.routes[event.params.searchType].root,
+    );
   }
 }

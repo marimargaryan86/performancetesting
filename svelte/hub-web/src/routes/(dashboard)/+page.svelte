@@ -43,7 +43,7 @@
           <a
             variant="primary"
             class="widget-button"
-            href={routeConfig.routes.tripManagement.routes.book.routes.train.root}
+            href={routeConfig.routes.tripManagement.routes.book.routes.rail.root}
           >
             {$t("actions.bookTrip")}
           </a>

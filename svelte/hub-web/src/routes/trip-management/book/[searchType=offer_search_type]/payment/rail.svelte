@@ -29,8 +29,9 @@
   import { browser } from "$app/environment";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
   import { passengerParser } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data";
+  import type { PageData } from "./$types";
 
-  export let data;
+  export let data: PageData;
 
   let fareRulesDialog: FareRulesDialog | undefined;
   let payment: Payment | undefined;
@@ -93,7 +94,7 @@
   }
 
   function cancel(): void {
-    goto(routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root);
+    goto(routeConfig.routes.tripManagement.routes.book.routes.rail.routes.select.root);
   }
 
   async function createOrder(): Promise<boolean> {
@@ -174,7 +175,7 @@
       }
 
       await goto(
-        routeConfig.routes.tripManagement.routes.book.routes.train.routes.confirmation.root,
+        routeConfig.routes.tripManagement.routes.book.routes.rail.routes.confirmation.root,
       );
     } finally {
       $pending = false;
@@ -200,8 +201,8 @@
 
 <BookingLayout
   showActions
-  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.payment.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.payment.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.payment.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.payment.subTitle")}
 >
   <div class="content">
     {#if priceQuote}
@@ -239,7 +240,7 @@
     <a
       variant="outline"
       size="small"
-      href={routeConfig.routes.tripManagement.routes.book.routes.train.routes.select.root}
+      href={routeConfig.routes.tripManagement.routes.book.routes.rail.routes.select.root}
       class="action"
     >
       {$t("actions.previous")}

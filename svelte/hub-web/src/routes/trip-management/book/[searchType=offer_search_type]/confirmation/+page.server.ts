@@ -26,6 +26,9 @@ export async function load(event): Promise<{
 
     return { order, markups };
   } catch {
-    throw redirect(303, routeConfig.routes.tripManagement.routes.book.routes.train.root);
+    throw redirect(
+      303,
+      routeConfig.routes.tripManagement.routes.book.routes[event.params.searchType].root,
+    );
   }
 }

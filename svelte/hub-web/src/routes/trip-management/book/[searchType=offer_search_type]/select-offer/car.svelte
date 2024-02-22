@@ -11,10 +11,11 @@
   import routeConfig from "$lib/route-config";
   import { onDestroy, type ComponentEvents } from "svelte";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
+  import type { PageData } from "./$types";
 
   const t = getTranslator();
 
-  export let data;
+  export let data: PageData;
 
   $: searchData = carSearchDataParser.fromSearchData(data.bookingSession.searchData);
 

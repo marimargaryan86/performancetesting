@@ -35,8 +35,9 @@
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
   import OfferResultLayout from "$lib/components/pages/trip-management/offer-result-layout.svelte";
+  import type { PageData } from "./$types";
 
-  export let data;
+  export let data: PageData;
 
   let selected: PartialSelectedOffer = data.bookingSession.selectedOffer ?? {};
   let offers: MobileSchemas.Offer[] = [];
@@ -113,7 +114,7 @@
       }
 
       await manager.selectOffer(data.bookingSession, offer, options);
-      await goto(routeConfig.routes.tripManagement.routes.book.routes.train.routes.payment.root);
+      await goto(routeConfig.routes.tripManagement.routes.book.routes.rail.routes.payment.root);
     } finally {
       $selectOfferPending = false;
     }
@@ -190,8 +191,8 @@
 
 <OfferResultLayout
   showActions={Boolean(selected.offerId && selected.optionIds)}
-  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.select.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.select.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.select.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.select.subTitle")}
   expiresAt={data.bookingSession.offerSearch.expiresAt}
   showCountdown={Boolean(offers.length)}
 >

@@ -569,7 +569,7 @@ export default {
         book: {
           title: "Boka",
           pages: {
-            train: {
+            rail: {
               pages: {
                 search: {
                   title: "Sök",

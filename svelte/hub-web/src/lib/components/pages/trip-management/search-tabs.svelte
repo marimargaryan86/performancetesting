@@ -2,7 +2,7 @@
   const links = [
     {
       type: "rail",
-      url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
+      url: routeConfig.routes.tripManagement.routes.book.routes.rail.root,
     },
     {
       type: "car",
@@ -15,10 +15,11 @@
   import { getTranslator } from "$lib/i18n";
   import routeConfig from "$lib/route-config";
   import type { TransportType } from "~/integration/common/schemas";
+  import type { SearchType } from "~/params/offer_search_type";
 
   const t = getTranslator();
 
-  export let active: Exclude<TransportType, "unspecified" | "air">;
+  export let active: SearchType;
 </script>
 
 <div class="search-tabs" typography="title-small" weight="bold">

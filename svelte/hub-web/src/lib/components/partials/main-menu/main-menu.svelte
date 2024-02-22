@@ -57,7 +57,7 @@
   $: menuItems = [
     {
       type: "link",
-      url: routeConfig.routes.tripManagement.routes.book.routes.train.root,
+      url: routeConfig.routes.tripManagement.routes.book.routes.rail.root,
       activeMatcher: (pathname): boolean =>
         pathname.startsWith(routeConfig.routes.tripManagement.routes.book.root),
       label: $t("pages.tripManagement.pages.book.title"),

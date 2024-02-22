@@ -19,8 +19,8 @@ export default {
               root: `${this.root}/book`,
               get routes() {
                 return {
-                  train: {
-                    root: `${this.root}/train`,
+                  rail: {
+                    root: `${this.root}/rail`,
                     get routes() {
                       return {
                         select: { root: `${this.root}/select-offer` },

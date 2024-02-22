@@ -97,7 +97,7 @@
     <a
       variant="primary"
       size="small"
-      href={routeConfig.routes.tripManagement.routes.book.routes.train.root}
+      href={routeConfig.routes.tripManagement.routes.book.routes.rail.root}
     >
       <Icon variant="plus" size="20px" />
       {$t("actions.newOrder")}

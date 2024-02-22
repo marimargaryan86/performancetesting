@@ -24,8 +24,9 @@
   import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
+  import type { PageData } from "./$types";
 
-  export let data;
+  export let data: PageData;
 
   const t = getTranslator();
 
@@ -38,8 +39,8 @@
 
 <BookingLayout
   showActions
-  pageTitle={$t("pages.tripManagement.pages.book.pages.train.pages.confirmation.title")}
-  pageSubTitle={$t("pages.tripManagement.pages.book.pages.train.pages.confirmation.subTitle")}
+  pageTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.confirmation.title")}
+  pageSubTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.confirmation.subTitle")}
 >
   <div class="content">
     <Alert type={alertType}>
@@ -96,7 +97,7 @@
     <a
       variant="primary"
       size="small"
-      href={routeConfig.routes.tripManagement.routes.book.routes.train.root}
+      href={routeConfig.routes.tripManagement.routes.book.routes.rail.root}
       class="action"
     >
       {$t("sentences.newSearch")}

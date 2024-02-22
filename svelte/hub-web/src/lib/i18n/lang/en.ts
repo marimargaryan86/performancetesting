@@ -574,7 +574,7 @@ export default {
         book: {
           title: "Book",
           pages: {
-            train: {
+            rail: {
               pages: {
                 search: {
                   title: "Search",

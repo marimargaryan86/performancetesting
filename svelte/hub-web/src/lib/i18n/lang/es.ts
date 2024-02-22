@@ -596,7 +596,7 @@ export default {
         book: {
           title: "Crear Reserva",
           pages: {
-            train: {
+            rail: {
               pages: {
                 search: {
                   title: "Buscar",
