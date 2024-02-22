@@ -91,6 +91,7 @@
 //     "pycountry==23.12.11",
 //     "pydantic-core==2.16.2",
 //     "pydantic[email]==2.6.1",
+//     "pygments==2.17.2",
 //     "pyjwt==2.8.0",
 //     "pymongo==4.6.1",
 //     "pyshp==2.3.1",
@@ -3338,13 +3339,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "7634d29dcd1e101f5226a23cbc4a0c6cda6394253bf80e281d9c5c6797869c53",
-              "url": "https://files.pythonhosted.org/packages/ff/ce/1b4dc8b5ecdc9a99202b093729192b69301c33064d0e312fb8d9e384dbe0/google_auth-2.28.0-py2.py3-none-any.whl"
+              "hash": "25141e2d7a14bfcba945f5e9827f98092716e99482562f15306e5b026e21aa72",
+              "url": "https://files.pythonhosted.org/packages/b7/1d/f152a5f6d243b6acbb2a710ed19aa47154d678359bed995abdd9daf0cff0/google_auth-2.28.1-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "3cfc1b6e4e64797584fb53fc9bd0b7afa9b7c0dba2004fa7dcc9349e58cc3195",
-              "url": "https://files.pythonhosted.org/packages/22/1d/65514adf8e2fc3546f4fc7025afe00828597eb98c414ef3327867dc263c6/google-auth-2.28.0.tar.gz"
+              "hash": "34fc3046c257cedcf1622fc4b31fc2be7923d9b4d44973d481125ecc50d83885",
+              "url": "https://files.pythonhosted.org/packages/9a/15/ac42556763c08e1b1821a7e55f3a93982c50ca7f25adf8f61a01dd2ed98b/google-auth-2.28.1.tar.gz"
             }
           ],
           "project_name": "google-auth",
@@ -3362,7 +3363,7 @@
             "rsa<5,>=3.1.4"
           ],
           "requires_python": ">=3.7",
-          "version": "2.28.0"
+          "version": "2.28.1"
         },
         {
           "artifacts": [
@@ -10040,6 +10041,7 @@
     "pycountry==23.12.11",
     "pydantic-core==2.16.2",
     "pydantic[email]==2.6.1",
+    "pygments==2.17.2",
     "pyjwt==2.8.0",
     "pymongo==4.6.1",
     "pyshp==2.3.1",

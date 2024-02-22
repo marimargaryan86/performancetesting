@@ -129,6 +129,7 @@ known_versions = [
 requirements = [
   "allure-pytest",
   "hvac",
+  "pygments",
   "pytest",
   "pytest-asyncio",
   "pytest-cov",
