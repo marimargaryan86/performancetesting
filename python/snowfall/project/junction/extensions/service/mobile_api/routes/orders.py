@@ -27,11 +27,12 @@ from snowfall.project.pay.service.transactions.v1 import (
 )
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import (
-    models as stdlib_models,
-)
-from snowfall.stdlib.integration.starlette import (
+    authentication,
     pagination_helpers,
     request_helpers,
+)
+from snowfall.stdlib.integration.starlette import (
+    models as stdlib_models,
 )
 from snowfall.stdlib.integration.starlette.models import JsonApiResponse
 from snowfall.stdlib.logging import stdout
@@ -147,6 +148,7 @@ async def create_order(  # noqa: WPS217
     vouchers_repository: repository.VouchersRepository,
     bills_client: bills.Client,
     credit_card_client: credit_card_payment.Client,
+    reseller_id: str = "",
     order_by_journey: bool = False,  # noqa: FBT001, FBT002
 ) -> JsonApiResponse:
     body = await request_helpers.flatten_request(request)
@@ -158,10 +160,12 @@ async def create_order(  # noqa: WPS217
         body["quote"],
         voucher,
         junction_client,
+        reseller_id,
     )
     if not correct_amount:
         await credit_card_client.cancel_credit_card_payment(
             payment,
+            reseller_id,
         )
         # TODO(nikos.p): split this into invalid amount & invalid currency. Create err func
         return stdlib_models.JsonApiResponse(
@@ -234,6 +238,7 @@ async def create_order(  # noqa: WPS217
     except httpx.HTTPStatusError:
         await credit_card_client.cancel_credit_card_payment(
             payment,
+            reseller_id,
         )
         raise
     mobile_order = models_pb2.MobileOrder(
@@ -265,6 +270,7 @@ async def create_order(  # noqa: WPS217
         mobile_order.voucher_code = voucher_code
     await credit_card_client.update_credit_card_payment(
         payment,
+        reseller_id,
         receipt_email=contact_details["email"],
         metadata={"order_id": mobile_order.id, "spnr": spnr},
     )
@@ -280,6 +286,7 @@ async def create_order(  # noqa: WPS217
         vouchers_repository,
         plus_http_client,
         credit_card_client,
+        reseller_id,
     )
     junction_order["data"]["relationships"]["payment"] = {
         "data": {
@@ -380,6 +387,10 @@ class Orders(endpoints.HTTPEndpoint):
         bills_client: bills.Client = lagom.injectable,
         credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
+        reseller_id = ""
+        if isinstance(request.user, authentication.AuthenticatedUser):
+            reseller_id = request.user.metadata.get("reseller_id", "")
+
         return await create_order(
             request,
             voucher,
@@ -390,6 +401,7 @@ class Orders(endpoints.HTTPEndpoint):
             vouchers_repository,
             bills_client,
             credit_card_client,
+            reseller_id,
         )
 
 
@@ -407,6 +419,10 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         bills_client: bills.Client = lagom.injectable,
         credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
+        reseller_id = ""
+        if isinstance(request.user, authentication.AuthenticatedUser):
+            reseller_id = request.user.metadata.get("reseller_id", "")
+
         return await create_order(
             request,
             voucher,
@@ -417,6 +433,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
             vouchers_repository,
             bills_client,
             credit_card_client,
+            reseller_id,
             order_by_journey=True,
         )
 
@@ -557,8 +574,12 @@ async def check_payment_amount_and_state(
     quote: str,
     voucher: models_pb2.Voucher | None,
     junction_client: client.Client,
+    reseller_id: str,
 ) -> tuple[bool, bool]:
-    payment_intent = await credit_card_client.get_credit_card_payment(payment_intent_id)
+    payment_intent = await credit_card_client.get_credit_card_payment(
+        payment_intent_id,
+        reseller_id,
+    )
     intent_amount = money.from_protobuf(payment_intent.amount)
 
     quote_response = await junction_client.get_offer_quote_by_id(

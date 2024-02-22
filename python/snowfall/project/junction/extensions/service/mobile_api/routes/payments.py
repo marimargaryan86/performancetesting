@@ -10,7 +10,11 @@ from snowfall.project.junction.extensions.service.mobile_api.routes import order
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
 from snowfall.project.pay.adapter import credit_card_payment
 from snowfall.stdlib import money
-from snowfall.stdlib.integration.starlette import models, request_helpers
+from snowfall.stdlib.integration.starlette import (
+    authentication,
+    models,
+    request_helpers,
+)
 
 
 async def get_or_create_stripe_customer(
@@ -18,9 +22,11 @@ async def get_or_create_stripe_customer(
     users_repository: repository.UsersRepository,
     guests_repository: repository.GuestsRepository,
     user_id: str,
+    reseller_id: str,
 ) -> tuple[str, str]:
     stripe_user, ephemeral_key = await credit_card_client.get_credit_card_holder(
         user_id,
+        reseller_id,
     )
     if stripe_user.id:
         return stripe_user.id, ephemeral_key
@@ -34,6 +40,7 @@ async def get_or_create_stripe_customer(
             user_id,
             user.email,
             user.first_name,
+            reseller_id,
         )
     else:
         guest = await guests_repository.find_by_id(user_id)
@@ -46,6 +53,7 @@ async def get_or_create_stripe_customer(
             user_id,
             "",
             "",
+            reseller_id,
         )
     return api_response_user.id, ephemeral_key
 
@@ -66,18 +74,26 @@ class Payments(endpoints.HTTPEndpoint):
         )
         stripe_user_id = None
         ephemeral_key_secret = None
+
+        reseller_id, username = "", request.user.username
+        if isinstance(request.user, authentication.AuthenticatedUser):
+            reseller_id = request.user.metadata.get("reseller_id", "")
+            username = request.user.identity
+
         if switcher.create_stripe_customers:
             stripe_user_id, ephemeral_key_secret = await get_or_create_stripe_customer(
                 credit_card_client,
                 users_repository,
                 guests_repository,
-                request.user.username,
+                username,
+                reseller_id,
             )
 
         payment_intent = await credit_card_client.create_credit_card_payment(
             amount=intent_money,
             credit_card_holder_id=stripe_user_id or "",
             enable_automatic_payment_method=True,
+            reseller_id=reseller_id,
         )
 
         attributes = {
@@ -111,9 +127,14 @@ class Payment(endpoints.HTTPEndpoint):
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
         credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
+        reseller_id = ""
+        if isinstance(request.user, authentication.AuthenticatedUser):
+            reseller_id = request.user.metadata.get("reseller_id", "")
+
         if voucher:
             payment_intent = await credit_card_client.get_credit_card_payment(
                 request.path_params["paymentIntentId"],
+                reseller_id,
             )
             intent_amount = money.from_protobuf(payment_intent.amount)
             new_amount = (
@@ -125,6 +146,7 @@ class Payment(endpoints.HTTPEndpoint):
             )
             await credit_card_client.update_credit_card_payment(
                 request.path_params["paymentIntentId"],
+                reseller_id,
                 money.Money(
                     amount=max_amount,
                     currency=intent_amount.currency,

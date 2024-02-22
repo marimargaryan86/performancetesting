@@ -90,6 +90,7 @@ job "pay-payments-grpc-credit-card" {
         change_mode = "restart"
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+PAYMENT_PROVIDER_RESELLERS={{keyOrDefault "${var.environment}/pay/providers/reseller-providers" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/webhooks" }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
 {{ end }}

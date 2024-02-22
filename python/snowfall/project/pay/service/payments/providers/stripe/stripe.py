@@ -21,6 +21,10 @@ class Stripe(interfaces.CreditCardProvider):
         self._stripe_key = stripe_key
         stripe.api_key = stripe_key
 
+    @property
+    def name(self) -> str:
+        return "stripe"
+
     def get_credit_card_payment(
         self,
         payment_id: str,

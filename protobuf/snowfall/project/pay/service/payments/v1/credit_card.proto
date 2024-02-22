@@ -21,6 +21,7 @@ service CreditCardPaymentService {
 
 message GetCreditCardPaymentRequest {
   string payment_id = 1;
+  string reseller_id = 2;
 }
 
 message GetCreditCardPaymentResponse {
@@ -29,6 +30,7 @@ message GetCreditCardPaymentResponse {
 
 message CreateCreditCardPaymentRequest {
   CreditCardPayment payment = 1;
+  string reseller_id = 2;
 }
 
 message CreateCreditCardPaymentResponse {
@@ -40,6 +42,7 @@ message UpdateCreditCardPaymentRequest {
   snowfall.stdlib.v1.Money amount = 2;
   PaymentMetaData metadata = 3;
   string receipt_email = 4;
+  string reseller_id = 5;
 }
 
 message UpdateCreditCardPaymentResponse {
@@ -48,6 +51,7 @@ message UpdateCreditCardPaymentResponse {
 
 message CancelCreditCardPaymentRequest {
   string payment_id = 1;
+  string reseller_id = 2;
 }
 
 message CancelCreditCardPaymentResponse {
@@ -56,6 +60,7 @@ message CancelCreditCardPaymentResponse {
 
 message CaptureCreditCardPaymentRequest {
   string payment_id = 1;
+  string reseller_id = 2;
 }
 
 message CaptureCreditCardPaymentResponse {
@@ -64,6 +69,7 @@ message CaptureCreditCardPaymentResponse {
 
 message GetCreditCardHolderRequest {
   string credit_card_holder_id = 1;
+  string reseller_id = 2;
 }
 
 message GetCreditCardHolderResponse {
@@ -74,6 +80,7 @@ message GetCreditCardHolderResponse {
 message CreateCreditCardHolderRequest {
   CreditCardHolder credit_card_holder = 1;
   string user_id = 2;
+  string reseller_id = 3;
 }
 
 message CreateCreditCardHolderResponse {
@@ -83,6 +90,7 @@ message CreateCreditCardHolderResponse {
 
 message GetRefundRequest {
   string refund_id = 1;
+  string reseller_id = 2;
 }
 
 message GetRefundResponse {
@@ -92,6 +100,7 @@ message GetRefundResponse {
 message CreateRefundRequest {
   int32 amount = 1;
   string credit_card_payment_id = 2;
+  string reseller_id = 3;
 }
 
 message CreateRefundResponse {

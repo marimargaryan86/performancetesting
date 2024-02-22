@@ -8,10 +8,14 @@ from snowfall.project.pay.service.payments.credit_card_service.grpc import (
     CreditCardPaymentService,
 )
 from snowfall.project.pay.service.payments.grpc import PaymentsService
+from snowfall.project.pay.service.payments.providers import interfaces
 from snowfall.project.pay.service.payments.providers.stripe.repositories import (
     PaymentUsersRepository,
 )
 from snowfall.project.pay.service.payments.providers.stripe.stripe import Stripe
+from snowfall.project.pay.service.payments.providers.stripe_mock.stripe import (
+    MockStripe,
+)
 from snowfall.project.pay.service.payments.repositories import PaymentsRepository
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application
@@ -34,6 +38,7 @@ class _CreditCardGrpcSettings(application.Settings):
     mongo_dsn: AnyUrl
     stripe_version: str
     stripe_api_key: str
+    payment_provider_resellers: dict[str, str]
 
 
 async def _serve_credit_card_payment(
@@ -50,13 +55,19 @@ async def _serve_credit_card_payment(
         app.settings.stripe_version,
         app.settings.stripe_api_key,
     )
+    mock_stripe_provider = MockStripe()
+    providers: dict[str, interfaces.CreditCardProvider] = {
+        stripe_provider.name: stripe_provider,
+        mock_stripe_provider.name: mock_stripe_provider,
+    }
 
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
             CreditCardPaymentService(
-                stripe_provider,
+                providers,
+                app.settings.payment_provider_resellers,
             ),
         ],
     )

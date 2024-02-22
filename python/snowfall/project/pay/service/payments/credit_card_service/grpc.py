@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 import grpc
 from google.protobuf.json_format import MessageToDict
 
@@ -14,8 +16,13 @@ class CreditCardPaymentService(
     service.Service,
     credit_card_pb2_grpc.CreditCardPaymentServiceServicer,
 ):
-    def __init__(self, provider: interfaces.CreditCardProvider):
-        self._provider = provider
+    def __init__(
+        self,
+        providers: Mapping[str, interfaces.CreditCardProvider],
+        reseller_to_provider: Mapping[str, str],
+    ):
+        self._providers = providers
+        self._reseller_to_provider = reseller_to_provider
 
     def get_name(self) -> str:
         return credit_card_pb2.DESCRIPTOR.services_by_name[
@@ -33,7 +40,9 @@ class CreditCardPaymentService(
         request: credit_card_pb2.GetCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.GetCreditCardPaymentResponse:
-        payment = self._provider.get_credit_card_payment(request.payment_id)
+        payment = self._provider(request.reseller_id).get_credit_card_payment(
+            request.payment_id,
+        )
         if not payment:
             await context.abort(
                 code=grpc.StatusCode.NOT_FOUND,
@@ -46,7 +55,7 @@ class CreditCardPaymentService(
         request: credit_card_pb2.CreateCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.CreateCreditCardPaymentResponse:
-        payment = self._provider.create_credit_card_payment(
+        payment = self._provider(request.reseller_id).create_credit_card_payment(
             request.payment,
         )
         return credit_card_pb2.CreateCreditCardPaymentResponse(payment=payment)
@@ -57,7 +66,9 @@ class CreditCardPaymentService(
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.UpdateCreditCardPaymentResponse:
         metadata = MessageToDict(request.metadata, preserving_proto_field_name=True)
-        updated_payment = self._provider.update_credit_card_payment(
+        updated_payment = self._provider(
+            request.reseller_id,
+        ).update_credit_card_payment(
             request.payment_id,
             money.from_protobuf(request.amount)
             if request.amount.ListFields()
@@ -79,7 +90,9 @@ class CreditCardPaymentService(
         request: credit_card_pb2.GetCreditCardHolderRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.GetCreditCardHolderResponse:
-        credit_card_holder, signature = await self._provider.get_credit_card_holder(
+        credit_card_holder, signature = await self._provider(
+            request.reseller_id,
+        ).get_credit_card_holder(
             request.credit_card_holder_id,
         )
 
@@ -93,7 +106,9 @@ class CreditCardPaymentService(
         request: credit_card_pb2.CreateCreditCardHolderRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.CreateCreditCardHolderResponse:
-        credit_card_holder, signature = await self._provider.create_credit_card_holder(
+        credit_card_holder, signature = await self._provider(
+            request.reseller_id,
+        ).create_credit_card_holder(
             request.user_id,
             request.credit_card_holder,
         )
@@ -108,7 +123,9 @@ class CreditCardPaymentService(
         request: credit_card_pb2.CancelCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.CancelCreditCardPaymentResponse:
-        credit_card_payment = self._provider.cancel_credit_card_payment(
+        credit_card_payment = self._provider(
+            request.reseller_id,
+        ).cancel_credit_card_payment(
             request.payment_id,
         )
         if not credit_card_payment:
@@ -126,7 +143,9 @@ class CreditCardPaymentService(
         request: credit_card_pb2.CaptureCreditCardPaymentRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.CaptureCreditCardPaymentResponse:
-        credit_card_payment = self._provider.capture_credit_card_payment(
+        credit_card_payment = self._provider(
+            request.reseller_id,
+        ).capture_credit_card_payment(
             request.payment_id,
         )
         if not credit_card_payment:
@@ -144,7 +163,7 @@ class CreditCardPaymentService(
         request: credit_card_pb2.CreateRefundRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.CreateRefundResponse:
-        refund = self._provider.create_refund(
+        refund = self._provider(request.reseller_id).create_refund(
             amount=request.amount,
             credit_card_payment_id=request.credit_card_payment_id,
         )
@@ -159,7 +178,7 @@ class CreditCardPaymentService(
         request: credit_card_pb2.GetRefundRequest,
         context: grpc.aio.ServicerContext,
     ) -> credit_card_pb2.GetRefundResponse:
-        refund = self._provider.get_refund(
+        refund = self._provider(request.reseller_id).get_refund(
             external_reference_id=request.refund_id,
         )
 
@@ -167,3 +186,9 @@ class CreditCardPaymentService(
             await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return credit_card_pb2.GetRefundResponse(refund=refund)
+
+    def _provider(self, reseller_id: str) -> interfaces.CreditCardProvider:
+        return self._providers.get(
+            self._reseller_to_provider.get(reseller_id, ""),
+            self._providers["stripe"],
+        )

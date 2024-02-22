@@ -6,6 +6,11 @@ from snowfall.stdlib import money
 
 
 class CreditCardProvider(object):
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        """Get provider name."""
+
     @abstractmethod
     def get_credit_card_payment(
         self,

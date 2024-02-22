@@ -16,6 +16,7 @@ class Client(abc.ABC):
     async def get_credit_card_holder(
         self,
         user_id: str,
+        reseller_id: str = "",
     ) -> tuple[credit_card_models_pb2.CreditCardHolder, str]:
         """Get credit card holder."""
 
@@ -25,6 +26,7 @@ class Client(abc.ABC):
         user_id: str,
         email: str,
         name: str,
+        reseller_id: str = "",
     ) -> tuple[credit_card_models_pb2.CreditCardHolder, str]:
         """Create Credit Card holder."""
 
@@ -32,6 +34,7 @@ class Client(abc.ABC):
     async def get_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Get Credit Card Payment."""
 
@@ -41,6 +44,7 @@ class Client(abc.ABC):
         amount: money.Money,
         credit_card_holder_id: str,
         enable_automatic_payment_method: bool,  # noqa: FBT001
+        reseller_id: str = "",
         capture_method: str = "manual",
         setup_future_usage: str = "on_session",
     ) -> credit_card_models_pb2.CreditCardPayment:
@@ -50,6 +54,7 @@ class Client(abc.ABC):
     async def update_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
         amount: money.Money | None = None,
         receipt_email: str = "",
         metadata: dict[str, str] | None = None,
@@ -60,6 +65,7 @@ class Client(abc.ABC):
     async def cancel_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Cancel the credit card payment."""
 
@@ -67,6 +73,7 @@ class Client(abc.ABC):
     async def capture_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Capture the credit card payment."""
 
@@ -75,6 +82,7 @@ class Client(abc.ABC):
         self,
         amount: int,
         credit_card_payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.Refund:
         """Create refund."""
 
@@ -82,6 +90,7 @@ class Client(abc.ABC):
     async def get_refund(
         self,
         external_reference_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.Refund:
         """Get refund."""
 
@@ -95,6 +104,7 @@ class DictClient(Client):
     async def get_credit_card_holder(
         self,
         user_id: str,
+        reseller_id: str = "",
     ) -> tuple[credit_card_models_pb2.CreditCardHolder, str]:
         return self._credit_card_holders.get(
             user_id,
@@ -106,6 +116,7 @@ class DictClient(Client):
         user_id: str,
         email: str,
         name: str,
+        reseller_id: str = "",
     ) -> tuple[credit_card_models_pb2.CreditCardHolder, str]:
         credit_card_holder_id = string.uuid()
         credit_card_holder = credit_card_models_pb2.CreditCardHolder(
@@ -120,6 +131,7 @@ class DictClient(Client):
     async def get_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment = self._credit_card_payments.get(payment_id)
         if credit_card_payment:
@@ -131,6 +143,7 @@ class DictClient(Client):
         amount: money.Money,
         credit_card_holder_id: str,
         enable_automatic_payment_method: bool,  # noqa: FBT001
+        reseller_id: str = "",
         capture_method: str = "manual",
         setup_future_usage: str = "on_session",
     ) -> credit_card_models_pb2.CreditCardPayment:
@@ -150,6 +163,7 @@ class DictClient(Client):
     async def update_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
         amount: money.Money | None = None,
         receipt_email: str = "",
         metadata: dict[str, str] | None = None,
@@ -174,6 +188,7 @@ class DictClient(Client):
     async def cancel_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment = self._credit_card_payments.get(payment_id)
         if credit_card_payment:
@@ -185,6 +200,7 @@ class DictClient(Client):
     async def capture_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment = self._credit_card_payments.get(payment_id)
         if credit_card_payment:
@@ -197,6 +213,7 @@ class DictClient(Client):
         self,
         amount: int,
         credit_card_payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.Refund:
         external_reference_id = string.uuid()
         refund = credit_card_models_pb2.Refund(
@@ -214,6 +231,7 @@ class DictClient(Client):
     async def get_refund(
         self,
         external_reference_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.Refund:
         refund = self._refunds.get(external_reference_id)
         if refund:
@@ -233,9 +251,11 @@ class GrpcClient(Client):
     async def get_credit_card_holder(
         self,
         user_id: str,
+        reseller_id: str = "",
     ) -> tuple[credit_card_models_pb2.CreditCardHolder, str]:
         credit_card_holder_request = credit_card_pb2.GetCreditCardHolderRequest(
             credit_card_holder_id=user_id,
+            reseller_id=reseller_id,
         )
         credit_card_holder_response = await self._client.GetCreditCardHolder(
             credit_card_holder_request,
@@ -251,6 +271,7 @@ class GrpcClient(Client):
         user_id: str,
         email: str,
         name: str,
+        reseller_id: str = "",
     ) -> tuple[credit_card_models_pb2.CreditCardHolder, str]:
         credit_card_holder_request = credit_card_pb2.CreateCreditCardHolderRequest(
             credit_card_holder=credit_card_models_pb2.CreditCardHolder(
@@ -258,6 +279,7 @@ class GrpcClient(Client):
                 name=name,
             ),
             user_id=user_id,
+            reseller_id=reseller_id,
         )
         credit_card_holder_response = await self._client.CreateCreditCardHolder(
             credit_card_holder_request,
@@ -271,9 +293,11 @@ class GrpcClient(Client):
     async def get_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         get_payment_request = credit_card_pb2.GetCreditCardPaymentRequest(
             payment_id=payment_id,
+            reseller_id=reseller_id,
         )
 
         payment_response = await errors.handle_grpc_errors(
@@ -290,6 +314,7 @@ class GrpcClient(Client):
         amount: money.Money,
         credit_card_holder_id: str,
         enable_automatic_payment_method: bool,  # noqa: FBT001
+        reseller_id: str = "",
         capture_method: str = "manual",
         setup_future_usage: str = "on_session",
     ) -> credit_card_models_pb2.CreditCardPayment:
@@ -301,6 +326,7 @@ class GrpcClient(Client):
                 enable_automatic_payment_method=enable_automatic_payment_method,
                 setup_future_usage=setup_future_usage,
             ),
+            reseller_id=reseller_id,
         )
 
         payment_response = await self._client.CreateCreditCardPayment(
@@ -313,6 +339,7 @@ class GrpcClient(Client):
     async def update_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
         amount: money.Money | None = None,
         receipt_email: str = "",
         metadata: dict[str, str] | None = None,
@@ -328,6 +355,7 @@ class GrpcClient(Client):
             amount=None if amount is None else amount.protobuf(),
             receipt_email=receipt_email,
             metadata=proto_metadata,
+            reseller_id=reseller_id,
         )
 
         updated_payment = await errors.handle_grpc_errors(
@@ -342,11 +370,13 @@ class GrpcClient(Client):
     async def cancel_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         cancel_response = await errors.handle_grpc_errors(
             self._client.CancelCreditCardPayment(
                 credit_card_pb2.CancelCreditCardPaymentRequest(
                     payment_id=payment_id,
+                    reseller_id=reseller_id,
                 ),
                 timeout=self._timeout,
             ),
@@ -356,11 +386,13 @@ class GrpcClient(Client):
     async def capture_credit_card_payment(
         self,
         payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment:
         capture_response = await errors.handle_grpc_errors(
             self._client.CaptureCreditCardPayment(
                 credit_card_pb2.CancelCreditCardPaymentRequest(
                     payment_id=payment_id,
+                    reseller_id=reseller_id,
                 ),
                 timeout=self._timeout,
             ),
@@ -371,12 +403,14 @@ class GrpcClient(Client):
         self,
         amount: int,
         credit_card_payment_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.Refund:
         response = await errors.handle_grpc_errors(
             self._client.CreateRefund(
                 credit_card_pb2.CreateRefundRequest(
                     amount=amount,
                     credit_card_payment_id=credit_card_payment_id,
+                    reseller_id=reseller_id,
                 ),
                 timeout=self._timeout,
             ),
@@ -387,11 +421,13 @@ class GrpcClient(Client):
     async def get_refund(
         self,
         external_reference_id: str,
+        reseller_id: str = "",
     ) -> credit_card_models_pb2.Refund:
         response = await errors.handle_grpc_errors(
             self._client.GetRefund(
                 credit_card_pb2.GetRefundRequest(
                     refund_id=external_reference_id,
+                    reseller_id=reseller_id,
                 ),
                 timeout=self._timeout,
             ),
