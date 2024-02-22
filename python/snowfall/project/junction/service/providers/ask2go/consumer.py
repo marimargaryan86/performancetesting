@@ -1,5 +1,6 @@
 import logging
 import uuid
+from collections.abc import Sequence
 
 from aio_pika import Message, connect_robust
 from aio_pika.abc import AbstractIncomingMessage
@@ -13,6 +14,7 @@ from snowfall.project.junction.service.providers.ask2go import (
     pricing,
     transformer,
 )
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.service.amqp_factory import SkipConnectionLostFilter
@@ -163,7 +165,7 @@ class SeatMapRpcServer(object):
 
                     if not offer_details:
                         continue  # noqa: WPS220
-                    response = seat_map.to_seat_map_pb(
+                    response = _to_seat_map_pb(
                         await self._ask2go_client.get_seat_map(
                             search_id=offer_details.search_id,
                             itinerary_id=offer_details.itinerary_id,
@@ -178,3 +180,62 @@ class SeatMapRpcServer(object):
                         ),
                         routing_key=message.reply_to,
                     )
+
+
+def _to_seat_map_pb(
+    seat_map_response: seat_map.SeatMapResponse,
+) -> seat_maps_pb2.SeatMapResult:
+    return seat_maps_pb2.SeatMapResult(
+        segments=[
+            seat_maps_pb2.SeatMapSegment(
+                segment_id=str(segment.segment_index),
+                compartments=[
+                    seat_maps_pb2.SeatMapCompartment(
+                        deck_index=deck_idx,
+                        row_range_start=compartment.row_range_start,
+                        row_range_end=compartment.row_range_end,
+                        rows=[
+                            seat_maps_pb2.SeatMapRow(
+                                row_key=row.row_key,
+                                sections=_get_row_sections(
+                                    row.seats,
+                                    seat_map_response.currency,
+                                ),
+                            )
+                            for row in compartment.rows
+                        ],
+                    )
+                    for deck_idx, deck in enumerate(segment.decks)
+                    for compartment in deck.compartments
+                ],
+            )
+            for segment in seat_map_response.segment_seat_maps
+        ],
+    )
+
+
+def _get_row_sections(
+    seats: Sequence[seat_map.SeatMapSeat],
+    currency: str,
+) -> Sequence[seat_maps_pb2.SeatMapSection]:
+    # TODO(nikos.p): Separate the sections properly
+    return [
+        seat_maps_pb2.SeatMapSection(
+            elements=[
+                seat_maps_pb2.SeatMapElement(
+                    designator=seat.seat_designation,
+                    element_type=seat_maps_pb2.SeatMapElement.Type.TYPE_SEAT,
+                    price=(
+                        money.Money(
+                            seat.price.total_amount,
+                            money.Currency(currency),
+                        ).protobuf()
+                        if seat.selectable
+                        else None
+                    ),
+                    selectable=seat.selectable,
+                )
+                for seat in seats
+            ],
+        ),
+    ]
