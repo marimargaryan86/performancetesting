@@ -901,9 +901,8 @@ def get_arrival_before(
         common_pb2.Schedule.Type.TYPE_CAR in allowed_segment_types
         and not arrival_before
     ):
-        raise exceptions.HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("`arrivalBefore` is required when `car` leg type is provided"),
+        raise errors.UnprocessableEntityError(
+            _("`arrivalBefore` is required when `car` leg type is provided"),
         )
 
     return arrival_before
