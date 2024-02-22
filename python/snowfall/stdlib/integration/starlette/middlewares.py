@@ -1,20 +1,15 @@
 import enum
+import http
 from collections.abc import Awaitable, Callable, Container
 from typing import cast
 
 import sentry_sdk
 from openapi_core import protocols
-from openapi_core.exceptions import OpenAPIError
-from openapi_core.templating.paths.exceptions import PathNotFound
-from openapi_core.templating.security import exceptions as security_exceptions
-from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import (
     applications,
     background,
-    exceptions,
     requests,
     responses,
-    status,
     types,
 )
 from starlette.middleware import base
@@ -139,11 +134,14 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
     ) -> responses.Response:
         resolved_request = await resolve_request(request)
         openapi_request = await validation.request_to_openapi(resolved_request)
+        openapi_result = await self._validator.validate_request(openapi_request)
+        errors = list(validation.openapi_errors_to_errors(openapi_result.errors))
 
-        try:
-            openapi_result = await self._validator.validate_request(openapi_request)
-        except OpenAPIError as err:
-            return await self._handle_validation_error(resolved_request, err)
+        if errors:
+            return await handlers.multiple4xx_error_handler(
+                request=request,
+                errors=errors,
+            )
 
         resolved_request.scope["parsed_query_string"] = openapi_result.parameters.query
         resolved_request.scope["security"] = openapi_result.security
@@ -191,70 +189,21 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         resolved_response: responses.Response,
     ) -> responses.Response:
         openapi_response = await validation.response_to_openapi(resolved_response)
+        openapi_result = await self._validator.validate_response(
+            openapi_request,
+            openapi_response,
+        )
+        errors = list(validation.openapi_errors_to_errors(openapi_result.errors))
 
-        try:
-            await self._validator.validate_response(
-                openapi_request,
-                openapi_response,
+        if errors:
+            self._response_logger.error(
+                "Response body does not validate against schema",
+                body=resolved_response.body,
+                errors=[error.model_dump() for error in errors],
             )
-        except OpenAPIError as err:
-            if isinstance(err.__cause__, validation_exceptions.InvalidSchemaValue):
-                return await self._handle_response_schema_error(
-                    resolved_request,
-                    err.__cause__,
-                )
 
-            raise
+            return handlers.error_response_from_status(
+                int(http.HTTPStatus.INTERNAL_SERVER_ERROR),
+            )
 
         return resolved_response
-
-    async def _handle_response_schema_error(
-        self,
-        request: requests.Request,
-        exc: validation_exceptions.InvalidSchemaValue,
-    ) -> responses.Response:
-        self._response_logger.info(
-            "Response body does not validate against schema",
-            body=exc.value,
-            source="transport",
-        )
-
-        self._logger.error(
-            "Response body does not validate against schema",
-            errors=[
-                error.model_dump()
-                for error in validation.invalid_schema_value_to_errors(
-                    exc=exc,
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-            ],
-        )
-
-        return await handlers.server_error_handler(request, exc)
-
-    async def _handle_validation_error(
-        self,
-        request: requests.Request,
-        err: OpenAPIError,
-    ) -> responses.Response:
-        if isinstance(err, PathNotFound):
-            return await handlers.server_error_handler(
-                request,
-                exceptions.HTTPException(status_code=status.HTTP_404_NOT_FOUND),
-            )
-
-        match err.__cause__:
-            case security_exceptions.SecurityNotFound():
-                return await handlers.server_error_handler(
-                    request,
-                    exceptions.HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                    ),
-                )
-            case validation_exceptions.InvalidSchemaValue():
-                return await handlers.validation_error_handler(request, err.__cause__)
-            case _:
-                return await handlers.server_error_handler(
-                    request,
-                    exceptions.HTTPException(status_code=status.HTTP_400_BAD_REQUEST),
-                )

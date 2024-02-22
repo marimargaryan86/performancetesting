@@ -1,89 +1,84 @@
 import asyncio
-import dataclasses
+import http
 import pathlib
-from typing import cast
+from collections.abc import Iterable
+from types import MappingProxyType
 
-import jsonschema
 import orjson
-from openapi_core import protocols, shortcuts, spec
+from jsonschema import exceptions as jsonschema_exceptions
+from openapi_core import OpenAPI, configurations, exceptions, protocols
+from openapi_core.contrib.starlette import (
+    StarletteOpenAPIRequest,
+    StarletteOpenAPIResponse,
+    handlers,
+)
+from openapi_core.templating.security import exceptions as security_exceptions
 from openapi_core.unmarshalling.request import datatypes as request_datatypes
 from openapi_core.unmarshalling.response import datatypes as response_datatypes
-from openapi_core.validation.request.datatypes import RequestParameters
-from openapi_core.validation.schemas import exceptions as validation_exceptions
+from openapi_core.validation.schemas import exceptions as schema_exceptions
 from sentry_sdk import tracing
 from starlette import requests, responses
-from werkzeug.datastructures import Headers
 
+from snowfall.stdlib import string
 from snowfall.stdlib.integration.openapi_core import formats
 from snowfall.stdlib.integration.starlette import models
 
-
-@dataclasses.dataclass(frozen=True)
-class OpenAPIRequest(object):
-    host_url: str
-    path: str
-    method: str
-    body: str | None
-    mimetype: str
-    parameters: RequestParameters = dataclasses.field(
-        default_factory=RequestParameters,
-    )
-
-
-@dataclasses.dataclass(frozen=True)
-class OpenAPIResponse(object):
-    data: str
-    status_code: int
-    mimetype: str
-    headers: Headers = dataclasses.field(default_factory=Headers)
+_status_codes: MappingProxyType[type[BaseException], int] = MappingProxyType({
+    **handlers.StarletteOpenAPIErrorsHandler.OPENAPI_ERROR_STATUS,
+    security_exceptions.SecurityNotFound: 401,
+})
 
 
 async def request_to_openapi(request: requests.Request) -> protocols.Request:
-    return cast(
-        protocols.Request,
-        OpenAPIRequest(
-            host_url="{scheme}://{hostname}".format(
-                scheme=request.url.scheme,
-                hostname=request.url.hostname,
-            ),
-            path=request.url.path,
-            method=request.method.lower(),
-            parameters=RequestParameters(
-                query=request.query_params,
-                header=Headers(dict(request.headers)),
-                cookie=request.cookies,
-            ),
-            body=(await request.body()).decode("utf-8"),
-            mimetype=request.headers.get(
-                "Content-Type",
-                request.headers.get("Accept", ""),
-            ),
-        ),
-    )
+    return StarletteOpenAPIRequest(request=request, body=await request.body())
 
 
 async def response_to_openapi(
     response: responses.Response,
 ) -> protocols.Response:
-    return cast(
-        protocols.Response,
-        OpenAPIResponse(
-            data=response.body.decode("utf-8"),
-            mimetype=str(response.media_type) if response.media_type else "",
-            status_code=response.status_code,
-            headers=Headers(dict(response.headers)),
-        ),
-    )
+    return StarletteOpenAPIResponse(response=response, data=response.body)
 
 
-def invalid_schema_value_to_errors(
-    exc: validation_exceptions.InvalidSchemaValue,
-    status_code: int,
-) -> list[models.Error]:
-    return [
-        models.Error(
-            status=str(status_code),
-            code=str(error.validator),
+def openapi_errors_to_errors(
+    errors: Iterable[exceptions.OpenAPIError],
+) -> Iterable[models.Error]:
+    for error in errors:
+        actual_error: BaseException = error
+
+        if error.__cause__ is not None:
+            actual_error = error.__cause__
+
+        if isinstance(actual_error, schema_exceptions.InvalidSchemaValue):
+            yield from jsonschema_errors_to_errors(actual_error.schema_errors)
+        else:
+            status_code_obj = http.HTTPStatus(
+                _status_codes.get(
+                    actual_error.__class__,
+                    int(http.HTTPStatus.BAD_REQUEST),
+                ),
+            )
+
+            yield models.Error(
+                status=str(int(status_code_obj)),
+                title=status_code_obj.phrase,
+                code=string.to_snake(type(actual_error).__name__).upper(),
+                detail=status_code_obj.description,
+            )
+
+
+def jsonschema_errors_to_errors(
+    errors: Iterable[Exception],
+) -> Iterable[models.Error]:
+    status_code_obj = http.HTTPStatus.BAD_REQUEST
+
+    for error in errors:
+        if not isinstance(error, jsonschema_exceptions.ValidationError):
+            raise NotImplementedError
+
+        yield models.Error(
+            status=str(int(status_code_obj)),
+            title=status_code_obj.phrase,
+            code=string.to_snake(type(error).__name__).upper(),
             detail=error.message,
             source=models.ErrorSourcePointer(
                 pointer="/{0}".format(
@@ -91,8 +86,6 @@ def invalid_schema_value_to_errors(
                 ),
             ),
         )
-        for error in cast(list[jsonschema.ValidationError], exc.schema_errors)
-    ]
 
 
 class Validator(object):
@@ -100,17 +93,17 @@ class Validator(object):
         self,
         spec_path: pathlib.Path,
     ):
-        with spec_path.open() as spec_file:
-            self._spec = spec.Spec.from_dict(
-                orjson.loads(spec_file.read()),
-                base_uri="file://{0}".format(spec_path),
-            )
-
-        self._format_unmarshallers = formats.format_unmarshallers()
-        self._format_validators = formats.format_validators()
-        self._media_type_deserializers = {
-            "application/vnd.api+json": orjson.loads,
-        }
+        self._spec = OpenAPI.from_path(
+            spec_path.resolve(strict=True),
+            config=configurations.Config(
+                spec_base_uri="file://{0}".format(spec_path.resolve(strict=True)),
+                extra_media_type_deserializers={
+                    "application/vnd.api+json": orjson.loads,
+                },
+                extra_format_unmarshallers=formats.format_unmarshallers(),
+                extra_format_validators=formats.format_validators(),
+            ),
+        )
 
     @tracing.trace
     async def validate_request(
@@ -120,13 +113,7 @@ class Validator(object):
         loop = asyncio.get_running_loop()
 
         def wrapper() -> request_datatypes.RequestUnmarshalResult:
-            return shortcuts.unmarshal_request(
-                request=request,
-                spec=self._spec,
-                extra_media_type_deserializers=self._media_type_deserializers,
-                extra_format_validators=self._format_validators,
-                extra_format_unmarshallers=self._format_unmarshallers,
-            )
+            return self._spec.unmarshal_request(request=request)
 
         return await loop.run_in_executor(None, wrapper)
 
@@ -139,13 +126,6 @@ class Validator(object):
         loop = asyncio.get_running_loop()
 
         def wrapper() -> response_datatypes.ResponseUnmarshalResult:
-            return shortcuts.unmarshal_response(
-                request=request,
-                response=response,
-                spec=self._spec,
-                extra_media_type_deserializers=self._media_type_deserializers,
-                extra_format_validators=self._format_validators,
-                extra_format_unmarshallers=self._format_unmarshallers,
-            )
+            return self._spec.unmarshal_response(request=request, response=response)
 
         return await loop.run_in_executor(None, wrapper)

@@ -1,9 +1,9 @@
 import http
+from collections.abc import Sequence
 
-from openapi_core.validation.schemas import exceptions as validation_exceptions
 from starlette import exceptions, requests, responses, status
 
-from snowfall.stdlib.integration.starlette import models, validation
+from snowfall.stdlib.integration.starlette import models
 
 
 def error_response_from_status(
@@ -116,18 +116,20 @@ async def server_error_handler(
     return error_response_from_status(status_code)
 
 
-async def validation_error_handler(
+async def multiple4xx_error_handler(
     request: requests.Request,
-    exc: validation_exceptions.InvalidSchemaValue,
+    errors: Sequence[models.Error],
 ) -> responses.Response:
+    status_codes = {error.status for error in errors}
+
+    if len(status_codes) != 1:
+        status_codes = {"400"}
+
     return models.JsonApiResponse(
         models.Body(
-            errors=validation.invalid_schema_value_to_errors(
-                exc=exc,
-                status_code=status.HTTP_400_BAD_REQUEST,
-            ),
+            errors=errors,
         ),
-        status_code=http.HTTPStatus.BAD_REQUEST,
+        status_code=int(status_codes.pop() or "400"),
     )
 
 

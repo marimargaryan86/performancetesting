@@ -361,6 +361,14 @@ filterwarnings = [
 addopts = "--import-mode=importlib --asyncio-mode=auto --dist loadscope"
 
 [tool.ruff]
+target-version = "py311"
+preview = true
+unsafe-fixes = true
+
+[tool.ruff.format]
+preview = true
+
+[tool.ruff.lint]
 external = [
   "P103",   # other string does contain unindexed parameters
   "SF10",   # All dataclasses should be frozen
@@ -501,20 +509,14 @@ select = [
   "W",   # pycodestyle
   "YTT", # flake8-2020
 ]
-target-version = "py311"
-preview = true
-unsafe-fixes = true
 
-[tool.ruff.flake8-annotations]
+[tool.ruff.lint.flake8-annotations]
 mypy-init-return = true
 
-[tool.ruff.format]
-preview = true
-
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["snowfall"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "*/conftest.py" = ["S101", "S105", "S106"]
 "*_test.py" = ["S101", "S105", "S106"]
 "python/snowfall/stdlib/integration/starlette/testing.py" = [
@@ -533,5 +535,5 @@ known-first-party = ["snowfall"]
   "N802",
 ]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"

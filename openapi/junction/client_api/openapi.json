@@ -8117,7 +8117,6 @@
         "name": "page[cursor]",
         "in": "query",
         "required": false,
-        "allowEmptyValue": true,
         "schema": {
           "type": "string",
           "default": "",

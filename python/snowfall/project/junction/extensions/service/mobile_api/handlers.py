@@ -16,6 +16,7 @@ def go_status_error_handler(
         return responses.JSONResponse(
             exc.response.json(),
             exc.response.status_code,
+            media_type=models.JsonApiResponse.media_type,
         )
     raise exc
 
