@@ -25,7 +25,7 @@
 
   export let data: PartialCarSearchData = {};
 
-  let differentDropoff = data.origin?.id !== data.destination?.id;
+  let differentDropoff = data.destination && data.origin?.id !== data.destination.id;
   let errors: CarSearchDataError | undefined;
 
   function search(): void {
