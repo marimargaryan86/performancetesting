@@ -243,7 +243,7 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:250px 20px 10px;font-family:arial,helvetica,sans-serif;" align="left">
 
   <!--[if mso]><table width="100%"><tr><td><![endif]-->
-    <h1 style="margin: 0px; color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word; font-size: 30px; font-weight: 700;"><span><span>Booking confirmed</span></span></h1>
+    <h1 style="margin: 0px; color: #ffffff; line-height: 140%; text-align: left; word-wrap: break-word; font-size: 30px; font-weight: 700;"><span><span>{{_('Booking confirmed')}} </span></span></h1>
   <!--[if mso]></td></tr></table><![endif]-->
 
       </td>
@@ -287,7 +287,7 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:10px 20px;font-family:arial,helvetica,sans-serif;" align="left">
 
   <!--[if mso]><table width="100%"><tr><td><![endif]-->
-    <h1 style="margin: 0px; color: #00251a; line-height: 140%; text-align: left; word-wrap: break-word; font-size: 22px; font-weight: 700;"><span><span><span><span><span><span><span><span>Booking EAF38593</span></span></span></span></span></span></span></span></h1>
+    <h1 style="margin: 0px; color: #00251a; line-height: 140%; text-align: left; word-wrap: break-word; font-size: 22px; font-weight: 700;"><span><span><span><span><span><span><span><span>{{ _('Booking: {reference}').format(reference=reference) }}</span></span></span></span></span></span></span></span></h1>
   <!--[if mso]></td></tr></table><![endif]-->
 
       </td>
@@ -301,14 +301,15 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:10px 20px;font-family:arial,helvetica,sans-serif;" align="left">
 
   <div style="font-size: 14px; color: #00251a; line-height: 140%; text-align: left; word-wrap: break-word;">
-    <p style="line-height: 140%;">Thank you for booking with Snowfall!</p>
+    <p style="line-height: 140%;">{{ _('Thank you for booking with Snowfall!')}}</p>
 <p style="line-height: 140%;"> </p>
-<p style="line-height: 140%;">Your booking EAF38593 has been confirmed - below are the complete itinerary and ticket details.</p>
+<p style="line-height: 140%;"> {{ _('Your booking ({reference}) has been confirmed - below are the complete itinerary and ticket details.').format(reference=reference) }}</p>
 <p style="line-height: 140%;"> </p>
-<p style="line-height: 140%;">To download the tickets, click the button link below.</p>
+<p style="line-height: 140%;">{{ _('To download the tickets, click the button link below.')}}</p>
 <p style="line-height: 140%;"> </p>
-<p style="line-height: 140%;">And, if you need any assistance, please <span style="color: #4bb69c; line-height: 19.6px;"><a rel="noopener" href="mailto:support@snowfalltravel.com" target="_blank" style="color: #4bb69c;">get in touch with our team</a></span>.</p>
-  </div>
+<p style="line-height: 140%;">
+    {{ _('And, if you need any assistance, please <span style="color: #4bb69c; line-height: 19.6px;"><a rel="noopener" href="mailto:support@snowfalltravel.com" target="_blank" style="color: #4bb69c;">get in touch with our team</a></span>.')|safe }}
+</p>  </div>
 
       </td>
     </tr>
@@ -327,7 +328,7 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
             {% for ticket_url in booking.ticketUrls %}
                 <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ ticket_url }}" style="height:36px; v-text-anchor:middle; width:159px;" arcsize="55.5%" stroke="f" fillcolor="#4bb69c"><w:anchorlock/><center style="color:#FFFFFF;"><![endif]-->
                 <a href="{{ ticket_url }}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #FFFFFF; background-color: #4bb69c; border-radius: 20px;-webkit-border-radius: 20px; -moz-border-radius: 20px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;font-weight: 700; ">
-                    <span style="display:block;padding:10px 20px;line-height:120%;"><span style="line-height: 16.8px;">Download Tickets</span></span>
+                    <span style="display:block;padding:10px 20px;line-height:120%;"><span style="line-height: 16.8px;">{{ _('Download Tickets')}} </span></span>
                 </a>
                 <!--[if mso]></center></v:roundrect><![endif]-->
             {% endfor %}
@@ -346,7 +347,7 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:10px 20px;font-family:arial,helvetica,sans-serif;" align="left">
 
   <!--[if mso]><table width="100%"><tr><td><![endif]-->
-    <h3 style="margin: 0px; line-height: 140%; text-align: left; word-wrap: break-word; font-size: 18px; font-weight: 700;"><span><span>Itinerary details - booking EAF38593</span></span></h3>
+    <h3 style="margin: 0px; line-height: 140%; text-align: left; word-wrap: break-word; font-size: 18px; font-weight: 700;"><span><span>{{ _('Itinerary details - booking {reference}').format(reference=reference) }}</span></span></h3>
   <!--[if mso]></td></tr></table><![endif]-->
 
       </td>
@@ -407,13 +408,13 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
         <p style="line-height: 140%;">
             {% if leg.legType == 'air' %}
                 <strong>Flight {{ leg.ref }}</strong><br>
-                Departing: {{ leg.origin.name }}, {{ leg.departureAt }} (local)<br>
-                Arriving: {{ leg.destination.name }}, {{ leg.arrivalAt }} (local)
+                {{ _('Departing:') }} {{ leg.origin.name }}, {{ leg.departureAt }} (local)<br>
+                {{ _('Arriving:') }} {{ leg.destination.name }}, {{ leg.arrivalAt }} (local)
             {% endif %}
             {% if leg.legType == 'rail' %}
                 <strong>Rail {{ leg.ref }}</strong><br>
-                Departing: {{ leg.origin.name }}, {{ leg.departureAt }} (local)<br>
-                Arriving: {{ leg.destination.name }}, {{ leg.arrivalAt }} (local)
+                {{ _('Departing:') }} {{ leg.origin.name }}, {{ leg.departureAt }} (local)<br>
+                {{ _('Arriving:') }} {{ leg.destination.name }}, {{ leg.arrivalAt }} (local)
             {% endif %}
             <!-- Add any other information like ticket type if needed -->
         </p>
@@ -451,12 +452,12 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:10px 20px 30px;font-family:arial,helvetica,sans-serif;" align="left">
 
       <div style="font-size: 14px; line-height: 140%; text-align: left; word-wrap: break-word;">
-<p style="line-height: 140%;"><strong>Travellers:</strong></p>
+<p style="line-height: 140%;"><strong>{{ _n("Traveller:", "Travellers:", passengers|length) }}</strong></p>
     {% for passenger in passengers %}
         <p style="line-height: 140%;">{{ passenger.lastName.upper() }}, {{ passenger.firstName.upper() }}</p>
     {% endfor %}
 
-    <p style="line-height: 140%;"><strong>Operator/check-in reference:</strong></p>
+    <p style="line-height: 140%;"><strong>{{ _('Operator/check-in reference:') }}</strong></p>
     {% if operator_booking_references %}
         {% for reference in operator_booking_references %}
             <p style="line-height: 140%;">{{ reference }}</p>

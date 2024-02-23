@@ -1,0 +1,74 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-01-25 10:04-0600\n"
+"PO-Revision-Date: 2024-01-25 10:06-0600\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:246
+msgid "Booking confirmed"
+msgstr "Booking confirmed"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:290
+msgid "Booking {reference}"
+msgstr "Booking {reference}"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:304
+msgid "Thank you for booking with Snowfall!"
+msgstr "Thank you for booking with Snowfall!"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:306
+msgid ""
+"Your booking {reference} has been confirmed - below are the complete "
+"itinerary and ticket details."
+msgstr "Your booking {reference} has been confirmed - below are the complete "
+"itinerary and ticket details."
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:308
+msgid "To download the tickets, click the button link below."
+msgstr "To download the tickets, click the button link below."
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:311
+msgid "And, if you need any assistance, please <span style=\"color: #4bb69c; line-height: 19.6px;\"><a rel=\"noopener\" href=\"mailto:support@snowfalltravel.com\" target=\"_blank\" style=\"color: #4bb69c;\">get in touch with our team</a></span>."
+msgstr "And, if you need any assistance, please <span style=\"color: #4bb69c; line-height: 19.6px;\"><a rel=\"noopener\" href=\"mailto:support@snowfalltravel.com\" target=\"_blank\" style=\"color: #4bb69c;\">get in touch with our team</a></span>."
+
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:331
+msgid "Download Tickets"
+msgstr "Download Tickets"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:350
+msgid "Itinerary details - booking {reference}"
+msgstr "Itinerary details - booking {reference}"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:411
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:416
+msgid "Departing:"
+msgstr "Departing:"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:412
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:417
+msgid "Arriving:"
+msgstr "Arriving:"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:455
+msgid "Traveller(s):"
+msgstr "Traveller(s):"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:460
+msgid "Operator/check-in reference:"
+msgstr "Operator/check-in reference:"
+

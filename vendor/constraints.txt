@@ -9,6 +9,7 @@
 //     "CPython==3.11.*"
 //   ],
 //   "generated_with_requirements": [
+//     "Babel==2.10.1",
 //     "Faker==23.2.1",
 //     "Flake8-pyproject==1.2.3",
 //     "Pillow==10.2.0",
@@ -778,6 +779,26 @@
           ],
           "requires_python": ">=3.8",
           "version": "2.3.0"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
+              "hash": "3f349e85ad3154559ac4930c3918247d319f21910d5ce4b25d439ed8693b98d2",
+              "url": "https://files.pythonhosted.org/packages/c5/7b/2c9fc1e18cb97676c7bedaa872447eb720e0c6e0e48190b4fba7eccdc1a8/Babel-2.10.1-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "98aeaca086133efb3e1e2aad0396987490c8425929ddbcfe0550184fdc54cd13",
+              "url": "https://files.pythonhosted.org/packages/23/a6/a616817c8e4fb1a69f7e8aae9fc7fce1a147e1a492f45b6fa0b7d6823178/Babel-2.10.1.tar.gz"
+            }
+          ],
+          "project_name": "babel",
+          "requires_dists": [
+            "pytz>=2015.7"
+          ],
+          "requires_python": ">=3.6",
+          "version": "2.10.1"
         },
         {
           "artifacts": [
@@ -3315,13 +3336,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "9d83b178496b180e058fd206ebfb70ea1afab49f235dd326f557513f56f496d5",
-              "url": "https://files.pythonhosted.org/packages/be/c6/edbba414d1c87a47fb24813de7baa1e92615905d15d62affba1dbfb5df40/google_api_python_client-2.118.0-py2.py3-none-any.whl"
+              "hash": "84e43bdb58dd8d2301669513863996378ffe9a3bf6d23b5ccd4f1e021323dbeb",
+              "url": "https://files.pythonhosted.org/packages/f5/f0/7ee7c16b34e6e22e50010ba3c350c8a7ac9a02550de2933bea11c71e2658/google_api_python_client-2.119.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ebf4927a3f5184096647be8f705d090e7f06d48ad82b0fa431a2fe80c2cbe182",
-              "url": "https://files.pythonhosted.org/packages/e4/6c/6258d89feb950462d44a868b0aa58034f5cd00a10bd99fc1f379ef9494fb/google-api-python-client-2.118.0.tar.gz"
+              "hash": "ff9ef7539eaf7e088a481b25d1af4704210b07863e1d51b5ee498b910a3a46a3",
+              "url": "https://files.pythonhosted.org/packages/29/5b/f12ea82c03b0e114e5280363b88cff16a87ecee2b3c68dbda7f8eace693c/google-api-python-client-2.119.0.tar.gz"
             }
           ],
           "project_name": "google-api-python-client",
@@ -3333,7 +3354,7 @@
             "uritemplate<5,>=3.0.1"
           ],
           "requires_python": ">=3.7",
-          "version": "2.118.0"
+          "version": "2.119.0"
         },
         {
           "artifacts": [
@@ -8040,13 +8061,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "8cc040628f3cea5d7128f2e76cf486b2251a4e543c7b938f58d9a377f6694a2d",
-              "url": "https://files.pythonhosted.org/packages/4b/68/e739fd061b0aba464bef8e8be48428b2aabbfb3f2f8f2f8ca257363ee6b2/stevedore-5.1.0-py3-none-any.whl"
+              "hash": "1c15d95766ca0569cad14cb6272d4d31dae66b011a929d7c18219c176ea1b5c9",
+              "url": "https://files.pythonhosted.org/packages/eb/f1/c7c6205c367c764ee173537f7eaf070bba4dd0fa11bf081813c2f75285a3/stevedore-5.2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a54534acf9b89bc7ed264807013b505bf07f74dbe4bcfa37d32bd063870b087c",
-              "url": "https://files.pythonhosted.org/packages/ac/d6/77387d3fc81f07bc8877e6f29507bd7943569093583b0a07b28cfa286780/stevedore-5.1.0.tar.gz"
+              "hash": "46b93ca40e1114cea93d738a6c1e365396981bb6bb78c27045b7587c9473544d",
+              "url": "https://files.pythonhosted.org/packages/e7/c1/b210bf1071c96ecfcd24c2eeb4c828a2a24bf74b38af13896d02203b1eec/stevedore-5.2.0.tar.gz"
             }
           ],
           "project_name": "stevedore",
@@ -8054,7 +8075,7 @@
             "pbr!=2.1.0,>=2.0.0"
           ],
           "requires_python": ">=3.8",
-          "version": "5.1.0"
+          "version": "5.2.0"
         },
         {
           "artifacts": [
@@ -9123,19 +9144,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "f61a120d3e98ee1387bc5ca4b93437f258cc5c2af1f55f8634ec4cee5729f178",
-              "url": "https://files.pythonhosted.org/packages/8f/08/cffc4debfbe0ae38855a0a5f0f9dbba82a5f6eccc25c05442c1e1568ccee/types_awscrt-0.20.3-py3-none-any.whl"
+              "hash": "73be0a2720d6f76b924df6917d4edf4c9958f83e5c25bf7d9f0c1e9cdf836941",
+              "url": "https://files.pythonhosted.org/packages/9c/f4/ff0da3d518e101f00806732b7d1e96e804b06c88ead7a3de9ddb698db525/types_awscrt-0.20.4-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "06a859189a329ca8e66d56ceeef2391488e39b878fbd2141f115eab4d416fe22",
-              "url": "https://files.pythonhosted.org/packages/54/1f/a435977c79c316224010d0fa0bd85ae48440e11fd0f530df8be964bef791/types_awscrt-0.20.3.tar.gz"
+              "hash": "10245570c7285e949362b4ae710c54bf285d64a27453d42762477bcee5cd77a3",
+              "url": "https://files.pythonhosted.org/packages/1f/6c/bffa5a9d2302d23ff7691b4e5708efa0be62ee5fec0cd1e4bb3607b89bec/types_awscrt-0.20.4.tar.gz"
             }
           ],
           "project_name": "types-awscrt",
           "requires_dists": [],
           "requires_python": "<4.0,>=3.7",
-          "version": "0.20.3"
+          "version": "0.20.4"
         },
         {
           "artifacts": [
@@ -9959,6 +9980,7 @@
   "pip_version": "23.3.2",
   "prefer_older_binary": false,
   "requirements": [
+    "Babel==2.10.1",
     "Faker==23.2.1",
     "Flake8-pyproject==1.2.3",
     "Pillow==10.2.0",

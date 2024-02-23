@@ -1,11 +1,11 @@
 import asyncio
 import datetime
+import gettext
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-import aiofiles
 import json_api_doc
-from jinja2 import Template
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from snowfall.project.junction.extensions.service.mobile_api import (
     plus_client,
@@ -100,6 +100,39 @@ async def poll_order_status(
     return False
 
 
+def setup_translation_environment(user_language: str) -> Environment:
+    gettext.bindtextdomain("messages")
+    gettext.textdomain("messages")
+
+    templates_dir = filesystem.package_path(
+        "snowfall.project.junction.extensions.service.mobile_api.html_templates",
+    )
+
+    localization_dir = templates_dir / "translations"
+
+    translation = gettext.translation(
+        "messages",
+        localization_dir,
+        languages=[user_language],
+        fallback=True,
+    )
+
+    jinja_env = Environment(
+        loader=FileSystemLoader(templates_dir),
+        autoescape=select_autoescape(),
+    )
+    jinja_env.globals["_"] = translation.gettext
+    jinja_env.globals["_n"] = translation.ngettext
+
+    return jinja_env
+
+
+def get_user_language() -> str:
+    # Your logic to determine the user's preferred language
+    # Return a language code like 'es', 'fr', etc., or 'eng' for default English
+    return "es"
+
+
 async def send_booking_confirmation(
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
@@ -107,6 +140,13 @@ async def send_booking_confirmation(
     *,
     forward_to_support: bool = False,
 ) -> None:
+    user_language = get_user_language()
+    jinja_env = setup_translation_environment(
+        user_language,
+    )  # Set up the Jinja environment with translations
+    template = jinja_env.get_template(
+        "booking_template.html",
+    )
     details: Sequence[Mapping[str, Any]] = [
         detail for booking in order["bookings"] for detail in booking["details"]
     ]
@@ -117,13 +157,7 @@ async def send_booking_confirmation(
         for booking in order["bookings"]
         for reference in booking["operatorBookingReferences"]
     ]
-    async with aiofiles.open(
-        filesystem.resource_path(
-            "snowfall.project.junction.extensions.service.mobile_api.html_templates",
-            "booking_template.html",
-        ),
-    ) as template_file:
-        template = Template(await template_file.read())
+
     body = template.render(
         details=details,
         reference=order["journey"]["reference"],
@@ -134,6 +168,7 @@ async def send_booking_confirmation(
         record_locators=record_locators,
         operator_booking_references=operator_booking_references,
     )
+
     await smtp_client.send_email_html_template(
         forward_email or order["journey"]["contactDetails"]["email"],
         "{company_name}. Itinerary details for Booking {reference}".format(

@@ -1,4 +1,12 @@
-python_sources(dependencies=["openapi/junction/mobile_api", ":populations"])
+python_sources(
+    dependencies=[
+        "openapi/junction/mobile_api",
+        ":populations",
+        "python/snowfall/project/junction/extensions/service/mobile_api/html_templates",
+        "python/snowfall/project/junction/extensions/service/mobile_api/html_templates/translations:compile_translations",
+    ]
+)
+
 python_image(
     name="main",
     entry_point="main.py",
