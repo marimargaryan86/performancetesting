@@ -2,5 +2,8 @@ python_image(
     name="main",
     entry_point="main.py",
 )
-
-python_sources()
+python_sources(
+    dependencies=[
+        "python/snowfall/project/junction/service/providers/carnect/html_templates"
+    ]
+)
