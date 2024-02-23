@@ -1,6 +1,6 @@
 {
   "development": {
-    "deploy": false,
+    "deploy": true,
     "variables": {
       "count": 1,
       "provider_company_id": "ecb66326-b796-41a7-8658-d0c0f91eb912",
