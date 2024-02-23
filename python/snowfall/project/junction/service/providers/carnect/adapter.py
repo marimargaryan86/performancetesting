@@ -5,6 +5,7 @@ from collections.abc import AsyncIterator
 from types import MappingProxyType
 from typing import Any
 
+import httpx
 import timezonefinder
 
 from snowfall.project.junction.go.service.offers.v1 import (
@@ -19,7 +20,6 @@ from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.carnect import client, config
 from snowfall.vendor.carnect.adapters import veh_avail_rate_adapter
@@ -569,7 +569,7 @@ class CarnectOffersAdapter(object):
         try:
             async for offer_group in self._gather_offer_groups(search_task):
                 yield offer_group
-        except errors.HttpError:
+        except httpx.HTTPError:
             self._logger.exception("Offer search failed")
 
     async def _gather_offer_groups(

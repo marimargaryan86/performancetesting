@@ -3,6 +3,7 @@ import pathlib
 import types
 import uuid
 
+import httpx
 from xsdata.formats.dataclass import parsers
 from xsdata.formats.dataclass.parsers import config as parsers_config
 
@@ -17,7 +18,6 @@ from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.transport.http import errors
 from snowfall.vendor.carnect import client
 from snowfall.vendor.carnect import config as carnect_settings
 from snowfall.vendor.carnect.adapters import (
@@ -105,7 +105,7 @@ class BookingCancellationHandler(object):
     ) -> bookings_pb2.BookingCancellation:
         try:
             rs_adapter = await self._cancel_booking(provider_booking_reference)
-        except (errors.HttpError, _CarnectCancellationError, ValueError):
+        except (httpx.HTTPError, _CarnectCancellationError, ValueError):
             self._logger.exception(
                 "Booking cancellation failed",
                 provider_booking_reference=provider_booking_reference,
@@ -254,7 +254,7 @@ class BookingHandler(object):
                 task=task,
                 price_quote=price_quote,
             )
-        except errors.HttpError as ex:
+        except httpx.HTTPError as ex:
             self._logger.exception(
                 "Failed to create booking",
                 offer_id=price_quote.quote_id,
