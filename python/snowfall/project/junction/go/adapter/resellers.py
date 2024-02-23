@@ -28,6 +28,8 @@ class Client(abc.ABC):
     async def get_reseller(
         self,
         identifier: str,
+        *,
+        fetch_child_resellers: bool = False,
     ) -> models_pb2.Reseller:
         """Fetch a reseller resource."""
 
@@ -79,11 +81,29 @@ class DictClient(Client):
     async def get_reseller(
         self,
         identifier: str,
+        *,
+        fetch_child_resellers: bool = False,
     ) -> models_pb2.Reseller:
         if identifier not in self._resellers:
             raise errors.NotFoundError()
 
-        return self._resellers[identifier]
+        child_reseller_ids = []
+        if fetch_child_resellers:
+            for res_id, res in self._resellers.items():
+                if identifier in res.parent_reseller_ids:
+                    child_reseller_ids.append(res_id)
+
+        reseller = self._resellers[identifier]
+
+        return models_pb2.Reseller(
+            id=reseller.id,
+            name=reseller.name,
+            company_id=reseller.company_id,
+            default_currency=reseller.default_currency,
+            provider_ids=reseller.provider_ids,
+            parent_reseller_ids=reseller.parent_reseller_ids,
+            child_reseller_ids=child_reseller_ids if child_reseller_ids else None,
+        )
 
     async def create_reseller(
         self,
@@ -146,11 +166,14 @@ class GrpcClient(Client):
     async def get_reseller(
         self,
         identifier: str,
+        *,
+        fetch_child_resellers: bool = False,
     ) -> models_pb2.Reseller:
         response = await errors.handle_grpc_errors(
             self._resellers.GetReseller(
                 resellers_pb2.GetResellerRequest(
                     id=identifier,
+                    fetch_child_resellers=fetch_child_resellers,
                 ),
                 timeout=self._timeout,
             ),

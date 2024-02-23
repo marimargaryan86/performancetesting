@@ -1,5 +1,6 @@
 import datetime
 import secrets
+import types
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
@@ -115,6 +116,9 @@ BOOKING_DETAILS = (
 RESELLERS = (
     "effb6d65-2ddc-4a26-9b57-af79d44254cb",
     "6bd5e38b-f9b1-48d7-b92b-3c2d26231003",
+)
+PARENT_RESELLERS = types.MappingProxyType(
+    {"6bd5e38b-f9b1-48d7-b92b-3c2d26231003": ["effb6d65-2ddc-4a26-9b57-af79d44254cb"]},
 )
 CANCELLATION_REQUESTS = ("0a4f4726-df18-4d50-b7ae-17eec528265c",)
 BOOKING_CANCELLATIONS = (
@@ -655,6 +659,7 @@ def get_resellers() -> Sequence[resellers_pb2.Reseller]:
             provider_ids=[
                 string.uuid(),
             ],
+            parent_reseller_ids=(PARENT_RESELLERS.get(reseller_id, [])),
         )
         for index, reseller_id in enumerate(RESELLERS)
     ]

@@ -17,4 +17,5 @@ message Reseller {
   string default_currency = 4;
   repeated string provider_ids = 7;
   repeated string parent_reseller_ids = 6;
+  repeated string child_reseller_ids = 8;
 }

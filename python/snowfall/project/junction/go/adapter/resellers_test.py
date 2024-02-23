@@ -21,6 +21,18 @@ class TestDictClient(object):
         reseller = await resellers_client.get_reseller(fixtures.RESELLERS[0])
         assert reseller.id == fixtures.RESELLERS[0]
 
+    async def test_single_reseller_is_retrievable_with_child_resellers(
+        self,
+        resellers_client: resellers.Client,
+    ) -> None:
+        reseller = await resellers_client.get_reseller(
+            fixtures.RESELLERS[0],
+            fetch_child_resellers=True,
+        )
+
+        assert reseller.id == fixtures.RESELLERS[0]
+        assert fixtures.RESELLERS[1] in reseller.child_reseller_ids
+
     async def test_single_reseller_not_found(
         self,
         resellers_client: resellers.Client,

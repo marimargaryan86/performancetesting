@@ -95,7 +95,12 @@ class ResellerService(
         request: resellers_pb2.GetResellerRequest,
         context: aio.ServicerContext,
     ) -> resellers_pb2.GetResellerResponse:
-        reseller = await self._repository.find_by_id(request.id)
+        if request.fetch_child_resellers:
+            reseller = await self._repository.find_by_id_with_child_resellers(
+                identifier=request.id,
+            )
+        else:
+            reseller = await self._repository.find_by_id(request.id)
         if not reseller:
             return await context.abort(StatusCode.NOT_FOUND)
 

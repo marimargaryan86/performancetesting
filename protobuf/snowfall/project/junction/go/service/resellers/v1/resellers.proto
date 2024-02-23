@@ -25,6 +25,7 @@ message CreateResellerResponse {
 
 message GetResellerRequest {
   string id = 1;
+  bool fetch_child_resellers = 2;
 }
 
 message GetResellerResponse {
