@@ -6,6 +6,14 @@ from typing import Any
 import allure
 import pytest
 
+from snowfall.project.junction.api_automation.conftest import (
+    ConfigurationManager,
+)
+from snowfall.project.junction.api_automation.test_functions.benerail import (
+    br_dialogues,
+    br_passengers,
+    br_trip_collections,
+)
 from snowfall.project.junction.api_automation.test_functions.helper import (
     stripe_confirmation,
     wait_until_completed,
@@ -149,6 +157,10 @@ async def get_order_by_id(
 
 
 places_pairs = [("Brussels-Midi", "Rotterdam Centraal")]
+place_to_br_id = {
+    "Brussels-Midi": "urn:bnds:tstatn_id:BEBMI",
+    "Rotterdam Centraal": "urn:bnds:tstatn_id:NLRTC",
+}
 providers = [
     "Custom",
 ]
@@ -162,6 +174,7 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     places_pairs: Sequence[str],
     departure_after: datetime,
     stripe_api_key: str,
+    config_manager: ConfigurationManager,
 ) -> None:
     with allure.step("Step to log the origin and destination coordinates"):
         origin_cord, destination_cord = await get_place_coordinates(
@@ -208,83 +221,122 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
             mobile_client,
             offer_id_simple_search,
         )
-        assert "included" in offers_list, "no offers"
-        offer_included = offers_list["included"]
-        assert offer_included
-        offer_id = offers_list["data"][0]["id"]
-        offer_option_id = await get_option_id(offer_id, offers_list)
-        assert offer_id
-        assert offer_option_id
-        allure.attach(
-            "offer id: {0} and offer option id : {1}".format(offer_id, offer_option_id),
-            "text/plain",
-        )
+        offer_included = offers_list.get("included")
+        if offer_included:
+            offer_id = offers_list["data"][0]["id"]
+            offer_option_id = await get_option_id(offer_id, offers_list)
+            assert offer_id
+            assert offer_option_id
+            allure.attach(
+                "offer id: {0} and offer option id : {1}".format(
+                    offer_id,
+                    offer_option_id,
+                ),
+                "text/plain",
+            )
+        else:
+            offer_id = None
+            offer_option_id = None
+            dialogues = await br_dialogues(config_manager)
+            assert dialogues, "the dialogues of BR is empty"
+            dialogues_id = dialogues[0]["result"]["id"]
+            dialogue_etag = dialogues[1].get("ETag")
+            passengers = await br_passengers(
+                config_manager,
+                dialogues_id,
+                dialogue_etag,
+            )
+            passenger_ids = passengers[0]["result"]["id"]
+            dialogue_etag = passengers[1].get("ETag")
+            assert passengers
+            trip_filter_list_count = await br_trip_collections(
+                config_manager,
+                dialogues_id,
+                dialogue_etag,
+                [
+                    {
+                        "origin": place_to_br_id[places_pairs[0]],
+                        "destination": place_to_br_id[places_pairs[1]],
+                    },
+                ],
+                passenger_ids,
+                str(departure_after),
+            )
 
-    with allure.step("Step to Create quotes"):
-        quotes = await create_quote(mobile_client, offer_id, [offer_option_id])
-        assert quotes
-        allure.attach(
-            "Quotes ID {0}".format(quotes),
-            "text/plain",
-        )
+            with allure.step("Step to log the offer count of BR"):
+                allure.attach(
+                    "Offer Count from BR: {0}".format(trip_filter_list_count),
+                    "text/plain",
+                )
+            assert (
+                not trip_filter_list_count
+            ), "Benerail has offers, simple search doesn't"
+    if offer_id:
+        with allure.step("Step to Create quotes"):
+            quotes = await create_quote(mobile_client, offer_id, [offer_option_id])
+            assert quotes
+            allure.attach(
+                "Quotes ID {0}".format(quotes),
+                "text/plain",
+            )
 
-    with allure.step("Step to Get quotes"):
-        quote_data = await wait_until_completed(
-            lambda: get_quote(mobile_client, quotes),
-            "Timeout reached and status was not completed.",
-        )
-        assert quote_data
-        currency = quote_data["attributes"]["price"]["currency"]
-        amount = quote_data["attributes"]["price"]["amount"]
-        allure.attach(
-            "Quote with currency: {0} and amount {1}".format(
+        with allure.step("Step to Get quotes"):
+            quote_data = await wait_until_completed(
+                lambda: get_quote(mobile_client, quotes),
+                "Timeout reached and status was not completed.",
+            )
+            assert quote_data
+            currency = quote_data["attributes"]["price"]["currency"]
+            amount = quote_data["attributes"]["price"]["amount"]
+            allure.attach(
+                "Quote with currency: {0} and amount {1}".format(
+                    currency,
+                    amount,
+                ),
+                "text/plain",
+            )
+
+        with allure.step("Step to Create Payment"):
+            payment_intent_id = await create_payment(
+                mobile_client,
                 currency,
                 amount,
-            ),
-            "text/plain",
-        )
+            )
+            assert payment_intent_id
+            allure.attach(
+                "Payment ID: {0}".format(payment_intent_id),
+                "text/plain",
+            )
 
-    with allure.step("Step to Create Payment"):
-        payment_intent_id = await create_payment(
-            mobile_client,
-            currency,
-            amount,
-        )
-        assert payment_intent_id
-        allure.attach(
-            "Payment ID: {0}".format(payment_intent_id),
-            "text/plain",
-        )
+        with allure.step("Step to Update Stripe Intent and Confirm"):
+            payment_intent = await stripe_confirmation(
+                payment_intent_id=payment_intent_id,
+                stripe_api_key=stripe_api_key,
+            )
+            assert payment_intent["status"] == "requires_capture"
+            allure.attach(
+                "Payment Intent ID: {0}".format(payment_intent_id),
+                "text/plain",
+            )
 
-    with allure.step("Step to Update Stripe Intent and Confirm"):
-        payment_intent = await stripe_confirmation(
-            payment_intent_id=payment_intent_id,
-            stripe_api_key=stripe_api_key,
-        )
-        assert payment_intent["status"] == "requires_capture"
-        allure.attach(
-            "Payment Intent ID: {0}".format(payment_intent_id),
-            "text/plain",
-        )
+        with allure.step("Step to Create Order"):
+            trip_offer_price_quotes = quote_data["id"]
+            orders_data = await create_order(
+                mobile_client,
+                trip_offer_price_quotes,
+                payment_intent_id,
+            )
+            assert orders_data
+            order_id = orders_data["id"]
+            allure.attach(
+                "Order ID: {0}".format(order_id),
+                "text/plain",
+            )
 
-    with allure.step("Step to Create Order"):
-        trip_offer_price_quotes = quote_data["id"]
-        orders_data = await create_order(
-            mobile_client,
-            trip_offer_price_quotes,
-            payment_intent_id,
-        )
-        assert orders_data
-        order_id = orders_data["id"]
-        allure.attach(
-            "Order ID: {0}".format(order_id),
-            "text/plain",
-        )
-
-    with allure.step("Step to get order"):
-        order_data_by_id = await mobile_client.get_order(order_id)
-        assert order_data_by_id
-        allure.attach(
-            "Order created successfully",
-            "text/plain",
-        )
+        with allure.step("Step to get order"):
+            order_data_by_id = await mobile_client.get_order(order_id)
+            assert order_data_by_id
+            allure.attach(
+                "Order created successfully",
+                "text/plain",
+            )
