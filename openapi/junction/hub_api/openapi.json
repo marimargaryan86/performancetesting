@@ -23,6 +23,12 @@
       ]
     },
     {
+      "name": "Activities",
+      "tags": [
+        "activities"
+      ]
+    },
+    {
       "name": "Balances",
       "tags": [
         "balances"
@@ -112,6 +118,11 @@
       "name": "accounts",
       "description": "Accounts",
       "x-displayName": "Accounts"
+    },
+    {
+      "name": "activities",
+      "description": "Activities",
+      "x-displayName": "Activities"
     },
     {
       "name": "balances",
@@ -839,6 +850,117 @@
                   "required": [
                     "data"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/activities": {
+      "get": {
+        "summary": "List finance information",
+        "description": "List finance information",
+        "tags": [
+          "activities"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterOrderIds"
+          },
+          {
+            "$ref": "#/components/parameters/filterDepartureDates"
+          },
+          {
+            "$ref": "#/components/parameters/filterTransactionCreatedDates"
+          },
+          {
+            "$ref": "#/components/parameters/filterBeneficiaryIds"
+          },
+          {
+            "$ref": "#/components/parameters/filterPayerIds"
+          }
+        ],
+        "operationId": "get-activities",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/Activities"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/activities/{transactionId}": {
+      "get": {
+        "summary": "Get finance information",
+        "description": "Get finance information",
+        "tags": [
+          "activities"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/transactionId"
+          }
+        ],
+        "operationId": "get-activities-id",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Activities"
+                    }
+                  }
                 }
               }
             }
@@ -3693,6 +3815,24 @@
         },
         "description": "Transaction id"
       },
+      "filterTransactionCreatedDates": {
+        "name": "filter[transactionCreatedDates][eq]",
+        "in": "query",
+        "required": false,
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "2025-02-03"
+          ],
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "description": "Filter based on transaction created dates"
+      },
       "orderId": {
         "name": "orderId",
         "in": "path",
@@ -3756,6 +3896,42 @@
         "style": "form",
         "explode": false
       },
+      "filterOrderIds": {
+        "name": "filter[orderIds][eq]",
+        "in": "query",
+        "required": false,
+        "description": "Filter based on the ids",
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "filterPayerIds": {
+        "name": "filter[payerIds][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "description": "Filter based on the payer ids",
+        "style": "form",
+        "explode": false
+      },
       "page-cursor": {
         "name": "page[cursor]",
         "in": "query",
@@ -3812,6 +3988,24 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Beneficiary id"
+      },
+      "filterBeneficiaryIds": {
+        "name": "filter[beneficiaryIds][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "271f6d54-9e59-407e-a860-b0771d9e3d26"
+          ],
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "description": "Filter based on beneficiary ids",
+        "style": "form",
+        "explode": false
       },
       "ConversionInclude": {
         "name": "include",
@@ -4149,6 +4343,24 @@
           "example": "USD"
         },
         "description": "Currency name"
+      },
+      "filterDepartureDates": {
+        "name": "filter[departureDates][eq]",
+        "in": "query",
+        "required": false,
+        "style": "form",
+        "explode": false,
+        "schema": {
+          "type": "array",
+          "example": [
+            "2025-02-03"
+          ],
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "description": "Filter based on departure dates"
       },
       "resellerId": {
         "name": "resellerId",
@@ -5863,6 +6075,241 @@
               "attributes",
               "relationships"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "ExternalReferenceIdentifier": {
+        "title": "External reference Identifier",
+        "description": "External Reference",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "external-reference"
+            ],
+            "example": "external-reference"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "InvoiceReferenceIdentifier": {
+        "title": "Invoice reference Identifier",
+        "description": "Invoice Reference",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "invoice-reference"
+            ],
+            "example": "invoice-reference"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "Activities": {
+        "title": "Activities",
+        "description": "Activities",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "271f6d54-9e59-407e-a860-b0771d9e3d26",
+                "format": "uuid",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "example": "activities",
+                "enum": [
+                  "activities"
+                ]
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "transactionCreatedAt",
+                  "departureAt",
+                  "baseConverted",
+                  "salesMargin",
+                  "quotation",
+                  "taxConverted",
+                  "totalAmount",
+                  "payerName",
+                  "fxMargin",
+                  "processingMargin",
+                  "feeAmount",
+                  "totalMarkups",
+                  "beneficiaryAmount",
+                  "beneficiaryName",
+                  "passengerName",
+                  "paymentMethod",
+                  "paymentType",
+                  "fxMarkup",
+                  "salesMarkup",
+                  "processingMarkup"
+                ],
+                "properties": {
+                  "transactionCreatedAt": {
+                    "type": "string",
+                    "example": "2025-02-03",
+                    "format": "date"
+                  },
+                  "departureAt": {
+                    "type": "string",
+                    "example": "2025-02-03",
+                    "format": "date"
+                  },
+                  "baseConverted": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "salesMargin": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.858611
+                  },
+                  "quotation": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "taxConverted": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "totalAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "payerName": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "fxMargin": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.858611
+                  },
+                  "processingMargin": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.858611
+                  },
+                  "feeAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "totalMarkups": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "beneficiaryAmount": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "beneficiaryName": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "passengerName": {
+                    "type": "string",
+                    "example": "name"
+                  },
+                  "paymentType": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "card",
+                      "bank-transfer"
+                    ],
+                    "example": "card"
+                  },
+                  "paymentMethod": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "transactional",
+                      "invoice"
+                    ],
+                    "example": "transactional"
+                  },
+                  "fxMarkup": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "salesMrkup": {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  "processingMarkup": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 5.6
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "order",
+                  "invoiceReference",
+                  "externalReference"
+                ],
+                "properties": {
+                  "invoiceReference": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/InvoiceReferenceIdentifier"
+                      }
+                    }
+                  },
+                  "externalReference": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/ExternalReferenceIdentifier"
+                      }
+                    }
+                  },
+                  "order": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OrderIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           {
             "$ref": "#/components/schemas/SelfLink"
