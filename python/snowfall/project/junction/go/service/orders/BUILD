@@ -1,5 +1,8 @@
 python_sources(
-    dependencies=["python/snowfall/project/junction/go/service/orders/html_templates"]
+    dependencies=[
+        "python/snowfall/project/junction/go/service/orders/html_templates",
+        "python/snowfall/project/junction/go/service/orders/html_templates/translations:compile_translations",
+    ]
 )
 python_tests(name="tests")
 python_test_utils(name="test_utils")

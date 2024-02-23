@@ -1,8 +1,8 @@
 import datetime
+import gettext
 from collections.abc import Iterable
 from typing import Any
 
-import aiofiles
 import jinja2
 
 from snowfall.project.junction.go.service.orders import smtp
@@ -53,6 +53,38 @@ def _order_details_sorted_by_date(
     return sorted(detail_objects, key=lambda detail: detail["departure_at"])
 
 
+def setup_translation_environment(user_language: str) -> jinja2.Environment:
+    gettext.bindtextdomain("messages")
+    gettext.textdomain("messages")
+    templates_dir = filesystem.resource_path(
+        "snowfall.project.junction.go.service.orders.html_templates",
+        "",
+    )
+    localization_dir = templates_dir / "translations"
+
+    translation = gettext.translation(
+        "messages",
+        localization_dir,
+        languages=[user_language],
+        fallback=True,
+    )
+
+    jinja_env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(templates_dir),
+        autoescape=jinja2.select_autoescape(),
+    )
+    jinja_env.globals["_"] = translation.gettext
+    jinja_env.globals["_n"] = translation.ngettext
+
+    return jinja_env
+
+
+def get_user_language() -> str:
+    # Your logic to determine the user's preferred language
+    # Return a language code like 'es', 'fr', etc., or 'eng' for default English
+    return "es"
+
+
 async def send_cancel_confirmation(
     journey: models_pb2.Journey,
     order: models_pb2.Order,
@@ -63,6 +95,13 @@ async def send_cancel_confirmation(
     *,
     forward_email: str | None = None,
 ) -> None:
+    user_language = get_user_language()
+    jinja_env = setup_translation_environment(
+        user_language,
+    )
+    template_content = jinja_env.get_template(
+        "booking_cancel_template.html",
+    )
     total_price = money.from_protobuf(booking.total_price)
     base_url = EnvironmentURLs.get_url(environment)
 
@@ -72,13 +111,7 @@ async def send_cancel_confirmation(
         booking_id=booking.id,
     )
     details = _order_details_sorted_by_date(booking.trip_option.details)
-    template_path = filesystem.resource_path(
-        "snowfall.project.junction.go.service.orders.html_templates",
-        "booking_cancel_template.html",
-    )
-    async with aiofiles.open(template_path) as template_file:
-        template_content = await template_file.read()
-    body = jinja2.Template(template_content).render(
+    body = template_content.render(
         details=details,
         full_link=full_link,
         reference=journey.passenger_name_record,

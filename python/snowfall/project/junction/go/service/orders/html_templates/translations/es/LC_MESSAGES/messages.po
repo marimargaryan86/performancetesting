@@ -1,0 +1,82 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-02-01 14:19-0600\n"
+"PO-Revision-Date: 2024-02-01 14:25-0600\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:248
+msgid "Cancellation confirmed"
+msgstr "Cancelación confirmada"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:313
+msgid "Booking {reference}"
+msgstr "Reserva {reference}"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:329
+msgid ""
+"The cancellation for booking {reference} has been confirmed - you can "
+"find summary details, including any refund due, below."
+msgstr ""
+"La cancelación de la reserva {reference} ha sido confirmada - puedes "
+"encontrar los detalles resumidos, incluyendo cualquier reembolso debido, a continuación."
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:344
+msgid "Itinerary details - booking {reference}"
+msgstr "Detalles del itinerario - reserva {reference}"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:413
+msgid "Departing:"
+msgstr "Salida:"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:418
+msgid "Arriving:"
+msgstr "Llegada:"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:424
+msgid "Cancellation status:"
+msgstr "Estado de la cancelación:"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:425
+msgid "Total refund due:"
+msgstr "Total del reembolso debido:"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:465
+msgid "Traveller:"
+msgid_plural "Travellers:"
+msgstr[0] "Viajero:"
+msgstr[1] "Viajeros:"
+
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:470
+msgid "Operator/check-in reference:"
+msgstr "Referencia del operador/check-in:"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:479
+msgid "Snowfall reference:"
+msgstr "Referencia de Snowfall:"
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:518
+msgid "Click the link below to review the booking status in Junction Hub."
+msgstr "Haz clic en el enlace a continuación para revisar el estado de la reserva en Junction Hub."
+
+#: python/snowfall/project/junction/go/service/orders/html_templates/booking_cancel_template.html:535
+msgid "Review booking status"
+msgstr "Revisar estado de la reserva"
+
+#: python/snowfall/project/junction/extensions/service/mobile_api/html_templates/booking_template.html:460
+msgid "Operator/check-in reference:"
+msgstr "Operator/check-in reference:"
