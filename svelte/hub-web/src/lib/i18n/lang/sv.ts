@@ -100,6 +100,8 @@ export default {
     optional: "Frivillig",
     inbound: "Inkommande",
     outbound: "Utgående",
+    admin: "Admin",
+    user: "Användare",
     earlier: "Tidigare",
     later: "Senare",
   },
@@ -157,6 +159,7 @@ export default {
     findTrip: "Hitta resa",
     modifySearch: "Ändra sökning",
     addUser: "Lägg till användare",
+    save: "Spara",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -235,6 +238,9 @@ export default {
     passengerNameRecordError: "Din referens är en sekvens av åtta bokstäver och/eller siffror.",
     noTripsFoundMessage:
       "Se till att du har angett rätt referensnummer.\nFörsök igen eller kontakta supporten.",
+    adminRoleDescription:
+      "Visa och hantera alla beställningar som gjorts inom agenturen. Hantera återförsäljare och användarinställningar.",
+    userRoleDescription: "Visa och hantera dina egna beställningar för en personlig upplevelse.",
   },
   tableHeaders: {
     id: "ID",

@@ -24,6 +24,7 @@
     | "lock"
     | "logout"
     | "password"
+    | "password-circular"
     | "passenger"
     | "payment"
     | "phone"
@@ -42,7 +43,8 @@
     | "swap-directions"
     | "user"
     | "car"
-    | "train";
+    | "train"
+    | "user-circular";
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 

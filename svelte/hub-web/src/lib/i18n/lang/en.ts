@@ -106,6 +106,8 @@ export default {
     optional: "Optional",
     inbound: "Inbound",
     outbound: "Outbound",
+    admin: "Admin",
+    user: "User",
     earlier: "Earlier",
     later: "Later",
   },
@@ -163,6 +165,7 @@ export default {
     findTrip: "Find Trip",
     modifySearch: "Modify Search",
     addUser: "Add User",
+    save: "Save",
   },
   sentences: {
     priceChange: "Price change",
@@ -241,6 +244,9 @@ export default {
     passengerNameRecordError: "Your reference is a sequence of eight letters and/or numbers.",
     noTripsFoundMessage:
       "Please ensure you have entered the correct reference number.\nPlease try again or contact support.",
+    adminRoleDescription:
+      "View and manage any orders made within the agency. Manage reseller & user settings.",
+    userRoleDescription: "View and manage your own orders for a personalized experience.",
   },
   tableHeaders: {
     id: "ID",
