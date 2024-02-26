@@ -333,6 +333,7 @@ export default {
     fastest: "Fastest",
   } satisfies Record<SortOption, string>,
   statuses: {
+    active: "Active",
     confirmed: "Confirmed",
     "no-refund": "No Refund",
     "not-ticketed": "Not Ticketed",

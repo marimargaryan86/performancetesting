@@ -353,6 +353,7 @@ export default {
     fastest: "Lo más rápido",
   },
   statuses: {
+    active: "Active",
     confirmed: "Confirmado",
     "no-refund": "No hay reembolso",
     "not-ticketed": "No boletado",

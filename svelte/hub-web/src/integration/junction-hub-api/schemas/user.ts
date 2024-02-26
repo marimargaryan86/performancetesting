@@ -43,7 +43,11 @@ export const userParser = {
     id: data.id,
     email: data.attributes.email,
     role: data.attributes.role,
-    resellerId: data.relationships.reseller?.data.id,
+    // Check if reseller is neither null nor undefined before accessing id
+    resellerId:
+      data.relationships.reseller && data.relationships.reseller.data
+        ? data.relationships.reseller.data.id
+        : undefined,
     // TODO: include?
     reseller: undefined,
   }),

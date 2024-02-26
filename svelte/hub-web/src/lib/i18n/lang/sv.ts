@@ -327,6 +327,7 @@ export default {
     fastest: "Snabbast",
   },
   statuses: {
+    active: "Active",
     confirmed: "Bekräftad",
     "no-refund": "Ingen Återbetalning",
     "not-ticketed": "Inga Biljetter",

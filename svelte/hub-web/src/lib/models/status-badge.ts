@@ -1,5 +1,6 @@
 export type StatusBadgeVariant = "ok" | "warn" | "error";
 export type StatusBadgeValue =
+  | "active"
   | "confirmed"
   | "error"
   | "rejected"
@@ -21,6 +22,7 @@ export type StatusBadgeValue =
   | "unknown";
 
 export const STATUS_BADGE_MAPPING = {
+  active: "ok",
   confirmed: "ok",
   completed: "ok",
   executed: "ok",
