@@ -1,110 +1,155 @@
 # Junction Pay
 
+## Overview
+
+Junction Pay is the Junction's clearing house and handles all finance-related responsibilities between all the participants in Junction marketplace (for eg. providers and resellers). It is a part of Junction Go, and exposes its functionality over gRPC.\
+Resellers can order based on their multi-modal travel offers they have received from Snowfall. This would be a single-payment per order. Each Order is a bundle of Bookings from various providers (as it could be multimodal travel) and also potentially other services. Snowfall maintains commercial relationships with each reseller and each provider and is able to include details of previously-existing relationships between them within the platform configuration, as needed.\
+So essentially Junction Pay enables smooth receiving, managing and settlement of funds.
+
+## Vision
+
+Junction Pay aims to introduce a modern fintech approach to settlements in the travel industry with smooth payments and low fees.
+The guiding principle of Junction’s payment solution is to provide a secure, transparent and flexible platform with a modular services approach.
+
+Reseller | Provider
+--- | ---
+Receive client funds in multiple currencies | No integration required
+All transaction details in one platform | Minimal onboarding
+Instant FX to lock in market rate | Single invoice per duration
+Seamless payment of invoices | Receive single payment for multiple resellers
+Maintain existing relationships | Invoice payable in multiple currencies
+Automate admin overheads for accounts payable | No integration required
+
+## Concepts
+
+### Quotation
+
+Junction uses the term *Quotation* for the potential pricing which could eventually change to actual payments. The currency used by the Provider and the Reseller could differ. In this case we would need to convert the Provider price from a particular currency to a Reseller price in their own supported currency. This would require FX rate comparisons and hence called a quotation, as it would be fixed but valid only for a certain time. This (Snowfall) Quotation will have Provider price plus added costs like FX margins, related taxes and expenses.
+Each reseller will have a different configuration for the price calculation depending on different margins set for each. A Quotation is valid for 15 minutes from the time it has been created ans session tokens are used to keep the same value for the duration of the quotation validity.
+
+### Transaction
+
+A *Bill* is similar to what is an *Order* at Junction GO side.\
+As an *Order* has multiple *Bookings*, similarly, a *Bill* has many *Transactions*. So a *Transaction* is similar to a *Booking*.
+
+```mermaid
+    flowchart LR
+    subgraph Junction GO
+        subgraph Order
+            B1(Booking1)
+            B2(Booking2)
+            B3(Booking3)
+        end
+    end
+
+    subgraph Junction Pay
+        subgraph Bill
+            T1(Transaction1)
+            T2(Transaction2)
+            T3(Transaction3)
+        end
+    end
+    B1<-->T1
+    B2<-->T2
+    B3<-->T3
+
+```
+
 ## Junction Pay System Flow Diagram
 
 ```mermaid
     flowchart LR
 
         subgraph Client
-            A(Client)
+            HA(Hub API)
+            CA(Client API)
+            MA(Mobile API)
         end
 
-        subgraph Firewall
-            B(Firewall)
+        users[(Users DB)]
+        subgraph Authenticator
+        O(ORY)
         end
 
-        subgraph PayAPI
-            direction LR
-            C(Pay API)
-            E(Vault)
-            I(transaction repo)
-            U(quotation repo)
-            V(fx Conversion repo)
-            W(Company Repo)
-            C --> E
-            C --> I
-            C --> U
-            C --> V
-            C --> W
-        end
-
-        subgraph AdminAPI
-            direction LR
-            D(Admin API)
-            X(Vault)
-            Y(transaction repo)
-            Z(quotation repo)
-            A1(fx Conversion repo)
-            B2(Company Repo)
-
-            D --> X
-            D --> Y
-            D --> Z
-            D --> A1
-            D --> B2
-        end
+        HA-->O
+        CA-->O
+        MA-->|user auth|users
+        Client-->H
 
         subgraph AuthenticationServices
-            F(Authentication Services)
-            G(MongoDB)
-            F --> G
+            Auth(Auth)
         end
 
-        subgraph Adapters
-            H(Adapters)
-        end
+        H(Adapters)
 
-        subgraph Microservices
+        H-->Vault
+        H-->Auth
+        H-->JG(Junction GO)
+        H-->MS
+        JG-->T
+
+        Auth-->O
+
+        subgraph MS[Microservices]
             direction LR
-                J(Rates Service)
-                K(Rates Repo)
-                L(Currencies Service)
-                M(CurrenciesRepo)
-                N(Redis Cache)
-                O(Accounts)
-                P(Accounts Repo)
-                Q(Payment Service)
-                R(Payment Repo)
-                O --> P
-                J --> K
-                J --> N
-                L --> N
-                L --> M
-                Q --> R
+            CCS(CreditCardPaymentService)
+            CS(CompaniesService)
+            AS(AccountsService)
+            CTCS(ContactsService)
+            BNFS(BenefeciariesService)
+            CCY(CurrenciesService)
+            J(RatesService)
+            RS(RefundsService)
+            T(TransactionsService)
+            QS(QuotationsService)
+            CVS(ConversionsService)
+            BS(BillsService)
+            N(RedisCache)
+
+            CTCS-->CS
+            AS-->CS
+            BNFS-->CS
+
+            QS-->T
+            BS-->T
+            CVS-->T
+
+            J-->N
+            CCY-->N
         end
 
-        subgraph CurrencyCloud Client
+        CCS-->STP
+
+        subgraph CCLDC[CurrencyCloud Client]
             S(CurrencyCloud Client)
         end
 
-        subgraph Firewall Outbound
-            T(Firewall)
+        MS-->O
+
+        subgraph Pay
+        MS-->CCLDC
         end
 
-        A --> B
-        B --> PayAPI
-        B --> AdminAPI
-        PayAPI --> S
-        PayAPI --> Adapters
-        AdminAPI --> Adapters
-        Adapters --> AuthenticationServices
-        Adapters --> Microservices
-        Microservices --> S
-        S --> T
-        T --> CurrencyCloud
-        AdminAPI --> S
+        subgraph EX[External]
+            CC(CurrencyCloud)
+            STP[Stripe]
+        end
+
+        S-->CC
+
 ```
 
 In this flow diagram
 
-* The Client (A) communicates to Pay and admin API via inbound Firewall (B).
-* The Pay API (C) retrieves secrets using the Vault (E) and will use quotation, transaction and fx conversion repos, this will be used by Go to create Quotations and Transactions.
-* The Admin API (D) retrieves secrets using the Vault (E) and will use quotation, transaction and fx conversion repos. admin api will be used by Hub to list down quotations, transactions, and fx conversions
-* The Adapters (H) mediate the communication between the Pay API, Admin API, Authentication Services, and the Microservices.
-* The Authentication Services (F) have a connection to the User Repository (G).
-* The Microservices include the Rates Service (J), Rates Repository (K), Currencies Service (L), Currencies Repository (M), Redis Cache (N), Accounts (O), Accounts Repository (P), Payment Service (Q), and Payment Repository (R).
-* The Microservices interacts with the CurrencyCloud Client (S).
-* The FirewallOutbound (T) represents the outbound traffic from the Firewall.
+* The Client for PAY in this case is Hub API, Mobile API and Client API.
+* The Hub-API get authenticated by ORY and Mobile API users get autheticated by the local database -> users.
+* Once authenticated the clients can call the adapter to access the relevant Junction Pay gRPC microservice.
+* Relevent  secrets are retrieved using the Vault.
+* The Adapters mediate the communication between the Client, Authentication Services and the Microservices.
+* Some of the major Microservices include services like the Company Service, Refund Service, Transaction Service, CreditCardPayment service, CurrencyService and the Rates Service .
+* The Microservices interacts with the external CurrencyCloud via the CurrencyCloud Client.
+
+Note: PayAPI and AdminAPI has been deprecate. Admin API has been moved to Hub.
 
 ### Fetch Quotation API
 
