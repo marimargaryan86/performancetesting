@@ -24,6 +24,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>BigXtra - immer etwas neues</title>
+</svelte:head>
+
 <div class="app">
   <Navigation />
 

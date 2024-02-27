@@ -1,3 +1,5 @@
 export default {
-  placeholder: "Hello",
+  words: {
+    hello: "Hello",
+  },
 };

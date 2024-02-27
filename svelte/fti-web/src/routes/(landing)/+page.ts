@@ -1,3 +1,16 @@
-// since there's no dynamic data here, we can prerender
-// it so that it gets served as a static asset in production
+import { database } from "$lib/data/database";
+
 export const prerender = false;
+
+/** @type {import('./$types').PageServerLoad} */
+export function load(): { data: { title: string } } {
+  const data = {
+    title: "Landing",
+    holidayPackages: database.holidayPackages,
+    holidayCategories: database.holidayCategories,
+    featuredPackages: database.featuredPackages,
+    weatherHolidays: database.weatherHolidays,
+  };
+
+  return { data };
+}

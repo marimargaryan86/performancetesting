@@ -1,6 +1,25 @@
+/* Variable names are from figma, probs gonna rename when I've copied all styles from figma */
 :root {
   --text-black-text: #000000;
   --fti-colours-grey: #eeeeee;
   --text-dark-text: #1c1c1c;
   --stroke-colour: #e4e4e4;
+  --background-white: #ffffff;
+  --colours-primary-blue: #01a5c9;
+  --colours-primary-orange: #ea7121;
+  --colours-sea-blue: #40bed9;
+  --colours-section-background: #f2fbff;
+  --colours-rating-stars: #fbd148;
+  --colours-background-grey: #f6f5f5;
+  --colours-selected-tab: #fdf4ed;
+  --colours-category-nav-bar: #fbeadd;
+  --colours-email-pop-up: #caf5ff;
+  --colours-budget-slider-blur: rgb(207 207 207 / 0.5);
+  --colours-hover-button: rgb(30 30 30 / 0.5);
+  --text-light: #ffffff;
+  --text-mid: #818181;
+  --text-dark: #1c1c1c;
+  --text-primary-blue: #00a8cd;
+  --text-secondary-blue: #01a5c9;
+  --text-email-hint-icon: #bbbbbb;
 }

@@ -1,13 +1,18 @@
 <script lang="ts">
-  import github from "$lib/images/github.svg";
   import FaHeart from "svelte-icons/fa/FaHeart.svelte";
   import FaUser from "svelte-icons/fa/FaUser.svelte";
   import FaPhoneAlt from "svelte-icons/fa/FaPhoneAlt.svelte";
   import ExploreDropdown from "./explore-dropdown.svelte";
+  import FaBars from "svelte-icons/fa/FaBars.svelte";
 
   let exploreDropdown: boolean = false;
 
   const setDropdown = (value: boolean): boolean => (exploreDropdown = value);
+  function toggleMenu(): void {
+    mobileExpand = !mobileExpand;
+  }
+
+  let mobileExpand: boolean = false;
 </script>
 
 <header>
@@ -19,14 +24,14 @@
   <nav>
     <ul>
       <li>
-        <a href="/test">Destinations</a>
+        <a href="/coming-soon">Destinations</a>
       </li>
       <li
         on:focus
         on:mouseover={setDropdown.bind(setDropdown, true)}
         on:mouseleave={setDropdown.bind(setDropdown, false)}
       >
-        <a href="/test">Holiday types</a>
+        <a href="/coming-soon">Holiday types</a>
         {#if exploreDropdown}
           <div class="panel">
             <ExploreDropdown />
@@ -34,26 +39,27 @@
         {/if}
       </li>
       <li>
-        <a href="/test">Offers</a>
+        <a href="/coming-soon">Offers</a>
       </li>
       <li>
-        <a href="/test">Hotels</a>
+        <a href="/coming-soon">Hotels</a>
       </li>
       <li>
-        <a href="/test">Car Rental</a>
+        <a href="/coming-soon">Car Rental</a>
       </li>
     </ul>
   </nav>
 
   <div class="side-buttons">
-    <a href="https://github.com/sveltejs/kit">
-      <img src={github} alt="GitHub" />
-    </a>
     <div class="icon heart-icon">
-      <FaHeart />
+      <a href="/coming-soon">
+        <FaHeart />
+      </a>
     </div>
-    <div class="icon">
-      <FaUser />
+    <div class="icon user-icon">
+      <a href="/coming-soon">
+        <FaUser />
+      </a>
     </div>
     <div class="phone-box">
       <div class="icon">
@@ -61,12 +67,41 @@
       </div>
       <p>123-456-7890</p>
     </div>
+    <div class="expand-menu">
+      <button class="icon" on:click={toggleMenu}>
+        <FaBars />
+      </button>
+    </div>
   </div>
 </header>
 
+{#if mobileExpand}
+  <div class="mobile-menu">
+    <nav>
+      <ul>
+        <li>
+          <a href="/coming-soon">Destinations</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Holiday types</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Offers</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Hotels</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Car Rental</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+{/if}
+
 <style>
   header {
-    position: fixed;
+    /* position: fixed; */
     left: 10%;
     z-index: 9;
     display: flex;
@@ -174,11 +209,68 @@
     color: white;
   }
 
+  .user-icon a {
+    color: white;
+  }
+
   .icon:hover {
     cursor: pointer;
   }
 
   .heart-icon:hover {
     color: red;
+  }
+
+  .expand-menu {
+    display: none;
+  }
+
+  .expand-menu button {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    border: none;
+  }
+
+  .mobile-menu {
+    display: none;
+  }
+
+  @media only screen and (width <= 720px) {
+    /* Styles for screens smaller than iPhone X */
+    nav,
+    .phone-box,
+    .heart-icon {
+      display: none;
+    }
+
+    .expand-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      position: absolute;
+      right: 0;
+      display: block;
+      width: 300px;
+      height: 100vh;
+      background: white;
+    }
+
+    header {
+      left: 0;
+      width: 100%;
+    }
+
+    .corner {
+      padding-left: 50px;
+    }
+
+    .side-buttons {
+      padding-right: 20px;
+    }
+
+    /* Add your styles here */
   }
 </style>
