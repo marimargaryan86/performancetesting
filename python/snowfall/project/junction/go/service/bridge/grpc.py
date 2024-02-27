@@ -55,4 +55,4 @@ class TripCandidateSearchService(
         request: trips_pb2.GetTripCandidateSearchDetailsRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.GetTripCandidateSearchDetailsResponse:
-        return await context.abort(StatusCode.NOT_IMPLEMENTED)
+        return await context.abort(StatusCode.UNIMPLEMENTED)
