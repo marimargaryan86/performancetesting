@@ -43,6 +43,7 @@ async def get_place_coordinates(
 async def create_offer_simple_search(
     mobile_hub_client: MobileApiClient,
     departure_after: datetime,
+    departure_before: datetime,
     origin: tuple[float, float],
     destination: tuple[float, float],
     passengers_dates_of_birth: Sequence[date],
@@ -53,6 +54,7 @@ async def create_offer_simple_search(
         origin,
         destination,
         departure_after,
+        departure_before,
         passengers_dates_of_birth,
         maximum_connections,
         allowed_segment_types,
@@ -173,6 +175,7 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
     mobile_client: MobileApiClient,
     places_pairs: Sequence[str],
     departure_after: datetime,
+    departure_before: datetime,
     stripe_api_key: str,
     config_manager: ConfigurationManager,
 ) -> None:
@@ -192,6 +195,7 @@ async def test_simple_search(  # noqa: WPS217, WPS218, PLR0915
         offer_simple_search = await create_offer_simple_search(
             mobile_client,
             departure_after,
+            departure_before,
             origin_cord,
             destination_cord,
             [date(1980, 2, 3)],

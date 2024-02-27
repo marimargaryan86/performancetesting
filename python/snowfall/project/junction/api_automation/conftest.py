@@ -98,10 +98,23 @@ def departure_after(departures_after: Sequence[str]) -> str:
 
 
 @pytest.fixture(scope="package", autouse=True)
+def departure_before(departures_before: Sequence[str]) -> str:
+    return departures_before[0]
+
+
+@pytest.fixture(scope="package", autouse=True)
 def departures_after(request: pytest.FixtureRequest) -> Sequence[str]:
     departures = (
         datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
     ).strftime("%Y-%m-%dT08:00:00.000Z")
+    return departures.split(",")
+
+
+@pytest.fixture(scope="package", autouse=True)
+def departures_before(request: pytest.FixtureRequest) -> Sequence[str]:
+    departures = (
+        datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+    ).strftime("%Y-%m-%dT10:00:00.000Z")
     return departures.split(",")
 
 
@@ -262,6 +275,7 @@ def add_allure_environment_property(
 def _save_properties_to_allure_file(
     add_allure_environment_property: Callable[[str, Any], None],
     departures_after: Sequence[str],
+    departures_before: Sequence[str],
 ) -> None:
     add_allure_environment_property(
         "departure_after",
@@ -270,6 +284,10 @@ def _save_properties_to_allure_file(
     add_allure_environment_property(
         "departures_after",
         departures_after,
+    )
+    add_allure_environment_property(
+        "departures_before",
+        departures_before,
     )
 
 

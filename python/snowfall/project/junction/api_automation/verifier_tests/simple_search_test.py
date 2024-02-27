@@ -35,6 +35,7 @@ async def test_verify_simple_search(  # noqa: WPS218
     mock_mobile_client: MobileApiClient,
     places_pairs: Sequence[str],
     departure_after: datetime,
+    departure_before: datetime,
 ) -> None:
     origin_cord, destination_cord = await get_place_coordinates(
         mock_mobile_client,
@@ -46,6 +47,7 @@ async def test_verify_simple_search(  # noqa: WPS218
     offer_simple_search = await create_offer_simple_search(
         mock_mobile_client,
         departure_after,
+        departure_before,
         origin_cord,
         destination_cord,
         [date(1980, 2, 3)],

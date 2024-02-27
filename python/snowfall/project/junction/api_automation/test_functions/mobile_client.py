@@ -815,6 +815,7 @@ class MobileApiClient(Client):
         origin: tuple[float, float],
         destination: tuple[float, float],
         departure_after: datetime,
+        departure_before: datetime,
         passengers_dates_of_birth: Sequence[date],
         maximum_connections: int | None = None,
         allowed_segment_types: Sequence[LegType] | None = None,
@@ -835,6 +836,7 @@ class MobileApiClient(Client):
                 "longitude": destination[1],
             },
             "departureAfter": departure_after,
+            "departureBefore": departure_before,
         }
 
         if maximum_connections is not None:
