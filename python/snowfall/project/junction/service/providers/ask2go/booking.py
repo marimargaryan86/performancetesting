@@ -87,12 +87,14 @@ class BookingHandler(object):
         booking_storage: filesystem.Storage,
         *,
         override_double_booking_check: bool,
+        offer_cache: cache.OfferCache,
     ):
         self._client = ask2go_client
         self._logger = stdout.get_logger()
         self._notifier = notifier
         self._storage = booking_storage
         self._override_double_booking_check = override_double_booking_check
+        self._cache = offer_cache
 
     async def book(
         self,
@@ -100,6 +102,7 @@ class BookingHandler(object):
         quote: cache.PriceQuote,
     ) -> models_pb2.Booking:
         new_booking = task.booking
+        offer_details = await self._cache.fetch(task.booking.trip_option.id)
 
         try:
             booking_result = await self._make_booking(
@@ -107,6 +110,7 @@ class BookingHandler(object):
                 passengers=task.passengers,
                 quote=quote,
                 metadata=task.metadata,
+                gds=offer_details.gds if offer_details else None,
             )
         except (errors.Ask2GoError, phonenumbers.NumberParseException) as error:
             if isinstance(error, errors.Ask2GoError):
@@ -181,6 +185,7 @@ class BookingHandler(object):
         passengers: Sequence[models_pb2.Passenger],
         quote: cache.PriceQuote,
         metadata: amqp_pb2.OrderMetadata,
+        gds: str | None,
     ) -> booking.Booking:
         number = phonenumbers.parse(contact_details.phone.e164_number)
         country = pycountry.countries.get(
@@ -231,6 +236,7 @@ class BookingHandler(object):
         await self._client.update_booking_billing_address(
             booking_ref_id=booking_result.id,
             transaction_id=booking_result.transaction_id,
+            gds=gds,
             override_double_booking_check=self._override_double_booking_check,
         )
         booking_result, raw_response = await self._poll_booking(booking_result)

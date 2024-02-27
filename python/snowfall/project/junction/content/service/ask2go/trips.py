@@ -2,6 +2,7 @@ import asyncio
 import zoneinfo
 from collections.abc import AsyncIterator, Iterable
 from types import MappingProxyType
+from typing import cast
 
 from snowfall.project.junction.go.v1.models_pb2 import CabinClass
 from snowfall.project.junction.provider import airports, cabin_classes
@@ -85,8 +86,12 @@ class Transformer(object):
         self,
         segment: offers.TripSegment,
     ) -> trips_pb2.Segment:
-        origin, origin_tz = self._location_to_proto(segment.origin.airport_code)
-        dest, dest_tz = self._location_to_proto(segment.destination.airport_code)
+        origin, origin_tz = self._location_to_proto(
+            cast(offers.TripOriginDestinationFlight, segment.origin).airport_code,
+        )
+        dest, dest_tz = self._location_to_proto(
+            cast(offers.TripOriginDestinationFlight, segment.destination).airport_code,
+        )
         departure_at = segment.departure.date_time.replace(
             tzinfo=zoneinfo.ZoneInfo(origin_tz),
         )

@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import Literal
 
 from snowfall.vendor.ask2go.enums import AirCabinClassType
 from snowfall.vendor.ask2go.models import offers
@@ -39,3 +40,4 @@ class CreateSearchCriteria(CamelCaseBaseModel):
     children: int = 0
     infants: int = 0
     transaction_id: uuid.UUID | None = None
+    product_type: Literal["Rail", "Flight"] | None = None

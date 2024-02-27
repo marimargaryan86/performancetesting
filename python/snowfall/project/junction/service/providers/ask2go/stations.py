@@ -12,25 +12,29 @@ async def dump_stations(
     ask2go_client: client.Ask2GoClient,
     output_file_path: str,
 ) -> None:
-    station_responses = await ask2go_client.get_train_stations()
+    station_response = await ask2go_client.get_train_stations()
     stations = [
         {
-            "id": station.identifier,
-            "name": station.name,
-            "time_zone": (
+            "identifier": ts["code"],
+            "name": ts["name"],
+            "timezone": (
                 await geocoder.TimeZoneLookup(
                     geocoding_pb2.TimeZoneLookupRequest(
                         coordinates=latlng_pb2.LatLng(
-                            latitude=station.latitude,
-                            longitude=station.longtitude,
+                            latitude=ts["latitude"],
+                            longitude=ts["longtitude"],
                         ),
                     ),
                 )
             ).time_zone.id,
-            "latitude": station.latitude,
-            "longitude": station.longtitude,
+            "latitude": ts["latitude"],
+            "longitude": ts["longtitude"],
+            "is_enabled": ts["isEnabled"],
+            "iata_country_code": ts["country"],
+            "railname": ts["railname"],
         }
-        for station in station_responses
+        for ts in station_response.json()
+        if ts["isEnabled"]
     ]
 
     async with aiofiles.open(output_file_path, "w") as out_file:

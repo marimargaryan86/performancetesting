@@ -7,9 +7,12 @@ from dateutil import relativedelta
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.go.v1 import models_pb2
-from snowfall.project.junction.provider import airports, cabin_classes, parsers
+from snowfall.project.junction.provider import cabin_classes, parsers
 from snowfall.project.junction.service.providers.ask2go import cache, models
 from snowfall.project.junction.service.providers.ask2go.constant import PROVIDER_ID
+from snowfall.project.junction.service.providers.ask2go.location_repository import (
+    LocationRepository,
+)
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2, money_pb2
@@ -23,13 +26,13 @@ _InfantMaxAge = 2
 class OfferTransformer(object):
     def __init__(
         self,
-        airport_repository: airports.AirportRepository,
+        repository: LocationRepository,
         cabin_mapping_repository: cabin_classes.CabinMappingRepository,
         offer_cache: cache.OfferCache,
         price_cache: cache.PriceQuoteCache,
         offer_ttl: datetime.timedelta,
     ):
-        self._airports = airport_repository
+        self._repository = repository
         self._cabin_mappings = cabin_mapping_repository
         self._offer_cache = offer_cache
         self._price_cache = price_cache
@@ -225,7 +228,8 @@ class OfferTransformer(object):
                         cache.OfferDetails(
                             search_id=str(offer.search_id),
                             itinerary_id=str(offer.id),
-                            brand_id=str(brand.brand_id),
+                            brand_id=brand.brand_id,
+                            gds=offer.gds,
                         ),
                         expires_at=expires_at,
                     ),
@@ -355,8 +359,8 @@ class OfferTransformer(object):
         self,
         segment: offers.TripSegment,
     ) -> offers_pb2.OfferSegment:
-        origin = self._airports.get_by_iata(segment.origin.airport_code)
-        destination = self._airports.get_by_iata(segment.destination.airport_code)
+        origin = self._repository.retrieve_by_hub(segment.origin)
+        destination = self._repository.retrieve_by_hub(segment.destination)
 
         # TODO(jyggen): does not handle multi-leg flights?
         return offers_pb2.OfferSegment(

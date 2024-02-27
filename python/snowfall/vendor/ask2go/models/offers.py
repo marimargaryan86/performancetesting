@@ -13,8 +13,16 @@ Duration = Annotated[
 ]
 
 
-class TripOriginDestination(CamelCaseBaseModel):
+class TripOriginDestinationFlight(CamelCaseBaseModel):
     airport_code: str
+
+
+class TripOriginDestinationRail(CamelCaseBaseModel):
+    trainstation_code: str
+    trainstation_name: str
+
+
+TripOriginDestination = TripOriginDestinationFlight | TripOriginDestinationRail
 
 
 class TripDepartureArrival(CamelCaseBaseModel):
@@ -69,8 +77,8 @@ class TripSegment(CamelCaseBaseModel):
     cabin: str | None = None
     aircraft: SegmentAircraft
     availability: SegmentAvailability | None = None
-    origin: TripOriginDestination
-    destination: TripOriginDestination
+    origin: TripOriginDestination = pydantic.Field(union_mode="left_to_right")
+    destination: TripOriginDestination = pydantic.Field(union_mode="left_to_right")
     departure: TripDepartureArrival
     arrival: TripDepartureArrival
     marketing_carrier: TripSegmentCarrier

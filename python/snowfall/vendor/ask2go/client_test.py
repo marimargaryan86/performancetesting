@@ -1,5 +1,6 @@
 import http
 import inspect
+from typing import Any
 
 import httpx
 import pytest
@@ -8,6 +9,20 @@ import pytest_httpx
 from snowfall.vendor.ask2go import client, errors
 
 _URL = "https://test_url/api/Airports"
+
+
+@pytest.fixture()
+def train_station() -> dict[str, Any]:
+    return {
+        "id": 19757,
+        "name": "LAROQUEBROU",
+        "code": "V16",
+        "country": "FR",
+        "latitude": 44.9643,
+        "longtitude": 2.19271,
+        "isEnabled": True,
+        "railname": "bene",
+    }
 
 
 async def test_error_message(
@@ -108,24 +123,14 @@ async def test_timeout_error_message(
 async def test_get_train_stations(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
+    train_station: dict[str, Any],
 ) -> None:
     httpx_mock.add_response(
         url="https://test_url/api/TrainStations",
         status_code=http.HTTPStatus.OK.value,
-        json=[
-            {
-                "id": 19757,
-                "name": "LAROQUEBROU",
-                "code": "V16",
-                "country": "FR",
-                "latitude": 44.9643,
-                "longtitude": 2.19271,
-                "isEnabled": True,
-                "railname": "bene",
-            },
-        ],
+        json=[train_station],
     )
-    stations = await ask2go_client.get_train_stations()
+    stations = (await ask2go_client.get_train_stations()).json()
 
     assert stations
-    assert stations[0].identifier == "19757"
+    assert stations[0]["code"] == "V16"

@@ -25,21 +25,22 @@ class Ask2GoClient(object):
         api_booking_base_url: str,
         http_client: httpx.AsyncClient,
         rate_limit_client: RateLimitClient | None = None,
+        *,
+        fake_the_bookings: bool = False,
     ) -> None:
         self._api_base_url = httpx.URL(api_base_url)
         self._api_booking_base_url = httpx.URL(api_booking_base_url)
         self._http_client = http_client
         self._rate_limit_client = rate_limit_client
+        self._fake_the_bookings = fake_the_bookings
 
-    async def get_train_stations(self) -> list[common.TrainStation]:
-        response = await self._make_request(
+    async def get_train_stations(self) -> httpx.Response:
+        return await self._make_request(
             "GET",
             self._api_base_url.copy_with(
                 path="/api/TrainStations",
             ),
         )
-
-        return [common.TrainStation(**station) for station in response.json()]
 
     async def get_airports(self) -> list[common.Airport]:
         response = await self._make_request(
@@ -102,9 +103,11 @@ class Ask2GoClient(object):
         self,
         booking_ref_id: str,
         transaction_id: str,
+        gds: str | None,
         *,
         override_double_booking_check: bool,
     ) -> booking.Booking:
+        fake_booking = self._fake_the_bookings and gds == "Travelfusion"
         response = await self._make_request(
             "PUT",
             self._api_booking_base_url.copy_with(
@@ -114,6 +117,7 @@ class Ask2GoClient(object):
                 booking_ref_id=booking_ref_id,
                 transaction_id=transaction_id,
                 override_double_booking_check=override_double_booking_check,
+                fake_booking=fake_booking,
             ),
         )
 

@@ -23,6 +23,13 @@ from snowfall.project.junction.service.providers.ask2go import (
     pricing,
     transformer,
 )
+from snowfall.project.junction.service.providers.ask2go.location_repository import (
+    LocationRepository,
+)
+from snowfall.project.junction.service.providers.ask2go.train_stations import (
+    TrainStation,
+    TrainStationRepository,
+)
 from snowfall.stdlib import h3
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
@@ -30,6 +37,19 @@ from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.adapter import Adapter
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
+
+
+@pytest.fixture()
+def train_station_repository() -> TrainStationRepository:
+    return TrainStationRepository([])
+
+
+@pytest.fixture()
+def location_repository(
+    airport_repository: airports.AirportRepository,
+    train_station_repository: TrainStationRepository,
+) -> LocationRepository:
+    return LocationRepository(airport_repository, train_station_repository)
 
 
 async def load_json_fixture(
@@ -154,12 +174,12 @@ def pricing_adapter(
 
 @pytest.fixture()
 def offer_transformer(
-    airport_repository: airports.AirportRepository,
+    location_repository: LocationRepository,
     provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
     redis_client: aioredis.Redis[bytes],
 ) -> transformer.OfferTransformer:
     return transformer.OfferTransformer(
-        airport_repository=airport_repository,
+        repository=location_repository,
         cabin_mapping_repository=provider_cabin_class_mapping,
         offer_cache=cache.OfferCache(
             client=redis.Client(redis_client),
@@ -182,11 +202,23 @@ def h3_mapping_repository(
 
 
 @pytest.fixture()
+def stations_h3_mapping(
+    train_station_repository: TrainStationRepository,
+) -> h3.H3MappingRepository[TrainStation]:
+    return h3.H3MappingRepository[TrainStation](
+        mapping=train_station_repository.all_(),
+        resolution=7,
+    )
+
+
+@pytest.fixture()
 def criteria_generator(
     h3_mapping_repository: h3.H3MappingRepository[airports.Airport],
+    stations_h3_mapping: h3.H3MappingRepository[TrainStation],
 ) -> criteria.CriteriaGenerator:
     return criteria.CriteriaGenerator(
         h3_mapping=h3_mapping_repository,
+        stations_h3_mapping=stations_h3_mapping,
         reseller_id_affiliate_id_map={"test-reseller": "test-affiliate"},
     )
 
@@ -198,8 +230,14 @@ async def storage() -> AsyncIterator[filesystem.Storage]:
 
 
 @pytest.fixture()
+def offer_cache(redis_client: aioredis.Redis[bytes]) -> cache.OfferCache:
+    return cache.OfferCache(client=redis.Client(redis_client))
+
+
+@pytest.fixture()
 def booking_handler(
     ask2go_client: client.Ask2GoClient,
+    offer_cache: cache.OfferCache,
     storage: filesystem.Storage,
 ) -> booking.BookingHandler:
     return booking.BookingHandler(
@@ -207,6 +245,7 @@ def booking_handler(
         notifier=notifications.LogNotifier(),
         booking_storage=storage,
         override_double_booking_check=False,
+        offer_cache=offer_cache,
     )
 
 

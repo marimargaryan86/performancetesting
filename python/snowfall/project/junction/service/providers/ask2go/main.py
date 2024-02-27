@@ -4,6 +4,7 @@ import contextlib
 import datetime
 import pathlib
 import random
+import zoneinfo
 from collections.abc import Sequence
 
 import aiosmtplib
@@ -21,6 +22,7 @@ from snowfall.project.junction.provider import (
     notifications,
     offers,
     service,
+    simple_offers,
 )
 from snowfall.project.junction.service.providers.ask2go import (
     booking,
@@ -35,6 +37,15 @@ from snowfall.project.junction.service.providers.ask2go import (
 )
 from snowfall.project.junction.service.providers.ask2go import offers as a2g_offers
 from snowfall.project.junction.service.providers.ask2go.constant import PROVIDER_ID
+from snowfall.project.junction.service.providers.ask2go.location_repository import (
+    LocationRepository,
+)
+from snowfall.project.junction.service.providers.ask2go.train_stations import (
+    ASK2GO_RESOURCE,
+    ASK2GO_STATIONS_PACKAGE,
+    TrainStation,
+    TrainStationRepository,
+)
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
@@ -45,7 +56,6 @@ from snowfall.stdlib.service import amqp_factory, grpc_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
-from snowfall.vendor.ask2go.adapter import Adapter
 from snowfall.vendor.ask2go.models import search as search_models
 from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
@@ -195,6 +205,14 @@ async def _offers(
     airport_repo = airports.AirportRepository(
         airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
     )
+    json_data = filesystem.PkgLoader(ASK2GO_STATIONS_PACKAGE).load(
+        ASK2GO_RESOURCE,
+    )
+    train_station_repo = TrainStationRepository([
+        TrainStation(**{**data, "timezone": zoneinfo.ZoneInfo(data["timezone"])})
+        for data in json_data
+    ])
+    location_repository = LocationRepository(airport_repo, train_station_repo)
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
@@ -205,19 +223,19 @@ async def _offers(
                 mapping=airport_repo.all_(),
                 resolution=7,
             ),
+            stations_h3_mapping=h3.H3MappingRepository[TrainStation](
+                mapping=train_station_repo.all_(),
+                resolution=7,
+            ),
             reseller_id_affiliate_id_map=app.settings.reseller_affiliate_mapping,
             min_lower_bound=app.settings.min_lower_bound,
         ).from_search,
         search_criteria_generator=search.search_criteria_generator,
         offer_group_cache_key_generator=search.generate_cache_key,
         offer_group_generator=a2g_offers.offer_group_generator(
-            a2g_adapter=Adapter(
-                ask2go_client=ask2go_client,
-                poll_retries_limit=app.settings.poll_retries_limit,
-                wait_time_between_polling=app.settings.wait_time_between_polling,
-            ),
+            a2g_adapter=search.Adapter(ask2go_client=ask2go_client),
             a2g_transformer=transformer.OfferTransformer(
-                airport_repository=airport_repo,
+                repository=location_repository,
                 cabin_mapping_repository=cabin_classes.CabinMappingRepository(
                     mongo.ask2go.provider_cabin_mapping,
                 ),
@@ -239,6 +257,103 @@ async def _offers(
     )
 
 
+def simple_criteria_generator(
+    search_criteria: search_models.CreateSearchCriteria,
+) -> search_models.CreateSearchCriteria:
+    return search_criteria
+
+
+async def _simple_offers(
+    app: service.Application[_Settings],
+    amqp_conn: abc.AbstractConnection,
+    redis_conn: aioredis.Redis[bytes],
+    stack: contextlib.AsyncExitStack,
+) -> simple_offers.SimpleOfferSearchImplementation[search_models.CreateSearchCriteria]:
+    http_client = await stack.enter_async_context(
+        httpx.AsyncClient(
+            timeout=app.settings.http_timeout,
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+
+    rate_limit_client = RateLimitClient(
+        gubernator_pb2_grpc.V1Stub(
+            await grpc_factory.make_insecure_channel(
+                app,
+                app.settings.rate_limiter_grpc_host,
+            ),
+        ),
+        app.settings.rate_limiter_service_configs["ask2go"],
+    )
+
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
+        http_client=http_client,
+        rate_limit_client=rate_limit_client,
+    )
+
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    airport_repo = airports.AirportRepository(
+        airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
+    )
+    json_data = filesystem.PkgLoader(ASK2GO_STATIONS_PACKAGE).load(
+        ASK2GO_RESOURCE,
+    )
+    train_station_repo = TrainStationRepository([
+        TrainStation(**{**data, "timezone": zoneinfo.ZoneInfo(data["timezone"])})
+        for data in json_data
+    ])
+    location_repository = LocationRepository(airport_repo, train_station_repo)
+
+    offer_group_generator = a2g_offers.offer_group_generator(
+        a2g_adapter=search.Adapter(ask2go_client=ask2go_client),
+        a2g_transformer=transformer.OfferTransformer(
+            repository=location_repository,
+            cabin_mapping_repository=cabin_classes.CabinMappingRepository(
+                mongo.ask2go.provider_cabin_mapping,
+            ),
+            offer_cache=cache.OfferCache(
+                client=redis.Client[bytes](
+                    redis_conn,
+                    prefix=app.name,
+                ),
+            ),
+            price_cache=cache.PriceQuoteCache(
+                client=redis.Client[bytes](
+                    redis_conn,
+                    prefix=app.name,
+                ),
+            ),
+            offer_ttl=app.settings.ttl,
+        ),
+    )
+
+    search_criteria_task_generator = criteria.CriteriaGenerator(
+        h3_mapping=h3.H3MappingRepository[airports.Airport](
+            mapping=airport_repo.all_(),
+            resolution=7,
+        ),
+        stations_h3_mapping=h3.H3MappingRepository[TrainStation](
+            mapping=train_station_repo.all_(),
+            resolution=7,
+        ),
+        reseller_id_affiliate_id_map=app.settings.reseller_affiliate_mapping,
+        min_lower_bound=app.settings.min_lower_bound,
+    ).criteria_generator
+
+    return simple_offers.SimpleOfferSearchImplementation(
+        search_criteria_task_generator=search_criteria_task_generator,
+        search_criteria_generator=simple_criteria_generator,
+        offer_group_cache_key_generator=search.generate_cache_key,
+        offer_group_generator=offer_group_generator,
+    )
+
+
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
     http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
@@ -257,6 +372,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
         api_base_url=str(app.settings.api_base_url),
         api_booking_base_url=str(app.settings.api_booking_base_url),
         http_client=http_client,
+        fake_the_bookings=app.environment != "production",
     )
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
@@ -287,6 +403,7 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
             ),
             booking_storage=storage,
             override_double_booking_check=app.settings.override_double_booking_check,
+            offer_cache=cache.OfferCache(client=redis_client),
         ),
         price_quote_cache=cache.PriceQuoteCache(
             client=redis_client,
@@ -357,6 +474,18 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
         rate_limit_client=rate_limit_client,
     )
 
+    airport_repo = airports.AirportRepository(
+        airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
+    )
+    json_data = filesystem.PkgLoader(ASK2GO_STATIONS_PACKAGE).load(
+        ASK2GO_RESOURCE,
+    )
+    train_station_repo = TrainStationRepository([
+        TrainStation(**{**data, "timezone": zoneinfo.ZoneInfo(data["timezone"])})
+        for data in json_data
+    ])
+    location_repository = LocationRepository(airport_repo, train_station_repo)
+
     await consumer.PriceQuoteConsumer(
         consumer_obj=amqp_consumer.Consumer(
             connection=amqp_connection,
@@ -371,11 +500,7 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
             client=redis_client,
         ),
         offer_transformer=transformer.OfferTransformer(
-            airport_repository=airports.AirportRepository(
-                airports_data=filesystem.PkgLoader("snowfall.data").load(
-                    "airports.json",
-                ),
-            ),
+            repository=location_repository,
             cabin_mapping_repository=cabin_classes.CabinMappingRepository(
                 mongo.ask2go.provider_cabin_mapping,
             ),
@@ -449,6 +574,7 @@ if __name__ == "__main__":
         meta_factory=_meta_factory,
         offers_factory=_offers,
         bookings_factory=_bookings_factory,
+        simple_offers_factory=_simple_offers,
     )
 
     entrypoint.enter_with_commands(

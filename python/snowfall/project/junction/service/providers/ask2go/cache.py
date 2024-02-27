@@ -8,6 +8,7 @@ class OfferDetails(RedisRecord):
     search_id: str
     itinerary_id: str
     brand_id: str | None = None
+    gds: str | None = None
 
 
 class OfferCache(RedisRepository[OfferDetails]):

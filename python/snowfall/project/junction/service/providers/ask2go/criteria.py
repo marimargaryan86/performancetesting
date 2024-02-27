@@ -1,33 +1,42 @@
 import datetime
 import itertools
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Collection, Iterator, Mapping, Sequence
 
 import more_itertools
+from geopy import distance
 
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.provider import airports, segment_grouper
+from snowfall.project.junction.service.providers.ask2go.train_stations import (
+    TrainStation,
+)
 from snowfall.project.junction.service.providers.ask2go.v1 import (
     amqp_pb2 as provider_amqp_pb2,
 )
 from snowfall.stdlib import h3
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.ask2go import enums
+from snowfall.vendor.ask2go.models import search as search_models
 
 _ADULT_YEARS = 12
 _CHILD_YEARS = 2
+_AFFILIATE_ID = 24
 
 
 class CriteriaGenerator(object):
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[airports.Airport],
+        stations_h3_mapping: h3.H3MappingRepository[TrainStation],
         reseller_id_affiliate_id_map: Mapping[str, str],
         min_lower_bound: datetime.timedelta | None = None,
     ):
         self._mapping = h3_mapping
+        self._stations_mapping = stations_h3_mapping
         self._reseller_id_affiliate_id_map = reseller_id_affiliate_id_map
         self._grouper = segment_grouper.SegmentGrouper(h3_mapping, min_lower_bound)
 
@@ -60,6 +69,73 @@ class CriteriaGenerator(object):
             )
 
         return tasks
+
+    def criteria_generator(
+        self,
+        simple_search: offer_models_pb2.SimpleTripOfferSearch,
+    ) -> list[search_models.CreateSearchCriteria]:
+        allowed_segment_types = simple_search.allowed_segment_types
+        if models_pb2.Schedule.TYPE_RAIL in allowed_segment_types:
+            origins = self._stations_mapping.find_mapped_values(
+                coordinates=simple_search.origin.coordinates,
+                neighbour_search_radius=1,
+            )
+            destinations = self._stations_mapping.find_mapped_values(
+                coordinates=simple_search.destination.coordinates,
+                neighbour_search_radius=1,
+            )
+
+            if not origins or not destinations:
+                return []
+
+            return create_criteria_time_windows(origins, destinations, simple_search)
+        return []
+
+
+def create_criteria_time_windows(
+    origins: Collection[TrainStation],
+    destinations: Collection[TrainStation],
+    search: offer_models_pb2.SimpleTripOfferSearch,
+) -> list[search_models.CreateSearchCriteria]:
+    timestamps = []
+    departure_at = protobuf.protobuf_to_datetime(search.departure_at)
+
+    if search.HasField("departure_before"):
+        departure_before = protobuf.protobuf_to_datetime(search.departure_before)
+    else:
+        departure_before = departure_at + datetime.timedelta(days=1)
+
+    while departure_at < departure_before:
+        timestamps.append(departure_at)
+        departure_at += datetime.timedelta(hours=2)
+
+    number_of_types = get_num_of_passenger_types(
+        passenger_dobs=[
+            protobuf.protobuf_to_date(passenger.date_of_birth)
+            for passenger in search.passengers
+        ],
+        date_of_travel=departure_at.date(),
+    )
+
+    return [
+        search_models.CreateSearchCriteria(
+            origin_iata=_find_nearest_place(
+                origins,
+                search.origin.coordinates,
+            ),
+            destination_iata=_find_nearest_place(
+                destinations,
+                search.destination.coordinates,
+            ),
+            outbound_date=timestamp,
+            adults=number_of_types[0],
+            children=number_of_types[1],
+            infants=number_of_types[2],
+            affiliate_id=_AFFILIATE_ID,
+            product_type="Rail",
+        )
+        for timestamp in timestamps
+    ]
 
 
 def _generate_search_criteria(
@@ -153,3 +229,17 @@ def _get_age_at_date(birth_date: datetime.date, travel_date: datetime.date) -> i
     return year_difference - (
         (travel_date.month, travel_date.day) < (birth_date.month, birth_date.day)
     )
+
+
+def _find_nearest_place(
+    stations: Collection[h3.CoordinatesItem],
+    coordinates: latlng_pb2.LatLng,
+) -> str:
+    coords = coordinates.latitude, coordinates.longitude
+    return min(
+        stations,
+        key=lambda station: distance.distance(
+            coords,
+            (station.latitude, station.longitude),
+        ),
+    ).identifier

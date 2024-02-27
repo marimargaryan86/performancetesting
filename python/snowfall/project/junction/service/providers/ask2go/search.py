@@ -1,12 +1,17 @@
 import datetime
 import math
 import uuid
+from collections.abc import AsyncIterator
+
+import tenacity
+from starlette import status
 
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.ask2go import enums
-from snowfall.vendor.ask2go.models import search
+from snowfall.stdlib.logging import stdout
+from snowfall.vendor.ask2go import client, enums, errors
+from snowfall.vendor.ask2go.models import offers, search
 
 _WINDOW_SIZE = 6
 
@@ -85,3 +90,93 @@ def generate_cache_key(search_criteria: search.CreateSearchCriteria) -> str:
             ],
         ),
     )
+
+
+class NoResultsError(Exception):
+    """Raised when a result page has not results."""
+
+
+class ResultsNotReadyError(Exception):
+    """Raised when results haven't been processed yet."""
+
+
+class Adapter(object):
+    def __init__(
+        self,
+        ask2go_client: client.Ask2GoClient,
+    ):
+        self._client = ask2go_client
+        self._logger = stdout.get_logger()
+
+    async def gather_search_results(
+        self,
+        search_criteria: search.CreateSearchCriteria,
+    ) -> AsyncIterator[offers.Offer]:
+        identifiers = await self._client.create_search(criteria=search_criteria)
+
+        async for offer in self._gather_offers(identifiers):
+            yield offer
+
+    async def _gather_offers(
+        self,
+        identifiers: search.CreateSearchResponse,
+    ) -> AsyncIterator[offers.Offer]:
+        async for result_page in self._yield_pages(identifiers=identifiers):
+            for offer in result_page.flight:
+                offer.search_id = identifiers.id
+                yield offer
+
+    async def _yield_pages(
+        self,
+        identifiers: search.CreateSearchResponse,
+    ) -> AsyncIterator[search.SearchResultsResponse]:
+        page = 0
+        total_pages = 1
+
+        while page < total_pages:
+            try:
+                search_result = await self._get_page(identifiers=identifiers, page=page)
+            except NoResultsError:
+                self._logger.info(
+                    "Search returned no results.",
+                    search=repr(identifiers),
+                )
+                return
+            except ResultsNotReadyError:
+                self._logger.info(
+                    "Abandoned at page after waiting too long for results.",
+                    page=page,
+                    total_pages=total_pages,
+                    search=repr(identifiers),
+                )
+                return
+            yield search_result
+            total_pages = search_result.page_information.total_pages
+            page += 1
+
+    @tenacity.retry(
+        stop=tenacity.stop_after_delay(20),  # noqa: WPS432
+        wait=tenacity.wait_random_exponential(multiplier=1, max=5),
+        reraise=True,
+        retry=tenacity.retry_if_not_exception_type(NoResultsError),
+    )
+    async def _get_page(
+        self,
+        identifiers: search.CreateSearchResponse,
+        page: int,
+    ) -> search.SearchResultsResponse:
+        try:
+            search_result = await self._client.get_search_results(
+                search_id=identifiers.id,
+                transaction_id=identifiers.transaction_id,
+                page_offset=page,
+            )
+        except errors.HttpStatusError as exc:
+            if exc.response.status_code == status.HTTP_404_NOT_FOUND:
+                raise NoResultsError("No results found.") from exc
+            raise
+
+        if search_result.is_finished:
+            return search_result
+
+        raise ResultsNotReadyError("Results not ready.")

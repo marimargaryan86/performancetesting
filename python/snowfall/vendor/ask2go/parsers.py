@@ -60,6 +60,7 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
         "cabinClass": criteria.cabin_class.value,
         "direction": direction,
         "searchCriteria": search_criteria,
+        "productType": criteria.product_type,
     }
 
     if criteria.transaction_id:
@@ -138,8 +139,9 @@ def parse_update_booking_request(
     transaction_id: str,
     *,
     override_double_booking_check: bool,
+    fake_booking: bool,
 ) -> dict[str, Any]:
-    return {
+    doc = {
         "id": booking_ref_id,
         "transactionId": transaction_id,
         "billingDetails": {
@@ -156,6 +158,16 @@ def parse_update_booking_request(
         "isInvoiceRequested": True,
         "overrideDoubleBookingCheck": override_double_booking_check,
     }
+    if fake_booking:
+        doc.update({
+            "fakeBooking": {
+                "isFakeBooking": True,
+                "returnBookingStatus": "Unknown",
+                "delaySeconds": 0,
+            },
+        })
+
+    return doc
 
 
 def parse_validated_offer_criteria(

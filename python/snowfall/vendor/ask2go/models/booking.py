@@ -34,9 +34,9 @@ class FareRule(CamelCaseBaseModel):
 
 
 class FareRules(CamelCaseBaseModel):
-    origin: str
-    destination: str
-    fare_basis: str
+    origin: str | None = None
+    destination: str | None = None
+    fare_basis: str | None = None
     fare_rule: list[FareRule]
 
 
