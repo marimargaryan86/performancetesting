@@ -5,6 +5,8 @@ python_sources(
         ":benerail_stations",
         ":train_stations",
         ":ask2go_stations",
+        ":df_ports",
+        ":distribusion_stations",
     ]
 )
 python_image(
@@ -58,5 +60,25 @@ resource(
         len=1366659,
         sha256="084eca6b645d07a6f51e5cdadcff69a0ca11116e06c5fb22f545e03d11d36708",
         filename="ask2go_stations.json",
+    ),
+)
+
+resource(
+    name="df_ports",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/df-ports-864b8ea4b32d91b1009a3e1ed7a1789ce31b13e643ce94d2fa3a7e3576c406f9.json",
+        len=95798,
+        sha256="864b8ea4b32d91b1009a3e1ed7a1789ce31b13e643ce94d2fa3a7e3576c406f9",
+        filename="ports.json",
+    ),
+)
+
+resource(
+    name="distribusion_stations",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/distribusion_stations-50454d9147d33df2bb6815d093885368599d5b86901b9d992e38207a67bd9cc8.json",
+        len=4569411,
+        sha256="50454d9147d33df2bb6815d093885368599d5b86901b9d992e38207a67bd9cc8",
+        filename="distribusion.json",
     ),
 )

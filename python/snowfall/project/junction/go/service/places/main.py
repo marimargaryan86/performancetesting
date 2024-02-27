@@ -84,6 +84,16 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
         "ask2go_stations.json",
     )
 
+    df_json = pkgutil.get_data(
+        "snowfall.project.junction.go.service.places.main",
+        "ports.json",
+    )
+
+    dbs_json = pkgutil.get_data(
+        "snowfall.project.junction.go.service.places.main",
+        "distribusion.json",
+    )
+
     provider_json: ProviderTypedDict = {
         models_pb2.Location.TYPE_RAILWAY_STATION: {
             constant.BENERAIL_ID: (
@@ -97,6 +107,12 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
             constant.ASK2GO_ID: json.loads(ask2go_json.decode("utf-8"))
             if ask2go_json
             else [],
+        },
+        models_pb2.Location.TYPE_FERRY_PORT: {
+            constant.DF_ID: json.loads(df_json.decode("utf-8")) if df_json else [],
+        },
+        models_pb2.Location.TYPE_BUS_STATION: {
+            constant.DBS_ID: json.loads(dbs_json.decode("utf-8")) if dbs_json else [],
         },
     }
 
