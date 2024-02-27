@@ -3,7 +3,6 @@
 </script>
 
 <script lang="ts">
-  import { dev } from "$app/environment";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";
@@ -48,32 +47,28 @@
   </title>
 </svelte:head>
 
-{#if !dev}
-  <div />
-{:else}
-  <StandardLayout pageTitle={$t("pages.pay.pages.accounts.title")} bind:searchQuery>
-    <div class="wrapper">
-      <h2 typography="title-medium" weight="bold">
-        {$t("words.subAccounts")}
-      </h2>
+<StandardLayout pageTitle={$t("pages.pay.pages.accounts.title")} bind:searchQuery>
+  <div class="wrapper">
+    <h2 typography="title-medium" weight="bold">
+      {$t("words.subAccounts")}
+    </h2>
 
-      <ul class="accounts" use:scrollLoad={{ func: loadMore }}>
-        {#each accounts as account (account.id)}
-          <li>
-            <a
-              href={routeConfig.routes.pay.routes.accounts.routes.account(account.id).root}
-              class="account"
-            >
-              <EntityAvatar name={account.name} size="72px" />
-              <span class="account-name" typography="body-large">{account.name}</span>
-              <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
-            </a>
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </StandardLayout>
-{/if}
+    <ul class="accounts" use:scrollLoad={{ func: loadMore }}>
+      {#each accounts as account (account.id)}
+        <li>
+          <a
+            href={routeConfig.routes.pay.routes.accounts.routes.account(account.id).root}
+            class="account"
+          >
+            <EntityAvatar name={account.name} size="72px" />
+            <span class="account-name" typography="body-large">{account.name}</span>
+            <ChevronIcon size="20px" color="var(--color-main-neutral-700)" />
+          </a>
+        </li>
+      {/each}
+    </ul>
+  </div>
+</StandardLayout>
 
 <style>
   .wrapper {

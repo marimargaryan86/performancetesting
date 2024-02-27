@@ -3,7 +3,6 @@
 </script>
 
 <script lang="ts">
-  import { dev } from "$app/environment";
   import { capitalize } from "$lib/utils/common";
   import routeConfig from "$lib/route-config";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
@@ -51,69 +50,65 @@
   <title>{getPageTitle("Junction Hub", "Pay", "Beneficiaries")}</title>
 </svelte:head>
 
-{#if !dev}
-  <div />
-{:else}
-  <StandardLayout pageTitle="Beneficiaries">
-    <a
-      variant="primary"
-      size="small"
-      href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
-      slot="actions"
-    >
-      Add Beneficiary
-      <Icon variant="plus" size="20px" />
-    </a>
+<StandardLayout pageTitle="Beneficiaries">
+  <a
+    variant="primary"
+    size="small"
+    href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary().root}
+    slot="actions"
+  >
+    Add Beneficiary
+    <Icon variant="plus" size="20px" />
+  </a>
 
-    <x-table
-      class="beneficiaries-table"
-      use:scrollLoad={{ func: loadMore, pending }}
-      style:grid-template-columns="2fr repeat(3, 1fr) min-content"
-    >
-      <x-thead>
-        <x-th>Company</x-th>
-        <x-th>Currency</x-th>
-        <x-th>Bank Country</x-th>
-        <x-th>Type</x-th>
-        <x-th />
-      </x-thead>
+  <x-table
+    class="beneficiaries-table"
+    use:scrollLoad={{ func: loadMore, pending }}
+    style:grid-template-columns="2fr repeat(3, 1fr) min-content"
+  >
+    <x-thead>
+      <x-th>Company</x-th>
+      <x-th>Currency</x-th>
+      <x-th>Bank Country</x-th>
+      <x-th>Type</x-th>
+      <x-th />
+    </x-thead>
 
-      {#each beneficiaries as item (item.id)}
-        {@const currency = currencyData.mapping[item.currencyId]}
+    {#each beneficiaries as item (item.id)}
+      {@const currency = currencyData.mapping[item.currencyId]}
 
-        <x-tr>
-          <x-td class="company-name">{item.bankAccountHolderName}</x-td>
-          <x-td class="currency">
-            <strong typography="body-medium" weight="bold">{item.currencyId}</strong>
-            <span typography="body-small">{currency?.name ?? ""}</span>
-          </x-td>
-          <x-td>{item.bankDetails.address.countryCode}</x-td>
-          <x-td>{capitalize(item.bankDetails.paymentType)}</x-td>
-          <x-tactions>
-            <a
-              href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
-              class="action"
-            >
-              <Icon variant="edit" size="32px" />
-            </a>
+      <x-tr>
+        <x-td class="company-name">{item.bankAccountHolderName}</x-td>
+        <x-td class="currency">
+          <strong typography="body-medium" weight="bold">{item.currencyId}</strong>
+          <span typography="body-small">{currency?.name ?? ""}</span>
+        </x-td>
+        <x-td>{item.bankDetails.address.countryCode}</x-td>
+        <x-td>{capitalize(item.bankDetails.paymentType)}</x-td>
+        <x-tactions>
+          <a
+            href={routeConfig.routes.pay.routes.beneficiaries.routes.beneficiary(item.id).root}
+            class="action"
+          >
+            <Icon variant="edit" size="32px" />
+          </a>
 
-            <button on:click={remove.bind(remove)} class="action">
-              <Icon variant="remove-trash" size="32px" />
-            </button>
+          <button on:click={remove.bind(remove)} class="action">
+            <Icon variant="remove-trash" size="32px" />
+          </button>
 
-            <button class="outline action" typography="body-medium" weight="bold">Pay</button>
-          </x-tactions>
-        </x-tr>
-      {/each}
+          <button class="outline action" typography="body-medium" weight="bold">Pay</button>
+        </x-tactions>
+      </x-tr>
+    {/each}
 
-      {#if $pending}
-        <x-tloading transition:slideFade={{ duration: 200 }}>
-          <LoadingIcon color="var(--color-main-primary-500)" />
-        </x-tloading>
-      {/if}
-    </x-table>
-  </StandardLayout>
-{/if}
+    {#if $pending}
+      <x-tloading transition:slideFade={{ duration: 200 }}>
+        <LoadingIcon color="var(--color-main-primary-500)" />
+      </x-tloading>
+    {/if}
+  </x-table>
+</StandardLayout>
 
 <style>
   .beneficiaries-table {
