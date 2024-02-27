@@ -3,6 +3,7 @@
   "name": "@snowfall/monorepo",
   "private": true,
   "workspaces": [
+    "configs/*",
     "hub-web",
     "fti-web"
   ],
