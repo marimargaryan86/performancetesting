@@ -38,7 +38,6 @@ const selectedOfferModel = z.object({
 });
 type SelectedOffer = z.infer<typeof selectedOfferModel>;
 export type PartialSelectedOfferData = {
-  offer?: MobileSchemas.Offer;
   outbound?: MobileSchemas.OfferOption;
   inbound?: MobileSchemas.OfferOption;
 };

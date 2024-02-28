@@ -52,7 +52,7 @@
   function select(proceed: boolean, event: ComponentEvents<OfferGroup>["select"]): void {
     selected[tripDirection] = event.detail.option;
 
-    selected.offer = getOffer({
+    const offer = getOffer({
       offers,
       tripType,
       outbound: selected.outbound,
@@ -60,7 +60,7 @@
     });
 
     // Remove inbound option if it doesn't exist within the offer
-    if (!selected.offer && selected.inbound) {
+    if (!offer && selected.inbound) {
       selected.inbound = undefined;
     }
 

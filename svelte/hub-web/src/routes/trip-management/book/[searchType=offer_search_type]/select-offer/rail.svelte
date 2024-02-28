@@ -25,6 +25,7 @@
   import SearchOptions from "$lib/components/pages/trip-management/book/select-offer/rail-components/search-options.svelte";
   import { getOfferSortFunc, type OfferSortOption } from "$lib/sorting/offer";
   import { getOfferFilterFunc } from "$lib/filters/offer";
+  import { getOffer } from "$lib/utils/offer";
 
   const featureTools = getFeatureTools();
   const t = getTranslator();
@@ -47,13 +48,8 @@
   }
 
   function updateSelection(offer: MobileSchemas.Offer): void {
-    const offerId = data.bookingSession.selectedOffer?.offerId;
     const outboundId = data.bookingSession.selectedOffer?.optionIds?.[0];
     const inboundId = data.bookingSession.selectedOffer?.optionIds?.[1];
-
-    if (offerId && !selected.offer && offer.id === offerId) {
-      selected.offer = offer;
-    }
 
     if (outboundId && !selected.outbound) {
       selected.outbound = offer.groups
@@ -110,13 +106,10 @@
       return;
     }
 
-    const { offer, inbound, outbound } = selected;
+    const { inbound, outbound } = selected;
+    const offer = getOffer({ offers, tripType: searchData.tripType, outbound, inbound });
 
-    if (!(offer && outbound)) {
-      return;
-    }
-
-    if (searchData.tripType === "round-trip" && !inbound) {
+    if (!offer) {
       return;
     }
 
@@ -190,6 +183,7 @@
   {/key}
 
   <Checkout
+    {offers}
     {selected}
     {tripDirection}
     tripType={searchData.tripType}

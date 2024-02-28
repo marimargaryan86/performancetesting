@@ -8,6 +8,8 @@
   import { writable, type Writable } from "svelte/store";
   import TripSummary from "./trip-summary.svelte";
   import type { TripDirection } from "$lib/models/trip";
+  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
+  import { getOffer } from "$lib/utils/offer";
 
   const t = getTranslator();
   const locale = getLocale();
@@ -16,15 +18,16 @@
     changedirection: TripDirection;
   }>();
 
+  export let offers: MobileSchemas.Offer[];
   export let tripType: TripType;
   export let selected: PartialSelectedOfferData;
   export let tripDirection: TripDirection;
 
   const pending = writable(false);
 
-  $: offer = selected.offer;
   $: outbound = selected.outbound;
   $: inbound = selected.inbound;
+  $: offer = getOffer({ offers, tripType, outbound, inbound });
   $: totalPrice = outbound
     ? {
         amount: outbound.price.total.amount + (inbound?.price.total.amount ?? 0),

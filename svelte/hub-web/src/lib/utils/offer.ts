@@ -91,8 +91,8 @@ export function getOffer({
 
     return offers.find(
       (item) =>
-        item.groups.find((group) => group.optionIds.includes(outbound.id)) &&
-        item.groups.find((group) => group.optionIds.includes(inbound.id)),
+        item.groups.some((group) => group.optionIds.includes(outbound.id)) &&
+        item.groups.some((group) => group.optionIds.includes(inbound.id)),
     );
   }
 
@@ -100,7 +100,7 @@ export function getOffer({
     return undefined;
   }
 
-  return offers.find((item) => item.groups.find((group) => group.optionIds.includes(outbound.id)));
+  return offers.find((item) => item.groups.some((group) => group.optionIds.includes(outbound.id)));
 }
 
 export function getLegExtremes(details: MobileSchemas.TripOfferGroupDetails | undefined): {
