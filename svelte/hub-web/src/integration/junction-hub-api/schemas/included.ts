@@ -77,35 +77,35 @@ const parserMapping: {
 };
 
 function orderIncluded(included: IncludedMapping): IncludedMapping {
-  // TripBookingDetails legs (must be sorted before Booking details)
-  included.tripBookingDetails?.forEach((details) => {
-    details.legs.sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
-  });
-
-  // Booking details (must be sorted before Order bookings)
-  included.tripBookings?.forEach((booking) => {
-    booking.detailsList.sort(
+  included.tripBookingDetails?.forEach((item) =>
+    item.legs.sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime()),
+  );
+  included.tripBookings?.forEach((item) =>
+    item.detailsList.sort(
       (a, b) => (a.legs[0]?.departureAt.getTime() ?? 0) - (b.legs[0]?.departureAt.getTime() ?? 0),
-    );
-  });
-
-  // Order bookings (must be sorted before Order journeys)
-  included.orders?.forEach((order) => {
-    order.bookings.sort(
+    ),
+  );
+  included.orders?.forEach((item) =>
+    item.bookings.sort(
       (a, b) =>
         (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
         (b.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
-    );
-  });
-
-  // Journey orders
-  included.journeys?.forEach((journey) => {
-    journey.orders.sort(
+    ),
+  );
+  included.journeys?.forEach((item) =>
+    item.orders.sort(
       (a, b) =>
         (a.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
         (b.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
-    );
-  });
+    ),
+  );
+  included.journeys?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  included.transactions?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  included.orders?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  included.conversions?.sort(
+    (a, b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0),
+  );
+  included.bills?.sort((a, b) => (a.updatedAt?.getTime() ?? 0) - (b.updatedAt?.getTime() ?? 0));
 
   return included;
 }
