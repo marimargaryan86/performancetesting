@@ -116,6 +116,10 @@ A good example of the reason for this configurable is to only have an operator b
 returned from Provider A, rather than B and C also, if the rates with A are more
 favourable.
 
+#### Apply Globally
+
+In some situations it may be the case that we want to disable an operator for **ALL** resellers. In that scenario setting the `RESELLER_ID` in the json config to `"*"` will apply it to every reseller.
+
 ### Reseller Pay Companies
 
 #### Consul Key
