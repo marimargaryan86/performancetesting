@@ -34,6 +34,25 @@ export function getLegsFromPriceQuote(
   );
 }
 
+type LegSequenceTuple = [
+  CommonSchemas.OfferSegmentLeg,
+  MobileSchemas.TripOfferGroupDetails["sequences"]["trip"],
+];
+
+export function getLegsAndSequencesFromPriceQuote(
+  priceQuote: MobileSchemas.TripOfferPriceQuote,
+): LegSequenceTuple[] {
+  return (
+    priceQuote.offer?.groups
+      .flatMap((group) =>
+        group.detailsList.flatMap((details) =>
+          details.legs.map((leg) => [leg, details.sequences.trip] as LegSequenceTuple),
+        ),
+      )
+      .sort((a, b) => a[0].departureAt.getTime() - b[0].departureAt.getTime()) ?? []
+  );
+}
+
 export function getGroups(
   offers: MobileSchemas.Offer[],
   tripType: TripType,
