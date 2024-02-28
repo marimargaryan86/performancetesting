@@ -51,7 +51,7 @@
   .search-wrapper {
     display: flex;
     flex-flow: column;
-    gap: 24px;
+    gap: 16px;
     max-width: 1154px;
     margin: 24px;
     padding: 16px 24px;

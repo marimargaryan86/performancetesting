@@ -23,13 +23,6 @@
   import type { SearchData } from "$lib/booking-manager/booking-manager";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
 
-  export let data: PartialTripSearchData = {
-    tripType: "one-way",
-    passengers: getDefaultValue(),
-    outbound: getClosestFullHour(true),
-  };
-  let errors: TripSearchDataError | undefined = undefined;
-
   const featureTools = getFeatureTools();
   const dispatch = createEventDispatcher<{
     search: { data: SearchData; pending: Writable<boolean> };
@@ -39,6 +32,13 @@
   const today = new Date();
   today.setSeconds(0);
   today.setMinutes(0);
+
+  export let data: PartialTripSearchData = {
+    tripType: $featureTools.hasFeature(Feature.ROUND_TRIP) ? "round-trip" : "one-way",
+    passengers: getDefaultValue(),
+    outbound: getClosestFullHour(true),
+  };
+  let errors: TripSearchDataError | undefined = undefined;
 
   function swapOriginAndDestination(): void {
     [data.origin, data.destination] = [data.destination, data.origin];
@@ -63,6 +63,14 @@
   class:extended={data.tripType === "round-trip"}
   on:submit|preventDefault={search}
 >
+  <div class="settings">
+    {#if $featureTools.hasFeature(Feature.ROUND_TRIP)}
+      <TripTypePicker bind:value={data.tripType} />
+    {/if}
+
+    <PassengerPicker bind:passengers={data.passengers} error={errors?.passengers?._errors} />
+  </div>
+
   <AutocompleteField
     label={$t("words.from")}
     required
@@ -116,21 +124,13 @@
       <Icon variant="search" size="20px" color="var(--color-common-dark-strong)" />
     {/if}
   </button>
-
-  <div class="settings">
-    {#if $featureTools.hasFeature(Feature.ROUND_TRIP)}
-      <TripTypePicker bind:value={data.tripType} />
-    {/if}
-
-    <PassengerPicker bind:passengers={data.passengers} error={errors?.passengers?._errors} />
-  </div>
 </form>
 
 <style>
   .trip-search {
     display: grid;
     grid-template-columns: 1fr max-content 1fr 1fr max-content;
-    gap: 8px;
+    gap: 16px 8px;
     align-items: flex-start;
   }
 
@@ -149,6 +149,7 @@
     display: flex;
     grid-column: 1 / -1;
     gap: 24px;
+    align-items: flex-start;
   }
 
   .trip-search > button[variant] {
