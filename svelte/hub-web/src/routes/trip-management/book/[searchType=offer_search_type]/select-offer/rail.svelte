@@ -5,7 +5,7 @@
   import { browser } from "$app/environment";
   import {
     manager,
-    type PartialSelectedOffer,
+    type PartialSelectedOfferData,
     type SearchData,
   } from "$lib/booking-manager/booking-manager";
   import OfferResultLayout from "$lib/components/pages/trip-management/offer-result-layout.svelte";
@@ -34,7 +34,7 @@
   let offers: MobileSchemas.Offer[] = [];
   let pollOffersController: AbortController | undefined;
   let offersPending = true;
-  let selected: PartialSelectedOffer = { ...(data.bookingSession.selectedOffer ?? {}) };
+  let selected: PartialSelectedOfferData = {};
   let createPriceQuotePending = false;
   let tripDirection: TripDirection = "outbound";
   let sortBy: OfferSortOption = "earliest-departure";
@@ -44,6 +44,28 @@
   $: offerSearchId = data.bookingSession.offerSearch.id;
   $: if (browser) {
     getOffers(offerSearchId);
+  }
+
+  function updateSelection(offer: MobileSchemas.Offer): void {
+    const offerId = data.bookingSession.selectedOffer?.offerId;
+    const outboundId = data.bookingSession.selectedOffer?.optionIds?.[0];
+    const inboundId = data.bookingSession.selectedOffer?.optionIds?.[1];
+
+    if (offerId && !selected.offer && offer.id === offerId) {
+      selected.offer = offer;
+    }
+
+    if (outboundId && !selected.outbound) {
+      selected.outbound = offer.groups
+        .flatMap((group) => group.options)
+        .find((option) => option.id === outboundId);
+    }
+
+    if (inboundId && !selected.inbound) {
+      selected.inbound = offer.groups
+        .flatMap((group) => group.options)
+        .find((option) => option.id === inboundId);
+    }
   }
 
   async function getOffers(id: string): Promise<void> {
@@ -56,6 +78,8 @@
       offersPending = true;
       for await (const offer of manager.getOffers(id, pollOffersController.signal)) {
         offers = [...offers, offer];
+
+        updateSelection(offer);
       }
     } finally {
       if (currPollOffersController === pollOffersController) {
@@ -86,18 +110,7 @@
       return;
     }
 
-    let offer: MobileSchemas.Offer | undefined;
-    let outbound: MobileSchemas.OfferOption | undefined;
-    let inbound: MobileSchemas.OfferOption | undefined;
-
-    if ("offerId" in event.detail) {
-      const { offerId, outboundId, inboundId } = event.detail;
-      offer = offers.find((item) => item.id === offerId);
-      outbound = offer?.groups[0]?.options.find((option) => option.id === outboundId);
-      inbound = offer?.groups[1]?.options.find((option) => option.id === inboundId);
-    } else {
-      ({ offer, inbound, outbound } = event.detail);
-    }
+    const { offer, inbound, outbound } = selected;
 
     if (!(offer && outbound)) {
       return;
@@ -108,7 +121,7 @@
     }
 
     try {
-      event.detail.pending.set(true);
+      event.detail.set(true);
       createPriceQuotePending = true;
 
       await manager.selectOffer(
@@ -118,7 +131,7 @@
       );
       await goto(routeConfig.routes.tripManagement.routes.book.routes.rail.routes.payment.root);
     } finally {
-      event.detail.pending.set(false);
+      event.detail.set(false);
       createPriceQuotePending = false;
     }
   }
@@ -129,17 +142,13 @@
 
   function moveTimeWindow(event: ComponentEvents<OfferList>["movetimewindow"]): void {
     const delta = event.detail === "earlier" ? -SEARCH_WINDOW_H : SEARCH_WINDOW_H;
+    const nextData: Partial<SearchData> = {};
+    const currTime = data.bookingSession.searchData[tripDirection];
 
-    let nextData: Partial<SearchData> | undefined;
-
-    if (tripDirection === "outbound") {
-      const outbound = new Date(data.bookingSession.searchData.outbound);
-      outbound.setHours(outbound.getHours() + delta);
-      nextData = { outbound };
-    } else if (data.bookingSession.searchData.inbound) {
-      const inbound = new Date(data.bookingSession.searchData.inbound);
-      inbound.setHours(inbound.getHours() + delta);
-      nextData = { inbound };
+    if (currTime) {
+      const nextTime = new Date(currTime);
+      nextTime.setHours(nextTime.getHours() + delta);
+      nextData[tripDirection] = nextTime;
     }
 
     searchAux({ ...data.bookingSession.searchData, ...nextData });
@@ -181,7 +190,6 @@
   {/key}
 
   <Checkout
-    {offers}
     {selected}
     {tripDirection}
     tripType={searchData.tripType}

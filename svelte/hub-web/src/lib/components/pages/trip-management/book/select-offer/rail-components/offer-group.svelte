@@ -15,13 +15,13 @@
   }>();
 
   export let group: MobileSchemas.OfferGroup;
-  export let selectedOptionId: string | undefined;
+  export let selectedOption: MobileSchemas.OfferOption | undefined;
   export let finalSelection: boolean;
 
   let container: HTMLDivElement | undefined;
 
   $: defaultOption = group.options[0];
-  $: groupSelected = Boolean(group.optionIds.find((id) => id === selectedOptionId));
+  $: groupSelected = group.optionIds.some((id) => id === selectedOption?.id);
   $: expanded = groupSelected;
 
   function mark(option: MobileSchemas.OfferOption): void {
@@ -115,7 +115,7 @@
       {group}
       {defaultOption}
       {groupSelected}
-      {selectedOptionId}
+      {selectedOption}
       {finalSelection}
       on:select={select}
       on:mark

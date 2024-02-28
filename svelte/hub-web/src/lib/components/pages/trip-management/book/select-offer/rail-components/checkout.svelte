@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { TripType } from "../../search/trip-search-data";
-  import type { PartialSelectedOffer } from "$lib/booking-manager/booking-manager";
+  import type { PartialSelectedOfferData } from "$lib/booking-manager/booking-manager";
   import { createEventDispatcher } from "svelte";
-  import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "$lib/i18n";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
@@ -13,29 +12,19 @@
   const t = getTranslator();
   const locale = getLocale();
   const dispatch = createEventDispatcher<{
-    createpricequote: {
-      offer: MobileSchemas.Offer;
-      outbound: MobileSchemas.OfferOption;
-      inbound?: MobileSchemas.OfferOption;
-      pending: Writable<boolean>;
-    };
+    createpricequote: Writable<boolean>;
     changedirection: TripDirection;
   }>();
 
   export let tripType: TripType;
-  export let offers: MobileSchemas.Offer[];
-  export let selected: PartialSelectedOffer;
+  export let selected: PartialSelectedOfferData;
   export let tripDirection: TripDirection;
 
   const pending = writable(false);
 
-  $: offer = offers.find((item) => item.id === selected.offerId);
-  $: outbound = offers
-    .flatMap((item) => item.groups.flatMap((group) => group.options))
-    .find((option) => option.id === selected.optionIds?.[0]);
-  $: inbound = offer?.groups
-    .flatMap((group) => group.options)
-    .find((option) => option.id === selected.optionIds?.[1]);
+  $: offer = selected.offer;
+  $: outbound = selected.outbound;
+  $: inbound = selected.inbound;
   $: totalPrice = outbound
     ? {
         amount: outbound.price.total.amount + (inbound?.price.total.amount ?? 0),
@@ -45,20 +34,7 @@
   $: proceedDisabled = !offer || !outbound || (tripType === "round-trip" && !inbound);
 
   function createPriceQuote(): void {
-    if (!(offer && outbound)) {
-      return;
-    }
-
-    if (tripType === "round-trip" && !inbound) {
-      return;
-    }
-
-    dispatch("createpricequote", {
-      offer,
-      outbound,
-      inbound,
-      pending,
-    });
+    dispatch("createpricequote", pending);
   }
 
   function changeDirection(direction: TripDirection): void {

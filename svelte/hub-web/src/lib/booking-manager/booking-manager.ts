@@ -37,7 +37,11 @@ const selectedOfferModel = z.object({
   originalPrice: CommonSchemas.priceModel,
 });
 type SelectedOffer = z.infer<typeof selectedOfferModel>;
-export type PartialSelectedOffer = Partial<SelectedOffer>;
+export type PartialSelectedOfferData = {
+  offer?: MobileSchemas.Offer;
+  outbound?: MobileSchemas.OfferOption;
+  inbound?: MobileSchemas.OfferOption;
+};
 
 const priceQuoteModel = z.object({
   id: z.string().uuid(),

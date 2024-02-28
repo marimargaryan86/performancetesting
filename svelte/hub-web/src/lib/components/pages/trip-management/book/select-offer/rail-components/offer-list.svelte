@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { PartialSelectedOffer } from "$lib/booking-manager/booking-manager";
+  import type { PartialSelectedOfferData } from "$lib/booking-manager/booking-manager";
   import { SEARCH_WINDOW_H, type TripType } from "../../search/trip-search-data";
-  import { ensureDefined } from "$lib/utils/array";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import LoadingSkeleton from "./loading-skeleton.svelte";
   import OfferGroup from "./offer-group.svelte";
@@ -15,7 +14,7 @@
   import { cubicInOut } from "svelte/easing";
   import type { OfferFilterFunc } from "$lib/filters/offer";
   import type { OfferSortFunc } from "$lib/sorting/offer";
-  import { getGroups, getOfferId } from "$lib/utils/offer";
+  import { getGroups, getOffer } from "$lib/utils/offer";
   import type { TimeWindowDirection, TripDirection } from "$lib/models/trip";
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
@@ -25,18 +24,13 @@
   const featureTools = getFeatureTools();
   const t = getTranslator();
   const dispatch = createEventDispatcher<{
-    createpricequote: {
-      offerId: string;
-      outboundId: string;
-      inboundId?: string;
-      pending: Writable<boolean>;
-    };
+    createpricequote: Writable<boolean>;
     movetimewindow: TimeWindowDirection;
   }>();
 
   export let pending: boolean;
   export let offers: MobileSchemas.Offer[];
-  export let selected: PartialSelectedOffer;
+  export let selected: PartialSelectedOfferData;
   export let tripType: TripType;
   export let tripDate: Date;
   export let tripDirection: TripDirection;
@@ -48,46 +42,26 @@
   $: groups = getGroups(
     offers,
     tripType,
-    tripDirection === "inbound" ? selected.optionIds?.[0] : undefined,
+    tripDirection === "inbound" ? selected.outbound?.id : undefined,
   );
 
   function createPriceQuote(priceQuotePending: Writable<boolean>): void {
-    const outboundId = selected.optionIds?.[0];
-    const inboundId = selected.optionIds?.[1];
-
-    if (!(selected.offerId && outboundId)) {
-      return;
-    }
-
-    if (tripType === "round-trip" && !inboundId) {
-      return;
-    }
-
-    dispatch("createpricequote", {
-      offerId: selected.offerId,
-      outboundId,
-      inboundId,
-      pending: priceQuotePending,
-    });
+    dispatch("createpricequote", priceQuotePending);
   }
 
   function select(proceed: boolean, event: ComponentEvents<OfferGroup>["select"]): void {
-    if (tripDirection === "outbound") {
-      selected.optionIds = [event.detail.option.id, selected.optionIds?.[1]].filter(ensureDefined);
-    } else {
-      selected.optionIds?.splice(1, 1, event.detail.option.id);
-    }
+    selected[tripDirection] = event.detail.option;
 
-    selected.offerId = getOfferId({
+    selected.offer = getOffer({
       offers,
       tripType,
-      outboundId: selected.optionIds?.[0],
-      inboundId: selected.optionIds?.[1],
+      outbound: selected.outbound,
+      inbound: selected.inbound,
     });
 
     // Remove inbound option if it doesn't exist within the offer
-    if (!selected.offerId && selected.optionIds?.[1]) {
-      selected.optionIds = [selected.optionIds?.[0]].filter(ensureDefined);
+    if (!selected.offer && selected.inbound) {
+      selected.inbound = undefined;
     }
 
     if (proceed) {
@@ -186,9 +160,7 @@
               {group}
               on:select={select.bind(select, true)}
               on:mark={select.bind(select, false)}
-              selectedOptionId={tripDirection === "outbound"
-                ? selected.optionIds?.[0]
-                : selected.optionIds?.[1]}
+              selectedOption={tripDirection === "outbound" ? selected.outbound : selected.inbound}
               finalSelection={tripType === "one-way" || tripDirection === "inbound"}
             />
           </li>

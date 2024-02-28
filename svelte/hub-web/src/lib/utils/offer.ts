@@ -54,35 +54,34 @@ export function getGroups(
   return groupIds.map((id) => groups.find((group) => group?.id === id)).filter(ensureDefined);
 }
 
-export function getOfferId({
+export function getOffer({
   offers,
   tripType,
-  outboundId,
-  inboundId,
+  outbound,
+  inbound,
 }: {
   offers: MobileSchemas.Offer[];
   tripType: TripType;
-  outboundId: string | undefined;
-  inboundId: string | undefined;
-}): string | undefined {
+  outbound: MobileSchemas.OfferOption | undefined;
+  inbound: MobileSchemas.OfferOption | undefined;
+}): MobileSchemas.Offer | undefined {
   if (tripType === "round-trip") {
-    if (!(outboundId && inboundId)) {
+    if (!(outbound && inbound)) {
       return undefined;
     }
 
     return offers.find(
       (item) =>
-        item.groups.find((group) => group.optionIds.includes(outboundId)) &&
-        item.groups.find((group) => group.optionIds.includes(inboundId)),
-    )?.id;
+        item.groups.find((group) => group.optionIds.includes(outbound.id)) &&
+        item.groups.find((group) => group.optionIds.includes(inbound.id)),
+    );
   }
 
-  if (!outboundId) {
+  if (!outbound) {
     return undefined;
   }
 
-  return offers.find((item) => item.groups.find((group) => group.optionIds.includes(outboundId)))
-    ?.id;
+  return offers.find((item) => item.groups.find((group) => group.optionIds.includes(outbound.id)));
 }
 
 export function getLegExtremes(details: MobileSchemas.TripOfferGroupDetails | undefined): {

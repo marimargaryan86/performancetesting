@@ -21,14 +21,14 @@
 
   export let group: MobileSchemas.OfferGroup;
   export let defaultOption: MobileSchemas.OfferOption;
-  export let selectedOptionId: string | undefined;
+  export let selectedOption: MobileSchemas.OfferOption | undefined;
   export let groupSelected: boolean;
   export let finalSelection: boolean;
 
   const pending = writable(false);
 
   function select(): void {
-    const nextOption = group.options.find((option) => option.id === selectedOptionId);
+    const nextOption = group.options.find((option) => option.id === selectedOption?.id);
 
     dispatch("select", { option: nextOption ?? defaultOption, pending });
   }
@@ -41,7 +41,7 @@
 <div class="offer-options" transition:slideFade={{ duration: OPTION_EXPANSION_TIME_MS }}>
   <ul class="options">
     {#each group.options as option}
-      {@const selected = option.id === selectedOptionId}
+      {@const selected = option.id === selectedOption?.id}
 
       <li class="option" class:selected>
         <span typography="body-large" weight="bold">{option.brandName}</span>
