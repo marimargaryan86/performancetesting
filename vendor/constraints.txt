@@ -28,7 +28,6 @@
 //     "authlib==1.3.0",
 //     "autoflake==2.3.0",
 //     "bcrypt==4.1.2",
-//     "black==24.2.0",
 //     "boto3-stubs[location]==1.34.46",
 //     "boto3==1.34.34",
 //     "botocore-stubs==1.34.46",
@@ -944,53 +943,6 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "e8a6ae970537e67830776488bca52000eaa37fa63b9988e8c487458d9cd5ace6",
-              "url": "https://files.pythonhosted.org/packages/47/15/b3770bc3328685a53bc9c041136240146c5cd866a1f020c2cf47f2ff9683/black-24.2.0-py3-none-any.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "e37c99f89929af50ffaf912454b3e3b47fd64109659026b678c091a4cd450fb2",
-              "url": "https://files.pythonhosted.org/packages/11/15/4646143c19bc896a0cbc0c6663abf5751b465edefbc49491179454e2e2fd/black-24.2.0-cp311-cp311-macosx_11_0_arm64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "4f9de21bafcba9683853f6c96c2d515e364aee631b178eaa5145fc1c61a3cc92",
-              "url": "https://files.pythonhosted.org/packages/1a/53/0b82f36f0a8beee5388f6bcc3a1591e094c87a275c64532ac6ce69fb491f/black-24.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "bce4f25c27c3435e4dace4815bcb2008b87e167e3bf4ee47ccdc5ce906eb4894",
-              "url": "https://files.pythonhosted.org/packages/29/69/f3ab49cdb938b3eecb048fa64f86bdadb1fac26e92c435d287181d543b0a/black-24.2.0.tar.gz"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "163baf4ef40e6897a2a9b83890e59141cc8c2a98f2dda5080dc15c00ee1e62cd",
-              "url": "https://files.pythonhosted.org/packages/6c/de/938fd8c271ee903212f3599d7ece0d4a930af667c51135d4e6d1fac50455/black-24.2.0-cp311-cp311-macosx_10_9_x86_64.whl"
-            }
-          ],
-          "project_name": "black",
-          "requires_dists": [
-            "aiohttp!=3.9.0,>=3.7.4; (sys_platform == \"win32\" and implementation_name == \"pypy\") and extra == \"d\"",
-            "aiohttp>=3.7.4; (sys_platform != \"win32\" or implementation_name != \"pypy\") and extra == \"d\"",
-            "click>=8.0.0",
-            "colorama>=0.4.3; extra == \"colorama\"",
-            "ipython>=7.8.0; extra == \"jupyter\"",
-            "mypy-extensions>=0.4.3",
-            "packaging>=22.0",
-            "pathspec>=0.9.0",
-            "platformdirs>=2",
-            "tokenize-rt>=3.2.0; extra == \"jupyter\"",
-            "tomli>=1.1.0; python_version < \"3.11\"",
-            "typing-extensions>=4.0.1; python_version < \"3.11\"",
-            "uvloop>=0.15.2; extra == \"uvloop\""
-          ],
-          "requires_python": ">=3.8",
-          "version": "24.2.0"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
               "hash": "33a8b6d9136fa7427160edb92d2e50f2035f04e9d63a2d1027349053e12626aa",
               "url": "https://files.pythonhosted.org/packages/0e/78/d505b8c71139d234e34df1c4a18d0567287494ce63f690337aa2af23219c/boto3-1.34.34-py3-none-any.whl"
             },
@@ -1885,19 +1837,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "861f35a13a451f94e301ce2bec7cac63e881232ccce7ed67fab9b5df4d3beaa1",
-              "url": "https://files.pythonhosted.org/packages/a2/91/2d843adb9fbd911e0da45fbf6f18ca89d07a087c3daa23e955584f90ebf4/cachetools-5.3.2-py3-none-any.whl"
+              "hash": "0abad1021d3f8325b2fc1d2e9c8b9c9d57b04c3932657a72465447332c24d945",
+              "url": "https://files.pythonhosted.org/packages/fb/2b/a64c2d25a37aeb921fddb929111413049fc5f8b9a4c1aefaffaafe768d54/cachetools-5.3.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "086ee420196f7b2ab9ca2db2520aca326318b68fe5ba8bc4d49cca91add450f2",
-              "url": "https://files.pythonhosted.org/packages/10/21/1b6880557742c49d5b0c4dcf0cf544b441509246cdd71182e0847ac859d5/cachetools-5.3.2.tar.gz"
+              "hash": "ba29e2dfa0b8b556606f097407ed1aa62080ee108ab0dc5ec9d6a723a007d105",
+              "url": "https://files.pythonhosted.org/packages/b3/4d/27a3e6dd09011649ad5210bdf963765bc8fa81a0827a4fc01bafd2705c5b/cachetools-5.3.3.tar.gz"
             }
           ],
           "project_name": "cachetools",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "5.3.2"
+          "version": "5.3.3"
         },
         {
           "artifacts": [
@@ -5635,24 +5587,6 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08",
-              "url": "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl"
-            },
-            {
-              "algorithm": "sha256",
-              "hash": "a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712",
-              "url": "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz"
-            }
-          ],
-          "project_name": "pathspec",
-          "requires_dists": [],
-          "requires_python": ">=3.8",
-          "version": "0.12.1"
-        },
-        {
-          "artifacts": [
-            {
-              "algorithm": "sha256",
               "hash": "4a7317d5e3b17a3dccb6a8cfe67dab65b20551404c52c8ed41279fa4f0cb4cda",
               "url": "https://files.pythonhosted.org/packages/64/dd/171c9fb653591cf265bcc89c436eec75c9bde3dec921cc236fa71e5698df/pbr-6.0.0-py2.py3-none-any.whl"
             },
@@ -7943,19 +7877,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "eecefdce1e5bbfb7ad2eeaabf7c1eeb404d7757c379bd1f7e5cce9d8bf425384",
-              "url": "https://files.pythonhosted.org/packages/c3/a0/5dba8ed157b0136607c7f2151db695885606968d1fae123dc3391e0cfdbf/sniffio-1.3.0-py3-none-any.whl"
+              "hash": "2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2",
+              "url": "https://files.pythonhosted.org/packages/e9/44/75a9c9421471a6c4805dbf2356f7c181a29c1879239abab1ea2cc8f38b40/sniffio-1.3.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e60305c5e5d314f5389259b7f22aaa33d8f7dee49763119234af3755c55b9101",
-              "url": "https://files.pythonhosted.org/packages/cd/50/d49c388cae4ec10e8109b1b833fd265511840706808576df3ada99ecb0ac/sniffio-1.3.0.tar.gz"
+              "hash": "f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc",
+              "url": "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964ddf5cfdbd/sniffio-1.3.1.tar.gz"
             }
           ],
           "project_name": "sniffio",
           "requires_dists": [],
           "requires_python": ">=3.7",
-          "version": "1.3.0"
+          "version": "1.3.1"
         },
         {
           "artifacts": [
@@ -9999,7 +9933,6 @@
     "authlib==1.3.0",
     "autoflake==2.3.0",
     "bcrypt==4.1.2",
-    "black==24.2.0",
     "boto3-stubs[location]==1.34.46",
     "boto3==1.34.34",
     "botocore-stubs==1.34.46",

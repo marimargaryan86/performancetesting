@@ -1,19 +1,20 @@
 [GLOBAL]
-pants_version = "2.20.0.dev7"
+pants_version = "2.20.0rc0"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
 unmatched_build_file_globs = "error"
 pants_ignore = "+['/golang/', 'node_modules']"
 backend_packages = [
-  "pants.backend.build_files.fmt.black",
+  "pants.backend.build_files.fmt.ruff",
   "pants.backend.codegen.protobuf.lint.buf",
   "pants.backend.codegen.protobuf.python",
   "pants.backend.docker",
   "pants.backend.docker.lint.hadolint",
   "pants.backend.experimental.adhoc",
   "pants.backend.experimental.python.lint.add_trailing_comma",
-  "pants.backend.experimental.python.lint.ruff",
+  "pants.backend.experimental.python.lint.ruff.check",
+  "pants.backend.experimental.python.lint.ruff.format",
   "pants.backend.experimental.tools.yamllint",
   "pants.backend.experimental.visibility",
   "pants.backend.project_info",
@@ -41,12 +42,6 @@ requirements = ["autoflake"]
 install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 args = ["--remove-all-unused-imports", "--remove-unused-variables"]
-
-[black]
-requirements = ["black"]
-config = "vendor/pyproject.toml"
-install_from_resolve = "python-default"
-interpreter_constraints = ["CPython==3.11.*"]
 
 [buf]
 config = "protobuf/buf.yaml"
