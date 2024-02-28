@@ -145,7 +145,7 @@ def svelte_image(prefix=None, **kwargs) -> None:  # type: ignore[no-untyped-def]
                 "FROM ${REGISTRY}node:${NODE_VERSION}-bookworm-slim AS build",
                 "RUN corepack enable",
                 "WORKDIR /app",
-                "COPY svelte/package.json svelte/yarn.lock svelte/.yarnrc.yml ./",
+                "COPY svelte/package.json svelte/yarn.lock svelte/.yarnrc.yml svelte/configs ./",
                 "COPY svelte/{0}/package.json svelte/{0}/svelte.config.js svelte/{0}/vite.config.ts ./{0}/".format(
                     folder_name,
                 ),
