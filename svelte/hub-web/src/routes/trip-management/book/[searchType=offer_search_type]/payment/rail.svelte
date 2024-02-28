@@ -1,23 +1,22 @@
 <script lang="ts">
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import routeConfig from "$lib/route-config";
-  import Payment from "$lib/components/pages/trip-management/booking-flow-train/payment/payment.svelte";
-  import Fees from "$lib/components/pages/trip-management/booking-flow-train/payment/fees.svelte";
-  import PassengerEntry from "$lib/components/pages/trip-management/booking-flow-train/payment/passenger-entry.svelte";
+  import Payment from "$lib/components/pages/trip-management/book/payment/rail-components/payment.svelte";
+  import Fees from "$lib/components/pages/trip-management/book/payment/rail-components/fees.svelte";
+  import PassengerEntry from "$lib/components/pages/trip-management/book/payment/rail-components/passenger-entry.svelte";
   import type { PartialPassengerData } from "$lib/models/passenger";
-  import ContactInformation from "$lib/components/pages/trip-management/booking-flow-train/payment/contact-information.svelte";
+  import ContactInformation from "$lib/components/pages/trip-management/book/payment/rail-components/contact-information.svelte";
   import { contactDetailsModel } from "$lib/models/contact-details";
-  import Countdown from "$lib/components/pages/trip-management/booking-flow-train/countdown.svelte";
+  import Countdown from "$lib/components/pages/trip-management/book/countdown.svelte";
   import { z } from "zod";
   import { goto } from "$app/navigation";
   import PriceDialog from "$lib/components/ui/dialogues/price-dialog.svelte";
-  import Summary from "$lib/components/pages/trip-management/booking-flow-train/summary/summary.svelte";
+  import Summary from "$lib/components/pages/trip-management/book/summary/rail-components/summary.svelte";
   import { onDestroy } from "svelte";
-  import FareRulesDialog from "$lib/components/pages/trip-management/booking-flow-train/fare-rules-dialog.svelte";
+  import FareRulesDialog from "$lib/components/pages/trip-management/book/fare-rules-dialog.svelte";
   import { getDefaultPassengers, getPassengerValidator } from "$lib/utils/passenger";
   import { writable } from "svelte/store";
   import { formatAmount } from "$lib/formatting/currency";
-  import TripBanner from "$lib/components/pages/trip-management/booking-flow-train/trip-banner.svelte";
   import { getLocale, getTranslator } from "$lib/i18n";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import {
@@ -28,10 +27,11 @@
   } from "$lib/booking-manager/booking-manager";
   import { browser } from "$app/environment";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
-  import { passengerParser } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data";
+  import { passengerParser } from "$lib/components/pages/trip-management/book/search/trip-search-data";
   import type { PageData } from "./$types";
 
   export let data: PageData;
+  const isRoundTrip = Boolean(data.bookingSession.searchData?.inbound);
 
   let fareRulesDialog: FareRulesDialog | undefined;
   let payment: Payment | undefined;
@@ -205,10 +205,6 @@
   pageSubTitle={$t("pages.tripManagement.pages.book.pages.rail.pages.payment.subTitle")}
 >
   <div class="content">
-    {#if priceQuote}
-      <TripBanner {priceQuote} passengers={data.bookingSession.searchData.passengers} />
-    {/if}
-
     <Countdown expiresAt={data.bookingSession.priceQuote.expiresAt} type="price-quote" show />
 
     <div class="wrapper">
@@ -226,6 +222,8 @@
       <div class="column payment">
         <Summary
           {priceQuote}
+          {isRoundTrip}
+          searchData={data.bookingSession.searchData}
           on:showFareRules={fareRulesDialog?.open}
           passengers={data.bookingSession.searchData.passengers}
         />

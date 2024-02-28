@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Countdown from "./booking-flow-train/countdown.svelte";
+  import Countdown from "./book/countdown.svelte";
   import BookingLayout from "./booking-layout.svelte";
 
   export let showActions = false;
@@ -70,7 +70,7 @@
     flex-grow: 1;
     gap: 24px;
     width: 100%;
-    padding: 0 24px 24px;
+    padding: 0 24px;
     overflow: auto;
   }
 

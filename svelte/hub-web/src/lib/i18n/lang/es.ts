@@ -159,7 +159,9 @@ export default {
     findTrip: "Buscar viaje",
     modifySearch: "Modificar búsqueda",
     addUser: "Agregar Usuario",
-    save: "Save",
+    save: "Ahorrar",
+    change: "Cambiar",
+    confirmSelection: "Confirmar selección",
   },
   sentences: {
     priceChange: "Cambio de precio",
@@ -267,6 +269,7 @@ export default {
     adminRoleDescription:
       "View and manage any orders made within the agency. Manage reseller & user settings.",
     userRoleDescription: "View and manage your own orders for a personalized experience.",
+    totalAmount: "Cantidad total",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",
@@ -353,8 +356,6 @@ export default {
   sortOptions: {
     "earliest-arrival": "Llegada más temprana",
     "earliest-departure": "Salida más temprana",
-    "latest-arrival": "Última llegada",
-    "latest-departure": "Última salida",
     "lowest-price": "Precio más bajo",
     fastest: "Lo más rápido",
   },
@@ -612,6 +613,10 @@ export default {
                 select: {
                   title: "Seleccionar",
                   subTitle: "Seleccione una oferta",
+                  outbound: 'Seleccionar <strong weight="bold">saliente</strong>',
+                  inbound: 'Seleccionar <strong weight="bold">entrante</strong>',
+                  findingOutbound: "Buscando ofertas salientes...",
+                  findingInbound: "Buscando ofertas entrantes...",
                 },
                 payment: {
                   title: "Pagar",

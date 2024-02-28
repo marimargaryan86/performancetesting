@@ -1,65 +1,59 @@
-import {
-  getEarliestArrival,
-  getEarliestDeparture,
-  getOfferDurationS,
-  getLowestPrice,
-  type SearchOptionsData,
-} from "$lib/utils/offer";
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
-function getArrivalDelta(a: MobileSchemas.Offer, b: MobileSchemas.Offer): number {
-  return getEarliestArrival(a).getTime() - getEarliestArrival(b).getTime();
-}
+export const offerSortOptions = [
+  "earliest-departure",
+  "earliest-arrival",
+  "lowest-price",
+  "fastest",
+] as const;
+export type OfferSortOption = (typeof offerSortOptions)[number];
+export type OfferSortFunc = (a: MobileSchemas.OfferGroup, b: MobileSchemas.OfferGroup) => number;
 
-function getDepartureDelta(a: MobileSchemas.Offer, b: MobileSchemas.Offer): number {
-  return getEarliestDeparture(a).getTime() - getEarliestDeparture(b).getTime();
-}
+const earliestArrival: OfferSortFunc = (a, b) =>
+  (a.detailsList.at(-1)?.legs.at(-1)?.arrivalAt.getTime() ?? 0) -
+  (b.detailsList.at(-1)?.legs.at(-1)?.arrivalAt.getTime() ?? 0);
 
-/**
- * Sorts offers according to the specified filter string. When sorting by
- * price, offers with the same price are further sorted by the earliest
- * departure time.
- *
- * See `svelte/hub-web/src/tests/sorting/offer.test.ts` for more context.
- *
- * @param {SearchOptionsData} options - The search options containing the sort criteria.
- * @returns {(a: MobileSchemas.Offer, b: MobileSchemas.Offer) => number} - A comparator function that can be used in array sort.
- *
- * @throws {Error} Throws an error if an unknown sorting parameter is provided.
- *
- * @example
- * // Example usage
- * const offers = [...]; // Array of Offer objects
- * const sortedOffers = offers.sort(getSortOffersFunc(searchOptions));
- */
-export function getSortOffersFunc(
-  options: SearchOptionsData,
-): (a: MobileSchemas.Offer, b: MobileSchemas.Offer) => number {
-  return (a, b) => {
-    if (options.sortBy === "earliest-arrival") {
-      return getArrivalDelta(a, b);
-    } else if (options.sortBy === "latest-arrival") {
-      return getArrivalDelta(b, a);
-    } else if (options.sortBy === "earliest-departure") {
-      return getDepartureDelta(a, b);
-    } else if (options.sortBy === "latest-departure") {
-      return getDepartureDelta(b, a);
-    } else if (options.sortBy === "fastest") {
-      return getOfferDurationS(a) - getOfferDurationS(b);
-    } else if (options.sortBy === "lowest-price") {
-      const priceDiff = getLowestPrice(a) - getLowestPrice(b);
+const earliestDeparture: OfferSortFunc = (a, b) =>
+  (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+  (b.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0);
 
-      if (priceDiff === 0) {
-        return getDepartureDelta(a, b);
-      }
+const lowestPrice: OfferSortFunc = (a, b) => {
+  const diff = (a.options[0]?.price.total.amount ?? 0) - (b.options[0]?.price.total.amount ?? 0);
 
-      return priceDiff;
-    }
+  if (diff === 0) {
+    return earliestDeparture(a, b);
+  }
 
-    throw new Error("Unknown sort parameter");
-  };
-}
+  return diff;
+};
 
-export function sortOptions(a: MobileSchemas.OfferOption, b: MobileSchemas.OfferOption): number {
-  return a.price.total.amount - b.price.total.amount;
+const fastest: OfferSortFunc = (a, b) => {
+  const aDuration =
+    (a.detailsList.at(-1)?.legs.at(-1)?.arrivalAt.getTime() ?? 0) -
+    (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0);
+  const bDuration =
+    (b.detailsList.at(-1)?.legs.at(-1)?.arrivalAt.getTime() ?? 0) -
+    (b.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0);
+
+  return aDuration - bDuration;
+};
+
+export function getOfferSortFunc(sortBy: OfferSortOption): OfferSortFunc {
+  if (sortBy === "earliest-arrival") {
+    return earliestArrival;
+  }
+
+  if (sortBy === "earliest-departure") {
+    return earliestDeparture;
+  }
+
+  if (sortBy === "lowest-price") {
+    return lowestPrice;
+  }
+
+  if (sortBy === "fastest") {
+    return fastest;
+  }
+
+  throw new Error("Unknonw sort parameter");
 }

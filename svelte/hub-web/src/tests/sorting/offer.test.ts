@@ -1,99 +1,78 @@
 import { describe, expect, it } from "vitest";
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
-import { getSortOffersFunc } from "$lib/sorting/offer";
-import type { SearchOptionsData } from "$lib/utils/offer";
+import { getOfferSortFunc, type OfferSortOption } from "$lib/sorting/offer";
 
 const foo = {
-  groups: [
+  options: [{ price: { total: { amount: 100 } } }],
+  detailsList: [
     {
-      options: [{ price: { total: { amount: 100 } } }],
-      detailsList: [
+      legs: [
         {
-          legs: [
-            {
-              departureAt: new Date("2023-09-25T19:10:00.000Z"),
-              arrivalAt: new Date("2023-09-25T20:57:00.000Z"),
-            },
-          ],
+          departureAt: new Date("2023-09-25T19:10:00.000Z"),
+          arrivalAt: new Date("2023-09-25T20:57:00.000Z"),
         },
       ],
     },
   ],
-} as unknown as MobileSchemas.Offer;
+} as MobileSchemas.OfferGroup;
 
 const bar = {
-  groups: [
+  options: [{ price: { total: { amount: 200 } } }],
+  detailsList: [
     {
-      options: [{ price: { total: { amount: 200 } } }],
-      detailsList: [
+      legs: [
         {
-          legs: [
-            {
-              departureAt: new Date("2023-09-26T03:56:00.000Z"),
-              arrivalAt: new Date("2023-09-26T06:35:00.000Z"),
-            },
-          ],
+          departureAt: new Date("2023-09-26T03:56:00.000Z"),
+          arrivalAt: new Date("2023-09-26T06:35:00.000Z"),
         },
       ],
     },
   ],
-} as unknown as MobileSchemas.Offer;
+} as MobileSchemas.OfferGroup;
 
 const baz = {
-  groups: [
+  options: [{ price: { total: { amount: 200 } } }],
+  detailsList: [
     {
-      options: [{ price: { total: { amount: 200 } } }],
-      detailsList: [
+      legs: [
         {
-          legs: [
-            {
-              departureAt: new Date("2023-09-26T02:56:00.000Z"),
-              arrivalAt: new Date("2023-09-26T05:35:00.000Z"),
-            },
-          ],
+          departureAt: new Date("2023-09-26T02:56:00.000Z"),
+          arrivalAt: new Date("2023-09-26T05:35:00.000Z"),
         },
       ],
     },
   ],
-} as unknown as MobileSchemas.Offer;
+} as MobileSchemas.OfferGroup;
 
-describe("getSortOffersFunc", () => {
-  const earliestArrival = { sortBy: "earliest-arrival" } as SearchOptionsData;
-  const latestArrival = { sortBy: "latest-arrival" } as SearchOptionsData;
-  const earliestDeparture = { sortBy: "earliest-departure" } as SearchOptionsData;
-  const latestDeparture = { sortBy: "latest-departure" } as SearchOptionsData;
-  const fastest = { sortBy: "fastest" } as SearchOptionsData;
-  const price = { sortBy: "lowest-price" } as SearchOptionsData;
-  const invalid = { sortBy: "slowest" } as unknown as SearchOptionsData;
+describe("getOfferSortFunc", () => {
+  const earliestArrival: OfferSortOption = "earliest-arrival";
+  const earliestDeparture: OfferSortOption = "earliest-departure";
+  const fastest: OfferSortOption = "fastest";
+  const price: OfferSortOption = "lowest-price";
 
   it("returns correct results for valid sort options", () => {
-    const comparedOffersByEarliestArrival = getSortOffersFunc(earliestArrival)(foo, bar);
+    const comparedOffersByEarliestArrival = getOfferSortFunc(earliestArrival)(foo, bar);
     expect(comparedOffersByEarliestArrival).toBeLessThan(0);
 
-    const comparedOffersByLatestArrival = getSortOffersFunc(latestArrival)(foo, bar);
-    expect(comparedOffersByLatestArrival).toBeGreaterThan(0);
-
-    const comparedOffersByEarliestDeparture = getSortOffersFunc(earliestDeparture)(foo, bar);
+    const comparedOffersByEarliestDeparture = getOfferSortFunc(earliestDeparture)(foo, bar);
     expect(comparedOffersByEarliestDeparture).toBeLessThan(0);
 
-    const comparedOffersByLatestDeparture = getSortOffersFunc(latestDeparture)(foo, bar);
-    expect(comparedOffersByLatestDeparture).toBeGreaterThan(0);
-
-    const comparedOffersByFastest = getSortOffersFunc(fastest)(foo, bar);
+    const comparedOffersByFastest = getOfferSortFunc(fastest)(foo, bar);
     expect(comparedOffersByFastest).toBeLessThan(0);
 
-    const comparedOffersByPrice = getSortOffersFunc(price)(foo, bar);
+    const comparedOffersByPrice = getOfferSortFunc(price)(foo, bar);
     expect(comparedOffersByPrice).toBeLessThan(0);
 
-    const comparedSamePriceOffersByPrice = getSortOffersFunc(price)(bar, baz);
+    const comparedSamePriceOffersByPrice = getOfferSortFunc(price)(bar, baz);
     expect(comparedSamePriceOffersByPrice).toBeGreaterThan(0);
   });
 
   it("throws an error with invalid sort options", () => {
-    const offerA = { id: "foo" } as MobileSchemas.Offer;
-    const offerB = { id: "bar" } as MobileSchemas.Offer;
-    const invalidSort = getSortOffersFunc(invalid);
+    const offerA = { id: "foo" } as MobileSchemas.OfferGroup;
+    const offerB = { id: "bar" } as MobileSchemas.OfferGroup;
 
-    expect(() => invalidSort(offerA, offerB)).toThrowError("Unknown sort parameter");
+    expect(() => getOfferSortFunc("invalid" as OfferSortOption)(offerA, offerB)).toThrowError(
+      "Unknonw sort parameter",
+    );
   });
 });

@@ -98,8 +98,8 @@ export default {
     manageTrip: "Hantera en resa",
     passengerNameRecord: "Referensnummer",
     optional: "Frivillig",
-    inbound: "Inkommande",
-    outbound: "Utgående",
+    inbound: "Inresa",
+    outbound: "Utresa",
     admin: "Admin",
     user: "Användare",
     earlier: "Tidigare",
@@ -160,6 +160,8 @@ export default {
     modifySearch: "Ändra sökning",
     addUser: "Lägg till användare",
     save: "Spara",
+    change: "Ändra",
+    confirmSelection: "Bekräfta val",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -241,6 +243,7 @@ export default {
     adminRoleDescription:
       "Visa och hantera alla beställningar som gjorts inom agenturen. Hantera återförsäljare och användarinställningar.",
     userRoleDescription: "Visa och hantera dina egna beställningar för en personlig upplevelse.",
+    totalAmount: "Summa",
   },
   tableHeaders: {
     id: "ID",
@@ -327,8 +330,6 @@ export default {
   sortOptions: {
     "earliest-arrival": "Tidigast ankomst",
     "earliest-departure": "Tidigast avgång",
-    "latest-arrival": "Senast ankomst",
-    "latest-departure": "Senast avgång",
     "lowest-price": "Lägsta pris",
     fastest: "Snabbast",
   },
@@ -585,6 +586,10 @@ export default {
                 select: {
                   title: "Välj",
                   subTitle: "Välj ett erbjudande",
+                  outbound: 'Välj <strong weight="bold">utresa</strong>',
+                  inbound: 'Välj <strong weight="bold">inresa</strong>',
+                  findingOutbound: "Hittar utresor...",
+                  findingInbound: "Hittar inresor...",
                 },
                 payment: {
                   title: "Betalning",

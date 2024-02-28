@@ -1,5 +1,5 @@
 <script lang="ts">
-  import TripSearch from "$lib/components/pages/trip-management/booking-flow-train/trip-search/trip-search.svelte";
+  import TripSearch from "$lib/components/pages/trip-management/book/search/rail-components/trip-search.svelte";
   import { getTranslator } from "$lib/i18n";
   import type { ComponentEvents } from "svelte";
   import { manager } from "$lib/booking-manager/booking-manager";
@@ -8,7 +8,7 @@
   import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
   import SearchTabs from "$lib/components/pages/trip-management/search-tabs.svelte";
-  import CarSearch from "$lib/components/pages/trip-management/booking-flow-car/search/car-search.svelte";
+  import CarSearch from "$lib/components/pages/trip-management/book/search/car-components/car-search.svelte";
 
   export let data;
 

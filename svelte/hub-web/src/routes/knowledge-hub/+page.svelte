@@ -13,7 +13,7 @@
   <title>{getPageTitle($t("title"), $t("pages.knowledgeHub.title"))}</title>
 </svelte:head>
 
-<StandardLayout pageTitle={$t("pages.knowledgeHub.title")} backgroundImage="none">
+<StandardLayout pageTitle={$t("pages.knowledgeHub.title")}>
   <div class="content">
     <UserManuals />
 

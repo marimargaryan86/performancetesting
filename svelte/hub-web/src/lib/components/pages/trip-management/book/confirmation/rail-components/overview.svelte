@@ -1,7 +1,7 @@
 <script lang="ts">
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import * as CommonSchemas from "~/integration/common/schemas";
-  import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
+  import Ticket from "../../ticket.svelte";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
   import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";

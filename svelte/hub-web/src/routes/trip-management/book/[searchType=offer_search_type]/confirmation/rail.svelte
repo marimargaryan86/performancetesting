@@ -14,13 +14,13 @@
   import routeConfig from "$lib/route-config";
   import Alert from "$lib/components/ui/alert.svelte";
   import type { AlertType } from "$lib/models/ui";
-  import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
-  import Price from "$lib/components/pages/trip-management/booking-flow-train/price.svelte";
-  import Overview from "$lib/components/pages/trip-management/booking-flow-train/confirmation/overview.svelte";
-  import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
+  import Passengers from "$lib/components/pages/trip-management/book/passengers.svelte";
+  import Price from "$lib/components/pages/trip-management/book/price.svelte";
+  import Overview from "$lib/components/pages/trip-management/book/confirmation/rail-components/overview.svelte";
+  import Itinerary from "$lib/components/pages/trip-management/book/itinerary.svelte";
   import { ensureDefined } from "$lib/utils/array";
   import * as CommonSchemas from "~/integration/common/schemas";
-  import Fees from "$lib/components/pages/trip-management/booking-flow-train/confirmation/fees.svelte";
+  import Fees from "$lib/components/pages/trip-management/book/confirmation/rail-components/fees.svelte";
   import { getTranslator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";

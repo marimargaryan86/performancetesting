@@ -53,7 +53,7 @@
     flex-flow: column;
     flex-grow: 1;
     overflow: auto;
-    background-image: var(--color-gradient-extensions-horizontal);
+    background-color: #fafafa;
   }
 
   .actions {

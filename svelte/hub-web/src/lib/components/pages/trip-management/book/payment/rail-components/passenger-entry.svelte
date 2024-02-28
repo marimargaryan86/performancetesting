@@ -3,7 +3,7 @@
   import DateTextField from "$lib/components/ui/date-text-field.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";
-  import Collapsible from "../collapsible.svelte";
+  import Collapsible from "../../collapsible.svelte";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getLocale, getTranslator } from "$lib/i18n";
   import {

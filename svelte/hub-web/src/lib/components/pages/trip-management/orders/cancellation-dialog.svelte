@@ -1,8 +1,8 @@
 <script lang="ts">
   import Backdrop from "$lib/components/ui/backdrop.svelte";
-  import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
-  import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
-  import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
+  import Ticket from "../book/ticket.svelte";
+  import Passengers from "../book/passengers.svelte";
+  import Itinerary from "$lib/components/pages/trip-management/book/itinerary.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { scale } from "svelte/transition";
   import { createEventDispatcher } from "svelte";

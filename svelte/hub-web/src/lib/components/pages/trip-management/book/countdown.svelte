@@ -12,9 +12,9 @@
   import Icon from "$lib/components/icons/icon.svelte";
   import Alert from "$lib/components/ui/alert.svelte";
   import { getTranslator } from "$lib/i18n";
-  import { onDestroy, onMount } from "svelte";
-  import { sleep } from "$lib/utils/common";
+  import { onDestroy } from "svelte";
   import { getTimeDeltaS } from "$lib/utils/date-time";
+  import { browser } from "$app/environment";
 
   export let expiresAt: Date;
   export let show = false;
@@ -22,41 +22,37 @@
 
   const t = getTranslator();
 
-  let ticking = show;
+  let interval = 0;
+  let timeLeft = getTimeLeft(expiresAt);
 
-  $: timeLeft = getTimeLeft(expiresAt);
-
-  async function tick(): Promise<void> {
-    if (!ticking) {
-      return;
+  $: if (browser) {
+    if (show) {
+      interval = setInterval(tick, 1000, []);
+    } else {
+      clearInterval(interval);
     }
+  }
 
+  function tick(): void {
     timeLeft = getTimeLeft(expiresAt);
 
     if (timeLeft === "00:00") {
-      return;
+      clearInterval(interval);
     }
-
-    await sleep(1000);
-
-    return tick();
   }
 
   export function close(): void {
     show = false;
-    ticking = false;
   }
 
   export function open(): void {
     show = true;
-    ticking = true;
-    tick();
   }
 
-  onMount(tick);
-
   onDestroy(() => {
-    ticking = false;
+    if (browser) {
+      clearInterval(interval);
+    }
   });
 </script>
 

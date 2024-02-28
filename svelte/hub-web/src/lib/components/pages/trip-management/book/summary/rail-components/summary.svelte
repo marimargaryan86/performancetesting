@@ -3,18 +3,24 @@
   import { formatAmount } from "$lib/formatting/currency";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { getTotalPriceBreakdown } from "$lib/utils/offer";
-  import Collapsible from "../collapsible.svelte";
+  import Collapsible from "../../collapsible.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import SummaryItinerary from "./summary-itinerary.svelte";
   import { getPassengersPresentation } from "$lib/models/passenger";
   import { createEventDispatcher } from "svelte";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import { passengerParser } from "../trip-search-data";
+  import { passengerParser } from "../../search/trip-search-data";
+  import type { SearchData } from "$lib/booking-manager/booking-manager";
 
   let passengersExt: Date[];
   export { passengersExt as passengers };
   export let priceQuote: MobileSchemas.TripOfferPriceQuote | undefined = undefined;
   $: passengers = passengerParser.fromSearchData(passengersExt);
+
+  export let searchData: SearchData;
+  $: currentSearchData = searchData;
+
+  export let isRoundTrip: boolean = false;
 
   let collapsible: Collapsible | undefined;
 
@@ -30,21 +36,34 @@
   $: totalPrice = priceQuote?.price.total;
 </script>
 
-<Collapsible bind:this={collapsible} title={$t("words.summary")}>
+<Collapsible expandedOnMount={true} bind:this={collapsible} title={$t("words.summary")}>
   <div class="details">
     {#if priceQuote}
-      <p typography="label-large">
-        {$t("words.passenger_other")}
-        <span weight="bold">{getPassengersPresentation(passengers, $t)}</span>
-      </p>
+      <div typography="body-large" class="orig-dest" weight="bold">
+        {currentSearchData.origin.name}
+        <span typography="label-medium" weight="bold">{isRoundTrip ? "⇄" : "→"}</span>
+        {currentSearchData.destination.name}
+      </div>
 
-      <p typography="label-large">
-        {$t("words.fareBrand", { count: priceQuote.options.length })}
+      <div typography="label-large">
+        {currentSearchData.outbound.toLocaleDateString($locale, {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        })}
 
-        <span weight="bold">
-          {priceQuote.options.map((item) => item.brandName).join(", ")}
-        </span>
-      </p>
+        {#if isRoundTrip && currentSearchData.inbound !== undefined}
+          - {currentSearchData.inbound.toLocaleDateString($locale, {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+          })}
+        {/if}
+        ·
+        {$t(`tripTypes.${isRoundTrip ? "round-trip" : "one-way"}`)}
+        ·
+        {getPassengersPresentation(passengers, $t)}
+      </div>
 
       <SummaryItinerary {priceQuote} on:showFareRules={showFareRules} />
     {:else}
@@ -165,5 +184,9 @@
     background-color: transparent;
     border: 0;
     cursor: pointer;
+  }
+
+  .orig-dest > span {
+    color: var(--color-main-primary-500);
   }
 </style>

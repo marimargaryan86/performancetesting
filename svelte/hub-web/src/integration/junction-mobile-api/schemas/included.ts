@@ -106,46 +106,80 @@ const parserMapping: {
   bookingCancellations: { type: "booking-cancellation", parser: bookingCancellationParser },
 };
 
+function sortLegs(a: CommonSchemas.OfferSegmentLeg, b: CommonSchemas.OfferSegmentLeg): number {
+  return a.departureAt.getTime() - b.departureAt.getTime();
+}
+
+function sortBookingDetails(a: TripBookingDetails, b: TripBookingDetails): number {
+  return (a.legs[0]?.departureAt.getTime() ?? 0) - (b.legs.at(-1)?.departureAt.getTime() ?? 0);
+}
+
+function sortOfferGroupDetails(a: TripOfferGroupDetails, b: TripOfferGroupDetails): number {
+  return (
+    a.sequences.trip * 1000 + a.sequences.segment - (b.sequences.trip * 1000 + b.sequences.segment)
+  );
+}
+
+function sortOfferOptionDetails(a: TripOfferOptionDetails, b: TripOfferOptionDetails): number {
+  if (!(a.details && b.details)) {
+    return 0;
+  }
+
+  return (
+    a.details.sequences.trip * 1000 +
+    a.details.sequences.segment -
+    (b.details.sequences.trip * 1000 + b.details.sequences.segment)
+  );
+}
+
+function sortOfferOptions(a: OfferOption, b: OfferOption): number {
+  return a.price.total.amount - b.price.total.amount;
+}
+
+function sortOfferGroups(a: OfferGroup, b: OfferGroup): number {
+  return (
+    (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+    (b.detailsList.at(-1)?.legs.at(-1)?.departureAt.getTime() ?? 0)
+  );
+}
+
+function sortBookings(a: TripBooking, b: TripBooking): number {
+  return (
+    (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+    (b.detailsList.at(-1)?.legs.at(-1)?.departureAt.getTime() ?? 0)
+  );
+}
+
+function sortOrders(a: Order, b: Order): number {
+  return (
+    (a.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+    (b.bookings.at(-1)?.detailsList.at(-1)?.legs.at(-1)?.departureAt.getTime() ?? 0)
+  );
+}
+
 function orderIncluded(included: IncludedMapping): IncludedMapping {
-  // TripBookingDetails legs (must be sorted before Booking details)
-  included.tripBookingDetails?.forEach((details) => {
-    details.legs.sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
+  // Sort legs
+  included.tripOfferGroupDetails?.forEach((item) => item.legs.sort(sortLegs));
+  included.tripBookingDetails?.forEach((item) => item.legs.sort(sortLegs));
+  // Sort details lists
+  included.tripBookings?.forEach((item) => item.detailsList.sort(sortBookingDetails));
+  included.offerOptions?.forEach((item) => item.detailsList.sort(sortOfferOptionDetails));
+  // Sort options
+  included.groups?.forEach((item) => {
+    item.detailsList.sort(sortOfferGroupDetails);
+    item.options.sort(sortOfferOptions);
   });
-
-  // Booking details (must be sorted before Order bookings)
-  included.tripBookings?.forEach((booking) => {
-    booking.detailsList.sort(
-      (a, b) => (a.legs[0]?.departureAt.getTime() ?? 0) - (b.legs[0]?.departureAt.getTime() ?? 0),
-    );
-  });
-
-  // Order bookings (must be sorted before Order journeys)
-  included.orders?.forEach((order) => {
-    order.bookings.sort(
-      (a, b) =>
-        (a.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
-        (b.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
-    );
-  });
-
-  // Journey orders
-  included.journeys?.forEach((journey) => {
-    journey.orders.sort(
-      (a, b) =>
-        (a.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
-        (b.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
-    );
-  });
-
-  // TripOfferGroupDetails legs
-  included.tripOfferGroupDetails?.forEach((details) => {
-    details.legs.sort((a, b) => a.departureAt.getTime() - b.departureAt.getTime());
-  });
-
-  // OfferGroup segments
-  included.groups?.forEach((group) => {
-    group.detailsList.sort((a, b) => a.sequences.segment - b.sequences.segment);
-  });
+  included.tripOfferPriceQuotes?.forEach((item) => item.options.sort(sortOfferOptions));
+  included.offers?.forEach((item) => item.groups.sort(sortOfferGroups));
+  included.cancellationRequests?.forEach((item) => item.bookings.sort(sortBookings));
+  included.orders?.forEach((item) => item.bookings.sort(sortBookings));
+  included.journeys?.forEach((item) => item.orders.sort(sortOrders));
+  // Offers
+  included.offers?.sort(
+    (a, b) =>
+      (a.groups[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0) -
+      (b.groups[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
+  );
 
   return included;
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getLocale } from "$lib/i18n";
   import type { CarSearchData } from "../car-search-data";
-  import CollapsibleSearch from "../../collapsible-search.svelte";
+  import CollapsibleSearch from "../../../collapsible-search.svelte";
   import CarSearch from "./car-search.svelte";
 
   export let searchData: CarSearchData;

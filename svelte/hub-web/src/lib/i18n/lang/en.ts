@@ -3,9 +3,9 @@ import type { StatusBadgeValue } from "$lib/models/status-badge";
 import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
 import type * as OrySchemas from "~/integration/ory/schemas";
 import type { PassengerType } from "$lib/models/passenger";
-import type { SortOption } from "$lib/utils/offer";
 import type * as CommonSchemas from "~/integration/common/schemas";
-import type { TripType } from "$lib/components/pages/trip-management/booking-flow-train/trip-search-data";
+import type { TripType } from "$lib/components/pages/trip-management/book/search/trip-search-data";
+import type { OfferSortOption } from "$lib/sorting/offer";
 
 export default {
   title: "Junction Hub",
@@ -166,6 +166,8 @@ export default {
     modifySearch: "Modify Search",
     addUser: "Add User",
     save: "Save",
+    change: "Change",
+    confirmSelection: "Confirm selection",
   },
   sentences: {
     priceChange: "Price change",
@@ -247,6 +249,7 @@ export default {
     adminRoleDescription:
       "View and manage any orders made within the agency. Manage reseller & user settings.",
     userRoleDescription: "View and manage your own orders for a personalized experience.",
+    totalAmount: "Total amount",
   },
   tableHeaders: {
     id: "ID",
@@ -333,11 +336,9 @@ export default {
   sortOptions: {
     "earliest-arrival": "Earliest arrival",
     "earliest-departure": "Earliest departure",
-    "latest-arrival": "Latest arrival",
-    "latest-departure": "Latest departure",
     "lowest-price": "Lowest price",
     fastest: "Fastest",
-  } satisfies Record<SortOption, string>,
+  } satisfies Record<OfferSortOption, string>,
   statuses: {
     active: "Active",
     confirmed: "Confirmed",
@@ -590,6 +591,10 @@ export default {
                 select: {
                   title: "Select",
                   subTitle: "Select an offer",
+                  outbound: 'Select <strong weight="bold">outbound</strong>',
+                  inbound: 'Select <strong weight="bold">inbound</strong>',
+                  findingOutbound: "Finding outbound offers...",
+                  findingInbound: "Finding inbound offers...",
                 },
                 payment: {
                   title: "Payment",

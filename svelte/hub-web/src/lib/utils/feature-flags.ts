@@ -14,6 +14,7 @@ export const enum Feature {
   DEV_TOOLS = "dev-tools",
   OFFERS_TIME_WINDOWS = "offers-time-windows",
   CAR_RENTAL = "car-rental",
+  ROUND_TRIP = "round-trip",
 }
 
 export const FEATURES: Record<
@@ -42,6 +43,12 @@ export const FEATURES: Record<
     description: "Enables car rentals",
     releaseDate: "2024-03-31",
     removalDate: "2024-06-30",
+  },
+  [Feature.ROUND_TRIP]: {
+    owner: "Mattias Andersson <mandersson@snowfalltravel.com>",
+    description: "Enables round trip",
+    releaseDate: "2024-04-30",
+    removalDate: "2024-07-31",
   },
 };
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { dev } from "$app/environment";
   import DatePicker from "$lib/components/ui/date-picker/date-picker.svelte";
   import PassengerPicker from "./passenger-picker/passenger-picker.svelte";
   import { getDefaultValue } from "$lib/models/passenger";
@@ -22,6 +21,7 @@
   import { formatPlace } from "$lib/formatting/location";
   import { getClosestFullHour } from "$lib/utils/date-time";
   import type { SearchData } from "$lib/booking-manager/booking-manager";
+  import { Feature, getFeatureTools } from "$lib/utils/feature-flags";
 
   export let data: PartialTripSearchData = {
     tripType: "one-way",
@@ -30,6 +30,7 @@
   };
   let errors: TripSearchDataError | undefined = undefined;
 
+  const featureTools = getFeatureTools();
   const dispatch = createEventDispatcher<{
     search: { data: SearchData; pending: Writable<boolean> };
   }>();
@@ -117,7 +118,7 @@
   </button>
 
   <div class="settings">
-    {#if dev}
+    {#if $featureTools.hasFeature(Feature.ROUND_TRIP)}
       <TripTypePicker bind:value={data.tripType} />
     {/if}
 

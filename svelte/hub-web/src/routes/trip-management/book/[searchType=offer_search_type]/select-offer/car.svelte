@@ -2,9 +2,8 @@
   import { browser } from "$app/environment";
   import { invalidateAll } from "$app/navigation";
   import { manager } from "$lib/booking-manager/booking-manager";
-  import { carSearchDataParser } from "$lib/components/pages/trip-management/booking-flow-car/car-search-data";
-  import CollapsibleCarSearch from "$lib/components/pages/trip-management/booking-flow-car/search/collapsible-car-search.svelte";
-  import LoadingSkelton from "$lib/components/pages/trip-management/booking-flow-train/select-offer/loading-skelton.svelte";
+  import { carSearchDataParser } from "$lib/components/pages/trip-management/book/search/car-search-data";
+  import CollapsibleCarSearch from "$lib/components/pages/trip-management/book/search/car-components/collapsible-car-search.svelte";
   import OfferResultLayout from "$lib/components/pages/trip-management/offer-result-layout.svelte";
   import Alert from "$lib/components/ui/alert.svelte";
   import { getTranslator } from "$lib/i18n";
@@ -75,10 +74,10 @@
     {/each}
 
     {#if offersPending}
-      <li><LoadingSkelton /></li>
-      <li><LoadingSkelton /></li>
-      <li><LoadingSkelton /></li>
-      <li><LoadingSkelton /></li>
+      <li>Loading...</li>
+      <li>Loading...</li>
+      <li>Loading...</li>
+      <li>Loading...</li>
     {:else if !offers.length}
       <li>
         <Alert type="warning" dismissable={false}>

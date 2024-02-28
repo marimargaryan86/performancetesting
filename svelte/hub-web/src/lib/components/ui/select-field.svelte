@@ -26,6 +26,7 @@
   export let dialogMinWidth: string | undefined = undefined;
   export let search: ((query: string, option?: TValue) => boolean) | undefined = undefined;
   export let readonly = false;
+  export let id: string | undefined = undefined;
 
   let expanded = false;
   let dialog: HTMLUListElement | undefined;
@@ -138,6 +139,7 @@
     {required}
     {label}
     {placeholder}
+    {id}
     role="combobox"
     readonly={readonly || !search}
     on:input={input}

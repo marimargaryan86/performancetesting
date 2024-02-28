@@ -5,7 +5,7 @@
 <script lang="ts">
   import { roundCurrency } from "$lib/utils/money";
   import { slideFade } from "$lib/transitions/slide-fade";
-  import Collapsible from "../collapsible.svelte";
+  import Collapsible from "../../collapsible.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";

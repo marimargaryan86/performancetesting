@@ -2,7 +2,7 @@
   import { getPassengersPresentation } from "$lib/models/passenger";
   import { getLocale, getTranslator } from "$lib/i18n";
   import type { TripSearchData } from "../trip-search-data";
-  import CollapsibleSearch from "../../collapsible-search.svelte";
+  import CollapsibleSearch from "../../../collapsible-search.svelte";
   import TripSearch from "./trip-search.svelte";
 
   export let searchData: TripSearchData;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { formatDuration } from "$lib/formatting/date-time";
   import { getTimeDeltaS } from "$lib/utils/date-time";
-  import Collapsible from "../collapsible.svelte";
+  import Collapsible from "../../collapsible.svelte";
   import { createEventDispatcher } from "svelte";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import EntityAvatar from "$lib/components/ui/entity-avatar.svelte";

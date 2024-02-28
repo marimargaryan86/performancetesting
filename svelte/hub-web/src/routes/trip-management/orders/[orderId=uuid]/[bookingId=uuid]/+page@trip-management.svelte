@@ -3,17 +3,17 @@
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import routeConfig from "$lib/route-config";
   import { getDestination, getOrigin } from "$lib/utils/booking";
-  import Passengers from "$lib/components/pages/trip-management/booking-flow-train/passengers.svelte";
-  import Ticket from "$lib/components/pages/trip-management/booking-flow-train/ticket.svelte";
-  import Itinerary from "$lib/components/pages/trip-management/booking-flow-train/itinerary.svelte";
+  import Passengers from "$lib/components/pages/trip-management/book/passengers.svelte";
+  import Ticket from "$lib/components/pages/trip-management/book/ticket.svelte";
+  import Itinerary from "$lib/components/pages/trip-management/book/itinerary.svelte";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
   import { getUser, permitted } from "$lib/utils/permissions";
   import Admin from "$lib/components/pages/trip-management/orders/admin.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import Fees from "$lib/components/pages/trip-management/booking-flow-train/confirmation/fees.svelte";
+  import Fees from "$lib/components/pages/trip-management/book/confirmation/rail-components/fees.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import Price from "$lib/components/pages/trip-management/booking-flow-train/price.svelte";
+  import Price from "$lib/components/pages/trip-management/book/price.svelte";
 
   export let data;
 
