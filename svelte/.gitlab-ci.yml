@@ -23,7 +23,6 @@ svelte:setup:
     - yarn workspace "@snowfall/${PROJECT_NAME}" lint
     - yarn workspace "@snowfall/${PROJECT_NAME}" check
     - yarn workspace "@snowfall/${PROJECT_NAME}" vitest
-    - yarn workspace "@snowfall/${PROJECT_NAME}" build
   cache:
     - key:
         files:
