@@ -241,6 +241,12 @@ class OfferImporter(object):
             offer_search.reseller_id,
             {},
         ).get(message.provider_name, [])
+        disabled_operators.extend(
+            self._reseller_disabled_operators.get("*", {}).get(
+                message.provider_name,
+                [],
+            ),
+        )
 
         if self._contains_disabled_operator(disabled_operators, message.offer):
             return
