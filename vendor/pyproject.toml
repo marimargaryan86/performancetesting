@@ -362,7 +362,6 @@ addopts = "--import-mode=importlib --asyncio-mode=auto --dist loadscope"
 
 [tool.ruff]
 target-version = "py311"
-preview = true
 unsafe-fixes = true
 
 [tool.ruff.format]
@@ -449,6 +448,7 @@ ignore = [
   "UP032",   # Use f-string instead of `format` call
   "W191",    # Indentation contains tabs. Incompatible with Ruff's formatter.
 ]
+preview = true
 select = [
   "A",   # flake8-builtins
   "AIR", # Airflow
@@ -479,21 +479,21 @@ select = [
   "ISC",  # flake8-implicit-str-concat
   "ICN",  # flake8-import-conventions
   #"INP", # flake8-no-pep420
-  "INT", # flake8-gettext
-  "LOG", # flake8-logging
-  "N",   # pep8-naming
-  "NPY", # NumPy-specific rules
-  "PD",  # pandas-vet
-  "PGH", # pygrep-hooks
-  "PIE", # flake8-pie
-  "PL",  # Pylint
-  "RET", # flake8-return
-  #"RSE", # flake8-raise
+  "INT",  # flake8-gettext
+  "LOG",  # flake8-logging
+  "N",    # pep8-naming
+  "NPY",  # NumPy-specific rules
+  "PD",   # pandas-vet
   "PERF", # Perflint
+  "PGH",  # pygrep-hooks
+  "PIE",  # flake8-pie
+  "PL",   # Pylint
   "PT",   # flake8-pytest-style
   "PTH",  # flake8-use-pathlib
   "PYI",  # flake8-pyi
   "Q",    # flake8-quotes
+  "RET",  # flake8-return
+  #"RSE", # flake8-raise
   "RUF",  # Ruff-specific rules
   "S",    # flake8-bandit
   "SIM",  # flake8-simplify
