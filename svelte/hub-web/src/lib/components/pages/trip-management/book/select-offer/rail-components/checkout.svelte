@@ -22,6 +22,8 @@
   export let tripType: TripType;
   export let selected: PartialSelectedOfferData;
   export let tripDirection: TripDirection;
+  export let outboundPending: boolean;
+  export let inboundPending: boolean;
 
   const pending = writable(false);
 
@@ -55,6 +57,7 @@
       start={outbound?.detailsList[0]?.details?.legs[0]}
       end={outbound?.detailsList.at(-1)?.details?.legs.at(-1)}
       showTripDirection={tripType === "round-trip"}
+      pending={outboundPending}
     >
       <button
         on:click={changeDirection.bind(changeDirection, "outbound")}
@@ -75,15 +78,19 @@
       direction="left"
       start={inbound?.detailsList[0]?.details?.legs[0]}
       end={inbound?.detailsList.at(-1)?.details?.legs.at(-1)}
+      pending={inboundPending}
     >
-      <button
-        on:click={changeDirection.bind(changeDirection, "inbound")}
-        slot="action"
-        class="change"
-        typography="body-medium"
-      >
-        {$t("actions.change")}
-      </button>
+      <svelte:fragment slot="action">
+        {#if selected.outbound}
+          <button
+            on:click={changeDirection.bind(changeDirection, "inbound")}
+            class="change"
+            typography="body-medium"
+          >
+            {$t("actions.change")}
+          </button>
+        {/if}
+      </svelte:fragment>
     </TripSummary>
   {/if}
 

@@ -51,7 +51,7 @@
   {/if}
 
   {#if expanded}
-    <div class="dialogue" transition:scale={{ duration: 150, start: 0.8 }}>
+    <div class="dialog" transition:scale={{ duration: 150, start: 0.8 }}>
       <div class="header" typography="title-medium" weight="bold">
         {$t("words.passenger_other")}
       </div>
@@ -88,7 +88,7 @@
     cursor: pointer;
   }
 
-  .dialogue {
+  .dialog {
     position: absolute;
     top: var(--x-height);
     left: 0;

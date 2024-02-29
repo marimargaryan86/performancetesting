@@ -104,6 +104,7 @@ export default {
     user: "Användare",
     earlier: "Tidigare",
     later: "Senare",
+    ok: "Ok",
   },
   actions: {
     logout: "Logga ut",
@@ -244,6 +245,9 @@ export default {
       "Visa och hantera alla beställningar som gjorts inom agenturen. Hantera återförsäljare och användarinställningar.",
     userRoleDescription: "Visa och hantera dina egna beställningar för en personlig upplevelse.",
     totalAmount: "Summa",
+    fetchingSelection: "Hämtar erbjudande",
+    previousSelectedOutboundUnavailable: "Din tidigare valda utresa är inte längre tillgänglig",
+    previousSelectedInboundUnavailable: "Din tidigare valda inresa är inte längre tillgänglig",
   },
   tableHeaders: {
     id: "ID",

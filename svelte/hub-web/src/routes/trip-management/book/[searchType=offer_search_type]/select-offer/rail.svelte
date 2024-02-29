@@ -25,7 +25,8 @@
   import SearchOptions from "$lib/components/pages/trip-management/book/select-offer/rail-components/search-options.svelte";
   import { getOfferSortFunc, type OfferSortOption } from "$lib/sorting/offer";
   import { getOfferFilterFunc } from "$lib/filters/offer";
-  import { getOffer } from "$lib/utils/offer";
+  import { getOffer, getOfferOptionHash } from "$lib/utils/offer";
+  import AlertDialog from "$lib/components/ui/dialogs/alert-dialog.svelte";
 
   const featureTools = getFeatureTools();
   const t = getTranslator();
@@ -40,6 +41,9 @@
   let tripDirection: TripDirection = "outbound";
   let sortBy: OfferSortOption = "earliest-departure";
   let directOnly = false;
+  let outboundHash: string | undefined;
+  let inboundHash: string | undefined;
+  let alertDialog: AlertDialog | undefined;
 
   $: searchData = tripSearchDataParser.fromSearchData(data.bookingSession.searchData);
   $: offerSearchId = data.bookingSession.offerSearch.id;
@@ -51,16 +55,28 @@
     const outboundId = data.bookingSession.selectedOffer?.optionIds?.[0];
     const inboundId = data.bookingSession.selectedOffer?.optionIds?.[1];
 
-    if (outboundId && !selected.outbound) {
-      selected.outbound = offer.groups
-        .flatMap((group) => group.options)
-        .find((option) => option.id === outboundId);
+    if (!selected.outbound) {
+      if (outboundHash) {
+        selected.outbound = offer.groups
+          .flatMap((item) => item.options)
+          .find((option) => getOfferOptionHash(option) === outboundHash);
+      } else if (outboundId) {
+        selected.outbound = offer.groups
+          .flatMap((group) => group.options)
+          .find((option) => option.id === outboundId);
+      }
     }
 
-    if (inboundId && !selected.inbound) {
-      selected.inbound = offer.groups
-        .flatMap((group) => group.options)
-        .find((option) => option.id === inboundId);
+    if (!selected.inbound) {
+      if (inboundHash) {
+        selected.inbound = offer.groups
+          .flatMap((item) => item.options)
+          .find((option) => getOfferOptionHash(option) === inboundHash);
+      } else if (inboundId) {
+        selected.inbound = offer.groups
+          .flatMap((group) => group.options)
+          .find((option) => option.id === inboundId);
+      }
     }
   }
 
@@ -78,6 +94,18 @@
         updateSelection(offer);
       }
     } finally {
+      if (outboundHash && !selected.outbound) {
+        alertDialog?.show($t("sentences.previousSelectedOutboundUnavailable"));
+        tripDirection = "outbound";
+      }
+
+      if (inboundHash && !selected.inbound) {
+        alertDialog?.show($t("sentences.previousSelectedInboundUnavailable"));
+      }
+
+      outboundHash = undefined;
+      inboundHash = undefined;
+
       if (currPollOffersController === pollOffersController) {
         offersPending = false;
       }
@@ -89,13 +117,13 @@
     offers = [];
     offersPending = true;
     selected = {};
-    tripDirection = "outbound";
     await invalidateAll();
   }
 
   async function search(event: ComponentEvents<CollapsibleTripSearch>["search"]): Promise<void> {
     event.detail.pending.set(true);
     await searchAux(event.detail.data);
+    tripDirection = "outbound";
     event.detail.pending.set(false);
   }
 
@@ -144,6 +172,12 @@
       nextData[tripDirection] = nextTime;
     }
 
+    if (selected.inbound && tripDirection === "outbound") {
+      inboundHash = getOfferOptionHash(selected.inbound);
+    } else if (selected.outbound && tripDirection === "inbound") {
+      outboundHash = getOfferOptionHash(selected.outbound);
+    }
+
     searchAux({ ...data.bookingSession.searchData, ...nextData });
   }
 
@@ -153,6 +187,8 @@
     }
   });
 </script>
+
+<AlertDialog bind:this={alertDialog} maxWidth="488px" />
 
 <OfferResultLayout
   showActions
@@ -186,6 +222,8 @@
     {offers}
     {selected}
     {tripDirection}
+    outboundPending={Boolean(outboundHash)}
+    inboundPending={Boolean(inboundHash)}
     tripType={searchData.tripType}
     slot="actions"
     on:createpricequote={createPriceQuote}

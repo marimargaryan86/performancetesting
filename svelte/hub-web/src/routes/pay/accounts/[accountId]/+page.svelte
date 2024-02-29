@@ -2,7 +2,7 @@
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import CurrencyFlag from "$lib/components/icons/currency-flag.svelte";
   import { formatAmount } from "$lib/formatting/currency";
-  import AddBalanceDialogue from "$lib/components/pages/pay/accounts/add-balance-dialogue.svelte";
+  import AddBalanceDialog from "$lib/components/pages/pay/accounts/add-balance-dialog.svelte";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import routeConfig from "$lib/route-config";
   import { getPageTitle } from "$lib/utils/page-title";
@@ -16,7 +16,7 @@
   const t = getTranslator();
 
   let searchQuery = "";
-  let dialogue: AddBalanceDialogue;
+  let dialog: AddBalanceDialog;
 
   $: breadCrumbs = [
     { url: routeConfig.routes.pay.routes.accounts.root, label: "Accounts" },
@@ -29,11 +29,11 @@
     .filter((item) => item.currencyId.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => 0 - (a.currencyId < b.currencyId ? 1 : -1));
 
-  function openDialogue(): void {
-    dialogue.open();
+  function openDialog(): void {
+    dialog.open();
   }
 
-  function addBalances(event: ComponentEvents<AddBalanceDialogue>["addbalances"]): void {
+  function addBalances(event: ComponentEvents<AddBalanceDialog>["addbalances"]): void {
     data.balances = [...event.detail, ...data.balances];
   }
 </script>
@@ -50,15 +50,15 @@
   </title>
 </svelte:head>
 
-<AddBalanceDialogue
+<AddBalanceDialog
   exclude={balances}
   accountId={data.account.id}
   on:addbalances={addBalances}
-  bind:this={dialogue}
+  bind:this={dialog}
 />
 
 <StandardLayout pageTitle={$t("words.balances")} {breadCrumbs} bind:searchQuery>
-  <button variant="primary" size="small" on:click={openDialogue} slot="actions">
+  <button variant="primary" size="small" on:click={openDialog} slot="actions">
     {$t("actions.addBalance")}
     <Icon variant="plus" size="20px" />
   </button>

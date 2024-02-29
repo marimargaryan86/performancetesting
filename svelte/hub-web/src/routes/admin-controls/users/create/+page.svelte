@@ -135,7 +135,7 @@
 
 <div class="actions">
   <div class="wrapper">
-    <!-- TODO: ADD POPUP DIALOGUE TO CONFIRM DISCARDING CHANGES AS PER DESIGNS -->
+    <!-- TODO: ADD POPUP DIALOG TO CONFIRM DISCARDING CHANGES AS PER DESIGNS -->
     <a variant="outline" size="small" href={routeConfig.routes.adminControls.routes.users.root}>
       {$t("actions.cancel")}
     </a>

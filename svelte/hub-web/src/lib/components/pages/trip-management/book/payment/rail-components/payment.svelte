@@ -55,7 +55,7 @@
   } from "@stripe/stripe-js";
   import { env } from "$env/dynamic/public";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
-  import Dialog from "$lib/components/ui/dialogues/dialog.svelte";
+  import Dialog from "$lib/components/ui/dialogs/dialog.svelte";
   import { getLocale, getTranslator } from "$lib/i18n";
   import type { PaymentIntent } from "$lib/booking-manager/booking-manager";
   import { getUser } from "$lib/utils/permissions";

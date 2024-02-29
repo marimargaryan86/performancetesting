@@ -104,6 +104,7 @@ export default {
     user: "User",
     earlier: "Antes",
     later: "Después",
+    ok: "Ok",
   },
   actions: {
     logout: "Cerrar sesión",
@@ -270,6 +271,11 @@ export default {
       "View and manage any orders made within the agency. Manage reseller & user settings.",
     userRoleDescription: "View and manage your own orders for a personalized experience.",
     totalAmount: "Cantidad total",
+    fetchingSelection: "Obteniendo selección",
+    previousSelectedOutboundUnavailable:
+      "Tu viaje de ida seleccionado previamente ya no está disponible",
+    previousSelectedInboundUnavailable:
+      "Su viaje entrante seleccionado previamente ya no está disponible",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

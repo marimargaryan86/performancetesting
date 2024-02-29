@@ -10,7 +10,7 @@
   import Countdown from "$lib/components/pages/trip-management/book/countdown.svelte";
   import { z } from "zod";
   import { goto } from "$app/navigation";
-  import PriceDialog from "$lib/components/ui/dialogues/price-dialog.svelte";
+  import PriceDialog from "$lib/components/ui/dialogs/price-dialog.svelte";
   import Summary from "$lib/components/pages/trip-management/book/summary/rail-components/summary.svelte";
   import { onDestroy } from "svelte";
   import FareRulesDialog from "$lib/components/pages/trip-management/book/fare-rules-dialog.svelte";

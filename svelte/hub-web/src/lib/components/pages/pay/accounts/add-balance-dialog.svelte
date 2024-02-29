@@ -75,12 +75,12 @@
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
 
   <div
-    class="add-balance-dialogue"
+    class="add-balance-dialog"
     on:click|self={close}
     use:portal={document.body}
     transition:fade={{ duration: 200 }}
   >
-    <div class="dialogue" transition:fly={{ duration: 200, y: 24 }} on:introend={focusSearch}>
+    <div class="dialog" transition:fly={{ duration: 200, y: 24 }} on:introend={focusSearch}>
       <h1 typography="headline-medium" weight="bold">{$t("actions.addBalances")}</h1>
 
       <TextField
@@ -126,7 +126,7 @@
 {/if}
 
 <style>
-  .add-balance-dialogue {
+  .add-balance-dialog {
     position: fixed;
     top: 0;
     left: 0;
@@ -139,7 +139,7 @@
     background-color: rgb(0 0 0 / 0.5);
   }
 
-  .dialogue {
+  .dialog {
     display: flex;
     flex-flow: column;
     gap: 32px;
@@ -153,7 +153,7 @@
     box-shadow: 0 4px 20px rgb(0 0 0 / 0.1);
   }
 
-  .dialogue > :global(.text-field) {
+  .dialog > :global(.text-field) {
     --height: 40px;
   }
 

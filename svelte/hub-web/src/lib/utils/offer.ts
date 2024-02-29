@@ -3,6 +3,7 @@ import { summarizePrices } from "./money";
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import type * as CommonSchemas from "~/integration/common/schemas";
 import type { TripType } from "$lib/components/pages/trip-management/book/search/trip-search-data";
+import { Base64 } from "js-base64";
 
 export function getTotalPriceBreakdown(
   priceQuote: MobileSchemas.TripOfferPriceQuote,
@@ -115,4 +116,25 @@ export function getLegExtremes(details: MobileSchemas.TripOfferGroupDetails | un
   }
 
   return { start, end };
+}
+
+/**
+ * Get a hash that uniquely identifies an offer option
+ * @param option Option to hash
+ */
+export function getOfferOptionHash(option: MobileSchemas.OfferOption): string {
+  return Base64.encode(
+    JSON.stringify({
+      brandName: option.brandName,
+      price: option.price.total,
+      legs: option.detailsList
+        .flatMap((details) =>
+          details.details?.legs.flatMap((leg) => ({
+            departureAt: leg.departureAt,
+            arrivalAt: leg.arrivalAt,
+          })),
+        )
+        .filter(ensureDefined),
+    }),
+  );
 }

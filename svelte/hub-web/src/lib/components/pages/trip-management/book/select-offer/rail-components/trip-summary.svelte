@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { getLocale } from "$lib/i18n";
+  import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
+  import { getLocale, getTranslator } from "$lib/i18n";
   import type { DirectionX } from "$lib/models/spatial";
   import Route from "./route.svelte";
   import type * as CommonSchemas from "~/integration/common/schemas";
 
+  const t = getTranslator();
   const locale = getLocale();
 
   let className: string | undefined = undefined;
@@ -14,6 +16,7 @@
   export let direction: DirectionX;
   export let focused: boolean;
   export let showTripDirection = true;
+  export let pending: boolean;
 </script>
 
 <div class:trip-summary={true} class={className} class:focused>
@@ -59,6 +62,11 @@
         },
       ]}
     />
+  {:else if pending}
+    <div class="pending" typography="body-medium">
+      <span>{$t("sentences.fetchingSelection")}</span>
+      <LoadingIcon size="20px" color="var(--color-main-neutral-700)" />
+    </div>
   {/if}
 </div>
 
@@ -90,7 +98,23 @@
 
   .date {
     display: flex;
-    flex-grow: 1;
     align-items: center;
+  }
+
+  .pending {
+    display: flex;
+    flex-grow: 1;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pending > span {
+    color: var(--color-main-neutral-700);
+    text-align: center;
+  }
+
+  .pending > :global(svg) {
+    flex-shrink: 0;
   }
 </style>
