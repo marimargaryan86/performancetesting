@@ -57,13 +57,13 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         provider = await self._providers.find_by_id(ids.provider_id)
 
         if not provider:
-            return context.abort(
+            return await context.abort(
                 StatusCode.UNAVAILABLE,
                 "Provider is unavailable",
             )
 
         if not provider.booking_capabilities.supports_cancellation:
-            return context.abort(StatusCode.UNIMPLEMENTED)
+            return await context.abort(StatusCode.UNIMPLEMENTED)
 
         try:
             response = await provider.connection.bookings.CancelBooking(
@@ -74,7 +74,7 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         except aio.AioRpcError as error:
             self._logger.exception("Booking cancellation failed")
 
-            return context.abort(
+            return await context.abort(
                 code=StatusCode.INTERNAL,
                 details=str(error),
             )
