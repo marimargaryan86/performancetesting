@@ -9,7 +9,6 @@
   import { writable } from "svelte/store";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { slideFade } from "$lib/transitions/slide-fade";
-  import { getUser, permitted } from "$lib/utils/permissions";
   import routeConfig from "$lib/route-config";
   import Icon from "$lib/components/icons/icon.svelte";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
@@ -17,7 +16,6 @@
   import integrationInstancesClient from "~/integration-instances-client";
 
   const t = getTranslator();
-  const user = getUser();
   const pending = writable(false);
   const columns = "repeat(4, minmax(max-content, 1fr)) minmax(160px, 1fr) 1fr";
 
@@ -54,74 +52,72 @@
   </title>
 </svelte:head>
 
-{#if permitted($user, "users.add")}
-  <StandardLayout pageTitle={$t("pages.adminControls.pages.users.title")}>
-    <div slot="actions">
-      <a
-        variant="primary"
-        size="small"
-        href={routeConfig.routes.adminControls.routes.users.routes.create.root}
-      >
-        <Icon variant="plus" size="20px" />
-        {$t("actions.addUser")}
-      </a>
-    </div>
+<StandardLayout pageTitle={$t("pages.adminControls.pages.users.title")}>
+  <div slot="actions">
+    <a
+      variant="primary"
+      size="small"
+      href={routeConfig.routes.adminControls.routes.users.routes.create.root}
+    >
+      <Icon variant="plus" size="20px" />
+      {$t("actions.addUser")}
+    </a>
+  </div>
 
-    {#if users.length}
-      <x-table
-        class="users-table"
-        use:scrollLoad={{ func: loadMore, pending }}
-        style:grid-template-columns={columns}
-      >
-        <x-thead>
-          <x-th>{"Email"}</x-th>
-          <x-th>{"Role"}</x-th>
-          <x-th>{"Resellers"}</x-th>
-          <x-th>{"User Status"}</x-th>
-          <x-th></x-th>
-        </x-thead>
+  {#if users.length}
+    <x-table
+      class="users-table"
+      use:scrollLoad={{ func: loadMore, pending }}
+      style:grid-template-columns={columns}
+    >
+      <x-thead>
+        <x-th>{"Email"}</x-th>
+        <x-th>{"Role"}</x-th>
+        <x-th>{"Resellers"}</x-th>
+        <x-th>{"User Status"}</x-th>
+        <x-th></x-th>
+      </x-thead>
 
-        {#each users as hubUser}
-          <x-tr>
-            <x-td>
-              {hubUser.email}
-            </x-td>
-            <x-td>
-              {hubUser.role}
-            </x-td>
-            <x-td>
-              {hubUser.resellerId}
-              <!-- {hubUser.resellers.map((reseller) => reseller.name).join(", ")} -->
-            </x-td>
-            <x-td>
-              <StatusBadge value={"active"} />
-              <!-- {#if hubUser.status === "active"}
+      {#each users as hubUser}
+        <x-tr>
+          <x-td>
+            {hubUser.email}
+          </x-td>
+          <x-td>
+            {hubUser.role}
+          </x-td>
+          <x-td>
+            {hubUser.resellerId}
+            <!-- {hubUser.resellers.map((reseller) => reseller.name).join(", ")} -->
+          </x-td>
+          <x-td>
+            <StatusBadge value={"active"} />
+            <!-- {#if hubUser.status === "active"}
                 <StatusBadge value={"active"} />
               {:else if hubUser.status === "pending"}
                 <StatusBadge value={"pending"} />
               {/if} -->
-            </x-td>
-            <button class="action-btn">⋮</button>
-          </x-tr>
-        {/each}
+          </x-td>
+          <button class="action-btn">⋮</button>
+        </x-tr>
+      {/each}
 
-        {#if $pending}
-          <x-tloading transition:slideFade={{ duration: 200 }}>
-            <LoadingIcon color="var(--color-main-primary-500)" />
-          </x-tloading>
-        {/if}
-      </x-table>
-    {:else}
-      <div class="not-found-wrapper">
-        <div class="not-found-container">
-          <img src="/images/illustrations/not-found.png" alt="" />
-          <h3 typography="headline-large" weight="bold">{$t("sentences.noTripsFound")}</h3>
-          <pre typography="body-large">{$t("sentences.noTripsFoundMessage")}</pre>
-        </div>
+      {#if $pending}
+        <x-tloading transition:slideFade={{ duration: 200 }}>
+          <LoadingIcon color="var(--color-main-primary-500)" />
+        </x-tloading>
+      {/if}
+    </x-table>
+  {:else}
+    <div class="not-found-wrapper">
+      <div class="not-found-container">
+        <img src="/images/illustrations/not-found.png" alt="" />
+        <h3 typography="headline-large" weight="bold">{$t("sentences.noTripsFound")}</h3>
+        <pre typography="body-large">{$t("sentences.noTripsFoundMessage")}</pre>
       </div>
-    {/if}
-  </StandardLayout>
-{/if}
+    </div>
+  {/if}
+</StandardLayout>
 
 <style>
   .users-table {

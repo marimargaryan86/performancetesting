@@ -4,7 +4,7 @@
   import { getPageTitle } from "$lib/utils/page-title";
   import Icon from "$lib/components/icons/icon.svelte";
   import { getTranslator } from "$lib/i18n";
-  import { getUser, permitted } from "$lib/utils/permissions";
+  import { getUser } from "$lib/utils/permissions";
   import TextField from "$lib/components/ui/text-field.svelte";
   import RoleOption from "../components/role-option.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
@@ -55,83 +55,80 @@
   </title>
 </svelte:head>
 
-{#if permitted($user, "users.add")}
-  <StandardLayout pageTitle={$t("pages.adminControls.pages.users.pages.create.title")}>
-    {#if user}
-      <div class="body">
-        <form class="user-information">
-          <div class="section">
-            <div class="section-title">
-              <span typography="title-medium">Profile</span>
-              <span class="subtitle" typography="body-medium">Enter the user’s account details</span
-              >
-            </div>
-            <div class="fields-container">
-              <TextField label="Name" required placeholder="Enter name" />
-              <TextField label="Email address" required placeholder="Enter email address" />
-            </div>
+<StandardLayout pageTitle={$t("pages.adminControls.pages.users.pages.create.title")}>
+  {#if user}
+    <div class="body">
+      <form class="user-information">
+        <div class="section">
+          <div class="section-title">
+            <span typography="title-medium">Profile</span>
+            <span class="subtitle" typography="body-medium">Enter the user’s account details</span>
           </div>
+          <div class="fields-container">
+            <TextField label="Name" required placeholder="Enter name" />
+            <TextField label="Email address" required placeholder="Enter email address" />
+          </div>
+        </div>
 
-          <div class="section">
-            <div class="section-title">
-              <span typography="title-medium">Role</span>
-              <span class="subtitle" typography="body-medium">Define the role of the user</span>
-            </div>
-            <div class="role-options-container">
-              <RoleOption on:select={selectAdminRole} active={selectedRole === "admin"}>
-                <div slot="media">
-                  <Icon
-                    variant="password-circular"
-                    color="var(--color-common-light-strong)"
-                    size="32px"
-                  />
-                </div>
-                <div slot="content" class="content">
-                  <span typography="body-large" weight="bold">{$t("words.admin")}</span>
-                  <span class="role-description" typography="body-small"
-                    >{$t("sentences.adminRoleDescription")}</span
-                  >
-                </div>
-              </RoleOption>
-              <RoleOption on:select={selectUserRole} active={selectedRole === "user"}>
-                <div slot="media">
-                  <Icon
-                    variant="user-circular"
-                    color="var(--color-common-light-strong)"
-                    size="32px"
-                  />
-                </div>
-                <div slot="content" class="content">
-                  <span typography="body-large" weight="bold">{$t("words.user")}</span>
-                  <span class="role-description" typography="body-small"
-                    >{$t("sentences.userRoleDescription")}</span
-                  >
-                </div>
-              </RoleOption>
-            </div>
+        <div class="section">
+          <div class="section-title">
+            <span typography="title-medium">Role</span>
+            <span class="subtitle" typography="body-medium">Define the role of the user</span>
           </div>
+          <div class="role-options-container">
+            <RoleOption on:select={selectAdminRole} active={selectedRole === "admin"}>
+              <div slot="media">
+                <Icon
+                  variant="password-circular"
+                  color="var(--color-common-light-strong)"
+                  size="32px"
+                />
+              </div>
+              <div slot="content" class="content">
+                <span typography="body-large" weight="bold">{$t("words.admin")}</span>
+                <span class="role-description" typography="body-small">
+                  {$t("sentences.adminRoleDescription")}
+                </span>
+              </div>
+            </RoleOption>
+            <RoleOption on:select={selectUserRole} active={selectedRole === "user"}>
+              <div slot="media">
+                <Icon
+                  variant="user-circular"
+                  color="var(--color-common-light-strong)"
+                  size="32px"
+                />
+              </div>
+              <div slot="content" class="content">
+                <span typography="body-large" weight="bold">{$t("words.user")}</span>
+                <span class="role-description" typography="body-small">
+                  {$t("sentences.userRoleDescription")}
+                </span>
+              </div>
+            </RoleOption>
+          </div>
+        </div>
 
-          <div class="section">
-            <div class="section-title">
-              <span typography="title-medium">Resellers</span>
-              <span class="subtitle" typography="body-medium"
-                >Add or remove resellers of the user</span
-              >
-            </div>
-            <div class="fields-container">
-              <SelectField
-                required
-                label="Resellers"
-                placeholder="Add resellers"
-                options={resellerOptions}
-              />
-            </div>
+        <div class="section">
+          <div class="section-title">
+            <span typography="title-medium">Resellers</span>
+            <span class="subtitle" typography="body-medium">
+              Add or remove resellers of the user
+            </span>
           </div>
-        </form>
-      </div>
-    {/if}
-  </StandardLayout>
-{/if}
+          <div class="fields-container">
+            <SelectField
+              required
+              label="Resellers"
+              placeholder="Add resellers"
+              options={resellerOptions}
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+  {/if}
+</StandardLayout>
 
 <div class="actions">
   <div class="wrapper">
@@ -168,10 +165,10 @@
     padding: 100px 100px 100px 0;
   }
 
-  .user-information :global(.text-field > label) {
-    font-weight: 600;
-    font-size: 14px;
-    font-family: Inter, sans-serif;
+  .user-information :global(.text-field) {
+    --label-font-weight: 600;
+    --label-font-size: 14px;
+    --label-font-family: "Inter";
   }
 
   .section {
