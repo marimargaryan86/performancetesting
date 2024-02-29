@@ -1,7 +1,11 @@
 package merge_request
 
 import (
+	"bytes"
+	_ "embed"
 	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
+	"github.com/xanzy/go-gitlab"
+	"gopkg.in/yaml.v2"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -13,185 +17,52 @@ const sizeMedium = "size::medium"
 const sizeLarge = "size::large"
 const sizeXLarge = "size::x-large"
 
+//go:embed languages.yml
+var languagesData []byte
+
+var languages map[string]language
 var sizeExtensions []string
 var sizeSpecRegex *regexp.Regexp
 var sizeTestRegex *regexp.Regexp
 
+type language struct {
+	FileSystemName     *string  `yaml:"fs_name"`
+	Type               string   `yaml:"type"`
+	Aliases            []string `yaml:"aliases"`
+	AceMode            string   `yaml:"ace_mode"`
+	CodeMirrorMode     string   `yaml:"codemirror_mode"`
+	CodeMirrorMimeType string   `yaml:"codemirror_mime_type"`
+	Wrap               bool     `yaml:"wrap"`
+	Extensions         []string `yaml:"extensions"`
+	Filenames          []string `yaml:"filenames"`
+	Interpreters       []string `yaml:"interpreters"`
+	LanguageId         int      `yaml:"language_id"`
+	Color              string   `yaml:"color"`
+	TextMateScope      string   `yaml:"tm_scope"`
+	Group              string   `yaml:"group"`
+}
+
 func init() {
 	sizeSpecRegex = regexp.MustCompile(`/.*\.spec\..*/i`)
 	sizeTestRegex = regexp.MustCompile(`/*((T|t)est|TEST).*/`)
-	sizeExtensions = []string{
-		// JavaScript
-		"js",
-		"_js",
-		"bones",
-		"cjs",
-		"es",
-		"es6",
-		"frag",
-		"gs",
-		"jake",
-		"jsb",
-		"jscad",
-		"jsfl",
-		"jsm",
-		"jss",
-		"jsx",
-		"mjs",
-		"njs",
-		"pac",
-		"sjs",
-		"ssjs",
-		"xsjs",
-		"xsjslib",
-		// JavaScript: Ecere Projects
-		"epj",
-		// JavaScript: JavaScript+ERB
-		"erb",
-		// Python
-		"py",
-		"cgi",
-		"fcgi",
-		"gyp",
-		"gypi",
-		"lmi",
-		"py3",
-		"pyde",
-		"pyi",
-		"pyp",
-		"pyt",
-		"pyw",
-		"rpy",
-		"smk",
-		"spec",
-		"tac",
-		"wsgi",
-		"xpy",
-		// Python: Cython
-		"pyx",
-		"pxd",
-		"pxi",
-		// Python: Easybuild
-		"eb",
-		// Python: NumPy
-		"numpy",
-		"numpyw",
-		"numsc",
-		// Python: Python traceback
-		"pytb",
-		// Java
-		"java",
-		// Java: Java Server Pages
-		"jsp",
-		// TypeScript
-		"ts",
-		// TypeScript: TSX
-		"tsx",
-		// C#
-		"cs",
-		"cake",
-		"csx",
-		"linq",
-		// PHP
-		"php",
-		"aw",
-		"ctp",
-		"fcgi",
-		"inc",
-		"php3",
-		"php4",
-		"php5",
-		"phps",
-		"phpt",
-		// C++
-		"cpp",
-		"c++",
-		"cc",
-		"cp",
-		"cxx",
-		"h",
-		"h++",
-		"hh",
-		"hpp",
-		"hxx",
-		"inc",
-		"inl",
-		"ino",
-		"ipp",
-		"re",
-		"tcc",
-		"tpp",
-		// C
-		"c",
-		"cats",
-		"h",
-		"idc",
-		// C: OpenCL
-		"cl",
-		"opencl",
-		// C: Unified Parallel C
-		"upc",
-		// C: X BitMap
-		"xbm",
-		// C: X PixMap
-		"xpm",
-		"pm",
-		// Shell
-		"sh",
-		"bash",
-		"bats",
-		"cgi",
-		"command",
-		"env",
-		"fcgi",
-		"ksh",
-		"tmux",
-		"tool",
-		"zsh",
-		// Shell: fish
-		"fish",
-		// Shell: Gentoo Ebuild
-		"ebuild",
-		// Shell: Gentoo Eclass
-		"eclass",
-		// Shell: PowerShell
-		"ps1",
-		"psd1",
-		"psm1",
-		// Shell: Tcsh
-		"tcsh",
-		"csh",
-		// Ruby
-		"rb",
-		"builder",
-		"eye",
-		"fcgi",
-		"gemspec",
-		"god",
-		"jbuilder",
-		"mspec",
-		"pluginspec",
-		"podspec",
-		"prawn",
-		"rabl",
-		"rake",
-		"rbi",
-		"rbuild",
-		"rbw",
-		"rbx",
-		"ru",
-		"ruby",
-		"spec",
-		"thor",
-		"watchr",
+	err := yaml.Unmarshal(languagesData, &languages)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, l := range languages {
+		if l.Type == "markup" || l.Type == "programming" {
+			sizeExtensions = append(sizeExtensions, l.Extensions...)
+		}
 	}
 }
 
-func (mr *mergeRequest) expectedSizeLabel() string {
+func (mr *mergeRequest) expectedSizeLabel() (string, error) {
 	additions := float64(0)
 
 	for _, c := range mr.object.Changes {
-		if !sliceutil.In(sizeExtensions, strings.TrimPrefix(filepath.Ext(c.NewPath), ".")) {
+		if !sliceutil.In(sizeExtensions, filepath.Ext(c.NewPath)) {
 			continue
 		}
 
@@ -199,9 +70,21 @@ func (mr *mergeRequest) expectedSizeLabel() string {
 			continue
 		}
 
-		for _, line := range strings.Split(c.Diff, "\n") {
-			if len(line) > 0 && line[0] == '+' {
-				additions++
+		if c.Diff == "" && c.NewFile {
+			body, _, err := mr.client.RepositoryFiles.GetRawFile(mr.object.ProjectID, c.NewPath, &gitlab.GetRawFileOptions{
+				Ref: func() *string { s := mr.object.SHA; return &s }(),
+			})
+
+			if err != nil {
+				return "", err
+			}
+
+			additions += float64(bytes.Count(body, []byte{'\n'}))
+		} else {
+			for _, line := range strings.Split(c.Diff, "\n") {
+				if len(line) > 0 && line[0] == '+' {
+					additions++
+				}
 			}
 		}
 	}
@@ -215,7 +98,7 @@ func (mr *mergeRequest) expectedSizeLabel() string {
 	}
 
 	if additions < mr.configuration.Metrics.BaseSize {
-		return sizes[0]
+		return sizes[0], nil
 	}
 
 	index := 1
@@ -233,9 +116,15 @@ func (mr *mergeRequest) expectedSizeLabel() string {
 		result = sizes[index]
 	}
 
-	return result
+	return result, nil
 }
 
 func (mr *mergeRequest) setSize() error {
-	return mr.setLabel(mr.expectedSizeLabel())
+	label, err := mr.expectedSizeLabel()
+
+	if err != nil {
+		return err
+	}
+
+	return mr.setLabel(label)
 }
