@@ -200,7 +200,7 @@ func (mr *mergeRequest) expectedSizeLabel() string {
 		}
 
 		for _, line := range strings.Split(c.Diff, "\n") {
-			if line[0] == '+' {
+			if len(line) > 0 && line[0] == '+' {
 				additions++
 			}
 		}
