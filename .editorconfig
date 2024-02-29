@@ -33,7 +33,7 @@ indent_size = 2
 [*.proto]
 indent_size = 2
 
-[*.py]
+[{*.py,BUILD}]
 max_line_length = 88
 
 [*.sh]
