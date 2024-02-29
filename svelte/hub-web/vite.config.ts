@@ -1,5 +1,5 @@
 // import { sentrySvelteKit } from "@sentry/sveltekit";
-import { defineConfig, type UserConfigExport } from "vitest/config";
+import { defineConfig, type UserConfigExport } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 
 export default defineConfig(({ command }) => {
@@ -8,9 +8,6 @@ export default defineConfig(({ command }) => {
       // sentrySvelteKit(),
       sveltekit(),
     ],
-    test: {
-      include: ["src/**/*.{test,spec}.{js,ts}"],
-    },
   };
 
   if (command === "build") {
