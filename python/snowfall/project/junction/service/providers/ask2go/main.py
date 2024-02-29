@@ -209,7 +209,16 @@ async def _offers(
         ASK2GO_RESOURCE,
     )
     train_station_repo = TrainStationRepository([
-        TrainStation(**{**data, "timezone": zoneinfo.ZoneInfo(data["timezone"])})
+        TrainStation(
+            identifier=data["identifier"],
+            latitude=data["latitude"],
+            longitude=data["longitude"],
+            timezone=zoneinfo.ZoneInfo(data["timezone"]),
+            airport_name=data["name"],
+            iata_country_code=data["iata_country_code"],
+            is_enabled=data["is_enabled"],
+            railname=data["railname"],
+        )
         for data in json_data
     ])
     location_repository = LocationRepository(airport_repo, train_station_repo)
@@ -305,7 +314,16 @@ async def _simple_offers(
         ASK2GO_RESOURCE,
     )
     train_station_repo = TrainStationRepository([
-        TrainStation(**{**data, "timezone": zoneinfo.ZoneInfo(data["timezone"])})
+        TrainStation(
+            identifier=data["identifier"],
+            latitude=data["latitude"],
+            longitude=data["longitude"],
+            timezone=zoneinfo.ZoneInfo(data["timezone"]),
+            airport_name=data["name"],
+            iata_country_code=data["iata_country_code"],
+            is_enabled=data["is_enabled"],
+            railname=data["railname"],
+        )
         for data in json_data
     ])
     location_repository = LocationRepository(airport_repo, train_station_repo)
@@ -481,7 +499,16 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
         ASK2GO_RESOURCE,
     )
     train_station_repo = TrainStationRepository([
-        TrainStation(**{**data, "timezone": zoneinfo.ZoneInfo(data["timezone"])})
+        TrainStation(
+            identifier=data["identifier"],
+            latitude=data["latitude"],
+            longitude=data["longitude"],
+            timezone=zoneinfo.ZoneInfo(data["timezone"]),
+            airport_name=data["name"],
+            iata_country_code=data["iata_country_code"],
+            is_enabled=data["is_enabled"],
+            railname=data["railname"],
+        )
         for data in json_data
     ])
     location_repository = LocationRepository(airport_repo, train_station_repo)
