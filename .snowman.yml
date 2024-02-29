@@ -82,4 +82,6 @@ commits:
       - "python/snowfall/vendor/save_a_train"
     vendor/consul:
       - "python/snowfall/vendor/consul"
+metrics:
+  base_size: 75
 use_merge_train: false
