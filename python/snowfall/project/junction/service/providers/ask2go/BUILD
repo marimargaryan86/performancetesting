@@ -13,9 +13,9 @@ python_image(
 resource(
     name="ask2go_stations",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/ask2go_stations-084eca6b645d07a6f51e5cdadcff69a0ca11116e06c5fb22f545e03d11d36708.json",
-        len=1366659,
-        sha256="084eca6b645d07a6f51e5cdadcff69a0ca11116e06c5fb22f545e03d11d36708",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/ask2go_stations-3a46ff151af895068bbfdbb3634a758b7b18b2d3723fb14bdb6bcbca2318bc8c.json",
+        len=3094176,
+        sha256="3a46ff151af895068bbfdbb3634a758b7b18b2d3723fb14bdb6bcbca2318bc8c",
         filename="ask2go_stations.json",
     ),
 )

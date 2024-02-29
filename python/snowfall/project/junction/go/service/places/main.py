@@ -83,7 +83,7 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
         "snowfall.project.junction.go.service.places.main",
         "ask2go_stations.json",
     )
-
+    ask2go_list = json.loads(ask2go_json.decode("utf-8")) if ask2go_json else []
     df_json = pkgutil.get_data(
         "snowfall.project.junction.go.service.places.main",
         "ports.json",
@@ -104,9 +104,16 @@ async def _generate_cities(app: application.Application[_CitiesSettings]) -> Non
                 else []
             ),
             constant.SAT_ID: json.loads(sat_json.decode("utf-8")) if sat_json else [],
-            constant.ASK2GO_ID: json.loads(ask2go_json.decode("utf-8"))
-            if ask2go_json
-            else [],
+            constant.ASK2GO_ID: [
+                {
+                    "id": item["identifier"],
+                    "name": item["name"],
+                    "time_zone": item["timezone"],
+                    "latitude": item["latitude"],
+                    "longitude": item["longitude"],
+                }
+                for item in ask2go_list
+            ],
         },
         models_pb2.Location.TYPE_FERRY_PORT: {
             constant.DF_ID: json.loads(df_json.decode("utf-8")) if df_json else [],
