@@ -99,13 +99,13 @@ function orderIncluded(included: IncludedMapping): IncludedMapping {
         (b.bookings[0]?.detailsList[0]?.legs[0]?.departureAt.getTime() ?? 0),
     ),
   );
-  included.journeys?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  included.transactions?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-  included.orders?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  included.journeys?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  included.transactions?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  included.orders?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   included.conversions?.sort(
-    (a, b) => (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0),
+    (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0),
   );
-  included.bills?.sort((a, b) => (a.updatedAt?.getTime() ?? 0) - (b.updatedAt?.getTime() ?? 0));
+  included.bills?.sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
 
   return included;
 }
