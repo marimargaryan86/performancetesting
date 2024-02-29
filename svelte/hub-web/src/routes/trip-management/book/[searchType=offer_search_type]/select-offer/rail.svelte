@@ -95,12 +95,12 @@
       }
     } finally {
       if (outboundHash && !selected.outbound) {
-        alertDialog?.show($t("sentences.previousSelectedOutboundUnavailable"));
+        alertDialog?.open($t("sentences.previousSelectedOutboundUnavailable"));
         tripDirection = "outbound";
       }
 
       if (inboundHash && !selected.inbound) {
-        alertDialog?.show($t("sentences.previousSelectedInboundUnavailable"));
+        alertDialog?.open($t("sentences.previousSelectedInboundUnavailable"));
       }
 
       outboundHash = undefined;
