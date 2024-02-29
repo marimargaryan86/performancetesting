@@ -14,6 +14,11 @@ type CommitsConfiguration struct {
 	Types  []string            `yaml:"types"`
 }
 
+type MetricsConfiguration struct {
+	BaseSize   float64 `yaml:"base_size"`
+	GrowthRate float64 `yaml:"growth_rate"`
+}
+
 type ReviewersConfiguration struct {
 	Blacklist []int `yaml:"blacklist"`
 	Breaking  []int `yaml:"breaking"`
@@ -21,6 +26,7 @@ type ReviewersConfiguration struct {
 
 type Configuration struct {
 	Commits       CommitsConfiguration   `yaml:"commits"`
+	Metrics       MetricsConfiguration   `yaml:"metrics"`
 	Reviewers     ReviewersConfiguration `yaml:"reviewers"`
 	UseMergeTrain bool                   `yaml:"use_merge_train"`
 }
@@ -42,6 +48,10 @@ func defaultConfiguration() Configuration {
 				"style",
 				"test",
 			},
+		},
+		Metrics: MetricsConfiguration{
+			BaseSize:   200,
+			GrowthRate: 2.0,
 		},
 	}
 }

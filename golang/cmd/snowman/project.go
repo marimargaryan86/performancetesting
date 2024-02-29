@@ -53,7 +53,35 @@ type label struct {
 	description string
 }
 
-var labels = []label{
+var sizeLabels = []label{
+	{
+		name:        "size::x-small",
+		color:       "#009966",
+		description: "An extra small pull request.",
+	},
+	{
+		name:        "size::small",
+		color:       "#EEE600",
+		description: "A small pull request.",
+	},
+	{
+		name:        "size::medium",
+		color:       "#ED9121",
+		description: "A medium pull request.",
+	},
+	{
+		name:        "size::large",
+		color:       "#CD5B45",
+		description: "A large pull request.",
+	},
+	{
+		name:        "size::x-large",
+		color:       "#C21E56",
+		description: "An extra large pull request.",
+	},
+}
+
+var statusLabels = []label{
 	{
 		name:        "status::abandoned",
 		color:       "#000000",
@@ -86,13 +114,21 @@ var labels = []label{
 	},
 }
 
-func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
+func verifySizeLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
+	verifyLabels(client, logger, p, sizeLabels, "size::")
+}
+
+func verifyStatusLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
+	verifyLabels(client, logger, p, statusLabels, "status::")
+}
+
+func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, labels []label, prefix string) {
 	currentLabels := make([]*gitlab.Label, 0)
 	ch, g := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Label, *gitlab.Response, error) {
 		return client.Labels.ListLabels(p.ID, &gitlab.ListLabelsOptions{
 			ListOptions:           options,
 			IncludeAncestorGroups: func() *bool { b := true; return &b }(),
-			Search:                func() *string { s := "status::"; return &s }(),
+			Search:                &prefix,
 		})
 	})
 
@@ -265,7 +301,8 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 
 		verifyProjectSettings(client, pLogger, p, config)
 		verifyApprovalRules(client, pLogger, p, snowman)
-		verifyLabels(client, pLogger, p)
+		verifySizeLabels(client, pLogger, p)
+		verifyStatusLabels(client, pLogger, p)
 
 		var foundHook *gitlab.ProjectHook
 

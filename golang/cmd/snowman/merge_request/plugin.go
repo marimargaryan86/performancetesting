@@ -81,6 +81,7 @@ func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 	}
 
 	for _, i := range []invokable{
+		wrapper.setSize,
 		wrapper.validateTitle,
 		wrapper.validateScope,
 		wrapper.setReviewers,
