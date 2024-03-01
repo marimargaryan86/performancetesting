@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.orders.v1;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/project/junction/go/v1/models.proto";
+import "snowfall/project/junction/rocket/service/offers/v1/models.proto";
+import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/money.proto";
+import "snowfall/stdlib/v1/options.proto";
+import "snowfall/stdlib/v1/phone_number.proto";
+import "snowfall/stdlib/v1/postal_address.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/orders/v1";
+
+message Journey {
+  string id = 1;
+  repeated Order orders = 2;
+  string passenger_name_record = 3;
+  ContactDetails contact_details = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  string reseller_id = 7;
+  repeated string owner_reseller_ids = 8;
+}
+
+message Order {
+  string id = 1;
+  string journey_id = 2;
+  repeated Booking bookings = 3;
+  repeated Passenger passengers = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  snowfall.stdlib.v1.PostalAddress residence_address = 7;
+}
+
+message Booking {
+  string id = 1;
+  string order_id = 2;
+  oneof option {
+    TripOption trip_option = 3;
+  }
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_CONFIRMED = 2;
+    STATUS_REJECTED = 3;
+    STATUS_NOT_TICKETED = 4;
+    STATUS_ERROR = 5;
+    STATUS_CANCELLED = 6;
+  }
+  Status status = 4;
+  string provider_name = 5;
+  string provider_id = 13;
+  snowfall.stdlib.v1.Money total_price = 6;
+  oneof result {
+    TripBooking trip_result = 7;
+  }
+  string raw_data = 8; // json
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  string transaction_id = 11;
+  snowfall.stdlib.v1.Money provider_total_price = 12;
+  repeated string ticket_urls = 14;
+}
+
+message TripBooking {
+  string provider_booking_reference = 3;
+  string record_locator = 1;
+  repeated string operator_booking_references = 2;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message ContactDetails {
+  snowfall.stdlib.v1.PostalAddress address = 1;
+  snowfall.stdlib.v1.PhoneNumber phone = 2;
+  string email = 3;
+}
+
+message Passenger {
+  string first_name = 1;
+  string last_name = 2;
+  enum Title {
+    TITLE_UNSPECIFIED = 0;
+    TITLE_MR = 1;
+    TITLE_MRS = 2;
+    TITLE_MISS = 3;
+    TITLE_MS = 4;
+  }
+  Title title = 3;
+  enum Gender {
+    GENDER_UNSPECIFIED = 0;
+    GENDER_MALE = 1;
+    GENDER_FEMALE = 2;
+  }
+  Gender gender = 4;
+  snowfall.stdlib.v1.Date date_of_birth = 5;
+  optional DocumentDetails doc_details = 6;
+}
+
+message DocumentDetails {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_PASSPORT = 1;
+  }
+  Type document_type = 1;
+  string document_number = 2;
+  string issue_county = 3;
+  string nationality = 4;
+  snowfall.stdlib.v1.Date exp_date = 5;
+  string residence_country_code = 6;
+  snowfall.stdlib.v1.Date issue_date = 7;
+}
+
+message TripOption {
+  string id = 1;
+  string booking_id = 4;
+  string price_quote_id = 5;
+  string pay_quote_id = 6;
+  repeated TripOptionDetails details = 2;
+  snowfall.stdlib.v1.Money price = 3;
+  repeated snowfall.project.junction.rocket.service.offers.v1.FareRule rules = 7;
+}
+
+message TripOptionDetails {
+  string id = 3;
+  string booking_id = 4;
+  snowfall.project.junction.rocket.service.offers.v1.OfferSegment segment = 1;
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 2;
+}
+
+message BookingCancellation {
+  string id = 1;
+  string booking_id = 2;
+  string ticket_id = 3 [(snowfall.stdlib.v1.read_only) = true];
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_COMPLETED = 2;
+    STATUS_REJECTED = 3;
+    STATUS_NO_REFUND = 4;
+    STATUS_REFUND_DUE = 5;
+    STATUS_REFUND_ISSUED = 6;
+    STATUS_REFUND_FAILED = 7;
+  }
+  Status status = 4;
+  snowfall.stdlib.v1.Money refunded_us = 5;
+}
+
+message CancellationRequest {
+  string id = 1;
+  repeated BookingCancellation booking_cancellations = 2;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_COMPLETED = 2;
+  }
+  Status status = 3 [(snowfall.stdlib.v1.read_only) = true];
+  google.protobuf.Timestamp created_at = 4 [(snowfall.stdlib.v1.read_only) = true];
+  string reseller_id = 5;
+}

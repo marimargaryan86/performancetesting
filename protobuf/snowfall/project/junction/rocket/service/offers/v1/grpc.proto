@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.offers.v1;
+
+import "snowfall/project/junction/go/v1/models.proto";
+import "snowfall/project/junction/rocket/service/offers/v1/models.proto";
+import "snowfall/stdlib/v1/sort.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/offers/v1";
+
+service OfferSearchService {
+  rpc EnqueueOfferSearch(EnqueueOfferSearchRequest) returns (EnqueueOfferSearchResponse) {}
+  rpc EnqueueOfferSearchGetId(EnqueueOfferSearchGetIdRequest) returns (EnqueueOfferSearchGetIdResponse) {} // @todo: remove once FieldMasks are implemented
+  rpc GetOfferSearch(GetOfferSearchRequest) returns (GetOfferSearchResponse) {}
+  rpc ListOfferSearches(ListOfferSearchesRequest) returns (ListOfferSearchesResponse) {}
+}
+
+service OfferService {
+  rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
+  rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
+  rpc GetOfferGroup(GetOfferGroupRequest) returns (GetOfferGroupResponse) {}
+  rpc ListOfferGroups(ListOfferGroupsRequest) returns (ListOfferGroupsResponse) {}
+  rpc GetOfferGroupDetails(GetOfferGroupDetailsRequest) returns (GetOfferGroupDetailsResponse) {}
+  rpc ListOfferGroupDetails(ListOfferGroupDetailsRequest) returns (ListOfferGroupDetailsResponse) {}
+  rpc GetOfferOption(GetOfferOptionRequest) returns (GetOfferOptionResponse) {}
+  rpc ListOfferOptions(ListOfferOptionsRequest) returns (ListOfferOptionsResponse) {}
+  rpc GetOfferOptionDetails(GetOfferOptionDetailsRequest) returns (GetOfferOptionDetailsResponse) {}
+  rpc ListOfferOptionDetails(ListOfferOptionDetailsRequest) returns (ListOfferOptionDetailsResponse) {}
+}
+
+service PriceQuoteService {
+  rpc CreatePriceQuote(CreatePriceQuoteRequest) returns (CreatePriceQuoteResponse) {}
+  rpc GetPriceQuote(GetPriceQuoteRequest) returns (GetPriceQuoteResponse) {}
+}
+
+message EnqueueOfferSearchRequest {
+  OfferSearch search = 1;
+}
+
+message EnqueueOfferSearchGetIdRequest {
+  OfferSearch search = 1;
+}
+
+message EnqueueOfferSearchResponse {
+  OfferSearch search = 1;
+}
+
+message EnqueueOfferSearchGetIdResponse {
+  string offer_search_id = 1;
+}
+
+message GetOfferSearchRequest {
+  string id = 1;
+}
+
+message GetOfferSearchResponse {
+  OfferSearch search = 1;
+}
+
+message ListOfferSearchesRequest {
+  repeated string ids = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListOfferSearchesResponse {
+  repeated OfferSearch offer_searches = 1;
+  string next_page_token = 2;
+}
+
+message GetOfferRequest {
+  string id = 1;
+}
+
+message GetOfferResponse {
+  OfferAggregate offer = 1;
+}
+
+message ListOffersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    string offer_search_id = 3;
+    ListOfIds offer_ids = 4;
+    ListOfIds offer_search_ids = 6;
+  }
+  repeated snowfall.project.junction.go.v1.CabinClass.Type cabin_class_types = 5;
+  snowfall.stdlib.v1.Sort sort_by = 7;
+}
+
+message ListOfIds {
+  repeated string ids = 1;
+}
+
+message ListOffersResponse {
+  string next_page_token = 1;
+  repeated OfferAggregate offers = 2;
+}
+
+message GetOfferGroupRequest {
+  string id = 1;
+}
+
+message GetOfferGroupResponse {
+  OfferGroup group = 1;
+}
+
+message ListOfferGroupsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_group_ids = 3;
+  }
+}
+
+message ListOfferGroupsResponse {
+  string next_page_token = 1;
+  repeated OfferGroup groups = 2;
+}
+
+message GetOfferGroupDetailsRequest {
+  string id = 1;
+}
+
+message GetOfferGroupDetailsResponse {
+  OfferSegment details = 1;
+}
+
+message ListOfferGroupDetailsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_group_details_ids = 3;
+  }
+}
+
+message ListOfferGroupDetailsResponse {
+  string next_page_token = 1;
+  repeated OfferSegment details = 2;
+}
+
+message GetOfferOptionRequest {
+  string id = 1;
+}
+
+message GetOfferOptionResponse {
+  Offer option = 1;
+}
+
+message ListOfferOptionsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_option_ids = 3;
+  }
+}
+
+message ListOfferOptionsResponse {
+  string next_page_token = 1;
+  repeated Offer options = 2;
+}
+
+message GetOfferOptionDetailsRequest {
+  string id = 1;
+}
+
+message GetOfferOptionDetailsResponse {
+  OfferSegmentDetails details = 1;
+}
+
+message ListOfferOptionDetailsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  oneof payload {
+    ListOfIds offer_option_details_ids = 3;
+  }
+}
+
+message ListOfferOptionDetailsResponse {
+  string next_page_token = 1;
+  repeated OfferSegmentDetails details = 2;
+}
+
+message CreatePriceQuoteRequest {
+  string offer_id = 1;
+  repeated string option_ids = 2;
+  string session_token = 3;
+  string pay_company_id = 4;
+  string reseller_id = 5;
+}
+
+message CreatePriceQuoteResponse {
+  PriceQuoteContainer price_quote = 1;
+}
+
+message GetPriceQuoteRequest {
+  string id = 1;
+}
+
+message GetPriceQuoteResponse {
+  PriceQuoteContainer price_quote = 1;
+}
