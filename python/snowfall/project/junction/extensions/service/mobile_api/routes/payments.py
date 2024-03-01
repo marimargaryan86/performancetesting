@@ -75,7 +75,7 @@ class Payments(endpoints.HTTPEndpoint):
         stripe_user_id = None
         ephemeral_key_secret = None
 
-        reseller_id, username = "", request.user.username
+        reseller_id, username = request.user.username, request.user.username
         if isinstance(request.user, authentication.AuthenticatedUser):
             reseller_id = request.user.metadata.get("reseller_id", "")
             username = request.user.identity
@@ -127,7 +127,7 @@ class Payment(endpoints.HTTPEndpoint):
         vouchers_repository: repository.VouchersRepository = lagom.injectable,
         credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
-        reseller_id = ""
+        reseller_id = request.user.username
         if isinstance(request.user, authentication.AuthenticatedUser):
             reseller_id = request.user.metadata.get("reseller_id", "")
 

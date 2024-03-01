@@ -387,7 +387,7 @@ class Orders(endpoints.HTTPEndpoint):
         bills_client: bills.Client = lagom.injectable,
         credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
-        reseller_id = ""
+        reseller_id = request.user.username
         if isinstance(request.user, authentication.AuthenticatedUser):
             reseller_id = request.user.metadata.get("reseller_id", "")
 
@@ -419,7 +419,7 @@ class OrdersByJourney(endpoints.HTTPEndpoint):
         bills_client: bills.Client = lagom.injectable,
         credit_card_client: credit_card_payment.Client = lagom.injectable,
     ) -> responses.Response:
-        reseller_id = ""
+        reseller_id = request.user.username
         if isinstance(request.user, authentication.AuthenticatedUser):
             reseller_id = request.user.metadata.get("reseller_id", "")
 
