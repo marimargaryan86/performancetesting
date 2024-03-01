@@ -189,11 +189,3 @@ export function getClosestFullHour(onlyInFuture = true): Date {
 
   return now;
 }
-
-export function toUtcDate(date: Date): Date {
-  const utc = new Date(date);
-  const tzOffset = date.getTimezoneOffset();
-  utc.setMinutes(utc.getMinutes() - tzOffset);
-
-  return utc;
-}

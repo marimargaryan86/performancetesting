@@ -32,6 +32,30 @@ type ServerServiceFactory<TClient extends Record<string, AnyFunc>> = (mapping: {
   ) => MaybePromise<Awaited<ReturnType<TClient[key]>>>;
 }) => (event: RequestEvent) => Promise<Response>;
 
+const CLIENT_REDUCERS = {
+  /** Add TZ offset on client side requests to make dates TZ agnostic */
+  Date: (value: unknown): string | undefined => {
+    if (value instanceof Date) {
+      const date = new Date(value);
+      const tzOffset = date.getTimezoneOffset();
+      date.setMinutes(date.getMinutes() - tzOffset);
+
+      return date.toISOString();
+    }
+
+    return undefined;
+  },
+};
+const CLIENT_REVIVERS = {
+  Date: (value: unknown): Date | undefined => {
+    if (typeof value === "string") {
+      return new Date(value);
+    }
+
+    return undefined;
+  },
+} satisfies Record<keyof typeof CLIENT_REDUCERS, (value: unknown) => unknown>;
+
 /**
  * Get a fetch function for the client service
  *
@@ -53,7 +77,7 @@ function getFetchFunc(route: string, action: string, func: AnyFunc): AnyFunc {
   return async (...args) => {
     const resp = await fetch(url, {
       method: "POST",
-      body: devalue.stringify(func(...args)),
+      body: devalue.stringify(func(...args), CLIENT_REDUCERS),
     });
 
     if (resp.status === 200) {
@@ -117,7 +141,10 @@ export function serverServiceFactory<TClient extends Record<string, AnyFunc>>(
     }
 
     try {
-      const result = await method(event, ...devalue.parse(await event.request.text()));
+      const result = await method(
+        event,
+        ...devalue.parse(await event.request.text(), CLIENT_REVIVERS),
+      );
 
       return new Response(devalue.stringify(result));
     } catch (err) {
