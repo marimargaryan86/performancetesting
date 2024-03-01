@@ -5,6 +5,7 @@ from typing import Any
 import httpx
 
 from snowfall.stdlib import string
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.ask2go import errors, parsers
 from snowfall.vendor.ask2go.models import (
     booking,
@@ -33,6 +34,7 @@ class Ask2GoClient(object):
         self._http_client = http_client
         self._rate_limit_client = rate_limit_client
         self._fake_the_bookings = fake_the_bookings
+        self._logger = stdout.get_logger()
 
     async def get_train_stations(self) -> httpx.Response:
         return await self._make_request(
@@ -66,16 +68,26 @@ class Ask2GoClient(object):
                 ),
             )
 
+        payload = parsers.parse_search_request(criteria)
         response = await self._make_request(
             "POST",
             self._api_base_url.copy_with(
                 path="/api/search",
             ),
-            payload=parsers.parse_search_request(criteria),
+            payload=payload,
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        return search.CreateSearchResponse(**response.json())
+        response_json = response.json()
+
+        if "transactionId" not in response_json:
+            self._logger.error(
+                "Bad Search response",
+                payload=repr(payload),
+                response=repr(response_json),
+            )
+
+        return search.CreateSearchResponse(**response_json)
 
     async def get_search_results(
         self,
