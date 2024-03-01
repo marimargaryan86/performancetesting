@@ -60,8 +60,10 @@ def parse_search_request(criteria: search.CreateSearchCriteria) -> dict[str, Any
         "cabinClass": criteria.cabin_class.value,
         "direction": direction,
         "searchCriteria": search_criteria,
-        "productType": criteria.product_type,
     }
+
+    if criteria.product_type:
+        request_body["productType"] = criteria.product_type
 
     if criteria.transaction_id:
         request_body["transactionId"] = str(criteria.transaction_id)
