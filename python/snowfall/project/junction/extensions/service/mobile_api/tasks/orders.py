@@ -1,9 +1,11 @@
 import asyncio
+import contextlib
 import datetime
 import gettext
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+import httpx
 import json_api_doc
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -133,6 +135,27 @@ def get_user_language() -> str:
     return "es"
 
 
+async def download_and_prepare_attachments(
+    ticket_urls: list[str],
+    departure_date: str,
+) -> list[smtp.Attachment]:
+    attachments = []
+    async with httpx.AsyncClient() as http_client:
+        for url in ticket_urls:
+            with contextlib.suppress(httpx.HTTPStatusError):
+                response = await http_client.get(url)
+                file_name = "Ticket_{departure}".format(departure=departure_date)
+                content = response.content
+                attachment = smtp.Attachment(
+                    payload=content,
+                    main_type="application",
+                    sub_type="pdf",
+                    file_name=file_name,
+                )
+                attachments.append(attachment)
+    return attachments
+
+
 async def send_booking_confirmation(
     order: Mapping[str, Any],
     smtp_client: smtp.EmailClient,
@@ -168,6 +191,14 @@ async def send_booking_confirmation(
         record_locators=record_locators,
         operator_booking_references=operator_booking_references,
     )
+    ticket_urls = [
+        url for booking in order["bookings"] for url in booking.get("ticketUrls", [])
+    ]
+
+    attachments = await download_and_prepare_attachments(
+        ticket_urls,
+        str(details[0].get("departureAt")),
+    )
 
     await smtp_client.send_email_html_template(
         forward_email or order["journey"]["contactDetails"]["email"],
@@ -176,6 +207,7 @@ async def send_booking_confirmation(
             reference=order["journey"]["reference"],
         ),
         body,
+        attachments=attachments,
     )
     if forward_to_support:
         await smtp_client.send_email_html_template(

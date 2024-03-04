@@ -1,14 +1,12 @@
 import dataclasses
 from email import message
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 import aiosmtplib
 
 
 @dataclasses.dataclass(frozen=True)
 class Attachment(object):
-    payload: str
+    payload: str | bytes
     main_type: str
     sub_type: str
     file_name: str
@@ -34,8 +32,13 @@ class EmailClient(object):
         email.set_content(body)
 
         if attachment:
+            payload = (
+                attachment.payload.encode("utf-8")
+                if isinstance(attachment.payload, str)
+                else attachment.payload
+            )
             email.add_attachment(
-                attachment.payload.encode("utf-8"),
+                payload,
                 maintype=attachment.main_type,
                 subtype=attachment.sub_type,
                 filename=attachment.file_name,
@@ -49,12 +52,23 @@ class EmailClient(object):
         mail_to: str,
         subject: str,
         body: str,
+        attachments: list[Attachment] | None = None,
     ) -> None:
-        email = MIMEMultipart("alternative")
+        email = message.EmailMessage()
         email["From"] = "no-reply@snowfalltravel.com"
         email["To"] = mail_to
         email["Subject"] = subject
-        email.attach(MIMEText(body, "html", "utf-8"))
+
+        email.set_content(body, subtype="html")
+
+        if attachments:
+            for attachment in attachments:
+                email.add_attachment(
+                    attachment.payload,
+                    maintype=attachment.main_type,
+                    subtype=attachment.sub_type,
+                    filename=attachment.file_name,
+                )
 
         async with self._smtp:
             await self._smtp.send_message(email)
