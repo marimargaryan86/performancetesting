@@ -86,7 +86,7 @@ async def download_url(  # noqa: WPS231
                     b=await resp.aread(),
                 )
                 raise RuntimeError(msg)
-            if "zip" not in resp.headers["Content-Type"]:
+            if "zip" not in resp.headers["Content-Type"].lower():
                 msg = "({n}) Incorrect content_type: {t}\nResponse: {c!r}"
                 resp_content = await resp.aread()
                 msg = msg.format(n=name, t=resp.headers["Content-Type"], c=resp_content)
