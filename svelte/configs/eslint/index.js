@@ -23,6 +23,14 @@ module.exports = {
         parser: "@typescript-eslint/parser",
       },
     },
+    {
+      files: ["*.{spec,test}.{js,ts}"],
+      extends: ["plugin:vitest/recommended"],
+      rules: {
+        "no-inline-comments": "off",
+        "max-lines-per-function": "off",
+      },
+    },
   ],
   parserOptions: {
     sourceType: "module",
