@@ -32,7 +32,7 @@ class MockStripe(interfaces.CreditCardProvider):
         """Create payment intent in stripe."""
         payment.id = string.uuid()
         payment.secret = string.uuid()
-        payment.status = "requires_payment_method"
+        payment.status = "requires_capture"
 
         self._credit_card_payments[payment.id] = payment
 
