@@ -1,0 +1,26 @@
+{
+  "development": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "rocket.api.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "rocket.api.junction.travel"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "rocket.api.sandbox.junction.dev"
+    }
+  }
+}
