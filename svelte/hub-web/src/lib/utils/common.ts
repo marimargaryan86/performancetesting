@@ -3,30 +3,41 @@ export function sleep(timeMs: number): Promise<void> {
 }
 
 export function isUpperCase(value: string): boolean {
-  return value.toUpperCase() === value;
+  // Early return if the string is empty or contains only non-alphabetic characters
+  if (value.length === 0 || !/\p{L}/u.test(value)) {
+    return false;
+  }
+
+  // Check if all alphabetic characters are uppercase
+  for (let i = 0; i < value.length; i++) {
+    const char = value[i];
+    // If the character is alphabetic and not uppercase, return false
+    if (char !== undefined && /\p{L}/u.test(char) && char !== char.toLocaleUpperCase()) {
+      return false;
+    }
+  }
+
+  // If the loop completes without returning false, all alphabetic characters are uppercase
+  return true;
 }
 
 export function getInitials(name: string): string {
-  const alpha = name.replace(/[^A-z]/g, "");
-  const parts = alpha.split(" ").filter((part) => part.trim().length);
-
-  if (parts.length > 1) {
-    return `${parts[0]?.[0]?.toUpperCase()}${parts[1]?.[0]?.toUpperCase()}`;
-  }
-
-  let result = parts[0]?.[0] as string;
-
-  for (const char of parts[0]?.substring(1) ?? "") {
-    if (isUpperCase(char)) {
-      result += char;
-    }
-
-    if (result.length === 2) {
-      break;
-    }
-  }
-
-  return result.toUpperCase();
+  return (
+    name
+      // Split the name by whitespace characters
+      .split(/\s+/)
+      .map((part) => {
+        // Find all uppercase letters in the part
+        const uppercaseLetters = part.match(/[A-Z]/g) || [];
+        // If there are more than one uppercase letters, use the first two, otherwise use the first letter
+        if (uppercaseLetters.length > 1 && uppercaseLetters[0]) {
+          return uppercaseLetters[0] + uppercaseLetters[1];
+        }
+        return part[0];
+      })
+      .join("")
+      .toUpperCase()
+  );
 }
 
 export function getHexColor(value: string): string {
@@ -41,6 +52,6 @@ export function getHexColor(value: string): string {
   return `#${hex.substring(0, 6)}`;
 }
 
-export function capitalize(value: string): string {
-  return `${value[0]?.toUpperCase()}${value.substring(1)}`;
+export function capitalize([first, ...rest]: string): string {
+  return `${first?.toUpperCase()}${rest.join("")}`;
 }
