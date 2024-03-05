@@ -563,6 +563,8 @@ def generate_journey(
                                         operator="BA",
                                         vendor="BA",
                                         type=models_pb2.Schedule.TYPE_AIR,
+                                        segment_sequence=1,
+                                        trip_sequence=1,
                                     ),
                                     cabin_class=models_pb2.CabinClass(
                                         type=models_pb2.CabinClass.TYPE_ECONOMY,

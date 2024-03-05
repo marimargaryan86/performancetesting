@@ -302,6 +302,10 @@ class TripBookingDetailsResource(models.Resource):
                     vendor=details.segment.vehicle.number,
                     operator=None,
                 ),
+                "sequences": {
+                    "trip": details.segment.trip_sequence,
+                    "segment": details.segment.segment_sequence,
+                },
                 "legs": [
                     OfferSegmentLeg.from_proto(leg) for leg in details.segment.legs
                 ],
