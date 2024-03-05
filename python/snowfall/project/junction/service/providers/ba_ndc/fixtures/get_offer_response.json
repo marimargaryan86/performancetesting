@@ -1,0 +1,506 @@
+{
+    "expires_at": "2024-02-14T18:13:02+00:00",
+    "payment_expires_at": "2024-02-17T23:59:00+00:00",
+    "price_guarantee_expires_at": "2024-02-14T17:58:02+00:00",
+    "offer": {
+        "identifier": "b42204be-3dbd-4322-b81a-49f9f702629e",
+        "price": {
+            "currency": "EUR",
+            "total_amount": "507.07",
+            "base_amount": "469.00",
+            "tax_amount": "469.00"
+        },
+        "trips": [
+            {
+                "duration": 3900.0,
+                "price_class_id": "PCR_1",
+                "segment_ids": [
+                    "FS1"
+                ],
+                "penalty_ids": [
+                    "Rule1",
+                    "Rule2",
+                    "Rule3",
+                    "Rule4",
+                    "Rule5",
+                    "Rule6"
+                ],
+                "baggage_allowance_refs": [
+                    "HANDBAGALLOWANCE",
+                    "CKBAG1",
+                    "CKBAG2"
+                ]
+            }
+        ],
+        "offer_items": [
+            {
+                "price": {
+                    "currency": "EUR",
+                    "total_amount": "507.07",
+                    "base_amount": "469.00",
+                    "tax_amount": "38.07"
+                },
+                "passenger_ids": [
+                    "PA0"
+                ]
+            }
+        ],
+        "bags": [
+            {
+                "bag_allowance_id": "HANDBAGALLOWANCE",
+                "flight_ids": [
+                    "Flight1"
+                ],
+                "passenger_ids": [
+                    "PA0"
+                ]
+            },
+            {
+                "bag_allowance_id": "CKBAG1",
+                "flight_ids": [
+                    "Flight1"
+                ],
+                "passenger_ids": [
+                    "PA0"
+                ]
+            }
+        ],
+        "bag_disclosure_ids": [
+            "HANDBAGOD1",
+            "CKBAGOD1"
+        ]
+    },
+    "passengers": [
+        {
+            "identifier": "PA0",
+            "passenger_type": "adult"
+        }
+    ],
+    "segments": [
+        {
+            "identifier": "FS1",
+            "origin": {
+                "code": "LHR",
+                "name": "Heathrow (London) Airport",
+                "terminal_gate": null,
+                "terminal_name": null
+            },
+            "destination": {
+                "code": "MAN",
+                "name": "Manchester Airport",
+                "terminal_gate": null,
+                "terminal_name": null
+            },
+            "departure_date_time": "2024-03-30T22:05:00",
+            "arrival_date_time": "2024-03-30T23:10:00",
+            "duration": 3900.0,
+            "equipment": {
+                "code": "320",
+                "name": "Airbus A320 jet"
+            },
+            "marketing_carrier": {
+                "airline_id": "BA",
+                "airline_name": "British Airways",
+                "flight_number": "1406"
+            },
+            "operating_carrier": {
+                "airline_id": "BA",
+                "airline_name": "British Airways",
+                "flight_number": null
+            },
+            "stops": []
+        }
+    ],
+    "price_classes": [
+        {
+            "identifier": "PCR_1",
+            "cabin_type": "business",
+            "name": "CLUB PLUS",
+            "classes_of_service": [
+                {
+                    "disclosure_id": "DISCLOSURE1",
+                    "segment_id": "FS1",
+                    "fare_group_id": "FBCODE1",
+                    "seats_left": null
+                }
+            ]
+        },
+        {
+            "identifier": "PCR_2",
+            "cabin_type": "business",
+            "name": "CLUB PLUS SELECT",
+            "classes_of_service": [
+                {
+                    "disclosure_id": null,
+                    "segment_id": "FS1",
+                    "fare_group_id": "FBCODE2ADT",
+                    "seats_left": null
+                }
+            ]
+        },
+        {
+            "identifier": "PCR_3",
+            "cabin_type": "business",
+            "name": "CLUB FLEX",
+            "classes_of_service": [
+                {
+                    "disclosure_id": null,
+                    "segment_id": "FS1",
+                    "fare_group_id": "FBCODE3ADT",
+                    "seats_left": null
+                }
+            ]
+        }
+    ],
+    "flights": [
+        {
+            "identifier": "Flight1",
+            "duration": 3900.0,
+            "segment_ids": [
+                "FS1"
+            ]
+        }
+    ],
+    "fare_groups": [
+        {
+            "identifier": "FBCODE1",
+            "fare_group_type": "non_negotiated_public_fare",
+            "basis_code": "CHV2RO/Y",
+            "passenger_ids": [
+                "PA0"
+            ]
+        },
+        {
+            "identifier": "FBCODE2ADT",
+            "fare_group_type": "non_negotiated_public_fare",
+            "basis_code": "CHV2OMJ/Y",
+            "passenger_ids": [
+                "PA0"
+            ]
+        },
+        {
+            "identifier": "FBCODE3ADT",
+            "fare_group_type": "non_negotiated_public_fare",
+            "basis_code": "CV3RO/Y",
+            "passenger_ids": [
+                "PA0"
+            ]
+        }
+    ],
+    "disclosures": [
+        {
+            "identifier": "DISCLOSURE1",
+            "text": [
+                "1 handbag/laptop bag (40cm x 30cm x 15cm/16in x 12in x 6in) plus one additional cabin bag (56cm x 45cm x 25cm/22in x 18in x 10in)",
+                "Comfortable leather seats with guaranteed window or aisle seat",
+                "This fare entitles you to choose your seat at any time prior to check-in",
+                "This fare will earn Executive Club Tier Points",
+                "Convenient centrally located airports"
+            ]
+        }
+    ],
+    "bag_disclosures": [
+        {
+            "identifier": "HANDBAGOD1",
+            "rule": [
+                "LHR",
+                "MAN"
+            ],
+            "description": [
+                "Up to 56cm x 45cm x 25cm/22in x 18in x 10in.",
+                "1 handbag/laptop bag per person",
+                "Up to 40cm x 30cm x 15cm/16in x 12in x 6in.",
+                "To be placed under the seat in front of you*.",
+                "Plus 1 additional cabin bag per person",
+                "You must be able to lift your bag unaided into the overhead locker*."
+            ]
+        },
+        {
+            "identifier": "CKBAGOD1",
+            "rule": [
+                "LHR",
+                "MAN"
+            ],
+            "description": [
+                "There are restrictions on what you may pack and on the dimensions of your bags.",
+                "You may be charged for extra or overweight bags. ",
+                "Baggage essentials",
+                "restrictions on what you can pack",
+                "Baggage allowances and charges"
+            ]
+        }
+    ],
+    "bag_allowances": [
+        {
+            "identifier": "HANDBAGALLOWANCE",
+            "category": "carry_on",
+            "piece_allowance": [
+                {
+                    "combination": "and",
+                    "description": "",
+                    "quantity": 1,
+                    "passenger_ids": [
+                        "FS1",
+                        "PA0"
+                    ],
+                    "measurement": {
+                        "dimensions": [
+                            {
+                                "unit": "centimeter",
+                                "height": 15.0,
+                                "length": 40.0,
+                                "width": 30.0
+                            },
+                            {
+                                "unit": "inch",
+                                "height": 6.0,
+                                "length": 16.0,
+                                "width": 12.0
+                            }
+                        ],
+                        "weight": []
+                    }
+                },
+                {
+                    "combination": "and",
+                    "description": "",
+                    "quantity": 1,
+                    "passenger_ids": [
+                        "FS1",
+                        "PA0"
+                    ],
+                    "measurement": {
+                        "dimensions": [
+                            {
+                                "unit": "centimeter",
+                                "height": 25.0,
+                                "length": 56.0,
+                                "width": 45.0
+                            },
+                            {
+                                "unit": "inch",
+                                "height": 10.0,
+                                "length": 22.0,
+                                "width": 18.0
+                            }
+                        ],
+                        "weight": []
+                    }
+                }
+            ]
+        },
+        {
+            "identifier": "CKBAG1",
+            "category": "checked",
+            "piece_allowance": [
+                {
+                    "combination": null,
+                    "description": "",
+                    "quantity": 2,
+                    "passenger_ids": [
+                        "FS1",
+                        "PA0"
+                    ],
+                    "measurement": {
+                        "dimensions": [],
+                        "weight": [
+                            {
+                                "unit": "kilogram",
+                                "weight_value": 32.0
+                            },
+                            {
+                                "unit": "pounds",
+                                "weight_value": 70.0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "identifier": "CKBAG2",
+            "category": "checked",
+            "piece_allowance": [
+                {
+                    "combination": null,
+                    "description": "",
+                    "quantity": 2,
+                    "passenger_ids": [
+                        "FS1"
+                    ],
+                    "measurement": {
+                        "dimensions": [],
+                        "weight": []
+                    }
+                }
+            ]
+        }
+    ],
+    "penalties": [
+        {
+            "identifier": "Rule1",
+            "penalty_type": "change",
+            "price": null,
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule2",
+            "penalty_type": "change",
+            "price": {
+                "currency": "EUR",
+                "total_amount": "118.00"
+            },
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule3",
+            "penalty_type": "change",
+            "price": null,
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule4",
+            "penalty_type": "cancel",
+            "price": null,
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule5",
+            "penalty_type": "cancel",
+            "price": null,
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule6",
+            "penalty_type": "cancel",
+            "price": null,
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule7",
+            "penalty_type": "change",
+            "price": {
+                "currency": "EUR",
+                "total_amount": "0.00"
+            },
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule8",
+            "penalty_type": "cancel",
+            "price": {
+                "currency": "EUR",
+                "total_amount": "41.00"
+            },
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule9",
+            "penalty_type": "change",
+            "price": {
+                "currency": "EUR",
+                "total_amount": "0.00"
+            },
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule10",
+            "penalty_type": "cancel",
+            "price": {
+                "currency": "EUR",
+                "total_amount": "0.00"
+            },
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        },
+        {
+            "identifier": "Rule11",
+            "penalty_type": "cancel",
+            "price": {
+                "currency": "EUR",
+                "total_amount": "0.00"
+            },
+            "passenger_ids": [
+                "FS1",
+                "PA0"
+            ],
+            "remarks": []
+        }
+    ],
+    "payment_cards": [
+        {
+            "code": "VD",
+            "name": "Visa Delta/Debit",
+            "payment_type": "debit"
+        },
+        {
+            "code": "VI",
+            "name": "Visa Credit",
+            "payment_type": "credit"
+        },
+        {
+            "code": "MD",
+            "name": "MasterCard Debit",
+            "payment_type": "debit"
+        },
+        {
+            "code": "CA",
+            "name": "MasterCard",
+            "payment_type": "credit"
+        },
+        {
+            "code": "DS",
+            "name": "Discover",
+            "payment_type": "credit"
+        },
+        {
+            "code": "DC",
+            "name": "Diners Club",
+            "payment_type": "credit"
+        },
+        {
+            "code": "AX",
+            "name": "American Express",
+            "payment_type": "credit"
+        }
+    ]
+}

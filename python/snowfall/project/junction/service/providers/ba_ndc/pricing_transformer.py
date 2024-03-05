@@ -33,11 +33,11 @@ def _to_penalties(penalties: Sequence[cache.OfferPenalty]) -> list[offers_pb2.Pe
 
 
 def _to_document_requirement(
-    offer_details: cache.OfferDetails,
+    price_quote_details: cache.PriceQuoteDetails,
 ) -> list[offers_pb2.PriceQuote.Required.ValueType]:
     required_docs: list[offers_pb2.PriceQuote.Required.ValueType] = []
 
-    if offer_details.international_flight:
+    if price_quote_details.is_international_flight:
         required_docs.extend(
             [
                 offers_pb2.PriceQuote.Required.REQUIRED_NATIONALITY,
@@ -48,7 +48,7 @@ def _to_document_requirement(
             ],
         )
 
-    if offer_details.return_flight_to_usa:
+    if price_quote_details.has_flight_with_usa_destination:
         required_docs.append(
             offers_pb2.PriceQuote.Required.REQUIRED_RESIDENCE_ADDRESS,
         )
@@ -57,28 +57,25 @@ def _to_document_requirement(
 
 
 class PriceQuoteTransformer(object):
-    def __init__(
-        self,
-        offer_cache: cache.OfferCache,
-    ) -> None:
-        self._offer_cache = offer_cache
-
     def to_price_quote(
         self,
-        price_quote_id: str,
-        offer_details: cache.OfferDetails,
+        price_quote_details_id: str,
+        price_quote_details: cache.PriceQuoteDetails,
         option_id: str,
     ) -> offers_pb2.PriceQuote:
         return offers_pb2.PriceQuote(
-            id=price_quote_id,
+            id=price_quote_details_id,
             option_id=option_id,
-            expires_at=protobuf.datetime_to_protobuf(offer_details.expires_at),
-            price=_to_money(offer_details.price.amount, offer_details.price.currency),
-            price_breakdown=parsers.parse_price_breakdown(
-                offer_details.price_breakdown.base_amount,
-                offer_details.price_breakdown.tax_amount,
-                offer_details.price_breakdown.currency,
+            expires_at=protobuf.datetime_to_protobuf(price_quote_details.expires_at),
+            price=_to_money(
+                price_quote_details.price.amount,
+                price_quote_details.price.currency,
             ),
-            penalties=_to_penalties(offer_details.penalties),
-            required_documents=_to_document_requirement(offer_details),
+            price_breakdown=parsers.parse_price_breakdown(
+                price_quote_details.price_breakdown.base_amount,
+                price_quote_details.price_breakdown.tax_amount,
+                price_quote_details.price_breakdown.currency,
+            ),
+            penalties=_to_penalties(price_quote_details.penalties),
+            required_documents=_to_document_requirement(price_quote_details),
         )

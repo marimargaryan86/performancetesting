@@ -108,14 +108,14 @@ class BookingHandler(object):
     async def book(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        price_quote_details: cache.PriceQuoteDetails,
     ) -> models_pb2.Booking:
         new_booking = task.booking
 
         try:
             booking_adapter: OrderViewAdapter = await self._make_booking(
                 task=task,
-                details=details,
+                price_quote_details=price_quote_details,
             )
         except errors.ServiceError as error:
             self._logger.exception(
@@ -162,22 +162,22 @@ class BookingHandler(object):
     async def _make_booking(
         self,
         task: amqp_pb2.PlaceOrderTask,
-        details: cache.OfferDetails,
+        price_quote_details: cache.PriceQuoteDetails,
     ) -> OrderViewAdapter:
         number = ba_ndc_helpers.parse_phone_number(
             task.contact_details.phone.e164_number,
         )
-        order_request = OrderRequestBuilder(details.offer_id)
+        order_request = OrderRequestBuilder(price_quote_details.offer_id)
 
         for index, passenger in enumerate(task.passengers):
             passport_document = _get_passport_document(
                 passenger=passenger,
-                is_international_flight=details.international_flight,
+                is_international_flight=price_quote_details.is_international_flight,
             )
 
             order_request.add_passenger(
                 request_order_schemas.PassengerExtended(
-                    identifier=details.passengers[index].identifier,
+                    identifier=price_quote_details.passengers[index].identifier,
                     passenger_type=criteria.get_passenger_type_enum(
                         ba_ndc_helpers.proto_to_date(passenger.date_of_birth),
                         ba_ndc_helpers.get_last_travel_date(task),
@@ -201,7 +201,8 @@ class BookingHandler(object):
                     ),
                     identity_documents=(
                         [passport_document]
-                        if passport_document and details.international_flight
+                        if passport_document
+                        and price_quote_details.is_international_flight
                         else []
                     ),
                 ),
@@ -209,13 +210,13 @@ class BookingHandler(object):
 
             order_request.residence_address = _get_residence_address(
                 residence_address=task.residence_address,
-                return_flight_to_usa=details.return_flight_to_usa,
+                return_flight_to_usa=price_quote_details.has_flight_with_usa_destination,
             )
 
         order_request.set_cash_payment_info(
-            more_itertools.first(details.passengers).identifier,
-            details.price.currency,
-            ba_ndc_helpers.str_to_decimal(details.price.amount),
+            more_itertools.first(price_quote_details.passengers).identifier,
+            price_quote_details.price.currency,
+            ba_ndc_helpers.str_to_decimal(price_quote_details.price.amount),
         )
         order_response, raw_response = await self._client.create_order(
             order_request.build(),

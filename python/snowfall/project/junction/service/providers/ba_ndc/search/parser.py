@@ -347,34 +347,17 @@ class OfferParser(object):
                     id=await self._offer_cache.store(
                         cache.OfferDetails(
                             offer_id=offer.identifier,
-                            price=cache.Price(
-                                amount=offer.price.total_amount,
-                                currency=offer.price.currency,
+                            is_international_flight=self.check_if_international_flight(
+                                offer.trips,
+                                offers_adapter,
                             ),
-                            price_breakdown=cache.PriceBreakdown(
-                                currency=offer.price.currency,
-                                tax_amount=offer.price.tax_amount,
-                                base_amount=offer.price.base_amount,
+                            has_flight_with_usa_destination=self.check_if_flight_to_usa(
+                                offer.trips,
+                                offers_adapter,
                             ),
-                            passengers=[
-                                cache.OfferDetailsPassenger(
-                                    identifier=passenger_info.identifier,
-                                    passenger_type=passenger_info.passenger_type.name,
-                                )
-                                for passenger_info in offers_adapter.get_passengers()
-                            ],
                             expires_at=offers_adapter.get_expires_at(),
-                            penalties=get_penalties(offer.trips, offers_adapter),
-                            international_flight=self.check_if_international_flight(
-                                offer.trips,
-                                offers_adapter,
-                            ),
-                            return_flight_to_usa=self.check_if_flight_to_usa(
-                                offer.trips,
-                                offers_adapter,
-                            ),
                         ),
-                        expires_at=offers_adapter.get_expires_at(),
+                        expires_at=offers_adapter.get_expires_at(),  # TODO(brant): we define ttl in othe provider implementations
                     ),
                     segment_details=_parse_segment_details(
                         offer.trips,

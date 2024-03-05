@@ -10,7 +10,6 @@ from snowfall.project.junction.service.providers.ba_ndc.pricing_transformer impo
     PriceQuoteTransformer,
 )
 from snowfall.stdlib import money
-from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.vendor.ba_ndc.models.response_offer_search_schemas import (
     OfferSearchResponse,
 )
@@ -25,7 +24,7 @@ class TestPricingTransformer(object):
         offer_search_response = OfferSearchResponse.parse_obj(json_res)
 
         offer = offer_search_response.offers[0]
-        offer_details = cache.OfferDetails(
+        price_quote_details = cache.PriceQuoteDetails(
             offer_id=offer.identifier,
             price=cache.Price(
                 amount=offer.price.total_amount,
@@ -39,24 +38,22 @@ class TestPricingTransformer(object):
             passengers=[],
             expires_at=offer_search_response.expires_at,
             penalties=[],
-            international_flight=True,
-            return_flight_to_usa=True,
+            is_international_flight=True,
+            has_flight_with_usa_destination=True,
         )
 
-        transformer = PriceQuoteTransformer(
-            offer_cache=cache.OfferCache(client=redis.Client(redis_client)),
-        )
+        transformer = PriceQuoteTransformer()
         price_quote = transformer.to_price_quote(
-            str(uuid.uuid4()),
-            offer_details,
-            str(uuid.uuid4()),
+            price_quote_details_id=str(uuid.uuid4()),
+            price_quote_details=price_quote_details,
+            option_id=str(uuid.uuid4()),
         )
 
         price = money.from_protobuf(price_quote.price)
         assert str(price) == "49.46"
         assert price.currency.code == "EUR"
 
-        base_fare = price_quote.price_breakdown[0]
+        base_fare = price_quote.price_breakdown[0]  # noqa: WPS432
         base_fare_price = money.from_protobuf(base_fare.price)
         assert str(base_fare_price) == "14.00"
         assert base_fare_price.currency.code == "EUR"

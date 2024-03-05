@@ -28,3 +28,5 @@ class PricingSettings(BaNdcConfig, service.Settings):
     redis_dsn: pydantic.RedisDsn
     provider_company_id: str
     ttl: datetime.timedelta = datetime.timedelta(minutes=_DEFAULT_TTL_IN_MINUTES)
+    rate_limiter_grpc_host: str
+    rate_limiter_service_configs: dict[str, RateLimitConfig]
