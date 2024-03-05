@@ -174,18 +174,18 @@ export const hourFormat = {
   }),
 };
 
-export function getClosestFullHour(onlyInFuture = true): Date {
-  const now = new Date();
-  const minutes = now.getMinutes();
+export function getClosestFullHour(inputDate: Date, onlyInFuture = true): Date {
+  const date = new Date(inputDate);
+  const minutes = date.getMinutes();
   const addToHour = !onlyInFuture && minutes < 30 ? 0 : 1;
 
   // Reset minutes, seconds, and milliseconds to 0
-  now.setMinutes(0, 0, 0);
+  date.setMinutes(0, 0, 0);
   if (addToHour) {
     // Don´t worry about the new hours being more than 23
     // It will automatically roll over to the next day
-    now.setHours(now.getHours() + addToHour);
+    date.setHours(date.getHours() + addToHour);
   }
 
-  return now;
+  return date;
 }

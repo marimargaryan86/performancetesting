@@ -36,7 +36,7 @@
   export let data: PartialTripSearchData = {
     tripType: $featureTools.hasFeature(Feature.ROUND_TRIP) ? "round-trip" : "one-way",
     passengers: getDefaultValue(),
-    outbound: getClosestFullHour(true),
+    outbound: getClosestFullHour(new Date(), true),
   };
   let errors: TripSearchDataError | undefined = undefined;
 
