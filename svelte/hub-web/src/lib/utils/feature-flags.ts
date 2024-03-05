@@ -122,5 +122,6 @@ export function getAvailableFeatures(environment?: string, user?: OrySchemas.Use
   return {
     // Enable the following features in production:
     [Feature.OFFERS_TIME_WINDOWS]: FEATURES["offers-time-windows"],
+    [Feature.ROUND_TRIP]: FEATURES["round-trip"],
   };
 }
