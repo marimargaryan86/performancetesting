@@ -11,7 +11,9 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test:unit": "vitest",
+    "test:unit-ui": "vitest --coverage.enabled=true --ui",
     "test:e2e": "playwright test --headed",
+    "coverage": "vitest --coverage --run",
     "lint": "prettier --check . && eslint . && stylelint **/*.html **/*.svelte **/*.css",
     "format": "prettier --write ."
   },
@@ -61,7 +63,7 @@
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
     "vite": "^4.5.2",
-    "vitest": "^0.32.4",
+    "vitest": "^1.3.1",
     "zod": "^3.22.4"
   },
   "type": "module",
