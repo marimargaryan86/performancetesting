@@ -6,7 +6,6 @@ export function getZeroTimeDate(date?: Date): Date {
   nextDate.setMinutes(0);
   nextDate.setSeconds(0);
   nextDate.setMilliseconds(0);
-
   return nextDate;
 }
 
@@ -143,20 +142,27 @@ export function getAge(date: Date, today = new Date()): number {
   return age;
 }
 
-export function parseDateRange(from = "", to = ""): DateRange | undefined {
-  const dateFrom = new Date(from);
+export function parseDateRange(fromStr = "", toStr = ""): DateRange | undefined {
+  const dateFrom = new Date(fromStr);
 
   if (isNaN(dateFrom.getTime())) {
     return undefined;
   }
 
-  const dateTo = new Date(to);
+  const dateTo = new Date(toStr);
 
   if (isNaN(dateTo.getTime())) {
     return undefined;
   }
 
-  return { from: getZeroTimeDate(dateFrom), to: getZeroTimeDate(dateTo) };
+  const from = getZeroTimeDate(dateFrom);
+  const to = getZeroTimeDate(dateTo);
+
+  if (to < from) {
+    return undefined;
+  }
+
+  return { from, to };
 }
 
 export const hourFormat = {
