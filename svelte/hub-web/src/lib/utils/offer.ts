@@ -35,11 +35,13 @@ export function getLegsFromPriceQuote(
   );
 }
 
+// TODO(2024-03-04/asantos): Deprecate this after the "Confirmation" page is complete
 type LegSequenceTuple = [
   CommonSchemas.OfferSegmentLeg,
   MobileSchemas.TripOfferGroupDetails["sequences"]["trip"],
 ];
 
+// TODO(2024-03-04/asantos): Deprecate this after the "Confirmation" page is complete
 export function getLegsAndSequencesFromPriceQuote(
   priceQuote: MobileSchemas.TripOfferPriceQuote,
 ): LegSequenceTuple[] {

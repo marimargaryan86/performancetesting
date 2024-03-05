@@ -65,7 +65,7 @@
         {getPassengersPresentation(passengers, $t)}
       </div>
 
-      <SummaryItinerary {priceQuote} {isRoundTrip} on:showFareRules={showFareRules} />
+      <SummaryItinerary {priceQuote} on:showFareRules={showFareRules} />
     {:else}
       <LoadingIcon size="24px" />
     {/if}
