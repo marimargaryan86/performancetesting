@@ -143,11 +143,12 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find_bookings(
         self,
-        identifiers: Sequence[str],
+        identifiers: Sequence[str] = (),
         transaction_ids: Sequence[str] | None = None,
         reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        filter_by_departure_dates: Sequence[str] = (),
     ) -> orders_pb2.ListBookingsResponse:
         """Fetch booking resources by identifiers."""
 
@@ -429,11 +430,12 @@ class DictClient(Client):
 
     async def find_bookings(
         self,
-        identifiers: Sequence[str],
+        identifiers: Sequence[str] = (),
         transaction_ids: Sequence[str] | None = None,
         reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        filter_by_departure_dates: Sequence[str] = (),
     ) -> orders_pb2.ListBookingsResponse:
         bookings = [
             booking
@@ -890,15 +892,17 @@ class GrpcClient(Client):
 
     async def find_bookings(
         self,
-        identifiers: Sequence[str] | None = None,
+        identifiers: Sequence[str] = (),
         transaction_ids: Sequence[str] | None = None,
         reseller_id: str | None = None,
         limit: int | None = None,
         cursor: str | None = None,
+        filter_by_departure_dates: Sequence[str] = (),
     ) -> orders_pb2.ListBookingsResponse:
         request = orders_pb2.ListBookingsRequest(
             page_token=cursor or "",
             reseller_id=reseller_id or "",
+            departure_dates=filter_by_departure_dates,
         )
         if identifiers:
             request.ids.ids.extend(identifiers)

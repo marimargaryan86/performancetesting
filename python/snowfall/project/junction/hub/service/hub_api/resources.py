@@ -454,6 +454,87 @@ class OrderResource(models.Resource):
         )
 
 
+class ActivityResource(models.Resource):
+    api_type: ClassVar[str] = "activities"
+
+    @classmethod
+    def from_proto(
+        cls,
+        transaction: transaction_models_pb2.Transaction,
+        order: order_models_pb2.Order,
+        booking: order_models_pb2.Booking,
+        company: companies_models_pb2.Company,
+        reseller: reseller_models_pb2.Reseller,
+        request: requests.Request,
+    ) -> ActivityResource:
+        return cls(
+            id=transaction.id,
+            type=ActivityResource.api_type,
+            attributes={
+                "transactionCreatedAt": protobuf.protobuf_to_date(
+                    transaction.created_at,
+                ),
+                "departureAt": protobuf.protobuf_to_date(
+                    booking.trip_option.details[0].segment.legs[0].departure_at,  # noqa: WPS219
+                ),
+                "baseConverted": Money.from_proto(transaction.amounts.base_converted),
+                "salesMargin": Money.from_proto(transaction.amounts.sales_margin),
+                "quotation": Money.from_proto(transaction.amounts.quotation),
+                "taxConverted": Money.from_proto(transaction.amounts.tax_converted),
+                "totalAmount": Money.from_proto(transaction.amounts.total_amount),
+                "payerName": reseller.name,
+                "fxMargin": Money.from_proto(transaction.amounts.fx_margin).amount,
+                "processingMargin": money.from_protobuf(
+                    transaction.amounts.processing_margin,
+                ).amount,
+                "feeAmount": Money.from_proto(transaction.amounts.fee_amount),
+                "totalMarkups": Money.from_proto(transaction.amounts.total_markups),
+                "beneficiaryAmount": Money.from_proto(transaction.amounts.beneficiary),
+                "beneficiaryName": company.name,
+                "passengerName": order.passengers[0].first_name,
+                "paymentType": protobuf.enum_value_to_slug(
+                    companies_models_pb2.PaymentType.DESCRIPTOR,
+                    company.payment_type,
+                ),
+                "paymentMethod": protobuf.enum_value_to_slug(
+                    companies_models_pb2.PaymentMethod.DESCRIPTOR,
+                    company.payment_method,
+                ),
+                "fxMarkup": transaction.rates.fx_markup,
+                "salesMarkup": transaction.rates.sales_markup,
+                "processingMarkup": transaction.rates.processing_markup,
+            },
+            relationships={
+                "invoiceReference": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=transaction.invoice_reference_id,
+                        type="invoice-reference",
+                    ),
+                },
+                "externalReference": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=transaction.external_reference_id,
+                        type="external-reference",
+                    ),
+                },
+                "order": {
+                    _RELATIONSHIPS_FIELD: models.ResourceIdentifier(
+                        id=order.id,
+                        type="orders",
+                    ),
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "Activity",
+                        transactionId=transaction.id,
+                    ),
+                ),
+            },
+        )
+
+
 class CancellationRequestResource(models.Resource):
     api_type: ClassVar[str] = "cancellation-request"
 

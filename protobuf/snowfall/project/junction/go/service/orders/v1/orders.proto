@@ -138,6 +138,7 @@ message ListBookingsRequest {
     ListOfIds transaction_ids = 5;
   }
   string reseller_id = 6;
+  repeated string departure_dates = 7;
 }
 
 message ListBookingsResponse {

@@ -4352,6 +4352,7 @@
         "explode": false,
         "schema": {
           "type": "array",
+          "maxItems": 1,
           "example": [
             "2025-02-03"
           ],
@@ -6088,7 +6089,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
@@ -6111,7 +6111,6 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
@@ -6191,9 +6190,7 @@
                     "$ref": "#/components/schemas/Money"
                   },
                   "salesMargin": {
-                    "type": "number",
-                    "format": "float",
-                    "example": 59.858611
+                    "$ref": "#/components/schemas/Money"
                   },
                   "quotation": {
                     "$ref": "#/components/schemas/Money"
@@ -6254,10 +6251,14 @@
                     "example": "transactional"
                   },
                   "fxMarkup": {
-                    "$ref": "#/components/schemas/Money"
+                    "type": "number",
+                    "format": "float",
+                    "example": 5.6
                   },
                   "salesMrkup": {
-                    "$ref": "#/components/schemas/Money"
+                    "type": "number",
+                    "format": "float",
+                    "example": 5.6
                   },
                   "processingMarkup": {
                     "type": "number",

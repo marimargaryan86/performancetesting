@@ -236,12 +236,14 @@ class OrderService(
                 transaction_ids=list(request.transaction_ids.ids),
                 cursor=request.page_token,
                 reseller_id=request.reseller_id,
+                filter_by_departure_dates=request.departure_dates,
             )
         else:
             bookings_result = await self._bookings.find(
                 ids=list(request.ids.ids),
                 cursor=request.page_token,
                 reseller_id=request.reseller_id,
+                filter_by_departure_dates=request.departure_dates,
             )
 
         bookings_result.limit(

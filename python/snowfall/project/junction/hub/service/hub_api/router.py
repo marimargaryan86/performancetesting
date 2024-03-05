@@ -7,6 +7,7 @@ from snowfall.project.junction.go.adapter import resellers
 from snowfall.project.junction.hub.service.hub_api import repository
 from snowfall.project.junction.hub.service.hub_api.routes import (
     accounts,
+    activities,
     balances,
     beneficiaries,
     bills,
@@ -264,5 +265,17 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             go_resellers.Reseller,
             name="Reseller",
             methods=["PATCH", "GET", "DELETE"],
+        ),
+        integration.route(
+            "/activities/{transactionId}",
+            activities.Activity,
+            name="Activity",
+            methods=["GET"],
+        ),
+        integration.route(
+            "/activities",
+            activities.Activities,
+            name="Activities",
+            methods=["GET"],
         ),
     ]

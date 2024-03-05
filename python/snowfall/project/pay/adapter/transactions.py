@@ -41,9 +41,12 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def find(
         self,
-        filter_by: Sequence[str],
-        filter_by_bill_ids: Sequence[str],
-        filter_by_external_reference: Sequence[str],
+        filter_by: Sequence[str] = (),
+        filter_by_bill_ids: Sequence[str] = (),
+        filter_by_external_reference: Sequence[str] = (),
+        filter_by_payer_ids: Sequence[str] = (),
+        filter_by_beneficiary_ids: Sequence[str] = (),
+        filter_by_created_dates: Sequence[str] = (),
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -116,9 +119,12 @@ class DictClient(Client):
 
     async def find(
         self,
-        filter_by: Sequence[str],
-        filter_by_bill_ids: Sequence[str],
-        filter_by_external_reference: Sequence[str],
+        filter_by: Sequence[str] = (),
+        filter_by_bill_ids: Sequence[str] = (),
+        filter_by_external_reference: Sequence[str] = (),
+        filter_by_payer_ids: Sequence[str] = (),
+        filter_by_beneficiary_ids: Sequence[str] = (),
+        filter_by_created_dates: Sequence[str] = (),
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -129,6 +135,21 @@ class DictClient(Client):
                 filter(
                     lambda transaction: transaction.external_reference_id
                     in filter_by_external_reference,
+                    self._transactions.values(),
+                ),
+            )
+        if filter_by_payer_ids:
+            transactions = list(
+                filter(
+                    lambda transaction: transaction.payer_id in filter_by_payer_ids,
+                    self._transactions.values(),
+                ),
+            )
+        if filter_by_beneficiary_ids:
+            transactions = list(
+                filter(
+                    lambda transaction: transaction.beneficiary_id
+                    in filter_by_beneficiary_ids,
                     self._transactions.values(),
                 ),
             )
@@ -203,9 +224,12 @@ class GrpcClient(Client):
 
     async def find(
         self,
-        filter_by: Sequence[str],
-        filter_by_bill_ids: Sequence[str],
-        filter_by_external_reference: Sequence[str],
+        filter_by: Sequence[str] = (),
+        filter_by_bill_ids: Sequence[str] = (),
+        filter_by_external_reference: Sequence[str] = (),
+        filter_by_payer_ids: Sequence[str] = (),
+        filter_by_beneficiary_ids: Sequence[str] = (),
+        filter_by_created_dates: Sequence[str] = (),
         limit: int | None = None,
         cursor: str | None = None,
         sort: sort_pb2.Sort | None = None,
@@ -216,6 +240,9 @@ class GrpcClient(Client):
             filter_by=filter_by,
             filter_by_bill_ids=filter_by_bill_ids,
             filter_by_external_reference=filter_by_external_reference,
+            filter_by_payer_ids=filter_by_payer_ids,
+            filter_by_beneficiary_ids=filter_by_beneficiary_ids,
+            filter_by_created_dates=filter_by_created_dates,
         )
         if limit is not None:
             request.page_size = limit

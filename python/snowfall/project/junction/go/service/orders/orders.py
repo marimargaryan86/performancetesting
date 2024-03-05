@@ -425,6 +425,7 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
         transaction_ids: Sequence[str] | None = None,
         cursor: str = "",
         reseller_id: str = "",
+        filter_by_departure_dates: Sequence[str] = (),
     ) -> resultset.ResultSet[models_pb2.Booking]:
         filter_ = {}
         if ids:
@@ -439,6 +440,24 @@ class BookingRepository(repository.ProtoRepository[models_pb2.Booking]):
                     "$in": transaction_ids,
                 },
             }
+
+        if filter_by_departure_dates:
+            departure_dates = [
+                datetime.datetime.strptime(departure_date, "%Y-%m-%d").astimezone(
+                    datetime.UTC,
+                )
+                for departure_date in filter_by_departure_dates
+            ]
+            filter_departure_dates = [
+                {
+                    "orders.bookings.trip_option.details.segment.legs.departure_at": {
+                        "$gte": departure_date,
+                        "$lt": departure_date + datetime.timedelta(days=1),
+                    },
+                }
+                for departure_date in departure_dates
+            ]
+            filter_["$or"] = filter_departure_dates  # type: ignore[assignment]
 
         filter_ = _add_reseller_id_to_filter(reseller_id, filter_)
 

@@ -37,6 +37,9 @@ class TransactionsRepository(
         filter_by_ids: Sequence[str] = (),
         filter_by_bill_ids: Sequence[str] = (),
         filter_by_external_reference: Sequence[str] = (),
+        filter_by_payer_ids: Sequence[str] = (),
+        filter_by_beneficiary_ids: Sequence[str] = (),
+        filter_by_created_dates: Sequence[str] = (),
         from_date: datetime.datetime | None = None,
         to_date: datetime.datetime | None = None,
         sort: tuple[str, int] | None = None,
@@ -54,6 +57,33 @@ class TransactionsRepository(
             filter_["external_reference_id"] = {
                 "$in": list(filter_by_external_reference),
             }
+
+        if filter_by_beneficiary_ids:
+            filter_["beneficiary_id"] = {
+                "$in": list(filter_by_beneficiary_ids),
+            }
+        if filter_by_payer_ids:
+            filter_["payer_id"] = {
+                "$in": list(filter_by_payer_ids),
+            }
+
+        if filter_by_created_dates:
+            created_dates = [
+                datetime.datetime.strptime(created_date, "%Y-%m-%d").astimezone(
+                    datetime.UTC,
+                )
+                for created_date in filter_by_created_dates
+            ]
+            filter_created_dates = [
+                {
+                    "created_at": {
+                        "$gte": created_date,
+                        "$lt": created_date + datetime.timedelta(days=1),
+                    },
+                }
+                for created_date in created_dates
+            ]
+            filter_["$or"] = filter_created_dates
 
         filter_by_date = {}
         if from_date:

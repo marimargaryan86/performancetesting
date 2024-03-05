@@ -64,6 +64,9 @@ class TransactionsService(
             filter_by_ids=request.filter_by,
             filter_by_bill_ids=request.filter_by_bill_ids,
             filter_by_external_reference=request.filter_by_external_reference,
+            filter_by_payer_ids=request.filter_by_payer_ids,
+            filter_by_beneficiary_ids=request.filter_by_beneficiary_ids,
+            filter_by_created_dates=request.filter_by_created_dates,
         )
         transactions.limit(
             request.page_size if request.page_size else self._default_page_size,
