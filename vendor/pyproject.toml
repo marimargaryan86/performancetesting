@@ -350,6 +350,7 @@ filterwarnings = [
   "ignore::DeprecationWarning:xdist.plugin",
   "ignore::DeprecationWarning:unittest.mock",
   "ignore::DeprecationWarning:mongomock.__version__:1",
+  "ignore::DeprecationWarning:httpx._client",
   "ignore::DeprecationWarning:pkg_resources",
   "ignore::DeprecationWarning:google.rpc",
   "ignore::DeprecationWarning:openapi_core.deserializing.parameters.deserializers",

@@ -18,7 +18,10 @@ WEBHOOK_SIGNING_SECRET = "1B2M2Y8AsgTpgAmY7PhCftQdjNmPALIE6YAJmOz4Qn4="
 async def client(
     app: applications.Starlette,
 ) -> AsyncIterator[httpx.AsyncClient]:
-    async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),  # type: ignore[arg-type]
+        base_url="https://example.com",
+    ) as client:
         yield client
 
 

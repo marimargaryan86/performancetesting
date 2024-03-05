@@ -278,5 +278,8 @@ def app(
 async def client(
     app: applications.Starlette,
 ) -> AsyncIterator[httpx.AsyncClient]:
-    async with httpx.AsyncClient(app=app, base_url="https://example.com") as client:
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),  # type: ignore[arg-type]
+        base_url="https://example.com",
+    ) as client:
         yield client
