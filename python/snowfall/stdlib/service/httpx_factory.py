@@ -13,7 +13,7 @@ _DefaultTimeout = 5
 _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Certificate(object):
     certificate_file: pathlib.Path
     key_file: pathlib.Path | None = None

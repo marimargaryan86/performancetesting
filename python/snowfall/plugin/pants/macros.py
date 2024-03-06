@@ -1,7 +1,7 @@
 _BASE_IMAGE_SHA = "af8a06428ec2679884374891296754df12d5247ccaf95d2cc5d844d915a2218f"
 
 
-def _generate_repository(build_file_dir, exclude: set[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001
+def _generate_repository(build_file_dir, exclude: frozenset[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001
     repository = "{base_url}/{namespace}/{name}".format(
         base_url=env("CI_PROJECT_PATH", "").strip("/"),  # type: ignore[name-defined]  # noqa: F821
         namespace="-".join(
@@ -188,7 +188,7 @@ def go_image(  # type: ignore[no-untyped-def]
 
     repository = _generate_repository(
         build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
-        {"golang", "cmd"},
+        frozenset(("golang", "cmd")),
     )
     service_name = _generate_service_name(repository)
 
@@ -282,7 +282,7 @@ def python_image(  # type: ignore[no-untyped-def]
 
     repository = _generate_repository(
         build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
-        {"python", "snowfall", "project", "service"},
+        frozenset(("python", "snowfall", "project", "service")),
     )
     service_name = _generate_service_name(repository)
 

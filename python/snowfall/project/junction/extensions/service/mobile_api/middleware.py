@@ -1,6 +1,6 @@
 import dataclasses
-import typing
 from collections.abc import Awaitable, Callable
+from typing import TypeAlias
 
 import jwt as jwtlib
 from starlette import applications, authentication, requests, responses
@@ -10,7 +10,7 @@ from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.transport.http import auth
 
-OnErrorHandler: typing.TypeAlias = typing.Callable[
+OnErrorHandler: TypeAlias = Callable[
     [requests.HTTPConnection, authentication.AuthenticationError],
     Awaitable[responses.Response],
 ]

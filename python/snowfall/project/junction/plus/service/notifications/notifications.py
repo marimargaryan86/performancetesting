@@ -1,7 +1,6 @@
-import copy
 import datetime
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 import pymongo
 
@@ -239,7 +238,7 @@ class ConfigurationVectorRepository(
         reseller_id: str,
         permissions_to_add: Sequence[str],
         permissions_to_remove: Sequence[str],
-        cv_permissions: dict[str, list[str]],
+        cv_permissions: Mapping[str, Sequence[str]],
         consul_client: ConsulClient,
         consul_key: str,
     ) -> bool:
@@ -263,11 +262,12 @@ class ConfigurationVectorRepository(
             raise RuntimeError()
 
         # Update permissions in consul
-        cv_permissions_mapping = copy.deepcopy(cv_permissions)
-        cv_permissions_mapping[reseller_id] = list(updated_permissions)
         await consul_client.put_key(
             consul_key,
-            json.dumps(cv_permissions_mapping).encode(),
+            json.dumps({
+                **cv_permissions,
+                reseller_id: updated_permissions,
+            }).encode(),
         )
 
         return update.acknowledged

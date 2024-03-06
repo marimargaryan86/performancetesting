@@ -890,7 +890,7 @@ def _check_trip_conflicts(trips_list: Sequence[common_pb2.Trip]) -> list[models.
 
 def get_arrival_before(
     body: Mapping[str, Any],
-    allowed_segment_types: list[common_pb2.Schedule.Type.ValueType],
+    allowed_segment_types: Sequence[common_pb2.Schedule.Type.ValueType],
 ) -> datetime.datetime | None:
     try:
         arrival_before = parser.isoparse(body["arrivalBefore"])

@@ -1,6 +1,6 @@
 import datetime
 import logging
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 import allure
@@ -79,7 +79,7 @@ async def get_offer_search(
 
 async def get_option_id(  # noqa: WPS231
     offer_id: str,
-    offer_list: dict[str, Any],
+    offer_list: Mapping[str, Any],
 ) -> str:
     option_id = ""
     offer_group_id = ""

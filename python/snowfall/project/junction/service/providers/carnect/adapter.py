@@ -1,7 +1,7 @@
 import datetime
 import zoneinfo
 from collections import defaultdict
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping, Sequence
 from types import MappingProxyType
 from typing import Any
 
@@ -595,7 +595,7 @@ class CarnectOffersAdapter(object):
 
     def _get_veh_avail_map(
         self,
-        veh_avails_type: list[service.VehicleVendorAvailabilityType],
+        veh_avails_type: Sequence[service.VehicleVendorAvailabilityType],
     ) -> dict[CoordinatesTuple, list[CarnectVehAvail]]:
         mapping = defaultdict(list)
         for availability_type in veh_avails_type:
@@ -618,7 +618,7 @@ class CarnectOffersAdapter(object):
     async def _generate_groups(
         self,
         search_task: amqp_pb2.Criteria,
-        veh_avail_map: dict[CoordinatesTuple, list[CarnectVehAvail]],
+        veh_avail_map: Mapping[CoordinatesTuple, Sequence[CarnectVehAvail]],
     ) -> AsyncIterator[offer_models_pb2.OfferGroup]:
         for veh_avails in veh_avail_map.values():
             try:
@@ -648,7 +648,7 @@ class CarnectOffersAdapter(object):
     async def _generate_offers(
         self,
         search_task: amqp_pb2.Criteria,
-        veh_avails: list[CarnectVehAvail],
+        veh_avails: Sequence[CarnectVehAvail],
         segment: offer_models_pb2.OfferSegment,
     ) -> list[offer_models_pb2.Offer]:
         offers = []

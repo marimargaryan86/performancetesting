@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from itertools import starmap
 
 import pytest
@@ -8,7 +9,7 @@ from snowfall.project.junction.hub.service.hub_api.routes.go_orders import Journ
 
 
 @pytest.fixture()
-def query_params() -> dict[str, str]:
+def query_params() -> Mapping[str, str]:
     return {
         "filter[createdAt][ge]": "2021-01-01",
         "filter[createdAt][le]": "2021-01-31",
@@ -21,7 +22,7 @@ def query_params() -> dict[str, str]:
 
 
 @pytest.fixture()
-def request_filters(query_params: dict[str, str]) -> requests.Request:
+def request_filters(query_params: Mapping[str, str]) -> requests.Request:
     query_string = "&".join(
         starmap("{0}={1}".format, query_params.items()),
     )

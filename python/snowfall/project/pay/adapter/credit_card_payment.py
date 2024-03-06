@@ -1,4 +1,5 @@
 import abc
+from collections.abc import Mapping
 
 from google.protobuf.json_format import ParseDict
 
@@ -57,7 +58,7 @@ class Client(abc.ABC):
         reseller_id: str = "",
         amount: money.Money | None = None,
         receipt_email: str = "",
-        metadata: dict[str, str] | None = None,
+        metadata: Mapping[str, str] | None = None,
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Update credit card payment."""
 
@@ -166,7 +167,7 @@ class DictClient(Client):
         reseller_id: str = "",
         amount: money.Money | None = None,
         receipt_email: str = "",
-        metadata: dict[str, str] | None = None,
+        metadata: Mapping[str, str] | None = None,
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment = self._credit_card_payments.get(payment_id)
         if credit_card_payment:
@@ -342,7 +343,7 @@ class GrpcClient(Client):
         reseller_id: str = "",
         amount: money.Money | None = None,
         receipt_email: str = "",
-        metadata: dict[str, str] | None = None,
+        metadata: Mapping[str, str] | None = None,
     ) -> credit_card_models_pb2.CreditCardPayment:
         proto_metadata = None
         if metadata:

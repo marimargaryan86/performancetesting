@@ -1,5 +1,6 @@
 import http
 import inspect
+from collections.abc import Mapping
 from typing import Any
 
 import httpx
@@ -123,7 +124,7 @@ async def test_timeout_error_message(
 async def test_get_train_stations(
     httpx_mock: pytest_httpx.HTTPXMock,
     ask2go_client: client.Ask2GoClient,
-    train_station: dict[str, Any],
+    train_station: Mapping[str, Any],
 ) -> None:
     httpx_mock.add_response(
         url="https://test_url/api/TrainStations",

@@ -35,7 +35,7 @@ class IncorrectBucketOfferIdFormatError(Exception):
     """Raised when an offer id is incorrect format (results bucket)."""
 
 
-def _validate_offer_ids(offer_ids: list[str]) -> None:
+def _validate_offer_ids(offer_ids: Sequence[str]) -> None:
     if len(offer_ids) != 2:
         raise IncorrectBucketOfferIdFormatError(
             "Offer {0} is incorrect format.".format(offer_ids),

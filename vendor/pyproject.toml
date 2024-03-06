@@ -43,7 +43,10 @@ select = [
   "RST2",   # flake8-rst-docstrings
   "RST3",   # flake8-rst-docstrings
   "RST4",   # flake8-rst-docstrings
-  "SF",     # snowfall.plugin.flake8
+  "SF10",   # snowfall.plugin.flake8
+  "SF20",   # snowfall.plugin.flake8
+  "SF21",   # snowfall.plugin.flake8
+  "SF22",   # snowfall.plugin.flake8
   "WPS100", # Forbid blacklisted module names.
   "WPS111", # Forbid short variable or module names.
   "WPS112", # Forbid private name pattern.

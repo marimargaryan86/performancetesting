@@ -1,5 +1,5 @@
 import copy
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from grpc import StatusCode, aio
 
@@ -197,7 +197,7 @@ class ConfigurationVectorService(
         consul_client: ConsulClient,
         subscribers: SubscriberRepository,
         environment: str,
-        cv_permissions: dict[str, list[str]],
+        cv_permissions: Mapping[str, Sequence[str]],
     ):
         self._configuration_vectors = configuration_vectors
         self._consul_client = consul_client

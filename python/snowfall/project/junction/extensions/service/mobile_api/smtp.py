@@ -1,4 +1,5 @@
 import dataclasses
+from collections.abc import Sequence
 from email import message
 
 import aiosmtplib
@@ -52,7 +53,7 @@ class EmailClient(object):
         mail_to: str,
         subject: str,
         body: str,
-        attachments: list[Attachment] | None = None,
+        attachments: Sequence[Attachment] | None = None,
     ) -> None:
         email = message.EmailMessage()
         email["From"] = "no-reply@snowfalltravel.com"

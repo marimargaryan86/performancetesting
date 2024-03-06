@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
 from typing import Any, cast
 from unittest import mock
 
@@ -64,20 +64,20 @@ async def provider_cabin_class_mapping(
 
 
 @pytest.fixture()
-async def stations() -> list[train_stations.TrainStation]:
+async def stations() -> Sequence[train_stations.TrainStation]:
     return train_stations.load_train_stations()
 
 
 @pytest.fixture()
 def train_station_repository(
-    stations: list[train_stations.TrainStation],
+    stations: Sequence[train_stations.TrainStation],
 ) -> train_stations.TrainStationRepository:
     return train_stations.TrainStationRepository(stations=stations)
 
 
 @pytest.fixture()
 def station_mapping(
-    stations: list[train_stations.TrainStation],
+    stations: Sequence[train_stations.TrainStation],
 ) -> h3.H3MappingRepository[train_stations.TrainStation]:
     return h3.H3MappingRepository[train_stations.TrainStation](
         mapping=stations,

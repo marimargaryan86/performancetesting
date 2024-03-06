@@ -31,7 +31,7 @@ class MigrateSettings(application.Settings):
     mongo_dsn: AnyUrl
 
 
-@dataclasses.dataclass()
+@dataclasses.dataclass(frozen=True)
 class Switcher(object):
     create_stripe_customers: bool
 

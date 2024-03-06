@@ -96,7 +96,7 @@ class TestClient(object):
 
     async def test_create_identity(
         self,
-        mock_identity_response: dict[str, Any],
+        mock_identity_response: Mapping[str, Any],
         ory_client: client.OryClient,
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
@@ -115,7 +115,7 @@ class TestClient(object):
 
     async def test_update_identity(
         self,
-        mock_identity_response: dict[str, Any],
+        mock_identity_response: Mapping[str, Any],
         ory_client: client.OryClient,
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
@@ -159,7 +159,7 @@ class TestClient(object):
 
     async def test_get_identity(
         self,
-        mock_identity_response: dict[str, Any],
+        mock_identity_response: Mapping[str, Any],
         ory_client: client.OryClient,
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:

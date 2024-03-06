@@ -136,7 +136,7 @@ def get_user_language() -> str:
 
 
 async def download_and_prepare_attachments(
-    ticket_urls: list[str],
+    ticket_urls: Sequence[str],
     departure_date: str,
 ) -> list[smtp.Attachment]:
     attachments = []
