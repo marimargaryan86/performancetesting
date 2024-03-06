@@ -243,12 +243,24 @@ class RefundsService(
         refunded_by_provider: money_pb2.Money,
         refunded_to_reseller: money_pb2.Money,
     ) -> DetailedRateResponse:
+        amount = money.from_protobuf(refunded_by_provider)
+        if amount.amount < 0:
+            amount = money.Money(
+                amount=abs(amount.amount),
+                currency=amount.currency,
+            )
+        if amount.amount == 0:
+            amount = money.Money(
+                amount=100,
+                currency=amount.currency,
+            )
+
         return await self._payment_client.get_detailed_rates(
             DetailedRateRequest(
                 sell_currency=refunded_by_provider.currency_code,
                 buy_currency=refunded_to_reseller.currency_code,
                 fixed_side=FixedSideEnum.sell,
-                amount=str(money.from_protobuf(refunded_by_provider)),
+                amount=str(amount),
             ),
         )
 
