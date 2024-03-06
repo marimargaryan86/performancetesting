@@ -322,19 +322,6 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:30px 10px;font-family:arial,helvetica,sans-serif;" align="left">
 
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
-<div align="center">
-    {% for booking in bookings %}
-        {% if booking.ticketUrls %}
-            {% for ticket_url in booking.ticketUrls %}
-                <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ ticket_url }}" style="height:36px; v-text-anchor:middle; width:159px;" arcsize="55.5%" stroke="f" fillcolor="#4bb69c"><w:anchorlock/><center style="color:#FFFFFF;"><![endif]-->
-                <a href="{{ ticket_url }}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #FFFFFF; background-color: #4bb69c; border-radius: 20px;-webkit-border-radius: 20px; -moz-border-radius: 20px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;font-weight: 700; ">
-                    <span style="display:block;padding:10px 20px;line-height:120%;"><span style="line-height: 16.8px;">{{ _('Download Tickets')}} </span></span>
-                </a>
-                <!--[if mso]></center></v:roundrect><![endif]-->
-            {% endfor %}
-        {% endif %}
-    {% endfor %}
-</div>
 
       </td>
     </tr>
