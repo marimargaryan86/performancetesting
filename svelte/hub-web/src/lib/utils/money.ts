@@ -4,16 +4,24 @@ export function pricesEqual(a: CommonSchemas.Price, b: CommonSchemas.Price): boo
   return a.amount === b.amount && a.currency === b.currency;
 }
 
+// Overload signature to allow destructuring
+export function summarizePrices(...prices: CommonSchemas.Price[]): CommonSchemas.Price;
+export function summarizePrices(
+  firstPrice: CommonSchemas.Price,
+  ...additionalPrices: CommonSchemas.Price[]
+): CommonSchemas.Price;
 export function summarizePrices(
   ...prices: [CommonSchemas.Price, ...CommonSchemas.Price[]]
 ): CommonSchemas.Price {
+  if (!prices[0]) {
+    throw new Error("No prices provided");
+  }
   if (new Set(prices.flatMap((price) => price.currency)).size !== 1) {
     throw new Error("Currencies do not match");
   }
-
   return {
     currency: prices[0].currency,
-    amount: prices.reduce((prev, curr) => prev + curr.amount, 0),
+    amount: prices.reduce((sum, curr) => sum + curr.amount, 0),
   };
 }
 
