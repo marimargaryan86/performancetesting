@@ -6,9 +6,13 @@ import pytest
 
 from snowfall.project.junction.api_automation.mobile_api_tests.e2e_simple_search_test import (
     create_offer_simple_search,
+    create_order,
+    create_payment,
+    create_quote,
     get_offer_list_simple_search,
     get_option_id,
     get_place_coordinates,
+    get_quote,
     get_search_offers,
 )
 from snowfall.project.junction.api_automation.test_functions.helper import (
@@ -31,7 +35,7 @@ providers = [
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
 @pytest.mark.parametrize("places_pairs", places_pairs, ids=providers)
-async def test_verify_simple_search(  # noqa: WPS218
+async def test_verify_simple_search(  # noqa: WPS217,WPS218
     mock_mobile_client: MobileApiClient,
     places_pairs: Sequence[str],
     departure_after: datetime,
@@ -77,3 +81,38 @@ async def test_verify_simple_search(  # noqa: WPS218
     assert offer_id
     assert offer_option_id
     logger.info("Get Offer ID and Option ID step: SUCCEED")
+
+    quotes = await create_quote(mock_mobile_client, offer_id, [offer_option_id])
+    assert quotes
+    logger.info("Create Quote step: SUCCEED")
+
+    quote_data = await wait_until_completed(
+        lambda: get_quote(mock_mobile_client, quotes),
+        "Timeout reached and status was not completed.",
+    )
+    assert quote_data
+    currency = quote_data["attributes"]["price"]["currency"]
+    amount = quote_data["attributes"]["price"]["amount"]
+    logger.info("Get Quote step: SUCCEED")
+
+    payment_intent_id = await create_payment(
+        mock_mobile_client,
+        currency,
+        amount,
+    )
+    assert payment_intent_id
+    logger.info("Create Payment step: SUCCEED")
+
+    trip_offer_price_quotes = quote_data["id"]
+    orders_data = await create_order(
+        mock_mobile_client,
+        trip_offer_price_quotes,
+        payment_intent_id,
+    )
+    assert orders_data
+    logger.info("Create Order step: SUCCEED")
+    order_id = orders_data["id"]
+
+    order_data_by_id = await mock_mobile_client.get_order(order_id)
+    assert order_data_by_id
+    logger.info("Get Order step: SUCCEED")

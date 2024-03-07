@@ -201,7 +201,7 @@ def mock_mobile_client(
         HTTPS_PREFIX,
         get_variable_value(host, api_token, "mock_mobile_api_host"),
     )
-    mobile_token = get_variable_value(host, api_token, "mobile_api_token")
+    mobile_token = get_variable_value(host, api_token, "mock_mobile_api_token")
     client_timeout = 20
 
     return MobileApiClient(
