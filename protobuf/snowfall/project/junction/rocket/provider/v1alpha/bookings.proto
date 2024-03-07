@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.provider.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/provider/v1alpha";
+
+service BookingService {
+  rpc GetBookings(GetBookingsRequest) returns (GetBookingsResponse) {}
+  rpc MakeBooking(MakeBookingRequest) returns (MakeBookingResponse) {}
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
+}
+
+message GetBookingsRequest {
+  repeated string ids = 1;
+}
+
+message GetBookingsResponse {
+  repeated Booking bookings = 1;
+}
+
+message MakeBookingRequest {
+  string offer_id = 1;
+}
+message MakeBookingResponse {}
+
+message Booking {
+  string id = 1;
+  message Provider {
+    string id = 1;
+    string name = 2;
+  }
+  Provider provider = 2;
+  message Trip {
+    string record_locator = 1;
+    repeated string operator_booking_references = 2;
+  }
+  oneof itinerary {
+    Trip trip = 3;
+  }
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_CONFIRMED = 2;
+    STATUS_CANCELLED = 3;
+    STATUS_REJECTED = 4;
+    STATUS_NOT_TICKETED = 5;
+    STATUS_ERROR = 6;
+  }
+  Status status = 4;
+  message Price {
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      TYPE_TOTAL = 1;
+    }
+    Type type = 1;
+    snowfall.stdlib.v1.Money amount = 2;
+  }
+  repeated Price prices = 5;
+  string raw_data = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  repeated string ticket_urls = 9;
+}
+
+message CancelBookingRequest {
+  string provider_booking_reference = 1;
+}
+
+message BookingCancellation {
+  string provider_booking_reference = 1;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_NO_REFUND = 1;
+    STATUS_REFUND_DUE = 2;
+    STATUS_REFUND_FAILED = 3;
+  }
+  Status status = 2;
+  snowfall.stdlib.v1.Money refunded_us = 3;
+}
+
+message CancelBookingResponse {
+  BookingCancellation cancellation = 1;
+}

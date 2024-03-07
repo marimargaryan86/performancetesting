@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.offers.v1alpha;
+
+import "snowfall/project/junction/rocket/service/offers/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/offers/v1alpha";
+
+service SearchService {
+  rpc EnqueueSearch(EnqueueSearchRequest) returns (EnqueueSearchResponse) {}
+  rpc GetSearch(GetSearchRequest) returns (GetSearchResponse) {}
+}
+
+service SearchResultPriceService {
+  rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
+  // rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
+  rpc GetSearchResult(GetSearchResultRequest) returns (GetSearchResultResponse) {}
+  // rpc ListOfferGroups(ListOfferGroupsRequest) returns (ListOfferGroupsResponse) {}
+  rpc GetOfferSegment(GetOfferSegmentRequest) returns (GetOfferSegmentResponse) {}
+  // rpc ListOfferGroupDetails(ListOfferGroupDetailsRequest) returns (ListOfferGroupDetailsResponse) {}
+  rpc GetOfferSegmentDetails(GetOfferSegmentDetailsRequest) returns (GetOfferSegmentDetailsResponse) {}
+  // rpc ListOfferOptionDetails(ListOfferOptionDetailsRequest) returns (ListOfferOptionDetailsResponse) {}
+}
+
+service PriceQuoteService {
+  rpc CreatePriceQuote(CreatePriceQuoteRequest) returns (CreatePriceQuoteResponse) {}
+  rpc GetPriceQuote(GetPriceQuoteRequest) returns (GetPriceQuoteResponse) {}
+}
+
+message EnqueueSearchRequest {
+  Search search = 1;
+}
+
+message EnqueueSearchResponse {
+  Search search = 1;
+}
+
+message GetSearchRequest {
+  string id = 1;
+}
+
+message GetSearchResponse {
+  Search search = 1;
+}
+
+message GetOfferRequest {
+  string id = 1;
+}
+
+message GetOfferResponse {
+  Offer offer = 1;
+}
+
+message GetSearchResultRequest {
+  string id = 1;
+}
+
+message GetSearchResultResponse {
+  SearchResult search_result = 1;
+}
+
+message GetOfferSegmentRequest {
+  string id = 1;
+}
+
+message GetOfferSegmentResponse {
+  OfferSegment offer_segment = 1;
+}
+
+message GetOfferSegmentDetailsRequest {
+  string id = 1;
+}
+
+message GetOfferSegmentDetailsResponse {
+  OfferSegmentDetails offer_segment_details = 1;
+}
+
+message CreatePriceQuoteRequest {
+  string search_result_id = 1;
+  string offer_id = 2;
+  string reseller_id = 3;
+}
+
+message CreatePriceQuoteResponse {
+  PriceQuote price_quote = 1;
+}
+
+message GetPriceQuoteRequest {
+  string id = 1;
+}
+
+message GetPriceQuoteResponse {
+  PriceQuote price_quote = 1;
+}

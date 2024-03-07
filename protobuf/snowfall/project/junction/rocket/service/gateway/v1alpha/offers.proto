@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.gateway.v1alpha;
+
+import "snowfall/project/junction/rocket/service/offers/v1alpha/amqp.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/gateway/v1alpha";
+
+service OfferService {
+  rpc EnqueueSearch(EnqueueSearchRequest) returns (EnqueueSearchResponse) {}
+  rpc PopSearchResults(PopSearchResultsRequest) returns (PopSearchResultsResponse) {}
+}
+
+message EnqueueSearchRequest {
+  snowfall.project.junction.rocket.service.offers.v1alpha.SearchTask search_task = 1;
+}
+
+message EnqueueSearchResponse {
+  string id = 1;
+}
+
+message PopSearchResultsRequest {
+  string id = 1;
+}
+
+message PopSearchResultsResponse {
+  bool is_in_progress = 1;
+  repeated snowfall.project.junction.rocket.service.offers.v1alpha.SearchTaskResult results = 2;
+}

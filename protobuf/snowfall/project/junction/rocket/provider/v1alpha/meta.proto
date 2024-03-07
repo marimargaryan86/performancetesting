@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.provider.v1alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/provider/v1alpha";
+
+service MetaService {
+  rpc GetCapabilities(GetCapabilitiesRequest) returns (GetCapabilitiesResponse) {}
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse) {}
+}
+
+message GetCapabilitiesRequest {}
+
+message GetCapabilitiesResponse {
+  BookingCapabilities booking_capabilities = 1;
+}
+
+message GetIdentityRequest {}
+
+message GetIdentityResponse {
+  string id = 1;
+  string name = 2;
+}
+
+message BookingCapabilities {
+  bool supports_cancellation = 1;
+}

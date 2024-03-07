@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package snowfall.project.junction.rocket.service.orders.v1;
+package snowfall.project.junction.rocket.service.orders.v1alpha;
 
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
-import "snowfall/project/junction/rocket/service/orders/v1/models.proto";
+import "snowfall/project/junction/rocket/service/orders/v1alpha/models.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 import "snowfall/stdlib/v1/sort.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/orders/v1";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/orders/v1alpha";
 
 service OrderService {
   rpc CreateJourney(CreateJourneyRequest) returns (CreateJourneyResponse) {}

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package snowfall.project.junction.rocket.service.gateway.v1;
+package snowfall.project.junction.rocket.service.gateway.v1alpha;
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/gateway/v1";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/gateway/v1alpha";
 
 service MetaService {
   rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {}

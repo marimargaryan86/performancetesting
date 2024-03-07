@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package snowfall.project.junction.rocket.service.orders.v1;
+package snowfall.project.junction.rocket.service.orders.v1alpha;
 
-import "snowfall/project/junction/rocket/service/orders/v1/models.proto";
+import "snowfall/project/junction/rocket/service/orders/v1alpha/models.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/orders/v1";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/orders/v1alpha";
 
 message PlaceOrderTask {
   Booking booking = 1;
