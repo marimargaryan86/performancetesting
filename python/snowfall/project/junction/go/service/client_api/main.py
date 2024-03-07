@@ -21,9 +21,6 @@ from snowfall.project.junction.go.adapter import (
     trip_searches,
     trips,
 )
-from snowfall.project.junction.go.service.bridge.v1alpha import (
-    trips_pb2_grpc as bridge_trips_pb2_grpc,
-)
 from snowfall.project.junction.go.service.client_api import (
     authentication as authentication_backends,
 )
@@ -50,7 +47,6 @@ class _Channels(NamedTuple):
     orders: aio.Channel
     offers: aio.Channel
     trips: aio.Channel
-    bridge: aio.Channel
     schedules: aio.Channel
     authentication: aio.Channel
 
@@ -75,10 +71,6 @@ async def _http(
             grpc_factory.make_insecure_channel(
                 app,
                 app.settings.trips_address,
-            ),
-            grpc_factory.make_insecure_channel(
-                app,
-                app.settings.bridge_address,
             ),
             grpc_factory.make_insecure_channel(
                 app,
@@ -127,13 +119,7 @@ async def _http(
                 trips_client=trips.GrpcClient(
                     trips_pb2_grpc.TripServiceStub(channels.trips),
                 ),
-                trip_candidate_searches_client=trip_candidate_searches.GrpcBridgeClient(
-                    trip_candidate_searches=bridge_trips_pb2_grpc.TripCandidateSearchServiceStub(
-                        channels.bridge,
-                    ),
-                )
-                if app.settings.use_bridge
-                else trip_candidate_searches.GrpcClient(
+                trip_candidate_searches_client=trip_candidate_searches.GrpcClient(
                     trip_candidate_searches=trips_pb2_grpc.TripCandidateSearchServiceStub(
                         channels.trips,
                     ),

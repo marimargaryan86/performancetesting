@@ -30,13 +30,11 @@ class Settings(application.Settings):
     offers_address: str
     orders_address: str
     trips_address: str
-    bridge_address: str
     schedules_address: str
     authentication_address: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     reseller_currencies: dict[str, str] = pydantic.Field(default_factory=dict)
     reseller_pay_companies: dict[str, str] = pydantic.Field(default_factory=dict)
-    use_bridge: bool = False
 
 
 def create_dependencies(

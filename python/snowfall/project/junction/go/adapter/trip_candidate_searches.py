@@ -4,9 +4,6 @@ import datetime
 from collections.abc import Sequence
 
 from snowfall.project.junction.go.adapter import errors
-from snowfall.project.junction.go.service.bridge.v1alpha import (
-    trips_pb2_grpc as bridge_trips_pb2_grpc,
-)
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
@@ -76,48 +73,6 @@ class GrpcClient(Client):
     def __init__(
         self,
         trip_candidate_searches: trips_pb2_grpc.TripCandidateSearchServiceStub,
-        timeout: int = 10,
-    ) -> None:
-        self._trip_candidate_searches = trip_candidate_searches
-        self._timeout = timeout
-
-    async def create(
-        self,
-        trip_candidate_search: TripCandidateSearchRequest,
-    ) -> trips_pb2.TripCandidateSearch:
-        response = await errors.handle_grpc_errors(
-            self._trip_candidate_searches.EnqueueTripCandidateSearch(
-                request=trips_pb2.EnqueueTripCandidateSearchRequest(
-                    trip_candidate_search=_create_trip_candidate_search(
-                        trip_candidate_search=trip_candidate_search,
-                    ),
-                ),
-                timeout=self._timeout,
-            ),
-        )
-
-        return response.trip_candidate_search
-
-    async def get(
-        self,
-        identifier: str,
-    ) -> trips_pb2.TripCandidateSearch:
-        response = await errors.handle_grpc_errors(
-            self._trip_candidate_searches.GetTripCandidateSearchDetails(
-                request=trips_pb2.GetTripCandidateSearchDetailsRequest(
-                    id=identifier,
-                ),
-                timeout=self._timeout,
-            ),
-        )
-
-        return response.trip_candidate_search
-
-
-class GrpcBridgeClient(Client):
-    def __init__(
-        self,
-        trip_candidate_searches: bridge_trips_pb2_grpc.TripCandidateSearchServiceStub,
         timeout: int = 10,
     ) -> None:
         self._trip_candidate_searches = trip_candidate_searches
