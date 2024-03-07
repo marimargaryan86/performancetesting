@@ -34,6 +34,7 @@ providers = [
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
+@pytest.mark.integration()
 @pytest.mark.parametrize("places_pairs", places_pairs, ids=providers)
 async def test_verify_simple_search(  # noqa: WPS217,WPS218
     mock_mobile_client: MobileApiClient,
