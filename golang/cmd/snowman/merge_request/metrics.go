@@ -43,8 +43,8 @@ type language struct {
 }
 
 func init() {
-	sizeSpecRegex = regexp.MustCompile(`/.*\.spec\..*/i`)
-	sizeTestRegex = regexp.MustCompile(`/*((T|t)est|TEST).*/`)
+	sizeSpecRegex = regexp.MustCompile(`(?i).*\.spec\..*`)
+	sizeTestRegex = regexp.MustCompile(`.*((T|t)est|TEST).*`)
 	err := yaml.Unmarshal(languagesData, &languages)
 
 	if err != nil {
