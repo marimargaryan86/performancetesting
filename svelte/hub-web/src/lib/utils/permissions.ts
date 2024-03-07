@@ -37,7 +37,7 @@ export type Action = keyof typeof PERMISSIONS;
  * @param actions Actions to generate the number identifier from
  * @returns A uniquely identifying number for the permission
  */
-function getPermission(...actions: Action[]): number {
+export function getPermission(...actions: Action[]): number {
   return Object.entries(PERMISSIONS).reduce(
     (prev, [key, val]) => prev | (actions.includes(key as Action) ? val : 0),
     0,
