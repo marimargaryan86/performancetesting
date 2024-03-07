@@ -7,10 +7,16 @@ mkdir -p "$(dirname "${PANTS_PUBLISH_OUTPUT}")"
 docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" "${CI_REGISTRY}"
 docker login -u "${CI_DEPENDENCY_PROXY_USER}" -p "${CI_DEPENDENCY_PROXY_PASSWORD}" "${CI_DEPENDENCY_PROXY_SERVER}"
 
-if [ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA+x}" ]; then
-	pants publish --changed-since="${CI_MERGE_REQUEST_DIFF_BASE_SHA}" --changed-dependents=transitive --docker-build-args=REGISTRY --docker-build-args=VERSION
-elif [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
-	pants publish --changed-since="${CI_COMMIT_BEFORE_SHA}" --changed-dependents=transitive --docker-build-args=REGISTRY --docker-build-args=VERSION
+if [ -n "${CI_MERGE_REQUEST_IID+x}" ]; then
+	PANTS_COMMAND="pants package"
 else
-	pants publish :: --docker-build-args=REGISTRY --docker-build-args=VERSION
+	PANTS_COMMAND="pants publish"
+fi
+
+if [ -n "${CI_MERGE_REQUEST_DIFF_BASE_SHA+x}" ]; then
+	$PANTS_COMMAND --changed-since="${CI_MERGE_REQUEST_DIFF_BASE_SHA}" --changed-dependents=transitive --docker-build-args=REGISTRY --docker-build-args=VERSION
+elif [ -n "${CI_COMMIT_BEFORE_SHA+x}" ] && [ "${CI_COMMIT_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+	$PANTS_COMMAND --changed-since="${CI_COMMIT_BEFORE_SHA}" --changed-dependents=transitive --docker-build-args=REGISTRY --docker-build-args=VERSION
+else
+	$PANTS_COMMAND :: --docker-build-args=REGISTRY --docker-build-args=VERSION
 fi
