@@ -1,1 +1,1 @@
-shell_sources(sources=["pre-commit"])
+shell_sources()
