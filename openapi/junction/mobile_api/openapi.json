@@ -4952,7 +4952,8 @@
                   "vendor",
                   "operator",
                   "routeIdentifiers",
-                  "legs"
+                  "legs",
+                  "sequences"
                 ],
                 "properties": {
                   "cabinClassName": {
@@ -4970,6 +4971,25 @@
                   },
                   "routeIdentifiers": {
                     "$ref": "#/components/schemas/RouteIdentifiers"
+                  },
+                  "sequences": {
+                    "type": "object",
+                    "required": [
+                      "trip",
+                      "segment"
+                    ],
+                    "properties": {
+                      "trip": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1
+                      },
+                      "segment": {
+                        "type": "integer",
+                        "example": 1,
+                        "minimum": 1
+                      }
+                    }
                   },
                   "legs": {
                     "type": "array",

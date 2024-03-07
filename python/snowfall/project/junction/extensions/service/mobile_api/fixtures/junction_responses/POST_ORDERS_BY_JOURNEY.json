@@ -121,6 +121,10 @@
               "vendor": "BA",
               "operator": "BA"
             },
+            "sequences": {
+              "trip": 1,
+              "segment": 1
+            },
             "legs": [
               {
                 "origin": {

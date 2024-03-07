@@ -136,6 +136,10 @@
             "vendor": "123",
             "operator": "123"
           },
+          "sequences": {
+            "trip": 1,
+            "segment": 1
+          },
           "legs": [
             {
               "origin": {

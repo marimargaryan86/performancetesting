@@ -400,17 +400,23 @@ class VehicleInformation(models.BaseModel):
         return cls(
             imageUrl=vehicle_information.image_url or None,
             model=vehicle_information.model or None,
-            seatsCount=vehicle_information.seats_count
-            if vehicle_information.HasField("seats_count")
-            else None,
-            doorsCount=vehicle_information.doors_count
-            if vehicle_information.HasField("doors_count")
-            else None,
+            seatsCount=(
+                vehicle_information.seats_count
+                if vehicle_information.HasField("seats_count")
+                else None
+            ),
+            doorsCount=(
+                vehicle_information.doors_count
+                if vehicle_information.HasField("doors_count")
+                else None
+            ),
             transmission=vehicle_information.transmission or None,
             fuelType=vehicle_information.fuel_type or None,
-            baggageQuantity=vehicle_information.baggage_quantity
-            if vehicle_information.HasField("baggage_quantity")
-            else None,
+            baggageQuantity=(
+                vehicle_information.baggage_quantity
+                if vehicle_information.HasField("baggage_quantity")
+                else None
+            ),
             driveType=vehicle_information.drive_type or None,
             carClass=vehicle_information.car_class or None,
         )
@@ -878,6 +884,10 @@ class TripBookingDetailsResource(models.Resource):
                     vendor=details.segment.vehicle.number,
                     operator=None,
                 ),
+                "sequences": {
+                    "trip": details.segment.trip_sequence,
+                    "segment": details.segment.segment_sequence,
+                },
                 "legs": [
                     OfferSegmentLeg.from_proto(leg) for leg in details.segment.legs
                 ],
