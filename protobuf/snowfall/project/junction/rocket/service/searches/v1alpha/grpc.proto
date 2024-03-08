@@ -1,21 +1,21 @@
 syntax = "proto3";
 
-package snowfall.project.junction.rocket.service.offers.v1alpha;
+package snowfall.project.junction.rocket.service.searches.v1alpha;
 
-import "snowfall/project/junction/rocket/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/rocket/service/searches/v1alpha/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/offers/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/searches/v1alpha";
 
 service SearchService {
   rpc EnqueueSearch(EnqueueSearchRequest) returns (EnqueueSearchResponse) {}
   rpc GetSearch(GetSearchRequest) returns (GetSearchResponse) {}
 }
 
-service SearchResultPriceService {
-  rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
-  // rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
+service SearchResultService {
   rpc GetSearchResult(GetSearchResultRequest) returns (GetSearchResultResponse) {}
   // rpc ListOfferGroups(ListOfferGroupsRequest) returns (ListOfferGroupsResponse) {}
+  rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
+  // rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
   rpc GetOfferSegment(GetOfferSegmentRequest) returns (GetOfferSegmentResponse) {}
   // rpc ListOfferGroupDetails(ListOfferGroupDetailsRequest) returns (ListOfferGroupDetailsResponse) {}
   rpc GetOfferSegmentDetails(GetOfferSegmentDetailsRequest) returns (GetOfferSegmentDetailsResponse) {}

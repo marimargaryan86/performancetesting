@@ -1,0 +1,158 @@
+import datetime
+import ipaddress
+import random
+from collections.abc import Sequence
+
+import pydantic
+from motor import motor_asyncio
+
+from snowfall.project.junction.rocket.service.gateway.v1alpha import searches_pb2_grpc
+from snowfall.project.junction.rocket.service.searches import (
+    importer,
+    repository,
+)
+from snowfall.project.junction.rocket.service.searches.amqp import (
+    SearchProducer,
+)
+from snowfall.project.junction.rocket.service.searches.grpc import (
+    SearchResultService,
+    SearchService,
+)
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    redis_factory,
+)
+from snowfall.stdlib.transport.amqp import consumer, producer, types
+from snowfall.stdlib.transport.grpc import server
+
+
+class _GrpcSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    default_page_size: int = 100
+    default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
+    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
+    grpc_port: int = 50051
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+
+
+class _ImportSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+    redis_dsn: pydantic.RedisDsn
+    # TODO(reuben.t): maybe move to provider?
+    reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = (
+        pydantic.Field(default_factory=dict)
+    )
+    gateway_address: str
+    gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
+    gateway_poll_sleep: int = 5
+
+
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    amqp_producer = producer.Producer(
+        connection=connection,
+        exchange=types.Exchange("searches"),
+    )
+    grpc_server = server.create_server(
+        app.settings.grpc_address,
+        app.settings.grpc_port,
+        [
+            SearchService(
+                searches_repo=repository.SearchRepository(
+                    mongo.search.searches,
+                    app.settings.default_ttl,
+                ),
+                publisher=SearchProducer(
+                    producer=amqp_producer,
+                    routing_key="searches",
+                    ttl=app.settings.default_ttl,
+                ),
+                default_page_size=app.settings.default_page_size,
+            ),
+            SearchResultService(
+                search_results=repository.SearchResultRepository(
+                    mongo.search.search_results,
+                ),
+                offer_segments=repository.OfferSegmentRepository(
+                    mongo.search.offer_segments,
+                ),
+                offers=repository.OfferRepository(
+                    mongo.search.offers,
+                ),
+                offer_segment_details=repository.OfferSegmentDetailsRepository(
+                    mongo.search.offer_segment_details,
+                ),
+                default_page_size=app.settings.default_page_size,
+            ),
+        ],
+    )
+
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
+
+
+async def _import(app: application.Application[_ImportSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=True,
+    )
+
+    gateway_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.gateway_address,
+    )
+
+    searches_repo = repository.SearchRepository(
+        mongo.search.searches,
+        app.settings.default_ttl,
+    )
+
+    search_result_importer = importer.SearchResultImporter(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_search_results".format(app.name),
+            binds=[
+                (types.Exchange("searches"), "searches"),
+                (types.Exchange("searches"), "search_results"),
+            ],
+        ),
+        search_results=repository.SearchResultRepository(
+            mongo.search.search_results,
+        ),
+        redis=redis_client,
+        status_handler=importer.StatusHandler(
+            redis=redis_client,
+            search_repository=searches_repo,
+        ),
+        searches=searches_repo,
+        reseller_disabled_operators=app.settings.reseller_disabled_operators,
+        gateway_stubs=searches_pb2_grpc.SearchServiceStub(gateway_channel),
+        gateway_timeout=app.settings.gateway_timeout,
+        gateway_poll_sleep=app.settings.gateway_poll_sleep,
+    )
+    await search_result_importer.consume()
+
+
+if __name__ == "__main__":
+    entrypoint = application.Entrypoint(name="offers")
+    entrypoint.enter_with_commands(
+        application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
+        application.Command(
+            name="import",
+            callback=_import,
+            settings_class=_ImportSettings,
+        ),
+    )

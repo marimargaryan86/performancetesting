@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package snowfall.project.junction.rocket.service.offers.v1alpha;
+package snowfall.project.junction.rocket.service.searches.v1alpha;
 
-import "snowfall/project/junction/rocket/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/rocket/service/searches/v1alpha/models.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/offers/v1alpha";
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/searches/v1alpha";
 
 message SearchTask {
   string search_id = 1;

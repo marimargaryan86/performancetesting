@@ -4,7 +4,7 @@ package snowfall.project.junction.rocket.service.orders.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/v1/models.proto";
-import "snowfall/project/junction/rocket/service/offers/v1alpha/models.proto";
+import "snowfall/project/junction/rocket/service/searches/v1alpha/models.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/money.proto";
 import "snowfall/stdlib/v1/options.proto";
@@ -119,13 +119,13 @@ message TripOption {
   string pay_quote_id = 6;
   repeated TripOptionDetails details = 2;
   snowfall.stdlib.v1.Money price = 3;
-  repeated snowfall.project.junction.rocket.service.offers.v1alpha.FareRule rules = 7;
+  repeated snowfall.project.junction.rocket.service.searches.v1alpha.FareRule rules = 7;
 }
 
 message TripOptionDetails {
   string id = 3;
   string booking_id = 4;
-  snowfall.project.junction.rocket.service.offers.v1alpha.OfferSegment offer_segment = 1;
+  snowfall.project.junction.rocket.service.searches.v1alpha.OfferSegment offer_segment = 1;
   snowfall.project.junction.go.v1.CabinClass cabin_class = 2;
 }
 
