@@ -1,0 +1,606 @@
+{
+    "status": "OK",
+    "code": 200,
+    "data": {
+        "trip": {
+            "id": 2623402,
+            "nms": 1709647053151,
+            "agencyCode": "P0",
+            "orgId": 635604,
+            "arrangerIds": [
+                2602536
+            ],
+            "grantedIds": [
+                2602536
+            ],
+            "userIds": [
+                2602536
+            ],
+            "name": "Trip to BER",
+            "visibility": "PUBLIC",
+            "startDate": "2024-03-07",
+            "endDate": "2024-03-10",
+            "total": 182.65,
+            "summary": [
+                {
+                    "id": 2623405,
+                    "type": "Flight",
+                    "date": "2024-03-07T07:30:00",
+                    "status": "PENDING",
+                    "userIds": [
+                        2602536
+                    ]
+                },
+                {
+                    "id": 2623406,
+                    "type": "Flight",
+                    "date": "2024-03-10T17:30:00",
+                    "status": "PENDING",
+                    "userIds": [
+                        2602536
+                    ]
+                }
+            ],
+            "tripBoardFlags": 0,
+            "draftBoards": 0,
+            "pendingBoards": 0,
+            "processingBoards": 1,
+            "confirmedBoards": 0,
+            "uiFlags": 21,
+            "agencyFlags": 31
+        },
+        "boards": [
+            {
+                "id": 2623403,
+                "nms": 1709647053149,
+                "tripId": 2623402,
+                "orgId": 635604,
+                "bookerId": 2602536,
+                "userIds": [
+                    2602536
+                ],
+                "agencyCode": "P0",
+                "status": "PROCESSING",
+                "statusChangedOn": "2024-03-05T13:57:33.146328",
+                "startDate": "2024-03-07",
+                "endDate": "2024-03-10",
+                "summary": [
+                    {
+                        "id": 2623405,
+                        "type": "Flight",
+                        "date": "2024-03-07T07:30:00",
+                        "status": "PENDING",
+                        "userIds": [
+                            2602536
+                        ]
+                    },
+                    {
+                        "id": 2623406,
+                        "type": "Flight",
+                        "date": "2024-03-10T17:30:00",
+                        "status": "PENDING",
+                        "userIds": [
+                            2602536
+                        ]
+                    }
+                ],
+                "exceptionFlags": 0,
+                "processingFlags": 4,
+                "tripBoardFlags": 8,
+                "waypointFlags": 0,
+                "ttl": "2024-03-06T12:57:33.146357",
+                "refs": [
+                    {
+                        "id": 2623407,
+                        "nms": 1709644155994,
+                        "tripId": 2623402,
+                        "tripBoardId": 2623403,
+                        "active": true,
+                        "reservationType": "Flight",
+                        "providerCode": "TF",
+                        "ref": "1P0XCz1XYQr",
+                        "vendor": "U2",
+                        "bookerId": 2602536,
+                        "reservationIds": [
+                            2623405,
+                            2623406
+                        ],
+                        "status": "PENDING",
+                        "userIds": [
+                            2602536
+                        ],
+                        "summary": [
+                            {
+                                "id": 2623405,
+                                "type": "Flight",
+                                "date": "2024-03-07T07:30:00",
+                                "status": "PENDING",
+                                "userIds": [
+                                    2602536
+                                ]
+                            },
+                            {
+                                "id": 2623406,
+                                "type": "Flight",
+                                "date": "2024-03-10T17:30:00",
+                                "status": "PENDING",
+                                "userIds": [
+                                    2602536
+                                ]
+                            }
+                        ],
+                        "startDate": "2024-03-07",
+                        "endDate": "2024-03-10",
+                        "pricedOn": "2024-03-05T10:56:30.959893",
+                        "currency": "GBP",
+                        "due": 182.65,
+                        "total": 182.65,
+                        "exceptionFlags": 0,
+                        "fopFlags": 0,
+                        "tripBoardFlags": 8,
+                        "waypointFlags": 0,
+                        "fops": [
+                            {
+                                "id": 2623419,
+                                "nms": 1709644044460,
+                                "tripId": 2623402,
+                                "tripBoardId": 2623403,
+                                "tripBoardRefId": 2623407,
+                                "cardId": 854,
+                                "label": "Mastercard - 4444",
+                                "description": "Flight Reservation",
+                                "onAccount": false
+                            }
+                        ],
+                        "uiFlags": 0
+                    }
+                ],
+                "uiFlags": 0,
+                "agencyFlags": 31
+            }
+        ],
+        "medias": [
+            {
+                "id": 2623408,
+                "nms": 1709636191671,
+                "media": {
+                    "id": 2603967,
+                    "nms": 1709244423023,
+                    "height": 330,
+                    "width": 1600,
+                    "source": "J1",
+                    "type": "IMAGE",
+                    "url": "o/trip-banner-images/5"
+                }
+            }
+        ],
+        "org": {
+            "id": 635604,
+            "nms": 1703196599864,
+            "agencyCode": "P0",
+            "name": "Snowfall Demo Site",
+            "flags": 0,
+            "billingAddressLocationId": 635603,
+            "phoneNumber": "12025534929",
+            "active": true,
+            "type": "CORPORATE",
+            "visibility": "PRIVATE",
+            "branding": {
+                "heroUrl": "https://cdn.one.junction.dev/o/company/7d491cb7971f4a60abbe749aa6c3b589.png",
+                "logoUrl": "https://cdn.one.junction.dev/o/company/f9275217f4ae4e9ea99c6c9e28291d84"
+            }
+        },
+        "users": {
+            "2602536": {
+                "id": 2602536,
+                "nms": 1709548017155,
+                "firstName": "Jeremy",
+                "lastName": "Tang",
+                "gender": "male",
+                "flags": 6,
+                "active": true,
+                "fullName": "Jeremy Tang",
+                "shortName": "Jeremy Tang"
+            }
+        },
+        "flightReservations": {
+            "2623406": {
+                "id": 2623406,
+                "ext": {
+                    "co2kg": 106,
+                    "consumers": [
+                        {
+                            "userId": 2602536,
+                            "firstName": "Jeremy",
+                            "lastName": "Tang",
+                            "dob": "1995-09-03"
+                        }
+                    ],
+                    "airPrice": 121.66,
+                    "taxesAndFees": 10.67,
+                    "od": {
+                        "co2kg": 106,
+                        "duration": 115,
+                        "arrivalStation": "LTN",
+                        "departureStation": "BER",
+                        "arrivalTime": "2024-03-10T18:25:00",
+                        "arrivalTimeOffset": 0,
+                        "departureTime": "2024-03-10T17:30:00",
+                        "departureTimeOffset": 60,
+                        "segments": [
+                            {
+                                "segmentKey": "U22604",
+                                "airline": "U2",
+                                "operatingAirline": "U2",
+                                "duration": 115,
+                                "arrivalStation": "LTN",
+                                "departureStation": "BER",
+                                "arrivalTime": "2024-03-10T18:25:00",
+                                "arrivalTimeOffset": 0,
+                                "departureTime": "2024-03-10T17:30:00",
+                                "departureTimeOffset": 60,
+                                "flightNumber": "2604",
+                                "flightClass": "Economy",
+                                "flightClassPremium": false,
+                                "serviceClass": "Y",
+                                "fareName": "Standard",
+                                "fareType": "2",
+                                "departureOffsetDateTime": "2024-03-10T17:30:00+01:00",
+                                "arrivalOffsetDateTime": "2024-03-10T18:25:00+00:00"
+                            }
+                        ],
+                        "fareName": "Standard",
+                        "fareType": "2",
+                        "departureOffsetDateTime": "2024-03-10T17:30:00+01:00",
+                        "arrivalOffsetDateTime": "2024-03-10T18:25:00+00:00"
+                    }
+                },
+                "tripId": 2623402,
+                "bookerId": 2602536,
+                "userIds": [
+                    2602536
+                ],
+                "agencyCode": "P0",
+                "providerCode": "TF",
+                "vendor": "U2",
+                "label": "BER-LTN",
+                "startDate": "2024-03-10T17:30:00",
+                "endDate": "2024-03-10T18:25:00",
+                "currency": "GBP",
+                "totalPrice": 121.66,
+                "orgId": 635604,
+                "inPolicy": true,
+                "createdOn": "2024-03-05T10:56:30.947921",
+                "updatedAt": "2024-03-05T10:56:30.947924",
+                "status": "PENDING",
+                "flags": 32,
+                "type": "Flight"
+            },
+            "2623405": {
+                "id": 2623405,
+                "ext": {
+                    "co2kg": 106,
+                    "consumers": [
+                        {
+                            "userId": 2602536,
+                            "firstName": "Jeremy",
+                            "lastName": "Tang",
+                            "dob": "1995-09-03"
+                        }
+                    ],
+                    "airPrice": 60.99,
+                    "taxesAndFees": 13.00,
+                    "od": {
+                        "co2kg": 106,
+                        "duration": 110,
+                        "arrivalStation": "BER",
+                        "departureStation": "LTN",
+                        "arrivalTime": "2024-03-07T10:20:00",
+                        "arrivalTimeOffset": 60,
+                        "departureTime": "2024-03-07T07:30:00",
+                        "departureTimeOffset": 0,
+                        "segments": [
+                            {
+                                "segmentKey": "U22601",
+                                "airline": "U2",
+                                "operatingAirline": "U2",
+                                "duration": 110,
+                                "arrivalStation": "BER",
+                                "departureStation": "LTN",
+                                "arrivalTime": "2024-03-07T10:20:00",
+                                "arrivalTimeOffset": 60,
+                                "departureTime": "2024-03-07T07:30:00",
+                                "departureTimeOffset": 0,
+                                "flightNumber": "2601",
+                                "flightClass": "Economy",
+                                "flightClassPremium": false,
+                                "serviceClass": "Y",
+                                "fareName": "Standard",
+                                "fareType": "2",
+                                "departureOffsetDateTime": "2024-03-07T07:30:00+00:00",
+                                "arrivalOffsetDateTime": "2024-03-07T10:20:00+01:00"
+                            }
+                        ],
+                        "fareName": "Standard",
+                        "fareType": "2",
+                        "departureOffsetDateTime": "2024-03-07T07:30:00+00:00",
+                        "arrivalOffsetDateTime": "2024-03-07T10:20:00+01:00"
+                    }
+                },
+                "tripId": 2623402,
+                "bookerId": 2602536,
+                "userIds": [
+                    2602536
+                ],
+                "agencyCode": "P0",
+                "providerCode": "TF",
+                "vendor": "U2",
+                "label": "LTN-BER",
+                "startDate": "2024-03-07T07:30:00",
+                "endDate": "2024-03-07T10:20:00",
+                "currency": "GBP",
+                "totalPrice": 60.99,
+                "orgId": 635604,
+                "inPolicy": true,
+                "createdOn": "2024-03-05T10:56:30.928278",
+                "updatedAt": "2024-03-05T10:56:30.928283",
+                "status": "PENDING",
+                "flags": 32,
+                "type": "Flight"
+            }
+        },
+        "airlines": {
+            "U2": {
+                "id": 2297,
+                "name": "easyJet",
+                "alias": "EasyJet Airline",
+                "iata": "U2",
+                "icao": "EZY",
+                "callsign": "EASY",
+                "country": "United Kingdom",
+                "active": true,
+                "rewardProgramId": 114382
+            }
+        },
+        "airports": {
+            "LTN": {
+                "id": 492,
+                "name": "Luton",
+                "city": "London",
+                "country": "United Kingdom",
+                "countryCode": "GB",
+                "iata": "LTN",
+                "icao": "EGGW",
+                "latitude": 51.874722,
+                "longitude": -0.368333,
+                "altitude": 526,
+                "timezoneOffset": 0.0,
+                "timezone": "Europe/London",
+                "dst": "E",
+                "airlineCount": 8,
+                "groupIata": "LON",
+                "label": "London, United Kingdom (Luton - LTN)",
+                "code": "LTN"
+            },
+            "BER": {
+                "id": 8420,
+                "name": "Berlin Brandenburg Willy Brandt",
+                "city": "Berlin",
+                "country": "Germany",
+                "countryCode": "DE",
+                "iata": "BER",
+                "icao": "EDDB",
+                "latitude": 52.366667,
+                "longitude": 13.503333,
+                "altitude": 154,
+                "timezoneOffset": 1.0,
+                "timezone": "Europe/Berlin",
+                "dst": "E",
+                "airlineCount": 6,
+                "label": "Berlin, Germany (Berlin Brandenburg Willy Brandt - BER)",
+                "code": "BER"
+            }
+        },
+        "fields": [
+            {
+                "id": 872543,
+                "nms": 1695412660388,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD1 ",
+                "name": "Department",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 7
+            },
+            {
+                "id": 904012,
+                "nms": 1696027481429,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD2 ",
+                "remarkCode": "RH/",
+                "name": "Out of Policy Reason",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 15,
+                "reservationType": "Hotel"
+            },
+            {
+                "id": 666229,
+                "nms": 1696027409013,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD1 ",
+                "remarkCode": "RC/",
+                "name": "Out of Policy Reason",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 15,
+                "reservationType": "Flight"
+            },
+            {
+                "id": 904016,
+                "nms": 1696027528855,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD3 ",
+                "remarkCode": "RZ/",
+                "name": "Out of Policy Reason",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 15,
+                "reservationType": "Car"
+            }
+        ],
+        "fieldValues": [
+            {
+                "id": 904010,
+                "nms": 1696027409002,
+                "fieldId": 666229,
+                "code": "AP",
+                "name": "Declined Lower Fare Due to Airport Preference",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904011,
+                "nms": 1696027409013,
+                "fieldId": 666229,
+                "code": "BR",
+                "name": "Declined Lower Fare Due to Business Requirements",
+                "active": true,
+                "remarkRequired": true
+            },
+            {
+                "id": 666230,
+                "nms": 1696027409013,
+                "fieldId": 666229,
+                "code": "CT",
+                "name": "Declined Lower Fare Due to Connection Time",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872544,
+                "nms": 1695412649523,
+                "fieldId": 872543,
+                "code": "Com",
+                "name": "Commercial",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872546,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Del",
+                "name": "Delivery",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872547,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Eng",
+                "name": "Engineering",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872548,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Ops",
+                "name": "Operations",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872545,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Prd",
+                "name": "Product",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904014,
+                "nms": 1696027481530,
+                "fieldId": 904012,
+                "code": "BN",
+                "name": "Declined Lower Priced Hotel Due to Business Need",
+                "active": true,
+                "remarkRequired": true
+            },
+            {
+                "id": 904015,
+                "nms": 1696027481534,
+                "fieldId": 904012,
+                "code": "CP",
+                "name": "Declined Lower Priced Hotel Due to Chain Preference",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904013,
+                "nms": 1696027481530,
+                "fieldId": 904012,
+                "code": "LP",
+                "name": "Declined Lower Priced Hotel Due to Location",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904019,
+                "nms": 1696027528958,
+                "fieldId": 904016,
+                "code": "BN",
+                "name": "Declined Lower Priced Car Due to Business Need",
+                "active": true,
+                "remarkRequired": true
+            },
+            {
+                "id": 904018,
+                "nms": 1696027528957,
+                "fieldId": 904016,
+                "code": "LP",
+                "name": "Declined Lower Priced Car Due to Location Preference",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904017,
+                "nms": 1696027528956,
+                "fieldId": 904016,
+                "code": "VP",
+                "name": "Declined Lower Priced Car Due to Vendor Preference",
+                "active": true,
+                "remarkRequired": false
+            }
+        ],
+        "reservationFields": [
+            {
+                "id": 2623409,
+                "nms": 1709636205592,
+                "reservationId": 2623405,
+                "fieldId": 872543,
+                "fieldValueId": 872547
+            },
+            {
+                "id": 2623410,
+                "nms": 1709636205598,
+                "reservationId": 2623406,
+                "fieldId": 872543,
+                "fieldValueId": 872547
+            }
+        ],
+        "targetResourceId": 2623403
+    }
+}

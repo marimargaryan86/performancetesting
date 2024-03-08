@@ -217,6 +217,24 @@ class JunctionOneClient(object):
 
         return auto_models.GetTripBoardsResponse(**response.data)
 
+    async def process_tripboard(
+        self,
+        query: models.TripboardProcessRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.GetTripBoardsResponse:
+        response = await self._make_request(
+            "POST",
+            "/v1/tripboard/process",
+            query,
+            rate_limit_timeout=rate_limit_timeout,
+            encode_json=True,
+        )
+
+        if not response.data:
+            raise errors.EmptyDataError()
+
+        return auto_models.GetTripBoardsResponse(**response.data)
+
     async def search_flights(
         self,
         query: auto_models.SearchFlightsRequest,

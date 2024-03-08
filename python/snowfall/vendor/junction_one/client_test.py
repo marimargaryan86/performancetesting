@@ -248,3 +248,29 @@ async def test_add_fop_to_tripboard(
 
     fop_card_ids = {fop.card_id for fop in fops}
     assert card_id in fop_card_ids, "Card ID {0} not found in fops".format(card_id)
+
+
+async def test_process_tripboard(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-tripboard-process.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/tripboard/process",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    tripboard_id = 2623403
+    flag = auto_models.TripBoardProcessingFlags.commit
+
+    response = await junction_one_client.process_tripboard(
+        models.TripboardProcessRequest(
+            id=tripboard_id,
+            flag=flag,
+        ),
+    )
+
+    assert response == auto_models.GetTripBoardsResponse(**fixture["data"])
