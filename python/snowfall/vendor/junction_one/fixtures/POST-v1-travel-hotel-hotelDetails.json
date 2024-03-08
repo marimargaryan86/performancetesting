@@ -1,0 +1,74 @@
+{
+  "status": "OK",
+  "code": 200,
+  "data": {
+    "rooms": [
+      {
+        "roomType": "Gds-bar, Rakesh test ttt-quadruple std with sundeck and garden-single be s -3 queen-size bed s s-no smoking gds-bar breakfast included",
+        "description": "Rakesh test ttt-quadruple std with sundeck and garden-single be s -3 queen-size bed s s-no smoking gds-bar breakfast included\nIncludes tax\nExcludes surcharges",
+        "currency": "GBP",
+        "totalPrice": 50.5,
+        "pricePerNight": 50.5,
+        "taxesAndFees": 16.5,
+        "taxesAndFeesPerNight": 16.5,
+        "cancellation": {
+          "nonRefundableRate": false,
+          "cancellable": true,
+          "cancellationFeePercent": 0,
+          "prepaymentPercent": 0,
+          "fullyRefundable": true,
+          "description": "Room is fully refundable."
+        },
+        "ratePlanType": "REGULAR_RACK",
+        "perks": 16,
+        "flags": 137,
+        "ref": "1P0I-KxVvJX",
+        "hotelPrefLevel": 0
+      },
+      {
+        "roomType": "Testgdstt, Rakesh test ttt-quadruple std with sundeck and garden-single be s -3 queen-size bed s s-no smoking gds testtthgy fullboard",
+        "description": "Testgdstt\nRakesh test ttt-quadruple std with sundeck and garden-single be s -3 queen-size bed s s-no smoking gds testtthgy fullboard\nIncludes tax\nExcludes surcharges",
+        "currency": "GBP",
+        "totalPrice": 101.5,
+        "pricePerNight": 101.5,
+        "taxesAndFees": 16.5,
+        "taxesAndFeesPerNight": 16.5,
+        "cancellation": {
+          "nonRefundableRate": true,
+          "cancellable": false,
+          "cancellationFeePercent": 100,
+          "prepaymentPercent": 100,
+          "fullyRefundable": false,
+          "description": "Room is non-refundable."
+        },
+        "ratePlanType": "CORPORATE",
+        "perks": 0,
+        "flags": 137,
+        "ref": "1P0pgEy6Ulf",
+        "hotelPrefLevel": 0
+      },
+      {
+        "roomType": "Testgdstt, Villa",
+        "description": "Testgdstt\nTests room-villa classic-16sqm-2 single bed s s-double bed s -ac-balcony-terrace-minibar-tv-hair dryer-safe-no smoking-soundproofed-iron and ironing board-disabled amenities-loggia-phone-bathroom gds testtthgy fullboard\nIncludes tax\nExcludes surcharges",
+        "currency": "GBP",
+        "totalPrice": 141.5,
+        "pricePerNight": 141.5,
+        "taxesAndFees": 16.5,
+        "taxesAndFeesPerNight": 16.5,
+        "cancellation": {
+          "nonRefundableRate": true,
+          "cancellable": false,
+          "cancellationFeePercent": 100,
+          "prepaymentPercent": 100,
+          "fullyRefundable": false,
+          "description": "Room is non-refundable."
+        },
+        "ratePlanType": "CORPORATE",
+        "perks": 0,
+        "flags": 137,
+        "ref": "1P0jL8ZV2YS",
+        "hotelPrefLevel": 0
+      }
+    ]
+  }
+}

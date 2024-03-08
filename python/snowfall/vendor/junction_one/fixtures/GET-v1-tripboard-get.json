@@ -1,0 +1,421 @@
+{
+  "status": "OK",
+  "code": 200,
+  "data": {
+    "trip": {
+      "id": 2623737,
+      "nms": 1709733167868,
+      "agencyCode": "P0",
+      "orgId": 635604,
+      "arrangerIds": [
+        2602533
+      ],
+      "bookerIds": [
+        2602533
+      ],
+      "grantedIds": [
+        2602533
+      ],
+      "userIds": [
+        2602533
+      ],
+      "name": "end2end trip test",
+      "visibility": "PUBLIC",
+      "startDate": "2024-03-07",
+      "endDate": "2024-03-09",
+      "total": 140.0,
+      "summary": [
+        {
+          "id": 2623740,
+          "type": "Hotel",
+          "date": "2024-03-07T12:00:00",
+          "status": "PENDING",
+          "userIds": [
+            2602533
+          ]
+        }
+      ],
+      "tripBoardFlags": 0,
+      "draftBoards": 1,
+      "pendingBoards": 0,
+      "processingBoards": 0,
+      "confirmedBoards": 0,
+      "uiFlags": 23,
+      "agencyFlags": 31
+    },
+    "boards": [
+      {
+        "id": 2623738,
+        "nms": 1709733167866,
+        "tripId": 2623737,
+        "orgId": 635604,
+        "bookerId": 2602533,
+        "userIds": [
+          2602533
+        ],
+        "agencyCode": "P0",
+        "status": "DRAFT",
+        "statusChangedOn": "2024-03-06T13:52:47.461598",
+        "startDate": "2024-03-07",
+        "endDate": "2024-03-09",
+        "summary": [
+          {
+            "id": 2623740,
+            "type": "Hotel",
+            "date": "2024-03-07T12:00:00",
+            "status": "PENDING",
+            "userIds": [
+              2602533
+            ]
+          }
+        ],
+        "exceptionFlags": 0,
+        "processingFlags": 0,
+        "tripBoardFlags": 9,
+        "waypointFlags": 0,
+        "refs": [
+          {
+            "id": 2623741,
+            "nms": 1709733167863,
+            "tripId": 2623737,
+            "tripBoardId": 2623738,
+            "active": true,
+            "reservationType": "Hotel",
+            "providerCode": "SC",
+            "ref": "1P0rg-vxDBh",
+            "vendor": "RT",
+            "bookerId": 2602533,
+            "reservationIds": [
+              2623740
+            ],
+            "status": "PENDING",
+            "userIds": [
+              2602533
+            ],
+            "summary": [
+              {
+                "id": 2623740,
+                "type": "Hotel",
+                "date": "2024-03-07T12:00:00",
+                "status": "PENDING",
+                "userIds": [
+                  2602533
+                ]
+              }
+            ],
+            "startDate": "2024-03-07",
+            "endDate": "2024-03-09",
+            "pricedOn": "2024-03-06T13:52:47.863463",
+            "currency": "EUR",
+            "due": 140.0,
+            "total": 140.0,
+            "exceptionFlags": 0,
+            "fopFlags": 0,
+            "tripBoardFlags": 9,
+            "waypointFlags": 0,
+            "uiFlags": 6,
+            "approvalPolicyIds": [
+              635605
+            ]
+          }
+        ],
+        "uiFlags": 11,
+        "agencyFlags": 31,
+        "approvalPolicyIds": [
+          635605
+        ]
+      }
+    ],
+    "org": {
+      "id": 635604,
+      "nms": 1703196599864,
+      "agencyCode": "P0",
+      "name": "Snowfall Demo Site",
+      "flags": 0,
+      "billingAddressLocationId": 635603,
+      "phoneNumber": "12025534929",
+      "active": true,
+      "type": "CORPORATE",
+      "visibility": "PRIVATE",
+      "branding": {
+        "heroUrl": "https://cdn.one.junction.dev/o/company/7d491cb7971f4a60abbe749aa6c3b589.png",
+        "logoUrl": "https://cdn.one.junction.dev/o/company/f9275217f4ae4e9ea99c6c9e28291d84"
+      }
+    },
+    "users": {
+      "2602533": {
+        "id": 2602533,
+        "nms": 1709028906070,
+        "firstName": "Paul",
+        "middleName": "Razvan",
+        "lastName": "Nechifor",
+        "suffix": "SR",
+        "gender": "male",
+        "flags": 6,
+        "active": true,
+        "fullName": "Paul Razvan Nechifor SR",
+        "shortName": "Paul Nechifor"
+      }
+    },
+    "hotelReservations": {
+      "2623740": {
+        "id": 2623740,
+        "ext": {
+          "consumers": [
+            {
+              "userId": 2602533,
+              "firstName": "Paul",
+              "middleName": "Razvan",
+              "lastName": "Nechifor SR",
+              "dob": "1989-03-03"
+            }
+          ],
+          "hotelRefs": [
+            "1P08z1HkVHl"
+          ],
+          "cancellation": {
+            "nonRefundableRate": false,
+            "cancellable": true,
+            "deadline": "2024-03-07T18:00:00",
+            "cancellationFeePercent": 0,
+            "prepaymentPercent": 0,
+            "fullyRefundable": true,
+            "description": "Room is fully refundable until Mar 07, 2024 6:00 PM."
+          },
+          "checkinDate": "2024-03-07",
+          "checkoutDate": "2024-03-09",
+          "checkinTime": "12:00:00",
+          "checkoutTime": "12:00:00",
+          "phone": "33-1-47702610",
+          "latitude": 48.8731,
+          "longitude": 2.34462,
+          "guests": 1,
+          "hotelName": "Mercure Paris Monty Opera",
+          "hotelChainName": "Accor Hotels",
+          "pricePerNight": 70.0,
+          "roomType": "Mercure breaks-early / ro, Standard Room",
+          "rating": 4.0,
+          "roomDescription": "Mercure breaks-early / ro\nStandard twin room with 2 single beds\nIncludes tax",
+          "atmosphereDescription": "- hotel\n\nYear built - 1929\nAdditional property description -\n  Located in the heart of paris, in a quiet street, close\n  To the main department stores, the opera, the louvre\n  And the folies  bergeres theatre. 69 fully equipped\n  Rooms, bathroom, hair dryer, minibar, telephone and\n  Cable television. The restaurant is only  open on\n  Request and for groups only, either business or\n  Tourist. For individual customers, room service is\n  Available during the  evening monday to friday.\n",
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "5 Rue De Montyon",
+          "zipCode": "75009",
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "perks": 0,
+          "chainCode": "RT",
+          "amenities": 257,
+          "roomFlags": 8
+        },
+        "tripId": 2623737,
+        "bookerId": 2602533,
+        "userIds": [
+          2602533
+        ],
+        "agencyCode": "P0",
+        "providerCode": "SC",
+        "vendor": "RT",
+        "label": "Mercure Paris Monty Opera",
+        "startDate": "2024-03-07T12:00:00",
+        "endDate": "2024-03-09T12:00:00",
+        "currency": "EUR",
+        "totalPrice": 140.0,
+        "orgId": 635604,
+        "approvalPolicyIds": [
+          635605
+        ],
+        "createdOn": "2024-03-06T13:52:47.85421",
+        "updatedAt": "2024-03-06T13:52:47.854211",
+        "status": "PENDING",
+        "flags": 256,
+        "type": "Hotel"
+      }
+    },
+    "fields": [
+      {
+        "id": 872543,
+        "nms": 1695412660388,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD1 ",
+        "name": "Department",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 7
+      },
+      {
+        "id": 904012,
+        "nms": 1696027481429,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD2 ",
+        "remarkCode": "RH/",
+        "name": "Out of Policy Reason",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 15,
+        "reservationType": "Hotel"
+      },
+      {
+        "id": 666229,
+        "nms": 1696027409013,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD1 ",
+        "remarkCode": "RC/",
+        "name": "Out of Policy Reason",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 15,
+        "reservationType": "Flight"
+      },
+      {
+        "id": 904016,
+        "nms": 1696027528855,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD3 ",
+        "remarkCode": "RZ/",
+        "name": "Out of Policy Reason",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 15,
+        "reservationType": "Car"
+      }
+    ],
+    "fieldValues": [
+      {
+        "id": 904010,
+        "nms": 1696027409002,
+        "fieldId": 666229,
+        "code": "AP",
+        "name": "Declined Lower Fare Due to Airport Preference",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904011,
+        "nms": 1696027409013,
+        "fieldId": 666229,
+        "code": "BR",
+        "name": "Declined Lower Fare Due to Business Requirements",
+        "active": true,
+        "remarkRequired": true
+      },
+      {
+        "id": 666230,
+        "nms": 1696027409013,
+        "fieldId": 666229,
+        "code": "CT",
+        "name": "Declined Lower Fare Due to Connection Time",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872544,
+        "nms": 1695412649523,
+        "fieldId": 872543,
+        "code": "Com",
+        "name": "Commercial",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872546,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Del",
+        "name": "Delivery",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872547,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Eng",
+        "name": "Engineering",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872548,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Ops",
+        "name": "Operations",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872545,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Prd",
+        "name": "Product",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904014,
+        "nms": 1696027481530,
+        "fieldId": 904012,
+        "code": "BN",
+        "name": "Declined Lower Priced Hotel Due to Business Need",
+        "active": true,
+        "remarkRequired": true
+      },
+      {
+        "id": 904015,
+        "nms": 1696027481534,
+        "fieldId": 904012,
+        "code": "CP",
+        "name": "Declined Lower Priced Hotel Due to Chain Preference",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904013,
+        "nms": 1696027481530,
+        "fieldId": 904012,
+        "code": "LP",
+        "name": "Declined Lower Priced Hotel Due to Location",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904019,
+        "nms": 1696027528958,
+        "fieldId": 904016,
+        "code": "BN",
+        "name": "Declined Lower Priced Car Due to Business Need",
+        "active": true,
+        "remarkRequired": true
+      },
+      {
+        "id": 904018,
+        "nms": 1696027528957,
+        "fieldId": 904016,
+        "code": "LP",
+        "name": "Declined Lower Priced Car Due to Location Preference",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904017,
+        "nms": 1696027528956,
+        "fieldId": 904016,
+        "code": "VP",
+        "name": "Declined Lower Priced Car Due to Vendor Preference",
+        "active": true,
+        "remarkRequired": false
+      }
+    ]
+  }
+}

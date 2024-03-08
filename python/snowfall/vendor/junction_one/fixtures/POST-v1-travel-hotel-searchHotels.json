@@ -1,0 +1,2400 @@
+{
+  "status": "OK",
+  "code": 200,
+  "data": {
+    "hotels": [
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "102 Boulevard De La Tour Maubo",
+          "zipCode": "75007",
+          "hotelCode": "100307700",
+          "hotelName": "Hotel De France Invalides",
+          "chainCode": "FG",
+          "chainName": "FastBooking",
+          "codeContext": "GLOBAL",
+          "latitude": 48.85347,
+          "longitude": 2.30932,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "0033147054049",
+          "amenities": 0
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "GBP",
+        "totalPrice": 86.00,
+        "taxesAndFees": 18.00,
+        "taxesAndFeesPerNight": 9.00,
+        "pricePerNight": 43.00,
+        "flags": 69,
+        "distance": 3.16,
+        "refs": [
+          "1P01KM7B5dO"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "5 Rue De Montyon",
+          "zipCode": "75009",
+          "hotelCode": "100036906",
+          "hotelName": "Mercure Paris Monty Opera",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.8731,
+          "longitude": 2.34462,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-47702610",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 140.00,
+        "pricePerNight": 70.00,
+        "flags": 69,
+        "distance": 1.92,
+        "refs": [
+          "1P0q7rgey3o"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "25 Blvd Blanqui",
+          "zipCode": "75013",
+          "hotelCode": "100052686",
+          "hotelName": "Mercure Paris Place Ditalie",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.83034,
+          "longitude": 2.35277,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45808223",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 147.00,
+        "pricePerNight": 73.50,
+        "flags": 69,
+        "distance": 2.92,
+        "refs": [
+          "1P0XuazD-Of"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "20 Rue Jean Rey 75737",
+          "zipCode": "75737",
+          "hotelCode": "100154386",
+          "hotelName": "Mercure Par Suffren Eiffel",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.855432,
+          "longitude": 2.291841,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45785000",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 154.00,
+        "taxesAndFees": 14.00,
+        "taxesAndFeesPerNight": 7.00,
+        "pricePerNight": 77.00,
+        "flags": 69,
+        "distance": 4.42,
+        "refs": [
+          "1P0goMziptH"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "12 Boulevard De Denain",
+          "zipCode": "75010",
+          "hotelCode": "100161454",
+          "hotelName": "Mercure Paris Terminus Nord",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87967,
+          "longitude": 2.3546,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42802000",
+          "amenities": 261
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 160.00,
+        "pricePerNight": 80.00,
+        "flags": 69,
+        "distance": 2.57,
+        "refs": [
+          "1P0EEKVkgYe"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "4 Rue De L Isly",
+          "zipCode": "75008",
+          "hotelCode": "100021754",
+          "hotelName": "Mercure Paris Opera Garnier",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.874788,
+          "longitude": 2.326406,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-43873550",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 160.00,
+        "pricePerNight": 80.00,
+        "flags": 69,
+        "distance": 2.77,
+        "refs": [
+          "1P0ZnaIuyuN"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "20 Rue Roquepine",
+          "zipCode": "75008",
+          "hotelCode": "100024328",
+          "hotelName": "Mercure Paris Haussmann St Augustin",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.873272,
+          "longitude": 2.318317,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42681164",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 168.00,
+        "pricePerNight": 84.00,
+        "flags": 69,
+        "distance": 3.10,
+        "refs": [
+          "1P0K0-ZZlQB"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "31 Rue De Surene",
+          "zipCode": "75008",
+          "hotelCode": "100107478",
+          "hotelName": "Hotel Du Ministere",
+          "chainCode": "FG",
+          "chainName": "FastBooking",
+          "codeContext": "GLOBAL",
+          "latitude": 48.871362,
+          "longitude": 2.319408,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42669604",
+          "amenities": 260
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 198.00,
+        "pricePerNight": 99.00,
+        "flags": 69,
+        "distance": 2.91,
+        "refs": [
+          "1P0yaK8eTwK"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "1 And 3 Rue De Chateau Landon",
+          "zipCode": "75010",
+          "hotelCode": "100066212",
+          "hotelName": "All Seasons Paris Gare De L Est Chateau Landon",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.876656,
+          "longitude": 2.361624,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44653333",
+          "amenities": 257,
+          "medias": [
+            {
+              "mediaHeight": 260,
+              "mediaWidth": 346,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/34774/jrzbyclgxjyri6uab1ew.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 200.00,
+        "pricePerNight": 100.00,
+        "flags": 69,
+        "distance": 2.33,
+        "refs": [
+          "1P0g1kSibeM"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "51 Lauriston",
+          "zipCode": "75116",
+          "hotelCode": "100075148",
+          "hotelName": "Mercure Paris Champs Elysees",
+          "chainCode": "BY",
+          "chainName": "Banyan Tree Hotels and Resorts",
+          "codeContext": "GLOBAL",
+          "latitude": 48.870001,
+          "longitude": 2.290718,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-56265929",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 200.00,
+        "pricePerNight": 100.00,
+        "flags": 69,
+        "distance": 4.74,
+        "refs": [
+          "1P0g-SqWI40"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "95 Rue De Richelieu",
+          "zipCode": "75002",
+          "hotelCode": "100068170",
+          "hotelName": "Mercure Paris Opera Cusset",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87092,
+          "longitude": 2.33954,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42974890",
+          "amenities": 1,
+          "medias": [
+            {
+              "mediaHeight": 460,
+              "mediaWidth": 840,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/35774/y5yeqlmt3zlop0lsn03a.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 235.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 117.88,
+        "flags": 69,
+        "distance": 1.84,
+        "refs": [
+          "1P0lmehEMPm"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "3 Rue Caulaincourt",
+          "zipCode": "75018",
+          "hotelCode": "100112326",
+          "hotelName": "Mercure Paris Montmartre",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.885059,
+          "longitude": 2.330035,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44697070",
+          "amenities": 257,
+          "medias": [
+            {
+              "mediaHeight": 667,
+              "mediaWidth": 1000,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/5862/uin5uexu2xajohoteuk0.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 268.80,
+        "pricePerNight": 134.40,
+        "flags": 69,
+        "distance": 3.55,
+        "refs": [
+          "1P0BdQPhfk1"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "87 Boulevard De Strasbourg",
+          "address2": "Paris Fr 75010",
+          "zipCode": "75010",
+          "hotelCode": "100024914",
+          "hotelName": "All Seasons Gare De L'est Tgv",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.875779,
+          "longitude": 2.35771,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42091228",
+          "amenities": 1
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 271.60,
+        "taxesAndFees": 1.60,
+        "taxesAndFeesPerNight": 0.80,
+        "pricePerNight": 135.80,
+        "flags": 69,
+        "distance": 2.17,
+        "refs": [
+          "1P03s_fOb-p"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "1-3 Cour De La Ferme St Lazar",
+          "zipCode": "75010",
+          "hotelCode": "100067384",
+          "hotelName": "Mercure Paris Gare De L'est Magenta",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87616,
+          "longitude": 2.3554,
+          "rating": 3.5,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-48248484",
+          "amenities": 261
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 280.00,
+        "pricePerNight": 140.00,
+        "flags": 69,
+        "distance": 2.19,
+        "refs": [
+          "1P0XvYq71tk"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "29 Rue De Larcade",
+          "zipCode": "75008",
+          "hotelCode": "100046964",
+          "hotelName": "Mercure Paris Royal Madeleine",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.872803,
+          "longitude": 2.324063,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42661381",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 290.00,
+        "pricePerNight": 145.00,
+        "flags": 69,
+        "distance": 2.74,
+        "refs": [
+          "1P0oPLaHjcX"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "14-20 Rue De La Gaite",
+          "zipCode": "75014",
+          "hotelCode": "100096260",
+          "hotelName": "Mercure Paris Montparnasse",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.83965,
+          "longitude": 2.32353,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-43352828",
+          "amenities": 23
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 315.00,
+        "pricePerNight": 157.50,
+        "flags": 69,
+        "distance": 2.82,
+        "refs": [
+          "1P0jm6LDMTd"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "22 Rue D Casanova",
+          "zipCode": "75002",
+          "hotelCode": "100068194",
+          "hotelName": "Mercure Paris Stendhal Place Vend�me",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.86821,
+          "longitude": 2.33069,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44585252",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 332.80,
+        "taxesAndFees": 2.80,
+        "taxesAndFeesPerNight": 1.40,
+        "pricePerNight": 166.40,
+        "flags": 69,
+        "distance": 2.04,
+        "refs": [
+          "1P0i9iJ-ss2"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "14 Rue Du Theatre",
+          "address2": "Paris Fr 75015",
+          "zipCode": "75015",
+          "hotelCode": "100022246",
+          "hotelName": "Adagio Paris Tour Eiffel",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.850026,
+          "longitude": 2.285235,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45718888",
+          "amenities": 33
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 337.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 168.88,
+        "flags": 69,
+        "distance": 4.96,
+        "refs": [
+          "1P0gR66eejL"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "14 Rue De La Sorbonne",
+          "zipCode": "75005",
+          "hotelCode": "100078384",
+          "hotelName": "Mercure Paris La Sorbonne",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.849054,
+          "longitude": 2.34315,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-56243434",
+          "amenities": 261
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 343.00,
+        "pricePerNight": 171.50,
+        "flags": 69,
+        "distance": 1.07,
+        "refs": [
+          "1P0o6aTU3WZ"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "23 Rue Damremont",
+          "zipCode": "75018",
+          "hotelCode": "100048968",
+          "hotelName": "Holiday Inn Garden Court Paris Montmartre",
+          "chainCode": "HI",
+          "chainName": "Holiday Inn",
+          "codeContext": "GLOBAL",
+          "brandCode": "10001",
+          "brandName": "Holiday Inn",
+          "latitude": 48.88874,
+          "longitude": 2.33324,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33 1 44923340",
+          "amenities": 261,
+          "medias": [
+            {
+              "mediaHeight": 366,
+              "mediaWidth": 550,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/26167/pphaymmahevjxwg07beu.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 347.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 173.88,
+        "flags": 69,
+        "distance": 3.83,
+        "refs": [
+          "1P0mc4VDZQX"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "5 Rue Du 8 Mai 1945",
+          "address2": "Paris Fr 75010",
+          "zipCode": "75010",
+          "hotelCode": "100095790",
+          "hotelName": "Holiday Inn Gare De L Est",
+          "chainCode": "HI",
+          "chainName": "Holiday Inn",
+          "codeContext": "GLOBAL",
+          "brandCode": "10001",
+          "brandName": "Holiday Inn",
+          "latitude": 48.876343,
+          "longitude": 2.357119,
+          "rating": 4.0,
+          "cityCode": "PAR",
+          "mainCityCode": "CDG",
+          "phone": "33-1-55260505",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 364.00,
+        "pricePerNight": 182.00,
+        "flags": 69,
+        "distance": 2.22,
+        "refs": [
+          "1P0-0-oBDJu"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "11 Rue De Lyon",
+          "zipCode": "75012",
+          "hotelCode": "100043234",
+          "hotelName": "Holiday Inn Bastille",
+          "chainCode": "HI",
+          "chainName": "Holiday Inn",
+          "codeContext": "GLOBAL",
+          "brandCode": "10001",
+          "brandName": "Holiday Inn",
+          "latitude": 48.846812,
+          "longitude": 2.371931,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "033153022000",
+          "amenities": 261,
+          "medias": [
+            {
+              "mediaHeight": 1333,
+              "mediaWidth": 2000,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/23343/gkkryofiihijo9si05cl.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 463.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 231.88,
+        "flags": 69,
+        "distance": 1.81,
+        "refs": [
+          "1P0t52tzU-a"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "102 Avenue Victor Hugo",
+          "zipCode": "75116",
+          "hotelCode": "100041134",
+          "hotelName": "Melia Alexander Boutique Hotel",
+          "chainCode": "ME",
+          "chainName": "Melia Hotels Intl",
+          "codeContext": "GLOBAL",
+          "brandCode": "10004",
+          "brandName": "Melia",
+          "latitude": 48.86873,
+          "longitude": 2.283065,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-56906100",
+          "amenities": 0
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 480.00,
+        "pricePerNight": 240.00,
+        "flags": 69,
+        "distance": 5.23,
+        "refs": [
+          "1P0tm5xhNOH"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "24 Rue De Miromesnil",
+          "zipCode": "75008",
+          "hotelCode": "100076374",
+          "hotelName": "Holiday Inn Gc Elysees",
+          "chainCode": "HI",
+          "chainName": "Holiday Inn",
+          "codeContext": "GLOBAL",
+          "brandCode": "10001",
+          "brandName": "Holiday Inn",
+          "latitude": 48.8729,
+          "longitude": 2.31598,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33143128787",
+          "amenities": 261,
+          "medias": [
+            {
+              "mediaHeight": 562,
+              "mediaWidth": 1000,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/39916/zoisjboxoohqaaiizt3x.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 724.26,
+        "taxesAndFees": 6.26,
+        "taxesAndFeesPerNight": 3.13,
+        "pricePerNight": 362.13,
+        "flags": 69,
+        "distance": 3.21,
+        "refs": [
+          "1P0PPB-9sTB"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "70 Avenue Des Champs Elysees",
+          "zipCode": "75008",
+          "hotelCode": "100069212",
+          "hotelName": "Marriott Paris Hotel Champs Elysees",
+          "chainCode": "MC",
+          "chainName": "Marriott Hotels",
+          "codeContext": "GLOBAL",
+          "brandCode": "10002",
+          "brandName": "Marriott Hotels",
+          "latitude": 48.87078,
+          "longitude": 2.30463,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-53935500",
+          "amenities": 279
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 875.46,
+        "taxesAndFees": 21.46,
+        "taxesAndFeesPerNight": 10.73,
+        "pricePerNight": 437.73,
+        "flags": 69,
+        "distance": 3.82,
+        "refs": [
+          "1P0WYuLmOPB"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "8 Rue Cambon",
+          "zipCode": "75001",
+          "hotelCode": "100059750",
+          "hotelName": "Melia Vendome Boutique Hotel",
+          "chainCode": "ME",
+          "chainName": "Melia Hotels Intl",
+          "codeContext": "GLOBAL",
+          "brandCode": "10004",
+          "brandName": "Melia",
+          "latitude": 48.86668,
+          "longitude": 2.32553,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44775400",
+          "amenities": 0
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 912.00,
+        "pricePerNight": 456.00,
+        "flags": 69,
+        "distance": 2.25,
+        "refs": [
+          "1P0CprpAV9O"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "7 Rue De L Hotel Colbert",
+          "zipCode": "75005",
+          "hotelCode": "100061374",
+          "hotelName": "Melia Colbert Boutique Hotel",
+          "chainCode": "ME",
+          "chainName": "Melia Hotels Intl",
+          "codeContext": "GLOBAL",
+          "brandCode": "10004",
+          "brandName": "Melia",
+          "latitude": 48.851581,
+          "longitude": 2.3485,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-56811900",
+          "amenities": 1
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 975.00,
+        "pricePerNight": 487.50,
+        "flags": 69,
+        "distance": 0.62,
+        "refs": [
+          "1P09JVCmtkn"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "35 Rue Jean Goujon",
+          "zipCode": "75008",
+          "hotelCode": "100056522",
+          "hotelName": "Melia Royal Alma",
+          "chainCode": "ME",
+          "chainName": "Melia Hotels Intl",
+          "codeContext": "GLOBAL",
+          "brandCode": "10004",
+          "brandName": "Melia",
+          "latitude": 48.86518,
+          "longitude": 2.304137,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-53936300",
+          "amenities": 256
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 1042.00,
+        "pricePerNight": 521.00,
+        "flags": 69,
+        "distance": 3.64,
+        "refs": [
+          "1P0IS-3lwAv"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "24 Boulevard Malesherbes",
+          "zipCode": "75008",
+          "hotelCode": "100067100",
+          "hotelName": "Hyatt Regency Paris Madeleine",
+          "chainCode": "HY",
+          "chainName": "Hyatt Hotels And Resorts",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87248,
+          "longitude": 2.32153,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-55271234",
+          "amenities": 5,
+          "medias": [
+            {
+              "mediaHeight": 1024,
+              "mediaWidth": 767,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/35213/jsyksct5attfnt7gedcj.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 1507.50,
+        "taxesAndFees": 7.50,
+        "taxesAndFeesPerNight": 3.75,
+        "pricePerNight": 753.75,
+        "flags": 69,
+        "distance": 2.86,
+        "refs": [
+          "1P0omrqH59v"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "4 Rue De La Boetie",
+          "zipCode": "75008",
+          "hotelCode": "100162690",
+          "hotelName": "Park Lane Paris",
+          "chainCode": "FG",
+          "chainName": "FastBooking",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87437,
+          "longitude": 2.3186,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33 142 652754",
+          "amenities": 261
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 46.00,
+        "pricePerNight": 23.00,
+        "flags": 65,
+        "distance": 3.15,
+        "refs": [
+          "1P0dZxfH0j1"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "8 Place Marguerite De Navarre",
+          "zipCode": "75001",
+          "hotelCode": "100127486",
+          "hotelName": "Novotel Paris Les Halles",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.86071,
+          "longitude": 2.34628,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42213131",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 158.00,
+        "taxesAndFees": 20.00,
+        "taxesAndFeesPerNight": 10.00,
+        "pricePerNight": 79.00,
+        "flags": 65,
+        "distance": 0.63,
+        "refs": [
+          "1P0vFH9Y9X2"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Charenton Le Pont",
+          "address1": "3-5 Place Des Marseillais",
+          "address2": "Charenton Le Pont Fr 94227",
+          "zipCode": "94227",
+          "hotelCode": "100061850",
+          "hotelName": "Novotel Paris Charenton",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.826243,
+          "longitude": 2.40575,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-46766060",
+          "amenities": 5
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 170.00,
+        "pricePerNight": 85.00,
+        "flags": 65,
+        "distance": 5.17,
+        "refs": [
+          "1P0eGtS7CXW"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "3 Rue De Montenotte",
+          "zipCode": "75017",
+          "hotelCode": "100023840",
+          "hotelName": "Best Western Empire Elysees",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.878036,
+          "longitude": 2.295523,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-58054200",
+          "amenities": 261,
+          "medias": [
+            {
+              "mediaHeight": 682,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/13678/rkywzshthwuxtzprnwej.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 182.27,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 91.14,
+        "flags": 65,
+        "distance": 4.78,
+        "refs": [
+          "1P0_AlwGLGQ"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "25 Av Du General Leclerc",
+          "zipCode": "75014",
+          "hotelCode": "100105688",
+          "hotelName": "Best Western Le Nouvel Orleans",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.8312,
+          "longitude": 2.32976,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-43278020",
+          "amenities": 5,
+          "medias": [
+            {
+              "mediaHeight": 703,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/55058/rqv0t5qflbrx5cvlrvtm.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 185.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 92.88,
+        "flags": 65,
+        "distance": 3.27,
+        "refs": [
+          "1P0ojKj5Lh_"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "17 Rue Du Cotentin",
+          "zipCode": "75015",
+          "hotelCode": "100043830",
+          "hotelName": "Novotel Paris Gare Montparnasse",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.83863,
+          "longitude": 2.31414,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-8-25884444",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "PLN",
+        "totalPrice": 196.00,
+        "pricePerNight": 98.00,
+        "flags": 65,
+        "distance": 3.43,
+        "refs": [
+          "1P0YkkaJOGv"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "10 Rue Agrippa D Aubigne",
+          "zipCode": "75004",
+          "hotelCode": "101794372",
+          "hotelName": "So Paris Hotel",
+          "chainCode": "EN",
+          "chainName": "Ennismore International",
+          "codeContext": "GLOBAL",
+          "latitude": 48.85029,
+          "longitude": 2.36264,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "330178907400",
+          "amenities": 502,
+          "medias": [
+            {
+              "mediaHeight": 768,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/397818/fhwedek5bgoh5lyev7ex.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 202.40,
+        "taxesAndFees": 2.40,
+        "taxesAndFeesPerNight": 1.20,
+        "pricePerNight": 101.20,
+        "flags": 65,
+        "distance": 1.04,
+        "refs": [
+          "1P05bQ1kKeY"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "4 Rue Riboutte",
+          "zipCode": "75009",
+          "hotelCode": "100110096",
+          "hotelName": "Best Western Anjou Lafayette Opera",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.876255,
+          "longitude": 2.346469,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42468344",
+          "amenities": 278
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 213.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 106.88,
+        "flags": 65,
+        "distance": 2.22,
+        "refs": [
+          "1P0zwpC33Rq"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "34 Ave De La Porte Dasnieres",
+          "zipCode": "75017",
+          "hotelCode": "100034438",
+          "hotelName": "Novotel Paris 17 Porte D Asnieres",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.891709,
+          "longitude": 2.30186,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44405252",
+          "amenities": 5
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 216.00,
+        "pricePerNight": 108.00,
+        "flags": 65,
+        "distance": 5.37,
+        "refs": [
+          "1P0LUlqGMw_"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "15 Rue Breguet",
+          "zipCode": "75011",
+          "hotelCode": "100060978",
+          "hotelName": "Ibis Bastille Opera",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.8572,
+          "longitude": 2.37281,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-49292020",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 223.76,
+        "taxesAndFees": 23.76,
+        "taxesAndFeesPerNight": 11.88,
+        "pricePerNight": 111.88,
+        "flags": 65,
+        "distance": 1.51,
+        "refs": [
+          "1P0Lhq2ZaT7"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "131 Rue De Charone",
+          "zipCode": "75011",
+          "hotelCode": "100096388",
+          "hotelName": "Classics Hotel Bastille",
+          "chainCode": "IH",
+          "chainName": "Classic International Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.855002,
+          "longitude": 2.386748,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33 1 446 434 34",
+          "amenities": 261,
+          "medias": [
+            {
+              "mediaHeight": 666,
+              "mediaWidth": 1000,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/50094/rrz1ltgdrexziz8fpuss.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 229.30,
+        "taxesAndFees": 3.30,
+        "taxesAndFeesPerNight": 1.65,
+        "pricePerNight": 114.65,
+        "flags": 65,
+        "distance": 2.53,
+        "refs": [
+          "1P0J83a0S34"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Le Kremlin Bicetre",
+          "address1": "22, Rue Voltaire",
+          "zipCode": "94270",
+          "hotelCode": "100036636",
+          "hotelName": "Novotel Paris Porte Ditalie",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.816057,
+          "longitude": 2.364374,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45211909",
+          "amenities": 261
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 233.00,
+        "taxesAndFees": 3.00,
+        "taxesAndFeesPerNight": 1.50,
+        "pricePerNight": 116.50,
+        "flags": 65,
+        "distance": 4.60,
+        "refs": [
+          "1P0sS3KVPj3"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "124 Rue De Rennes",
+          "zipCode": "75006",
+          "hotelCode": "100023812",
+          "hotelName": "Best Western Aramis Saint-germain",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.846852,
+          "longitude": 2.32671,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45480375",
+          "amenities": 4,
+          "medias": [
+            {
+              "mediaHeight": 644,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/13668/imooifricuhz0eo1l6ki.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 233.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 116.88,
+        "flags": 65,
+        "distance": 2.16,
+        "refs": [
+          "1P0Vyzu7u2Q"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "19 Place Des Vins De France",
+          "zipCode": "75012",
+          "hotelCode": "100026304",
+          "hotelName": "Ibis Paris Bercy Village",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.83222,
+          "longitude": 2.38734,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-49280606",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 234.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 117.38,
+        "flags": 65,
+        "distance": 3.74,
+        "refs": [
+          "1P0VRAJfj2A"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "128 Avenue De Wagram",
+          "zipCode": "75017",
+          "hotelCode": "100041254",
+          "hotelName": "Best Western Hotel Mercedes",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.88492,
+          "longitude": 2.303147,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42277782",
+          "amenities": 256,
+          "medias": [
+            {
+              "mediaHeight": 682,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/22334/f2lvutlsjknqe3jhx0ko.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 264.96,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 132.48,
+        "flags": 65,
+        "distance": 4.77,
+        "refs": [
+          "1P0QxjXtygl"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "60 Jardin De Valmy Blvd Cir",
+          "zipCode": "92918",
+          "hotelCode": "100038386",
+          "hotelName": "Renaissance Paris Hotel La Defense",
+          "chainCode": "BR",
+          "chainName": "Renaissance Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.870967,
+          "longitude": 2.365192,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-41-97-5050",
+          "amenities": 279
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 287.30,
+        "taxesAndFees": 14.30,
+        "taxesAndFeesPerNight": 7.15,
+        "pricePerNight": 143.65,
+        "flags": 65,
+        "distance": 1.86,
+        "refs": [
+          "1P0XhuCcPr5"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "9 Rue Gaillon",
+          "address2": "Paris Fr 75002",
+          "zipCode": "75002",
+          "hotelCode": "100021602",
+          "hotelName": "Best Western Gaillon Opera",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.868425,
+          "longitude": 2.33413,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-47424774",
+          "amenities": 260,
+          "medias": [
+            {
+              "mediaHeight": 677,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/12588/dolqnuiyxocezsblvrw0.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 301.30,
+        "taxesAndFees": 3.30,
+        "taxesAndFeesPerNight": 1.65,
+        "pricePerNight": 150.65,
+        "flags": 65,
+        "distance": 1.86,
+        "refs": [
+          "1P0tDecpC93"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "1 Impasse Marteau",
+          "zipCode": "75018",
+          "hotelCode": "100085138",
+          "hotelName": "Suitehotel Paris Porte De La Chapelle",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.90157,
+          "longitude": 2.3595,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-49463939",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 302.40,
+        "taxesAndFees": 2.40,
+        "taxesAndFeesPerNight": 1.20,
+        "pricePerNight": 151.20,
+        "flags": 65,
+        "distance": 5.03,
+        "refs": [
+          "1P0oM6btJPO"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "3 Ave Raymond Poincare",
+          "zipCode": "75116",
+          "hotelCode": "100028100",
+          "hotelName": "Best Western Au Trocadero",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.86367,
+          "longitude": 2.28687,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-47273330",
+          "amenities": 4,
+          "medias": [
+            {
+              "mediaHeight": 682,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/15833/aqmde7rq51ofeajipvwg.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 313.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 156.88,
+        "flags": 65,
+        "distance": 4.84,
+        "refs": [
+          "1P0_KK1sZoB"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "13 Rue Traversiere",
+          "zipCode": "75012",
+          "hotelCode": "100089552",
+          "hotelName": "Best Western Aurore",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.84583,
+          "longitude": 2.37081,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-43435412",
+          "amenities": 1,
+          "medias": [
+            {
+              "mediaHeight": 522,
+              "mediaWidth": 800,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/46533/wwy8agavffzm7egrucwm.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 343.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 171.88,
+        "flags": 65,
+        "distance": 1.81,
+        "refs": [
+          "1P0tD8ps4oU"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "10 Boulevard Montmartre",
+          "zipCode": "75009",
+          "hotelCode": "100016986",
+          "hotelName": "Best Western Hotel Ronceray Opera",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87168,
+          "longitude": 2.34192,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42471345",
+          "amenities": 260,
+          "medias": [
+            {
+              "mediaHeight": 1024,
+              "mediaWidth": 682,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/116063/cg7n86lfchfkj3kxsgic.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 353.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 176.88,
+        "flags": 65,
+        "distance": 1.84,
+        "refs": [
+          "1P0h_w9HO4E"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "50 Rue Des Mathurins",
+          "zipCode": "75008",
+          "hotelCode": "100148012",
+          "hotelName": "Best Western Hotel Sydney Opera",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.87333,
+          "longitude": 2.324083,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42653548",
+          "amenities": 260
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 353.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 176.88,
+        "flags": 65,
+        "distance": 2.77,
+        "refs": [
+          "1P04pvn70sI"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "71 Rue Monge",
+          "zipCode": "75005",
+          "hotelCode": "100059526",
+          "hotelName": "Best Western Quartier Latin Pantheon",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.84377,
+          "longitude": 2.35231,
+          "rating": 3.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-143-312564",
+          "amenities": 257,
+          "medias": [
+            {
+              "mediaHeight": 688,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/31443/nf7lft70arunivebzat5.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 361.76,
+        "taxesAndFees": 3.76,
+        "taxesAndFeesPerNight": 1.88,
+        "pricePerNight": 180.88,
+        "flags": 65,
+        "distance": 1.43,
+        "refs": [
+          "1P0Ik11C4H5"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "68 Quai De La Seine",
+          "address2": "Paris Fr 75019",
+          "zipCode": "75019",
+          "hotelCode": "100124880",
+          "hotelName": "Express By Holiday Inn Canal De La Seine",
+          "chainCode": "HI",
+          "chainName": "Holiday Inn",
+          "codeContext": "GLOBAL",
+          "brandCode": "10001",
+          "brandName": "Holiday Inn",
+          "latitude": 48.888557,
+          "longitude": 2.378387,
+          "rating": 3.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44650101",
+          "amenities": 269,
+          "medias": [
+            {
+              "mediaHeight": 405,
+              "mediaWidth": 630,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/66979/nqowzrymxktpqv3nusny.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 364.00,
+        "taxesAndFees": 4.00,
+        "taxesAndFeesPerNight": 2.00,
+        "pricePerNight": 182.00,
+        "flags": 65,
+        "distance": 4.03,
+        "refs": [
+          "1P0w3ICZkx2"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "61 Quai De Grenelle",
+          "zipCode": "75738",
+          "hotelCode": "100025538",
+          "hotelName": "Novotel Paris Tour Eiffel",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.84981,
+          "longitude": 2.28287,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-40582000",
+          "amenities": 293,
+          "medias": [
+            {
+              "mediaHeight": 3888,
+              "mediaWidth": 2592,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/14528/zsrorvcwkszpdea8bvp1.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 380.00,
+        "pricePerNight": 190.00,
+        "flags": 65,
+        "distance": 5.13,
+        "refs": [
+          "1P0NHpH6QU9"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "1 Rue De Libourne",
+          "zipCode": "75012",
+          "hotelCode": "100026058",
+          "hotelName": "Pullman Paris Bercy",
+          "chainCode": "PU",
+          "chainName": "Pullman Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.83146,
+          "longitude": 2.38752,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44673400",
+          "amenities": 5
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 404.80,
+        "pricePerNight": 202.40,
+        "flags": 65,
+        "distance": 3.81,
+        "refs": [
+          "1P0Em2uax-B"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "3 Bld Montmartre",
+          "zipCode": "75002",
+          "hotelCode": "100059746",
+          "hotelName": "Tryp Francois",
+          "chainCode": "ME",
+          "chainName": "Melia Hotels Intl",
+          "codeContext": "GLOBAL",
+          "brandCode": "10004",
+          "brandName": "Melia",
+          "latitude": 48.87152,
+          "longitude": 2.342856,
+          "rating": 3.5,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-42335153",
+          "amenities": 257
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 426.00,
+        "pricePerNight": 213.00,
+        "flags": 65,
+        "distance": 1.79,
+        "refs": [
+          "1P0CaFYti-e"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "Rue De Contantinople 18",
+          "zipCode": "75008",
+          "hotelCode": "100081350",
+          "hotelName": "Best Western Elysees Paris Monceau",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.872604,
+          "longitude": 2.313539,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45221452",
+          "amenities": 6,
+          "medias": [
+            {
+              "mediaHeight": 701,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/42251/nq6fgkhsizia11gstziu.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 453.96,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 226.98,
+        "flags": 65,
+        "distance": 3.34,
+        "refs": [
+          "1P0ot8EOYrj"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "2 8 Rue Hector Malot",
+          "zipCode": "75012",
+          "hotelCode": "100032622",
+          "hotelName": "Novotel Paris Gare De Lyon",
+          "chainCode": "RT",
+          "chainName": "Accor Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.845378,
+          "longitude": 2.375304,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44676000",
+          "amenities": 293
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 456.00,
+        "pricePerNight": 228.00,
+        "flags": 65,
+        "distance": 2.10,
+        "refs": [
+          "1P0fQiHb8j1"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "10 Place De La Republique",
+          "address2": "Paris Fr 75011",
+          "zipCode": "75011",
+          "hotelCode": "100061104",
+          "hotelName": "Crowne Plaza Place Derepubliqu",
+          "chainCode": "CP",
+          "chainName": "Crowne Plaza Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.867212,
+          "longitude": 2.365077,
+          "rating": 4.0,
+          "cityCode": "ORY",
+          "mainCityCode": "CDG",
+          "phone": "33-1-43144350",
+          "amenities": 261,
+          "medias": [
+            {
+              "mediaHeight": 657,
+              "mediaWidth": 1000,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/3222/tpdsbpglycpbvzt4mrix.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 518.00,
+        "pricePerNight": 259.00,
+        "flags": 65,
+        "distance": 1.51,
+        "refs": [
+          "1P0gZHSSZ0L"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "55 57 Ave Raymond Poincare",
+          "zipCode": "75116",
+          "hotelCode": "100087972",
+          "hotelName": "Renaissance Paris Hotel Le Parc Trocadero",
+          "chainCode": "BR",
+          "chainName": "Renaissance Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.867224,
+          "longitude": 2.285941,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-44056666",
+          "amenities": 277
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 584.36,
+        "taxesAndFees": 16.26,
+        "taxesAndFeesPerNight": 8.13,
+        "pricePerNight": 292.18,
+        "flags": 65,
+        "distance": 4.99,
+        "refs": [
+          "1P0MKl0tfsY"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "5 Bis Rue Massenet",
+          "zipCode": "75016",
+          "hotelCode": "100068016",
+          "hotelName": "Best Western Premier Trocadero La Tour",
+          "chainCode": "BW",
+          "chainName": "Best Western Intl",
+          "codeContext": "GLOBAL",
+          "latitude": 48.85808,
+          "longitude": 2.28,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-45244303",
+          "amenities": 260,
+          "medias": [
+            {
+              "mediaHeight": 682,
+              "mediaWidth": 1024,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/35702/nyxs3rkyfjl2tiboyww9.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 605.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 302.88,
+        "flags": 65,
+        "distance": 5.29,
+        "refs": [
+          "1P0xWS3Y9m1"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "39 Avenue De Wagram",
+          "zipCode": "75017",
+          "hotelCode": "100102948",
+          "hotelName": "Renaissance Paris Arc De Triomphe Hotel",
+          "chainCode": "BR",
+          "chainName": "Renaissance Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.877082,
+          "longitude": 2.297432,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-55375537",
+          "amenities": 275
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 717.46,
+        "taxesAndFees": 21.46,
+        "taxesAndFeesPerNight": 10.73,
+        "pricePerNight": 358.73,
+        "flags": 65,
+        "distance": 4.61,
+        "refs": [
+          "1P0GFAKIN-b"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "4 Rue De Mont Thabor",
+          "zipCode": "75001",
+          "hotelCode": "100045262",
+          "hotelName": "Renaissance Paris Vendome",
+          "chainCode": "BR",
+          "chainName": "Renaissance Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.865396,
+          "longitude": 2.329547,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-40202000",
+          "amenities": 439
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 1173.46,
+        "taxesAndFees": 21.46,
+        "taxesAndFeesPerNight": 10.73,
+        "pricePerNight": 586.73,
+        "flags": 65,
+        "distance": 1.92,
+        "refs": [
+          "1P0_Zr9Adxi"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "3 Rue De Castiglione",
+          "zipCode": "75001",
+          "hotelCode": "100017078",
+          "hotelName": "The Westin Paris",
+          "chainCode": "WI",
+          "chainName": "Westin Hotels And Resorts",
+          "codeContext": "GLOBAL",
+          "latitude": 48.86593,
+          "longitude": 2.32785,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-144-771-111",
+          "amenities": 262
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 1416.26,
+        "taxesAndFees": 16.26,
+        "taxesAndFeesPerNight": 8.13,
+        "pricePerNight": 708.13,
+        "flags": 65,
+        "distance": 2.06,
+        "refs": [
+          "1P0tXy4X7ea"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "5 Rue De La Paix",
+          "zipCode": "75002",
+          "hotelCode": "100056768",
+          "hotelName": "Park Hyatt Paris-vendome",
+          "chainCode": "HY",
+          "chainName": "Hyatt Hotels And Resorts",
+          "codeContext": "GLOBAL",
+          "latitude": 48.868691,
+          "longitude": 2.330644,
+          "rating": 5.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-58711234",
+          "amenities": 21,
+          "medias": [
+            {
+              "mediaHeight": 1024,
+              "mediaWidth": 768,
+              "mediaURL": "https://vcmp-hotels.cert.sabre.com/image/upload/hotel/i/30053/ewdn1lvnkmcpll7xcflj.jpg"
+            }
+          ]
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 2110.00,
+        "taxesAndFees": 10.00,
+        "taxesAndFeesPerNight": 5.00,
+        "pricePerNight": 1055.00,
+        "flags": 65,
+        "distance": 2.07,
+        "refs": [
+          "1P0oJ7SrzGS"
+        ],
+        "hotelPrefLevel": 0
+      },
+      {
+        "hotel": {
+          "country": "France",
+          "countryCode": "FR",
+          "city": "Paris",
+          "address1": "18 Avenue De Suffren",
+          "address2": "Paris Fr 75015",
+          "zipCode": "75015",
+          "hotelCode": "100162308",
+          "hotelName": "Pullman Paris Tour Eiffel",
+          "chainCode": "PU",
+          "chainName": "Pullman Hotels",
+          "codeContext": "GLOBAL",
+          "latitude": 48.855935,
+          "longitude": 2.293447,
+          "rating": 4.0,
+          "cityCode": "CDG",
+          "mainCityCode": "CDG",
+          "phone": "33-1-41088640",
+          "amenities": 261
+        },
+        "checkinDate": "2024-03-02",
+        "checkoutDate": "2024-03-04",
+        "currency": "EUR",
+        "totalPrice": 5465.76,
+        "taxesAndFees": 5.76,
+        "taxesAndFeesPerNight": 2.88,
+        "pricePerNight": 2732.88,
+        "flags": 65,
+        "distance": 4.30,
+        "refs": [
+          "1P0DXqv5qZF"
+        ],
+        "hotelPrefLevel": 0
+      }
+    ],
+    "rateCodeDescr": "Special Rate!",
+    "orgId": 635604,
+    "userIds": [
+      2602533
+    ]
+  }
+}

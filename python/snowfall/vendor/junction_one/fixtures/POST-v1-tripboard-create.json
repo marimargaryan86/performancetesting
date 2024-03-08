@@ -1,0 +1,267 @@
+{
+  "status": "OK",
+  "code": 200,
+  "data": {
+    "trip": {
+      "id": 2623174,
+      "nms": 1709558052863,
+      "agencyCode": "P0",
+      "orgId": 635604,
+      "arrangerIds": [
+        2602533
+      ],
+      "bookerIds": [
+        2602533
+      ],
+      "grantedIds": [
+        2602533
+      ],
+      "name": "bla",
+      "visibility": "PUBLIC",
+      "startDate": "2024-10-10",
+      "endDate": "2024-10-12",
+      "total": 0.00,
+      "tripBoardFlags": 0,
+      "draftBoards": 0,
+      "pendingBoards": 0,
+      "processingBoards": 0,
+      "confirmedBoards": 0,
+      "uiFlags": 23,
+      "agencyFlags": 31
+    },
+    "boards": [
+      {
+        "id": 2623175,
+        "nms": 1709558073739,
+        "tripId": 2623174,
+        "orgId": 635604,
+        "bookerId": 2602533,
+        "agencyCode": "P0",
+        "status": "DRAFT",
+        "statusChangedOn": "2024-03-04T13:14:33.739431",
+        "exceptionFlags": 0,
+        "processingFlags": 0,
+        "tripBoardFlags": 0,
+        "waypointFlags": 0,
+        "uiFlags": 3,
+        "agencyFlags": 31
+      }
+    ],
+    "org": {
+      "id": 635604,
+      "nms": 1703196599864,
+      "agencyCode": "P0",
+      "name": "Snowfall Demo Site",
+      "flags": 0,
+      "billingAddressLocationId": 635603,
+      "phoneNumber": "12025534929",
+      "active": true,
+      "type": "CORPORATE",
+      "visibility": "PRIVATE",
+      "branding": {
+        "heroUrl": "https://cdn.one.junction.dev/o/company/7d491cb7971f4a60abbe749aa6c3b589.png",
+        "logoUrl": "https://cdn.one.junction.dev/o/company/f9275217f4ae4e9ea99c6c9e28291d84"
+      }
+    },
+    "users": {
+      "2602533": {
+        "id": 2602533,
+        "nms": 1709028906070,
+        "firstName": "Paul",
+        "middleName": "Razvan",
+        "lastName": "Nechifor",
+        "suffix": "SR",
+        "gender": "male",
+        "flags": 6,
+        "active": true,
+        "fullName": "Paul Razvan Nechifor SR",
+        "shortName": "Paul Nechifor"
+      }
+    },
+    "fields": [
+      {
+        "id": 872543,
+        "nms": 1695412660388,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD1 ",
+        "name": "Department",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 7
+      },
+      {
+        "id": 904012,
+        "nms": 1696027481429,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD2 ",
+        "remarkCode": "RH/",
+        "name": "Out of Policy Reason",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 15,
+        "reservationType": "Hotel"
+      },
+      {
+        "id": 666229,
+        "nms": 1696027409013,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD1 ",
+        "remarkCode": "RC/",
+        "name": "Out of Policy Reason",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 15,
+        "reservationType": "Flight"
+      },
+      {
+        "id": 904016,
+        "nms": 1696027528855,
+        "orgId": 635604,
+        "agencyCode": "P0",
+        "code": "5.S*UD3 ",
+        "remarkCode": "RZ/",
+        "name": "Out of Policy Reason",
+        "type": "RESERVATION",
+        "valueType": "LOOKUP",
+        "active": true,
+        "flags": 15,
+        "reservationType": "Car"
+      }
+    ],
+    "fieldValues": [
+      {
+        "id": 904010,
+        "nms": 1696027409002,
+        "fieldId": 666229,
+        "code": "AP",
+        "name": "Declined Lower Fare Due to Airport Preference",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904011,
+        "nms": 1696027409013,
+        "fieldId": 666229,
+        "code": "BR",
+        "name": "Declined Lower Fare Due to Business Requirements",
+        "active": true,
+        "remarkRequired": true
+      },
+      {
+        "id": 666230,
+        "nms": 1696027409013,
+        "fieldId": 666229,
+        "code": "CT",
+        "name": "Declined Lower Fare Due to Connection Time",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872544,
+        "nms": 1695412649523,
+        "fieldId": 872543,
+        "code": "Com",
+        "name": "Commercial",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872546,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Del",
+        "name": "Delivery",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872547,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Eng",
+        "name": "Engineering",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872548,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Ops",
+        "name": "Operations",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 872545,
+        "nms": 1695412649524,
+        "fieldId": 872543,
+        "code": "Prd",
+        "name": "Product",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904014,
+        "nms": 1696027481530,
+        "fieldId": 904012,
+        "code": "BN",
+        "name": "Declined Lower Priced Hotel Due to Business Need",
+        "active": true,
+        "remarkRequired": true
+      },
+      {
+        "id": 904015,
+        "nms": 1696027481534,
+        "fieldId": 904012,
+        "code": "CP",
+        "name": "Declined Lower Priced Hotel Due to Chain Preference",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904013,
+        "nms": 1696027481530,
+        "fieldId": 904012,
+        "code": "LP",
+        "name": "Declined Lower Priced Hotel Due to Location",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904019,
+        "nms": 1696027528958,
+        "fieldId": 904016,
+        "code": "BN",
+        "name": "Declined Lower Priced Car Due to Business Need",
+        "active": true,
+        "remarkRequired": true
+      },
+      {
+        "id": 904018,
+        "nms": 1696027528957,
+        "fieldId": 904016,
+        "code": "LP",
+        "name": "Declined Lower Priced Car Due to Location Preference",
+        "active": true,
+        "remarkRequired": false
+      },
+      {
+        "id": 904017,
+        "nms": 1696027528956,
+        "fieldId": 904016,
+        "code": "VP",
+        "name": "Declined Lower Priced Car Due to Vendor Preference",
+        "active": true,
+        "remarkRequired": false
+      }
+    ],
+    "targetResourceId": 2623175
+  }
+}

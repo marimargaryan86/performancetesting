@@ -1,0 +1,264 @@
+{
+  "status": "OK",
+  "code": 200,
+  "data": {
+    "trips": [
+      {
+        "id": 2602622,
+        "nms": 1709029139491,
+        "agencyCode": "P0",
+        "orgId": 396927,
+        "arrangerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "userIds": [
+          2602533
+        ],
+        "name": "Trip to PAR",
+        "visibility": "PUBLIC",
+        "startDate": "2024-02-27",
+        "endDate": "2024-02-27",
+        "total": 47.99,
+        "summary": [
+          {
+            "id": 2602625,
+            "type": "Flight",
+            "date": "2024-02-27T16:10:00",
+            "status": "PENDING",
+            "userIds": [
+              2602533
+            ]
+          }
+        ],
+        "tripBoardFlags": 0,
+        "draftBoards": 1,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 22,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2603521,
+        "nms": 1709296178118,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "userIds": [
+          2602533
+        ],
+        "name": "test1",
+        "visibility": "PUBLIC",
+        "startDate": "2024-03-01",
+        "endDate": "2024-03-02",
+        "total": 50.5,
+        "summary": [
+          {
+            "id": 2604150,
+            "type": "Hotel",
+            "date": "2024-03-01T00:00:00",
+            "status": "PENDING",
+            "userIds": [
+              2602533
+            ]
+          }
+        ],
+        "tripBoardFlags": 0,
+        "draftBoards": 1,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2603522,
+        "nms": 1709211702269,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "name": "bla",
+        "visibility": "PUBLIC",
+        "startDate": "2024-10-10",
+        "endDate": "2024-10-12",
+        "total": 0.0,
+        "tripBoardFlags": 0,
+        "draftBoards": 0,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2603523,
+        "nms": 1709211735180,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "name": "bla",
+        "visibility": "PUBLIC",
+        "startDate": "2024-10-10",
+        "endDate": "2024-10-12",
+        "total": 0.0,
+        "tripBoardFlags": 0,
+        "draftBoards": 0,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2604140,
+        "nms": 1709270682271,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "name": "bla",
+        "visibility": "PUBLIC",
+        "startDate": "2024-10-10",
+        "endDate": "2024-10-12",
+        "total": 0.0,
+        "tripBoardFlags": 0,
+        "draftBoards": 0,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2604141,
+        "nms": 1709270772329,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "name": "bla",
+        "visibility": "PUBLIC",
+        "startDate": "2024-10-10",
+        "endDate": "2024-10-12",
+        "total": 0.0,
+        "tripBoardFlags": 0,
+        "draftBoards": 0,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2604146,
+        "nms": 1709286358608,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "name": "bla",
+        "visibility": "PUBLIC",
+        "startDate": "2024-10-10",
+        "endDate": "2024-10-12",
+        "total": 0.0,
+        "tripBoardFlags": 0,
+        "draftBoards": 0,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      },
+      {
+        "id": 2604147,
+        "nms": 1709286463661,
+        "agencyCode": "P0",
+        "orgId": 635604,
+        "arrangerIds": [
+          2602533
+        ],
+        "bookerIds": [
+          2602533
+        ],
+        "grantedIds": [
+          2602533
+        ],
+        "name": "bla",
+        "visibility": "PUBLIC",
+        "startDate": "2024-10-10",
+        "endDate": "2024-10-12",
+        "total": 0.0,
+        "tripBoardFlags": 0,
+        "draftBoards": 0,
+        "pendingBoards": 0,
+        "processingBoards": 0,
+        "confirmedBoards": 0,
+        "uiFlags": 23,
+        "agencyFlags": 0
+      }
+    ],
+    "users": {
+      "2602533": {
+        "id": 2602533,
+        "nms": 1709028906070,
+        "firstName": "Paul",
+        "middleName": "Razvan",
+        "lastName": "Nechifor",
+        "suffix": "SR",
+        "gender": "male",
+        "flags": 6,
+        "active": true,
+        "fullName": "Paul Razvan Nechifor SR",
+        "shortName": "Paul Nechifor"
+      }
+    }
+  }
+}
