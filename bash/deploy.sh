@@ -20,6 +20,18 @@ for TEMPLATE_FILE in "$@"; do
 		}
 	}
 
+	if hcl2json "${TEMPLATE_FILE}" | jq -e 'try((.job[][].group[][].service[] | select(.port == "grpc")) != null)' >/dev/null; then
+		echo -n "[${SERVICE_NAME}] registering as grpc service in consul: "
+		jq -nc --arg Name "${SERVICE_NAME}" \
+			'{"Kind": "service-defaults", $Name, "LocalRequestTimeoutMs": 50000, "Protocol": "grpc"}' |
+			curl -sL -X PUT "${NOMAD_ADDR%:*}:8500/v1/config" --data @-
+
+		echo -n "[${SERVICE_NAME}] setting 50s timeout in consul: "
+		jq -nc --arg Name "${SERVICE_NAME}" \
+			'{"Kind":"service-router", $Name, "Routes": [{"Match": {"HTTP":{}}, "Destination": {"RequestTimeout": "50s"}}]}' |
+			curl -sL -X PUT "${NOMAD_ADDR%:*}:8500/v1/config" --data @-
+	fi
+
 	CHECK_INDEX=$(awk '/Job Modify Index:/ {print $NF}' <<<"${PLAN_OUTPUT}")
 	echo "Check Index: ${CHECK_INDEX}"
 
