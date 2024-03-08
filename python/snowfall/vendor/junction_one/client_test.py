@@ -211,6 +211,36 @@ async def test_search_flights(
     assert response == auto_models.SearchFlightsResponse(**fixture["data"])
 
 
+async def test_update_reservation_field(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-reservation-field-update.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/reservation/field/update",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    reservation_id = 2623405
+    field_id = 872543
+    field_value_id = 872547
+    remark = ""
+
+    response = await junction_one_client.update_reservation_field(
+        models.UpdateReservationFieldRequest(
+            reservation_id=reservation_id,
+            field_id=field_id,
+            field_value_id=field_value_id,
+            remark=remark,
+        ),
+    )
+
+    assert response == auto_models.ReservationFieldResponse(**fixture["data"])
+
+
 async def test_add_fop_to_tripboard(
     junction_one_client: JunctionOneClient,
     httpx_mock: pytest_httpx.HTTPXMock,
