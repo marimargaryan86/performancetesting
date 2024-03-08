@@ -66,6 +66,13 @@
     box-sizing: border-box;
   } */
 
+  main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
   footer {
     display: flex;
     flex-direction: column;

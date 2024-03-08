@@ -4,8 +4,8 @@
   import type { FeaturedPackage, Scroll } from "$lib/models/common";
   import FaMapMarkerAlt from "svelte-icons/fa/FaMapMarkerAlt.svelte";
 
-  export let scroll: Scroll;
   export let featuredPackage: FeaturedPackage;
+  export let scroll: Scroll;
 </script>
 
 <div class="featured-package">
@@ -60,6 +60,12 @@
     font-size: 16px;
   }
 
+  .package-gallery {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  }
+
   .package-details {
     display: flex;
   }
@@ -76,9 +82,20 @@
     font-size: 28px;
   }
 
-  img {
-    width: 325px;
-    height: 200px;
+  .image-left img {
+    width: 678px;
+    height: 550px;
+  }
+
+  .images-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .images-right img {
+    width: 333px;
+    height: 267px;
   }
 
   .icon {
@@ -97,13 +114,21 @@
       gap: 12px;
     }
 
-    .package-title {
-      margin-bottom: 16px;
+    .package-gallery {
+      flex-direction: column;
+    }
+
+    .package-gallery img {
+      width: 325px;
+      height: 200px;
     }
 
     .images-right {
-      display: flex;
-      gap: 5px;
+      flex-direction: row;
+    }
+
+    .package-title {
+      margin-bottom: 16px;
     }
 
     .images-right img {

@@ -99,6 +99,30 @@
   </div>
 {/if}
 
+{#if mobileExpand}
+  <div class="mobile-menu">
+    <nav>
+      <ul>
+        <li>
+          <a href="/coming-soon">Destinations</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Holiday types</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Offers</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Hotels</a>
+        </li>
+        <li>
+          <a href="/coming-soon">Car Rental</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+{/if}
+
 <style>
   header {
     /* position: fixed; */
@@ -238,6 +262,43 @@
   }
 
   @media only screen and (width <= 720px) {
+    /* Styles for screens smaller than iPhone X */
+    nav,
+    .phone-box,
+    .heart-icon {
+      display: none;
+    }
+
+    .expand-menu {
+      display: flex;
+    }
+
+    .mobile-menu {
+      position: absolute;
+      right: 0;
+      display: block;
+      width: 300px;
+      height: 100vh;
+      background: white;
+    }
+
+    header {
+      left: 0;
+      width: 100%;
+    }
+
+    .corner {
+      padding-left: 50px;
+    }
+
+    .side-buttons {
+      padding-right: 20px;
+    }
+
+    /* Add your styles here */
+  }
+
+  @media only screen and (width <= 430px) {
     /* Styles for screens smaller than iPhone X */
     nav,
     .phone-box,

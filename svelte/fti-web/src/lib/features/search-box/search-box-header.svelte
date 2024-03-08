@@ -20,7 +20,8 @@
 <style>
   .search-header {
     display: flex;
-    margin: 0 20px;
+    width: 461px;
+    padding: 0 76px;
   }
 
   .search-header > label {
@@ -47,5 +48,13 @@
 
   .search-header > label:last-of-type {
     border-top-right-radius: 8px;
+  }
+
+  @media only screen and (width <= 720px) {
+    .search-header {
+      width: auto;
+      margin: 0 20px;
+      padding: 0;
+    }
   }
 </style>

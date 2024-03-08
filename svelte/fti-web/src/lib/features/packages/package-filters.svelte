@@ -21,24 +21,35 @@
 <style>
   .package-filter-container {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    overflow: scroll hidden;
+    overflow-x: scroll;
   }
 
   .package-filters {
-    position: relative;
-    left: 410px;
     display: flex;
+    flex-basis: 85%;
     gap: 16px;
-    padding: 8px 0;
+    min-width: 85%; /* Chrome Fix */
+    padding: 30px 0;
+  }
+
+  .scroll-buttons {
+    flex-basis: 15%;
+    min-width: 15% /* Chrome Fix */;
+  }
+
+  /* Weird needed  */
+  :global(.package-filter-container .scroll-buttons > div.filter-buttons) {
+    display: flex;
+    gap: 20px;
+    justify-content: end;
   }
 
   .category-button {
     width: max-content;
     max-width: 175px;
-    padding: 12px 24px;
+    height: 38px;
+    padding: 0 34px;
     color: var(--text-dark-text, #1c1c1c);
     font-weight: 500;
     font-size: 14px;
@@ -56,6 +67,8 @@
 
   @media only screen and (width <= 720px) {
     .package-filter-container {
+      flex-direction: row;
+      align-items: center;
       overflow: auto;
     }
 

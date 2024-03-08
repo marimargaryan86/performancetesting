@@ -15,6 +15,10 @@
 </div>
 
 <style>
+  .weather-forecast {
+    padding: 0 76px 100px;
+  }
+
   .weather-forecast-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

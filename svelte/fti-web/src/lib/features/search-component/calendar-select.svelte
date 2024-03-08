@@ -1,7 +1,5 @@
 <script lang="ts">
   import type { SelectedDate } from "$lib/models/common";
-
-  // import { ChevronRight, ChevronLeft, Calendar } from "$icons/index.js";
   import DatePicker from "$lib/components/date-picker.svelte";
   import DateRangePicker from "$lib/components/date-range-picker.svelte";
 

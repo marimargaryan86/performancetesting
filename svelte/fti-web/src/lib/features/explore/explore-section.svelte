@@ -17,7 +17,7 @@
   </div>
   <div class="holidays">
     <div class="holiday holiday-cruise">
-      <p>Ocean Cruises</p>
+      <p>Packages under €250pp</p>
       <button>Explore</button>
     </div>
     <div class="holiday holiday-inclusive">
@@ -33,11 +33,11 @@
     gap: 16px;
     align-items: center;
     height: 385px;
-    padding: 32px 120px;
+    padding: 32px 76px;
   }
 
   .tv-number {
-    flex-basis: 35%;
+    flex-basis: 30%;
     height: 344px;
     padding: 20px 32px;
     background: #00a8cd;
@@ -103,11 +103,12 @@
 
   .top-deals {
     display: flex;
-    flex-basis: 35%;
+    flex-basis: 45%;
     flex-direction: column;
     height: 320px;
     padding: 32px;
     background: url("/images/top-deals.jpg") no-repeat center center;
+    background-size: cover;
     border-radius: 4px;
   }
 
@@ -153,7 +154,7 @@
 
   .holidays {
     display: flex;
-    flex-basis: 25%;
+    flex-basis: 20%;
     flex-direction: column;
     gap: 16px;
     height: 100%;
@@ -169,8 +170,8 @@
 
   .holiday p {
     color: #ffffff;
-    font-weight: 700;
-    font-size: 22px;
+    font-weight: 600;
+    font-size: 20px;
     font-style: normal;
     line-height: normal;
   }

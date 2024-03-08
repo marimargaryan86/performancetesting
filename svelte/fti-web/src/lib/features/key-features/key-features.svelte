@@ -29,6 +29,7 @@
     flex-direction: column;
     gap: 20px;
     align-items: center;
+    padding: 60px 76px;
     color: white;
     background: #00a8cd;
   }
@@ -52,12 +53,14 @@
     gap: 20px;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
+
+    /* padding: 0 20px; */
   }
 
   .reason-card {
     display: flex;
     gap: 16px;
+    padding: 32px 14px;
     color: var(--text-dark-text);
     background: #ffffff;
     border-radius: 8px;
@@ -67,25 +70,26 @@
     margin-bottom: 8px;
     color: var(--text-dark-text);
     font-weight: 600;
-    font-size: 20px;
+    font-size: 18px;
     text-transform: capitalize;
   }
 
   .reason-desc {
     color: #818181;
     font-weight: 400;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 24px;
   }
 
   @media only screen and (width <= 720px) {
     .key-features-container {
-      padding: 50px 0;
+      padding: 48px 0;
     }
 
     .reason-cards {
       flex-direction: column;
       gap: 16px;
+      padding: 0 20px;
     }
 
     .reason-card {

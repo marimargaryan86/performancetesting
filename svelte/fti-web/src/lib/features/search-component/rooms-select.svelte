@@ -30,20 +30,6 @@
   }
 
   $: roomCount, adjustRooms();
-
-  // $: {
-  //   if (roomCount > rooms.length) {
-  //     rooms = [
-  //       ...rooms,
-  //       {
-  //         adults: 1,
-  //         children: 1,
-  //       },
-  //     ];
-  //   } else if (roomCount < rooms.length) {
-  //     rooms = rooms.slice(0, roomCount);
-  //   }
-  // }
 </script>
 
 <div class="dropdown">

@@ -29,7 +29,6 @@ const setDropdown = (value: string): string => {
 };
 
 function getMonthNames(locale: string): string[] {
-  // const months: string[] = [];
   return Array.from({ length: 12 }).reduce((acc: string[], _, index) => {
     // Year 0 is used as a workaround for getting month names
     const date = new Date(0, index);

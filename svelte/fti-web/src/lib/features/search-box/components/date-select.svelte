@@ -18,7 +18,7 @@
       <div class="icon">
         <FaRegCalendarAlt />
       </div>
-      <p class="label">Travel Dates</p>
+      <p>Travel Dates</p>
     </div>
     <p class="desc">
       {!$searchOptions.dates || $searchOptions.dates.start === undefined
@@ -49,8 +49,19 @@
     align-items: center;
   }
 
+  .label {
+    margin: 0;
+    padding: 0;
+  }
+
   .label p {
     margin: 0;
+    color: var(--text-dark-text);
+  }
+
+  p.desc {
+    padding: 6px 0;
+    color: var(--text-grey-text, #818181);
   }
 
   .icon {
@@ -66,6 +77,7 @@
 
   @media only screen and (width <= 720px) {
     .search-section {
+      margin: 0;
       padding: 10px 16px;
       background: #fafafa;
       border: 1px solid #eae9e9;

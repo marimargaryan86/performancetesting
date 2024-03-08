@@ -34,12 +34,6 @@
 </div>
 
 <style>
-  .label {
-    color: #1c1c1c;
-    font-weight: 500;
-    font-size: 16px;
-  }
-
   .search-section {
     position: relative;
     display: flex;
@@ -54,12 +48,6 @@
   .search-section:last-child {
     flex-basis: 10%;
     border-right: none;
-  }
-
-  .search-section > .label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
   }
 
   .people-section {
@@ -78,18 +66,25 @@
     align-items: center;
   }
 
+  .label {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+  }
+
   .label p {
     margin: 0;
+    color: var(--text-dark-text);
   }
 
   .desc {
-    color: #1c1c1c;
+    margin: 0;
+    padding: 6px 0;
     color: var(--text-grey-text, #818181);
     font-weight: 400;
     font-size: 16px;
-    font-style: normal;
     line-height: 25px;
-    line-height: normal;
     opacity: 0.5;
   }
 
@@ -104,6 +99,7 @@
 
   @media only screen and (width <= 720px) {
     .search-section {
+      margin: 0;
       padding: 10px 16px;
       background: #fafafa;
       border: 1px solid #eae9e9;

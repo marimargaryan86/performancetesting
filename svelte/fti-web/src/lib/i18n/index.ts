@@ -48,7 +48,7 @@ export function setTranslator(
     derived([localeStore, localeDataStore], ([nextLocale, nextLang]) => {
       i18next.addResourceBundle(nextLocale, "translation", nextLang);
       i18next.changeLanguage(nextLocale);
-
+      // @ts-expect-error Mattias is busy and he's the only one who knows whats going on here
       return i18next.t;
     }),
   );

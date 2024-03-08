@@ -40,7 +40,7 @@
     font-size: 16px;
     font-style: normal;
     line-height: normal;
-    background-color: #fafafa;
+    background-color: #ffffff;
     border: none;
   }
 
@@ -63,6 +63,7 @@
 
   .label p {
     margin: 0;
+    color: var(--text-dark-text);
   }
 
   .icon {
@@ -73,6 +74,7 @@
 
   @media only screen and (width <= 720px) {
     .search-section {
+      margin: 0;
       padding: 10px 16px;
       background: #fafafa;
       border: 1px solid #eae9e9;

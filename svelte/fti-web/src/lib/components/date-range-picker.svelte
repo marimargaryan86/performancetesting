@@ -1,5 +1,4 @@
 <script lang="ts">
-  // import { ChevronRight, ChevronLeft, Calendar } from "$icons/index.js";
   import { melt, createDateRangePicker } from "@melt-ui/svelte";
   import FaChevronRight from "svelte-icons/fa/FaChevronRight.svelte";
   import FaChevronLeft from "svelte-icons/fa/FaChevronLeft.svelte";

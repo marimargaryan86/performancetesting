@@ -19,11 +19,14 @@
       <PackageCard holiday={result} />
     {/each}
   </ScrollComponent>
+  <button class="show-more-button">See all packages</button>
 </div>
 
 <style>
   .package-section {
-    padding: 0 16px 32px;
+    display: flex;
+    flex-direction: column;
+    padding: 0 76px;
   }
 
   .package-section h2 {
@@ -35,7 +38,27 @@
     line-height: 44px;
   }
 
+  .show-more-button {
+    margin: 40px auto 90px;
+    padding: 19px 32px;
+    color: #000000;
+    font-weight: 600;
+    font-size: 16px;
+    text-align: center;
+    background: none;
+    border: 1px solid #000000;
+    border-radius: 8px;
+  }
+
+  .package-section :global(.scroll-container) {
+    gap: 16px;
+  }
+
   @media only screen and (width <= 720px) {
+    .package-section {
+      padding: 0 16px 32px;
+    }
+
     :global(.scroll-container) {
       margin-top: 24px;
     }

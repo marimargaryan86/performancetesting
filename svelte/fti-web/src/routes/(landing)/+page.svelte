@@ -6,6 +6,7 @@
   import KeyFeatures from "$lib/features/key-features/key-features.svelte";
   import WeatherForecast from "$lib/features/weather-forecast/weather-forecast.svelte";
   import SearchBox from "$lib/features/search-box/search-box.svelte";
+  import BudgetSelector from "$lib/features/budget-finder/budget-selector.svelte";
 
   export let data: LandingPageModel;
 
@@ -21,7 +22,20 @@
   <SearchBox />
   <ExploreSection />
   <Packages {categories} {packages} />
+  <BudgetSelector />
   <Featured {featuredPackages} />
   <KeyFeatures />
   <WeatherForecast {weatherHolidays} />
 </div>
+
+<style>
+  .page {
+    background-color: white;
+  }
+
+  @media only screen and (width <= 720px) {
+    .page {
+      padding: 0;
+    }
+  }
+</style>

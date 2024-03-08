@@ -1,5 +1,6 @@
 export default {
-  words: {
+  title: "Junction Hub",
+  sentences: {
     hello: "Hello",
   },
 };

@@ -35,7 +35,7 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 60px;
+    width: 40px;
     color: #ea7121;
     background: none;
     border: none;
@@ -46,8 +46,8 @@
   }
 
   .package-image {
-    width: calc(33vw - 90px);
-    height: 340px;
+    width: 324px;
+    height: 310px;
     object-fit: cover;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -60,12 +60,12 @@
 
   .price-box {
     position: absolute;
-    top: -36px;
+    top: -28px;
     right: 20px;
     display: flex;
     align-items: center;
     height: 48px;
-    padding: 8px 16px;
+    padding: 0 12px;
     color: white;
     background: #ea7121;
     border-radius: 4px;

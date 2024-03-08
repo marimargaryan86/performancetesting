@@ -22,6 +22,7 @@
     .search-container {
       flex-direction: column;
       gap: 20px;
+      width: 100%;
     }
 
     :global(.dropdown) {

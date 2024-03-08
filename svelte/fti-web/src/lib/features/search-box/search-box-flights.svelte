@@ -7,22 +7,31 @@
   let journeyType = "return";
 </script>
 
-<div class="return-journey">
-  <input type="radio" id="one-way" bind:group={journeyType} value="one-way" />
-  <label for="one-way">One-way</label>
-  <input type="radio" id="return" bind:group={journeyType} value="return" />
-  <label for="return">Return</label>
-</div>
-<div class="search-container">
-  <OriginSelect />
-  {#if journeyType === "return"}
-    <DestinationSelect />
-  {/if}
-  <DateSelect returnTrip={journeyType === "return"} />
-  <PeopleSelect />
+<div class="flights-container">
+  <div class="return-journey">
+    <input type="radio" id="one-way" bind:group={journeyType} value="one-way" />
+    <label for="one-way">One-way</label>
+    <input type="radio" id="return" bind:group={journeyType} value="return" />
+    <label for="return">Return</label>
+  </div>
+  <div class="search-container">
+    <OriginSelect />
+    {#if journeyType === "return"}
+      <DestinationSelect />
+    {/if}
+    <DateSelect returnTrip={journeyType === "return"} />
+    <PeopleSelect />
+  </div>
 </div>
 
 <style>
+  .flights-container {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
   .search-container {
     position: relative;
     display: flex;
@@ -38,6 +47,7 @@
     .search-container {
       flex-direction: column;
       gap: 20px;
+      width: 100%;
     }
 
     :global(.dropdown) {

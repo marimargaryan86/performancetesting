@@ -1,8 +1,6 @@
 import type { Locale, LocaleData } from "$lib/i18n";
 import en from "./en";
-import de from "./de";
 
 export default {
-  "en-GB": en,
-  de,
+  en: en as LocaleData,
 } satisfies Record<Locale, LocaleData>;

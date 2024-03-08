@@ -19,6 +19,9 @@
 
   .star {
     width: 22px;
-    color: #fbd148;
+  }
+
+  :global(.star > svg) {
+    fill: #fbd148;
   }
 </style>

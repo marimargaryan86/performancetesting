@@ -1,7 +1,7 @@
 <script lang="ts">
   import { weatherCategories } from "$lib/data/constants";
   import { getMonthNames } from "$lib/helpers/common";
-  // export let weatherHolidays: WeatherHoliday[];
+
   export let activeCategory: string = "Any Weather";
 
   const months = getMonthNames("en-US");
@@ -67,6 +67,7 @@
   }
 
   p {
+    width: 100%;
     margin: 0;
     font-weight: 400;
     font-size: 16px;
@@ -77,10 +78,13 @@
   .forecast-options {
     display: flex;
     gap: 20px;
+    align-items: center;
   }
 
   .options {
     display: flex;
+    gap: 16px;
+    justify-content: flex-end;
     width: 100%;
   }
 
@@ -91,7 +95,6 @@
     color: var(--text-dark-text);
     font-size: 14px;
     line-height: 16px;
-    background: #f6f5f5;
     border: 1px solid #a7a7a7;
     border-radius: 4px;
     appearance: initial;
