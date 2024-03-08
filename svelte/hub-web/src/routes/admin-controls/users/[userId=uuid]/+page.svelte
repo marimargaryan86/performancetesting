@@ -1,16 +1,13 @@
 <script lang="ts">
+  import UserComponent from "$lib/components/pages/admin-controls/user/user.svelte";
+  import type { User } from "~/integration/junction-hub-api/schemas";
+
+  const MOCK_USER: User = {
+    id: "mock-id",
+    email: "user@example.com",
+    role: "reseller-user",
+    resellerId: "mock-reseller",
+  };
 </script>
 
-<div class="temporary">
-  <h2>🚧 Under Construction 🚧</h2>
-</div>
-
-<style>
-  .temporary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 80vw;
-    height: 100vh;
-  }
-</style>
+<UserComponent mode={"update"} user={MOCK_USER} />
