@@ -54,10 +54,26 @@ func (mr *mergeRequest) expectedAssignees() ([]int, error) {
 		return []int{}, err
 	}
 
-	return determineAssignee(mr.object.Author.ID, mr.status(), reviewers), nil
+	approvalState, err := mr.approvalState()
+
+	if err != nil {
+		return []int{}, err
+	}
+
+	approvers := make([]int, 0)
+
+	for _, rule := range approvalState.Rules {
+		for _, u := range rule.ApprovedBy {
+			approvers = append(approvers, u.ID)
+		}
+	}
+
+	approvers = sliceutil.Unique(approvers)
+
+	return determineAssignee(mr.object.Author.ID, mr.status(), reviewers, approvers), nil
 }
 
-func determineAssignee(author int, status string, reviewers []*gitlab.MergeRequestReviewer) []int {
+func determineAssignee(author int, status string, reviewers []*gitlab.MergeRequestReviewer, approvers []int) []int {
 	if status == statusAbandoned || status == statusAccepted {
 		return []int{}
 	}
@@ -73,7 +89,7 @@ func determineAssignee(author int, status string, reviewers []*gitlab.MergeReque
 	}
 
 	for _, reviewer := range reviewers {
-		if reviewer.State == "unreviewed" {
+		if reviewer.State == "unreviewed" && !sliceutil.In(approvers, reviewer.User.ID) {
 			assignees = append(assignees, reviewer.User.ID)
 		}
 	}

@@ -10,6 +10,7 @@ type determineAssigneeTestCase struct {
 	author    int
 	status    string
 	reviewers []*gitlab.MergeRequestReviewer
+	approvers []int
 	want      []int
 }
 
@@ -28,7 +29,8 @@ func TestDetermineAssignee(t *testing.T) {
 					State: "reviewed",
 				},
 			},
-			want: []int{},
+			approvers: []int{},
+			want:      []int{},
 		},
 		{
 			author: 1,
@@ -43,7 +45,8 @@ func TestDetermineAssignee(t *testing.T) {
 					State: "reviewed",
 				},
 			},
-			want: []int{},
+			approvers: []int{},
+			want:      []int{},
 		},
 		{
 			author: 1,
@@ -58,7 +61,8 @@ func TestDetermineAssignee(t *testing.T) {
 					State: "reviewed",
 				},
 			},
-			want: []int{1},
+			approvers: []int{},
+			want:      []int{1},
 		},
 		{
 			author: 1,
@@ -73,7 +77,8 @@ func TestDetermineAssignee(t *testing.T) {
 					State: "reviewed",
 				},
 			},
-			want: []int{1, 2},
+			approvers: []int{},
+			want:      []int{1, 2},
 		},
 		{
 			author: 1,
@@ -88,7 +93,8 @@ func TestDetermineAssignee(t *testing.T) {
 					State: "reviewed",
 				},
 			},
-			want: []int{2},
+			approvers: []int{},
+			want:      []int{2},
 		},
 		{
 			author: 1,
@@ -103,13 +109,30 @@ func TestDetermineAssignee(t *testing.T) {
 					State: "reviewed",
 				},
 			},
-			want: []int{1, 2},
+			approvers: []int{},
+			want:      []int{1, 2},
+		},
+		{
+			author: 1,
+			status: statusReviewNeeded,
+			reviewers: []*gitlab.MergeRequestReviewer{
+				{
+					User:  &gitlab.BasicUser{ID: 2},
+					State: "unreviewed",
+				},
+				{
+					User:  &gitlab.BasicUser{ID: 3},
+					State: "reviewed",
+				},
+			},
+			approvers: []int{2},
+			want:      []int{},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.status, func(t *testing.T) {
-			if got := determineAssignee(tc.author, tc.status, tc.reviewers); !sliceutil.Equal(got, tc.want) {
+			if got := determineAssignee(tc.author, tc.status, tc.reviewers, tc.approvers); !sliceutil.Equal(got, tc.want) {
 				t.Errorf("got %v; want %v", got, tc.want)
 			}
 		})
