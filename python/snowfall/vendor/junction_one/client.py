@@ -66,9 +66,6 @@ class JunctionOneClient(object):
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        if not response.data:
-            raise errors.EmptyDataError()
-
         ret_model = auto_models.GetTripBoardsResponse(**response.data)
 
         if not ret_model.trip:
@@ -88,9 +85,6 @@ class JunctionOneClient(object):
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        if not response.data:
-            raise errors.EmptyDataError()
-
         ret_model = auto_models.ListTripsResponse(**response.data)
 
         if not ret_model.trips:
@@ -102,14 +96,13 @@ class JunctionOneClient(object):
         self,
         query: models.TripDeleteRequest,
         rate_limit_timeout: float | None = None,
-    ) -> bool:
+    ) -> None:
         await self._make_request(
             "GET",
             "/v1/trip/delete",
             query,
             rate_limit_timeout=rate_limit_timeout,
         )
-        return True
 
     async def create_tripboard(
         self,
@@ -122,9 +115,6 @@ class JunctionOneClient(object):
             query,
             rate_limit_timeout=rate_limit_timeout,
         )
-
-        if not response.data:
-            raise errors.EmptyDataError()
 
         return auto_models.GetTripBoardsResponse(**response.data)
 
@@ -139,9 +129,6 @@ class JunctionOneClient(object):
             models.GetTripRequest(trip_id=trip_id),
             rate_limit_timeout=rate_limit_timeout,
         )
-
-        if not response.data:
-            raise errors.EmptyDataError()
 
         return auto_models.GetTripBoardsResponse(**response.data)
 
@@ -158,9 +145,6 @@ class JunctionOneClient(object):
             encode_json=True,
         )
 
-        if not response.data:
-            raise errors.EmptyDataError()
-
         return auto_models.SearchHotelsResponse(**response.data)
 
     async def get_hotel_details(
@@ -176,9 +160,6 @@ class JunctionOneClient(object):
             encode_json=True,
         )
 
-        if not response.data:
-            raise errors.EmptyDataError()
-
         return auto_models.HotelRoomsResponse(**response.data)
 
     async def add_refs(
@@ -191,11 +172,7 @@ class JunctionOneClient(object):
             "/v1/tripboard/addRefs",
             query,
             rate_limit_timeout=rate_limit_timeout,
-            encode_json=False,
         )
-
-        if not response.data:
-            raise errors.EmptyDataError()
 
         return auto_models.GetTripBoardsResponse(**response.data)
 
@@ -209,11 +186,7 @@ class JunctionOneClient(object):
             "/v1/tripboard/addFop",
             query,
             rate_limit_timeout=rate_limit_timeout,
-            encode_json=False,
         )
-
-        if not response.data:
-            raise errors.EmptyDataError()
 
         return auto_models.GetTripBoardsResponse(**response.data)
 
@@ -266,16 +239,8 @@ class JunctionOneClient(object):
             encode_json=True,
         )
 
-        if not response.data:
-            raise errors.EmptyDataError()
-
         return auto_models.SearchFlightsResponse(**response.data)
 
-    # this deals with weird J1 request encoding,
-    #
-    # sometimes it's an URLENCODED json within a "data" param
-    # sometimes it's standard URLENCODED form params, in a POST
-    # sometimes it's standard URLENCODED form params, in a GET
     def _encode_data(
         self,
         method: _Method,
@@ -283,6 +248,12 @@ class JunctionOneClient(object):
         *,
         encode_json: bool,
     ) -> dict[str, Any]:
+        """This deals with weird J1 request encoding.
+
+        * sometimes it's an URLENCODED json within a "data" param
+        * sometimes it's standard URLENCODED form params, in a POST
+        * sometimes it's standard URLENCODED form params, in a GET
+        """
         if method == "POST":
             if encode_json:
                 return {
@@ -325,14 +296,14 @@ class JunctionOneClient(object):
         except httpx.RequestError as request_exc:
             raise errors.RequestError.from_error(request_exc) from request_exc
 
-        response_model = models.Response(**response.json())
-
-        if response_model.status == auto_models.ResponseStatus.failed:
-            raise errors.ProtocolError.from_error(response_model, response)
-
         try:
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
             raise errors.HttpStatusError.from_error(exc) from exc
+
+        response_model = models.Response(**response.json())
+
+        if response_model.status == auto_models.ResponseStatus.failed:
+            raise errors.ProtocolError.from_error(response_model, response)
 
         return response_model
