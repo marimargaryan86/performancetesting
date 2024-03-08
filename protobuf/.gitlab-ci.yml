@@ -1,3 +1,4 @@
+---
 .protobuf:files: &files
   - "protobuf/**/*"
   - "buf.work.yaml"
@@ -5,7 +6,7 @@
 .protobuf:buf:
   interruptible: true
   image:
-    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bufbuild/buf:1.29.0"
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bufbuild/buf:1.30.0"
     pull_policy: always
     entrypoint: [""]
   variables:

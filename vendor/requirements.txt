@@ -131,3 +131,4 @@ uvicorn[standard]==0.27.1
 wemake-python-styleguide==0.18.0
 xmltodict==0.13.0
 xsdata==24.1  # freeze (breaking changes in >=24.2)
+yamllint==1.35.1

@@ -1,3 +1,4 @@
+---
 svelte:setup:
   stage: setup
   interruptible: true

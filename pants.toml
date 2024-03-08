@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.20.0rc0"
+pants_version = "2.21.0dev1"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
@@ -45,12 +45,12 @@ args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
 [buf]
 config = "protobuf/buf.yaml"
-version = "v1.29.0"
+version = "v1.30.0"
 known_versions = [
-  "v1.29.0|linux_arm64 |a725e0ab1c6b1e97b31f9d1d946f8b1d56586a96715fae4a7ecc88b6cf601cea|20334642",
-  "v1.29.0|linux_x86_64|1033f26361e6fc30ffcfab9d4e4274ffd4af88d9c97de63d2e1721c4a07c1380|21778549",
-  "v1.29.0|macos_arm64 |b97225a3b3f18bdabb36e83d9aba2e6419ead0c6ca0894d10a95517be5fd302f|22711144",
-  "v1.29.0|macos_x86_64|7ec6c2fd8f7e5e2ddba1e9ebff51eb9b0d6b67b85e105138dd064057c7b32db8|23004290",
+  "v1.30.0|linux_arm64 |70efa6f5379dbe44297f0efac8fdd5e4ea90389330555a23e317f968b51a307c|17688808",
+  "v1.30.0|linux_x86_64|219f48fb1bb190e0f761e35cac0821dfd9c1b0dfda80d7aaf522347755d829ab|19246162",
+  "v1.30.0|macos_arm64 |2787ed233e2639c833ad2485bcca3c1c9563547ee9430d3e449820458722b590|18649632",
+  "v1.30.0|macos_x86_64|3d6a27b472906c4c35e5a5e8fa04305c27abfcbbe94a8eab9c17ed688fb596fa|19749518",
 ]
 
 [cli.alias]
@@ -102,22 +102,22 @@ install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [pex-cli]
-version = "v2.1.161"
+version = "v2.2.2"
 known_versions = [
-  "v2.1.161|linux_arm64 |5bb08a677d309889b3357cd23a3a95945a4c3438cfb00ece5291dcfe89221fcc|3675619",
-  "v2.1.161|linux_x86_64|5bb08a677d309889b3357cd23a3a95945a4c3438cfb00ece5291dcfe89221fcc|3675619",
-  "v2.1.161|macos_arm64 |5bb08a677d309889b3357cd23a3a95945a4c3438cfb00ece5291dcfe89221fcc|3675619",
-  "v2.1.161|macos_x86_64|5bb08a677d309889b3357cd23a3a95945a4c3438cfb00ece5291dcfe89221fcc|3675619",
+  "v2.2.2|linux_arm64 |a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
+  "v2.2.2|linux_x86_64|a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
+  "v2.2.2|macos_arm64 |a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
+  "v2.2.2|macos_x86_64|a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
 ]
 
 [protoc]
-version = "25.2"
+version = "25.3"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-  "25.2|linux_arm64 |07683afc764e4efa3fa969d5f049fbc2bdfc6b4e7786a0b233413ac0d8753f6b|3071655",
-  "25.2|linux_x86_64|78ab9c3288919bdaa6cfcec6127a04813cf8a0ce406afa625e48e816abee2878|3105555",
-  "25.2|macos_arm64 |8822b090c396800c96ac652040917eb3fbc5e542538861aad7c63b8457934b20|2209071",
-  "25.2|macos_x86_64|5fe89993769616beff1ed77408d1335216379ce7010eee80284a01f9c87c8888|2235343",
+  "25.3|linux_arm64 |9eae1f20f70cccc912d1c318c3929b86aebf5afd4b0f32c196ef682c222ed5ae|3071653",
+  "25.3|linux_x86_64|f853e691868d0557425ea290bf7ba6384eef2fa9b04c323afab49a770ba9da80|3105560",
+  "25.3|macos_arm64 |d0fcd6d3b3ef6f22f1c47cc30a80c06727e1eccdddcaf0f4a3be47c070ffd3fe|2209081",
+  "25.3|macos_x86_64|247e003b8e115405172eacc50bd19825209d85940728e766f0848eee7c80e2a1|2235056",
 ]
 
 [pytest]
@@ -142,7 +142,7 @@ interpreter_constraints = ["CPython==3.11.*"]
 enable_resolves = true
 tailor_pex_binary_targets = false
 resolves = { python-default = "vendor/constraints.txt" }
-pip_version = "23.3.2"
+pip_version = "24.0"
 
 [python-infer]
 unowned_dependency_behavior = "error"
@@ -156,7 +156,6 @@ indexes.add = [
   "https://gitlab+deploy-token-124:kNkm3XvTkUiWo86sa5EW@git.snowfall.se/api/v4/projects/677/packages/pypi/simple",
 ]
 
-
 [regex-lint]
 config = "@vendor/regexes.json"
 
@@ -168,21 +167,21 @@ install_from_resolve = "python-default"
 install_from_resolve = "python-default"
 
 [shellcheck]
-version = "v0.9.0"
+version = "v0.10.0"
 known_versions = [
-  "v0.9.0|macos_arm64 |a75b912015aaa5b2a48698b63f3619783d90abda4d32a31362209315e6c1cdf6|14423429",
-  "v0.9.0|macos_x86_64|d1244da2aa5d0c2874f3a4a680c6ac79a488ff6dbf9928e12dc80ff3fdc294db|6543378",
-  "v0.9.0|linux_arm64 |b5633bd195cfe61a310bd8dcff2514855afefea908942a0fd4d01fa6451cb4e6|5083502",
-  "v0.9.0|linux_x86_64|0ab5711861e6fcafad5aa21587ee75bbd2b16505d56f41c9ba1191a83d314074|3600036",
+  "v0.10.0|linux_arm64 |7b598216ab4b60225ac0c2113d5cbcb84e56ffa3b5eb3c4ffdcb76ebaff77815|7174935",
+  "v0.10.0|linux_x86_64|736d51bfeb583fbdfcafc322aab9c8064a53ce30bf00f40468ccbd7492174adf|3673174",
+  "v0.10.0|macos_arm64 |dbe2e63ad23ddd83e41902d42f45006246d226f37be6e7e4abc5d6658fe27e39|11384552",
+  "v0.10.0|macos_x86_64|b71fffca2886c3cf873a3022a27860a2e54c45dcac08c1355bd9b9786e1c657e|6792933",
 ]
 
 [shfmt]
-version = "v3.7.0"
+version = "v3.8.0"
 known_versions = [
-  "v3.7.0|macos_arm64 |ad7ff6f666adba3d801eb17365a15539f07296718d39fb62cc2fde6b527178aa|3138130",
-  "v3.7.0|macos_x86_64|ae1d1ab961c113fb3dc2ff1150f33c3548983550d91da889b3171a5bcfaab14f|3101472",
-  "v3.7.0|linux_arm64 |111612560d15bd53d8e8f8f85731176ce12f3b418ec473d39a40ed6bbec772de|2883584",
-  "v3.7.0|linux_x86_64|0264c424278b18e22453fe523ec01a19805ce3b8ebf18eaf3aadc1edc23f42e3|2899968",
+  "v3.8.0|linux_arm64 |27e1f69b0d57c584bcbf5c882b4c4f78ffcf945d0efef45c1fbfc6692213c7c3|2687128",
+  "v3.8.0|linux_x86_64|27b3c6f9d9592fc5b4856c341d1ff2c88856709b9e76469313642a1d7b558fe0|2703512",
+  "v3.8.0|macos_arm64 |1481240d2a90d4f0b530688d76d4f9117d17a756b6027cfa42b96f0707317f83|2736466",
+  "v3.8.0|macos_x86_64|c0218b47a0301bb006f49fad85d2c08de23df303472834faf5639d04121320f8|2747696",
 ]
 
 [source]
@@ -207,4 +206,6 @@ ignore_paths = ["**/node_modules/**", "bash/tests/schedule_tests/**"]
 fmt = false
 
 [yamllint]
+args = "--strict"
 include = "+['.yamllint']"
+install_from_resolve = "python-default"

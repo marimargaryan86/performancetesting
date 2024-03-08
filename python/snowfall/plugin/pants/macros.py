@@ -1,4 +1,4 @@
-_BASE_IMAGE_SHA = "af8a06428ec2679884374891296754df12d5247ccaf95d2cc5d844d915a2218f"
+_BASE_IMAGE_SHA = "5e9c9e30b1a3ba73b10574792b719067a4bd30c25eea505e447ed49ff3bcde42"
 
 
 def _generate_repository(build_file_dir, exclude: frozenset[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001
@@ -203,7 +203,7 @@ def go_image(  # type: ignore[no-untyped-def]
             ),
             (
                 "RUN apk update && apk add --no-cache --update-cache"
-                " glibc~=2.38 tzdata~=2023d"
+                " glibc~=2.38 tzdata~=2024a"
             ),
             "COPY {namespace}/{name} /bin/{name}".format(
                 namespace=".".join(
@@ -297,7 +297,7 @@ def python_image(  # type: ignore[no-untyped-def]
             ),
             (
                 "RUN apk update && apk add --no-cache --update-cache"
-                " python-3.11~=3.11.7 tzdata~=2023d"
+                " python-3.11~=3.11.8 tzdata~=2024a"
             ),
             "ENV PYTHONUNBUFFERED 1",
             "COPY {namespace}/{name}.pex /bin/{name}".format(
