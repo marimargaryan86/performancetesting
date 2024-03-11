@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import time
-from collections.abc import AsyncGenerator, Sequence
+from collections.abc import AsyncGenerator, Mapping, Sequence
 
 import prometheus_client
 from grpc import StatusCode, aio
@@ -96,11 +96,13 @@ class Queue(consumer.AbstractQueue[amqp_pb2.SearchTask]):
         providers_list: providers.Collection,
         runner: tasks.Runner[amqp_pb2.SearchTaskResult],
         timeout: datetime.timedelta,
+        reseller_providers: Mapping[str, Sequence[str]],
     ):
         self._name_prefix = name_prefix
         self._providers = providers_list
         self._runner = runner
         self._timeout = timeout
+        self._reseller_providers = reseller_providers
 
     @property
     def binds(self) -> Sequence[tuple[amqp.Exchange, str]]:
@@ -128,6 +130,7 @@ class Queue(consumer.AbstractQueue[amqp_pb2.SearchTask]):
         search_tasks = [
             _do_search(provider, msg, self._timeout)
             async for provider in self._providers.all_healthy()
+            if self._provider_on_for_reseller(provider.identifier, msg.reseller_id)
         ]
 
         for task in asyncio.as_completed(search_tasks):
@@ -135,6 +138,19 @@ class Queue(consumer.AbstractQueue[amqp_pb2.SearchTask]):
 
             for search_result in search_response.search_results.results:
                 yield search_result
+
+    def _provider_on_for_reseller(
+        self,
+        provider_id: str,
+        reseller_id: str,
+    ) -> bool:
+        provider_on_for_all = provider_id in self._reseller_providers.get("*", [])
+        provider_on_for_reseller = provider_id in self._reseller_providers.get(
+            reseller_id,
+            [],
+        )
+
+        return provider_on_for_all or provider_on_for_reseller
 
 
 async def _do_search(

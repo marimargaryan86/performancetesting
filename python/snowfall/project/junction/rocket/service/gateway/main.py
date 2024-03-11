@@ -35,6 +35,7 @@ class _SharedSettings(application.Settings):
 
 class _ConsumeSettings(_SharedSettings):
     search_timeout: datetime.timedelta = datetime.timedelta(seconds=30)
+    reseller_providers: dict[str, list[str]]
 
 
 class _ServeSettings(_SharedSettings):
@@ -95,6 +96,7 @@ async def _consume(app: application.Application[_ConsumeSettings]) -> None:
         providers_list=bootstrap_return.providers,
         runner=bootstrap_return.search_task_result_runner,
         timeout=app.settings.search_timeout,
+        reseller_providers=app.settings.reseller_providers,
     )
 
     await consumer.QueueConsumer(
