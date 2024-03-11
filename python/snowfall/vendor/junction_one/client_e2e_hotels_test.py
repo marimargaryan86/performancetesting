@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -9,16 +9,22 @@ from snowfall.vendor.junction_one.models import base as models
 
 @pytest.mark.integration()
 async def test_e2e_flow(remote_junction_one_client: JunctionOneClient) -> None:  # noqa: WPS217,WPS218
+    start_date = datetime.now(tz=UTC).date() + timedelta(days=30)
+    end_date = datetime.now(tz=UTC).date() + timedelta(days=32)
+
     # Create a trip.
-    trip = await remote_junction_one_client.create_trip(
+    create_trip = await remote_junction_one_client.create_trip(
         models.TripCreateRequest(
             name="end2end trip test",
-            start_date=date(2024, 10, 10),
-            end_date=date(2024, 10, 12),
+            start_date=start_date,
+            end_date=end_date,
             org_id=635604,
             booker_ids=[2602533],
         ),
     )
+
+    trip = create_trip.trip
+    assert trip
     assert trip.id
     assert trip.booker_ids
 
@@ -29,14 +35,15 @@ async def test_e2e_flow(remote_junction_one_client: JunctionOneClient) -> None: 
     # Get a hotel reference.
     hotels = await remote_junction_one_client.search_hotels(
         auto_models.SearchHotelsRequest(
-            checkin_date=datetime.now(tz=UTC).date() + timedelta(days=1),
-            checkout_date=datetime.now(tz=UTC).date() + timedelta(days=3),
+            checkin_date=start_date,
+            checkout_date=end_date,
             latitude=48.856614,
             longitude=2.3522219,
             org_id=635604,
             user_ids=[2602533],
         ),
     )
+
     assert hotels.hotels
     hotel = hotels.hotels[0]
     assert hotel.refs
@@ -45,6 +52,7 @@ async def test_e2e_flow(remote_junction_one_client: JunctionOneClient) -> None: 
     rooms = await remote_junction_one_client.get_hotel_details(
         models.HotelDetailsRequest(refs=hotel.refs),
     )
+
     assert rooms.rooms
     room = rooms.rooms[0]
 

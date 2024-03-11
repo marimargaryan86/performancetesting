@@ -33,7 +33,30 @@ async def test_create_trip(
         ),
     )
 
-    assert trip == auto_models.Trip(**fixture["data"]["trip"])
+    assert trip == auto_models.GetTripBoardsResponse(**fixture["data"])
+
+
+async def test_create_trip_with_refs(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-trip-create-refs.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/trip/create",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    trip = await junction_one_client.create_trip_with_refs(
+        models.TripCreateRefsRequest(
+            name="Trip to PAR",
+            flight_refs="1P0yCOk9bHp",
+        ),
+    )
+
+    assert trip == auto_models.GetTripBoardsResponse(**fixture["data"])
 
 
 async def test_list_trips(

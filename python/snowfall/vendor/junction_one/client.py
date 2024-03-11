@@ -58,7 +58,7 @@ class JunctionOneClient(object):
         self,
         query: models.TripCreateRequest,
         rate_limit_timeout: float | None = None,
-    ) -> auto_models.Trip:
+    ) -> auto_models.GetTripBoardsResponse:
         response = await self._make_request(
             "POST",
             "/v1/trip/create",
@@ -66,12 +66,24 @@ class JunctionOneClient(object):
             rate_limit_timeout=rate_limit_timeout,
         )
 
-        ret_model = auto_models.GetTripBoardsResponse(**response.data)
+        return auto_models.GetTripBoardsResponse(**response.data)
 
-        if not ret_model.trip:
-            raise ValueError("missing trip")
+    async def create_trip_with_refs(
+        self,
+        query: models.TripCreateRefsRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.GetTripBoardsResponse:
+        response = await self._make_request(
+            "POST",
+            "/v1/trip/create",
+            query,
+            rate_limit_timeout=rate_limit_timeout,
+        )
 
-        return ret_model.trip
+        if not response.data:
+            raise errors.EmptyDataError()
+
+        return auto_models.GetTripBoardsResponse(**response.data)
 
     async def list_trips(
         self,

@@ -1,0 +1,461 @@
+{
+    "status": "OK",
+    "code": 200,
+    "data": {
+        "trip": {
+            "id": 2623865,
+            "nms": 1709810291769,
+            "agencyCode": "P0",
+            "orgId": 635604,
+            "arrangerIds": [
+                2602536
+            ],
+            "grantedIds": [
+                2602536
+            ],
+            "userIds": [
+                2602536
+            ],
+            "name": "Trip to PAR",
+            "visibility": "PUBLIC",
+            "startDate": "2024-03-12",
+            "endDate": "2024-03-12",
+            "total": 44.99,
+            "summary": [
+                {
+                    "id": 2623868,
+                    "type": "Flight",
+                    "date": "2024-03-12T16:10:00",
+                    "status": "PENDING",
+                    "userIds": [
+                        2602536
+                    ]
+                }
+            ],
+            "tripBoardFlags": 0,
+            "draftBoards": 1,
+            "pendingBoards": 0,
+            "processingBoards": 0,
+            "confirmedBoards": 0,
+            "uiFlags": 23,
+            "agencyFlags": 31
+        },
+        "boards": [
+            {
+                "id": 2623866,
+                "nms": 1709810291768,
+                "tripId": 2623865,
+                "orgId": 635604,
+                "bookerId": 2602536,
+                "userIds": [
+                    2602536
+                ],
+                "agencyCode": "P0",
+                "status": "DRAFT",
+                "statusChangedOn": "2024-03-07T11:18:11.746907",
+                "startDate": "2024-03-12",
+                "endDate": "2024-03-12",
+                "summary": [
+                    {
+                        "id": 2623868,
+                        "type": "Flight",
+                        "date": "2024-03-12T16:10:00",
+                        "status": "PENDING",
+                        "userIds": [
+                            2602536
+                        ]
+                    }
+                ],
+                "exceptionFlags": 0,
+                "processingFlags": 0,
+                "tripBoardFlags": 8,
+                "waypointFlags": 0,
+                "refs": [
+                    {
+                        "id": 2623869,
+                        "nms": 1709810291765,
+                        "tripId": 2623865,
+                        "tripBoardId": 2623866,
+                        "active": true,
+                        "reservationType": "Flight",
+                        "providerCode": "TF",
+                        "ref": "1P0yCOk9bHp",
+                        "vendor": "VY",
+                        "bookerId": 2602536,
+                        "reservationIds": [
+                            2623868
+                        ],
+                        "status": "PENDING",
+                        "userIds": [
+                            2602536
+                        ],
+                        "summary": [
+                            {
+                                "id": 2623868,
+                                "type": "Flight",
+                                "date": "2024-03-12T16:10:00",
+                                "status": "PENDING",
+                                "userIds": [
+                                    2602536
+                                ]
+                            }
+                        ],
+                        "startDate": "2024-03-12",
+                        "endDate": "2024-03-12",
+                        "pricedOn": "2024-03-07T11:18:11.765191",
+                        "currency": "EUR",
+                        "due": 44.99,
+                        "total": 44.99,
+                        "exceptionFlags": 0,
+                        "fopFlags": 0,
+                        "tripBoardFlags": 8,
+                        "waypointFlags": 0,
+                        "uiFlags": 6
+                    }
+                ],
+                "uiFlags": 19,
+                "agencyFlags": 31
+            }
+        ],
+        "org": {
+            "id": 635604,
+            "nms": 1703196599864,
+            "agencyCode": "P0",
+            "name": "Snowfall Demo Site",
+            "flags": 0,
+            "billingAddressLocationId": 635603,
+            "phoneNumber": "12025534929",
+            "active": true,
+            "type": "CORPORATE",
+            "visibility": "PRIVATE",
+            "branding": {
+                "heroUrl": "https://cdn.one.junction.dev/o/company/7d491cb7971f4a60abbe749aa6c3b589.png",
+                "logoUrl": "https://cdn.one.junction.dev/o/company/f9275217f4ae4e9ea99c6c9e28291d84"
+            }
+        },
+        "users": {
+            "2602536": {
+                "id": 2602536,
+                "nms": 1709548017155,
+                "firstName": "Jeremy",
+                "lastName": "Tang",
+                "gender": "male",
+                "flags": 6,
+                "active": true,
+                "fullName": "Jeremy Tang",
+                "shortName": "Jeremy Tang"
+            }
+        },
+        "flightReservations": {
+            "2623868": {
+                "id": 2623868,
+                "ext": {
+                    "co2kg": 60,
+                    "consumers": [
+                        {
+                            "userId": 2602536,
+                            "firstName": "Jeremy",
+                            "lastName": "Tang",
+                            "dob": "1995-09-03"
+                        }
+                    ],
+                    "airPrice": 44.99,
+                    "od": {
+                        "co2kg": 60,
+                        "duration": 80,
+                        "arrivalStation": "ORY",
+                        "departureStation": "LGW",
+                        "arrivalTime": "2024-03-12T18:30:00",
+                        "arrivalTimeOffset": 60,
+                        "departureTime": "2024-03-12T16:10:00",
+                        "departureTimeOffset": 0,
+                        "segments": [
+                            {
+                                "segmentKey": "VY6949",
+                                "airline": "VY",
+                                "operatingAirline": "VY",
+                                "duration": 80,
+                                "arrivalStation": "ORY",
+                                "departureStation": "LGW",
+                                "arrivalTime": "2024-03-12T18:30:00",
+                                "arrivalTimeOffset": 60,
+                                "departureTime": "2024-03-12T16:10:00",
+                                "departureTimeOffset": 0,
+                                "flightNumber": "6949",
+                                "flightClass": "Economy",
+                                "flightClassPremium": false,
+                                "serviceClass": "QQ",
+                                "fareBasisCode": "QQI3CC1",
+                                "fareName": "Basic Fare",
+                                "fareType": "1",
+                                "departureOffsetDateTime": "2024-03-12T16:10:00+00:00",
+                                "arrivalOffsetDateTime": "2024-03-12T18:30:00+01:00"
+                            }
+                        ],
+                        "fareName": "Basic Fare",
+                        "fareType": "1",
+                        "departureOffsetDateTime": "2024-03-12T16:10:00+00:00",
+                        "arrivalOffsetDateTime": "2024-03-12T18:30:00+01:00"
+                    }
+                },
+                "tripId": 2623865,
+                "bookerId": 2602536,
+                "userIds": [
+                    2602536
+                ],
+                "agencyCode": "P0",
+                "providerCode": "TF",
+                "vendor": "VY",
+                "label": "LGW-ORY",
+                "startDate": "2024-03-12T16:10:00",
+                "endDate": "2024-03-12T18:30:00",
+                "currency": "EUR",
+                "totalPrice": 44.99,
+                "orgId": 635604,
+                "inPolicy": true,
+                "createdOn": "2024-03-07T11:18:11.754966",
+                "updatedAt": "2024-03-07T11:18:11.754968",
+                "status": "PENDING",
+                "flags": 32,
+                "type": "Flight"
+            }
+        },
+        "airlines": {
+            "VY": {
+                "id": 5352,
+                "name": "Vueling Airlines",
+                "iata": "VY",
+                "icao": "VLG",
+                "callsign": "VUELING",
+                "country": "Spain",
+                "active": true,
+                "rewardProgramId": 110038,
+                "ticketingCode": "030"
+            }
+        },
+        "airports": {
+            "ORY": {
+                "id": 1386,
+                "name": "Orly",
+                "city": "Paris",
+                "country": "France",
+                "countryCode": "FR",
+                "iata": "ORY",
+                "icao": "LFPO",
+                "latitude": 48.725278,
+                "longitude": 2.359444,
+                "altitude": 291,
+                "timezoneOffset": 1.0,
+                "timezone": "Europe/Paris",
+                "dst": "E",
+                "airlineCount": 30,
+                "groupIata": "PAR",
+                "label": "Paris, France (Orly - ORY)",
+                "code": "ORY"
+            },
+            "LGW": {
+                "id": 502,
+                "name": "Gatwick",
+                "city": "London",
+                "country": "United Kingdom",
+                "countryCode": "GB",
+                "iata": "LGW",
+                "icao": "EGKK",
+                "latitude": 51.148056,
+                "longitude": -0.190278,
+                "altitude": 202,
+                "timezoneOffset": 0.0,
+                "timezone": "Europe/London",
+                "dst": "E",
+                "airlineCount": 47,
+                "groupIata": "LON",
+                "label": "London, United Kingdom (Gatwick - LGW)",
+                "code": "LGW"
+            }
+        },
+        "fields": [
+            {
+                "id": 872543,
+                "nms": 1695412660388,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD1 ",
+                "name": "Department",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 7
+            },
+            {
+                "id": 904012,
+                "nms": 1696027481429,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD2 ",
+                "remarkCode": "RH/",
+                "name": "Out of Policy Reason",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 15,
+                "reservationType": "Hotel"
+            },
+            {
+                "id": 666229,
+                "nms": 1696027409013,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD1 ",
+                "remarkCode": "RC/",
+                "name": "Out of Policy Reason",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 15,
+                "reservationType": "Flight"
+            },
+            {
+                "id": 904016,
+                "nms": 1696027528855,
+                "orgId": 635604,
+                "agencyCode": "P0",
+                "code": "5.S*UD3 ",
+                "remarkCode": "RZ/",
+                "name": "Out of Policy Reason",
+                "type": "RESERVATION",
+                "valueType": "LOOKUP",
+                "active": true,
+                "flags": 15,
+                "reservationType": "Car"
+            }
+        ],
+        "fieldValues": [
+            {
+                "id": 904010,
+                "nms": 1696027409002,
+                "fieldId": 666229,
+                "code": "AP",
+                "name": "Declined Lower Fare Due to Airport Preference",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904011,
+                "nms": 1696027409013,
+                "fieldId": 666229,
+                "code": "BR",
+                "name": "Declined Lower Fare Due to Business Requirements",
+                "active": true,
+                "remarkRequired": true
+            },
+            {
+                "id": 666230,
+                "nms": 1696027409013,
+                "fieldId": 666229,
+                "code": "CT",
+                "name": "Declined Lower Fare Due to Connection Time",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872544,
+                "nms": 1695412649523,
+                "fieldId": 872543,
+                "code": "Com",
+                "name": "Commercial",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872546,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Del",
+                "name": "Delivery",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872547,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Eng",
+                "name": "Engineering",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872548,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Ops",
+                "name": "Operations",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 872545,
+                "nms": 1695412649524,
+                "fieldId": 872543,
+                "code": "Prd",
+                "name": "Product",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904014,
+                "nms": 1696027481530,
+                "fieldId": 904012,
+                "code": "BN",
+                "name": "Declined Lower Priced Hotel Due to Business Need",
+                "active": true,
+                "remarkRequired": true
+            },
+            {
+                "id": 904015,
+                "nms": 1696027481534,
+                "fieldId": 904012,
+                "code": "CP",
+                "name": "Declined Lower Priced Hotel Due to Chain Preference",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904013,
+                "nms": 1696027481530,
+                "fieldId": 904012,
+                "code": "LP",
+                "name": "Declined Lower Priced Hotel Due to Location",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904019,
+                "nms": 1696027528958,
+                "fieldId": 904016,
+                "code": "BN",
+                "name": "Declined Lower Priced Car Due to Business Need",
+                "active": true,
+                "remarkRequired": true
+            },
+            {
+                "id": 904018,
+                "nms": 1696027528957,
+                "fieldId": 904016,
+                "code": "LP",
+                "name": "Declined Lower Priced Car Due to Location Preference",
+                "active": true,
+                "remarkRequired": false
+            },
+            {
+                "id": 904017,
+                "nms": 1696027528956,
+                "fieldId": 904016,
+                "code": "VP",
+                "name": "Declined Lower Priced Car Due to Vendor Preference",
+                "active": true,
+                "remarkRequired": false
+            }
+        ]
+    }
+}
