@@ -22,9 +22,9 @@ service SearchResultService {
   // rpc ListOfferOptionDetails(ListOfferOptionDetailsRequest) returns (ListOfferOptionDetailsResponse) {}
 }
 
-service PriceQuoteService {
-  rpc CreatePriceQuote(CreatePriceQuoteRequest) returns (CreatePriceQuoteResponse) {}
-  rpc GetPriceQuote(GetPriceQuoteRequest) returns (GetPriceQuoteResponse) {}
+service QuoteService {
+  rpc CreateQuote(CreateQuoteRequest) returns (CreateQuoteResponse) {}
+  rpc GetQuote(GetQuoteRequest) returns (GetQuoteResponse) {}
 }
 
 message EnqueueSearchRequest {
@@ -75,20 +75,20 @@ message GetOfferSegmentDetailsResponse {
   OfferSegmentDetails offer_segment_details = 1;
 }
 
-message CreatePriceQuoteRequest {
+message CreateQuoteRequest {
   string search_result_id = 1;
   string offer_id = 2;
   string reseller_id = 3;
 }
 
-message CreatePriceQuoteResponse {
-  PriceQuote price_quote = 1;
+message CreateQuoteResponse {
+  Quote quote = 1;
 }
 
-message GetPriceQuoteRequest {
+message GetQuoteRequest {
   string id = 1;
 }
 
-message GetPriceQuoteResponse {
-  PriceQuote price_quote = 1;
+message GetQuoteResponse {
+  Quote quote = 1;
 }

@@ -134,7 +134,7 @@ message Penalty {
   optional bool conditions_apply = 7;
 }
 
-message PriceQuote {
+message Quote {
   string id = 1;
   string search_result_id = 2;
   string offer_id = 3;

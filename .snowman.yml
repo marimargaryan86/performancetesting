@@ -10,6 +10,8 @@ commits:
       - "python/snowfall/project/junction/extensions"
     junction/content:
       - "python/snowfall/project/junction/content"
+    junction/fti:
+      - "svelte/fti-web"
     junction/go:
       - ".gitlab/junction"
       - "golang/cmd/gtfs-import"
@@ -46,8 +48,10 @@ commits:
       - "openapi/junction/plus_poc_api"
       - "protobuf/snowfall/project/junction/plus"
       - "python/snowfall/project/junction/plus"
-    junction/fti:
-      - "svelte/fti-web"
+    junction/rocket:
+      - "openapi/junction/rocket_api"
+      - "protobuf/snowfall/project/junction/rocket"
+      - "python/snowfall/project/junction/rocket"
     protobuf/stdlib:
       - "protobuf/snowfall/stdlib"
     python/stdlib:

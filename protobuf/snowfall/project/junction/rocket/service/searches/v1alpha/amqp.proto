@@ -19,15 +19,13 @@ message SearchTaskResult {
   string provider_name = 4;
 }
 
-message PriceQuoteTask {
-  string price_quote_container_id = 1;
-  string offer_id = 2;
-  string reseller_id = 3;
+message QuoteTask {
+  string offer_id = 1;
+  string reseller_id = 2;
 }
 
-message PriceQuoteTaskResult {
-  string price_quote_container_id = 1;
+message QuoteTaskResult {
   string offer_id = 2;
-  PriceQuote price_quote = 3;
+  Quote quote = 3;
   string provider_company_id = 4;
 }
