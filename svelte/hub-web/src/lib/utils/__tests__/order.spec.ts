@@ -1,4 +1,3 @@
-/* eslint-disable max-nested-callbacks */
 import { describe, expect, it } from "vitest";
 import { getOrderDepartureDate, getPassengerNames, getTotalPrice } from "$lib/utils/order";
 import type { Order } from "~/integration/junction-hub-api/schemas";

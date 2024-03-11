@@ -1,4 +1,3 @@
-/* eslint-disable max-nested-callbacks */
 import { describe, expect, it } from "vitest";
 import {
   getTotalPriceBreakdown,

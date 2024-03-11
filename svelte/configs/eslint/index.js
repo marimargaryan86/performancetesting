@@ -29,6 +29,8 @@ module.exports = {
       rules: {
         "no-inline-comments": "off",
         "max-lines-per-function": "off",
+        "max-nested-callbacks": "off",
+        "@typescript-eslint/no-explicit-any": "off",
       },
     },
   ],

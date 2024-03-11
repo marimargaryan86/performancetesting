@@ -1,4 +1,3 @@
-/* eslint-disable max-nested-callbacks */
 import { describe, it, expect } from "vitest";
 import { pricesEqual, summarizePrices, roundCurrency } from "../money";
 import type { Price } from "~/integration/common/schemas";
