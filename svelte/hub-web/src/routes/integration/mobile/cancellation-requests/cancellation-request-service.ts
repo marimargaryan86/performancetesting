@@ -1,13 +1,14 @@
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import type CancellationRequestService from "~/integration/junction-mobile-api/services/cancellation-request-service";
-import { clientServiceFactory } from "../../framework";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<CancellationRequestService, RouteId>(
+const { client, server } = rpcBase<CancellationRequestService, RequestEvent>(
   "/integration/mobile/cancellation-requests",
-);
-
-export default factory({
+)({
   create: (params: { data: MobileSchemas.CancellationRequestCreate }) => [params],
   get: (params: { id: string }) => [params],
 });
+
+export { server };
+export default client;

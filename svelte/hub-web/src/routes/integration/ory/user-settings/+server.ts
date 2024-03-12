@@ -1,11 +1,8 @@
 import integrationInstances from "~/integration-instances";
 import { cookieStore } from "$lib/stores/cookie-store.server";
-import { serverServiceFactory } from "../../framework";
-import userSettingsService from "./user-settings-service";
+import { server } from "./user-settings-service";
 
-const factory = serverServiceFactory(userSettingsService);
-
-export const POST = factory({
+export const POST = server({
   async complete(event, data) {
     const session = event.locals.session;
     const userSettings = cookieStore.userSettingsToken.get(event);

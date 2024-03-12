@@ -1,11 +1,9 @@
-import { clientServiceFactory } from "../../framework";
 import type BillService from "~/integration/junction-hub-api/services/bill-service";
 import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<BillService, RouteId>("/integration/hub/bills");
-
-export default factory({
+const { client, server } = rpcBase<BillService, RequestEvent>("/integration/hub/bills")({
   find: (params: {
     limit?: number;
     cursor?: string;
@@ -14,3 +12,6 @@ export default factory({
   get: (params: { id: string }) => [params],
   toggleReconciliation: (params: { bill: HubSchemas.Bill }) => [params],
 });
+
+export { server };
+export default client;

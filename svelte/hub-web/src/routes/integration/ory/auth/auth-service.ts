@@ -1,6 +1,6 @@
-import { clientServiceFactory } from "../../framework";
 import type LoginFlowService from "~/integration/ory/services/login-flow-service";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
 type Service = {
   login: LoginFlowService["complete"];
@@ -8,10 +8,11 @@ type Service = {
   logout(): void;
 };
 
-const factory = clientServiceFactory<Service, RouteId>("/integration/ory/auth");
-
-export default factory({
+const { client, server } = rpcBase<Service, RequestEvent>("/integration/ory/auth")({
   login: (params: { data: Record<string, string>; rememberMe?: boolean }) => [params],
   resetLogin: () => [],
   logout: () => [],
 });
+
+export { server };
+export default client;

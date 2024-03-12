@@ -1,10 +1,7 @@
 import integrationInstances from "~/integration-instances";
-import { serverServiceFactory } from "../../framework";
-import currencyService from "./currency-service";
+import { server } from "./currency-service";
 
-const factory = serverServiceFactory(currencyService);
-
-export const POST = factory({
+export const POST = server({
   find({ locals: { session } }, { cursor, limit }) {
     return integrationInstances.junctionHubApi.currencies.find({ session, cursor, limit });
   },

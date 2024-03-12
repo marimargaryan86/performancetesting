@@ -1,10 +1,7 @@
 import integrationInstances from "~/integration-instances";
-import { serverServiceFactory } from "../../framework";
-import bookingService from "./booking-service";
+import { server } from "./booking-service";
 
-const factory = serverServiceFactory(bookingService);
-
-export const POST = factory({
+export const POST = server({
   get({ locals: { session } }, { id }) {
     return integrationInstances.junctionHubApi.bookings.get({ session, id });
   },

@@ -1,10 +1,10 @@
 import type TransactionService from "~/integration/junction-hub-api/services/transaction-service";
-import { clientServiceFactory } from "../../framework";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<TransactionService, RouteId>("/integration/hub/transactions");
-
-export default factory({
+const { client, server } = rpcBase<TransactionService, RequestEvent>(
+  "/integration/hub/transactions",
+)({
   find: (params: {
     cursor?: string;
     limit?: number;
@@ -13,3 +13,6 @@ export default factory({
   }) => [params],
   get: (params: { id: string }) => [params],
 });
+
+export { server };
+export default client;

@@ -1,11 +1,12 @@
-import { clientServiceFactory } from "../../framework";
 import type RecoveryFlowService from "~/integration/ory/services/recovery-flow-service";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<RecoveryFlowService, RouteId>(
+const { client, server } = rpcBase<RecoveryFlowService, RequestEvent>(
   "/integration/ory/account-recovery",
-);
-
-export default factory({
+)({
   complete: (data: Record<string, string>) => [data],
 });
+
+export { server };
+export default client;

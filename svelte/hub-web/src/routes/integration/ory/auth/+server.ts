@@ -1,14 +1,11 @@
 import integrationInstances from "~/integration-instances";
 import { cookieStore } from "$lib/stores/cookie-store.server";
-import { serverServiceFactory } from "../../framework";
-import authService from "./auth-service";
+import { server } from "./auth-service";
 
 // Two weeks, as set by the Legal team. Do not modify.
 const EXPIRY_MAX_AGE = 1209600;
 
-const factory = serverServiceFactory(authService);
-
-export const POST = factory({
+export const POST = server({
   async login(event, { data, rememberMe }) {
     const login = cookieStore.loginToken.get(event);
 

@@ -1,10 +1,7 @@
 import integrationInstances from "~/integration-instances";
-import { serverServiceFactory } from "../../framework";
-import balanceService from "./balance-service";
+import { server } from "./balance-service";
 
-const factory = serverServiceFactory(balanceService);
-
-export const POST = factory({
+export const POST = server({
   create({ locals: { session } }, { accountId, data }) {
     return integrationInstances.junctionHubApi.balances.create({ session, accountId, data });
   },

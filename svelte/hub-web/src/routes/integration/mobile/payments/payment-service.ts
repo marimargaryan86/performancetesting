@@ -1,10 +1,11 @@
 import type PaymentService from "~/integration/junction-mobile-api/services/payment-service";
 import type * as CommonSchemas from "~/integration/common/schemas";
-import { clientServiceFactory } from "../../framework";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<PaymentService, RouteId>("/integration/mobile/payments");
-
-export default factory({
+const { client, server } = rpcBase<PaymentService, RequestEvent>("/integration/mobile/payments")({
   create: (params: { data: CommonSchemas.Price }) => [params],
 });
+
+export { server };
+export default client;

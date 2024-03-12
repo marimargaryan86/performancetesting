@@ -1,10 +1,7 @@
 import integrationInstancesServer from "~/integration-instances";
-import { serverServiceFactory } from "../../framework";
-import simpleOfferService from "./simple-offer-service";
+import { server } from "./simple-offer-service";
 
-const factory = serverServiceFactory(simpleOfferService);
-
-export const POST = factory({
+export const POST = server({
   create({ locals: { session } }, { data }) {
     return integrationInstancesServer.junctionMobileApi.simpleOfferSearches.create({
       session,

@@ -1,10 +1,7 @@
 import integrationInstances from "~/integration-instances";
-import { serverServiceFactory } from "../../framework";
-import transactionService from "./transaction-service";
+import { server } from "./transaction-service";
 
-const factory = serverServiceFactory(transactionService);
-
-export const POST = factory({
+export const POST = server({
   find({ locals: { session } }, { cursor, filter, limit, sort }) {
     return integrationInstances.junctionHubApi.transactions.find({
       session,

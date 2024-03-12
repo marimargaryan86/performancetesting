@@ -1,4 +1,4 @@
-# `routes/integration` middlewares
+# `routes/integration` rpc-base
 
 ## Summary
 

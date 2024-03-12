@@ -1,10 +1,7 @@
 import integrationInstances from "~/integration-instances";
-import { serverServiceFactory } from "../../framework";
-import placeService from "./place-service";
+import { server } from "./place-service";
 
-const factory = serverServiceFactory(placeService);
-
-export const POST = factory({
+export const POST = server({
   find({ locals: { session } }, query) {
     return query.length < 3
       ? []

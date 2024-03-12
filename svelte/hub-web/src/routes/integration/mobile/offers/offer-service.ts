@@ -1,11 +1,12 @@
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import type OfferService from "~/integration/junction-mobile-api/services/offer-service";
-import { clientServiceFactory } from "../../framework";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<OfferService, RouteId>("/integration/mobile/offers");
-
-export default factory({
+const { client, server } = rpcBase<OfferService, RequestEvent>("/integration/mobile/offers")({
   create: (params: { data: MobileSchemas.TripOfferPriceQuoteCreate }) => [params],
   get: (params: { id: string }) => [params],
 });
+
+export { server };
+export default client;

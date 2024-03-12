@@ -1,11 +1,8 @@
 import integrationInstances from "~/integration-instances";
 import { cookieStore } from "$lib/stores/cookie-store.server";
-import { serverServiceFactory } from "../../framework";
-import accountRecoveryService from "./account-recovery-service";
+import { server } from "./account-recovery-service";
 
-const factory = serverServiceFactory(accountRecoveryService);
-
-export const POST = factory({
+export const POST = server({
   async complete(event, data) {
     const recovery = cookieStore.recoveryToken.get(event);
 

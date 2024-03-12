@@ -1,9 +1,10 @@
 import type BookingService from "~/integration/junction-hub-api/services/booking-service";
-import { clientServiceFactory } from "../../framework";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<BookingService, RouteId>("/integration/hub/bookings");
-
-export default factory({
+const { client, server } = rpcBase<BookingService, RequestEvent>("/integration/hub/bookings")({
   get: (params: { id: string }) => [params],
 });
+
+export { server };
+export default client;

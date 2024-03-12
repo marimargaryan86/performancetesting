@@ -1,12 +1,13 @@
 import type CancellationRequestService from "~/integration/junction-hub-api/services/cancellation-request-service";
 import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
-import { clientServiceFactory } from "../../framework";
-import type { RouteId } from "./$types";
+import type { RequestEvent } from "./$types";
+import rpcBase from "../../rpc-base";
 
-const factory = clientServiceFactory<CancellationRequestService, RouteId>(
+const { client, server } = rpcBase<CancellationRequestService, RequestEvent>(
   "/integration/hub/cancellation-requests",
-);
-
-export default factory({
+)({
   create: (params: { data: HubSchemas.CancellationRequestCreate }) => [params],
 });
+
+export { server };
+export default client;
