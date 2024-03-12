@@ -4,7 +4,6 @@ from starlette import routing
 
 from snowfall.project.pay.service.pay_api.routes import (
     authentication,
-    payments,
     quotations,
     rates,
     transactions,
@@ -61,16 +60,5 @@ def get_admin_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             authentication.ChangePassword,
             name="Authenticate",
             methods=["PATCH"],
-        ),
-        integration.route(
-            "/payments",
-            payments.Payments,
-            name="Payments",
-            methods=["GET", "POST"],
-        ),
-        integration.route(
-            "/payments/{paymentId}",
-            payments.Payment,
-            name="Payment",
         ),
     ]

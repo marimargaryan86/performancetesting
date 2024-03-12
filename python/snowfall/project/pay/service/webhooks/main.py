@@ -4,8 +4,6 @@ from starlette.middleware import Middleware
 from snowfall.project.junction.go.adapter import orders
 from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.pay.adapter import refunds, transactions
-from snowfall.project.pay.adapter.payments import GrpcClient
-from snowfall.project.pay.service.payments.v1 import payments_pb2_grpc
 from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2_grpc as refunds_pb2_grpc,
 )
@@ -23,10 +21,6 @@ from snowfall.stdlib.service import application, grpc_factory
 async def _http(
     app: application.Application[bootstrap.Settings],
 ) -> None:
-    payments_channel = await grpc_factory.make_insecure_channel(
-        app,
-        app.settings.payments_address,
-    )
     refunds_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.refunds_address,
@@ -38,9 +32,6 @@ async def _http(
     orders_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.orders_address,
-    )
-    grpc_payment_client = GrpcClient(
-        payments_pb2_grpc.PaymentsServiceStub(payments_channel),
     )
     grpc_refunds_client = refunds.GrpcClient(
         refunds_pb2_grpc.RefundsServiceStub(refunds_channel),
@@ -54,7 +45,6 @@ async def _http(
     asgi_app = starlette.create_starlette_app(
         routes=routers.get_routes(
             bootstrap.create_dependencies(
-                payment_client=grpc_payment_client,
                 refunds_state=RefundsState(
                     app.settings.stripe_api_key,
                     grpc_refunds_client,
@@ -66,7 +56,6 @@ async def _http(
         custom_middlewares=[
             Middleware(
                 HmacHeaderMiddleware,
-                secret_key=app.settings.secret_key,
                 stripe_secret_key=app.settings.stripe_secret_key,
             ),
         ],

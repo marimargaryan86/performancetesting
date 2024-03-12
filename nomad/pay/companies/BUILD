@@ -1,4 +1,4 @@
 nomad_template(
-    ["grpc", "sync_accounts#sync-accounts"],
+    ["grpc"],
     "python/snowfall/project/pay/service/companies:main",
 )

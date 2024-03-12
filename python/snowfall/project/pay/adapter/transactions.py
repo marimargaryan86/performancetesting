@@ -82,7 +82,6 @@ class DictClient(Client):
             created_at=protobuf.datetime_to_protobuf(
                 datetime.datetime.now(tz=datetime.UTC),
             ),
-            conversion_id=string.uuid(),
             amounts=quotation.amounts,
             rates=quotation.rates,
             payer_id=quotation.payer_id,

@@ -3,7 +3,6 @@ import random
 from collections.abc import Sequence
 from typing import NamedTuple
 
-import httpx
 import pydantic
 import stripe
 from grpc import aio
@@ -29,14 +28,9 @@ from snowfall.project.junction.plus.service.notifications.v1.grpc_pb2_grpc impor
     ConfigurationVectorServiceStub,
 )
 from snowfall.project.pay.adapter import (
-    accounts as accounts_adapter,
-)
-from snowfall.project.pay.adapter import (
-    beneficiaries,
     bills,
     companies,
     contacts,
-    conversions,
     credit_card_payment,
     currencies,
     quotations,
@@ -44,8 +38,6 @@ from snowfall.project.pay.adapter import (
     transactions,
 )
 from snowfall.project.pay.service.companies.v1.grpc_pb2_grpc import (
-    AccountsServiceStub,
-    BeneficiariesServiceStub,
     CompaniesServiceStub,
     ContactsServiceStub,
 )
@@ -63,12 +55,10 @@ from snowfall.project.pay.service.transactions.v1.grpc_pb2_grpc import (
     QuotationsServiceStub,
 )
 from snowfall.service.authentication.v1 import identities_pb2_grpc, sessions_pb2_grpc
-from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication, handlers
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory
-from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 class Settings(starlette.Settings):
@@ -147,15 +137,6 @@ async def _http(app: application.Application[Settings]) -> None:
             ),
         ),
     )
-    cc_payment_client = PaymentClient(
-        base_url=app.settings.cc_address,
-        auth=CurrencyCloudAuth(
-            base_url=app.settings.cc_address,
-            login_id=app.settings.cc_login,
-            api_key=app.settings.cc_api_key,
-        ),
-        client=metrics.register(httpx.AsyncClient()),
-    )
 
     asgi_app = starlette.create_starlette_app(
         routes=router.get_routes(
@@ -163,11 +144,6 @@ async def _http(app: application.Application[Settings]) -> None:
                 orders_client=orders.GrpcClient(
                     orders_pb2_grpc.OrderServiceStub(
                         channels.orders,
-                    ),
-                ),
-                accounts_client=accounts_adapter.GrpcClient(
-                    AccountsServiceStub(
-                        channels.companies,
                     ),
                 ),
                 companies_client=companies.GrpcClient(
@@ -180,16 +156,6 @@ async def _http(app: application.Application[Settings]) -> None:
                         channels.companies,
                     ),
                 ),
-                beneficiaries_client=beneficiaries.GrpcClient(
-                    BeneficiariesServiceStub(
-                        channels.companies,
-                    ),
-                ),
-                conversions_client=conversions.GrpcClient(
-                    transactions_pb2_grpc.ConversionsServiceStub(
-                        channels.transactions,
-                    ),
-                ),
                 transactions_client=transactions.GrpcClient(
                     transactions_pb2_grpc.TransactionsServiceStub(
                         channels.transactions,
@@ -200,7 +166,6 @@ async def _http(app: application.Application[Settings]) -> None:
                         channels.currencies,
                     ),
                 ),
-                cc_payment_client=cc_payment_client,
                 quotations_client=quotations.GrpcClient(
                     QuotationsServiceStub(
                         channels.transactions,

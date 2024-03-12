@@ -6,14 +6,10 @@ from snowfall.adapter import identities
 from snowfall.project.junction.go.adapter import resellers
 from snowfall.project.junction.hub.service.hub_api import repository
 from snowfall.project.junction.hub.service.hub_api.routes import (
-    accounts,
     activities,
-    balances,
-    beneficiaries,
     bills,
     companies,
     contacts,
-    conversions,
     currencies,
     go_orders,
     go_resellers,
@@ -124,18 +120,6 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="ViewOrder",
         ),
         integration.route(
-            "/accounts",
-            accounts.Accounts,
-            name="Accounts",
-            methods=["GET", "POST"],
-        ),
-        integration.route(
-            "/accounts/{accountId}",
-            accounts.Account,
-            name="Account",
-            methods=["GET", "PATCH"],
-        ),
-        integration.route(
             "/companies",
             companies.AdminCompanies,
             name="Companies",
@@ -155,40 +139,6 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/companies/{companyId}/contacts",
             contacts.Contacts,
             name="Contact",
-        ),
-        integration.route(
-            "/conversions/{conversionId}",
-            conversions.Conversions,
-            name="Conversion",
-        ),
-        integration.route(
-            "/conversions",
-            conversions.ListConversions,
-            name="ListConversion",
-            methods=["GET"],
-        ),
-        integration.route(
-            "/beneficiaries",
-            beneficiaries.Beneficiaries,
-            name="Beneficiaries",
-        ),
-        integration.route(
-            "/beneficiaries/{beneficiaryId}",
-            beneficiaries.Beneficiary,
-            name="Beneficiary",
-            methods=["GET", "PATCH"],
-        ),
-        integration.route(
-            "/accounts/{accountId}/balances",
-            balances.Balances,
-            name="Balances",
-            methods=["GET"],
-        ),
-        integration.route(
-            "/accounts/{accountId}/relationships/currencies",
-            balances.Balances,
-            name="Balances",
-            methods=["POST"],
         ),
         integration.route(
             "/transactions",

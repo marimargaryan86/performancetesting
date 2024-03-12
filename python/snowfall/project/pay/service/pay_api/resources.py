@@ -5,8 +5,6 @@ from typing import ClassVar, Literal
 from starlette import requests
 
 from snowfall.project.pay.service.companies.v1 import models_pb2
-from snowfall.project.pay.service.payments.v1 import models_pb2 as payment_models
-from snowfall.project.pay.service.payments.v1.models_pb2 import Payment
 from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transaction_models,
 )
@@ -89,58 +87,6 @@ class Money(models.BaseModel):
         )
 
 
-class PaymentsResource(models.Resource):
-    api_type: ClassVar[str] = "payments"
-
-    @classmethod
-    def from_models(
-        cls,
-        payment: Payment,
-        request: requests.Request,
-    ) -> PaymentsResource:
-        return cls(
-            id=payment.id,
-            type=PaymentsResource.api_type,
-            attributes={
-                "amount": Money.from_proto(payment.amount).amount,
-                "reason": payment.reason,
-                "reference": payment.reference,
-                "paymentAt": protobuf.protobuf_to_date(
-                    payment.payment_due_date,
-                ),
-                "status": protobuf.enum_value_to_slug(
-                    payment_models.Status.DESCRIPTOR,
-                    payment.status,
-                ),
-            },
-            relationships={
-                "beneficiary": {
-                    "data": models.ResourceIdentifier(
-                        id=payment.beneficiary_id,
-                        type="beneficiaries",
-                    ),
-                },
-                "transaction": {
-                    "data": [
-                        models.ResourceIdentifier(
-                            id=transaction_id,
-                            type="transactions",
-                        )
-                        for transaction_id in payment.transactions
-                    ],
-                },
-            },
-            links={
-                _SELF_HREF: str(
-                    request.url_for(
-                        "Payment",
-                        paymentId=payment.id,
-                    ),
-                ),
-            },
-        )
-
-
 class Transaction(models.Resource):
     api_type: ClassVar[str] = "transactions"
 
@@ -190,16 +136,6 @@ class Transaction(models.Resource):
                 ),
             },
             relationships={
-                "conversion": {
-                    "data": (
-                        models.ResourceIdentifier(
-                            id=transaction.conversion_id,
-                            type="conversions",
-                        )
-                        if transaction.conversion_id
-                        else None
-                    ),
-                },
                 "payer": {
                     "data": models.ResourceIdentifier(
                         id=transaction.payer_id,

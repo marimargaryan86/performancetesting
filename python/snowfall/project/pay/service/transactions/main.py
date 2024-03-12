@@ -5,7 +5,6 @@ import random
 from collections.abc import Sequence
 
 import aiosmtplib
-import httpx
 import pydantic
 from motor import motor_asyncio
 
@@ -32,16 +31,13 @@ from snowfall.project.pay.service.transactions.generate_cancellation_csv import 
 from snowfall.project.pay.service.transactions.generate_csv import CSVGenerator
 from snowfall.project.pay.service.transactions.grpc import (
     BillsService,
-    ConversionsService,
     QuotationsService,
     TransactionsService,
 )
 from snowfall.project.pay.service.transactions.reports_cron import NetsuiteReportJob
-from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
 
 
 class _GrpcSettings(application.Settings):
@@ -90,20 +86,8 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 transactions=transactions.TransactionsRepository(
                     mongo.transactions.transactions,
                 ),
-                conversions=transactions.ConversionsRepository(
-                    mongo.transactions.conversions,
-                ),
                 bills=transactions.BillsRepository(
                     mongo.transactions.bills,
-                ),
-                payment_client=PaymentClient(
-                    base_url=app.settings.cc_address,
-                    auth=CurrencyCloudAuth(
-                        base_url=app.settings.cc_address,
-                        login_id=app.settings.cc_login,
-                        api_key=app.settings.cc_api_key,
-                    ),
-                    client=metrics.register(httpx.AsyncClient()),
                 ),
                 companies_client=companies.GrpcClient(
                     companies_grpc_pb2.CompaniesServiceStub(
@@ -129,11 +113,6 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                             app.settings.currencies_address,
                         ),
                     ),
-                ),
-            ),
-            ConversionsService(
-                conversions=transactions.ConversionsRepository(
-                    mongo.transactions.conversions,
                 ),
             ),
             BillsService(

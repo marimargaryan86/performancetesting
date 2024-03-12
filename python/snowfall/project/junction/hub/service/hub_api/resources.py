@@ -34,7 +34,6 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.v1 import money_pb2
-from snowfall.vendor.currency_cloud.models import balance as balance_models
 
 _SELF_HREF: Literal["self"] = "self"
 _RELATIONSHIPS_FIELD: Literal["data"] = "data"
@@ -838,16 +837,6 @@ class Transaction(models.Resource):
                 ),
             },
             relationships={
-                "conversion": {
-                    "data": (
-                        models.ResourceIdentifier(
-                            id=transaction.conversion_id,
-                            type="conversions",
-                        )
-                        if transaction.conversion_id
-                        else None
-                    ),
-                },
                 "payer": {
                     "data": models.ResourceIdentifier(
                         id=transaction.payer_id,
@@ -986,40 +975,6 @@ class BookingCancellationResource(models.Resource):
         )
 
 
-class BalanceResource(models.Resource):
-    api_type: ClassVar[str] = "balances"
-
-    @classmethod
-    def from_model(
-        cls,
-        balance: balance_models.BalanceResponse,
-    ) -> BalanceResource:
-        return cls(
-            id=balance.identifier,
-            type=BalanceResource.api_type,
-            attributes={
-                "amount": money.from_string(
-                    balance.amount,
-                    money.Currency(balance.currency),
-                ).amount,
-            },
-            relationships={
-                "account": {
-                    "data": models.ResourceIdentifier(
-                        id=balance.account_id,
-                        type="accounts",
-                    ),
-                },
-                "currency": {
-                    "data": models.ResourceIdentifier(
-                        id=balance.currency,
-                        type="currencies",
-                    ),
-                },
-            },
-        )
-
-
 class BillResource(models.Resource):
     api_type: ClassVar[str] = "bills"
 
@@ -1121,16 +1076,6 @@ class RefundsResource(models.Resource):
                     "data": models.ResourceIdentifier(
                         id=refund.transaction_id,
                         type="transactions",
-                    ),
-                },
-                "conversion": {
-                    "data": (
-                        models.ResourceIdentifier(
-                            id=refund.conversion_id,
-                            type="conversions",
-                        )
-                        if refund.conversion_id
-                        else None
                     ),
                 },
             },

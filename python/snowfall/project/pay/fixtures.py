@@ -3,12 +3,8 @@ import datetime
 from snowfall.project.pay.service.companies.v1 import (
     models_pb2 as company_model_pb2,
 )
-from snowfall.project.pay.service.payments.v1 import models_pb2
 from snowfall.project.pay.service.refunds.v1 import (
     models_pb2 as refunds_models_pb2,
-)
-from snowfall.project.pay.service.transactions.v1 import (
-    models_pb2 as transactions_models_pb2,
 )
 from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Quotation,
@@ -23,14 +19,6 @@ from snowfall.stdlib.v1 import phone_number_pb2
 from snowfall.stdlib.v1.postal_address_pb2 import PostalAddress
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
-CONVERSIONS = (
-    "5a93b5ae-9590-4561-a664-fbaead485e91",
-    "d184081a-92bd-4ec8-af9a-1faaa8dfbber",
-)
-PAYMENTS = (
-    "5a93b5ae-9590-4561-a664-fbaead485e96",
-    "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
-)
 
 COMPANIES = (
     "9b4a1e83-a0e9-49b3-aa79-fccb6add617c",
@@ -62,10 +50,6 @@ BILLS = (
 QUOTATIONS = ("124b9668-7298-42e9-97e2-f0d205083ab8",)
 
 
-def get_payments() -> list[models_pb2.Payment]:
-    return [generate_payment(identifier) for identifier in PAYMENTS]
-
-
 def get_companies() -> list[company_model_pb2.Company]:
     companies = [generate_company(identifier) for identifier in COMPANIES]
     companies.extend(
@@ -82,40 +66,6 @@ def get_quotations() -> list[Quotation]:
     return [generate_quotation(identifier) for identifier in QUOTATIONS]
 
 
-def generate_payment(identifier: str) -> models_pb2.Payment:
-    return models_pb2.Payment(
-        id=identifier,
-        external_reference_id=string.uuid(),
-        created_at=protobuf.datetime_to_protobuf(
-            datetime.datetime.now(tz=datetime.UTC),
-        ),
-        amount=money.Money(amount=100, currency=money.Currency("EUR")).protobuf(),
-        beneficiary_id="5a93b5ae-9590-4561-a664-fbaead485e96",
-        reason="reason",
-        reference="5a93b5ae-9590-4561-a664-fbaead485e96",
-        payment_type="regular",
-    )
-
-
-def generate_conversion(identifier: str) -> transactions_models_pb2.Conversion:
-    usd = money.Money(100, money.Currency("USD"))
-    gbp = money.Money(100, money.Currency("GBP"))
-
-    return transactions_models_pb2.Conversion(
-        id=identifier,
-        external_id="f8144974-530f-477f-bbe1-c2eaedddec88",
-        settlement_date=protobuf.datetime_to_protobuf(
-            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(hours=1),
-        ),
-        created_at=protobuf.datetime_to_protobuf(
-            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(hours=2),
-        ),
-        buy_amount=usd.protobuf(),
-        sell_amount=gbp.protobuf(),
-        executed_rate=1,
-    )
-
-
 def generate_refund(identifier: str) -> refunds_models_pb2.Refund:
     usd = money.Money(100, money.Currency("USD"))
     gbp = money.Money(100, money.Currency("GBP"))
@@ -123,7 +73,6 @@ def generate_refund(identifier: str) -> refunds_models_pb2.Refund:
     return refunds_models_pb2.Refund(
         id=identifier,
         transaction_id="e719b289-982c-42f0-99a2-63fa70f8f8c0",
-        conversion_id="f8144974-530f-477f-bbe1-c2eaedddec88",
         status=refunds_models_pb2.Refund.Status.STATUS_PENDING,
         refund_received=True,
         note="simple note",
@@ -141,7 +90,6 @@ def generate_transaction(transaction_id: str) -> Transaction:
         id=transaction_id,
         external_reference_id=string.uuid(),
         invoice_reference_id=string.uuid(),
-        conversion_id=string.uuid(),
         amounts=QuotationAmounts(
             beneficiary=money_usd,
             base_converted=money_usd,

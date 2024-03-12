@@ -18,13 +18,15 @@ from snowfall.vendor.ask2go.models import search as search_model
 _AdultMinAge = 18
 _InfantMaxAge = 2
 
-CABIN_TO_FARE_MAPPING = MappingProxyType({
-    CabinClass.TYPE_UNSPECIFIED: fare_type_pb2.FARE_TYPE_UNSPECIFIED,
-    CabinClass.TYPE_ECONOMY: fare_type_pb2.FARE_TYPE_ECONOMY,
-    CabinClass.TYPE_PREMIUM: fare_type_pb2.FARE_TYPE_BUSINESS,
-    CabinClass.TYPE_BUSINESS: fare_type_pb2.FARE_TYPE_BUSINESS,
-    CabinClass.TYPE_FIRST: fare_type_pb2.FARE_TYPE_FIRST,
-})
+CABIN_TO_FARE_MAPPING = MappingProxyType(
+    {
+        CabinClass.TYPE_UNSPECIFIED: fare_type_pb2.FARE_TYPE_UNSPECIFIED,
+        CabinClass.TYPE_ECONOMY: fare_type_pb2.FARE_TYPE_ECONOMY,
+        CabinClass.TYPE_PREMIUM: fare_type_pb2.FARE_TYPE_BUSINESS,
+        CabinClass.TYPE_BUSINESS: fare_type_pb2.FARE_TYPE_BUSINESS,
+        CabinClass.TYPE_FIRST: fare_type_pb2.FARE_TYPE_FIRST,
+    },
+)
 
 
 class MissingIataError(Exception):

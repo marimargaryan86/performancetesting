@@ -210,7 +210,6 @@ class UserInformation(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         reseller_id = request.user.metadata.get("reseller_id", "")
         reseller = await resellers_client.get_reseller(reseller_id)
-
         company, contacts = await asyncio.gather(
             companies_client.get(reseller.company_id),
             contacts_client.find_by_company_id(

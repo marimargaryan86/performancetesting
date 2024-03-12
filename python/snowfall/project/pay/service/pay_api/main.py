@@ -1,20 +1,15 @@
 import asyncio
 import datetime
-from collections.abc import AsyncGenerator, Callable
-from typing import Any, NamedTuple
+from typing import NamedTuple
 
-import httpx
 from grpc import aio
-from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import (
-    beneficiaries,
     companies,
     currencies,
-    payments,
     quotations,
     transactions,
 )
@@ -25,36 +20,16 @@ from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.routes import router
-from snowfall.project.pay.service.payments.v1.payments_pb2_grpc import (
-    PaymentsServiceStub,
-)
 from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.service.authentication.v1 import authentication_pb2_grpc, oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
-from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
-from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application, grpc_factory, redis_factory
-from snowfall.vendor.currency_cloud import client
-
-
-def _lifespan(
-    payment_client: client.PaymentClient,
-    redis_client: redis.Client[str],
-) -> Callable[[applications.Starlette], AsyncGenerator[Any, Any]]:
-    async def decorator(app: applications.Starlette) -> AsyncGenerator[Any, Any]:
-        redis_key = "HouseAccount"
-        account = await payment_client.get_house_account()
-        await redis_client.put(redis_key, account.json(exclude_none=True))
-        yield
-        await redis_client.delete(redis_key)
-
-    return decorator
 
 
 class _HttpChannels(NamedTuple):
@@ -201,16 +176,8 @@ async def _admin_http(
             ),
         ),
     )
-    cc_payment_client = client.PaymentClient(
-        base_url=app.settings.cc_address,
-        auth=client.CurrencyCloudAuth(
-            base_url=app.settings.cc_address,
-            login_id=app.settings.cc_login,
-            api_key=app.settings.cc_api_key,
-        ),
-        client=metrics.register(httpx.AsyncClient()),
-    )
-    redis_client = await redis_factory.make_client(
+
+    await redis_factory.make_client(
         app=app,
         dsn=app.settings.redis_dsn,
         decode_responses=True,
@@ -250,19 +217,9 @@ async def _admin_http(
                         channels.authentication,
                     ),
                 ),
-                beneficiaries_client=beneficiaries.GrpcClient(
-                    companies_grpc_pb2.BeneficiariesServiceStub(
-                        channels.companies,
-                    ),
-                ),
                 transactions_client=transactions.GrpcClient(
                     transactions_pb2_grpc.TransactionsServiceStub(
                         channels.transactions,
-                    ),
-                ),
-                payments_client=payments.GrpcClient(
-                    PaymentsServiceStub(
-                        channels.payments,
                     ),
                 ),
             ),
@@ -271,7 +228,6 @@ async def _admin_http(
             "junction.pay_admin_api",
             "openapi.json",
         ),
-        lifespan=_lifespan(cc_payment_client, redis_client),
     )
 
     asgi_app.add_exception_handler(

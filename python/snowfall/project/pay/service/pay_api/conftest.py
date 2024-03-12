@@ -13,15 +13,11 @@ from snowfall.adapter.authentication import JWTFactory
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay import fixtures
 from snowfall.project.pay.adapter import (
-    beneficiaries,
     companies,
-    conversions,
     currencies,
-    payments,
     quotations,
     transactions,
 )
-from snowfall.project.pay.service.companies.v1 import models_pb2
 from snowfall.project.pay.service.pay_api import authenticator, bootstrap
 from snowfall.project.pay.service.pay_api.cache import UserSessionRepository
 from snowfall.project.pay.service.pay_api.routes import router
@@ -86,9 +82,7 @@ def _create_app(
 
 def _create_admin_app(
     authentication_client: auth.Client,
-    payment_client: payments.GrpcClient,
     transactions_client: transactions.Client,
-    beneficiaries_client: beneficiaries.Client,
     openapi_path: pathlib.Path,
     custom_middlewares: Sequence[Middleware] | None = None,
 ) -> applications.Starlette:
@@ -98,9 +92,7 @@ def _create_admin_app(
         routes=router.get_admin_routes(
             bootstrap.create_admin_dependencies(
                 authentication_client,
-                beneficiaries_client=beneficiaries_client,
                 transactions_client=transactions_client,
-                payments_client=payment_client,
             ),
         ),
     )
@@ -146,18 +138,6 @@ def transactions_client(
 
 
 @pytest.fixture()
-def conversions_client(
-    transaction_ids: Sequence[str],
-) -> conversions.DictClient:
-    return conversions.DictClient(
-        [
-            fixtures.generate_conversion(conversion_id)
-            for conversion_id in fixtures.CONVERSIONS
-        ],
-    )
-
-
-@pytest.fixture()
 def companies_client() -> companies.DictClient:
     return companies.DictClient(fixtures.get_companies())
 
@@ -193,23 +173,6 @@ def get_quotation(quotation_id: str) -> Quotation:
         ),
         payer_id=string.uuid(),
         beneficiary_id=string.uuid(),
-    )
-
-
-@pytest.fixture()
-def beneficiaries_client() -> beneficiaries.DictClient:
-    return beneficiaries.DictClient(
-        (
-            models_pb2.Beneficiary(
-                id=string.uuid(),
-                external_reference=string.uuid(),
-                account_id=string.uuid(),
-                created_by="ByMe",
-                updated_by="ByMe",
-                payment_type="priority",
-                currency="USD",
-            ),
-        ),
     )
 
 
@@ -256,16 +219,12 @@ def app(
 @pytest.fixture()
 def admin_app(
     authentication_client: auth.Client,
-    payment_client: payments.GrpcClient,
     transactions_client: transactions.Client,
-    beneficiaries_client: beneficiaries.Client,
     custom_middlewares: Sequence[Middleware],
 ) -> applications.Starlette:
     return _create_admin_app(
         authentication_client=authentication_client,
-        payment_client=payment_client,
         transactions_client=transactions_client,
-        beneficiaries_client=beneficiaries_client,
         custom_middlewares=custom_middlewares,
         openapi_path=filesystem.resource_path("junction.pay_admin_api", "openapi.json"),
     )

@@ -2,8 +2,7 @@ from collections.abc import Sequence
 
 import pytest
 
-from snowfall.project.pay import fixtures
-from snowfall.project.pay.adapter import currencies, payments
+from snowfall.project.pay.adapter import currencies
 from snowfall.stdlib import money
 
 
@@ -28,8 +27,3 @@ def currencies_client(
         },
         available_currencies,
     )
-
-
-@pytest.fixture()
-def payments_client() -> payments.Client:
-    return payments.DictClient(fixtures.get_payments())

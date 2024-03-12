@@ -203,26 +203,28 @@ class Trips(object):
         legs: list[leg.LegBase] = []
         for origin in origins:
             for destination in destinations:
-                legs.extend((
-                    leg.LegBase(
-                        is_return_leg=False,
-                        route_id=self._route.get_by_origin_destination(
-                            origin=origin.identifier,
-                            destination=destination.identifier,
-                        ).route_id,
-                        departure_date_time=departure_date_time,
-                        passengers=leg_passengers,
+                legs.extend(
+                    (
+                        leg.LegBase(
+                            is_return_leg=False,
+                            route_id=self._route.get_by_origin_destination(
+                                origin=origin.identifier,
+                                destination=destination.identifier,
+                            ).route_id,
+                            departure_date_time=departure_date_time,
+                            passengers=leg_passengers,
+                        ),
+                        leg.LegBase(
+                            is_return_leg=True,
+                            route_id=self._route.get_by_origin_destination(
+                                origin=destination.identifier,
+                                destination=origin.identifier,
+                            ).route_id,
+                            departure_date_time=return_date_time,
+                            passengers=leg_passengers,
+                        ),
                     ),
-                    leg.LegBase(
-                        is_return_leg=True,
-                        route_id=self._route.get_by_origin_destination(
-                            origin=destination.identifier,
-                            destination=origin.identifier,
-                        ).route_id,
-                        departure_date_time=return_date_time,
-                        passengers=leg_passengers,
-                    ),
-                ))
+                )
         quote_base = quote.QuoteBase(
             selected_currency=_CURRENCY,
             is_different_outbound_return=True,

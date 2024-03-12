@@ -808,27 +808,6 @@
                     },
                     "writeOnly": true
                   },
-                  "conversion": {
-                    "type": "object",
-                    "required": [
-                      "data"
-                    ],
-                    "properties": {
-                      "data": {
-                        "anyOf": [
-                          {
-                            "$ref": "#/components/schemas/ConversionIdentifier"
-                          },
-                          {
-                            "nullable": true
-                          }
-                        ],
-                        "nullable": true
-                      }
-                    },
-                    "readOnly": true,
-                    "description": "The ID that links and FX transaction in the provider system to Junction PAYs transcation history"
-                  },
                   "payer": {
                     "type": "object",
                     "required": [
@@ -961,28 +940,6 @@
               "quotations"
             ],
             "example": "quotations"
-          }
-        }
-      },
-      "ConversionIdentifier": {
-        "title": "Conversion Identifier",
-        "type": "object",
-        "required": [
-          "id",
-          "type"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "conversions"
-            ],
-            "example": "conversions"
           }
         }
       },

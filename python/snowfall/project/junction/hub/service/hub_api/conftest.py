@@ -29,19 +29,15 @@ from snowfall.project.junction.plus.service.notifications.v1 import (
 )
 from snowfall.project.pay import fixtures as pay_fixtures
 from snowfall.project.pay.adapter import (
-    accounts,
-    beneficiaries,
     bills,
     companies,
     contacts,
-    conversions,
     credit_card_payment,
     currencies,
     quotations,
     refunds,
     transactions,
 )
-from snowfall.project.pay.service.companies.v1 import models_pb2
 from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Bill,
     Quotation,
@@ -53,10 +49,6 @@ from snowfall.stdlib import authentication as stdlib_auth
 from snowfall.stdlib import money, string
 from snowfall.stdlib.integration.starlette import application, authentication, handlers
 from snowfall.stdlib.persistence import filesystem
-from snowfall.vendor.currency_cloud.client import PaymentClient
-from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
-from snowfall.vendor.currency_cloud.models.balance import BalanceResponse
-from snowfall.vendor.currency_cloud.models.beneficiary import BeneficiaryResponse
 
 RESELLER_ID = "effb6d65-2ddc-4a26-9b57-af79d44254cb"
 IDENTITIY_IDS = (
@@ -142,35 +134,6 @@ def companies_client() -> companies.Client:
 
 
 @pytest.fixture()
-def beneficiaries_client() -> beneficiaries.DictClient:
-    return beneficiaries.DictClient(
-        (
-            models_pb2.Beneficiary(
-                id=string.uuid(),
-                external_reference=string.uuid(),
-                account_id=string.uuid(),
-                created_by="ByMe",
-                updated_by="ByMe",
-                payment_type="priority",
-                currency="USD",
-            ),
-        ),
-    )
-
-
-@pytest.fixture()
-def conversions_client(
-    transaction_ids: Sequence[str],
-) -> conversions.DictClient:
-    return conversions.DictClient(
-        [
-            pay_fixtures.generate_conversion(conversion_id)
-            for conversion_id in pay_fixtures.CONVERSIONS
-        ],
-    )
-
-
-@pytest.fixture()
 def currencies_client(
     available_currencies: Sequence[money.Currency],
 ) -> currencies.DictClient:
@@ -225,80 +188,6 @@ def transactions_client(
     )
 
 
-@pytest.fixture()
-def accounts_list_from_cc() -> list[mock.Mock]:
-    return [
-        mock.Mock(
-            account_name="Snowfall",
-            legal_entity_type="company",
-            street="10-12 East Parade",
-            city="Leeds",
-            country="GB",
-            postal_code="LS1 2BH",
-            state_or_province="",
-            spread_table="flat_0.00",
-            api_trading=True,
-            online_trading=True,
-            phone_trading=True,
-            terms_and_conditions_accepted=None,
-            identifier="9954f733-27a8-46e5-9bf8-28b7b43ecd87",
-            status="enabled",
-        ),
-        mock.Mock(
-            account_name="Junction Pay First Account",
-            legal_entity_type="company",
-            street="1 Arcacia Avenue",
-            city="Tiddlington",
-            country="GB",
-            postal_code="OX1 1FX",
-            state_or_province="Oxfordshire",
-            spread_table="fxcg_rfx_default",
-            api_trading=True,
-            online_trading=True,
-            phone_trading=True,
-            terms_and_conditions_accepted=None,
-            identifier="6c37ed2c-6494-4d94-9c85-ff8e15e719ea",
-            status="enabled",
-        ),
-    ]
-
-
-@pytest.fixture()
-def balance() -> BalanceResponse:
-    return BalanceResponse(
-        amount="10",
-        currency="USD",
-        identifier=string.uuid(),
-        account_id=string.uuid(),
-    )
-
-
-@pytest.fixture()
-def beneficiary_response() -> BeneficiaryResponse:
-    return BeneficiaryResponse(
-        bank_country="GB",
-        currency="SEK",
-        beneficiary_company_name="Company",
-        beneficiary_address=["Street name 7"],
-        beneficiary_country="GB",
-        account_number=None,
-        bic_swift="AAAABBCC123",
-        iban="GB06BARC12314512778232",
-        bank_address=["Street name 7"],
-        bank_name="BankName",
-        bank_account_type="savings",
-        beneficiary_city="London",
-        beneficiary_postcode="12345",
-        beneficiary_state_or_province="California",
-        payment_types=["priority", "regular"],
-        beneficiary_entity_type="company",
-        name="Company",
-        bank_account_holder_name="bankAccountHolderName",
-        email="example@email.com",
-        identifier="e82060fe-894f-43e0-9b96-3ffaf6117431",
-    )
-
-
 def get_quotation(quotation_id: str) -> Quotation:
     money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
     basic_rate = float(1)
@@ -335,34 +224,8 @@ def get_bill(bill_id: str) -> Bill:
 
 
 @pytest.fixture()
-def cc_payment_client(
-    accounts_list_from_cc: Sequence[mock.Mock],
-    balance: BalanceResponse,
-    beneficiary_response: BeneficiaryResponse,
-) -> mock.Mock:
+def cc_payment_client() -> mock.Mock:
     payment_client = mock.Mock()
-    message = "Conversion of GBP equivalent 0.89 is less than your lower limit of 1.00"
-    payment_client.create_conversion = mock.Mock(
-        side_effect=CurrencyCloudError(messages=[message]),
-    )
-
-    def _get_all_accounts(  # noqa: WPS430
-        page_index: int,
-    ) -> Sequence[mock.Mock]:
-        if page_index == 1:
-            return accounts_list_from_cc
-
-        return []
-
-    payment_client.get_all_accounts = _get_all_accounts
-
-    payment_client.add_currency_into_account = mock.AsyncMock(return_value=balance)
-
-    payment_client.validate_beneficiary = mock.AsyncMock()
-
-    payment_client.create_beneficiary = mock.AsyncMock(
-        return_value=beneficiary_response,
-    )
 
     detailed_rate = mock.Mock()
     detailed_rate.client_buy_amount = secrets.randbelow(9999) + 1  # noqa: WPS432
@@ -371,11 +234,6 @@ def cc_payment_client(
     )
 
     return payment_client
-
-
-@pytest.fixture()
-def accounts_client() -> accounts.DictClient:
-    return accounts.DictClient()
 
 
 @pytest.fixture()
@@ -449,14 +307,10 @@ async def users_repository(
 def _create_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
-    accounts_client: accounts.Client,
     contacts_client: contacts.Client,
-    beneficiaries_client: beneficiaries.Client,
-    conversions_client: conversions.Client,
     identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
-    cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
     bills_client: bills.Client,
     refunds_client: refunds.Client,
@@ -471,14 +325,10 @@ def _create_app(
             bootstrap.create_dependencies(
                 orders_client=orders_client,
                 companies_client=companies_client,
-                accounts_client=accounts_client,
                 contacts_client=contacts_client,
-                beneficiaries_client=beneficiaries_client,
-                conversions_client=conversions_client,
                 identities_client=identities_client,
                 transactions_client=transactions_client,
                 currencies_client=currencies_client,
-                cc_payment_client=cc_payment_client,
                 quotations_client=quotations_client,
                 bills_client=bills_client,
                 refunds_client=refunds_client,
@@ -562,13 +412,9 @@ def app(
     orders_client: orders.Client,
     companies_client: companies.Client,
     bad_contacts_client: contacts.Client,
-    accounts_client: accounts.Client,
-    conversions_client: conversions.Client,
-    beneficiaries_client: beneficiaries.Client,
     identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
-    cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
     bills_client: bills.Client,
     refunds_client: refunds.Client,
@@ -581,13 +427,9 @@ def app(
         orders_client=orders_client,
         companies_client=companies_client,
         contacts_client=bad_contacts_client,
-        accounts_client=accounts_client,
-        conversions_client=conversions_client,
-        beneficiaries_client=beneficiaries_client,
         transactions_client=transactions_client,
         identities_client=identities_client,
         currencies_client=currencies_client,
-        cc_payment_client=cc_payment_client,
         quotations_client=quotations_client,
         bills_client=bills_client,
         refunds_client=refunds_client,
@@ -604,13 +446,9 @@ def users_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
     contacts_client: contacts.Client,
-    accounts_client: accounts.Client,
-    conversions_client: conversions.Client,
-    beneficiaries_client: beneficiaries.Client,
     identities_client: identities.Client,
     transactions_client: transactions.Client,
     currencies_client: currencies.Client,
-    cc_payment_client: PaymentClient,
     quotations_client: quotations.Client,
     bills_client: bills.Client,
     refunds_client: refunds.Client,
@@ -623,12 +461,8 @@ def users_app(
         orders_client=orders_client,
         companies_client=companies_client,
         contacts_client=contacts_client,
-        accounts_client=accounts_client,
-        conversions_client=conversions_client,
-        beneficiaries_client=beneficiaries_client,
         transactions_client=transactions_client,
         currencies_client=currencies_client,
-        cc_payment_client=cc_payment_client,
         identities_client=identities_client,
         quotations_client=quotations_client,
         bills_client=bills_client,

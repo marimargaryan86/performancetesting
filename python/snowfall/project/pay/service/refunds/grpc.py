@@ -23,7 +23,6 @@ from snowfall.stdlib import money, string
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.currency_cloud.client import PaymentClient
-from snowfall.vendor.currency_cloud.models import conversion
 from snowfall.vendor.currency_cloud.models.rate import (
     DetailedRateRequest,
     DetailedRateResponse,
@@ -354,7 +353,7 @@ class RefundsService(
                 transaction.amounts.processing_margin,
             ),
         )
-        conversion_id = ""
+
         if transaction.payment_type == PaymentType.PAYMENT_TYPE_CARD:
             stripe_refund = await self._create_stripe_refund(
                 context,
@@ -363,21 +362,7 @@ class RefundsService(
             )
             refund.external_reference_id = stripe_refund.external_reference_id or ""
             refund.status = models_pb2.Refund.Status.STATUS_SUBMITTED
-        else:
-            cc_conversion = await self._payment_client.create_conversion(
-                conversion.ConversionRequest(
-                    buy_currency=request.refund.refunded_us.currency_code,
-                    sell_currency=request.refund.refunded_reseller.currency_code,
-                    amount=str(
-                        money.from_protobuf(request.refund.refunded_us),
-                    ),
-                    reason=transaction.id,
-                ),
-            )
-            conversion_id = cc_conversion.identifier
-            refund.status = models_pb2.Refund.Status.STATUS_SUCCEEDED
 
-        refund.conversion_id = conversion_id
         refund.invoice_reference = request.refund.invoice_reference
         refund.note = request.refund.note
         refund.refund_received = request.refund.refund_received

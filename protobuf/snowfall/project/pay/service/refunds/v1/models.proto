@@ -12,7 +12,6 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 message Refund {
   string id = 1;
   string transaction_id = 2;
-  string conversion_id = 3;
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
@@ -20,14 +19,14 @@ message Refund {
     STATUS_FAILED = 3;
     STATUS_SUBMITTED = 4;
   }
-  Status status = 4;
-  bool refund_received = 5;
-  string note = 6;
-  snowfall.stdlib.v1.Money refunded_us = 7;
-  snowfall.stdlib.v1.Money refunded_us_in_payer_currency = 8;
-  snowfall.stdlib.v1.Money refunded_reseller = 9;
-  snowfall.stdlib.v1.Money refund_position = 10;
-  string invoice_reference = 11;
-  string external_reference_id = 12;
-  google.protobuf.Timestamp updated_at = 13;
+  Status status = 3;
+  bool refund_received = 4;
+  string note = 5;
+  snowfall.stdlib.v1.Money refunded_us = 6;
+  snowfall.stdlib.v1.Money refunded_us_in_payer_currency = 7;
+  snowfall.stdlib.v1.Money refunded_reseller = 8;
+  snowfall.stdlib.v1.Money refund_position = 9;
+  string invoice_reference = 10;
+  string external_reference_id = 11;
+  google.protobuf.Timestamp updated_at = 12;
 }

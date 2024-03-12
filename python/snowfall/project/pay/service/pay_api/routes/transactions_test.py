@@ -5,7 +5,6 @@ import pytest
 from starlette import status
 
 from snowfall.project.pay.service.transactions.v1.models_pb2 import Quotation
-from snowfall.stdlib.integration.starlette import request_helpers
 
 
 class TestTransactions(object):
@@ -46,24 +45,6 @@ class TestTransactions(object):
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert error["status"] == "404"
         assert error["code"] == "not_found"
-
-    async def test_creation_when_cc_is_failed(
-        self,
-        client: httpx.AsyncClient,
-        booked_quote_quoted: Quotation,
-    ) -> None:
-        request = self._transaction_request(booked_quote_quoted.id)
-
-        response = await client.post("/transactions", json=request)
-
-        assert response.status_code == status.HTTP_201_CREATED
-
-        response_data = response.json()
-        flatten_data = request_helpers.flatten_request_body(response_data)
-        assert response_data["data"]["id"]
-        assert flatten_data["payer"]
-        assert flatten_data["conversion"]
-        assert flatten_data["beneficiary"]
 
     def _transaction_request(self, quote_id: str) -> dict[str, Collection[str]]:
         return {

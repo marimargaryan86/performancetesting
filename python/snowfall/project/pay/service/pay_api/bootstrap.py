@@ -6,10 +6,8 @@ from pydantic import AnyUrl, RedisDsn
 
 from snowfall.adapter import authentication
 from snowfall.project.pay.adapter import (
-    beneficiaries,
     companies,
     currencies,
-    payments,
     quotations,
     transactions,
 )
@@ -40,14 +38,10 @@ class AdminSettings(_Settings):
 
 def create_admin_dependencies(
     authentication_client: authentication.Client,
-    payments_client: payments.GrpcClient,
-    beneficiaries_client: beneficiaries.Client,
     transactions_client: transactions.Client,
 ) -> lagom.Container:
     container = lagom.Container()
     container[authentication.Client] = authentication_client  # type: ignore[type-abstract]
-    container[payments.GrpcClient] = payments_client
-    container[beneficiaries.Client] = beneficiaries_client  # type: ignore[type-abstract]
     container[transactions.Client] = transactions_client  # type: ignore[type-abstract]
     return container
 

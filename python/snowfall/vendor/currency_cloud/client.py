@@ -1,39 +1,11 @@
 import asyncio
-from collections.abc import AsyncGenerator, Mapping, Sequence
+from collections.abc import AsyncGenerator, Mapping
 from typing import Any
 
 import httpx
 
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.currency_cloud.errors import CurrencyCloudError
-from snowfall.vendor.currency_cloud.models.account import (
-    AccountRequest,
-    AccountResponse,
-    AccountUpdateRequest,
-)
-from snowfall.vendor.currency_cloud.models.balance import (
-    BalanceRequest,
-    BalanceResponse,
-)
-from snowfall.vendor.currency_cloud.models.beneficiary import (
-    BeneficiaryRequest,
-    BeneficiaryResponse,
-    BeneficiaryValidateRequest,
-    BeneficiaryValidateResponse,
-)
-from snowfall.vendor.currency_cloud.models.contact import (
-    ContactRequest,
-    ContactResponse,
-    exclude_characters,
-)
-from snowfall.vendor.currency_cloud.models.conversion import (
-    ConversionRequest,
-    ConversionResponse,
-)
-from snowfall.vendor.currency_cloud.models.payment import (
-    PaymentRequest,
-    PaymentResponse,
-)
 from snowfall.vendor.currency_cloud.models.rate import (
     BasicRateResponse,
     DetailedRateRequest,
@@ -152,174 +124,6 @@ class PaymentClient(object):
         self._client.auth = auth
         self._logger = stdout.get_logger()
 
-    async def create_conversion(
-        self,
-        conversion_request: ConversionRequest,
-    ) -> ConversionResponse:
-        return ConversionResponse(
-            **await self._make_request(
-                _METHOD_POST,
-                "/conversions/create",
-                conversion_request.dict(exclude_none=True),
-            ),
-        )
-
-    async def create_contact(
-        self,
-        contact_request: ContactRequest,
-    ) -> ContactResponse:
-        exclude_characters(contact_request)
-        return ContactResponse(
-            **await self._make_request(
-                _METHOD_POST,
-                "/contacts/create",
-                payload=contact_request.dict(exclude_none=True),
-            ),
-        )
-
-    async def get_house_account(self) -> AccountResponse:
-        return AccountResponse(
-            **await self._make_request(
-                _METHOD_GET,
-                "/accounts/current",
-            ),
-        )
-
-    async def create_account(
-        self,
-        account_request: AccountRequest,
-    ) -> AccountResponse:
-        return AccountResponse(
-            **await self._make_request(
-                _METHOD_POST,
-                "/accounts/create",
-                payload=account_request.dict(exclude_none=True),
-            ),
-        )
-
-    async def update_account(
-        self,
-        account_id: str,
-        account_update_request: AccountUpdateRequest,
-    ) -> AccountResponse:
-        return AccountResponse(
-            **await self._make_request(
-                _METHOD_POST,
-                "/accounts/{0}".format(account_id),
-                payload=account_update_request.dict(exclude_none=True),
-            ),
-        )
-
-    async def get_balances(
-        self,
-        contact_id: str,
-        per_page: int = 25,
-    ) -> Sequence[BalanceResponse]:
-        balances = await self._make_request(
-            method=_METHOD_GET,
-            url="/balances/find",
-            query_parameters={
-                "on_behalf_of": contact_id,
-                "order": "amount",
-                "order_asc_desc": "asc",
-                "per_page": per_page,
-            },
-        )
-        return [BalanceResponse(**balance) for balance in balances["balances"]]
-
-    async def get_all_accounts(
-        self,
-        page_index: int,
-    ) -> list[AccountResponse]:
-        accounts = await self._make_request(
-            _METHOD_POST,
-            "/accounts/find",
-            payload={
-                "page": page_index,
-                "status": "enabled",
-            },
-        )
-
-        return [AccountResponse(**account) for account in accounts["accounts"]]
-
-    async def add_currency_into_account(
-        self,
-        balance_request: BalanceRequest,
-    ) -> BalanceResponse:
-        return BalanceResponse(
-            **await self._make_request(
-                method=_METHOD_GET,
-                url="/balances/{0}".format(balance_request.currency),
-                query_parameters={
-                    "on_behalf_of": balance_request.on_behalf_of,
-                },
-            ),
-        )
-
-    async def list_beneficiaries(
-        self,
-        page_index: int,
-    ) -> list[BeneficiaryResponse]:
-        beneficiaries = await self._make_request(
-            _METHOD_GET,
-            "/beneficiaries/find",
-            query_parameters={
-                "page": page_index,
-            },
-        )
-        return [
-            BeneficiaryResponse(**beneficiary)
-            for beneficiary in beneficiaries["beneficiaries"]
-        ]
-
-    async def get_beneficiary(self, beneficiary_id: str) -> BeneficiaryResponse:
-        beneficiary = await self._make_request(
-            _METHOD_GET,
-            "/beneficiaries/{0}".format(beneficiary_id),
-        )
-        return BeneficiaryResponse(**beneficiary)
-
-    async def update_beneficiary(
-        self,
-        beneficiary_id: str,
-        new_beneficiary: BeneficiaryRequest,
-    ) -> BeneficiaryResponse:
-        return BeneficiaryResponse(
-            **await self._make_request(
-                method=_METHOD_POST,
-                url="/beneficiaries/{0}".format(beneficiary_id),
-                payload=remove_blank_string(
-                    new_beneficiary.dict(exclude_none=True),
-                ),
-            ),
-        )
-
-    async def validate_beneficiary(
-        self,
-        beneficiary: BeneficiaryValidateRequest,
-    ) -> BeneficiaryValidateResponse:
-        return BeneficiaryValidateResponse(
-            **await self._make_request(
-                method=_METHOD_POST,
-                url="/beneficiaries/validate",
-                payload=beneficiary.dict(exclude_none=True),
-            ),
-        )
-
-    async def create_beneficiary(
-        self,
-        beneficiary: BeneficiaryRequest,
-    ) -> BeneficiaryResponse:
-        return BeneficiaryResponse(
-            **await self._make_request(
-                method=_METHOD_POST,
-                url="/beneficiaries/create",
-                payload=remove_blank_string(
-                    beneficiary.dict(exclude_none=True),
-                ),
-            ),
-        )
-
     async def get_detailed_rates(
         self,
         detailed_rates_request: DetailedRateRequest,
@@ -362,35 +166,6 @@ class PaymentClient(object):
             )
             for pair, rates in response_data["rates"].items()
         ]
-
-    async def create_payment(self, payment_request: PaymentRequest) -> PaymentResponse:
-        return PaymentResponse(
-            **await self._make_request(
-                method=_METHOD_POST,
-                url="/payments/create",
-                payload=payment_request.dict(exclude_none=True),
-            ),
-        )
-
-    async def get_payment(self, payment_id: str) -> PaymentResponse:
-        return PaymentResponse(
-            **await self._make_request(
-                method=_METHOD_GET,
-                url="/payments/{0}".format(payment_id),
-            ),
-        )
-
-    async def validate_payment(
-        self,
-        payment_request: PaymentRequest,
-    ) -> bool:
-        return (
-            await self._make_request(
-                method=_METHOD_POST,
-                url="/payments/validate",
-                payload=payment_request.dict(exclude_none=True),
-            )
-        )["validation_result"] == "success"
 
     async def _make_request(
         self,
