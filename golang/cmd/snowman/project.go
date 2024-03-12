@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"git.snowfall.se/junction/junction/golang/cmd/snowman/common"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
@@ -114,15 +115,29 @@ var statusLabels = []label{
 	},
 }
 
+func verifyScopeLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, config common.Configuration) {
+	scopeLabels := make([]label, 0, len(config.Commits.Scopes))
+
+	for l := range config.Commits.Scopes {
+		scopeLabels = append(scopeLabels, label{
+			name:        fmt.Sprintf("scope::%s", l),
+			color:       "#009966",
+			description: "",
+		})
+	}
+
+	verifyLabels(client, logger, p, scopeLabels, "scope::", true)
+}
+
 func verifySizeLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
-	verifyLabels(client, logger, p, sizeLabels, "size::")
+	verifyLabels(client, logger, p, sizeLabels, "size::", true)
 }
 
 func verifyStatusLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project) {
-	verifyLabels(client, logger, p, statusLabels, "status::")
+	verifyLabels(client, logger, p, statusLabels, "status::", false)
 }
 
-func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, labels []label, prefix string) {
+func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Project, labels []label, prefix string, deleteExtra bool) {
 	currentLabels := make([]*gitlab.Label, 0)
 	ch, g := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Label, *gitlab.Response, error) {
 		return client.Labels.ListLabels(p.ID, &gitlab.ListLabelsOptions{
@@ -179,6 +194,31 @@ func verifyLabels(client *gitlab.Client, logger *zap.SugaredLogger, p *gitlab.Pr
 			} else {
 				lLogger.Info("Label created.")
 			}
+		}
+	}
+
+	if !deleteExtra {
+		return
+	}
+
+DeleteLoop:
+	for _, l := range currentLabels {
+		lLogger := logger.With("label", l.Name)
+
+		for _, l2 := range labels {
+			if l.Name == l2.name {
+				continue DeleteLoop
+			}
+		}
+
+		_, err := client.Labels.DeleteLabel(p.ID, &gitlab.DeleteLabelOptions{
+			Name: &l.Name,
+		})
+
+		if err != nil {
+			lLogger.Error(err)
+		} else {
+			lLogger.Info("Label deleted.")
 		}
 	}
 }
@@ -301,6 +341,7 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 
 		verifyProjectSettings(client, pLogger, p, config)
 		verifyApprovalRules(client, pLogger, p, snowman)
+		verifyScopeLabels(client, pLogger, p, config)
 		verifySizeLabels(client, pLogger, p)
 		verifyStatusLabels(client, pLogger, p)
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const discussionScopeBody = "Hi @%s! :wave:\n\nSorry to interrupt, but your merge request title contains an invalid scope. Make sure there's no typo and that you're following the naming convention. If you believe your scope is correct, please ping one of the maintainers so they can create a scope label for you."
+const discussionScopeBody = "Hi @%s! :wave:\n\nSorry to interrupt, but your merge request title contains an invalid scope. Make sure there's no typo and that you're following the naming convention. If you believe your scope is correct, please configure it in the repository's `.snowman.yml`."
 const discussionScopeSuffix = "invalid_scope"
 
 func (mr *mergeRequest) validateScope() error {
