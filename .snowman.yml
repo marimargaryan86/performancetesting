@@ -68,6 +68,8 @@ commits:
       - "python/snowfall/vendor/benerail"
     vendor/carnect:
       - "python/snowfall/vendor/carnect"
+    vendor/consul:
+      - "python/snowfall/vendor/consul"
     vendor/currency-cloud:
       - "python/snowfall/vendor/currency_cloud"
     vendor/direct-ferries:
@@ -76,6 +78,16 @@ commits:
       - "python/snowfall/vendor/distribusion"
     vendor/duffel:
       - "python/snowfall/vendor/duffel"
+    vendor/flight-stats:
+      - "python/snowfall/vendor/flight_stats"
+    vendor/fluxir:
+      - "python/snowfall/vendor/fluxir"
+    vendor/google-flights:
+      - "python/snowfall/vendor/google_flights"
+    vendor/junction:
+      - "python/snowfall/vendor/junction"
+    vendor/junction-one:
+      - "python/snowfall/vendor/junction_one"
     vendor/karhoo:
       - "python/snowfall/vendor/karhoo"
     vendor/ory:
@@ -84,8 +96,8 @@ commits:
       - "python/snowfall/vendor/rate_limiter"
     vendor/save-a-train:
       - "python/snowfall/vendor/save_a_train"
-    vendor/consul:
-      - "python/snowfall/vendor/consul"
+    vendor/zendesk:
+      - "python/snowfall/vendor/zendesk"
 metrics:
   base_size: 75
 use_merge_train: false
