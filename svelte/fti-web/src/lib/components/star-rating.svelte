@@ -18,10 +18,10 @@
   }
 
   .star {
-    width: 22px;
+    width: 20px;
   }
 
   :global(.star > svg) {
-    fill: #fbd148;
+    color: #fbd148;
   }
 </style>

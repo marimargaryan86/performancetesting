@@ -85,4 +85,12 @@ const origins: Place[] = [
     country: "America",
   },
 ];
-export { weatherCategories, places, origins };
+
+const amentitiesIconMap = {
+  beach: "/icons/amenities/beach.svg",
+  spa: "/icons/amenities/spa.svg",
+  pool: "/icons/amenities/pool.svg",
+  gym: "/icons/amenities/gym.svg",
+  tick: "/icons/amenities/tick.svg",
+};
+export { weatherCategories, places, origins, amentitiesIconMap };
