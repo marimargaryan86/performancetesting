@@ -3,12 +3,14 @@ syntax = "proto3";
 package snowfall.project.junction.go.service.planner.v1;
 
 import "snowfall/project/junction/go/v1/models.proto";
+import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 import "snowfall/stdlib/v1/latlng.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1";
 
 service PlannerService {
+  rpc FindRoutes(FindRoutesRequest) returns (FindRoutesResponse) {}
   rpc SearchJourney(SearchJourneyRequest) returns (SearchJourneyResponse) {}
 }
 
@@ -23,4 +25,23 @@ message SearchJourneyRequest {
 
 message SearchJourneyResponse {
   repeated snowfall.project.junction.go.v1.TripReference trips = 1;
+}
+
+message FindRoutesRequest {
+  repeated snowfall.stdlib.v1.LatLng origins = 1;
+  repeated snowfall.stdlib.v1.LatLng destinations = 2;
+}
+
+message FindRoutesResponse {
+  message Segment {
+    snowfall.stdlib.v1.LatLng origin = 1;
+    snowfall.stdlib.v1.LatLng destination = 2;
+    snowfall.project.junction.v1.SegmentType segment_type = 3;
+  }
+
+  message Route {
+    repeated Segment segments = 1;
+  }
+
+  repeated Route routes = 1;
 }
