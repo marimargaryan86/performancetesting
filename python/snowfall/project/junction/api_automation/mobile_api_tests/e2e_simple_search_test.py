@@ -6,15 +6,13 @@ from typing import Any
 import allure
 import pytest
 
-from snowfall.project.junction.api_automation.conftest import (
-    ConfigurationManager,
-)
 from snowfall.project.junction.api_automation.test_functions.benerail import (
     br_dialogues,
     br_passengers,
     br_trip_collections,
 )
 from snowfall.project.junction.api_automation.test_functions.helper import (
+    ConfigurationManager,
     stripe_confirmation,
     wait_until_completed,
 )

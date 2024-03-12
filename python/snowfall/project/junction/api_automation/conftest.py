@@ -1,10 +1,7 @@
-import base64
 import datetime
 import json
 import logging
 import re
-import tempfile
-import urllib
 from collections.abc import (
     AsyncGenerator,
     Callable,
@@ -18,12 +15,14 @@ from pathlib import Path
 from typing import Any
 
 import allure
-import boto3
 import httpx
-import hvac
 import pytest
 from pymongo import MongoClient
 
+from snowfall.project.junction.api_automation.test_functions.helper import (
+    ConfigurationManager,
+    get_variable_value,
+)
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
     MobileApiClient,
 )
@@ -213,38 +212,6 @@ def mock_mobile_client(
     )
 
 
-def get_variable_value(
-    host: str,
-    api_token: str,
-    variable_name: str,
-) -> str:
-    vusername, vpassword = api_token.split("+")
-    client = hvac.Client(url=host)
-    client.auth.userpass.login(username=vusername, password=vpassword)
-    is_authenticated = client.is_authenticated()
-    returned_data = {}
-    if is_authenticated:
-        returned_data = get_variable_from_server(client, "sandbox")
-        if not returned_data:
-            returned_data = get_variable_from_server(client, "development")
-            if not returned_data:
-                returned_data = get_variable_from_server(client, "production")
-
-    return str(returned_data["data"]["data"][variable_name])
-
-
-def get_variable_from_server(
-    client: hvac.Client,
-    environment: str,
-) -> dict[str, Any]:
-    query = "kv/data/{e}/{s}".format(e=environment, s="api-automation")
-    try:
-        returned_data = client.read(query)
-    except hvac.exceptions.Forbidden:
-        returned_data = {}
-    return returned_data
-
-
 @pytest.fixture(scope="session", autouse=True)
 def add_allure_environment_property(
     request: pytest.FixtureRequest,
@@ -364,94 +331,6 @@ def mongo_client(host: str, api_token: str) -> MongoClient[Any]:
         mdb_port,
     )
     return MongoClient(mongo_uri)
-
-
-def connect_to_aws() -> Any:
-    aws_access_key_id = "AKIA6JO5TGEWJNIU4LNR"
-    aws_secret_access_key = "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"
-    bucket_name = "junctionqa"
-    file_key = "rails_origin_destination.csv"
-
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,
-    )
-    response = s3.get_object(Bucket=bucket_name, Key=file_key)
-    return response["Body"].read()
-
-
-class ConfigurationManager(object):
-    def __init__(self, host: str, api_token: str) -> None:
-        self.host = host
-        self.api_token = api_token
-
-    def get_br_cert(self) -> str:
-        br_base64_cert = get_variable_value(self.host, self.api_token, "br_base64_cert")
-        return str(br_base64_cert)
-
-    def get_br_api_host(self) -> str:
-        br_api_host = get_variable_value(self.host, self.api_token, "br_api_host")
-        return str(br_api_host)
-
-    def get_br_subscription_key(self) -> str:
-        br_subscription_key = get_variable_value(
-            self.host,
-            self.api_token,
-            "br_subscription_key",
-        )
-        return str(br_subscription_key)
-
-
-async def create_br_connection(
-    config_manager: ConfigurationManager,
-) -> AsyncGenerator[httpx.AsyncClient, None]:
-    cert = (config_manager.get_br_cert(),)
-    base64_cert = "-----BEGIN CERTIFICATE-----\n{0}\n-----END CERTIFICATE-----".format(
-        cert[0],
-    )
-    decoded_cert = base64.b64decode(urllib.parse.unquote(base64_cert))
-
-    with tempfile.NamedTemporaryFile(delete=False) as temp_cert_file:
-        temp_cert_file.write(decoded_cert)
-        temp_cert_file_name = temp_cert_file.name
-    async with httpx.AsyncClient(http2=True, cert=temp_cert_file_name) as client:
-        yield client
-
-
-async def make_br_request(
-    config_manager: ConfigurationManager,
-    method: str,
-    endpoint: str,
-    payload: Mapping[str, Any],
-    custom_headers: Mapping[str, Any] | None = None,
-) -> tuple[dict[str, Any], Any]:
-    base_url = config_manager.get_br_api_host()
-    subscription_key = config_manager.get_br_subscription_key()
-    full_url = urllib.parse.urljoin(base_url, endpoint)
-
-    default_headers = {
-        "Cache-Control": "no-cache",
-        "Ocp-Apim-Subscription-Key": subscription_key,
-        "Content-Type": "application/json",
-        "x-bnds-user-token": "ea44f55b-f390-4327-b3a7-9d79668d4f11",
-    }
-    headers = default_headers
-    if custom_headers is not None:
-        headers = {**default_headers, **custom_headers}
-    async for conn in create_br_connection(config_manager):
-        response = await conn.request(
-            method,
-            full_url,
-            json=payload,
-            headers=headers,
-        )
-        response.raise_for_status()
-        response_hearder = response.headers
-        response_data = response.json()
-
-        return response_data, response_hearder
-    raise RuntimeError("Error on Benerail requests")
 
 
 @pytest.fixture()

@@ -3,7 +3,7 @@ from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from typing import Any
 
-from snowfall.project.junction.api_automation.conftest import (
+from snowfall.project.junction.api_automation.test_functions.helper import (
     ConfigurationManager,
     make_br_request,
 )

@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 import pytest
 
-from snowfall.project.junction.api_automation.mobile_api_tests.e2e_simple_search_test import (
+from snowfall.project.junction.api_automation.test_functions.helper import (
     create_offer_simple_search,
     create_order,
     create_payment,
@@ -14,8 +14,6 @@ from snowfall.project.junction.api_automation.mobile_api_tests.e2e_simple_search
     get_place_coordinates,
     get_quote,
     get_search_offers,
-)
-from snowfall.project.junction.api_automation.test_functions.helper import (
     wait_until_completed,
 )
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
