@@ -4,11 +4,11 @@ import type { PaginatedData } from "$lib/models/common";
 import { LIST_JOURNEYS_LIMIT, LIST_JOURNEYS_SORT } from "./+page.svelte";
 import { queryFiltersGetter } from "$lib/components/pages/trip-management/orders/filters.svelte";
 
-export function load(event): { journeys: Promise<PaginatedData<HubSchemas.Journey>> } {
+export async function load(event): Promise<{ journeys: PaginatedData<HubSchemas.Journey> }> {
   const filter = queryFiltersGetter(Object.fromEntries(event.url.searchParams));
 
   return {
-    journeys: integrationInstances.junctionHubApi.journeys.find({
+    journeys: await integrationInstances.junctionHubApi.journeys.find({
       limit: LIST_JOURNEYS_LIMIT,
       session: event.locals.session,
       sort: LIST_JOURNEYS_SORT,
