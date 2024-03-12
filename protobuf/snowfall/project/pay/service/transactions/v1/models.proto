@@ -32,6 +32,13 @@ message QuotationRates {
   int32 fee_multiplier = 6;
 }
 
+enum TransactionStatus {
+  TRANSACTION_STATUS_UNSPECIFIED = 0;
+  TRANSACTION_STATUS_PENDING = 1;
+  TRANSACTION_STATUS_SUCCEEDED = 2;
+  TRANSACTION_STATUS_FAILED = 3;
+}
+
 message Transaction {
   string id = 1;
   string external_reference_id = 2;
@@ -44,6 +51,7 @@ message Transaction {
   snowfall.project.pay.service.companies.v1.PaymentMethod payment_method = 9;
   snowfall.project.pay.service.companies.v1.PaymentType payment_type = 10;
   string bill_id = 11;
+  TransactionStatus status = 12;
 }
 
 enum QuotationStatus {

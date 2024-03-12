@@ -2,6 +2,7 @@ import grpc
 
 from snowfall.project.junction.go.adapter import errors as adapter_errors
 from snowfall.project.pay.adapter import companies, currencies
+from snowfall.project.pay.service.companies.v1.models_pb2 import PaymentType
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
@@ -121,23 +122,38 @@ class TransactionsService(
         transaction_id = string.uuid()
 
         payer = await self._companies.get(request.quotation.payer_id)
-
-        inserted_transaction = await self._transactions.insert(
-            models_pb2.Transaction(
-                id=transaction_id,
-                external_reference_id=request.external_reference,
-                invoice_reference_id=request.invoice_reference,
-                amounts=request.quotation.amounts,
-                rates=request.quotation.rates,
-                payer_id=request.quotation.payer_id,
-                beneficiary_id=request.quotation.beneficiary_id,
-                payment_type=payer.payment_type,
-                payment_method=payer.payment_method,
-                bill_id=bill.id,
-            ),
+        transaction = models_pb2.Transaction(
+            id=transaction_id,
+            external_reference_id=request.external_reference,
+            invoice_reference_id=request.invoice_reference,
+            amounts=request.quotation.amounts,
+            rates=request.quotation.rates,
+            payer_id=request.quotation.payer_id,
+            beneficiary_id=request.quotation.beneficiary_id,
+            payment_type=payer.payment_type,
+            payment_method=payer.payment_method,
+            bill_id=bill.id,
+            status=models_pb2.TransactionStatus.TRANSACTION_STATUS_SUCCEEDED,
         )
 
+        if payer.payment_type == PaymentType.PAYMENT_TYPE_CARD:
+            transaction.status = models_pb2.TransactionStatus.TRANSACTION_STATUS_PENDING
+
+        inserted_transaction = await self._transactions.insert(transaction)
+
         return grpc_pb2.CreateTransactionResponse(transaction=inserted_transaction)
+
+    async def UpdateTransactionStatus(  # type: ignore[override]  # noqa: N802
+        self,
+        request: grpc_pb2.UpdateTransactionStatusRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateTransactionStatusResponse:
+        return grpc_pb2.UpdateTransactionStatusResponse(
+            is_success=await self._transactions.update_status(
+                request.id,
+                request.status,
+            ),
+        )
 
     def _add_amount_to_bill_amount(
         self,

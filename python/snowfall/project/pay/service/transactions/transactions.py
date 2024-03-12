@@ -104,6 +104,23 @@ class TransactionsRepository(
         }
         return await self._execute(self._collection.find, query)
 
+    async def update_status(
+        self,
+        transaction_id: str,
+        status: int,
+    ) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            filter={repository.mongo_id_key: transaction_id},
+            update={
+                "$set": {
+                    "status": status,
+                },
+            },
+            upsert=False,
+        )
+        return update_result.matched_count != 0
+
 
 class QuotationsRepository(
     repository.ProtoRepository[models_pb2.Quotation],
