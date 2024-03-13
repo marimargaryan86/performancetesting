@@ -14,7 +14,7 @@ function getBeneficiaryData(event: RequestEvent): HubSchemas.BeneficiaryPut | un
 
 export async function load(event): Promise<{
   beneficiary: HubSchemas.BeneficiaryPut;
-  accounts: Promise<HubSchemas.Account[]>;
+  accounts: HubSchemas.Account[];
 }> {
   const session = event.locals.session;
   const accounts = integrationInstances.junctionHubApi.accounts
@@ -40,5 +40,5 @@ export async function load(event): Promise<{
     throw error(404, { message: "Beneficiary not found" });
   }
 
-  return { beneficiary, accounts };
+  return { beneficiary, accounts: await accounts };
 }
