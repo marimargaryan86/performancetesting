@@ -1,7 +1,7 @@
 package raptor
 
 import (
-	"errors"
+	"fmt"
 	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
@@ -15,6 +15,8 @@ import (
 
 	"go.uber.org/zap"
 )
+
+const maxSearchRange = 28 * time.Hour
 
 var executionTimes = promauto.NewHistogram(prometheus.HistogramOpts{
 	Name: "planner_execution_time_seconds",
@@ -67,6 +69,10 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 			models.Schedule_TYPE_UNSPECIFIED,
 			models.Schedule_TYPE_AIR,
 			models.Schedule_TYPE_RAIL,
+			models.Schedule_TYPE_FERRY,
+			models.Schedule_TYPE_BUS,
+			models.Schedule_TYPE_TAXI,
+			models.Schedule_TYPE_CAR,
 		}
 	}
 
@@ -77,18 +83,18 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 	start := time.Now()
 	sTime := departureAfter
 	eTime := departureBefore
+	difference := eTime.Sub(sTime)
 
-	difference := eTime.Sub(sTime).Hours()
-	if difference <= 0 || difference > 30 {
-		return trips, errors.New("Invalid date range (must be a duration of <30 hours).")
+	if difference > maxSearchRange {
+		return trips, fmt.Errorf("invalid search range: must be a duration below or equal to %s", maxSearchRange.String())
 	}
 
-	for sTime.Before(eTime) {
+	for !eTime.Before(sTime) {
 		iterations++
 
 		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap, maxConnections, workerCount)
 		results := r.run()
-		min := eTime
+		minTime := eTime
 		found := false
 
 		for _, to := range tos {
@@ -105,8 +111,8 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 			found = true
 
 			for _, s := range result.Trips {
-				if s.Segments[0].Depart.Before(min) {
-					min = s.Segments[0].Depart.In(sTime.Location())
+				if s.Segments[0].Depart.Before(minTime) {
+					minTime = s.Segments[0].Depart.In(sTime.Location())
 				}
 
 				if _, ok := seen[s.Id]; ok {
@@ -123,7 +129,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 			break
 		}
 
-		sTime = min.Add(time.Minute)
+		sTime = minTime.Add(time.Minute)
 	}
 
 	sort.SliceStable(trips, func(i, j int) bool {

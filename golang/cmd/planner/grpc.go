@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
+	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1"
 	v1Stdlib "git.snowfall.se/junction/junction/golang/protobuf/snowfall/stdlib/v1"
 	"git.snowfall.se/junction/junction/golang/raptor"
 	"git.snowfall.se/junction/junction/golang/stdlib/sliceutil"
@@ -23,6 +25,20 @@ type PlannerServiceServer struct {
 	Logger  *zap.SugaredLogger
 }
 
+var scheduleTypeToSegmentType map[models.Schedule_Type]v1.SegmentType
+
+func init() {
+	scheduleTypeToSegmentType = map[models.Schedule_Type]v1.SegmentType{
+		models.Schedule_TYPE_UNSPECIFIED: v1.SegmentType_SEGMENT_TYPE_UNSPECIFIED,
+		models.Schedule_TYPE_AIR:         v1.SegmentType_SEGMENT_TYPE_FLIGHT,
+		models.Schedule_TYPE_RAIL:        v1.SegmentType_SEGMENT_TYPE_TRAIN,
+		models.Schedule_TYPE_FERRY:       v1.SegmentType_SEGMENT_TYPE_FERRY,
+		models.Schedule_TYPE_BUS:         v1.SegmentType_SEGMENT_TYPE_BUS,
+		models.Schedule_TYPE_TAXI:        v1.SegmentType_SEGMENT_TYPE_TAXI,
+		models.Schedule_TYPE_CAR:         v1.SegmentType_SEGMENT_TYPE_UNSPECIFIED,
+	}
+}
+
 func difference[T comparable](a, b []T) []T {
 	mb := make(map[T]struct{}, len(b))
 	for _, x := range b {
@@ -37,42 +53,101 @@ func difference[T comparable](a, b []T) []T {
 	return diff
 }
 
-func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
-	origins := make([]*planner.Stop, 0, len(req.Origins))
-	destinations := make([]*planner.Stop, 0, len(req.Destinations))
+func (ps *PlannerServiceServer) resolveStops(wantedStops []*v1Stdlib.LatLng) []*planner.Stop {
+	stops := make([]*planner.Stop, 0, len(wantedStops))
 
-	for _, origin := range req.Origins {
+	for _, stop := range wantedStops {
 		h3index := h3.LatLngToCell(h3.LatLng{
-			Lat: origin.Latitude,
-			Lng: origin.Longitude,
+			Lat: stop.Latitude,
+			Lng: stop.Longitude,
 		}, 9)
 
 		if v, ok := ps.Stops[h3index]; ok {
-			origins = append(origins, v...)
+			stops = append(stops, v...)
 		}
 	}
 
-	for _, destination := range req.Destinations {
-		h3index := h3.LatLngToCell(h3.LatLng{
-			Lat: destination.Latitude,
-			Lng: destination.Longitude,
-		}, 9)
+	return stops
+}
 
-		if v, ok := ps.Stops[h3index]; ok {
-			destinations = append(destinations, v...)
-		}
-	}
-
+func (ps *PlannerServiceServer) resolveOriginsDestinations(wantedOrigins []*v1Stdlib.LatLng, wantedDestinations []*v1Stdlib.LatLng) ([]*planner.Stop, []*planner.Stop, error) {
+	origins := ps.resolveStops(wantedOrigins)
+	destinations := ps.resolveStops(wantedDestinations)
 	origins = difference(origins, destinations)
 
 	if len(origins) == 0 {
-		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "no suitable origins found")
+		return origins, destinations, errors.New("no suitable origins found")
 	}
 
 	destinations = difference(destinations, origins)
 
 	if len(destinations) == 0 {
-		return &planner.SearchJourneyResponse{}, status.Errorf(codes.InvalidArgument, "no suitable destinations found")
+		return origins, destinations, errors.New("no suitable destinations found")
+	}
+
+	return origins, destinations, nil
+}
+
+func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.FindRoutesRequest) (*planner.FindRoutesResponse, error) {
+	origins, destinations, err := ps.resolveOriginsDestinations(req.Origins, req.Destinations)
+
+	if err != nil {
+		return &planner.FindRoutesResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	departureTime := time.Now()
+	departureTime = time.Date(departureTime.Year(), departureTime.Month(), departureTime.Day(), 0, 0, 0, 0, time.UTC)
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureTime, make([]models.Schedule_Type, 0), -1)
+
+	if err != nil {
+		ps.Logger.Error(err)
+		return &planner.FindRoutesResponse{}, status.Error(codes.Unknown, "raptor returned an error")
+	}
+
+	routes := make([]*planner.FindRoutesResponse_Route, 0, len(results))
+
+	for _, r := range results {
+		route := &planner.FindRoutesResponse_Route{
+			Segments: make([]*planner.FindRoutesResponse_Segment, 0, len(r.Segments)),
+		}
+
+		for _, s := range r.Segments {
+			if len(s.Stops) == 0 {
+				continue
+			}
+
+			origin := h3.CellToLatLng(s.Stops[0].Cell)
+			destination := h3.CellToLatLng(s.Stops[len(s.Stops)-1].Cell)
+			segmentType, ok := scheduleTypeToSegmentType[s.Type]
+
+			if !ok {
+				return &planner.FindRoutesResponse{}, status.Errorf(codes.Unknown, "unknown segment type: %d", s.Type)
+			}
+
+			route.Segments = append(route.Segments, &planner.FindRoutesResponse_Segment{
+				Origin: &v1Stdlib.LatLng{
+					Latitude:  origin.Lat,
+					Longitude: origin.Lng,
+				},
+				Destination: &v1Stdlib.LatLng{
+					Latitude:  destination.Lat,
+					Longitude: destination.Lng,
+				},
+				SegmentType: segmentType,
+			})
+		}
+
+		routes = append(routes, route)
+	}
+
+	return &planner.FindRoutesResponse{Routes: routes}, nil
+}
+
+func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.SearchJourneyRequest) (*planner.SearchJourneyResponse, error) {
+	origins, destinations, err := ps.resolveOriginsDestinations(req.Origins, req.Destinations)
+
+	if err != nil {
+		return &planner.SearchJourneyResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	departureTime := time.Now()
@@ -140,19 +215,9 @@ func (ps *PlannerServiceServer) SearchJourney(context context.Context, req *plan
 	}
 
 	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
-
 	copy(allowedSegmentTypes, req.AllowedSegmentTypes)
 
-	if len(allowedSegmentTypes) == 0 {
-		allowedSegmentTypes = append(
-			allowedSegmentTypes,
-			models.Schedule_TYPE_UNSPECIFIED,
-			models.Schedule_TYPE_AIR,
-			models.Schedule_TYPE_RAIL,
-		)
-	}
 	maxConnections := -1
-
 	if req.MaximumConnections != nil {
 		maxConnections = int(*req.MaximumConnections)
 	}

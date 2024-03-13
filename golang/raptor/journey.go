@@ -2,7 +2,10 @@ package raptor
 
 import (
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
+	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	"github.com/google/uuid"
+	"github.com/uber/h3-go/v4"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -22,11 +25,13 @@ type Segment struct {
 	Depart     time.Time
 	Arrive     time.Time
 	Stops      []*Stop
+	Type       models.Schedule_Type
 }
 
 type Stop struct {
 	Id       string
 	Sequence int64
+	Cell     h3.Cell
 }
 
 var namespace uuid.UUID
@@ -59,9 +64,17 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 
 				for _, s := range v.schedule.ScheduleStops[v.from : v.to+1] {
 					sScheduleStop := p.data.ScheduleStopBySequence(s)
+					sStop := p.data.StopBySequence(sScheduleStop.Stop)
+					sStopCellInt, err := strconv.Atoi(sStop.Id)
+
+					if err != nil {
+						return &TripSet{Trips: trips}, err
+					}
+
 					stops = append(stops, &Stop{
 						Id:       sScheduleStop.Id,
 						Sequence: int64(sScheduleStop.Sequence),
+						Cell:     h3.Cell(sStopCellInt),
 					})
 				}
 
@@ -80,6 +93,7 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 					Stops:      stops,
 					Depart:     time.Unix(int64(depart), 0),
 					Arrive:     time.Unix(int64(arrive), 0),
+					Type:       v.schedule.Type,
 				})
 
 				dest = org
