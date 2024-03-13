@@ -5,33 +5,37 @@
   import { slideFade } from "$lib/transitions/slide-fade";
   import { createEventDispatcher } from "svelte";
   import { getRandomId } from "$lib/utils/random";
-  import type { AriaRole, HTMLInputAttributes } from "svelte/elements";
+  import type { HTMLInputAttributes } from "svelte/elements";
 
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
   type TValue = TType extends "number" ? number : TType extends "date" ? Date : string;
 
-  let className: string | undefined = undefined;
+  interface $$Props extends Omit<HTMLInputAttributes, "type" | "value"> {
+    label?: string;
+    type?: TType;
+    value?: TValue;
+    clearValue?: TValue;
+    error?: string | string[] | boolean;
+    helpText?: string;
+    clearable?: boolean;
+    ignorePasswordManagers?: boolean;
+  }
+
+  let className: HTMLInputAttributes["class"] = undefined;
 
   export { className as class };
-  export let id = getRandomId("text-field");
+  export let id: HTMLInputAttributes["id"] = getRandomId("text-field");
   export let label: string | undefined = undefined;
-  export let placeholder: HTMLInputAttributes["placeholder"] = undefined;
   export let type: TType = "text" as TType;
   export let value: TValue | undefined = undefined;
   export let clearValue: TValue | undefined = undefined;
   export let error: string | string[] | boolean = false;
-  export let name: HTMLInputAttributes["name"] = undefined;
-  export let readonly = false;
-  export let required = false;
+  export let required: HTMLInputAttributes["required"] = false;
   export let helpText: string | undefined = undefined;
   export let clearable = false;
-  export let maxlength: HTMLInputAttributes["maxlength"] = undefined;
-  export let min: HTMLInputAttributes["min"] = undefined;
-  export let max: HTMLInputAttributes["max"] = undefined;
-  export let step: HTMLInputAttributes["step"] = undefined;
   export let autocomplete: HTMLInputAttributes["autocomplete"] = undefined;
-  export let disabled = false;
-  export let role: AriaRole = "textbox";
+  export let disabled: HTMLInputAttributes["disabled"] = false;
+  export let role: HTMLInputAttributes["role"] = "textbox";
   export let ignorePasswordManagers: boolean | undefined = undefined;
 
   let inputRef: HTMLInputElement;
@@ -97,14 +101,7 @@
     <input
       {id}
       {type}
-      {name}
       {role}
-      {readonly}
-      {placeholder}
-      {maxlength}
-      {min}
-      {max}
-      {step}
       {disabled}
       value={displayValue}
       on:click
@@ -126,6 +123,7 @@
       aria-disabled={disabled}
       data-1p-ignore={ignorePasswordManagersValue}
       data-lpignore={ignorePasswordManagersValue}
+      {...$$restProps}
     />
 
     {#if clearable && value}
