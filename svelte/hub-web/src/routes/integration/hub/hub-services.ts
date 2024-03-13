@@ -10,6 +10,7 @@ import currencies from "./currencies/currency-service";
 import journeys from "./journeys/journey-service";
 import transactions from "./transactions/transaction-service";
 import refunds from "./refunds/refund-service";
+import resellers from "./resellers/reseller-service";
 import users from "./users/user-service";
 
 export default {
@@ -25,5 +26,6 @@ export default {
   journeys,
   transactions,
   refunds,
+  resellers,
   users,
 };

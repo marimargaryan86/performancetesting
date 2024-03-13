@@ -3,11 +3,51 @@ import type * as OrySchemas from "~/integration/ory/schemas";
 
 export type Reseller = {
   id: string;
+  name?: string;
+  providers?: string[];
+
+  // TODO(2024-03-11/alvin.s): fix `unknown` typing.
+  company?: unknown;
+  currency?: unknown;
+  parentResellers?: unknown;
 };
 
 export type ResellerSchema = {
   id: string;
   type: "resellers";
+  attributes: {
+    name?: string;
+    providers?: string[];
+  };
+  relationships: {
+    company?: unknown;
+    currency?: unknown;
+    parentResellers?: unknown;
+  };
+};
+
+export const resellerParser = {
+  toModel: (data: ResellerSchema): Reseller => ({
+    id: data.id,
+    name: data.attributes?.name,
+    providers: data.attributes?.providers,
+    company: data.relationships?.company,
+    currency: data.relationships?.currency,
+    parentResellers: data.relationships?.parentResellers,
+  }),
+  toSchema: (data: Reseller): ResellerSchema => ({
+    id: data.id,
+    type: "resellers",
+    attributes: {
+      name: data.name,
+      providers: data.providers,
+    },
+    relationships: {
+      company: data.company,
+      currency: data.currency,
+      parentResellers: data.parentResellers,
+    },
+  }),
 };
 
 export type User = {

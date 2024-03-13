@@ -35,6 +35,7 @@ export default {
     cancellationRequests: new junctionHubApi.CancellationRequestService(env.HUB_API_BASE_URL),
     users: new junctionHubApi.UserService(env.HUB_API_BASE_URL),
     refunds: new junctionHubApi.RefundService(env.HUB_API_BASE_URL),
+    resellers: new junctionHubApi.ResellerService(env.HUB_API_BASE_URL),
   },
   ory: {
     loginFlow: new ory.LoginFlowService(env.ORY_BASE_URL),

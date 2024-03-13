@@ -10,11 +10,13 @@
   import { writable } from "svelte/store";
   import routeConfig from "$lib/route-config";
   import { sleep } from "$lib/utils/common";
-  import type { UserRole } from "~/integration/ory/schemas";
-  import type { User, UserCreate } from "~/integration/junction-hub-api/schemas";
+  import type * as OrySchemas from "~/integration/ory/schemas";
+  import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
+  import type { PaginatedData } from "$lib/models/common";
 
   export let mode: "create" | "update";
-  export let user: User | UserCreate | undefined;
+  export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
+  export let resellers: PaginatedData<HubSchemas.Reseller> | undefined;
 
   const t = getTranslator();
   const pending = writable(false);
@@ -27,7 +29,7 @@
     "Reuben Joshua Nichols",
   ];
 
-  let selectedRole: UserRole;
+  let selectedRole: OrySchemas.UserRole;
 
   function selectAdminRole(): void {
     selectedRole = "reseller-admin";
@@ -143,6 +145,24 @@
             />
           </div>
         </div>
+
+        {#if resellers !== undefined}
+          <div class="section">
+            <div class="section-title">
+              <h3 typography="title-medium">Dev Mode–Resellers list</h3>
+            </div>
+
+            <div class="fields-container">
+              <ul>
+                {#each resellers.data as reseller}
+                  <li>
+                    <p typography="body-medium">{reseller.id}: {reseller.name}</p>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          </div>
+        {/if}
       </form>
     </div>
   {/if}
