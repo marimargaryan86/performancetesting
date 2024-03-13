@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
     exclude: [...configDefaults.exclude, ".svelte-kit/**/*"],
     setupFiles: ["./vitest-setup.js"],
     coverage: {
+      provider: "istanbul",
       reporter: ["text", "json", "html"],
     },
   },
