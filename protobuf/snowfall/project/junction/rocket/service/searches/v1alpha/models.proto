@@ -34,9 +34,8 @@ message CarRental {
   snowfall.project.junction.go.v1.Point origin = 1;
   snowfall.project.junction.go.v1.Point destination = 2;
   google.protobuf.Timestamp pickup_at = 3;
-  google.protobuf.Timestamp dropoff_at = 4;
-  Passenger driver = 5;
-  uint32 passengers_count = 6;
+  google.protobuf.Timestamp return_at = 4;
+  uint32 driver_age = 5;
 }
 
 message Search { // old OfferSearch/TripOfferSearch/SimpleTripOfferSearch
