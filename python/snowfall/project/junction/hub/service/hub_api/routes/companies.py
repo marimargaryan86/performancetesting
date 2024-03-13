@@ -126,6 +126,10 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                 models_pb2.PaymentType,
                 body["paymentType"],
             ),
+            billing_type=protobuf.slug_to_enum_value(
+                models_pb2.BillingType,
+                body["billingType"],
+            ),
         )
         for fee_amount in body.get("feeAmounts", []):
             request_company.fee_amounts.append(

@@ -21,6 +21,12 @@ enum PaymentType {
   PAYMENT_TYPE_BANK_TRANSFER = 2;
 }
 
+enum BillingType {
+  BILLING_TYPE_UNSPECIFIED = 0;
+  BILLING_TYPE_PERCENTAGE = 1;
+  BILLING_TYPE_FIXED = 2;
+}
+
 message Company {
   string id = 1;
   string name = 2;
@@ -32,6 +38,7 @@ message Company {
   repeated snowfall.stdlib.v1.Money fee_amounts = 8;
   PaymentMethod payment_method = 9;
   PaymentType payment_type = 10;
+  BillingType billing_type = 11;
 }
 
 message Account {

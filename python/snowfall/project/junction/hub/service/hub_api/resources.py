@@ -652,6 +652,10 @@ class Company(models.Resource):
                     companies_models_pb2.PaymentMethod.DESCRIPTOR,
                     company.payment_method,
                 ),
+                "billingType": protobuf.enum_value_to_slug(
+                    companies_models_pb2.BillingType.DESCRIPTOR,
+                    company.billing_type,
+                ),
             },
             relationships=relationships,
             links={

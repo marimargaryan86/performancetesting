@@ -6180,6 +6180,15 @@
                 ],
                 "example": "card"
               },
+              "billingType": {
+                "type": "string",
+                "enum": [
+                  "unspecified",
+                  "percentage",
+                  "fixed"
+                ],
+                "example": "percentage"
+              },
               "paymentMethod": {
                 "type": "string",
                 "enum": [
@@ -6216,7 +6225,8 @@
                   "paymentType",
                   "paymentMethod",
                   "processingMarkup",
-                  "salesMarkup"
+                  "salesMarkup",
+                  "billingType"
                 ]
               }
             }
