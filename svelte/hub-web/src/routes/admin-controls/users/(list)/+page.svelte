@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+  import { createDropdownMenu, melt } from "@melt-ui/svelte";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
   import { getTranslator } from "$lib/i18n";
@@ -14,12 +15,14 @@
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
   import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load.js";
   import integrationInstancesClient from "~/integration-instances-client";
+  import type * as OrySchemas from "~/integration/ory/schemas";
 
   const t = getTranslator();
   const pending = writable(false);
   const columns = "repeat(4, minmax(max-content, 1fr)) minmax(160px, 1fr) 1fr";
 
   export let data;
+  let selectedUserId: string = "";
 
   $: users = data.users.data.flatMap((item) => item);
 
@@ -40,6 +43,14 @@
 
     return { depleted: !resp.cursor };
   };
+
+  const {
+    elements: { menu, item, trigger },
+  } = createDropdownMenu();
+
+  function setSelectedUserId(user: OrySchemas.User): void {
+    selectedUserId = user.id;
+  }
 </script>
 
 <svelte:head>
@@ -98,9 +109,32 @@
                 <StatusBadge value={"pending"} />
               {/if} -->
           </x-td>
-          <button class="action-btn">⋮</button>
+          <button
+            class="action-btn"
+            on:click={setSelectedUserId.bind(setSelectedUserId, hubUser)}
+            use:melt={$trigger}>⋮</button
+          >
         </x-tr>
       {/each}
+
+      <div class="menu-wrapper" use:melt={$menu}>
+        <ul class="menu">
+          <li class="menu-item" use:melt={$item}>
+            <a
+              class="menu-link"
+              href={routeConfig.routes.adminControls.routes.users.routes.update.user(selectedUserId)
+                .root}
+            >
+              <Icon variant="edit-user" size="12px" />
+              <p typography="body-small">Edit</p>
+            </a>
+          </li>
+          <li class="menu-item" use:melt={$item}>
+            <Icon variant="delete-user" size="10px" />
+            <p typography="body-small">Delete</p>
+          </li>
+        </ul>
+      </div>
 
       {#if $pending}
         <x-tloading transition:slideFade={{ duration: 200 }}>
@@ -171,5 +205,37 @@
   pre {
     color: var(--color-common-light-soft);
     text-align: center;
+  }
+
+  .menu-wrapper {
+    width: 96px;
+    height: 64px;
+    padding: 4px 0;
+    background-color: var(--color-common-background-light-main);
+    border-radius: 8px;
+    box-shadow: 0 0 40px 4px #e0e0e0;
+  }
+
+  .menu-item {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 5px 8px;
+  }
+
+  .menu-item:hover {
+    background-color: var(--color-main-neutral-50);
+    cursor: pointer;
+  }
+
+  .menu-link {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .menu-link > p {
+    color: var(--color-main-neutral-900);
   }
 </style>
