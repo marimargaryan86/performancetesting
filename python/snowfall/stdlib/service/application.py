@@ -167,9 +167,10 @@ def _create_logger(
     entrypoint: Entrypoint,
     global_settings: _GlobalSettings,
 ) -> stdout.Logger:
+    format_for_consoles = entrypoint.cli_tool or global_settings.env_name == "local"
     stdout.configure_logger(
         level=global_settings.log_level,
-        format_as_json=global_settings.json_output and not entrypoint.cli_tool,
+        format_as_json=global_settings.json_output and not format_for_consoles,
     )
     logger = stdout.get_logger()
 
