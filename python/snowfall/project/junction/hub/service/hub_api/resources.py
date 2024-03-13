@@ -656,6 +656,7 @@ class Company(models.Resource):
                     companies_models_pb2.BillingType.DESCRIPTOR,
                     company.billing_type,
                 ),
+                "applyMarkups": company.apply_markups,
             },
             relationships=relationships,
             links={

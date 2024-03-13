@@ -86,26 +86,35 @@ class Quote(object):
             self._to_currency,
             rate,
         )
-        sales_margin = base_converted.convert(
-            self._to_currency,
-            Decimal(self._company.sales_markup / 100),
-        )
+        if self._company.apply_markups:
+            sales_margin = base_converted.convert(
+                self._to_currency,
+                Decimal(self._company.sales_markup / 100),
+            )
+            processing_margin = base_converted.convert(
+                self._to_currency,
+                Decimal(self._company.processing_markup / 100),
+            )
+
+            fee_amount = self._fee_amount.convert(self._to_currency, rate)
+
+            if self._from_currency == self._to_currency:
+                fx_margin = money.Money(0, self._to_currency)
+            else:
+                fx_margin = base_converted.convert(
+                    self._to_currency,
+                    Decimal(self._company.fx_markup / 100),
+                )
+        else:
+            sales_margin = money.Money(0, self._to_currency)
+            processing_margin = money.Money(0, self._to_currency)
+            fx_margin = money.Money(0, self._to_currency)
+            fee_amount = money.Money(0, self._to_currency)
+
         tax_converted = self._tax.convert(
             self._to_currency,
             rate,
         )
-        processing_margin = base_converted.convert(
-            self._to_currency,
-            Decimal(self._company.processing_markup / 100),
-        )
-
-        if self._from_currency == self._to_currency:
-            fx_margin = money.Money(0, self._to_currency)
-        else:
-            fx_margin = base_converted.convert(
-                self._to_currency,
-                Decimal(self._company.fx_markup / 100),
-            )
 
         service_markup = money.total(
             [
@@ -118,7 +127,7 @@ class Quote(object):
         total_markups = money.total(
             [
                 service_markup,
-                self._fee_amount.convert(self._to_currency, rate),
+                fee_amount,
             ],
         )
 

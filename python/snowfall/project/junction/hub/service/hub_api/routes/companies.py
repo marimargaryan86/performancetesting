@@ -130,6 +130,7 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                 models_pb2.BillingType,
                 body["billingType"],
             ),
+            apply_markups=body["applyMarkups"],
         )
         for fee_amount in body.get("feeAmounts", []):
             request_company.fee_amounts.append(

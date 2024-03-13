@@ -16,6 +16,18 @@ def company() -> company_models.Company:
             money.Money(200, money.Currency("GBP")).protobuf(),  # noqa: WPS432
             money.Money(100, money.Currency("EUR")).protobuf(),  # noqa: WPS432
         ],
+        apply_markups=True,
+    )
+
+
+@pytest.fixture()
+def company_without_margins() -> company_models.Company:
+    return company_models.Company(
+        name="Snowfall",
+        fx_markup=0.4,
+        processing_markup=0.2,
+        sales_markup=float(1),
+        apply_markups=False,
     )
 
 
@@ -81,6 +93,40 @@ async def test_calculation(  # noqa: WPS218
     assert (
         money.from_protobuf(quote.amounts.processing_margin).amount
         == expected_amounts["processing_margin"]
+    )
+    assert (
+        money.from_protobuf(quote.amounts.service_markup).amount
+        == expected_amounts["service_markup"]
+    )
+    assert (
+        money.from_protobuf(quote.amounts.total_markups).amount
+        == expected_amounts["total_markups"]
+    )
+
+
+async def test_calculation_without_margins(  # noqa: WPS218
+    company_without_margins: company_models.Company,
+) -> None:
+    expected_amounts = {
+        "base_converted": money.Money(116000, money.Currency("EUR")).amount,
+        "service_markup": money.Money(0, money.Currency("EUR")).amount,
+        "total_markups": money.Money(0, money.Currency("EUR")).amount,
+    }
+
+    quote = Quote(
+        100000,
+        money.Currency("GBP"),
+        money.Currency("EUR"),
+        1.16,
+        company_without_margins,
+        "beneficiary_id",
+        0,
+        2,
+    ).to_proto()
+
+    assert (
+        money.from_protobuf(quote.amounts.base_converted).amount
+        == expected_amounts["base_converted"]
     )
     assert (
         money.from_protobuf(quote.amounts.service_markup).amount

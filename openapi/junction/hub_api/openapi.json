@@ -6197,6 +6197,11 @@
                   "invoice"
                 ],
                 "example": "transactional"
+              },
+              "applyMarkups": {
+                "type": "boolean",
+                "example": true,
+                "default": false
               }
             }
           },
