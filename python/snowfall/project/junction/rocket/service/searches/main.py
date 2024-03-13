@@ -42,10 +42,6 @@ class _ImportSettings(application.Settings):
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     mongo_dsn: Sequence[pydantic.AnyUrl]
     redis_dsn: pydantic.RedisDsn
-    # TODO(reuben.t): maybe move to provider?
-    reseller_disabled_operators: importer.RESELLERS_TO_PROVIDER_OPERATORS = (
-        pydantic.Field(default_factory=dict)
-    )
     gateway_address: str
     gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
     gateway_poll_sleep: int = 5
@@ -138,7 +134,6 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
             search_repository=searches_repo,
         ),
         searches=searches_repo,
-        reseller_disabled_operators=app.settings.reseller_disabled_operators,
         gateway_stubs=searches_pb2_grpc.SearchServiceStub(gateway_channel),
         gateway_timeout=app.settings.gateway_timeout,
         gateway_poll_sleep=app.settings.gateway_poll_sleep,

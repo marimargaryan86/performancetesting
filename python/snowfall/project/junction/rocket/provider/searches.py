@@ -137,7 +137,6 @@ class SearchService(service.Service, searches_pb2_grpc.SearchServiceServicer):
                     searches_amqp_pb2.SearchTaskResult(
                         search_id=request.search_task.search_id,
                         search_result=search_result,
-                        provider_name=self._provider_name,
                     )
                     async for search_result in self._searcher.search(
                         request.search_task.search,
@@ -184,7 +183,6 @@ class SearchConsumer(Generic[_SearchCriteria]):
                 msg=searches_amqp_pb2.SearchTaskResult(
                     search_id=amqp_message.body.search_id,
                     search_result=search_result,
-                    provider_name=self._provider_name,
                 ),
                 routing_key="searches",
             )

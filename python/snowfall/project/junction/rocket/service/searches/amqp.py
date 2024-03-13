@@ -26,7 +26,6 @@ class SearchProducer(object):
         msg: amqp_pb2.SearchTask = amqp_pb2.SearchTask(
             search_id=search.id,
             search=search,
-            reseller_id=search.reseller_id,
         )
 
         if isinstance(self._producer, trackable.TrackableProducer):

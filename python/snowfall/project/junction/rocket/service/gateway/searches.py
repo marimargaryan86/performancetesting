@@ -130,7 +130,10 @@ class Queue(consumer.AbstractQueue[amqp_pb2.SearchTask]):
         search_tasks = [
             _do_search(provider, msg, self._timeout)
             async for provider in self._providers.all_healthy()
-            if self._provider_on_for_reseller(provider.identifier, msg.reseller_id)
+            if self._provider_on_for_reseller(
+                provider.identifier,
+                msg.search.reseller_id,
+            )
         ]
 
         for task in asyncio.as_completed(search_tasks):

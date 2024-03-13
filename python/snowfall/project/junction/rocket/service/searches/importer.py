@@ -108,7 +108,6 @@ class SearchResultImporter(object):
         redis: types.Client[str],
         status_handler: StatusHandler,
         searches: repository.SearchRepository,
-        reseller_disabled_operators: RESELLERS_TO_PROVIDER_OPERATORS,
         gateway_stubs: searches_pb2_grpc.SearchServiceStub,
         gateway_timeout: datetime.timedelta,
         gateway_poll_sleep: int,
@@ -119,7 +118,6 @@ class SearchResultImporter(object):
         self._redis = redis
         self._status_handler = status_handler
         self._searches = searches
-        self._reseller_disabled_operators = reseller_disabled_operators
         self._gateway_stubs = gateway_stubs
         self._gateway_timeout = gateway_timeout
         self._gateway_poll_sleep = gateway_poll_sleep
@@ -209,21 +207,8 @@ class SearchResultImporter(object):
         search: Search,
         message: amqp_pb2.SearchTaskResult,
     ) -> None:
-        # TODO(reuben.t): Move this logic to the provider?
-        disabled_operators = self._reseller_disabled_operators.get(
-            search.reseller_id,
-            {},
-        ).get(message.provider_name, [])
-        disabled_operators.extend(
-            self._reseller_disabled_operators.get("*", {}).get(
-                message.provider_name,
-                [],
-            ),
-        )
-
-        if self._contains_disabled_operator(disabled_operators, message.search_result):
-            return
-
+        return
+        # TODO(reuben.t): Move disabled operator logic to the provider?
         # TODO(reuben.t): Insert the result into the SearchResultRepo
 
     def _contains_disabled_operator(

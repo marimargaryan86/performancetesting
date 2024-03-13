@@ -9,23 +9,20 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 message SearchTask {
   string search_id = 1;
   Search search = 2;
-  string reseller_id = 4;
 }
 
 message SearchTaskResult {
   string search_id = 1;
   SearchResult search_result = 2;
-  string provider_company_id = 3;
-  string provider_name = 4;
 }
 
 message QuoteTask {
-  string offer_id = 1;
-  string reseller_id = 2;
+  string search_result_id = 1;
+  string offer_id = 2;
+  string reseller_id = 3;
 }
 
 message QuoteTaskResult {
-  string offer_id = 2;
-  Quote quote = 3;
-  string provider_company_id = 4;
+  Quote quote = 1;
+  string reseller_id = 2;
 }
