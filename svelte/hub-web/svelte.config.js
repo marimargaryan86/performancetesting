@@ -7,7 +7,9 @@ const config = {
   // Consult https://kit.svelte.dev/docs/integrations#preprocessors
   // for more information about preprocessors
   preprocess: sequence([vitePreprocess(), preprocessMeltUI()]),
-  accessors: process.env.TEST,
+  compilerOptions: {
+    accessors: Boolean(process.env.TEST),
+  },
   vitePlugin: {
     inspector: {
       toggleKeyCombo: "control-shift",
