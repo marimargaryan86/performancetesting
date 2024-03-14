@@ -1,6 +1,9 @@
 {
   "packageManager": "yarn@4.0.2",
   "name": "@snowfall/prettier-config",
+  "bin": {
+    "prettier": "../../node_modules/prettier/bin/prettier.cjs"
+  },
   "devDependencies": {
     "@types/prettier": "^3.0.0",
     "prettier": "^3.2.5"

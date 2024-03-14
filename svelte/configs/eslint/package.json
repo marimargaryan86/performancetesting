@@ -1,6 +1,9 @@
 {
   "packageManager": "yarn@4.0.2",
   "name": "@snowfall/eslint-config",
+  "bin": {
+    "eslint": "../../node_modules/eslint/bin/eslint.js"
+  },
   "devDependencies": {
     "@types/eslint": "^8.56.2",
     "@typescript-eslint/eslint-plugin": "^6.11.0",

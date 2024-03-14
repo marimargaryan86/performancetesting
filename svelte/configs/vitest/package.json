@@ -3,6 +3,9 @@
   "name": "@snowfall/vitest-config",
   "version": "0.1.0",
   "type": "module",
+  "bin": {
+    "vitest": "../../node_modules/vitest/vitest.mjs"
+  },
   "devDependencies": {
     "@sveltejs/kit": "^2.5.3",
     "@sveltejs/vite-plugin-svelte": "^3.0.2",

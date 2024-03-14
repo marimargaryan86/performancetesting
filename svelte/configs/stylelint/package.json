@@ -1,6 +1,9 @@
 {
-  "name": "@snowfall/stylelint-config",
   "packageManager": "yarn@4.0.2",
+  "name": "@snowfall/stylelint-config",
+  "bin": {
+    "stylelint": "../../node_modules/stylelint/bin/stylelint.mjs"
+  },
   "devDependencies": {
     "stylelint": "^15.11.0",
     "stylelint-config-rational-order": "^0.1.2",
