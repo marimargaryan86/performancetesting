@@ -145,6 +145,27 @@ EOF
 	done
 fi
 
+if [ ${#deployed_services[@]} -ne 0 ]; then
+	# editorconfig-checker-disable
+	cat <<EOF
+
+acceptance-tests:
+  stage: verify
+  allow_failure: true
+  interruptible: false
+  script:
+    - docker login -u "\${PIPELINE_REGISTRY_USER}" -p "\${PIPELINE_REGISTRY_USER_PASSWORD}" "\${CI_REGISTRY}"
+    - docker run --rm --pull=always git.snowfall.se:4567/junction/junction/junction/api-automation:latest -m verify --alluredir=/tmp/allure /bin/main/snowfall/project/junction/api_automation/ --HOST="\${VAULT_ADDR_DEV}" --API-TOKEN="\${VAULT_USER_DEV}+\${VAULT_PASS_DEV}"
+  tags:
+    - shell
+  needs:
+EOF
+	# editorconfig-checker-enable
+	for service in "${deployed_services[@]}"; do
+		echo "    - ${service}"
+	done
+fi
+
 if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ] && [ ${#changed_services[@]} -ne 0 ]; then
 	# editorconfig-checker-disable
 	cat <<EOF
@@ -170,6 +191,7 @@ EOF
 		cat <<EOF
   needs:
     - verify
+    - acceptance-tests
 EOF
 		# editorconfig-checker-enable
 	fi
