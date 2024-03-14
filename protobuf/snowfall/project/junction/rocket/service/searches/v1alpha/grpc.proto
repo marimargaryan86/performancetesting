@@ -16,9 +16,9 @@ service SearchResultService {
   // rpc ListOfferGroups(ListOfferGroupsRequest) returns (ListOfferGroupsResponse) {}
   rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
   // rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
-  rpc GetOfferSegment(GetOfferSegmentRequest) returns (GetOfferSegmentResponse) {}
+  rpc GetResultDetail(GetResultDetailRequest) returns (GetResultDetailResponse) {}
   // rpc ListOfferGroupDetails(ListOfferGroupDetailsRequest) returns (ListOfferGroupDetailsResponse) {}
-  rpc GetOfferSegmentDetails(GetOfferSegmentDetailsRequest) returns (GetOfferSegmentDetailsResponse) {}
+  rpc GetOfferDetail(GetOfferDetailRequest) returns (GetOfferDetailResponse) {}
   // rpc ListOfferOptionDetails(ListOfferOptionDetailsRequest) returns (ListOfferOptionDetailsResponse) {}
 }
 
@@ -43,14 +43,6 @@ message GetSearchResponse {
   Search search = 1;
 }
 
-message GetOfferRequest {
-  string id = 1;
-}
-
-message GetOfferResponse {
-  Offer offer = 1;
-}
-
 message GetSearchResultRequest {
   string id = 1;
 }
@@ -59,20 +51,28 @@ message GetSearchResultResponse {
   SearchResult search_result = 1;
 }
 
-message GetOfferSegmentRequest {
+message GetOfferRequest {
   string id = 1;
 }
 
-message GetOfferSegmentResponse {
-  OfferSegment offer_segment = 1;
+message GetOfferResponse {
+  Offer offer = 1;
 }
 
-message GetOfferSegmentDetailsRequest {
+message GetResultDetailRequest {
   string id = 1;
 }
 
-message GetOfferSegmentDetailsResponse {
-  OfferSegmentDetails offer_segment_details = 1;
+message GetResultDetailResponse {
+  ResultDetail result_detail = 1;
+}
+
+message GetOfferDetailRequest {
+  string id = 1;
+}
+
+message GetOfferDetailResponse {
+  OfferDetail offer_detail = 1;
 }
 
 message CreateQuoteRequest {

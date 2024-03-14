@@ -61,19 +61,19 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
     def __init__(
         self,
         search_results: repository.SearchResultRepository,
-        offer_segments: repository.OfferSegmentRepository,
+        result_details: repository.ResultDetailsRepository,
         offers: repository.OfferRepository,
-        offer_segment_details: repository.OfferSegmentDetailsRepository,
+        offer_details: repository.OfferDetailsRepository,
         default_page_size: int,
     ):
         self._search_results = search_results
-        self._offer_segments = offer_segments
+        self._result_details = result_details
         self._offers = offers
-        self._offer_segment_details = offer_segment_details
+        self._offer_details = offer_details
         self._default_page_size = default_page_size
 
     def get_name(self) -> str:
-        return grpc_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+        return grpc_pb2.DESCRIPTOR.services_by_name["SearchResultService"].full_name
 
     def register(self, server: grpc.aio.Server) -> None:
         grpc_pb2_grpc.add_SearchResultServiceServicer_to_server(self, server)
@@ -90,17 +90,17 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
 
         return grpc_pb2.GetSearchResultResponse(search_result=search_result)
 
-    async def GetOfferSegment(  # type: ignore[override] # noqa: N802
+    async def GetResultDetail(  # type: ignore[override] # noqa: N802
         self,
-        request: grpc_pb2.GetOfferSegmentRequest,
+        request: grpc_pb2.GetResultDetailRequest,
         context: grpc.aio.ServicerContext,
-    ) -> grpc_pb2.GetOfferSegmentResponse:
-        offer_segment = await self._offer_segments.find_by_id(request.id)
+    ) -> grpc_pb2.GetResultDetailResponse:
+        result_detail = await self._result_details.find_by_id(request.id)
 
-        if not offer_segment:
+        if not result_detail:
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        return grpc_pb2.GetOfferSegmentResponse(offer_segment=offer_segment)
+        return grpc_pb2.GetResultDetailResponse(result_detail=result_detail)
 
     async def GetOffer(  # type: ignore[override] # noqa: N802
         self,
@@ -114,16 +114,16 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
 
         return grpc_pb2.GetOfferResponse(offer=offer)
 
-    async def GetOfferSegmentDetails(  # type: ignore[override] # noqa: N802
+    async def GetOfferDetail(  # type: ignore[override] # noqa: N802
         self,
-        request: grpc_pb2.GetOfferSegmentDetailsRequest,
+        request: grpc_pb2.GetOfferDetailRequest,
         context: grpc.aio.ServicerContext,
-    ) -> grpc_pb2.GetOfferSegmentDetailsResponse:
-        offer_segment_details = await self._offer_segment_details.find_by_id(request.id)
+    ) -> grpc_pb2.GetOfferDetailResponse:
+        offer_detail = await self._offer_details.find_by_id(request.id)
 
-        if not offer_segment_details:
+        if not offer_detail:
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        return grpc_pb2.GetOfferSegmentDetailsResponse(
-            offer_segment_details=offer_segment_details,
+        return grpc_pb2.GetOfferDetailResponse(
+            offer_detail=offer_detail,
         )

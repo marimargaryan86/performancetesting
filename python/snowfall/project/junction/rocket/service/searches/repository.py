@@ -44,14 +44,14 @@ class SearchResultRepository(
             filter_=filter_,
         )
 
-    async def find_by_offer_option(
+    async def find_by_offer(
         self,
-        offer_option_id: str,
+        offer_id: str,
     ) -> models_pb2.SearchResult | None:
         result = await self._find_with_cursor(
             filter_={
                 "offers._id": {
-                    "$eq": offer_option_id,
+                    "$eq": offer_id,
                 },
             },
         )
@@ -62,21 +62,21 @@ class SearchResultRepository(
             return None
 
 
-class OfferSegmentRepository(
-    repository.ProtoRepository[models_pb2.OfferSegment],
+class ResultDetailsRepository(
+    repository.ProtoRepository[models_pb2.ResultDetail],
 ):
-    _proto = models_pb2.OfferSegment
-    _nested_path = "segments"
-    _indexes = (pymongo.IndexModel("segments._id", background=True),)
+    _proto = models_pb2.ResultDetail
+    _nested_path = "result_details"
+    _indexes = (pymongo.IndexModel("result_details._id", background=True),)
 
     async def find(
         self,
         ids: Sequence[str],
         cursor: str,
-    ) -> resultset.ResultSet[models_pb2.OfferSegment]:
+    ) -> resultset.ResultSet[models_pb2.ResultDetail]:
         filter_ = (
             {
-                "segments._id": {
+                "result_details._id": {
                     _IN: ids,
                 },
             }
@@ -89,10 +89,10 @@ class OfferSegmentRepository(
             filter_=filter_,
         )
 
-    async def find_by_id(self, document_id: str) -> models_pb2.OfferSegment | None:
+    async def find_by_id(self, document_id: str) -> models_pb2.ResultDetail | None:
         details = await self._find_with_cursor(
             filter_={
-                "segments._id": {
+                "result_details._id": {
                     "$eq": document_id,
                 },
             },
@@ -146,24 +146,21 @@ class OfferRepository(
             return None
 
 
-class OfferSegmentDetailsRepository(
-    repository.ProtoRepository[models_pb2.OfferSegmentDetails],
+class OfferDetailsRepository(
+    repository.ProtoRepository[models_pb2.OfferDetail],
 ):
-    _proto = models_pb2.OfferSegmentDetails
-    _nested_path = "offers.segment_details"
-    _indexes = (
-        pymongo.IndexModel("offers.segment_details._id", background=True),
-        pymongo.IndexModel("offers.segment_details.cabin_class.type", background=True),
-    )
+    _proto = models_pb2.OfferDetail
+    _nested_path = "offers.offer_details"
+    _indexes = (pymongo.IndexModel("offers.offer_details._id", background=True),)
 
     async def find(
         self,
         ids: Sequence[str],
         cursor: str,
-    ) -> resultset.ResultSet[models_pb2.OfferSegmentDetails]:
+    ) -> resultset.ResultSet[models_pb2.OfferDetail]:
         filter_ = (
             {
-                "offers.segment_details._id": {
+                "offers.offer_details._id": {
                     _IN: ids,
                 },
             }
@@ -179,10 +176,10 @@ class OfferSegmentDetailsRepository(
     async def find_by_id(
         self,
         document_id: str,
-    ) -> models_pb2.OfferSegmentDetails | None:
+    ) -> models_pb2.OfferDetail | None:
         details = await self._find_with_cursor(
             filter_={
-                "offers.segment_details._id": {
+                "offers.offer_details._id": {
                     "$eq": document_id,
                 },
             },

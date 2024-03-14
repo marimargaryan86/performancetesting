@@ -38,7 +38,7 @@ message CarRental {
   uint32 driver_age = 5;
 }
 
-message Search { // old OfferSearch/TripOfferSearch/SimpleTripOfferSearch
+message Search { // old SimpleTripOfferSearch
   string id = 1;
   string reseller_id = 2;
   oneof search_criterion {
@@ -55,32 +55,53 @@ message Search { // old OfferSearch/TripOfferSearch/SimpleTripOfferSearch
 message SearchResult { // old OfferGroup
   string id = 1;
   string provider_id = 2;
-  repeated Offer offers = 3;
-  repeated OfferSegment offer_segments = 4;
-  google.protobuf.Timestamp expires_at = 5;
+  google.protobuf.Timestamp expires_at = 3;
+  repeated Offer offers = 4;
+  repeated ResultDetail result_details = 5;
 }
 
-message Offer {
+message Offer { // Old OfferOption
   string id = 1;
   string initial_offer_id = 2;
-  repeated OfferSegmentDetails offer_segment_details = 3;
-  snowfall.stdlib.v1.Money price = 4;
+  snowfall.stdlib.v1.Money price = 3;
+  repeated ConditionalPrice conditional_prices = 4;
   repeated PriceBreakdown price_breakdown = 5;
-  repeated ConditionalPrice conditional_prices = 6;
+  repeated OfferDetail offer_details = 6;
 }
 
-message OfferSegmentDetails {
-  string id = 1;
-  string offer_segment_id = 2;
-  snowfall.project.junction.go.v1.CabinClass cabin_class = 3;
-}
-
-message OfferSegment {
+message ResultDetail { // Old OfferSegment
   string id = 1;
   snowfall.project.junction.go.v1.Point origin = 2;
   snowfall.project.junction.go.v1.Point destination = 3;
   bool outbound_segment = 4;
   uint32 segment_sequence = 5;
+}
+
+message OfferDetail {
+  oneof detail {
+    RailDetail rail_detail = 1;
+    FerryDetail ferry_detail = 2;
+    CarRentalDetail car_rental_detail = 3;
+  }
+}
+
+message RailDetail {
+  string id = 1;
+  string detail_id = 2;
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 3;
+  // TODO(reuben.t): add ferry model fields here etc.
+}
+
+message FerryDetail {
+  string id = 1;
+  string detail_id = 2;
+  // TODO(reuben.t): add ferry model fields here etc.
+}
+
+message CarRentalDetail {
+  string id = 1;
+  string detail_id = 2;
+  // TODO(reuben.t): add car model fields here etc.
 }
 
 message Passenger {

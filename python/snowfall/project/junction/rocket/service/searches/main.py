@@ -76,14 +76,14 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 search_results=repository.SearchResultRepository(
                     mongo.search.search_results,
                 ),
-                offer_segments=repository.OfferSegmentRepository(
-                    mongo.search.offer_segments,
+                result_details=repository.ResultDetailsRepository(
+                    mongo.search.result_details,
                 ),
                 offers=repository.OfferRepository(
                     mongo.search.offers,
                 ),
-                offer_segment_details=repository.OfferSegmentDetailsRepository(
-                    mongo.search.offer_segment_details,
+                offer_details=repository.OfferDetailsRepository(
+                    mongo.search.offer_details,
                 ),
                 default_page_size=app.settings.default_page_size,
             ),
@@ -142,7 +142,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="offers")
+    entrypoint = application.Entrypoint(name="searches")
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
         application.Command(
