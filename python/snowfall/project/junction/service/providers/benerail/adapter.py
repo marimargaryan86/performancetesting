@@ -490,8 +490,13 @@ class BenerailOffersAdapter(BenerailAdapter):
             segment_ids = [string.uuid() for _ in range(timed_legs_count)]
 
             offer_protos = []
+            filtered_offers = [
+                offer_obj
+                for offer_obj in trip_offer_response.response_result.offers
+                if offer_obj.summary.price_with_optional_parts.currency != "?"
+            ]
 
-            for offer_obj in trip_offer_response.response_result.offers:
+            for offer_obj in filtered_offers:
                 offer_model = await self._parse_offer(
                     offer_summary=offer_obj.summary,
                     offer_segment_ids=segment_ids,
@@ -638,16 +643,11 @@ class BenerailOffersAdapter(BenerailAdapter):
         else:
             comfort_class_name = ""
 
-        try:
-            currency = money.Currency(
-                offer_summary.price_with_optional_parts.currency.upper(),
-            )
-        except ValueError:
-            currency = money.Currency("EUR")
-
         price_proto = money.from_string(
             string_amount=str(offer_summary.price_with_optional_parts.amount),
-            currency=currency,
+            currency=money.Currency(
+                offer_summary.price_with_optional_parts.currency.upper(),
+            ),
         ).protobuf()
 
         return offer_models_pb2.Offer(
