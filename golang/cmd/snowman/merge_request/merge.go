@@ -37,6 +37,12 @@ func (mr *mergeRequest) merge() error {
 	var resp *gitlab.Response
 
 	if mr.configuration.UseMergeTrain {
+		_, resp, err = mr.client.MergeTrains.GetMergeRequestOnAMergeTrain(mr.object.ProjectID, mr.object.IID)
+
+		if resp.StatusCode != http.StatusNotFound {
+			return nil
+		}
+
 		_, resp, err = mr.client.MergeTrains.AddMergeRequestToMergeTrain(
 			mr.object.ProjectID,
 			mr.object.IID,
