@@ -21,13 +21,9 @@
   const t = getTranslator();
   const pending = writable(false);
 
+  let resellerOptions: HubSchemas.Reseller[];
   let formCompleted: boolean = true;
-
-  const resellerOptions: string[] = [
-    "Joshua Reuben Castrioty",
-    "Nicholas Sparkes Tong",
-    "Reuben Joshua Nichols",
-  ];
+  let selectedReseller: HubSchemas.Reseller | undefined = user?.reseller;
 
   let selectedRole: OrySchemas.UserRole;
 
@@ -57,6 +53,15 @@
 
   // TODO(2024-03-06/alvin.s): Clean this up.
   $: selectedRole = mode === "update" ? user?.role || "reseller-user" : "reseller-user";
+  $: resellerOptions = resellers?.data || [];
+
+  function formatResellerOption(reseller?: HubSchemas.Reseller): string {
+    if (!reseller) {
+      return "";
+    }
+
+    return reseller.name;
+  }
 </script>
 
 <svelte:head>
@@ -142,27 +147,11 @@
               label="Resellers"
               placeholder="Add resellers"
               options={resellerOptions}
+              formatter={formatResellerOption}
+              bind:value={selectedReseller}
             />
           </div>
         </div>
-
-        {#if resellers !== undefined}
-          <div class="section">
-            <div class="section-title">
-              <h3 typography="title-medium">Dev Mode–Resellers list</h3>
-            </div>
-
-            <div class="fields-container">
-              <ul>
-                {#each resellers.data as reseller}
-                  <li>
-                    <p typography="body-medium">{reseller.id}: {reseller.name}</p>
-                  </li>
-                {/each}
-              </ul>
-            </div>
-          </div>
-        {/if}
       </form>
     </div>
   {/if}

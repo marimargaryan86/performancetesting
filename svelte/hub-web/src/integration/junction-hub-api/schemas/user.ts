@@ -3,7 +3,7 @@ import type * as OrySchemas from "~/integration/ory/schemas";
 
 export type Reseller = {
   id: string;
-  name?: string;
+  name: string;
   providers?: string[];
 
   // TODO(2024-03-11/alvin.s): fix `unknown` typing.
@@ -16,7 +16,7 @@ export type ResellerSchema = {
   id: string;
   type: "resellers";
   attributes: {
-    name?: string;
+    name: string;
     providers?: string[];
   };
   relationships: {
@@ -29,7 +29,7 @@ export type ResellerSchema = {
 export const resellerParser = {
   toModel: (data: ResellerSchema): Reseller => ({
     id: data.id,
-    name: data.attributes?.name,
+    name: data.attributes.name,
     providers: data.attributes?.providers,
     company: data.relationships?.company,
     currency: data.relationships?.currency,
