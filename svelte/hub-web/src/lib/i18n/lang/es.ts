@@ -163,6 +163,7 @@ export default {
     save: "Ahorrar",
     change: "Cambiar",
     confirmSelection: "Confirmar selección",
+    deactivate: "Desactivar",
   },
   sentences: {
     priceChange: "Cambio de precio",
@@ -276,6 +277,7 @@ export default {
       "Tu viaje de ida seleccionado previamente ya no está disponible",
     previousSelectedInboundUnavailable:
       "Su viaje entrante seleccionado previamente ya no está disponible",
+    deleteUser: "¿Estás seguro de que quieres eliminar a este usuario?",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

@@ -163,6 +163,7 @@ export default {
     save: "Spara",
     change: "Ändra",
     confirmSelection: "Bekräfta val",
+    deactivate: "Inaktivera",
   },
   sentences: {
     priceChange: "Prisändring",
@@ -248,6 +249,7 @@ export default {
     fetchingSelection: "Hämtar erbjudande",
     previousSelectedOutboundUnavailable: "Din tidigare valda utresa är inte längre tillgänglig",
     previousSelectedInboundUnavailable: "Din tidigare valda inresa är inte längre tillgänglig",
+    deleteUser: "Är du säker på att du vill radera denna användare?",
   },
   tableHeaders: {
     id: "ID",

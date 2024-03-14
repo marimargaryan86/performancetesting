@@ -16,15 +16,21 @@
   import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load.js";
   import integrationInstancesClient from "~/integration-instances-client";
   import type * as OrySchemas from "~/integration/ory/schemas";
+  import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
 
   const t = getTranslator();
   const pending = writable(false);
   const columns = "repeat(4, minmax(max-content, 1fr)) minmax(160px, 1fr) 1fr";
 
   export let data;
-  let selectedUserId: string = "";
+  let selectedUser: OrySchemas.User | undefined;
+  let deleteUserDialog: DeleteUserDialog;
 
   $: users = data.users.data.flatMap((item) => item);
+
+  const {
+    elements: { menu, item, trigger },
+  } = createDropdownMenu();
 
   const loadMore: ScrollLoadFunc = async () => {
     if (!data.users.cursor) {
@@ -44,12 +50,16 @@
     return { depleted: !resp.cursor };
   };
 
-  const {
-    elements: { menu, item, trigger },
-  } = createDropdownMenu();
+  function setSelectedUser(user?: OrySchemas.User): void {
+    if (!user) {
+      return;
+    }
 
-  function setSelectedUserId(user: OrySchemas.User): void {
-    selectedUserId = user.id;
+    selectedUser = user;
+  }
+
+  function openDeleteUserDialog(): void {
+    deleteUserDialog.open();
   }
 </script>
 
@@ -62,6 +72,8 @@
     )}
   </title>
 </svelte:head>
+
+<DeleteUserDialog maxWidth={"482px"} bind:this={deleteUserDialog} user={selectedUser} />
 
 <StandardLayout pageTitle={$t("pages.adminControls.pages.users.title")}>
   <div slot="actions">
@@ -111,30 +123,35 @@
           </x-td>
           <button
             class="action-btn"
-            on:click={setSelectedUserId.bind(setSelectedUserId, hubUser)}
+            on:click={setSelectedUser.bind(setSelectedUser, hubUser)}
             use:melt={$trigger}>⋮</button
           >
         </x-tr>
       {/each}
 
-      <div class="menu-wrapper" use:melt={$menu}>
-        <ul class="menu">
-          <li class="menu-item" use:melt={$item}>
-            <a
-              class="menu-link"
-              href={routeConfig.routes.adminControls.routes.users.routes.update.user(selectedUserId)
-                .root}
-            >
-              <Icon variant="edit-user" size="12px" />
-              <p typography="body-small">Edit</p>
-            </a>
-          </li>
-          <li class="menu-item" use:melt={$item}>
-            <Icon variant="delete-user" size="10px" />
-            <p typography="body-small">Delete</p>
-          </li>
-        </ul>
-      </div>
+      {#if selectedUser !== undefined}
+        <div class="menu-wrapper" use:melt={$menu}>
+          <ul class="menu">
+            <li class="menu-item" use:melt={$item}>
+              <a
+                class="menu-link"
+                href={routeConfig.routes.adminControls.routes.users.routes.update.user(
+                  selectedUser.id,
+                ).root}
+              >
+                <Icon variant="edit-user" size="12px" />
+                <p typography="body-small">Edit</p>
+              </a>
+            </li>
+            <li class="menu-item" use:melt={$item}>
+              <button class="menu-link" on:click={openDeleteUserDialog}>
+                <Icon variant="delete-user" size="10px" />
+                <p typography="body-small">Delete</p>
+              </button>
+            </li>
+          </ul>
+        </div>
+      {/if}
 
       {#if $pending}
         <x-tloading transition:slideFade={{ duration: 200 }}>
@@ -229,10 +246,22 @@
     cursor: pointer;
   }
 
+  button.menu-link {
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+  }
+
+  button.menu-link:hover {
+    cursor: pointer;
+  }
+
   .menu-link {
     display: flex;
     flex-direction: row;
     gap: 4px;
+    align-items: center;
   }
 
   .menu-link > p {

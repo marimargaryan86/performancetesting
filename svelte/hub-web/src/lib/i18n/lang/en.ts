@@ -169,6 +169,7 @@ export default {
     save: "Save",
     change: "Change",
     confirmSelection: "Confirm selection",
+    deactivate: "Deactivate",
   },
   sentences: {
     priceChange: "Price change",
@@ -256,6 +257,7 @@ export default {
       "Your previously selected outbound trip is no longer available",
     previousSelectedInboundUnavailable:
       "Your previously selected inbound trip is no longer available",
+    deleteUser: "Are you sure you want to delete this user?",
   },
   tableHeaders: {
     id: "ID",
