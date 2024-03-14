@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.places.v1alpha;
+
+import "snowfall/project/junction/rocket/service/places/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/places/v1alpha";
+
+message GetPlaceRequest {
+  string id = 1;
+}
+
+message GetPlaceResponse {
+  Place place = 1;
+}
+
+message GetPlaceClosestToCoordinatesRequest {
+  CoordinatesAndRadius coordinates_and_radius = 1;
+}
+
+message GetPlaceClosestToCoordinatesResponse {
+  Place place = 1;
+}
+
+message GetPlaceByIataRequest {
+  string iata = 1;
+}
+
+message GetPlaceByIataResponse {
+  Place place = 1;
+}
+
+// We can filter a list request by name, type, a radius around a point, and for places only contained within another
+message Filters {
+  string name = 1;
+  Type type = 2;
+  CoordinatesAndRadius coordinates_and_radius = 3;
+  PlaceIdentifier place_to_search_within = 4;
+}
+
+message ListPlacesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  Filters filters = 3;
+}
+
+message ListPlacesResponse {
+  repeated Place places = 1;
+}
+
+service PlacesService {
+  rpc GetPlace(GetPlaceRequest) returns (GetPlaceResponse) {}
+  rpc GetPlaceClosestToCoordinates(GetPlaceClosestToCoordinatesRequest) returns (GetPlaceClosestToCoordinatesResponse) {}
+  rpc GetPlaceByIata(GetPlaceByIataRequest) returns (GetPlaceByIataResponse) {}
+  rpc ListPlaces(ListPlacesRequest) returns (ListPlacesResponse) {}
+}

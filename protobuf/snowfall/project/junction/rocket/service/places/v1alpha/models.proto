@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.places.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/latlng.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/places/v1alpha";
+
+enum Type {
+  TYPE_UNSPECIFIED = 0;
+  TYPE_CITY = 1;
+  TYPE_RAILWAY_STATION = 2;
+  TYPE_AIRPORT = 3;
+  TYPE_FERRY_PORT = 4;
+}
+
+message CoordinatesAndRadius {
+  snowfall.stdlib.v1.LatLng coordinates = 1;
+  int32 radius = 2;
+}
+
+message ProviderPlaceId {
+  string snowfall_provider_id = 1;
+  string provider_place_id = 2;
+}
+
+message ProviderMappings {
+  repeated ProviderPlaceId rail = 1;
+  repeated ProviderPlaceId air = 2;
+  repeated ProviderPlaceId ferry = 3;
+}
+
+message PlaceIdentifier {
+  string id = 1;
+  string name = 2;
+}
+
+message Place {
+  // What is it
+  string id = 1;
+  string name = 2;
+  snowfall.stdlib.v1.LatLng coordinates = 3;
+  string time_zone = 4;
+  string country_code = 5;
+  string country_name = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  PlaceIdentifier city = 8;
+  Type type = 9;
+  // What vertical provider places allow it to be searched with specifically
+  // E.G A provider could allow a search for London as a city
+  ProviderMappings search_capabilities = 10;
+  // What vertical provider places are within it to search individually:
+  // E.G London contains many vertical places to search individually
+  ProviderMappings contains = 11;
+}
