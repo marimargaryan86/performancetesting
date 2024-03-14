@@ -1,15 +1,17 @@
 <script lang="ts" generics="TValue">
   /* global TValue */
   import type { ComponentEvents } from "svelte";
+  import type { MaybePromise } from "@sveltejs/kit";
   import { writable } from "svelte/store";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { keyboard, type KeyboardParams } from "$lib/directives/keyboard";
   import { clickOutside } from "$lib/directives/click-outside";
   import { scale } from "svelte/transition";
-  import type { MaybePromise } from "@sveltejs/kit";
+  import { getRandomId } from "$lib/utils/random";
   import TextField from "./text-field.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
 
+  export let id: string = getRandomId("autocomplete");
   export let value: TValue | undefined;
   export let required = false;
   export let clearable = false;
@@ -19,6 +21,7 @@
   export let autocomplete: (q: string) => MaybePromise<TValue[]> = () => [];
   export let error: string | string[] | undefined = undefined;
 
+  let listId = `${id}-list`;
   let items: TValue[] = [];
   let query = formatter(value);
   let dialog: HTMLUListElement | undefined;
@@ -63,7 +66,7 @@
   }
 
   function scrollToOption(): void {
-    dialog?.children[hoveredIndex]?.scrollIntoView({ block: "nearest" });
+    dialog?.children[hoveredIndex]?.scrollIntoView?.({ block: "nearest" });
   }
 
   function setHoveredIndex(option?: TValue): void {
@@ -115,8 +118,16 @@
   } satisfies KeyboardParams;
 </script>
 
-<div class="autocomplete-field" use:clickOutside={close} use:keyboard={keyMapping}>
+<div
+  class="autocomplete-field"
+  use:clickOutside={close}
+  use:keyboard={keyMapping}
+  aria-owns={expanded ? listId : undefined}
+  aria-haspopup="listbox"
+  aria-expanded={Boolean(expanded)}
+>
   <TextField
+    {id}
     {label}
     {required}
     {placeholder}
@@ -127,10 +138,14 @@
     on:input={search}
     on:blur={close}
     bind:this={textField}
+    role="list"
+    aria-controls={expanded ? listId : undefined}
   />
 
   {#if expanded}
     <ul
+      id={listId}
+      role="listbox"
       typography="body-medium"
       class="options"
       transition:scale={{ duration: 150, start: 0.8 }}
@@ -143,12 +158,14 @@
         </li>
       {/if}
       {#each items as item, idx}
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <!-- aria-selected is needed for role="option" but since
+          the options are collapsed once selected it will always be false -->
         <li
+          role="option"
           class="option"
           on:pointerover={setHoveredIndex.bind(setHoveredIndex, item)}
           on:mousedown={select.bind(select, item)}
-          class:selected={item === value}
+          aria-selected={false}
           class:hovered={hoveredIndex === idx}
         >
           {formatter(item)}
@@ -190,10 +207,6 @@
     padding: 16px;
     cursor: pointer;
     user-select: none;
-  }
-
-  .option.selected {
-    background-color: var(--color-main-neutral-50);
   }
 
   .option.hovered {
