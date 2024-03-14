@@ -13,10 +13,12 @@
   import type * as OrySchemas from "~/integration/ory/schemas";
   import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import type { PaginatedData } from "$lib/models/common";
+  import type { BreadCrumb } from "$lib/models/ui";
 
   export let mode: "create" | "update";
   export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
   export let resellers: PaginatedData<HubSchemas.Reseller> | undefined;
+  export let breadCrumbs: BreadCrumb[];
 
   const t = getTranslator();
   const pending = writable(false);
@@ -49,9 +51,10 @@
     }
   }
 
+  // TODO(2024-03-06/alvin.s): Re-evaluate reactive var statements when MVP complete.
   $: currentUser = user;
-
-  // TODO(2024-03-06/alvin.s): Clean this up.
+  $: i18nTitleString = $t(`pages.adminControls.pages.users.pages.${mode}.title`);
+  $: pageTitle = mode === "update" && currentUser ? currentUser.email : i18nTitleString;
   $: selectedRole = mode === "update" ? user?.role || "reseller-user" : "reseller-user";
   $: resellerOptions = resellers?.data || [];
 
@@ -65,18 +68,12 @@
 </script>
 
 <svelte:head>
-  {#if mode === "create"}
-    <title>
-      {getPageTitle($t("pages.adminControls.pages.users.pages.create.title"))}
-    </title>
-  {:else if mode === "update"}
-    <title>
-      {getPageTitle($t("pages.adminControls.pages.users.pages.update.title"))}
-    </title>
-  {/if}
+  <title>
+    {getPageTitle(i18nTitleString)}
+  </title>
 </svelte:head>
 
-<StandardLayout pageTitle={$t("pages.adminControls.pages.users.pages.create.title")}>
+<StandardLayout {pageTitle} {breadCrumbs}>
   {#if currentUser}
     <div class="body">
       <form class="user-information">
