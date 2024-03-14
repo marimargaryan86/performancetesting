@@ -10,6 +10,15 @@ import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/searches/v1alpha";
 
+message Mock {
+  snowfall.project.junction.go.v1.Point origin = 1;
+  snowfall.project.junction.go.v1.Point destination = 2;
+  google.protobuf.Timestamp departure_date = 3;
+  google.protobuf.Timestamp return_date = 5;
+  repeated Passenger passengers = 6;
+  string outbound_search_id = 7;
+}
+
 message Rail {
   snowfall.project.junction.go.v1.Point origin = 1;
   snowfall.project.junction.go.v1.Point destination = 2;
@@ -41,15 +50,16 @@ message CarRental {
 message Search { // old SimpleTripOfferSearch
   string id = 1;
   string reseller_id = 2;
+  snowfall.stdlib.v1.Trackable.Status status = 3;
+  google.protobuf.Timestamp expires_at = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
   oneof search_criterion {
-    Rail rail = 3;
-    Ferry ferry = 4;
-    CarRental car_rental = 5;
+    Mock mock = 7;
+    Rail rail = 8;
+    Ferry ferry = 9;
+    CarRental car_rental = 10;
   }
-  snowfall.stdlib.v1.Trackable.Status status = 6;
-  google.protobuf.Timestamp expires_at = 7;
-  google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
 }
 
 message SearchResult { // old OfferGroup
