@@ -1,4 +1,5 @@
 from collections.abc import Mapping, Sequence
+from typing import ClassVar
 
 import pytest
 
@@ -98,3 +99,32 @@ def test_resource_is_flattened(
     expected: Mapping[str, object | str | Sequence[str] | None],
 ) -> None:
     assert jsonapi.flatten_resource(resource) == expected
+
+
+class _Foobar(jsonapi.Model):
+    type: ClassVar[str] = "foobar"
+    foobar: str
+
+
+def test_serialization() -> None:
+    model = _Foobar(id="id", foobar="foobar")
+
+    assert model.model_dump() == {
+        "id": "id",
+        "type": "foobar",
+        "attributes": {
+            "foobar": "foobar",
+        },
+    }
+
+
+def test_validation() -> None:
+    input_data = {
+        "id": "id",
+        "type": "foobar",
+        "attributes": {
+            "foobar": "foobar",
+        },
+    }
+
+    assert _Foobar.model_validate(input_data).model_dump() == input_data
