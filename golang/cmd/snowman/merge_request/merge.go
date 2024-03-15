@@ -47,9 +47,8 @@ func (mr *mergeRequest) merge() error {
 			mr.object.ProjectID,
 			mr.object.IID,
 			&gitlab.AddMergeRequestToMergeTrainOptions{
-				SHA:                  func() *string { s := mr.object.SHA; return &s }(),
-				Squash:               func() *bool { b := true; return &b }(),
-				WhenPipelineSucceeds: func() *bool { b := true; return &b }(),
+				SHA:    func() *string { s := mr.object.SHA; return &s }(),
+				Squash: func() *bool { b := true; return &b }(),
 			},
 		)
 
