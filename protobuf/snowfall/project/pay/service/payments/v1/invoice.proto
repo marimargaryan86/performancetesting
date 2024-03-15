@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.payments.v1;
+
+import "snowfall/project/pay/service/payments/v1/invoice_models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
+
+service InvoiceService {
+  rpc CreateInvoiceAccount(CreateInvoiceAccountRequest) returns (CreateInvoiceAccountResponse) {}
+}
+
+message CreateInvoiceAccountRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message CreateInvoiceAccountResponse {
+  InvoiceAccount account = 1;
+}

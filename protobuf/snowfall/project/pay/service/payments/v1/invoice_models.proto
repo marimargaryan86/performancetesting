@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package snowfall.project.pay.service.payments.v1;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
+
+message InvoiceAccount {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+}

@@ -1,7 +1,10 @@
 from abc import abstractmethod
 from collections.abc import Mapping
 
-from snowfall.project.pay.service.payments.v1 import credit_card_models_pb2
+from snowfall.project.pay.service.payments.v1 import (
+    credit_card_models_pb2,
+    invoice_models_pb2,
+)
 from snowfall.stdlib import money
 
 
@@ -78,3 +81,13 @@ class CreditCardProvider(object):
         external_reference_id: str,
     ) -> credit_card_models_pb2.Refund | None:
         """Get refund."""
+
+
+class InvoiceProvider(object):
+    @abstractmethod
+    def create_account(
+        self,
+        name: str,
+        email: str,
+    ) -> invoice_models_pb2.InvoiceAccount:
+        """Create account."""

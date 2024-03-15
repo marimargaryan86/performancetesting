@@ -6,11 +6,15 @@ from pydantic import AnyUrl
 from snowfall.project.pay.service.payments.credit_card_service.grpc import (
     CreditCardPaymentService,
 )
+from snowfall.project.pay.service.payments.invoice_service.grpc import InvoiceService
 from snowfall.project.pay.service.payments.providers import interfaces
 from snowfall.project.pay.service.payments.providers.stripe.repositories import (
     PaymentUsersRepository,
 )
 from snowfall.project.pay.service.payments.providers.stripe.stripe import Stripe
+from snowfall.project.pay.service.payments.providers.stripe_invoice.client import (
+    StripeInvoice,
+)
 from snowfall.project.pay.service.payments.providers.stripe_mock.stripe import (
     MockStripe,
 )
@@ -42,6 +46,10 @@ async def _serve_credit_card_payment(
         app.settings.stripe_api_key,
     )
     mock_stripe_provider = MockStripe()
+    stripe_invoice_provider = StripeInvoice(
+        app.settings.stripe_version,
+        app.settings.stripe_api_key,
+    )
     providers: dict[str, interfaces.CreditCardProvider] = {
         stripe_provider.name: stripe_provider,
         mock_stripe_provider.name: mock_stripe_provider,
@@ -54,6 +62,9 @@ async def _serve_credit_card_payment(
             CreditCardPaymentService(
                 providers,
                 app.settings.payment_provider_resellers,
+            ),
+            InvoiceService(
+                stripe_invoice_provider,
             ),
         ],
     )

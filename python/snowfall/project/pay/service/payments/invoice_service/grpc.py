@@ -1,0 +1,40 @@
+import grpc
+
+from snowfall.project.pay.service.payments.providers import interfaces
+from snowfall.project.pay.service.payments.v1 import (
+    invoice_pb2,
+    invoice_pb2_grpc,
+)
+from snowfall.stdlib.transport.grpc import service
+
+
+class InvoiceService(
+    service.Service,
+    invoice_pb2_grpc.InvoiceServiceServicer,
+):
+    def __init__(
+        self,
+        provider: interfaces.InvoiceProvider,
+    ):
+        self._provider = provider
+
+    def get_name(self) -> str:
+        return invoice_pb2.DESCRIPTOR.services_by_name["InvoiceService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        invoice_pb2_grpc.add_InvoiceServiceServicer_to_server(
+            self,
+            server,
+        )
+
+    async def CreateInvoiceAccount(  # type: ignore[override] # noqa: N802
+        self,
+        request: invoice_pb2.CreateInvoiceAccountRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> invoice_pb2.CreateInvoiceAccountResponse:
+        account = self._provider.create_account(
+            email=request.email,
+            name=request.name,
+        )
+
+        return invoice_pb2.CreateInvoiceAccountResponse(account=account)
