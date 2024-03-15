@@ -225,7 +225,7 @@ func (mr *mergeRequest) removeLabel(label string) error {
 		mr.object.ProjectID,
 		mr.object.IID,
 		&gitlab.UpdateMergeRequestOptions{
-			RemoveLabels: &gitlab.Labels{label},
+			RemoveLabels: &gitlab.LabelOptions{label},
 		},
 	)
 
@@ -252,7 +252,7 @@ func (mr *mergeRequest) setLabel(label string) error {
 		mr.object.ProjectID,
 		mr.object.IID,
 		&gitlab.UpdateMergeRequestOptions{
-			AddLabels: &gitlab.Labels{label},
+			AddLabels: &gitlab.LabelOptions{label},
 		},
 	)
 

@@ -211,9 +211,7 @@ DeleteLoop:
 			}
 		}
 
-		_, err := client.Labels.DeleteLabel(p.ID, &gitlab.DeleteLabelOptions{
-			Name: &l.Name,
-		})
+		_, err := client.Labels.DeleteLabel(p.ID, l.ID, &gitlab.DeleteLabelOptions{})
 
 		if err != nil {
 			lLogger.Error(err)
