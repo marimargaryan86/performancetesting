@@ -24,6 +24,7 @@ from snowfall.project.junction.provider import (
     offers,
     service,
 )
+from snowfall.project.junction.provider.v1 import meta_pb2
 from snowfall.project.junction.service.providers.save_a_train import (
     adapter,
     cache,
@@ -114,7 +115,14 @@ _Impl = offers.OfferSearchImplementation[
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(
+        identifier=PROVIDER_ID,
+        name=_PROVIDER_NAME,
+        trip_search_capabilities=meta_pb2.TripSearchCapabilities(
+            supports_simple_search=False,
+            supports_trip_search=True,
+        ),
+    )
 
 
 async def _offers_factory(

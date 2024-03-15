@@ -1,4 +1,5 @@
 from snowfall.project.junction.provider import bookings, meta, service
+from snowfall.project.junction.provider.v1 import meta_pb2
 from snowfall.project.junction.service.providers.ba_ndc import (
     booking,
     config,
@@ -13,7 +14,14 @@ _PROVIDER_NAME = "British Airways NDC"
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(
+        identifier=PROVIDER_ID,
+        name=_PROVIDER_NAME,
+        trip_search_capabilities=meta_pb2.TripSearchCapabilities(
+            supports_simple_search=False,
+            supports_trip_search=True,
+        ),
+    )
 
 
 async def _bookings_factory(

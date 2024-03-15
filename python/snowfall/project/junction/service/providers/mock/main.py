@@ -11,6 +11,7 @@ from snowfall.project.junction.provider import bookings as provider_bookings
 from snowfall.project.junction.provider import meta, service
 from snowfall.project.junction.provider import offers as provider_offers
 from snowfall.project.junction.provider import simple_offers as provider_simple_offers
+from snowfall.project.junction.provider.v1 import meta_pb2
 from snowfall.project.junction.service.providers.mock import (
     bookings,
     cache,
@@ -109,7 +110,14 @@ async def _bookings(app: service.Application[_BookingsSettings]) -> None:
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(
+        identifier=PROVIDER_ID,
+        name=_PROVIDER_NAME,
+        trip_search_capabilities=meta_pb2.TripSearchCapabilities(
+            supports_simple_search=True,
+            supports_trip_search=True,
+        ),
+    )
 
 
 async def _offers_factory(

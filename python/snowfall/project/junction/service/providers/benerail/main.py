@@ -37,6 +37,10 @@ async def _meta_factory() -> meta.MetaImplementation:
         booking_capabilities=meta_pb2.BookingCapabilities(
             supports_cancellation=True,
         ),
+        trip_search_capabilities=meta_pb2.TripSearchCapabilities(
+            supports_simple_search=True,
+            supports_trip_search=True,
+        ),
     )
 
 
