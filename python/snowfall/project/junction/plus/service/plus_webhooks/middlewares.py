@@ -6,6 +6,7 @@ from starlette import applications, exceptions, requests, responses, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from twilio.request_validator import RequestValidator
 
+from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.integration.starlette.middlewares import resolve_request
 
 
@@ -47,14 +48,21 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         call_next: Callable[[requests.Request], Awaitable[responses.Response]],
     ) -> responses.Response:
         if request.scope["path"].endswith("alerts"):
-            return await call_next(
-                await self.flight_stats_dispatch(request),
-            )
+            try:
+                return await call_next(
+                    await self.flight_stats_dispatch(request),
+                )
+            except exceptions.HTTPException as flight_stats_exc:
+                return handlers.error_response_from_status(flight_stats_exc.status_code)
 
         if request.scope["path"].endswith("whatsapp"):
-            return await call_next(
-                await self.whatsapp_dispatch(request),
-            )
+            try:
+                return await call_next(
+                    await self.whatsapp_dispatch(request),
+                )
+            except exceptions.HTTPException as whatsapp_exc:
+                return handlers.error_response_from_status(whatsapp_exc.status_code)
+
         return await call_next(request)
 
     async def flight_stats_dispatch(

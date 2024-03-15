@@ -6,8 +6,9 @@ from collections.abc import Awaitable, Callable, Mapping, Sequence
 from typing import Any
 
 import uvicorn
-from starlette import applications, exceptions, requests, responses, routing, status
-from starlette.middleware import Middleware, errors
+from starlette import applications, exceptions, requests, responses, routing
+from starlette.middleware import Middleware
+from starlette.middleware import exceptions as exceptions_middleware
 
 from snowfall.stdlib.integration.starlette import (
     handlers,
@@ -16,11 +17,15 @@ from snowfall.stdlib.integration.starlette import (
     validation,
 )
 from snowfall.stdlib.integration.starlette import routes as common_routes
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.service import application
 
 ExceptionHandlerResponse = responses.Response | Awaitable[responses.Response]
 ExceptionHandler = Callable[[requests.Request, Exception], ExceptionHandlerResponse]
 ExceptionHandlerMapping = Mapping[Any, ExceptionHandler]
+
+
+_LOGGER = stdout.get_logger()
 
 
 class Settings(application.Settings):
@@ -29,6 +34,15 @@ class Settings(application.Settings):
     ]
     http_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     http_port: int = 80
+
+
+async def _logging_server_error_handler(
+    request: requests.Request,
+    exc: Exception,
+) -> responses.Response:
+    _LOGGER.exception()
+
+    return await handlers.server_error_handler(request, exc)
 
 
 def create_starlette_app(
@@ -76,14 +90,16 @@ def create_starlette_app(
         ],
         middleware=[
             *stack,
-            *(custom_middlewares or []),
             Middleware(
-                errors.ServerErrorMiddleware,
-                handler=handlers.server_error_handler,
+                exceptions_middleware.ExceptionMiddleware,
+                handlers={
+                    Exception: _logging_server_error_handler,
+                },
             ),
+            *(custom_middlewares or []),
         ],
         exception_handlers={
-            status.HTTP_500_INTERNAL_SERVER_ERROR: handlers.server_error_handler,
+            Exception: handlers.server_error_handler,
             exceptions.HTTPException: handlers.server_error_handler,
         },
         lifespan=lifespan,
