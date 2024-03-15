@@ -136,7 +136,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	loader := common.NewLoader(client, time.Minute*10)
+	loader := common.NewLoader(client)
 
 	mr := merge_request.NewPlugin(client, sugar, snowman, loader)
 

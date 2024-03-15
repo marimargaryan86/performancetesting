@@ -332,7 +332,7 @@ func manageMemberships(client *gitlab.Client, logger *zap.SugaredLogger, snowman
 
 		var config common.Configuration
 
-		config, err := loader.Load(p.ID)
+		config, err := loader.Fetch(p.ID)
 
 		if err != nil {
 			pLogger.Error(err)

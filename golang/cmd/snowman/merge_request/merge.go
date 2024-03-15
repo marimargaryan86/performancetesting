@@ -52,6 +52,10 @@ func (mr *mergeRequest) merge() error {
 				WhenPipelineSucceeds: func() *bool { b := true; return &b }(),
 			},
 		)
+
+		if err != nil {
+			return fmt.Errorf("merge train: %w", err)
+		}
 	} else {
 		_, resp, err = mr.client.MergeRequests.AcceptMergeRequest(
 			mr.object.ProjectID,
@@ -74,10 +78,10 @@ func (mr *mergeRequest) merge() error {
 
 			return err
 		}
-	}
 
-	if err != nil {
-		return fmt.Errorf("merge: %w", err)
+		if err != nil {
+			return fmt.Errorf("merge: %w", err)
+		}
 	}
 
 	mr.hasChanged = true
