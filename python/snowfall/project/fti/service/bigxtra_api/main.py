@@ -1,7 +1,11 @@
 import json
+import random
 
 import aiofiles
+import lagom
+from motor import motor_asyncio
 
+from snowfall.project.fti.service.bigxtra_api import bootstrap, repository
 from snowfall.project.fti.service.bigxtra_api.routes import router
 from snowfall.project.fti.service.bigxtra_api.schemas import SchemaGenerator
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -14,9 +18,16 @@ _schema_path = filesystem.resource_path(
 )
 
 
-async def _http(app: application.Application[starlette.Settings]) -> None:
+async def _http(app: application.Application[bootstrap.Settings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )[app.settings.mongo_db]
     asgi_app = starlette.create_starlette_app(
-        routes=router.get_routes(),
+        routes=router.get_routes(
+            bootstrap.create_dependencies(
+                places_repository=repository.PlacesRepository(mongo["places"]),
+            ),
+        ),
         openapi_path=_schema_path,
     )
     await starlette.serve(
@@ -30,7 +41,7 @@ async def _schema(app: application.Application[starlette.Settings]) -> None:
         {"openapi": "3.0.0", "info": {"title": "Example API", "version": "1.0"}},
     )
     sch = schemas.get_schema(
-        routes=router.get_routes(),
+        routes=router.get_routes(lagom.Container()),
     )
     async with aiofiles.open(_schema_path, "w", encoding="locale") as file:
         await file.write(json.dumps(sch, ensure_ascii=False, indent=4))
@@ -43,7 +54,7 @@ if __name__ == "__main__":
         application.Command(
             name="http",
             callback=_http,
-            settings_class=starlette.Settings,
+            settings_class=bootstrap.Settings,
         ),
         application.Command(
             name="schema",

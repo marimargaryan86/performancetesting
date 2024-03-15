@@ -1,14 +1,15 @@
-from collections.abc import Callable, Coroutine, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from typing import Any, ClassVar, TypedDict, Unpack
 
+from lagom.integrations.starlette import StarletteIntegration
 from pydantic import BaseModel
 from starlette import requests, responses, status
-from starlette.routing import BaseRoute
+from starlette.routing import BaseRoute, Route
 from starlette.schemas import BaseSchemaGenerator
 
 _default_http_code = status.HTTP_200_OK
 
-Handler = Callable[[Any, requests.Request], Coroutine[Any, Any, responses.Response]]
+Handler = Callable[[Any, requests.Request], Awaitable[responses.Response]]
 
 
 class SchemaArgs(TypedDict, total=False):
@@ -23,6 +24,7 @@ class SchemaArgs(TypedDict, total=False):
 
 class SchemaGenerator(BaseSchemaGenerator):
     _endpoints: ClassVar[dict[Handler, Any]] = {}
+    _routes: ClassVar[list[BaseRoute]] = []
 
     def __init__(self, base_schema: Mapping[str, Any]) -> None:
         self.base_schema = base_schema
@@ -40,6 +42,18 @@ class SchemaGenerator(BaseSchemaGenerator):
 
         return decorator
 
+    @classmethod
+    def to_route(
+        cls,
+        integration: StarletteIntegration | None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> BaseRoute:
+        cls._routes.append(Route(*args, **kwargs))
+        if integration:
+            return integration.route(*args, **kwargs)
+        return Route(*args, **kwargs)
+
     def get_schema(  # noqa: WPS231, C901, PLR0912
         self,
         routes: list[BaseRoute],  # noqa: SF20
@@ -48,7 +62,7 @@ class SchemaGenerator(BaseSchemaGenerator):
         schema.setdefault("paths", {})
         schema.setdefault("components", {})
         components: dict[str, Any] = {"schemas": {}}
-        endpoints_info = self.get_endpoints(routes)
+        endpoints_info = self.get_endpoints(self._routes)
         for endpoint in endpoints_info:
             signature = SchemaGenerator._endpoints.get(endpoint.func, {})
             endpoint_schema = {}

@@ -11,6 +11,7 @@ class BaseModel(PydanticBaseModel):
     class Config(object):
         alias_generator = string.to_lower_camel
         populate_by_name = True
+        extra = "forbid"
 
         @classmethod
         def json_schema_extra(
