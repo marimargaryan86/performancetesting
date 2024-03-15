@@ -27,7 +27,7 @@ func NewPlugin(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab
 		client:  client,
 		config:  config,
 		logger:  logger.Named("merge_request"),
-		timers:  make(map[timerKey]*time.Timer, 0),
+		timers:  make(map[timerKey]*time.Timer),
 		snowman: snowman,
 	}
 }
@@ -94,9 +94,13 @@ func (plugin *MergeRequestPlugin) onTimer(pid int, iid int) {
 			logger.Error(err)
 		}
 
+		// If we know we have made changes to the MR, another webhook is likely
+		// to kick in and detect it. If not, then we schedule another event to
+		// do one final passthrough anyway.
 		if wrapper.hasChanged {
 			logger.Debug("Changes detected, skipping.")
-			return // No need to run further since the changes will have triggered another event.
+			plugin.schedule(wrapper.object.ProjectID, wrapper.object.IID)
+			return
 		}
 	}
 }
@@ -129,6 +133,10 @@ func (plugin *MergeRequestPlugin) OnEvent(event interface{}) {
 		return
 	}
 
+	plugin.schedule(projectId, mrId)
+}
+
+func (plugin *MergeRequestPlugin) schedule(projectId int, mrId int) {
 	key := timerKey{
 		projectId:      projectId,
 		mergeRequestId: mrId,
