@@ -34,7 +34,7 @@ export function formatTravelerDocumentOption(
 export function getPassengerTitles(locale: Locale): CommonSchemas.PassengerTitle[] {
   const base: CommonSchemas.PassengerTitle[] = ["unspecified", "mr", "mrs", "miss"];
 
-  if (locale === "es-ES" || locale === "sv") {
+  if (locale === "es-ES") {
     return base;
   }
 
