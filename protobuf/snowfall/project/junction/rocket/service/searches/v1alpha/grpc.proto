@@ -12,14 +12,7 @@ service SearchService {
 }
 
 service SearchResultService {
-  rpc GetSearchResult(GetSearchResultRequest) returns (GetSearchResultResponse) {}
-  // rpc ListOfferGroups(ListOfferGroupsRequest) returns (ListOfferGroupsResponse) {}
-  rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
-  // rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
-  rpc GetResultDetail(GetResultDetailRequest) returns (GetResultDetailResponse) {}
-  // rpc ListOfferGroupDetails(ListOfferGroupDetailsRequest) returns (ListOfferGroupDetailsResponse) {}
-  rpc GetOfferDetail(GetOfferDetailRequest) returns (GetOfferDetailResponse) {}
-  // rpc ListOfferOptionDetails(ListOfferOptionDetailsRequest) returns (ListOfferOptionDetailsResponse) {}
+  rpc ListSearchResults(ListSearchResultsRequest) returns (ListSearchResultsResponse) {}
 }
 
 service QuoteService {
@@ -43,36 +36,12 @@ message GetSearchResponse {
   Search search = 1;
 }
 
-message GetSearchResultRequest {
-  string id = 1;
+message ListSearchResultsRequest {
+  string search_id = 1;
 }
 
-message GetSearchResultResponse {
-  SearchResult search_result = 1;
-}
-
-message GetOfferRequest {
-  string id = 1;
-}
-
-message GetOfferResponse {
-  Offer offer = 1;
-}
-
-message GetResultDetailRequest {
-  string id = 1;
-}
-
-message GetResultDetailResponse {
-  ResultDetail result_detail = 1;
-}
-
-message GetOfferDetailRequest {
-  string id = 1;
-}
-
-message GetOfferDetailResponse {
-  OfferDetail offer_detail = 1;
+message ListSearchResultsResponse {
+  repeated SearchResult search_results = 1;
 }
 
 message CreateQuoteRequest {

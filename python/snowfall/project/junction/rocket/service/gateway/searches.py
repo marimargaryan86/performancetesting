@@ -120,6 +120,9 @@ class Queue(consumer.AbstractQueue[amqp_pb2.SearchTask]):
             response: providers_pb2.SearchResponse = await task
 
             for search_task_result in response.search_results.search_task_results:
+                search_task_result.search_result.search_id = (
+                    search_task_result.search_id
+                )
                 yield search_task_result
 
     def _provider_on_for_reseller(

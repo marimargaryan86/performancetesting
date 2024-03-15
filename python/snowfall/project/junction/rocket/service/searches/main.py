@@ -76,13 +76,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 search_results=repository.SearchResultRepository(
                     mongo.searches.search_results,
                 ),
-                result_details=repository.ResultDetailsRepository(
-                    mongo.searches.search_results,
-                ),
                 offers=repository.OfferRepository(
-                    mongo.searches.search_results,
-                ),
-                offer_details=repository.OfferDetailsRepository(
                     mongo.searches.search_results,
                 ),
                 default_page_size=app.settings.default_page_size,

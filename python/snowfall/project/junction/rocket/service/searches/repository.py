@@ -45,64 +45,17 @@ class SearchResultRepository(
             filter_=filter_,
         )
 
-    async def find_by_offer(
+    async def find_by_search_id(
         self,
-        offer_id: str,
-    ) -> models_pb2.SearchResult | None:
-        result = await self._find_with_cursor(
-            filter_={
-                "offers._id": {
-                    "$eq": offer_id,
-                },
-            },
-        )
-
-        try:
-            return await result.take()
-        except StopAsyncIteration:
-            return None
-
-
-class ResultDetailsRepository(
-    repository.ProtoRepository[models_pb2.ResultDetail],
-):
-    _proto = models_pb2.ResultDetail
-    _nested_path = "result_details"
-    _indexes = (pymongo.IndexModel("result_details._id", background=True),)
-
-    async def find(
-        self,
-        ids: Sequence[str],
-        cursor: str,
-    ) -> resultset.ResultSet[models_pb2.ResultDetail]:
-        filter_ = (
-            {
-                "result_details._id": {
-                    _IN: ids,
-                },
-            }
-            if ids
-            else {}
-        )
-
+        search_id: str,
+    ) -> resultset.ResultSet[models_pb2.SearchResult]:
         return await self._find_with_cursor(
-            cur=cursor,
-            filter_=filter_,
-        )
-
-    async def find_by_id(self, document_id: str) -> models_pb2.ResultDetail | None:
-        details = await self._find_with_cursor(
             filter_={
-                "result_details._id": {
-                    "$eq": document_id,
+                "search_id": {
+                    "$eq": search_id,
                 },
             },
         )
-
-        try:
-            return await details.take()
-        except StopAsyncIteration:
-            return None
 
 
 class OfferRepository(
@@ -143,51 +96,6 @@ class OfferRepository(
 
         try:
             return await options.take()
-        except StopAsyncIteration:
-            return None
-
-
-class OfferDetailsRepository(
-    repository.ProtoRepository[models_pb2.OfferDetail],
-):
-    _proto = models_pb2.OfferDetail
-    _nested_path = "offers.offer_details"
-    _indexes = (pymongo.IndexModel("offers.offer_details._id", background=True),)
-
-    async def find(
-        self,
-        ids: Sequence[str],
-        cursor: str,
-    ) -> resultset.ResultSet[models_pb2.OfferDetail]:
-        filter_ = (
-            {
-                "offers.offer_details._id": {
-                    _IN: ids,
-                },
-            }
-            if ids
-            else {}
-        )
-
-        return await self._find_with_cursor(
-            cur=cursor,
-            filter_=filter_,
-        )
-
-    async def find_by_id(
-        self,
-        document_id: str,
-    ) -> models_pb2.OfferDetail | None:
-        details = await self._find_with_cursor(
-            filter_={
-                "offers.offer_details._id": {
-                    "$eq": document_id,
-                },
-            },
-        )
-
-        try:
-            return await details.take()
         except StopAsyncIteration:
             return None
 

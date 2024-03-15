@@ -64,10 +64,11 @@ message Search { // old SimpleTripOfferSearch
 
 message SearchResult { // old OfferGroup
   string id = 1;
-  string provider_id = 2;
-  google.protobuf.Timestamp expires_at = 3;
-  repeated Offer offers = 4;
-  repeated ResultDetail result_details = 5;
+  string search_id = 2;
+  string provider_id = 3;
+  google.protobuf.Timestamp expires_at = 4;
+  repeated Offer offers = 5;
+  repeated ResultDetail result_details = 6;
 }
 
 message Offer { // Old OfferOption
