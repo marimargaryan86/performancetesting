@@ -18,6 +18,7 @@ class SearchResultRepository(
     repository.ProtoRepository[models_pb2.SearchResult],
     mixins.FindByIdMixin[models_pb2.SearchResult],
     mixins.InsertMixin[models_pb2.SearchResult],
+    mixins.InsertManyMixin[models_pb2.SearchResult],
 ):
     _proto = models_pb2.SearchResult
     _indexes = (

@@ -25,5 +25,5 @@ message PopSearchResultsRequest {
 
 message PopSearchResultsResponse {
   bool is_in_progress = 1;
-  repeated snowfall.project.junction.rocket.service.searches.v1alpha.SearchTaskResult results = 2;
+  repeated snowfall.project.junction.rocket.service.searches.v1alpha.SearchTaskResult search_task_results = 2;
 }

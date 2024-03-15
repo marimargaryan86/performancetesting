@@ -133,7 +133,7 @@ class SearchService(service.Service, searches_pb2_grpc.SearchServiceServicer):
     ) -> searches_pb2.SearchResponse:
         return searches_pb2.SearchResponse(
             search_results=searches_pb2.SearchResults(
-                results=[
+                search_task_results=[
                     searches_amqp_pb2.SearchTaskResult(
                         search_id=request.search_task.search_id,
                         search_result=search_result,
@@ -168,9 +168,9 @@ class SearchConsumer(Generic[_SearchCriteria]):
         self,
         amqp_message: amqp_types.Message[searches_amqp_pb2.SearchTask],
     ) -> None:
-        await self._publish_search_results(amqp_message)
+        await self._publish_search_task_results(amqp_message)
 
-    async def _publish_search_results(
+    async def _publish_search_task_results(
         self,
         amqp_message: amqp_types.Message[searches_amqp_pb2.SearchTask],
     ) -> None:

@@ -5,7 +5,6 @@ import datetime
 import time
 from collections.abc import AsyncGenerator, Mapping, Sequence
 
-import prometheus_client
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.rocket.provider.v1alpha import (
@@ -17,7 +16,6 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     searches_pb2_grpc,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import amqp_pb2
-from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.service import tasks
 from snowfall.stdlib.transport.amqp import consumer, protocol
@@ -25,24 +23,6 @@ from snowfall.stdlib.transport.amqp import types as amqp
 from snowfall.stdlib.transport.grpc import service
 
 _logger = stdout.get_logger()
-_failed = prometheus_client.Counter(
-    "gateway_searches_total",
-    "Total number of failed searches",
-    ["provider_id"],
-)
-
-_histogram = prometheus_client.Histogram(
-    "gateway_search_duration_seconds",
-    "Duration of performed searches in seconds",
-    ["provider_id", "status"],
-    buckets=prometheus.BUCKETS,
-)
-
-_total = prometheus_client.Counter(
-    "gateway_searches_total",
-    "Total number of performed searches",
-    ["provider_id", "status"],
-)
 
 
 class Service(service.Service, searches_pb2_grpc.SearchServiceServicer):
@@ -68,7 +48,7 @@ class Service(service.Service, searches_pb2_grpc.SearchServiceServicer):
         await asyncio.gather(
             self._producer.publish(
                 request.search_task,
-                "searches",
+                "searches.search",
             ),
             self._runner.mark_as_in_progress(
                 request.search_task.search_id,
@@ -85,7 +65,7 @@ class Service(service.Service, searches_pb2_grpc.SearchServiceServicer):
     ) -> searches_pb2.PopSearchResultsResponse:
         return searches_pb2.PopSearchResultsResponse(
             is_in_progress=await self._runner.is_in_progress(request.id),
-            results=await self._runner.drain_results(request.id),
+            search_task_results=await self._runner.drain_results(request.id),
         )
 
 
@@ -137,10 +117,10 @@ class Queue(consumer.AbstractQueue[amqp_pb2.SearchTask]):
         ]
 
         for task in asyncio.as_completed(search_tasks):
-            search_response: providers_pb2.SearchResponse = await task
+            response: providers_pb2.SearchResponse = await task
 
-            for search_result in search_response.search_results.results:
-                yield search_result
+            for search_task_result in response.search_results.search_task_results:
+                yield search_task_result
 
     def _provider_on_for_reseller(
         self,
@@ -176,19 +156,16 @@ async def _do_search(
         if ex.code() != StatusCode.UNIMPLEMENTED:
             _logger.exception("Provider search failed")
 
-        _failed.labels(provider_id=provider.identifier).inc()
         response = providers_pb2.SearchResponse()
         status = "nok"
     finally:
         exec_time = time.perf_counter() - start
 
-    _histogram.labels(provider_id=provider.identifier, status=status).observe(exec_time)
-    _total.labels(provider_id=provider.identifier, status=status).inc()
     _logger.info(
         "search performed",
         provider_id=provider.identifier,
         failed=status == "nok",
-        results=len(response.search_results),
+        search_task_results=len(response.search_results.search_task_results),
         execution_time=exec_time,
     )
 

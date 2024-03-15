@@ -62,7 +62,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         [
             SearchService(
                 searches_repo=repository.SearchRepository(
-                    mongo.search.searches,
+                    mongo.searches.searches,
                     app.settings.default_ttl,
                 ),
                 publisher=SearchProducer(
@@ -74,16 +74,16 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
             ),
             SearchResultService(
                 search_results=repository.SearchResultRepository(
-                    mongo.search.search_results,
+                    mongo.searches.search_results,
                 ),
                 result_details=repository.ResultDetailsRepository(
-                    mongo.search.result_details,
+                    mongo.searches.search_results,
                 ),
                 offers=repository.OfferRepository(
-                    mongo.search.offers,
+                    mongo.searches.search_results,
                 ),
                 offer_details=repository.OfferDetailsRepository(
-                    mongo.search.offer_details,
+                    mongo.searches.search_results,
                 ),
                 default_page_size=app.settings.default_page_size,
             ),
@@ -112,7 +112,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
     )
 
     searches_repo = repository.SearchRepository(
-        mongo.search.searches,
+        mongo.searches.searches,
         app.settings.default_ttl,
     )
 
@@ -126,7 +126,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
             ],
         ),
         search_results=repository.SearchResultRepository(
-            mongo.search.search_results,
+            mongo.searches.search_results,
         ),
         redis=redis_client,
         status_handler=importer.StatusHandler(

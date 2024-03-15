@@ -16,7 +16,7 @@ message Mock {
   google.protobuf.Timestamp departure_date = 3;
   google.protobuf.Timestamp return_date = 5;
   repeated Passenger passengers = 6;
-  string outbound_search_id = 7;
+  string outbound_search_result_id = 7;
 }
 
 message Rail {
@@ -26,7 +26,7 @@ message Rail {
   google.protobuf.Timestamp departure_before = 4;
   google.protobuf.Timestamp return_date = 5;
   repeated Passenger passengers = 6;
-  string outbound_search_id = 7;
+  string outbound_search_result_id = 7;
 }
 
 message Ferry {
@@ -36,7 +36,7 @@ message Ferry {
   google.protobuf.Timestamp departure_before = 4;
   google.protobuf.Timestamp return_date = 5;
   repeated Passenger passengers = 6;
-  string outbound_search_id = 7;
+  string outbound_search_result_id = 7;
 }
 
 message CarRental {

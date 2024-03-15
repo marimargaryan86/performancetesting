@@ -22,6 +22,7 @@ _PROVIDER_NAME = "Mock"
 class _Settings(service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     storage_dsn: service.AnyDsn
+    # TODO(reuben.t): add disabled operator logic, once operator is available in  model
 
 
 async def _meta_factory() -> meta.MetaImplementation:
@@ -36,7 +37,7 @@ async def _search_factory(
 ) -> searches.SearchImplementation[provider_searches.Criteria]:
     search_result_generator = provider_searches.search_result_generator(
         generator=provider_searches.Generator(
-            offer_cache=cache.OfferCache(
+            search_result_cache=cache.SearchResultCache(
                 client=redis.Client(redis_conn, prefix=app.name),
             ),
             ttl=app.settings.ttl,

@@ -34,10 +34,10 @@ def cache_key(search: Criteria) -> str:
 class Generator(object):
     def __init__(
         self,
-        offer_cache: cache.OfferCache,
+        search_result_cache: cache.SearchResultCache,
         ttl: datetime.timedelta,
     ):
-        self._cache = offer_cache
+        self._cache = search_result_cache
         self._ttl = ttl
 
     async def generate(
@@ -75,7 +75,7 @@ class Generator(object):
                         name=search.origin,
                     ),
                     outbound_segment=False,
-                    segment_sequence=1,
+                    segment_sequence=2,
                 ),
             )
 
@@ -127,8 +127,8 @@ def search_criteria_task_generator(
                 search.mock.return_date,
             ),
             outbound_id=(
-                search.mock.outbound_search_id
-                if search.mock.outbound_search_id
+                search.mock.outbound_search_result_id
+                if search.mock.outbound_search_result_id
                 else None
             ),
         ),

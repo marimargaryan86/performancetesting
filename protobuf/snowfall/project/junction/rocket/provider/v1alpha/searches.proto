@@ -19,5 +19,5 @@ message SearchResponse {
 }
 
 message SearchResults {
-  repeated snowfall.project.junction.rocket.service.searches.v1alpha.SearchTaskResult results = 1;
+  repeated snowfall.project.junction.rocket.service.searches.v1alpha.SearchTaskResult search_task_results = 1;
 }

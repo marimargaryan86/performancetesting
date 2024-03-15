@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from collections.abc import Sequence
 
 import prometheus_client
 
@@ -12,10 +11,6 @@ from snowfall.project.junction.rocket.service.searches import (
     repository,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import amqp_pb2
-from snowfall.project.junction.rocket.service.searches.v1alpha.models_pb2 import (
-    Search,
-    SearchResult,
-)
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout
@@ -138,7 +133,7 @@ class SearchResultImporter(object):
                 if not search:
                     return
 
-                await self._process_search_result(search, message.body)
+                await self._search_results.insert(message.body.search_result)
             case trackable_pb2.Trackable():
                 await self._status_handler.on_message(message.body)
             case amqp_pb2.SearchTask():
@@ -182,12 +177,10 @@ class SearchResultImporter(object):
                 timeout=self._gateway_timeout.total_seconds(),
             )
 
-            await asyncio.gather(
-                *[
-                    self._process_search_result(search, search_result)
-                    for search_result in response.search_results.results
-                ],
-            )
+            await self._search_results.insert_many([
+                search_task_result.search_result
+                for search_task_result in response.search_task_results
+            ])
 
             if not response.is_in_progress:
                 break
@@ -201,20 +194,3 @@ class SearchResultImporter(object):
         )
 
         await self._searches.mark_as_completed(search.id)
-
-    async def _process_search_result(
-        self,
-        search: Search,
-        message: amqp_pb2.SearchTaskResult,
-    ) -> None:
-        return
-        # TODO(reuben.t): Move disabled operator logic to the provider?
-        # TODO(reuben.t): Insert the result into the SearchResultRepo
-
-    def _contains_disabled_operator(
-        self,
-        disabled_operators: Sequence[str],
-        search_result: SearchResult,
-    ) -> bool:
-        # TODO(reuben.t): Fix when we have more informational models :)
-        return False

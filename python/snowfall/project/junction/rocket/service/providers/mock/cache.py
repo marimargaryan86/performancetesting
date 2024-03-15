@@ -4,8 +4,8 @@ from snowfall.stdlib.persistence.redis.repository import (
 from snowfall.stdlib.persistence.redis.repository import RedisRecord
 
 
-class OfferNotFoundError(Exception):
-    """Raised when an offer is not found in the cache."""
+class SearchResultNotFoundError(Exception):
+    """Raised when a search result is not found in the cache."""
 
 
 class QuoteNotFoundError(Exception):
@@ -17,8 +17,8 @@ class MockDetails(RedisRecord):
     currency: str
 
 
-class OfferCache(RedisRepository[MockDetails]):
-    """Stores offers in the cache."""
+class SearchResultCache(RedisRepository[MockDetails]):
+    """Stores search result in the cache."""
 
     _record_type: type[MockDetails] = MockDetails
 
