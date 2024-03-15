@@ -57,7 +57,7 @@ allow-breaking-changes:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   artifacts:
     reports:
       dotenv: variables.env
@@ -75,7 +75,7 @@ editorconfig:validate:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   tags:
     - docker
 
@@ -87,7 +87,7 @@ misc:validate:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
     NOMAD_VAR_datacenter: "foobar"
     NOMAD_VAR_docker_image: "${CI_REGISTRY_IMAGE}"

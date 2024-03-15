@@ -8,7 +8,8 @@ svelte:setup:
     - docker buildx build --cache-to type=inline --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG} --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/svelte:${CI_DEFAULT_BRANCH} --pull --push --compress -f ".gitlab/svelte.Dockerfile" -t "${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg "NODE_VERSION=$(cat .node-version)" .gitlab/
   needs: []
   rules:
-    - if: "$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   tags:
     - shell
 
@@ -34,7 +35,7 @@ svelte:setup:
   needs:
     - "svelte:setup"
   rules:
-    - if: $CI_MERGE_REQUEST_IID
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - "svelte/${PROJECT_NAME}/**/*"
         - "svelte/.gitlab-ci.yml"

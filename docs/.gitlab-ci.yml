@@ -14,7 +14,7 @@
     paths:
       - "${PROJECT_PATH}/.npm/"
   rules:
-    - if: $CI_MERGE_REQUEST_IID
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       changes:
         - "${PROJECT_PATH}/**/*"
         - "docs/.gitlab-ci.yml"

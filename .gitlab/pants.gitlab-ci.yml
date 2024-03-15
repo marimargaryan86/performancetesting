@@ -11,7 +11,8 @@ pants:setup:
     - docker buildx build --cache-to type=inline --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG} --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/pants:${CI_DEFAULT_BRANCH} --pull --push --compress -f ".gitlab/pants.Dockerfile" -t "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg "PANTS_VERSION=$(grep pants_version pants.toml | cut -d'"' -f 2)" .gitlab/
   needs: []
   rules:
-    - if: '$CI_MERGE_REQUEST_IID || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: $E2E == "true"  # Needed to run the planner-test.gitlab-ci.yml tests
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $PROJECT_NAME == "api_automation"'
   tags:
@@ -79,7 +80,7 @@ pants:lint-check:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 pants:test:
   extends: .pants
@@ -98,7 +99,7 @@ pants:test:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 pants:tailor-update-build-files:
   extends: .pants
@@ -109,7 +110,7 @@ pants:tailor-update-build-files:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 pants:package:
   extends: .pants
@@ -134,7 +135,7 @@ pants:package:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
-    - if: '$CI_MERGE_REQUEST_IID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
 pants:release:
