@@ -49,6 +49,12 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     ),
                 ),
             ),
+            grpc.ContactsService(
+                contacts=repositories.ContactsRepository(mongo.companies.contacts),
+                companies=repositories.CompaniesRepository(
+                    mongo.companies.companies,
+                ),
+            ),
         ],
     )
 
