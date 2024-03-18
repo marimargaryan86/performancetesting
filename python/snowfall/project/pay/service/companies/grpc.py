@@ -137,3 +137,94 @@ class CompaniesService(
             company = await self._companies.update(company)
 
         return company
+
+
+class ContactsService(service.Service, grpc_pb2_grpc.ContactsServiceServicer):
+    _default_page_size = 20
+
+    def __init__(
+        self,
+        contacts: repositories.ContactsRepository,
+        companies: repositories.CompaniesRepository,
+    ):
+        self._contacts = contacts
+        self._companies = companies
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["ContactsService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_ContactsServiceServicer_to_server(self, server)
+
+    async def CreateContact(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.CreateContactRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreateContactResponse:
+        company = await self._companies.find_by_id(request.contact.company_id)
+
+        if not company:
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Company not found",
+                trailing_metadata=(
+                    ("field_name", "company_id"),
+                    ("field_description", "Company is not found"),
+                ),
+            )
+
+        request.contact.id = string.uuid()
+        inserted_contact = await self._contacts.insert(request.contact)
+
+        return grpc_pb2.CreateContactResponse(contact=inserted_contact)
+
+    async def GetContact(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetContactRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetContactResponse:
+        contact = await self._contacts.find_by_id(request.id)
+
+        if not contact:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetContactResponse(contact=contact)
+
+    async def ListCompanyContacts(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListCompanyContactsRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListCompanyContactsResponse:
+        contacts = await self._contacts.find_by_company_id(
+            company_id=request.company_id,
+            cursor=request.page_token,
+            limit=request.page_size or self._default_page_size,
+        )
+
+        return grpc_pb2.ListCompanyContactsResponse(
+            contacts=[contact async for contact in contacts],
+            next_page_token=await contacts.cursor(),
+        )
+
+    async def UpdateContactReference(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.UpdateContactReferenceRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateContactReferenceResponse:
+        contact = await self._contacts.find_by_id(request.contact_id)
+
+        if not contact:
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Contact not found",
+                trailing_metadata=(
+                    ("field_name", "contact_id"),
+                    ("field_description", "Contact is not found"),
+                ),
+            )
+
+        contact.external_reference = request.external_reference
+
+        await self._contacts.update_reference(contact)
+
+        return grpc_pb2.UpdateContactReferenceResponse(contact=contact)
