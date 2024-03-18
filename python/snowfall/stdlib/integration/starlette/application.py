@@ -116,7 +116,7 @@ async def serve(
             host=str(settings.http_address),
             loop="asyncio",
             port=settings.http_port,
-            access_log=False,
+            access_log=True,
             log_config=None,
             proxy_headers=True,
             server_header=False,
