@@ -277,7 +277,7 @@ export default {
       "Tu viaje de ida seleccionado previamente ya no está disponible",
     previousSelectedInboundUnavailable:
       "Su viaje entrante seleccionado previamente ya no está disponible",
-    deleteUser: "¿Estás seguro de que quieres eliminar a este usuario?",
+    deleteUser: "¿Estás seguro de que quieres desactivar a este usuario?",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

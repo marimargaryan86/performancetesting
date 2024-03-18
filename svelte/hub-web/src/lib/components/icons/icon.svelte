@@ -9,6 +9,7 @@
     | "bookings"
     | "bug"
     | "calendar"
+    | "car"
     | "checked"
     | "clock-filled"
     | "clock-outlined"
@@ -17,6 +18,7 @@
     | "copy"
     | "dashboard"
     | "delete-user"
+    | "download"
     | "edit"
     | "edit-user"
     | "email"
@@ -29,6 +31,7 @@
     | "password-circular"
     | "passenger"
     | "payment"
+    | "pdf"
     | "phone"
     | "play"
     | "play-circled"
@@ -39,14 +42,13 @@
     | "remove-trash"
     | "search"
     | "seat"
-    | "ticket"
-    | "download"
-    | "pdf"
     | "swap-directions"
-    | "user"
-    | "car"
+    | "ticket"
     | "train"
-    | "user-circular";
+    | "user"
+    | "user-circular"
+    | "user-cross";
+
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 

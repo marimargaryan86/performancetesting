@@ -10,15 +10,18 @@
   import { writable } from "svelte/store";
   import routeConfig from "$lib/route-config";
   import { sleep } from "$lib/utils/common";
-  import type * as OrySchemas from "~/integration/ory/schemas";
+  import * as OrySchemas from "~/integration/ory/schemas";
   import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import type { PaginatedData } from "$lib/models/common";
   import type { BreadCrumb } from "$lib/models/ui";
+  import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
 
   export let mode: "create" | "update";
   export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
   export let resellers: PaginatedData<HubSchemas.Reseller> | undefined;
   export let breadCrumbs: BreadCrumb[];
+  let deleteUserDialog: DeleteUserDialog;
+  let deleteUser: OrySchemas.User | undefined;
 
   const t = getTranslator();
   const pending = writable(false);
@@ -26,7 +29,6 @@
   let resellerOptions: HubSchemas.Reseller[];
   let formCompleted: boolean = true;
   let selectedReseller: HubSchemas.Reseller | undefined = user?.reseller;
-
   let selectedRole: OrySchemas.UserRole;
 
   function selectAdminRole(): void {
@@ -53,6 +55,9 @@
 
   // TODO(2024-03-06/alvin.s): Re-evaluate reactive var statements when MVP complete.
   $: currentUser = user;
+  $: if (mode === "update") {
+    deleteUser = user as OrySchemas.User;
+  }
   $: i18nTitleString = $t(`pages.adminControls.pages.users.pages.${mode}.title`);
   $: pageTitle = mode === "update" && currentUser ? currentUser.email : i18nTitleString;
   $: selectedRole = mode === "update" ? user?.role || "reseller-user" : "reseller-user";
@@ -65,6 +70,10 @@
 
     return reseller.name;
   }
+
+  function openDeleteUserDialog(): void {
+    deleteUserDialog.open();
+  }
 </script>
 
 <svelte:head>
@@ -72,6 +81,10 @@
     {getPageTitle(i18nTitleString)}
   </title>
 </svelte:head>
+
+{#if mode === "update"}
+  <DeleteUserDialog maxWidth={"482px"} bind:this={deleteUserDialog} user={deleteUser} />
+{/if}
 
 <StandardLayout {pageTitle} {breadCrumbs}>
   {#if currentUser}
@@ -149,6 +162,21 @@
             />
           </div>
         </div>
+
+        {#if mode === "update"}
+          <div class="section">
+            <div class="section-title">
+              <span class="delete-user-title" typography="title-medium">Delete User</span>
+              <span class="subtitle" typography="body-medium">
+                Deleting this account will permanently remove the user from the system.
+              </span>
+              <button class="delete-user-btn" variant="text" on:click={openDeleteUserDialog}>
+                <Icon variant="user-cross" color="var(--color-semantic-error-500)" size="16px" />
+                <p typography="title-small" weight="bold">Delete Account</p>
+              </button>
+            </div>
+          </div>
+        {/if}
       </form>
     </div>
   {/if}
@@ -232,6 +260,23 @@
 
   .subtitle {
     color: var(--color-common-light-soft);
+  }
+
+  .delete-user-title {
+    color: var(--color-semantic-error-500);
+  }
+
+  .delete-user-btn {
+    width: 180px;
+    height: 42px;
+    margin-top: 24px;
+    color: var(--color-semantic-error-500);
+    border: 1px solid var(--color-semantic-error-500);
+  }
+
+  .delete-user-btn:hover {
+    background-color: var(--color-semantic-error-100);
+    cursor: pointer;
   }
 
   .actions {
