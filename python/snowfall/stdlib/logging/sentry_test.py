@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 from collections.abc import Callable
 from typing import Any
 
 import pytest
-from sentry_sdk import Transport, envelope
+from sentry_sdk import Transport, _types, envelope
 
-from snowfall.stdlib import types
 from snowfall.stdlib.logging import sentry, stdout
 
 SentryEvents = list[dict[str, Any]]
@@ -34,7 +35,7 @@ class _MockTransport(Transport):
     def capture_envelope(self, event: envelope.Envelope) -> None:
         self._func(event)
 
-    def capture_event(self, event: types.PrimitiveMapping) -> None:
+    def capture_event(self, event: _types.Event) -> None:
         self._func(event)
 
 

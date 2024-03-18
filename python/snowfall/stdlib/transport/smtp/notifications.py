@@ -113,8 +113,8 @@ class SmtpNotifier(Notifier):
         recipient: str | None = None,
     ):
         self._client = smtp_client
-        self._sender = sender
-        self._recipient = recipient
+        self._sender = sender or ""
+        self._recipient = recipient or ""
         self._lock = asyncio.Lock()
 
     async def send(
