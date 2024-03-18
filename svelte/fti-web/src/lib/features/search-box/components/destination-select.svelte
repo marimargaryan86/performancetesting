@@ -1,9 +1,9 @@
 <script lang="ts">
-  import FaMapMarkerAlt from "svelte-icons/fa/FaMapMarkerAlt.svelte";
   import DestinationSelect from "$lib/features/search-component/destination-select.svelte";
   import { getSearchOptionsCtx } from "$lib/stores/search-box.store";
   import { setDropdown } from "$lib/helpers/common";
   import { clickOutside } from "$lib/helpers/click-outside";
+  import Icon from "$lib/components/icon.svelte";
 
   let dropdown: string = "";
   const clickOutsideHandler = (): string => handleSetDropdown("");
@@ -17,7 +17,7 @@
   <div class="label">
     <div class="label-container">
       <div class="icon">
-        <FaMapMarkerAlt />
+        <Icon variant="map-marker" color="#1c1b1f" size="18px" />
       </div>
       <p class="label">Destination</p>
     </div>

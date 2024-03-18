@@ -1,7 +1,7 @@
 <script lang="ts">
+  import Icon from "$lib/components/icon.svelte";
   import StarRating from "$lib/components/star-rating.svelte";
   import type { Package } from "$lib/models/common";
-  import FaRegHeart from "svelte-icons/fa/FaRegHeart.svelte";
 
   export let holiday: Package;
 </script>
@@ -9,7 +9,7 @@
 <div class="package-card">
   <img class="package-image" src={holiday.image} alt={holiday.name} />
   <button class="heart-button">
-    <FaRegHeart />
+    <Icon variant="heart" />
   </button>
   <div class="card-content">
     <div class="price-box">

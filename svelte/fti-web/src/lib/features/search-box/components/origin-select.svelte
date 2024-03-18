@@ -1,9 +1,9 @@
 <script lang="ts">
   import { getSearchOptionsCtx } from "$lib/stores/search-box.store";
-  import FaPlaneDeparture from "svelte-icons/fa/FaMapMarkerAlt.svelte";
   import { setDropdown } from "$lib/helpers/common";
   import OriginAirportSelect from "$lib/features/search-component/origin-airport-select.svelte";
   import { clickOutside } from "$lib/helpers/click-outside";
+  import Icon from "$lib/components/icon.svelte";
 
   let dropdown: string = "";
   const clickOutsideHandler = (): string => handleSetDropdown("");
@@ -15,7 +15,7 @@
   <div class="label">
     <div class="label-container">
       <div class="icon">
-        <FaPlaneDeparture />
+        <Icon variant="take-off" size="18px" color="black" />
       </div>
       <p class="label">Origin</p>
     </div>

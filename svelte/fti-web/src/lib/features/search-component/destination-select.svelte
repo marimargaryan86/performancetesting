@@ -1,8 +1,6 @@
 <script lang="ts">
-  import FaPlane from "svelte-icons/fa/FaPlane.svelte";
-  import FaMapMarkerAlt from "svelte-icons/fa/FaMapMarkerAlt.svelte";
-  import FaHotel from "svelte-icons/fa/FaHotel.svelte";
   import { places } from "$lib/data/constants";
+  import Icon from "$lib/components/icon.svelte";
   export let destination: string;
 
   $: placeNamesContainingDestinations = places.filter((place) => place?.name?.toLowerCase());
@@ -14,11 +12,11 @@
       <label class="place-label" for={place.id}>
         <div class="icon">
           {#if place.type === "airport"}
-            <FaPlane />
+            <Icon variant="take-off" color="#1c1b1f" size="18px" />
           {:else if place.type === "landmark"}
-            <FaMapMarkerAlt />
+            <Icon variant="map-marker" color="#1c1b1f" size="18px" />
           {:else if place.type === "hotel"}
-            <FaHotel />
+            <Icon variant="bed" color="#1c1b1f" size="18px" />
           {/if}
         </div>
         <input

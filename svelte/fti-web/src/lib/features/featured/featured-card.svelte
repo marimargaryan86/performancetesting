@@ -1,8 +1,8 @@
 <script lang="ts">
   import ArrowsComponent from "$lib/components/arrows-component.svelte";
+  import Icon from "$lib/components/icon.svelte";
   import StarRating from "$lib/components/star-rating.svelte";
   import type { FeaturedPackage, Scroll } from "$lib/models/common";
-  import FaMapMarkerAlt from "svelte-icons/fa/FaMapMarkerAlt.svelte";
 
   export let featuredPackage: FeaturedPackage;
   export let scroll: Scroll;
@@ -15,7 +15,7 @@
       <div class="package-title">{featuredPackage.name}</div>
       <div class="package-details">
         <span class="package-destination">
-          <div class="icon"><FaMapMarkerAlt /></div>
+          <div class="icon"><Icon variant="map-marker" color="#1c1b1f" /></div>
           {featuredPackage.location}
         </span>
         <span class="package-length">

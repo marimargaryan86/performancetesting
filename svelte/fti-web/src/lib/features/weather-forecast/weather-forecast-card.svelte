@@ -1,6 +1,6 @@
 <script lang="ts">
-  import FaRegHeart from "svelte-icons/fa/FaRegHeart.svelte";
   import type { WeatherHoliday } from "$lib/models/common";
+  import Icon from "$lib/components/icon.svelte";
   export let holiday: WeatherHoliday;
 </script>
 
@@ -13,7 +13,7 @@
         <span class="degree">°C</span>
       </div>
       <button class="heart-button">
-        <FaRegHeart />
+        <Icon variant="heart-full" color="#e12c2c" />
       </button>
     </div>
     <div class="bottom-section">

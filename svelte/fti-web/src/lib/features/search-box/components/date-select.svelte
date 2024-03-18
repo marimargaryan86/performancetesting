@@ -1,9 +1,9 @@
 <script lang="ts">
   import { getSearchOptionsCtx } from "$lib/stores/search-box.store";
-  import FaRegCalendarAlt from "svelte-icons/fa/FaRegCalendarAlt.svelte";
   import { setDropdown } from "$lib/helpers/common";
   import CalendarSelect from "$lib/features/search-component/calendar-select.svelte";
   import { clickOutside } from "$lib/helpers/click-outside";
+  import Icon from "$lib/components/icon.svelte";
 
   export const returnTrip: boolean = false;
   let dropdown: string = "";
@@ -16,7 +16,7 @@
   <button class="label date-label" on:click={handleSetDropdown.bind(handleSetDropdown, "date")}>
     <div class="label-container">
       <div class="icon">
-        <FaRegCalendarAlt />
+        <Icon variant="calendar" color="#1c1b1f" size="18px" />
       </div>
       <p>Travel Dates</p>
     </div>

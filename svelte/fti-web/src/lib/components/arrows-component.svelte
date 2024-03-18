@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import Icon from "./icon.svelte";
 
   const dispatch = createEventDispatcher<{ scroll: boolean }>();
   export const setContainerScroll = (item: boolean): void => {
@@ -11,6 +12,7 @@
   <button class="filter-button" on:click={setContainerScroll.bind(setContainerScroll, false)}>
     <div class="icon">
       <img src="/icons/chevron-left.svg" alt="Chevron Left" />
+      <Icon variant="chevron-left" />
     </div>
   </button>
   <button class="filter-button" on:click={setContainerScroll.bind(setContainerScroll, true)}>

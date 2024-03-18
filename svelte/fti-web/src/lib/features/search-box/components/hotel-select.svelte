@@ -1,9 +1,9 @@
 <script lang="ts">
-  import FaUsers from "svelte-icons/fa/FaUsers.svelte";
   import { getSearchOptionsCtx } from "$lib/stores/search-box.store";
   import RoomsSelect from "$lib/features/search-component/rooms-select.svelte";
   import { setDropdown } from "$lib/helpers/common";
   import { clickOutside } from "$lib/helpers/click-outside";
+  import Icon from "$lib/components/icon.svelte";
 
   let dropdown: string = "";
   const clickOutsideHandler = (): string => handleSetDropdown("");
@@ -15,7 +15,7 @@
   <button class="label hotel-label" on:click={handleSetDropdown.bind(handleSetDropdown, "hotels")}>
     <div class="label-container">
       <div class="icon">
-        <FaUsers />
+        <Icon variant="bed" color="black" size="18px" />
       </div>
       <p>Rooms & Guests</p>
     </div>

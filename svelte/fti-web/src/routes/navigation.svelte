@@ -1,9 +1,6 @@
 <script lang="ts">
-  import FaHeart from "svelte-icons/fa/FaHeart.svelte";
-  import FaUser from "svelte-icons/fa/FaUser.svelte";
-  import FaPhoneAlt from "svelte-icons/fa/FaPhoneAlt.svelte";
   import ExploreDropdown from "./explore-dropdown.svelte";
-  import FaBars from "svelte-icons/fa/FaBars.svelte";
+  import Icon from "$lib/components/icon.svelte";
 
   let exploreDropdown: boolean = false;
 
@@ -53,23 +50,18 @@
   <div class="side-buttons">
     <div class="icon heart-icon">
       <a href="/coming-soon">
-        <FaHeart />
-      </a>
-    </div>
-    <div class="icon user-icon">
-      <a href="/coming-soon">
-        <FaUser />
+        <Icon variant="heart-full" color="#e12c2c" />
       </a>
     </div>
     <div class="phone-box">
       <div class="icon">
-        <FaPhoneAlt />
+        <Icon variant="phone" color="white" />
       </div>
       <p>123-456-7890</p>
     </div>
     <div class="expand-menu">
       <button class="icon" on:click={toggleMenu}>
-        <FaBars />
+        <Icon variant="menu-bars" color="white" />
       </button>
     </div>
   </div>
@@ -225,16 +217,6 @@
 
   .phone-box p {
     margin: 0;
-  }
-
-  .icon {
-    width: 16px;
-    height: 16px;
-    color: white;
-  }
-
-  .user-icon a {
-    color: white;
   }
 
   .icon:hover {

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import FaPlus from "svelte-icons/fa/FaPlus.svelte";
-  import FaMinus from "svelte-icons/fa/FaMinus.svelte";
   export let value: number = 0;
 
   function increment(): void {
@@ -17,13 +15,13 @@
 <div class="passenger-count">
   <button class="inc-button" on:click={decrement}>
     <div class="icon">
-      <FaMinus />
+      <img src="/icons/minus-icon.svg" alt="Minus" />
     </div>
   </button>
   <p class="passenger-value">{value}</p>
   <button class="inc-button" on:click={increment}>
     <div class="icon">
-      <FaPlus />
+      <img src="/icons/plus-icon.svg" alt="Plus" />
     </div>
   </button>
 </div>
@@ -59,7 +57,6 @@
     color: var(--text-dark-text, #1c1c1c);
     font-weight: 500;
     font-size: 18px;
-    font-family: "Plus Jakarta Sans";
     font-style: normal;
     line-height: normal;
     text-align: center;

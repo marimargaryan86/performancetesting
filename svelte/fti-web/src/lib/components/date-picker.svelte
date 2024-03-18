@@ -1,9 +1,8 @@
 <script lang="ts">
   import { createDatePicker, melt } from "@melt-ui/svelte";
   import { CalendarDate } from "@internationalized/date";
-  import FaChevronRight from "svelte-icons/fa/FaChevronRight.svelte";
-  import FaChevronLeft from "svelte-icons/fa/FaChevronLeft.svelte";
   import type { SelectedDate } from "$lib/models/common";
+  import Icon from "./icon.svelte";
 
   const {
     elements: { calendar, cell, grid, heading, nextButton, prevButton },
@@ -24,13 +23,13 @@
 <div use:melt={$calendar}>
   <header class="calendar-heading">
     <button class="month-button" use:melt={$prevButton}>
-      <FaChevronLeft size={24} />
+      <Icon variant="chevron-left" />
     </button>
     <div use:melt={$heading}>
       {$headingValue}
     </div>
     <button class="month-button" use:melt={$nextButton}>
-      <FaChevronRight size={24} />
+      <Icon variant="chevron-right" />
     </button>
   </header>
   <div>
