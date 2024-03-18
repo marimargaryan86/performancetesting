@@ -7,6 +7,7 @@ svelte:setup:
     - docker login -u "${PIPELINE_REGISTRY_USER}" -p "${PIPELINE_REGISTRY_USER_PASSWORD}" "${CI_REGISTRY}"
     - docker buildx build --cache-to type=inline --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG} --cache-from type=registry,ref=${CI_REGISTRY_IMAGE}/svelte:${CI_DEFAULT_BRANCH} --pull --push --compress -f ".gitlab/svelte.Dockerfile" -t "${CI_REGISTRY_IMAGE}/svelte:${CI_COMMIT_REF_SLUG}" --build-arg "REGISTRY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" --build-arg "NODE_VERSION=$(cat .node-version)" .gitlab/
   needs: []
+  retry: 2
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
