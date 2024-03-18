@@ -6202,6 +6202,13 @@
                 "type": "boolean",
                 "example": true,
                 "default": false
+              },
+              "invoiceGenerationFrequency": {
+                "type": "integer",
+                "format": "int32",
+                "example": 7,
+                "minimum": 0,
+                "description": "The invoice generation period, in days"
               }
             }
           },
@@ -6231,7 +6238,8 @@
                   "paymentMethod",
                   "processingMarkup",
                   "salesMarkup",
-                  "billingType"
+                  "billingType",
+                  "invoiceGenerationFrequency"
                 ]
               }
             }

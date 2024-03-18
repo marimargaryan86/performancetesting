@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.pay.service.companies.v1;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/money.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
@@ -44,6 +45,8 @@ message Company {
   string finance_email = 14;
   string payment_reference = 15;
   int32 invoice_due_days = 16;
+  int32 invoice_generation_frequency = 17;
+  snowfall.stdlib.v1.Date invoice_generation_date = 18;
 }
 
 message Account {

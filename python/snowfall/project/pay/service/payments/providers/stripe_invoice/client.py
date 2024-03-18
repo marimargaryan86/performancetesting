@@ -30,3 +30,21 @@ class StripeInvoice(interfaces.InvoiceProvider):
             name=name,
             id=customer.id,
         )
+
+    def create_invoice(
+        self,
+        invoice_account_id: str,
+        days_until_due: int,
+    ) -> invoice_models_pb2.Invoice | None:
+        try:
+            stripe_invoice = stripe.Invoice.create(
+                customer=invoice_account_id,
+                collection_method="send_invoice",
+                days_until_due=days_until_due,
+            )
+        except stripe.StripeError:
+            return None
+
+        return invoice_models_pb2.Invoice(
+            id=stripe_invoice.id,  # type: ignore[arg-type]
+        )

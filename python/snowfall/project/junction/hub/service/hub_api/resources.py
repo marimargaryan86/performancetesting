@@ -657,6 +657,7 @@ class Company(models.Resource):
                     company.billing_type,
                 ),
                 "applyMarkups": company.apply_markups,
+                "invoiceGenerationFrequency": company.invoice_generation_frequency,
             },
             relationships=relationships,
             links={

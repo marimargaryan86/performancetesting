@@ -1,3 +1,5 @@
+import datetime
+
 import grpc
 from pymongo.errors import DuplicateKeyError
 
@@ -9,6 +11,7 @@ from snowfall.project.pay.service.companies.v1 import (
     models_pb2,
 )
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
 
 
@@ -40,6 +43,11 @@ class CompaniesService(
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateCompanyResponse:
         request.company.id = string.uuid()
+
+        request.company.invoice_generation_date = protobuf.date_to_protobuf(  # type: ignore[misc]
+            datetime.datetime.now(tz=datetime.UTC)
+            + datetime.timedelta(request.company.invoice_generation_frequency),
+        )
 
         try:
             inserted_company = await self._companies.insert(request.company)

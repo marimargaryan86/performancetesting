@@ -52,6 +52,7 @@ message Transaction {
   snowfall.project.pay.service.companies.v1.PaymentType payment_type = 10;
   string bill_id = 11;
   TransactionStatus status = 12;
+  string invoice_id = 13;
 }
 
 enum QuotationStatus {
@@ -100,4 +101,12 @@ message Bill {
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
   string payment_intent_id = 8;
+}
+
+message Invoice {
+  string id = 1;
+  string reseller_id = 2;
+  string statement_path = 3;
+  string external_reference_id = 4;
+  repeated string transaction_ids = 5;
 }

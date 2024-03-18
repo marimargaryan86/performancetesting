@@ -8,6 +8,7 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service InvoiceService {
   rpc CreateInvoiceAccount(CreateInvoiceAccountRequest) returns (CreateInvoiceAccountResponse) {}
+  rpc CreateInvoice(CreateInvoiceRequest) returns (CreateInvoiceResponse) {}
 }
 
 message CreateInvoiceAccountRequest {
@@ -17,4 +18,13 @@ message CreateInvoiceAccountRequest {
 
 message CreateInvoiceAccountResponse {
   InvoiceAccount account = 1;
+}
+
+message CreateInvoiceRequest {
+  string invoice_account_id = 1;
+  int32 days_until_due = 2;
+}
+
+message CreateInvoiceResponse {
+  Invoice invoice = 1;
 }

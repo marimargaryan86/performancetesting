@@ -91,3 +91,11 @@ class InvoiceProvider(object):
         email: str,
     ) -> invoice_models_pb2.InvoiceAccount:
         """Create account."""
+
+    @abstractmethod
+    def create_invoice(
+        self,
+        invoice_account_id: str,
+        days_until_due: int,
+    ) -> invoice_models_pb2.Invoice | None:
+        """Create invoice."""

@@ -38,3 +38,18 @@ class InvoiceService(
         )
 
         return invoice_pb2.CreateInvoiceAccountResponse(account=account)
+
+    async def CreateInvoice(  # type: ignore[override] # noqa: N802
+        self,
+        request: invoice_pb2.CreateInvoiceRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> invoice_pb2.CreateInvoiceResponse:
+        invoice = self._provider.create_invoice(
+            invoice_account_id=request.invoice_account_id,
+            days_until_due=request.days_until_due,
+        )
+
+        if invoice is None:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return invoice_pb2.CreateInvoiceResponse(invoice=invoice)

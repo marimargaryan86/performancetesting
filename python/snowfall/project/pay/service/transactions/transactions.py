@@ -214,3 +214,11 @@ class BillsRepository(
             sort=sort,
             filter_=filter_,
         )
+
+
+class InvoiceRepository(
+    repository.ProtoRepository[models_pb2.Invoice],
+    mixins.FindByIdMixin[models_pb2.Invoice],
+    mixins.InsertMixin[models_pb2.Invoice],
+):
+    _proto = models_pb2.Invoice
