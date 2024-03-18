@@ -8,6 +8,7 @@
   class:vertical={variant === "vertical"}
   class:horizontal={variant === "horizontal"}
   class:dark={theme === "dark"}
+  role="presentation"
 >
   {#if $$slots.media}
     <div
