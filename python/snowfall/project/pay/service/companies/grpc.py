@@ -1,10 +1,12 @@
 import grpc
 from pymongo.errors import DuplicateKeyError
 
+from snowfall.project.pay.adapter import invoice_payment
 from snowfall.project.pay.service.companies import repositories
 from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2,
     grpc_pb2_grpc,
+    models_pb2,
 )
 from snowfall.stdlib import string
 from snowfall.stdlib.transport.grpc import rich_status, service
@@ -17,8 +19,10 @@ class CompaniesService(
     def __init__(
         self,
         companies: repositories.CompaniesRepository,
+        invoice_client: invoice_payment.Client,
     ):
         self._companies = companies
+        self._invoice_client = invoice_client
         self._default_page_size = 20
 
     def get_name(self) -> str:
@@ -47,6 +51,7 @@ class CompaniesService(
                     field_description="name already exists",
                 ),
             )
+        inserted_company = await self._create_invoice_account(inserted_company)
 
         return grpc_pb2.CreateCompanyResponse(company=inserted_company)
 
@@ -118,3 +123,17 @@ class CompaniesService(
             companies=[company async for company in companies],
             next_page_token=await companies.cursor(),
         )
+
+    async def _create_invoice_account(
+        self,
+        company: models_pb2.Company,
+    ) -> models_pb2.Company:
+        if company.create_invoice_account:
+            invoice_account = await self._invoice_client.create_account(
+                company.finance_email,
+                company.name,
+            )
+            company.payment_reference = invoice_account.id
+            company = await self._companies.update(company)
+
+        return company

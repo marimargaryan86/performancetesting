@@ -40,6 +40,10 @@ message Company {
   PaymentType payment_type = 10;
   BillingType billing_type = 11;
   bool apply_markups = 12;
+  bool create_invoice_account = 13;
+  string finance_email = 14;
+  string payment_reference = 15;
+  int32 invoice_due_days = 16;
 }
 
 message Account {

@@ -77,6 +77,10 @@ job "pay-companies-grpc" {
               local_bind_port  = 8020
               destination_name = "currencies-${var.environment}"
             }
+            upstreams {
+              local_bind_port  = 8090
+              destination_name = "payments-${var.environment}"
+            }
           }
         }
       }
@@ -115,6 +119,7 @@ job "pay-companies-grpc" {
         data        = <<EOH
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
+PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_payments-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
