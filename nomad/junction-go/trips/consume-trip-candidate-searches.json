@@ -2,7 +2,7 @@
   "development": {
     "variables": {
       "count": 2,
-      "max_trip_length_factor": 3
+      "max_trip_length_factor": "1.5"
     }
   },
   "production": {
