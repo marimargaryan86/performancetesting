@@ -8,13 +8,13 @@
   import RoleOption from "./role-option.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { writable } from "svelte/store";
-  import routeConfig from "$lib/route-config";
   import { sleep } from "$lib/utils/common";
   import * as OrySchemas from "~/integration/ory/schemas";
   import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import type { PaginatedData } from "$lib/models/common";
   import type { BreadCrumb } from "$lib/models/ui";
   import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
+  import DiscardUserChangesDialog from "$lib/components/pages/admin-controls/user/discard-user-changes-dialog.svelte";
 
   export let mode: "create" | "update";
   export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
@@ -22,6 +22,7 @@
   export let breadCrumbs: BreadCrumb[];
   let deleteUserDialog: DeleteUserDialog;
   let deleteUser: OrySchemas.User | undefined;
+  let discardUserChangesDialog: DiscardUserChangesDialog;
 
   const t = getTranslator();
   const pending = writable(false);
@@ -74,6 +75,10 @@
   function openDeleteUserDialog(): void {
     deleteUserDialog.open();
   }
+
+  function openDiscardUserChangesDialog(): void {
+    discardUserChangesDialog.open();
+  }
 </script>
 
 <svelte:head>
@@ -85,6 +90,8 @@
 {#if mode === "update"}
   <DeleteUserDialog maxWidth={"482px"} bind:this={deleteUserDialog} user={deleteUser} />
 {/if}
+
+<DiscardUserChangesDialog maxWidth={"482px"} bind:this={discardUserChangesDialog} />
 
 <StandardLayout {pageTitle} {breadCrumbs}>
   {#if currentUser}
@@ -184,10 +191,9 @@
 
 <div class="actions">
   <div class="wrapper">
-    <!-- TODO: ADD POPUP DIALOG TO CONFIRM DISCARDING CHANGES AS PER DESIGNS -->
-    <a variant="outline" size="small" href={routeConfig.routes.adminControls.routes.users.root}>
+    <button variant="outline" size="small" on:click={openDiscardUserChangesDialog}>
       {$t("actions.cancel")}
-    </a>
+    </button>
 
     <button variant="primary" size="small" on:click={submit} disabled={!formCompleted}>
       {#if currentUser}
@@ -303,8 +309,7 @@
     pointer-events: none;
   }
 
-  .actions > .wrapper > button,
-  .actions > .wrapper > a {
+  .actions > .wrapper > button {
     width: 140px;
   }
 

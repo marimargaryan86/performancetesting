@@ -164,6 +164,7 @@ export default {
     change: "Cambiar",
     confirmSelection: "Confirmar selección",
     deactivate: "Desactivar",
+    discard: "Descartar",
   },
   sentences: {
     priceChange: "Cambio de precio",
@@ -278,6 +279,9 @@ export default {
     previousSelectedInboundUnavailable:
       "Su viaje entrante seleccionado previamente ya no está disponible",
     deleteUser: "¿Estás seguro de que quieres desactivar a este usuario?",
+    discardChangesTitle: "¿Descartar cambios?",
+    discardChangesBody:
+      "Tienes cambios sin guardar. ¿Estás seguro de que quieres descartar tus cambios?",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

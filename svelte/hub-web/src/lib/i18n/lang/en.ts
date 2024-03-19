@@ -170,6 +170,7 @@ export default {
     change: "Change",
     confirmSelection: "Confirm selection",
     deactivate: "Deactivate",
+    discard: "Discard",
   },
   sentences: {
     priceChange: "Price change",
@@ -258,6 +259,8 @@ export default {
     previousSelectedInboundUnavailable:
       "Your previously selected inbound trip is no longer available",
     deleteUser: "Are you sure you want to delete this user?",
+    discardChangesTitle: "Discard changes?",
+    discardChangesBody: "You have unsaved changes. Are you sure you want to discard your changes?",
   },
   tableHeaders: {
     id: "ID",
