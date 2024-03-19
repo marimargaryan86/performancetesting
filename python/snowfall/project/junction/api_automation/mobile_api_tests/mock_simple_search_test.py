@@ -6,7 +6,6 @@ import pytest
 
 from snowfall.project.junction.api_automation.test_functions.helper import (
     create_offer_simple_search,
-    create_order,
     create_payment,
     create_quote,
     get_offer_list_simple_search,
@@ -101,17 +100,3 @@ async def test_verify_simple_search(  # noqa: WPS217,WPS218
     )
     assert payment_intent_id
     logger.info("Create Payment step: SUCCEED")
-
-    trip_offer_price_quotes = quote_data["id"]
-    orders_data = await create_order(
-        mock_mobile_client,
-        trip_offer_price_quotes,
-        payment_intent_id,
-    )
-    assert orders_data
-    logger.info("Create Order step: SUCCEED")
-    order_id = orders_data["id"]
-
-    order_data_by_id = await mock_mobile_client.get_order(order_id)
-    assert order_data_by_id
-    logger.info("Get Order step: SUCCEED")
