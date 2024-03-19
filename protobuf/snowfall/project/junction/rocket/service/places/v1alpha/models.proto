@@ -53,4 +53,5 @@ message Place {
   // What vertical provider places are within it to search individually:
   // E.G London contains many vertical places to search individually
   ProviderMappings contains = 11;
+  string source_id = 12;
 }

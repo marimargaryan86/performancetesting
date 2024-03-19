@@ -44,6 +44,17 @@ async def _generate_places(
         raise RuntimeError("No nodes.json file present")
     nodes = json.loads(nodes_json.decode("utf-8"))  # noqa: F841
 
+    country_codes_to_countries_json = pkgutil.get_data(
+        "snowfall.project.junction.rocket.service.places.main",
+        "country_codes_to_countries.json",
+    )
+
+    if country_codes_to_countries_json is None:
+        raise RuntimeError("No country_codes_to_countries.json file present")
+    country_codes_to_countries = json.loads(  # noqa: F841
+        country_codes_to_countries_json.decode("utf-8"),
+    )
+
     benerail_json = pkgutil.get_data(
         "snowfall.project.junction.rocket.service.places.main",
         "benerail_stations.json",

@@ -4,6 +4,7 @@ python_sources(
         ":nodes",
         ":benerail_stations",
         ":directferries_ports",
+        ":countries",
     ]
 )
 
@@ -11,6 +12,8 @@ python_image(
     name="main",
     entry_point="main.py",
 )
+
+python_tests(name="tests")
 
 resource(
     name="cities",
@@ -49,5 +52,15 @@ resource(
         len=95798,
         sha256="864b8ea4b32d91b1009a3e1ed7a1789ce31b13e643ce94d2fa3a7e3576c406f9",
         filename="ports.json",
+    ),
+)
+
+resource(
+    name="countries",
+    source=http_source(
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/country_codes_to_countries-355bf01db1f9942ca78ddcc37a105cc5cea53a46b659436bad6e1baf5914508c.json",
+        len=6019,
+        sha256="355bf01db1f9942ca78ddcc37a105cc5cea53a46b659436bad6e1baf5914508c",
+        filename="country_codes_to_countries.json",
     ),
 )
