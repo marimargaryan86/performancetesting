@@ -1,0 +1,38 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "providers": [
+        {"uuid": "caefde65-c15c-4b60-b8d9-27638b50b08f", "service_name": "junction-rocket-providers-benerail-grpc"},
+        {"uuid": "92ada881-f31c-471e-a8b0-01ed48a181d5", "service_name": "junction-rocket-providers-direct-ferries-grpc"},
+        {"uuid": "da154d59-5f17-411d-bb80-f6237b307509", "service_name": "junction-rocket-providers-carnect-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "junction-rocket-providers-mock-grpc"}
+      ]
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "providers": [
+        {"uuid": "caefde65-c15c-4b60-b8d9-27638b50b08f", "service_name": "junction-rocket-providers-benerail-grpc"},
+        {"uuid": "92ada881-f31c-471e-a8b0-01ed48a181d5", "service_name": "junction-rocket-providers-direct-ferries-grpc"},
+        {"uuid": "da154d59-5f17-411d-bb80-f6237b307509", "service_name": "junction-rocket-providers-carnect-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "junction-rocket-providers-mock-grpc"}
+      ]
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "providers": [
+        {"uuid": "caefde65-c15c-4b60-b8d9-27638b50b08f", "service_name": "junction-rocket-providers-benerail-grpc"},
+        {"uuid": "92ada881-f31c-471e-a8b0-01ed48a181d5", "service_name": "junction-rocket-providers-direct-ferries-grpc"},
+        {"uuid": "da154d59-5f17-411d-bb80-f6237b307509", "service_name": "junction-rocket-providers-carnect-grpc"},
+        {"uuid": "f9ce75d1-2025-4ab5-b5d7-69e4c14c053e", "service_name": "junction-rocket-providers-mock-grpc"}
+      ]
+    }
+  }
+}

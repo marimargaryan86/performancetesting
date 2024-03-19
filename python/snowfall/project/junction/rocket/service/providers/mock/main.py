@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import datetime
 
+import pydantic
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -17,12 +18,16 @@ from snowfall.project.junction.rocket.service.providers.mock.constant import PRO
 from snowfall.stdlib.persistence.redis import types as redis
 
 _PROVIDER_NAME = "Mock"
+_PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
+_RESELLERS_TO_PROVIDER_OPERATORS = dict[str, _PROVIDERS_TO_DISABLED_OPERATORS]
 
 
 class _Settings(service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     storage_dsn: service.AnyDsn
-    # TODO(reuben.t): add disabled operator logic, once operator is available in  model
+    reseller_disabled_operators: _RESELLERS_TO_PROVIDER_OPERATORS = pydantic.Field(
+        default_factory=dict,
+    )
 
 
 async def _meta_factory() -> meta.MetaImplementation:

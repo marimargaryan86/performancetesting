@@ -1,0 +1,23 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "gateway_poll_sleep": 5
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "gateway_poll_sleep": 1
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "gateway_poll_sleep": 1
+    }
+  }
+}

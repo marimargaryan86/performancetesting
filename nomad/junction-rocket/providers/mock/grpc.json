@@ -1,0 +1,23 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "bucket": "junction-rocket-provider-data-development"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "bucket": "junction-rocket-provider-data-production"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "bucket": "junction-rocket-provider-data-sandbox"
+    }
+  }
+}
