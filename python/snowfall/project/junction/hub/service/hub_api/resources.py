@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import zoneinfo
 from collections.abc import Iterable, Sequence
-from typing import Any, ClassVar, Literal
+from typing import ClassVar, Literal
 
 import pydantic
 from starlette import datastructures, requests
@@ -671,126 +671,6 @@ class Company(models.Resource):
         )
 
 
-class AccountResource(models.Resource):
-    api_type: ClassVar[str] = "accounts"
-
-    @classmethod
-    def from_proto(
-        cls,
-        account: companies_models_pb2.Account,
-        request: requests.Request,
-    ) -> AccountResource:
-        relationships: dict[str, Any] = {
-            "company": {"data": None},
-            "contact": {"data": None},
-        }
-        if account.company_id:
-            relationships["company"] = {
-                "data": {
-                    "id": account.company_id,
-                    "type": "companies",
-                },
-            }
-        if account.contact_id:
-            relationships["contact"] = {
-                "data": {
-                    "id": account.contact_id,
-                    "type": "contacts",
-                },
-            }
-        return cls(
-            id=account.id,
-            type=AccountResource.api_type,
-            attributes={
-                "name": account.name,
-                "status": protobuf.enum_value_to_slug(
-                    companies_models_pb2.Status.DESCRIPTOR,
-                    account.status,
-                ),
-            },
-            relationships=relationships,
-            links={
-                _SELF_HREF: str(
-                    request.url_for(
-                        "Account",
-                        accountId=account.id,
-                    ),
-                ),
-            },
-        )
-
-
-class BeneficiariesResource(models.Resource):
-    api_type: ClassVar[str] = "beneficiaries"
-
-    @classmethod
-    def from_models(
-        cls,
-        beneficiary: companies_models_pb2.Beneficiary,
-        request: requests.Request,
-    ) -> BeneficiariesResource:
-        meta_data = beneficiary.meta_data
-        bank_details = meta_data.bank_details
-        beneficiary_address = meta_data.beneficiary_address
-        return cls(
-            id=beneficiary.id,
-            type=BeneficiariesResource.api_type,
-            attributes={
-                "bankAccountHolderName": meta_data.bank_account_holder_name,
-                "email": meta_data.email,
-                "beneficiaryAddress": {
-                    "addressLines": list(beneficiary_address.address_lines),
-                    "countryCode": beneficiary_address.region_code,
-                    "postalCode": beneficiary_address.postal_code or "",
-                    "city": beneficiary_address.locality,
-                    "state": beneficiary_address.administrative_area,
-                },
-                "bankDetails": {
-                    **(
-                        {
-                            "accountNumber": bank_details.account_number,
-                            "aba": bank_details.aba,
-                        }
-                        if bank_details.account_number
-                        else {
-                            "iban": bank_details.iban,
-                        }
-                    ),
-                    "name": bank_details.name,
-                    "bicSwift": bank_details.bic_swift,
-                    "accountType": bank_details.account_type,
-                    "paymentTypes": bank_details.payment_types,
-                    "address": {
-                        "addressLines": list(bank_details.address.address_lines),
-                        "countryCode": bank_details.address.region_code,
-                    },
-                },
-            },
-            relationships={
-                "account": {
-                    "data": models.ResourceIdentifier(
-                        id=beneficiary.account_id,
-                        type="accounts",
-                    ),
-                },
-                "currency": {
-                    "data": models.ResourceIdentifier(
-                        id=beneficiary.currency,
-                        type="currencies",
-                    ),
-                },
-            },
-            links={
-                _SELF_HREF: str(
-                    request.url_for(
-                        "Beneficiary",
-                        beneficiaryId=beneficiary.id,
-                    ),
-                ),
-            },
-        )
-
-
 class Transaction(models.Resource):
     api_type: ClassVar[str] = "transactions"
 
@@ -875,71 +755,6 @@ class Transaction(models.Resource):
                 ),
             },
         )
-
-
-class ConversionResource(models.Resource):
-    api_type: ClassVar[str] = "conversions"
-
-    @classmethod
-    def from_proto(
-        cls,
-        conversion: transaction_models_pb2.Conversion,
-        fx_delta: float | None,
-        transaction_id: str | None,
-        request: requests.Request,
-    ) -> ConversionResource:
-        conversion_resource = cls(
-            id=conversion.id,
-            type=ConversionResource.api_type,
-            links={
-                _SELF_HREF: str(
-                    request.url_for(
-                        "Conversion",
-                        conversionId=conversion.id,
-                    ),
-                ),
-            },
-        )
-        if conversion.status == conversion.Status.STATUS_FAILED:
-            attributes = {
-                "createdAt": protobuf.protobuf_to_datetime(
-                    conversion.created_at,
-                ),
-                "buyAmount": Money.from_proto(conversion.buy_amount),
-                "executedRate": round(conversion.executed_rate, 3),
-                "fxStatus": protobuf.enum_value_to_slug(
-                    conversion.Status.DESCRIPTOR,
-                    conversion.status,
-                ),
-            }
-        else:
-            attributes = {
-                "createdAt": protobuf.protobuf_to_datetime(
-                    conversion.created_at,
-                ),
-                "settledAt": protobuf.protobuf_to_datetime(
-                    conversion.settlement_date,
-                ),
-                "sellAmount": Money.from_proto(conversion.sell_amount),
-                "buyAmount": Money.from_proto(conversion.buy_amount),
-                "executedRate": round(conversion.executed_rate, 3),
-                "fxDelta": fx_delta,
-                "fxStatus": protobuf.enum_value_to_slug(
-                    conversion.Status.DESCRIPTOR,
-                    conversion.status,
-                ),
-            }
-        conversion_resource.attributes = attributes
-        if transaction_id is not None:
-            conversion_resource.relationships = {
-                "transactions": {
-                    "data": models.ResourceIdentifier(
-                        id=transaction_id,
-                        type=Transaction.api_type,
-                    ),
-                },
-            }
-        return conversion_resource
 
 
 class BookingCancellationResource(models.Resource):

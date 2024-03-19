@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Callable, Sequence
 from typing import Any
 
@@ -6,7 +7,6 @@ from pytest_mock import MockerFixture
 
 from snowfall.project.pay.adapter import transactions
 from snowfall.project.pay.service.companies.v1.models_pb2 import (
-    Account,
     Company,
 )
 from snowfall.stdlib import money
@@ -23,20 +23,17 @@ def available_currencies() -> Sequence[money.Currency]:
 
 
 @pytest.fixture()
-async def company(
-    account: Account,
-) -> Company:
+async def company() -> Company:
     fx_markup = 1.2
     processing_markup = 2.2
     sales_markup = 2.3
 
     return Company(
-        id=account.company_id,
+        id=str(uuid.uuid4()),
         name="test_company",
         fx_markup=fx_markup,
         processing_markup=processing_markup,
         sales_markup=sales_markup,
-        account_id=account.id,
     )
 
 

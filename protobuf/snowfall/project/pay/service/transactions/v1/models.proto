@@ -76,22 +76,6 @@ message Quotation {
   google.protobuf.Timestamp updated_at = 10;
 }
 
-message Conversion {
-  string id = 1;
-  string external_id = 2;
-  google.protobuf.Timestamp settlement_date = 3;
-  google.protobuf.Timestamp created_at = 4;
-  snowfall.stdlib.v1.Money buy_amount = 5;
-  snowfall.stdlib.v1.Money sell_amount = 6;
-  float executed_rate = 7;
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_EXECUTED = 1;
-    STATUS_FAILED = 2;
-  }
-  Status status = 8;
-}
-
 message Bill {
   string id = 1;
   string order_id = 2;

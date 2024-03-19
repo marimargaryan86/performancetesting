@@ -13,25 +13,11 @@ service CompaniesService {
   rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {}
 }
 
-service AccountsService {
-  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
-  rpc GetAccount(GetAccountRequest) returns (GetAccountResponse) {}
-  rpc ListAccounts(ListAccountsRequest) returns (ListAccountsResponse) {}
-  rpc UpdateAccountStatus(UpdateAccountStatusRequest) returns (UpdateAccountStatusResponse) {}
-}
-
 service ContactsService {
   rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {}
   rpc GetContact(GetContactRequest) returns (GetContactResponse) {}
   rpc ListCompanyContacts(ListCompanyContactsRequest) returns (ListCompanyContactsResponse) {}
   rpc UpdateContactReference(UpdateContactReferenceRequest) returns (UpdateContactReferenceResponse) {}
-}
-
-service BeneficiariesService {
-  rpc CreateBeneficiary(CreateBeneficiaryRequest) returns (CreateBeneficiaryResponse) {}
-  rpc GetBeneficiary(GetBeneficiaryRequest) returns (GetBeneficiaryResponse) {}
-  rpc UpdateBeneficiary(UpdateBeneficiaryRequest) returns (UpdateBeneficiaryResponse) {}
-  rpc ListBeneficiaries(ListBeneficiariesRequest) returns (ListBeneficiariesResponse) {}
 }
 
 message CreateContactRequest {
@@ -102,74 +88,5 @@ message ListCompaniesRequest {
 
 message ListCompaniesResponse {
   repeated Company companies = 1;
-  string next_page_token = 2;
-}
-
-message CreateAccountRequest {
-  Account account = 1;
-}
-
-message CreateAccountResponse {
-  Account account = 1;
-}
-
-message GetAccountRequest {
-  string id = 1;
-}
-
-message GetAccountResponse {
-  Account account = 1;
-}
-
-message ListAccountsRequest {
-  int32 page_size = 1;
-  string page_token = 2;
-  repeated string filter_by = 3;
-}
-
-message ListAccountsResponse {
-  repeated Account accounts = 1;
-  string next_page_token = 2;
-}
-
-message UpdateAccountStatusRequest {
-  string id = 1;
-  Status status = 2;
-}
-
-message UpdateAccountStatusResponse {
-  Account account = 1;
-}
-message CreateBeneficiaryRequest {
-  Beneficiary beneficiary = 1;
-}
-
-message CreateBeneficiaryResponse {
-  Beneficiary beneficiary = 1;
-}
-
-message GetBeneficiaryRequest {
-  string id = 1;
-}
-
-message GetBeneficiaryResponse {
-  Beneficiary beneficiary = 1;
-}
-
-message UpdateBeneficiaryRequest {
-  Beneficiary beneficiary = 1;
-}
-
-message UpdateBeneficiaryResponse {
-  Beneficiary beneficiary = 1;
-}
-
-message ListBeneficiariesRequest {
-  int32 page_size = 1;
-  string page_token = 2;
-}
-
-message ListBeneficiariesResponse {
-  repeated Beneficiary beneficiaries = 1;
   string next_page_token = 2;
 }

@@ -49,16 +49,6 @@ message Company {
   snowfall.stdlib.v1.Date invoice_generation_date = 18;
 }
 
-message Account {
-  string id = 1;
-  string external_reference = 2;
-  string company_id = 3;
-  string contact_id = 4;
-  string name = 5;
-  Status status = 6;
-  google.protobuf.Timestamp updated_at = 7;
-}
-
 message Contact {
   string id = 1;
   string first_name = 2;
@@ -68,42 +58,6 @@ message Contact {
   string company_id = 6;
   google.protobuf.Timestamp created_at = 7;
   string external_reference = 8;
-}
-
-enum Status {
-  STATUS_UNSPECIFIED = 0;
-  STATUS_ENABLED = 1;
-  STATUS_ENABLED_NO_TRADING = 2;
-  STATUS_DISABLED = 3;
-}
-
-message BankDetails {
-  string name = 1;
-  string bic_swift = 2;
-  string account_type = 3;
-  string payment_types = 4;
-  snowfall.stdlib.v1.PostalAddress address = 5;
-  string account_number = 6;
-  string aba = 7;
-  string iban = 8;
-}
-
-message MetaData {
-  string bank_account_holder_name = 1;
-  string email = 2;
-  snowfall.stdlib.v1.PostalAddress beneficiary_address = 3;
-  BankDetails bank_details = 4;
-}
-
-message Beneficiary {
-  string id = 1;
-  string external_reference = 2;
-  string account_id = 3;
-  string created_by = 4;
-  string updated_by = 5;
-  string payment_type = 6;
-  string currency = 7;
-  MetaData meta_data = 8;
 }
 
 message ListOfIds {

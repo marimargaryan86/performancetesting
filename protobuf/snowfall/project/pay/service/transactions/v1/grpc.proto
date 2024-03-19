@@ -4,7 +4,6 @@ package snowfall.project.pay.service.transactions.v1;
 
 import "snowfall/project/pay/service/companies/v1/models.proto";
 import "snowfall/project/pay/service/transactions/v1/models.proto";
-import "snowfall/stdlib/v1/money.proto";
 import "snowfall/stdlib/v1/sort.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/transactions/v1";
@@ -21,11 +20,6 @@ service QuotationsService {
   rpc CreateQuotation(CreateQuotationRequest) returns (CreateQuotationResponse) {}
   rpc GetQuotation(GetQuotationRequest) returns (GetQuotationResponse) {}
   rpc UpdateQuotationStatus(UpdateQuotationStatusRequest) returns (UpdateQuotationStatusResponse) {}
-}
-
-service ConversionsService {
-  rpc GetConversion(GetConversionRequest) returns (GetConversionResponse) {}
-  rpc ListConversions(ListConversionsRequest) returns (ListConversionsResponse) {}
 }
 
 service BillsService {
@@ -123,34 +117,6 @@ message UpdateQuotationStatusRequest {
 
 message UpdateQuotationStatusResponse {
   bool is_success = 1;
-}
-
-message CreateConversionRequest {
-  snowfall.stdlib.v1.Money beneficiary_amount = 1;
-  snowfall.stdlib.v1.Money base_converted_amount = 2;
-  string transaction_id = 3;
-}
-
-message CreateConversionResponse {
-  Conversion conversion = 1;
-}
-
-message GetConversionRequest {
-  string id = 1;
-}
-
-message GetConversionResponse {
-  Conversion conversion = 1;
-}
-
-message ListConversionsRequest {
-  int32 page_size = 1;
-  string page_token = 2;
-}
-
-message ListConversionsResponse {
-  string next_page_token = 1;
-  repeated Conversion conversions = 2;
 }
 
 message CreateBillRequest {
