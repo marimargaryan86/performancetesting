@@ -1,6 +1,19 @@
 import abc
+import functools
+import inspect
+import types
 from collections.abc import Callable, Mapping
-from typing import Any, NotRequired, Self
+from typing import (
+    Any,
+    ClassVar,
+    Generic,
+    NotRequired,
+    Self,
+    TypeVar,
+    final,
+    get_args,
+    get_origin,
+)
 
 import pydantic
 from typing_extensions import TypedDict
@@ -55,24 +68,109 @@ def flatten_resource(
     }
 
 
-class Model(pydantic.BaseModel, abc.ABC):
+class ResourceModel(pydantic.BaseModel, abc.ABC):
+    type: ClassVar[str]
     id: str
     model_config = pydantic.ConfigDict(extra="forbid", strict=True)
-
-    @property
-    @abc.abstractmethod
-    def type(self) -> str:
-        raise NotImplementedError
 
     @pydantic.model_serializer(mode="wrap", when_used="always", return_type=Resource)
     def _serialize(self, serializer: Callable[[Self], Mapping[str, Any]]) -> Resource:
         as_dict = serializer(self)
+        relationships = _relationship_fields(type(self))
+
+        try:
+            return_data: Resource = {
+                "type": self.type,
+                "id": as_dict["id"],
+                "attributes": {
+                    key: value
+                    for key, value in as_dict.items()
+                    if key != "id" and key not in relationships
+                },
+            }
+        except AttributeError:
+            raise ValueError(
+                "{0} has no JSON:API type defined as a ClassVar.".format(
+                    type(self).__name__,
+                ),
+            ) from None
+
+        if relationships:
+            return_data["relationships"] = {
+                key: {"data": value}
+                for key, value in as_dict.items()
+                if key in relationships
+            }
+
+        return return_data
+
+    @pydantic.model_validator(mode="before")
+    @classmethod
+    def _validate(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+
+        attributes_is_dict = isinstance(data.get("attributes"), dict)
+        relationships_is_dict = isinstance(data.get("relationships"), dict)
 
         return {
-            "id": as_dict["id"],
-            "type": self.type,
-            "attributes": {key: value for key, value in as_dict.items() if key != "id"},
+            **(data["attributes"] if attributes_is_dict else {}),
+            **(
+                cls._validate_relationships(data["relationships"])
+                if relationships_is_dict
+                else {}
+            ),
+            **{
+                key: value
+                for key, value in data.items()
+                if key not in {"attributes", "relationships", "type"}
+            },
         }
+
+    @classmethod
+    def _validate_relationships(
+        cls,
+        relationships: Mapping[str, Any],
+    ) -> Mapping[str, list[ResourceIdentifier] | ResourceIdentifier | None]:
+        return {
+            relationship: resources["data"]
+            if isinstance(resources, dict) and "data" in resources
+            else resources
+            for relationship, resources in relationships.items()
+        }
+
+
+_Relationship = TypeVar("_Relationship", bound=ResourceModel)
+
+
+@final
+class RelationshipModel(pydantic.BaseModel, Generic[_Relationship]):
+    id: str
+    model_config = pydantic.ConfigDict(extra="forbid", strict=True)
+
+    @pydantic.model_serializer(
+        mode="wrap",
+        when_used="always",
+        return_type=ResourceIdentifier,
+    )
+    def _serialize(
+        self,
+        serializer: Callable[[Self], Mapping[str, Any]],
+    ) -> ResourceIdentifier:
+        as_dict = serializer(self)
+        resource = self.__pydantic_generic_metadata__["args"][0]
+
+        try:
+            return {
+                "type": resource.type,
+                "id": as_dict["id"],
+            }
+        except AttributeError:
+            raise ValueError(
+                "{0} has no JSON:API type defined as a ClassVar.".format(
+                    resource.__name__,
+                ),
+            ) from None
 
     @pydantic.model_validator(mode="before")
     @classmethod
@@ -81,15 +179,28 @@ class Model(pydantic.BaseModel, abc.ABC):
             return data
 
         try:
-            is_dict = isinstance(data["attributes"], dict)
+            return {"id": data["id"]}
         except KeyError:
-            is_dict = False
+            return data
 
-        return {
-            **(data["attributes"] if is_dict else {}),
-            **{
-                key: value
-                for key, value in data.items()
-                if key not in {"attributes", "type"}
-            },
-        }
+
+@functools.cache
+def _relationship_fields(model: type[ResourceModel]) -> set[str]:
+    return {
+        field
+        for field, info in model.model_fields.items()
+        if _is_relationship(info.annotation)
+    }
+
+
+def _is_relationship(annotation: type[Any] | None) -> bool:
+    if inspect.isclass(annotation) and issubclass(annotation, RelationshipModel):
+        return True
+
+    if get_origin(annotation) not in {list, types.UnionType}:
+        return False
+
+    return all(
+        issubclass(arg, RelationshipModel) or arg is types.NoneType
+        for arg in get_args(annotation)
+    )
