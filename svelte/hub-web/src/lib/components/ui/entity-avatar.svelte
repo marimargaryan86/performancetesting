@@ -9,9 +9,17 @@
 </script>
 
 {#if imageUrl}
-  <img src={imageUrl} alt="" title={name} class="entity-avatar" style:--size={size} />
+  <img
+    role="presentation"
+    src={imageUrl}
+    alt=""
+    title={name}
+    class="entity-avatar"
+    style:--size={size}
+  />
 {:else}
   <span
+    role="presentation"
     typography="body-small"
     weight="bold"
     class="entity-avatar"
