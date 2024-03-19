@@ -2,7 +2,6 @@
   import JunctionLogo from "$lib/components/icons/junction-logo.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import TextField from "$lib/components/ui/text-field.svelte";
-  import Checkbox from "$lib/components/ui/checkbox.svelte";
   import { writable } from "svelte/store";
   import integrationInstancesClient from "~/integration-instances-client";
   import routeConfig from "$lib/route-config";
@@ -174,7 +173,7 @@
   </p>
 
   <label for="remember-me" class="remember-me">
-    <Checkbox id="remember-me" bind:checked={rememberMe} />
+    <input id="remember-me" type="checkbox" bind:checked={rememberMe} />
     <!-- TODO: Add i18n -->
     <span typography="body-small">Remember me for 14 days</span>
   </label>
