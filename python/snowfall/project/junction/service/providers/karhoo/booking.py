@@ -127,6 +127,6 @@ class BookingHandler(object):
                     notifications.BookingNotification(task.metadata, booking_result),
                 )
             except base_notifications.NotificationError:
-                self._logger.exception()
+                self._logger.exception("A notification error occurred.")
 
         return booking_result

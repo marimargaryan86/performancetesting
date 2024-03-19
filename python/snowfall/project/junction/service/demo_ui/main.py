@@ -54,7 +54,7 @@ class Routes(object):
                 timeout=self._grpc_timeout.total_seconds(),
             )
         except aio.AioRpcError as err:
-            self._logger.exception()
+            self._logger.exception("A gRPC error occurred.")
             raise exceptions.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             ) from err
@@ -75,7 +75,7 @@ class Routes(object):
                 timeout=self._grpc_timeout.total_seconds(),
             )
         except aio.AioRpcError as err:
-            self._logger.exception()
+            self._logger.exception("A gRPC error occurred.")
             raise exceptions.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             ) from err
@@ -96,7 +96,7 @@ class Routes(object):
                 trips_pb2.EnqueueTripSearchRequest(),
             )
         except json_format.ParseError as err:
-            self._logger.exception()
+            self._logger.exception("Unable to parse HTTP payload.")
             raise exceptions.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
             ) from err
@@ -107,7 +107,7 @@ class Routes(object):
                 timeout=self._grpc_timeout.total_seconds(),
             )
         except aio.AioRpcError as err2:
-            self._logger.exception()
+            self._logger.exception("A gRPC error occurred.")
             raise exceptions.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             ) from err2

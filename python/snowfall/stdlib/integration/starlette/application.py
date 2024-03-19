@@ -40,7 +40,7 @@ async def _logging_server_error_handler(
     request: requests.Request,
     exc: Exception,
 ) -> responses.Response:
-    _LOGGER.exception()
+    _LOGGER.exception("An unhandled exception occurred.")
 
     return await handlers.server_error_handler(request, exc)
 

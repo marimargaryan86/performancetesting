@@ -232,7 +232,7 @@ async def _async_wrapper(
         try:
             await asyncio.gather(*tasks)
         except Exception as err:
-            application.logger.exception()
+            application.logger.exception("An unhandled exception occurred.")
             raise SystemExit(1) from err
 
 

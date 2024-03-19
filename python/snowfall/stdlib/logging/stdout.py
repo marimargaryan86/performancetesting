@@ -22,7 +22,7 @@ class Logger(Protocol):
     def error(self, event: str, *args: Any, **kw: Any) -> None:
         """Log at **error** level."""
 
-    def exception(self, event: str | None = None, *args: Any, **kw: Any) -> None:
+    def exception(self, event: str, *args: Any, **kw: Any) -> None:
         """Log  at **error** level and ensure that `exc_info` is set."""
 
     def critical(self, event: str, *args: Any, **kw: Any) -> None:

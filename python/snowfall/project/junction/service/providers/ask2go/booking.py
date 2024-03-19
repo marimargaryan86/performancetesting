@@ -177,7 +177,7 @@ class BookingHandler(object):
                 response=error.response.body,
             )
         else:
-            self._logger.exception()
+            self._logger.exception("An unknown error occurred.")
 
     async def _make_booking(
         self,
@@ -249,7 +249,7 @@ class BookingHandler(object):
                 notifications.BookingNotification(metadata, booking_result),
             )
         except base_notifications.NotificationError:
-            self._logger.exception()
+            self._logger.exception("A notification error occurred.")
 
         return booking_result
 

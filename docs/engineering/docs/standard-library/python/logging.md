@@ -54,7 +54,7 @@ logger = stdout.get_logger()
 try:
     raise RuntimeError()
 except RuntimeError:
-    logger.exception()
+    logger.exception("exception message")
 ```
 
 This will output a log event with the severity level `error` with the call stack
