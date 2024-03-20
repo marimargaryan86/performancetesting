@@ -31,11 +31,10 @@
 </script>
 
 {#if show}
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
   <div
     class="backdrop"
     use:portal={document.body}
-    role="dialog"
+    role="presentation"
     on:click|self={closeOnClickOutside ? close : undefined}
     transition:fade={{ duration: 150 }}
   >
