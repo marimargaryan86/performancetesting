@@ -33,10 +33,12 @@ module.exports = {
       files: ["*.{spec,test}.{js,ts}"],
       extends: ["plugin:vitest/recommended"],
       rules: {
+        "no-empty-function": "off",
         "no-inline-comments": "off",
         "max-lines-per-function": "off",
         "max-nested-callbacks": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
       },
     },
   ],
