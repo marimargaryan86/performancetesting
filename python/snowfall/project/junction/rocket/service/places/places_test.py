@@ -1,4 +1,4 @@
-from collections.abc import Mapping
+from collections.abc import AsyncIterable, Mapping, Sequence
 from typing import Any
 from unittest import mock
 
@@ -6,6 +6,7 @@ import pytest
 
 from snowfall.project.junction.rocket.service.places import constants
 from snowfall.project.junction.rocket.service.places.places import (
+    cities_to_places,
     get_provider_places,
     osm_nodes_to_places,
     resolve_osm_properties,
@@ -110,95 +111,100 @@ class TestPlaces(object):
             models_pb2.TYPE_AIRPORT: [],
         }
 
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
+    )
     def test_get_provider_places_returns_result_if_provider_place_in_radius(
         self,
+        mock_place_within_radius: mock.Mock,
     ) -> None:
-        with mock.patch(
-            "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
-        ) as mock_place_within_radius:
-            mock_place_within_radius.return_value = "a-provider-id"
-            node = {"geometry": {"coordinates": [0, 1]}}
-            provider_json: ProviderTypedDict = {
-                models_pb2.TYPE_RAILWAY_STATION: {"an-id": [], "an-id-1": []},
-                models_pb2.TYPE_AIRPORT: {"an-id-2": []},
-            }
-            assert get_provider_places(
-                node=node,
-                vertical_type=models_pb2.TYPE_RAILWAY_STATION,
-                provider_jsons=provider_json,
-                iata=None,
-            ) == {
-                models_pb2.TYPE_RAILWAY_STATION: [
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id="an-id",
-                        provider_place_id="a-provider-id",
-                    ),
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id="an-id-1",
-                        provider_place_id="a-provider-id",
-                    ),
-                ],
-                models_pb2.TYPE_FERRY_PORT: [],
-                models_pb2.TYPE_AIRPORT: [],
-            }
+        mock_place_within_radius.return_value = "a-provider-id"
+        node = {"geometry": {"coordinates": [0, 1]}}
+        provider_json: ProviderTypedDict = {
+            models_pb2.TYPE_RAILWAY_STATION: {"an-id": [], "an-id-1": []},
+            models_pb2.TYPE_AIRPORT: {"an-id-2": []},
+        }
+        assert get_provider_places(
+            node=node,
+            vertical_type=models_pb2.TYPE_RAILWAY_STATION,
+            provider_jsons=provider_json,
+            iata=None,
+        ) == {
+            models_pb2.TYPE_RAILWAY_STATION: [
+                models_pb2.ProviderPlaceId(
+                    snowfall_provider_id="an-id",
+                    provider_place_id="a-provider-id",
+                ),
+                models_pb2.ProviderPlaceId(
+                    snowfall_provider_id="an-id-1",
+                    provider_place_id="a-provider-id",
+                ),
+            ],
+            models_pb2.TYPE_FERRY_PORT: [],
+            models_pb2.TYPE_AIRPORT: [],
+        }
 
-    def test_get_provider_places_returns_result_if_iata_present(self) -> None:
-        with mock.patch(
-            "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
-        ) as mock_place_within_radius:
-            mock_place_within_radius.return_value = "a-provider-id"
-            node = {"geometry": {"coordinates": [0, 1]}}
-            provider_json: ProviderTypedDict = {
-                models_pb2.TYPE_RAILWAY_STATION: {"an-id": [], "an-id-1": []},
-                models_pb2.TYPE_FERRY_PORT: {"an-id-2": []},
-            }
-            assert get_provider_places(
-                node=node,
-                vertical_type=models_pb2.TYPE_RAILWAY_STATION,
-                provider_jsons=provider_json,
-                iata="LHR",
-            ) == {
-                models_pb2.TYPE_RAILWAY_STATION: [
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id="an-id",
-                        provider_place_id="a-provider-id",
-                    ),
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id="an-id-1",
-                        provider_place_id="a-provider-id",
-                    ),
-                ],
-                models_pb2.TYPE_FERRY_PORT: [],
-                models_pb2.TYPE_AIRPORT: [
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id=constants.IATA_ID,
-                        provider_place_id="LHR",
-                    ),
-                ],
-            }
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
+    )
+    def test_get_provider_places_returns_result_if_iata_present(
+        self,
+        mock_place_within_radius: mock.Mock,
+    ) -> None:
+        mock_place_within_radius.return_value = "a-provider-id"
+        node = {"geometry": {"coordinates": [0, 1]}}
+        provider_json: ProviderTypedDict = {
+            models_pb2.TYPE_RAILWAY_STATION: {"an-id": [], "an-id-1": []},
+            models_pb2.TYPE_FERRY_PORT: {"an-id-2": []},
+        }
+        assert get_provider_places(
+            node=node,
+            vertical_type=models_pb2.TYPE_RAILWAY_STATION,
+            provider_jsons=provider_json,
+            iata="LHR",
+        ) == {
+            models_pb2.TYPE_RAILWAY_STATION: [
+                models_pb2.ProviderPlaceId(
+                    snowfall_provider_id="an-id",
+                    provider_place_id="a-provider-id",
+                ),
+                models_pb2.ProviderPlaceId(
+                    snowfall_provider_id="an-id-1",
+                    provider_place_id="a-provider-id",
+                ),
+            ],
+            models_pb2.TYPE_FERRY_PORT: [],
+            models_pb2.TYPE_AIRPORT: [
+                models_pb2.ProviderPlaceId(
+                    snowfall_provider_id=constants.IATA_ID,
+                    provider_place_id="LHR",
+                ),
+            ],
+        }
 
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
+    )
     def test_get_provider_places_returns_empty_result_if_provider_place_not_in_radius(
         self,
+        mock_place_within_radius: mock.Mock,
     ) -> None:
-        with mock.patch(
-            "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
-        ) as mock_place_within_radius:
-            mock_place_within_radius.return_value = None
-            node = {"geometry": {"coordinates": [0, 1]}}
-            provider_json: ProviderTypedDict = {
-                models_pb2.TYPE_RAILWAY_STATION: {"an-id": []},
-                models_pb2.TYPE_AIRPORT: {"an-id-1": []},
-            }
-            assert get_provider_places(
-                node=node,
-                vertical_type=models_pb2.TYPE_RAILWAY_STATION,
-                provider_jsons=provider_json,
-                iata=None,
-            ) == {
-                models_pb2.TYPE_RAILWAY_STATION: [],
-                models_pb2.TYPE_FERRY_PORT: [],
-                models_pb2.TYPE_AIRPORT: [],
-            }
+        mock_place_within_radius.return_value = None
+        node = {"geometry": {"coordinates": [0, 1]}}
+        provider_json: ProviderTypedDict = {
+            models_pb2.TYPE_RAILWAY_STATION: {"an-id": []},
+            models_pb2.TYPE_AIRPORT: {"an-id-1": []},
+        }
+        assert get_provider_places(
+            node=node,
+            vertical_type=models_pb2.TYPE_RAILWAY_STATION,
+            provider_jsons=provider_json,
+            iata=None,
+        ) == {
+            models_pb2.TYPE_RAILWAY_STATION: [],
+            models_pb2.TYPE_FERRY_PORT: [],
+            models_pb2.TYPE_AIRPORT: [],
+        }
 
     async def test_osm_nodes_to_places_yields_empty_if_invalid_name(self) -> None:
         places = [
@@ -224,73 +230,147 @@ class TestPlaces(object):
         ]
         assert not places
 
-    async def test_osm_nodes_to_places_yields_empty_if_no_places_matched(self) -> None:
-        with mock.patch(
-            "snowfall.project.junction.rocket.service.places.places.get_provider_places",
-        ) as mock_provider_places:
-            mock_provider_places.return_value = {
-                models_pb2.TYPE_RAILWAY_STATION: [],
-                models_pb2.TYPE_FERRY_PORT: [],
-                models_pb2.TYPE_AIRPORT: [],
-            }
-            places = [
-                place
-                async for place in osm_nodes_to_places(
-                    osm_nodes=[
-                        {
-                            "id": "id",
-                            "properties": {"name": "hello", "railway": "station"},
-                        },
-                    ],
-                    provider_jsons={},
-                    geocoding=mock.Mock(),
-                    country_codes_to_countries={},
-                )
-            ]
-            assert not places
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.places.get_provider_places",
+    )
+    async def test_osm_nodes_to_places_yields_empty_if_no_places_matched(
+        self,
+        mock_provider_places: mock.Mock,
+    ) -> None:
+        mock_provider_places.return_value = {
+            models_pb2.TYPE_RAILWAY_STATION: [],
+            models_pb2.TYPE_FERRY_PORT: [],
+            models_pb2.TYPE_AIRPORT: [],
+        }
+        places = [
+            place
+            async for place in osm_nodes_to_places(
+                osm_nodes=[
+                    {
+                        "id": "id",
+                        "properties": {"name": "hello", "railway": "station"},
+                    },
+                ],
+                provider_jsons={},
+                geocoding=mock.Mock(),
+                country_codes_to_countries={},
+            )
+        ]
+        assert not places
 
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.places.get_country_code_and_timezone",
+    )
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.places.get_provider_places",
+    )
     async def test_osm_nodes_yields_place_when_successfully_matched_to_provider(
         self,
+        mock_provider_places: mock.Mock,
+        mock_get_country_code_and_timezone: mock.Mock,
     ) -> None:
-        with mock.patch(
-            "snowfall.project.junction.rocket.service.places.places.get_provider_places",
-        ) as mock_provider_places:
-            mock_provider_places.return_value = {
-                models_pb2.TYPE_RAILWAY_STATION: [],
-                models_pb2.TYPE_FERRY_PORT: [],
-                models_pb2.TYPE_AIRPORT: [
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id="an-id",
-                        provider_place_id="123",
-                    ),
+        mock_provider_places.return_value = {
+            models_pb2.TYPE_RAILWAY_STATION: [],
+            models_pb2.TYPE_FERRY_PORT: [],
+            models_pb2.TYPE_AIRPORT: [
+                models_pb2.ProviderPlaceId(
+                    snowfall_provider_id="an-id",
+                    provider_place_id="123",
+                ),
+            ],
+        }
+        mock_get_country_code_and_timezone.return_value = (
+            "UK",
+            "Europe/London",
+        )
+
+        places = [
+            place
+            async for place in osm_nodes_to_places(
+                osm_nodes=[
+                    {
+                        "id": "id",
+                        "properties": {
+                            "name": "hello",
+                            "aeroway": "aerodrome",
+                            "iata": "123",
+                        },
+                        "geometry": {"coordinates": [0, 0]},
+                    },
                 ],
-            }
+                provider_jsons={},
+                geocoding=mock.Mock(),
+                country_codes_to_countries={"UK": "United Kingdom"},
+            )
+        ]
+        assert places
 
-            with mock.patch(
-                "snowfall.project.junction.rocket.service.places.places.get_country_code_and_timezone",
-            ) as mock_get_country_code_and_timezone:
-                mock_get_country_code_and_timezone.return_value = (
-                    "UK",
-                    "Europe/London",
-                )
+    async def mock_iterator(
+        self,
+        rows: Sequence[Mapping[str, Any]],
+    ) -> AsyncIterable[Mapping[str, Any]]:
+        for row in rows:
+            yield row
 
-                places = [
-                    place
-                    async for place in osm_nodes_to_places(
-                        osm_nodes=[
-                            {
-                                "id": "id",
-                                "properties": {
-                                    "name": "hello",
-                                    "aeroway": "aerodrome",
-                                    "iata": "123",
-                                },
-                                "geometry": {"coordinates": [0, 0]},
-                            },
-                        ],
-                        provider_jsons={},
-                        geocoding=mock.Mock(),
-                        country_codes_to_countries={"UK": "United Kingdom"},
-                    )
-                ]
-                assert places
+    async def test_cities_to_places_yields_empty_if_no_name_for_city(self) -> None:
+        rows = [{"name": ""}]
+        places = [
+            place
+            async for place in cities_to_places(
+                cities=self.mock_iterator(rows),
+                places_repository=mock.Mock(),
+                geocoding=mock.Mock(),
+                country_codes_to_countries=mock.Mock(),
+            )
+        ]
+        assert not places
+
+    async def test_cities_to_places_yields_empty_if_no_contained_places(self) -> None:
+        rows = [{"name": "A City", "latitude": 0, "longitude": 0}]
+
+        mock_repository = mock.AsyncMock()
+
+        places = [
+            place
+            async for place in cities_to_places(
+                cities=self.mock_iterator(rows),
+                places_repository=mock_repository,
+                geocoding=mock.Mock(),
+                country_codes_to_countries=mock.Mock(),
+            )
+        ]
+        assert not places
+
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.places.get_country_code_and_timezone",
+    )
+    async def test_cities_to_places_yields_place_when_it_contains_places(
+        self,
+        mock_get_country_code_and_timezone: mock.Mock,
+    ) -> None:
+        rows = [{"id": "an-id", "name": "A City", "latitude": 0, "longitude": 0}]
+        mock_get_country_code_and_timezone.return_value = (
+            "UK",
+            "Europe/London",
+        )
+
+        async def place_yield() -> AsyncIterable[models_pb2.Place]:  # noqa: WPS430
+            yield models_pb2.Place(
+                id="An ID",
+                type=models_pb2.TYPE_AIRPORT,
+                name="A Name",
+            )
+
+        mock_repository = mock.AsyncMock()
+        mock_repository.find_within_radius.return_value = place_yield()
+
+        places = [
+            place
+            async for place in cities_to_places(
+                cities=self.mock_iterator(rows),
+                places_repository=mock_repository,
+                geocoding=mock.Mock(),
+                country_codes_to_countries={"UK": "United Kingdom"},
+            )
+        ]
+        assert places

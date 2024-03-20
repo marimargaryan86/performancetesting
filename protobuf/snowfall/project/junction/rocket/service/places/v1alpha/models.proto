@@ -34,6 +34,7 @@ message ProviderMappings {
 message PlaceIdentifier {
   string id = 1;
   string name = 2;
+  Type type = 3;
 }
 
 message Place {
@@ -50,8 +51,8 @@ message Place {
   // What vertical provider places allow it to be searched with specifically
   // E.G A provider could allow a search for London as a city
   ProviderMappings search_capabilities = 10;
-  // What vertical provider places are within it to search individually:
-  // E.G London contains many vertical places to search individually
-  ProviderMappings contains = 11;
+  // What places are within it to search individually:
+  // E.G London contains many places to search individually
+  repeated PlaceIdentifier contains = 11;
   string source_id = 12;
 }

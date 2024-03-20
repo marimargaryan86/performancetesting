@@ -12,13 +12,15 @@ class ProviderJson(TypedDict):
 
 
 ProviderJsonDict: TypeAlias = dict[str, list[ProviderJson]]
+
 ProviderTypedDict: TypeAlias = dict[
     models_pb2.Type.ValueType,
     ProviderJsonDict,
 ]
 
-
 ProviderMappings: TypeAlias = dict[
     models_pb2.Type.ValueType,
     list[models_pb2.ProviderPlaceId],
 ]
+
+PlaceIdentifiers: TypeAlias = list[models_pb2.PlaceIdentifier]

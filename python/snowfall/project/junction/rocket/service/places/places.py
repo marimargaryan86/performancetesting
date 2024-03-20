@@ -8,6 +8,7 @@ from pymongo import GEOSPHERE, IndexModel
 
 from snowfall.project.junction.rocket.service.places import constants, handlers
 from snowfall.project.junction.rocket.service.places.typing import (
+    PlaceIdentifiers,
     ProviderMappings,
     ProviderTypedDict,
 )
@@ -20,6 +21,7 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1 import latlng_pb2
 
 _RADIUS_TO_MATCH_NODE_WITH_PROVIDER_PLACE = 5000
+_RADIUS_TO_MATCH_PLACE_WITH_CITY = 50000
 _NAMESPACE = uuid.UUID("f9ec30af-54df-4bd3-8dd9-6c4b51341d6d")
 
 _logger = stdout.get_logger()
@@ -46,6 +48,30 @@ class PlaceRepository(
             filter_=({
                 repository.mongo_id_key: {"$in": identifiers} if identifiers else None,
             }),
+        )
+
+    async def find_within_radius(
+        self,
+        cursor: str,
+        coordinates: latlng_pb2.LatLng,
+        radius: int,
+    ) -> resultset.ResultSet[models_pb2.Place]:
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_={
+                "coordinates": {
+                    "$nearSphere": {
+                        "$geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                coordinates.longitude,
+                                coordinates.latitude,
+                            ],
+                        },
+                        "$maxDistance": radius,
+                    },
+                },
+            },
         )
 
 
@@ -136,6 +162,21 @@ def has_no_provider_places(provider_places: ProviderMappings) -> bool:
     )
 
 
+async def get_country_code_and_timezone(
+    coordinates: latlng_pb2.LatLng,
+    geocoding: geocoding_pb2_grpc.GeocodingServiceStub,
+) -> tuple[str, str]:
+    country_code, time_zone = await asyncio.gather(
+        geocoding.CountryCodeLookup(
+            geocoding_pb2.CountryCodeLookupRequest(coordinates=coordinates),
+        ),
+        geocoding.TimeZoneLookup(
+            geocoding_pb2.TimeZoneLookupRequest(coordinates=coordinates),
+        ),
+    )
+    return country_code.country_code, time_zone.time_zone.id
+
+
 async def osm_nodes_to_places(  # noqa: WPS231
     osm_nodes: Sequence[Mapping[str, Any]],
     provider_jsons: ProviderTypedDict,
@@ -191,16 +232,56 @@ async def osm_nodes_to_places(  # noqa: WPS231
             )
 
 
-async def get_country_code_and_timezone(
+async def get_places_within_radius(
     coordinates: latlng_pb2.LatLng,
+    places_repository: PlaceRepository,
+) -> PlaceIdentifiers:
+    return [
+        models_pb2.PlaceIdentifier(id=place.id, name=place.name, type=place.type)
+        async for place in await places_repository.find_within_radius(
+            cursor="",
+            coordinates=coordinates,
+            radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY,
+        )
+    ]
+
+
+async def cities_to_places(
+    cities: AsyncIterable[Mapping[str, str]],
+    places_repository: PlaceRepository,
     geocoding: geocoding_pb2_grpc.GeocodingServiceStub,
-) -> tuple[str, str]:
-    country_code, time_zone = await asyncio.gather(
-        geocoding.CountryCodeLookup(
-            geocoding_pb2.CountryCodeLookupRequest(coordinates=coordinates),
-        ),
-        geocoding.TimeZoneLookup(
-            geocoding_pb2.TimeZoneLookupRequest(coordinates=coordinates),
-        ),
-    )
-    return country_code.country_code, time_zone.time_zone.id
+    country_codes_to_countries: Mapping[str, str],
+) -> AsyncIterable[models_pb2.Place]:
+    async for city in cities:
+        if not city["name"]:
+            continue
+        coordinates = latlng_pb2.LatLng(
+            latitude=float(city["latitude"]),
+            longitude=float(city["longitude"]),
+        )
+        places_within = await get_places_within_radius(
+            coordinates=coordinates,
+            places_repository=places_repository,
+        )
+        if not places_within:
+            continue
+        country_code, time_zone = await get_country_code_and_timezone(
+            coordinates,
+            geocoding,
+        )
+        yield models_pb2.Place(
+            id=string.to_uuid(city["id"], _NAMESPACE),
+            source_id=city["id"],
+            name=city["name"],
+            coordinates=coordinates,
+            time_zone=time_zone,
+            country_code=country_code,
+            country_name=country_codes_to_countries[country_code],
+            updated_at=protobuf.datetime_to_protobuf(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+            city=None,
+            type=models_pb2.TYPE_CITY,
+            search_capabilities=None,
+            contains=places_within,
+        )
