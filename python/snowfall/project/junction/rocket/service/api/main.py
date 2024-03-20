@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from grpc import aio
 from starlette.middleware import Middleware, authentication
@@ -21,8 +21,8 @@ from snowfall.stdlib.service import application, grpc_factory
 class _Settings(starlette.Settings):
     authentication_address: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
-    jwt_token_version: str
-    jwt_public_key: str
+    j_one_api_key: str
+    reseller_j1_credentials_mapping: dict[str, Any]
 
 
 class _Channels(NamedTuple):

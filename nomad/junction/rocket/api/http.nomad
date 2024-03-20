@@ -110,8 +110,9 @@ job "junction-rocket-api-http" {
         change_mode = "restart"
         data        = <<EOH
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
+RESELLER_J1_CREDENTIALS_MAPPING={{keyOrDefault "${var.environment}/rocket-api/reseller-j1-credentials-mapping" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/rocket-api" }}
-JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
+J_ONE_API_KEY={{ .Data.data.j_one_api_key }}
 {{ end }}
 EOH
       }
@@ -132,9 +133,9 @@ EOH
         FORWARDED_ALLOWED_IPS = "0.0.0.0"
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
-        JWT_TOKEN_VERSION     = "1.0.0"
         SENTRY_DSN            = "https://303cafc116e642efe7c538795b0c2e7a@sentry.snowfall.se/238"
       }
     }
   }
 }
+
