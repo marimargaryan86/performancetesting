@@ -1,6 +1,7 @@
 from collections.abc import Mapping, Sequence
-from typing import ClassVar
+from typing import Any, ClassVar
 
+import pydantic
 import pytest
 
 from snowfall.stdlib.format import jsonapi
@@ -102,24 +103,24 @@ def test_resource_is_flattened(
 
 
 class _Foobar(jsonapi.ResourceModel):
-    type: ClassVar[str] = "foobar"
+    _type: ClassVar[str] = "foobar"
     foobar: str
 
 
 class _BazquxWithFoobar(jsonapi.ResourceModel):
-    type: ClassVar[str] = "bazqux"
+    _type: ClassVar[str] = "bazqux"
     bazqux: str
     foobar: jsonapi.RelationshipModel[_Foobar]
 
 
 class _BazquxWithOptionalFoobar(jsonapi.ResourceModel):
-    type: ClassVar[str] = "bazqux"
+    _type: ClassVar[str] = "bazqux"
     bazqux: str
     foobar: jsonapi.RelationshipModel[_Foobar] | None
 
 
 class _BazquxWithFoobars(jsonapi.ResourceModel):
-    type: ClassVar[str] = "bazqux"
+    _type: ClassVar[str] = "bazqux"
     bazqux: str
     foobars: list[jsonapi.RelationshipModel[_Foobar]]
 
@@ -239,26 +240,22 @@ def test_serialization(
 
 
 def test_serialization_with_no_type_defined_on_resource() -> None:
-    model = _InvalidFoobar(id="foobar", foobar="foobar")
-
     with pytest.raises(
-        ValueError,
+        AttributeError,
         match="_InvalidFoobar has no JSON:API type defined as a ClassVar.",
     ):
-        model.model_dump()
+        _InvalidFoobar(id="foobar", foobar="foobar")
 
 
 def test_serialization_with_no_type_defined_on_relationship() -> None:
-    model = _BazquxWithInvalidFoobar(
-        id="foobar",
-        foobar=jsonapi.RelationshipModel[_InvalidFoobar](id="foobar"),
-    )
-
     with pytest.raises(
-        ValueError,
+        AttributeError,
         match="_InvalidFoobar has no JSON:API type defined as a ClassVar.",
     ):
-        model.model_dump()
+        _BazquxWithInvalidFoobar(
+            id="foobar",
+            foobar=jsonapi.RelationshipModel[_InvalidFoobar](id="foobar"),
+        )
 
 
 @pytest.mark.parametrize(
@@ -270,3 +267,64 @@ def test_validation(
     data: jsonapi.Resource,
 ) -> None:
     assert model_type.model_validate(data).model_dump() == data, "validation failed"
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param("foobar", id="invalid resource"),
+        pytest.param(
+            {
+                "id": "bazqux",
+                "type": "bazqux",
+                "bazqux": "bazqux",
+                "relationships": {
+                    "foobar": "foobar",
+                },
+            },
+            id="invalid relationship",
+        ),
+        pytest.param(
+            {
+                "id": "bazqux",
+                "type": "bazqux",
+                "bazqux": "bazqux",
+                "relationships": {
+                    "foobar": {
+                        "data": {
+                            "type": "foobar",
+                        },
+                    },
+                },
+            },
+            id="missing relationship ID",
+        ),
+        pytest.param(
+            {
+                "id": "bazqux",
+                "type": "foobar",
+                "bazqux": "bazqux",
+            },
+            id="invalid resource type",
+        ),
+        pytest.param(
+            {
+                "id": "bazqux",
+                "type": "bazqux",
+                "bazqux": "bazqux",
+                "relationships": {
+                    "foobar": {
+                        "data": {
+                            "id": "foobar",
+                            "type": "bazqux",
+                        },
+                    },
+                },
+            },
+            id="invalid relationship type",
+        ),
+    ],
+)
+def test_validation_invalid_data(payload: Any) -> None:
+    with pytest.raises(pydantic.ValidationError):
+        _BazquxWithFoobar.model_validate(payload)

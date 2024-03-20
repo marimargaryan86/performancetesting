@@ -1,4 +1,3 @@
-import abc
 import functools
 import inspect
 import types
@@ -68,32 +67,35 @@ def flatten_resource(
     }
 
 
-class ResourceModel(pydantic.BaseModel, abc.ABC):
-    type: ClassVar[str]
+class ResourceModel(pydantic.BaseModel):
+    _type: ClassVar[str]
     id: str
     model_config = pydantic.ConfigDict(extra="forbid", strict=True)
+
+    @classmethod
+    def type(cls) -> str:
+        try:
+            return cls._type
+        except AttributeError:
+            raise AttributeError(
+                "{0} has no JSON:API type defined as a ClassVar.".format(
+                    cls.__name__,
+                ),
+            ) from None
 
     @pydantic.model_serializer(mode="wrap", when_used="always", return_type=Resource)
     def _serialize(self, serializer: Callable[[Self], Mapping[str, Any]]) -> Resource:
         as_dict = serializer(self)
         relationships = _relationship_fields(type(self))
-
-        try:
-            return_data: Resource = {
-                "type": self.type,
-                "id": as_dict["id"],
-                "attributes": {
-                    key: value
-                    for key, value in as_dict.items()
-                    if key != "id" and key not in relationships
-                },
-            }
-        except AttributeError:
-            raise ValueError(
-                "{0} has no JSON:API type defined as a ClassVar.".format(
-                    type(self).__name__,
-                ),
-            ) from None
+        return_data: Resource = {
+            "type": self.type(),
+            "id": as_dict["id"],
+            "attributes": {
+                key: value
+                for key, value in as_dict.items()
+                if key != "id" and key not in relationships
+            },
+        }
 
         if relationships:
             return_data["relationships"] = {
@@ -113,10 +115,18 @@ class ResourceModel(pydantic.BaseModel, abc.ABC):
         attributes_is_dict = isinstance(data.get("attributes"), dict)
         relationships_is_dict = isinstance(data.get("relationships"), dict)
 
+        if data.get("type") not in {cls.type(), None}:
+            raise ValueError(
+                "JSON:API type {0} does not match {1}".format(
+                    data.get("type"),
+                    cls.type(),
+                ),
+            )
+
         return {
             **(data["attributes"] if attributes_is_dict else {}),
             **(
-                cls._validate_relationships(data["relationships"])
+                _validate_relationships(data["relationships"])
                 if relationships_is_dict
                 else {}
             ),
@@ -127,17 +137,16 @@ class ResourceModel(pydantic.BaseModel, abc.ABC):
             },
         }
 
-    @classmethod
-    def _validate_relationships(
-        cls,
-        relationships: Mapping[str, Any],
-    ) -> Mapping[str, list[ResourceIdentifier] | ResourceIdentifier | None]:
-        return {
-            relationship: resources["data"]
-            if isinstance(resources, dict) and "data" in resources
-            else resources
-            for relationship, resources in relationships.items()
-        }
+
+def _validate_relationships(
+    relationships: Mapping[str, Any],
+) -> Mapping[str, list[ResourceIdentifier] | ResourceIdentifier | None]:
+    return {
+        relationship: resources["data"]
+        if isinstance(resources, dict) and "data" in resources
+        else resources
+        for relationship, resources in relationships.items()
+    }
 
 
 _Relationship = TypeVar("_Relationship", bound=ResourceModel)
@@ -147,6 +156,26 @@ _Relationship = TypeVar("_Relationship", bound=ResourceModel)
 class RelationshipModel(pydantic.BaseModel, Generic[_Relationship]):
     id: str
     model_config = pydantic.ConfigDict(extra="forbid", strict=True)
+
+    @classmethod
+    def type(cls) -> str:
+        try:
+            resource = cls.__pydantic_generic_metadata__["args"][0]
+        except (IndexError, KeyError):
+            raise TypeError(
+                "Missing type parameters for generic type {0}.".format(
+                    cls.__name__,
+                ),
+            ) from None
+
+        try:
+            return resource.type()
+        except AttributeError:
+            raise AttributeError(
+                "{0} has no JSON:API type defined as a ClassVar.".format(
+                    resource.__name__,
+                ),
+            ) from None
 
     @pydantic.model_serializer(
         mode="wrap",
@@ -158,25 +187,25 @@ class RelationshipModel(pydantic.BaseModel, Generic[_Relationship]):
         serializer: Callable[[Self], Mapping[str, Any]],
     ) -> ResourceIdentifier:
         as_dict = serializer(self)
-        resource = self.__pydantic_generic_metadata__["args"][0]
 
-        try:
-            return {
-                "type": resource.type,
-                "id": as_dict["id"],
-            }
-        except AttributeError:
-            raise ValueError(
-                "{0} has no JSON:API type defined as a ClassVar.".format(
-                    resource.__name__,
-                ),
-            ) from None
+        return {
+            "type": self.type(),
+            "id": as_dict["id"],
+        }
 
     @pydantic.model_validator(mode="before")
     @classmethod
     def _validate(cls, data: Any) -> Any:
         if not isinstance(data, dict):
             return data
+
+        if data.get("type") not in {cls.type(), None}:
+            raise ValueError(
+                "JSON:API type {0} does not match {1}".format(
+                    data.get("type"),
+                    cls.type(),
+                ),
+            )
 
         try:
             return {"id": data["id"]}
