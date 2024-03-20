@@ -13,6 +13,10 @@ class AbstractAirSearchRepo(ABC):
     def insert(self, value: AirSearchResult) -> None:
         "Insert."
 
+    @abstractmethod
+    def exists_id(self, search_id: str) -> bool:
+        "ID exists."
+
 
 class AirSearchRepo(AbstractAirSearchRepo):
     def __init__(self, mongo_client: MongoClient[Any] = lagom.injectable):
@@ -22,3 +26,7 @@ class AirSearchRepo(AbstractAirSearchRepo):
         # Using model_dump_json so UUIDs are converted to strs.
         json_str = value.model_dump_json(exclude_none=True)
         self.collection.insert_one(orjson.loads(json_str))
+
+    def exists_id(self, search_id: str) -> bool:
+        collection_object = self.collection.find_one({"_id": search_id})
+        return bool(collection_object)

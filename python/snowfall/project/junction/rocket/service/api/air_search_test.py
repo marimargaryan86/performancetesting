@@ -47,6 +47,9 @@ class FakeAirSearchRepo(AbstractAirSearchRepo):
     def insert(self, value: AirSearchResult) -> None:
         self.inserted.append(value)
 
+    def exists_id(self, search_id: str) -> bool:
+        return uuid.UUID(search_id) in {result.id for result in self.inserted}
+
 
 @pytest.fixture()
 def air_search_repo() -> FakeAirSearchRepo:
@@ -68,6 +71,7 @@ def app(
 
     routes = [
         integration.route("/air/searches", AirSearch, name="AirSearch"),
+        integration.route("/air/searches/{id}", AirSearch, name="AirSearchGet"),
     ]
 
     return application.create_starlette_app(routes=routes, openapi_path=None)
@@ -106,3 +110,19 @@ def test_air_search_creation_and_storage(
 
     assert len(air_search_repo.inserted) == 1
     assert str(air_search_repo.inserted[0].id) == RESULT_UUID
+
+
+def test_air_search_get_status(
+    client: TestClient,
+    mocker: MockerFixture,
+) -> None:
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.search_flights",
+        return_value=SearchFlightsResponse(),
+    )
+    client.post("/air/searches", json={"origin": "LON"})
+
+    response = client.get("/air/searches/{0}".format(RESULT_UUID))
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "completed"

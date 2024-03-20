@@ -1,3 +1,5 @@
+import json
+
 import lagom
 from starlette import endpoints, requests, responses, status
 
@@ -27,4 +29,18 @@ class AirSearch(endpoints.HTTPEndpoint):
         repo.insert(transformed)
 
         json_model = transformed.model_dump_json(exclude_none=True)
+        return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
+
+    async def get(
+        self,
+        request: requests.Request,
+        repo: AbstractAirSearchRepo = lagom.injectable,
+    ) -> responses.Response:
+        search_id = request.path_params["id"]
+
+        search_status = (
+            "completed" if repo.exists_id(search_id=search_id) else "pending"
+        )
+        json_model = json.dumps({"status": search_status})
+
         return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
