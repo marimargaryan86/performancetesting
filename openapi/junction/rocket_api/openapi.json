@@ -17,6 +17,11 @@
   "x-tagGroups": [],
   "tags": [
     {
+      "name": "air",
+      "description": "Air.",
+      "x-displayName": "Air"
+    },
+    {
       "name": "car-rental",
       "description": "Car rental.",
       "x-displayName": "Car Rental"
@@ -28,6 +33,143 @@
     }
   ],
   "paths": {
+    "/air/searches": {
+      "post": {
+        "summary": "Create Air Search",
+        "tags": [
+          "air"
+        ],
+        "operationId": "post-air-searches",
+        "description": "Used to initiate an air search",
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Air Search Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AirSearchRequest"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "x-internal": true,
+        "security": [{"jwt": []}]
+      }
+    },
+    "/air/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Air Search status",
+        "tags": [
+          "air"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Air Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-air-searches-id",
+        "description": "Used to lookup data for a Search Identifier."
+      }
+    },
+    "/air/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Air Search results",
+        "tags": [
+          "air"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Air Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-air-searches-id-results",
+        "description": "Used to lookup data for a Search Identifier.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
     "/car-rental/searches": {
       "post": {
         "summary": "Create Car Rental Search",
@@ -194,6 +336,91 @@
   },
   "components": {
     "schemas": {
+      "AirSearchRequest": {
+        "title": "Air Search Request",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+              "readOnly": true
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "air-searches"
+              ],
+              "example": "air-searches"
+            },
+            "attributes": {
+              "type": "object",
+              "required": [
+                "criteria",
+                "passengers"
+              ],
+              "properties": {
+                "criteria": {
+                  "$ref": "#/components/schemas/AirSearchCriteria"
+                },
+                "passengers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Passenger"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "attributes"
+          ],
+          "x-examples": {}
+      },
+      "AirSearchCriteria": {
+        "title": "Air Search Criteria",
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string",
+            "example": "LON"
+          },
+          "destination": {
+            "type": "string",
+            "example": "PAR"
+          },
+          "departureAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2019-08-24T14:15:22Z"
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "departureAt"
+        ]
+      },
+      "Passenger": {
+        "title": "Passenger",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Smith"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          }
+        },
+        "required": [
+          "dateOfBirth"
+        ]
+      },
       "CarRentalSearch": {
         "allOf": [
           {
@@ -524,7 +751,31 @@
           "format": "uuid",
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
-        "description": "Car rental search identifier"
+        "description": "Search identifier"
+      },
+      "page-cursor": {
+        "name": "page[cursor]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "",
+          "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
+        },
+        "description": "Pagination cursor that defines your place in the list."
+      },
+      "page-limit": {
+        "name": "page[limit]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "example": 20
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
       }
     },
     "securitySchemes": {
