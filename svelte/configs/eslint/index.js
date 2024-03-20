@@ -30,7 +30,11 @@ module.exports = {
       },
     },
     {
-      files: ["*.{spec,test}.{js,ts}"],
+      files: [
+        "*.{spec,test}.{js,ts}",
+        "**/__tests__/**/*.{js,ts}",
+        "**/__mocks__/**/*.{js,ts}",
+      ],
       extends: ["plugin:vitest/recommended"],
       rules: {
         "no-empty-function": "off",
