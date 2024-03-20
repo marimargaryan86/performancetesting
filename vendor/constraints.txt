@@ -130,6 +130,7 @@
 //     "types-aiobotocore-sqs==2.12.1",
 //     "types-aiobotocore==2.12.1",
 //     "types-aiofiles==23.2.0.20240311",
+//     "types-antlr4-python3-runtime==4.13.0.20240116",
 //     "types-jsonschema==4.21.0.20240311",
 //     "types-protobuf==4.24.0.20240311",
 //     "types-python-dateutil==2.9.0.20240316",
@@ -3414,13 +3415,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "5d9237f88b648e1d724a0f20b5cde65996a37fe51d75d17660b1404097327dd2",
-              "url": "https://files.pythonhosted.org/packages/a7/0b/810c51757e1815a6e0888a914e1b7493f8ed9f50878fb4e44114693deb24/google_cloud_storage-2.15.0-py2.py3-none-any.whl"
+              "hash": "91a06b96fb79cf9cdfb4e759f178ce11ea885c79938f89590344d079305f5852",
+              "url": "https://files.pythonhosted.org/packages/cb/e5/7d045d188f4ef85d94b9e3ae1bf876170c6b9f4c9a950124978efc36f680/google_cloud_storage-2.16.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7560a3c48a03d66c553dc55215d35883c680fe0ab44c23aa4832800ccc855c74",
-              "url": "https://files.pythonhosted.org/packages/e6/41/ffa205e62a644ab63fecb795d139bc94ceee255f341b1fd33fa070e23461/google-cloud-storage-2.15.0.tar.gz"
+              "hash": "dda485fa503710a828d01246bd16ce9db0823dc51bbca742ce96a6817d58669f",
+              "url": "https://files.pythonhosted.org/packages/17/c5/0bc3f97cf4c14a731ecc5a95c5cde6883aec7289dc74817f9b41f866f77e/google-cloud-storage-2.16.0.tar.gz"
             }
           ],
           "project_name": "google-cloud-storage",
@@ -3434,7 +3435,7 @@
             "requests<3.0.0dev,>=2.18.0"
           ],
           "requires_python": ">=3.7",
-          "version": "2.15.0"
+          "version": "2.16.0"
         },
         {
           "artifacts": [
@@ -9111,6 +9112,24 @@
           "artifacts": [
             {
               "algorithm": "sha256",
+              "hash": "c9543955be138d57b8e32ad5588c863de71e2b77660f69cf25e3b871bcd67a7d",
+              "url": "https://files.pythonhosted.org/packages/a4/77/dd9441ceaaa1e7531ef16ae23329ec63d2eab75ccc433a78cf1ab47bb20d/types_antlr4_python3_runtime-4.13.0.20240116-py3-none-any.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "01d0290c6597f94f7ec5afb3e675e2c3b7e4717a55e854187ad6fda015d395a6",
+              "url": "https://files.pythonhosted.org/packages/b8/15/833f2ca986b1237478b836c58e8fc49ac875db06a70dfbf19979ae9afc48/types-antlr4-python3-runtime-4.13.0.20240116.tar.gz"
+            }
+          ],
+          "project_name": "types-antlr4-python3-runtime",
+          "requires_dists": [],
+          "requires_python": ">=3.8",
+          "version": "4.13.0.20240116"
+        },
+        {
+          "artifacts": [
+            {
+              "algorithm": "sha256",
               "hash": "79d5bfb01f64701b6cf442e89a37d9c4dc6dbb79a46f2f611739b2418d30ecfd",
               "url": "https://files.pythonhosted.org/packages/0c/60/57af8a2f05ab05a0218030ff2f96cfbc232055f0d2a0b5320d59187c4e82/types_awscrt-0.20.5-py3-none-any.whl"
             },
@@ -10092,6 +10111,7 @@
     "types-aiobotocore-sqs==2.12.1",
     "types-aiobotocore==2.12.1",
     "types-aiofiles==23.2.0.20240311",
+    "types-antlr4-python3-runtime==4.13.0.20240116",
     "types-jsonschema==4.21.0.20240311",
     "types-protobuf==4.24.0.20240311",
     "types-python-dateutil==2.9.0.20240316",

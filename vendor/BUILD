@@ -51,6 +51,7 @@ python_requirements(
         "types-aiobotocore-sqs": ["types_aiobotocore_sqs"],
     },
     overrides={
+        "antlr4-python3-runtime": {"dependencies": ["#types-antlr4-python3-runtime"]},
         "aiobotocore": {
             "dependencies": ["#types-aiobotocore", "#types-aiobotocore-sqs"]
         },
