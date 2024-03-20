@@ -279,9 +279,9 @@ export default {
     previousSelectedInboundUnavailable:
       "Su viaje entrante seleccionado previamente ya no está disponible",
     deleteUser: "¿Estás seguro de que quieres desactivar a este usuario?",
-    discardChangesTitle: "¿Descartar cambios?",
+    discardChangesTitle: "¿Descartar los cambios?",
     discardChangesBody:
-      "Tienes cambios sin guardar. ¿Estás seguro de que quieres descartar tus cambios?",
+      "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir sin guardarlos?",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",
