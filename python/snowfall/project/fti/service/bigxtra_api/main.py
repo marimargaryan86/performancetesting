@@ -25,7 +25,7 @@ async def _http(app: application.Application[bootstrap.Settings]) -> None:
     asgi_app = starlette.create_starlette_app(
         routes=router.get_routes(
             bootstrap.create_dependencies(
-                places_repository=repository.PlacesRepository(mongo["places"]),
+                places_repository=repository.PlacesRepository(mongo["flights"]),
             ),
         ),
         openapi_path=_schema_path,
