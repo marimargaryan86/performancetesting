@@ -1661,62 +1661,6 @@
         }
       }
     },
-    "/companies/accountless": {
-      "get": {
-        "summary": "List Accountless Companies",
-        "tags": [
-          "companies"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "uniqueItems": true,
-                          "minItems": 0,
-                          "items": {
-                            "$ref": "#/components/schemas/CompanyCreatable"
-                          }
-                        }
-                      },
-                      "required": [
-                        "data"
-                      ]
-                    },
-                    {
-                      "$ref": "#/components/schemas/NextLink"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "operationId": "get-companies-accountless",
-        "description": "Get accountless companies"
-      }
-    },
     "/companies/{companyId}/contacts": {
       "get": {
         "summary": "List Companies Contacts",
@@ -6210,12 +6154,6 @@
                 "minimum": 0,
                 "description": "The invoice generation period, in days"
               }
-            }
-          },
-          "relationships": {
-            "type": "object",
-            "readOnly": true,
-            "properties": {
             }
           }
         }

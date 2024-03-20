@@ -40,7 +40,6 @@ mock_company = {
     "payment_type": 1,
     "fx_markup": 0,
     "sales_markup": 0,
-    "account_id": "",
     "reseller_markups": [],
     "fee_amounts": [
         {

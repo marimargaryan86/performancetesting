@@ -35,7 +35,6 @@ message Company {
   float fx_markup = 4;
   float processing_markup = 5;
   float sales_markup = 6;
-  string account_id = 7;
   repeated snowfall.stdlib.v1.Money fee_amounts = 8;
   PaymentMethod payment_method = 9;
   PaymentType payment_type = 10;

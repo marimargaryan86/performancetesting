@@ -617,15 +617,6 @@ class Company(models.Resource):
         company: companies_models_pb2.Company,
         request: requests.Request,
     ) -> Company:
-        relationships: dict[str, models.Relationship] = {}
-        if company.account_id:
-            relationships["account"] = {
-                "data": models.ResourceIdentifier(
-                    id=company.account_id,
-                    type="accounts",
-                ),
-            }
-
         return cls(
             id=company.id,
             type=Company.api_type,
@@ -659,7 +650,6 @@ class Company(models.Resource):
                 "applyMarkups": company.apply_markups,
                 "invoiceGenerationFrequency": company.invoice_generation_frequency,
             },
-            relationships=relationships,
             links={
                 _SELF_HREF: str(
                     request.url_for(

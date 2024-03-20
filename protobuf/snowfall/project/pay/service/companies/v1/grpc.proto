@@ -82,8 +82,7 @@ message UpdateCompanyResponse {
 message ListCompaniesRequest {
   int32 page_size = 1;
   string page_token = 2;
-  bool is_accountless = 3;
-  ListOfIds ids = 4;
+  ListOfIds ids = 3;
 }
 
 message ListCompaniesResponse {

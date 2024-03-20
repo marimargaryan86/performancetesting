@@ -48,17 +48,6 @@ class CompaniesRepository(
             cur=cursor or "",
         )
 
-    async def find_accountless(
-        self,
-        cursor: str | None,
-    ) -> resultset.ResultSet[models_pb2.Company]:
-        return await self._find_with_cursor(
-            cur=cursor or "",
-            filter_={
-                "$or": [{"account_id": ""}, {"account_id": {"$exists": False}}],
-            },
-        )
-
 
 class ContactsRepository(
     repository.ProtoRepository[models_pb2.Contact],

@@ -25,12 +25,6 @@ COMPANIES = (
     "d184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
 )
 
-ACCOUNTLESS_COMPANIES = (
-    "1a93b5ae-9590-4561-a664-fbaead485e96",
-    "b184081a-92bd-4ec8-af9a-1faaa8dfbbeb",
-)
-
-
 CONTACTS = (
     "8304c0ff-7ba6-4431-9788-1d486be3a033",
     "946a7e4b-519a-4f3d-8169-bcb4dbb3af94",
@@ -51,15 +45,7 @@ QUOTATIONS = ("124b9668-7298-42e9-97e2-f0d205083ab8",)
 
 
 def get_companies() -> list[company_model_pb2.Company]:
-    companies = [generate_company(identifier) for identifier in COMPANIES]
-    companies.extend(
-        [
-            generate_accountless_company(identifier)
-            for identifier in ACCOUNTLESS_COMPANIES
-        ],
-    )
-
-    return companies
+    return [generate_company(identifier) for identifier in COMPANIES]
 
 
 def get_quotations() -> list[Quotation]:
@@ -111,7 +97,7 @@ def generate_transaction(transaction_id: str) -> Transaction:
     )
 
 
-def generate_accountless_company(identifier: str) -> company_model_pb2.Company:
+def generate_company(identifier: str) -> company_model_pb2.Company:
     return company_model_pb2.Company(
         id=identifier,
         name="Company name",
@@ -138,13 +124,6 @@ def generate_accountless_company(identifier: str) -> company_model_pb2.Company:
             "fixed",
         ),
     )
-
-
-def generate_company(identifier: str) -> company_model_pb2.Company:
-    company = generate_accountless_company(identifier)
-    company.account_id = string.uuid()
-
-    return company
 
 
 def generate_contact(identifier: str) -> company_model_pb2.Contact:

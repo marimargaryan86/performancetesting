@@ -1,6 +1,6 @@
 import httpx
 
-from snowfall.project.pay.fixtures import ACCOUNTLESS_COMPANIES, COMPANIES
+from snowfall.project.pay.fixtures import COMPANIES
 from snowfall.stdlib.integration.starlette import testing
 
 
@@ -12,25 +12,5 @@ class TestCompanies(object):
         await testing.test_list_and_view_endpoints(
             client=client,
             url="/companies",
-            expected_ids=COMPANIES + ACCOUNTLESS_COMPANIES,
-        )
-
-    async def test_get_all_accountless_companies(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        await testing.test_list_and_view_endpoints(
-            client=client,
-            url="/companies/accountless",
-            expected_ids=ACCOUNTLESS_COMPANIES,
-        )
-
-    async def test_get_all_accountless_companies_with_filters(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        await testing.test_list_and_view_endpoints(
-            client=client,
-            url="/companies/accountless?filter[type][eq]=reseller,provider",
-            expected_ids=ACCOUNTLESS_COMPANIES,
+            expected_ids=COMPANIES,
         )

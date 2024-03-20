@@ -125,11 +125,6 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="Companies",
         ),
         integration.route(
-            "/companies/accountless",
-            companies.AdminAccountlessCompanies,
-            name="AccountlessCompanies",
-        ),
-        integration.route(
             "/companies/{companyId}",
             companies.AdminCompany,
             name="Company",

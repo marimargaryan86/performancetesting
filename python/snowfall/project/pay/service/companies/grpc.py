@@ -113,15 +113,10 @@ class CompaniesService(
         request: grpc_pb2.ListCompaniesRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListCompaniesResponse:
-        if request.is_accountless:
-            companies = await self._companies.find_accountless(
-                cursor=request.page_token,
-            )
-        else:
-            companies = await self._companies.find_all(
-                identifiers=list(request.ids.ids),
-                cursor=request.page_token,
-            )
+        companies = await self._companies.find_all(
+            identifiers=list(request.ids.ids),
+            cursor=request.page_token,
+        )
 
         companies.limit(
             request.page_size or self._default_page_size,
