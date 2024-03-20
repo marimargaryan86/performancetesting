@@ -156,3 +156,47 @@ class SearchRepository(
             cur=cursor,
             filter_=filter_,
         )
+
+
+class QuoteRepository(
+    repository.ProtoRepository[models_pb2.Quote],
+    mixins.FindByIdMixin[models_pb2.Quote],
+    mixins.InsertMixin[models_pb2.Quote],
+    mixins.UpsertMixin[models_pb2.Quote],
+):
+    _default_ttl_minutes = 15
+    _proto = models_pb2.Quote
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
+
+    def __init__(
+        self,
+        collection: core.AgnosticCollection,
+        ttl: datetime.timedelta | None = None,
+    ):
+        super().__init__(collection)
+
+        if ttl:
+            self._ttl = ttl
+        else:
+            self._ttl = datetime.timedelta(minutes=self._default_ttl_minutes)
+
+    async def create(
+        self,
+        search_result_id: str,
+        offer_id: str,
+    ) -> models_pb2.Quote:
+        expires_at = timestamp_pb2.Timestamp()
+        expires_at.FromDatetime(
+            datetime.datetime.now(tz=datetime.UTC) + self._ttl,
+        )
+
+        quote = models_pb2.Quote(
+            id=string.uuid(),
+            search_result_id=search_result_id,
+            offer_id=offer_id,
+            expires_at=expires_at,
+        )
+
+        return await self.insert(quote)

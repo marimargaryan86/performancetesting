@@ -84,3 +84,44 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
         return grpc_pb2.ListSearchResultsResponse(
             search_results=[search_result async for search_result in search_results],
         )
+
+
+class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
+    def __init__(
+        self,
+        quotes_repo: repository.QuoteRepository,
+        publisher: amqp.QuoteTaskProducer,
+    ):
+        self._quotes_repo = quotes_repo
+        self._publisher = publisher
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["QuoteService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_QuoteServiceServicer_to_server(self, server)
+
+    async def CreateQuote(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.CreateQuoteRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.CreateQuoteResponse:
+        quote = await self._quotes_repo.create(
+            request.search_result_id,
+            request.offer_id,
+        )
+        await self._publisher.publish(quote, request.reseller_id)
+
+        return grpc_pb2.CreateQuoteResponse(quote=quote)
+
+    async def GetQuote(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetQuoteRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetQuoteResponse:
+        quote = await self._quotes_repo.find_by_id(request.id)
+
+        if not quote:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetQuoteResponse(quote=quote)

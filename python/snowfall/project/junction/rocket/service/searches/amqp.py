@@ -1,6 +1,5 @@
 import datetime
 
-from snowfall.project.junction.rocket.service.searches.repository import OfferRepository
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     amqp_pb2,
     models_pb2,
@@ -42,13 +41,24 @@ class SearchProducer(object):
             )
 
 
-class PriceQuoteProducer(object):
+class QuoteTaskProducer(object):
     def __init__(
         self,
         producer: protocol.Producer,
         routing_key: str,
-        offers_repository: OfferRepository,
     ):
         self._producer = producer
         self._routing_key = routing_key
-        self._offers_repository = offers_repository
+
+    async def publish(
+        self,
+        quote: models_pb2.Quote,
+        reseller_id: str,
+    ) -> None:
+        await self._producer.publish(
+            msg=amqp_pb2.QuoteTask(
+                quote=quote,
+                reseller_id=reseller_id,
+            ),
+            routing_key=self._routing_key,
+        )

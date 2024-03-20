@@ -194,3 +194,22 @@ class SearchResultImporter(object):
         )
 
         await self._searches.mark_as_completed(search.id)
+
+
+class QuoteResultImporter(object):
+    def __init__(
+        self,
+        consumer_obj: consumer.Consumer[amqp_pb2.QuoteTaskResult],
+        quotes: repository.QuoteRepository,
+    ):
+        self._consumer = consumer_obj
+        self._quotes = quotes
+
+    async def consume(self) -> None:
+        await self._consumer.consume(self._process_message)
+
+    async def _process_message(  # noqa: WPS217
+        self,
+        message: amqp_types.Message[amqp_pb2.QuoteTaskResult],
+    ) -> None:
+        await self._quotes.upsert(message.body.quote)

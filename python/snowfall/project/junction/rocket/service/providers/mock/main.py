@@ -10,12 +10,15 @@ from redis import asyncio as aioredis
 from snowfall.project.junction.rocket.provider import meta, searches, service
 from snowfall.project.junction.rocket.service.providers.mock import (
     cache,
+    pricing,
 )
 from snowfall.project.junction.rocket.service.providers.mock import (
     searches as provider_searches,
 )
 from snowfall.project.junction.rocket.service.providers.mock.constant import PROVIDER_ID
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import amqp_factory
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Mock"
 _PROVIDERS_TO_DISABLED_OPERATORS = dict[str, list[str]]
@@ -28,6 +31,10 @@ class _Settings(service.ProviderSettings):
     reseller_disabled_operators: _RESELLERS_TO_PROVIDER_OPERATORS = pydantic.Field(
         default_factory=dict,
     )
+
+
+class _PricingSettings(service.ProviderSettings):
+    amqp_dsn: pydantic.AmqpDsn
 
 
 async def _meta_factory() -> meta.MetaImplementation:
@@ -56,12 +63,38 @@ async def _search_factory(
     )
 
 
+async def _pricing(app: service.Application[_PricingSettings]) -> None:
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    quote_task_consumer = pricing.QuoteTaskConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_pricing_consumer".format(app.name),
+            binds=[(types.Exchange("searches"), "searches.pricing")],
+        ),
+        quote_result_producer=pricing.QuoteResultProducer(
+            producer_obj=producer.Producer(connection, types.Exchange("searches")),
+            routing_key="searches.pricing_results",
+        ),
+    )
+
+    await quote_task_consumer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
         name="mock",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,
+    )
+
+    entrypoint.add_command(
+        service.Command(
+            name="pricing",
+            callback=_pricing,
+            settings_class=_PricingSettings,
+        ),
     )
 
     entrypoint.enter()

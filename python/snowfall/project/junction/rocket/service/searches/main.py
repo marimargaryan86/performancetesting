@@ -12,9 +12,11 @@ from snowfall.project.junction.rocket.service.searches import (
     repository,
 )
 from snowfall.project.junction.rocket.service.searches.amqp import (
+    QuoteTaskProducer,
     SearchProducer,
 )
 from snowfall.project.junction.rocket.service.searches.grpc import (
+    QuoteService,
     SearchResultService,
     SearchService,
 )
@@ -32,6 +34,7 @@ class _GrpcSettings(application.Settings):
     amqp_dsn: pydantic.AmqpDsn
     default_page_size: int = 100
     default_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
+    quote_ttl: datetime.timedelta = datetime.timedelta(minutes=15)
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -45,6 +48,11 @@ class _ImportSettings(application.Settings):
     gateway_address: str
     gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
     gateway_poll_sleep: int = 5
+
+
+class _ConsumeQuoteSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -80,6 +88,16 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     mongo.searches.search_results,
                 ),
                 default_page_size=app.settings.default_page_size,
+            ),
+            QuoteService(
+                quotes_repo=repository.QuoteRepository(
+                    collection=mongo.searches.quotes,
+                    ttl=app.settings.quote_ttl,
+                ),
+                publisher=QuoteTaskProducer(
+                    producer=amqp_producer,
+                    routing_key="searches.pricing",
+                ),
             ),
         ],
     )
@@ -135,6 +153,27 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
     await search_result_importer.consume()
 
 
+async def _consume_quotes(app: application.Application[_ConsumeQuoteSettings]) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    quote_result_importer = importer.QuoteResultImporter(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_pricing_results".format(app.name),
+            binds=[
+                (types.Exchange("searches"), "searches.pricing_results"),
+            ],
+        ),
+        quotes=repository.QuoteRepository(
+            collection=mongo.searches.quotes,
+        ),
+    )
+    await quote_result_importer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="searches")
     entrypoint.enter_with_commands(
@@ -143,5 +182,10 @@ if __name__ == "__main__":
             name="import",
             callback=_import,
             settings_class=_ImportSettings,
+        ),
+        application.Command(
+            name="pricing",
+            callback=_consume_quotes,
+            settings_class=_ConsumeQuoteSettings,
         ),
     )
