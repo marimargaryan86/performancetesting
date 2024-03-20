@@ -81,23 +81,31 @@
 
 <div class="range-field">
   <div class="track" bind:this={track} class:span={typeof value !== "number"}>
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="start"
       style:--pos-x="calc({start}% - 8px)"
       bind:this={startHandle}
       on:dragstart|preventDefault={beginMove}
       draggable="true"
+      role="slider"
+      tabindex="0"
+      aria-valuemin={min}
+      aria-valuemax={endValue ? endValue - 1 : max}
+      aria-valuenow={startValue}
     />
 
     {#if end !== undefined}
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
         class="end"
         style:--pos-x="calc({end}% + 8px)"
         bind:this={endHandle}
         on:dragstart|preventDefault={beginMove}
         draggable="true"
+        role="slider"
+        tabindex="0"
+        aria-valuemin={startValue + 1}
+        aria-valuemax={max}
+        aria-valuenow={endValue}
       />
     {/if}
   </div>
