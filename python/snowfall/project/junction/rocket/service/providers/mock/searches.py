@@ -24,7 +24,7 @@ class Criteria(message.Message):
     passenger_dobs: Sequence[datetime.date]
     outbound_departure_datetime: datetime.datetime
     inbound_departure_datetime: datetime.datetime
-    outbound_id: str | None = None
+    outbound_search_result_id: str | None = None
 
 
 def cache_key(search: Criteria) -> str:
@@ -64,7 +64,7 @@ class Generator(object):
                 segment_sequence=1,
             ),
         ]
-        if search.outbound_id:
+        if search.outbound_search_result_id:
             result_details.append(
                 models_pb2.ResultDetail(
                     id=string.uuid(),
@@ -126,7 +126,7 @@ def search_criteria_task_generator(
             inbound_departure_datetime=protobuf.protobuf_to_datetime(
                 search.mock.return_date,
             ),
-            outbound_id=(
+            outbound_search_result_id=(
                 search.mock.outbound_search_result_id
                 if search.mock.outbound_search_result_id
                 else None
