@@ -24,7 +24,7 @@
 
 <div class="search-tabs" typography="title-small" weight="bold">
   {#each links as link}
-    <a href={link.url} class:active={active === link.type}>
+    <a href={link.url} class:active={active === link.type} data-testid={link.type}>
       {$t(`transportTypes.${link.type}`)}
     </a>
   {/each}

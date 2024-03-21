@@ -9,7 +9,8 @@
 
 <div class="trip-type-picker" typography="label-large">
   {#each TRIP_TYPES as tripType}
-    <label>
+    <!-- TODO(2024-03-20/alvin.s): In E2E, use the `testid` only when other selector strats fail.-->
+    <label data-testid={tripType}>
       <input type="radio" bind:group={value} value={tripType} />
       <span>{$t(`tripTypes.${tripType}`)}</span>
     </label>

@@ -2,7 +2,7 @@ import { PlaywrightTestConfig, devices } from "@playwright/test";
 
 const config: PlaywrightTestConfig = {
   // Specify the directory where your tests are located
-  testDir: "./e2e-tests",
+  testDir: "./e2e-tests/tests",
 
   // Configure projects for different browsers
   projects: [
