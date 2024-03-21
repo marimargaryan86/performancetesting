@@ -2,13 +2,16 @@ import asyncio
 import datetime
 from typing import Any, NamedTuple
 
+import lagom
 from grpc import aio
+from lagom.integrations.starlette import StarletteIntegration
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import (
     errors,
 )
+from snowfall.project.junction.rocket.service.api import air_search
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -56,8 +59,30 @@ async def _http(
         ).get_owner_from_jwt,
     )
 
+    container = lagom.Container()
+    # TODO(paul): Add all the dependencies.
+
+    integration = StarletteIntegration(container)
+
+    routes = [
+        integration.route(
+            "/air/searches",
+            air_search.AirSearch,
+            name="AirSearch",
+        ),
+        integration.route(
+            "/air/searches/{id:str}/results",
+            air_search.AirSearchRetrieval,
+            name="AirSearchRetrieval",
+        ),
+        integration.route(
+            "/air/searches/{id:str}",
+            air_search.AirSearchStatus,
+            name="AirSearchStatus",
+        ),
+    ]
     asgi_app = starlette.create_starlette_app(
-        routes=[],
+        routes=routes,
         custom_middlewares=[
             Middleware(
                 cls=authentication.AuthenticationMiddleware,

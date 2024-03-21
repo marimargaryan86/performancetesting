@@ -31,6 +31,8 @@ class AirSearch(endpoints.HTTPEndpoint):
         json_model = transformed.model_dump_json(exclude_none=True)
         return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
 
+
+class AirSearchStatus(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
@@ -44,3 +46,16 @@ class AirSearch(endpoints.HTTPEndpoint):
         json_model = json.dumps({"status": search_status})
 
         return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
+
+
+class AirSearchRetrieval(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        repo: AbstractAirSearchRepo = lagom.injectable,
+    ) -> responses.Response:
+        model = repo.find_by_id(request.path_params["id"])
+        return responses.Response(
+            status_code=status.HTTP_200_OK,
+            content=model.model_dump_json(exclude_none=True),
+        )

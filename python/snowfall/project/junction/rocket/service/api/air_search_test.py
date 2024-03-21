@@ -11,7 +11,7 @@ from pytest_mock import MockerFixture
 from starlette import applications
 from starlette.testclient import TestClient
 
-from snowfall.project.junction.rocket.service.api.air_search import AirSearch
+from snowfall.project.junction.rocket.service.api import air_search as routes
 from snowfall.project.junction.rocket.service.api.models import AirSearchResult
 from snowfall.project.junction.rocket.service.api.repositories import (
     AbstractAirSearchRepo,
@@ -50,6 +50,10 @@ class FakeAirSearchRepo(AbstractAirSearchRepo):
     def exists_id(self, search_id: str) -> bool:
         return uuid.UUID(search_id) in {result.id for result in self.inserted}
 
+    def find_by_id(self, id_: str) -> AirSearchResult:
+        assert len(self.inserted) == 1
+        return self.inserted[0]
+
 
 @pytest.fixture()
 def air_search_repo() -> FakeAirSearchRepo:
@@ -69,12 +73,21 @@ def app(
 
     integration = StarletteIntegration(container)
 
-    routes = [
-        integration.route("/air/searches", AirSearch, name="AirSearch"),
-        integration.route("/air/searches/{id}", AirSearch, name="AirSearchGet"),
+    route_list = [
+        integration.route("/air/searches", routes.AirSearch, name="AirSearch"),
+        integration.route(
+            "/air/searches/{id}/results",
+            routes.AirSearchRetrieval,
+            name="AirSearchRetrieval",
+        ),
+        integration.route(
+            "/air/searches/{id}",
+            routes.AirSearchStatus,
+            name="AirSearchStatus",
+        ),
     ]
 
-    return application.create_starlette_app(routes=routes, openapi_path=None)
+    return application.create_starlette_app(routes=route_list, openapi_path=None)
 
 
 @pytest.fixture()
@@ -126,3 +139,15 @@ def test_air_search_get_status(
 
     assert response.status_code == 200
     assert response.json()["status"] == "completed"
+
+
+def test_air_search_retrieval(
+    client: TestClient,
+    air_search_repo: FakeAirSearchRepo,
+) -> None:
+    result = AirSearchResult(id=uuid.UUID(RESULT_UUID))
+    air_search_repo.insert(result)
+    response = client.get("/air/searches/123/results")
+
+    assert response.status_code == 200
+    assert response.json()["id"] == RESULT_UUID
