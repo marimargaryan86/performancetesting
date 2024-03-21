@@ -278,6 +278,67 @@
         "description": "Used to lookup data for a Search Identifier."
       }
     },
+    "/car-rental/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Car Rental Search Results",
+        "tags": [
+          "car-rental"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "minItems": 0,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/CarRentalSearchResult"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-car-rental-searches-id-results",
+        "description": "Used to retrieve Search Results for Car Rentals.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -419,6 +480,208 @@
         },
         "required": [
           "dateOfBirth"
+        ]
+      },
+      "CarRentalSearchIdentifier": {
+        "title": "Car Rental Search Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "car-searches"
+            ],
+            "example": "car-searches"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "description": "A unique identifier for car rental search."
+      },
+      "OfferIdentifier": {
+        "title": "Offer Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offers"
+            ],
+            "example": "offers"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "ResultDetailIdentifier": {
+        "title": "Result Detail Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "result-details"
+            ],
+            "example": "result-details"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "CarRentalSearchResult": {
+        "title": "Car Rental Search Result",
+        "type": "object",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "search-results"
+                ],
+                "example": "search-results"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z",
+                    "readOnly": true
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "offers",
+                  "resultDetails",
+                  "search"
+                ],
+                "properties": {
+                  "offers": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/OfferIdentifier"
+                        }
+                      }
+                    }
+                  },
+                  "resultDetails": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "oneOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/ResultDetailIdentifier"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "search": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CarRentalSearchIdentifier"
+                      }
+                    }
+                  }
+                }
+              },
+              "meta": {
+                "type": "object",
+                "properties": {
+                  "providerId": {
+                    "type": "string",
+                    "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                    "readOnly": true
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Search result representing offer for specified origin and destination."
+      },
+      "NextLink": {
+        "title": "Next Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "next"
+            ],
+            "properties": {
+              "next": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
         ]
       },
       "CarRentalSearch": {
