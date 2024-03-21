@@ -9,7 +9,7 @@
 <div class="package-card">
   <img class="package-image" src={holiday.image} alt={holiday.name} />
   <button class="heart-button">
-    <Icon variant="heart" />
+    <Icon variant="heart-full" />
   </button>
   <div class="card-content">
     <div class="price-box">

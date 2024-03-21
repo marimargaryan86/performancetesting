@@ -117,7 +117,7 @@
 
 <style>
   header {
-    /* position: fixed; */
+    position: absolute;
     left: 10%;
     z-index: 9;
     display: flex;

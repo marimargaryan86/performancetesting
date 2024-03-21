@@ -6,15 +6,29 @@
   <title>Search Results</title>
 </svelte:head>
 
-<div class="container">
-  <SearchResultTile />
+<div class="page">
+  <div class="filter-sidebar">
+    <p>test</p>
+  </div>
+  <div class="main-content">
+    <div class="search-results">
+      <SearchResultTile />
+    </div>
+  </div>
 </div>
 
 <style>
-  .container {
+  .page {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 200px;
+    margin-top: 250px;
+  }
+
+  .filter-sidebar {
+    width: 450px;
+    background-color: #f5f5f5;
+  }
+
+  .main-content {
+    flex-grow: 1;
   }
 </style>

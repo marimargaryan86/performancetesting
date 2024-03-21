@@ -34,7 +34,7 @@
 <div class="dropdown">
   <div class="holiday-types">
     <div class="label-column">
-      <img src="/icons/umbrella-icon.svg" alt="Umbrella" />
+      <img src="/icons/umbrella.svg" alt="Umbrella" />
       <p>Holiday Types</p>
     </div>
     <div class="content-column">

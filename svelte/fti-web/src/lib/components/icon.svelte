@@ -1,20 +1,7 @@
 <script lang="ts">
-  export let variant:
-    | "chevron-left"
-    | "chevron-right"
-    | "plus-icon"
-    | "minus-icon"
-    | "star"
-    | "map-marker"
-    | "heart"
-    | "calendar"
-    | "bed"
-    | "take-off"
-    | "passenger"
-    | "heart-full"
-    | "heart-empty"
-    | "phone"
-    | "menu-bars";
+  import type { IconTypes } from "$lib/models/common";
+
+  export let variant: IconTypes;
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 

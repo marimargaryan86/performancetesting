@@ -67,8 +67,7 @@
   } */
 
   main {
-    position: absolute;
-    top: 0;
+    position: relative;
     left: 0;
     width: 100%;
   }

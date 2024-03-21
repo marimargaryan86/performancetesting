@@ -78,6 +78,45 @@ type SelectedDate =
     }
   | undefined;
 
+type IconTypes =
+  | "chevron-left"
+  | "chevron-right"
+  | "plus-icon"
+  | "minus-icon"
+  | "star"
+  | "map-marker"
+  | "heart"
+  | "calendar"
+  | "bed"
+  | "take-off"
+  | "passenger"
+  | "heart-full"
+  | "heart-empty"
+  | "phone"
+  | "menu-bars"
+  | "restaurant"
+  | "euro"
+  | "umbrella"
+  | "board-basis-any"
+  | "board-basis-all"
+  | "board-basis-room"
+  | "board-basis-breakfast"
+  | "board-basis-half"
+  | "board-basis-full"
+  | "thumbs-up-down"
+  | "hot-tub"
+  | "chevron-down";
+
+type SliderRange = {
+  from: number;
+  to: number;
+};
+
+type BoardOptions = {
+  title: string;
+  icon: IconTypes;
+};
+
 export type {
   Place,
   PlaceFilter,
@@ -90,4 +129,7 @@ export type {
   SearchOptions,
   Scroll,
   SelectedDate,
+  IconTypes,
+  SliderRange,
+  BoardOptions,
 };
