@@ -1,0 +1,291 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# MongoDB
+
+## Getting Started
+
+To use MongoDB in your application you first need to get a database object. The
+easiest and recommended way to do this is to use our database factory in your
+command's main function.
+
+```python
+import pydantic
+
+from snowfall.stdlib.service import application, mongo_factory
+
+class _Settings(application.Settings):
+    mongo_dsn: pydantic.MongoDsn
+
+async def _app(app: application.Application[_Settings]) -> None:
+    database = await mongo_factory.make_database(app=app, dsn=app.settings.mongo_dsn)
+```
+
+## Models and Repositories
+
+It's up to you to design your application's database models. We support Protocol
+Buffers, Pydantic models, and regular Python dictionaries. There are no further
+requirements on how you structure your database models nor are there any base
+classes that needs to be inherited from.
+
+:::info
+
+Snowfall encourages the use of **Protocol Buffers** to define your database models.
+Protocol Buffers are designed to have both backward- and forward compatibility by
+default. They are also covered by the breaking changes detection in our CI/CD
+pipeline.
+
+:::
+
+Once you've created your database models, you need to create repositories for them.
+This process is slightly different depending on which type of model you're using.
+
+<Tabs>
+    <TabItem value="protobuf" label="Protocol Buffers" default>
+        ```python
+        from snowfall.stdlib.persistence.mongo import repository
+        from snowfall.stdlib.v1 import testing_pb2
+
+        class FoobarRepository(repository.ProtoRepository[testing_pb2.Foobar]):
+            _proto = testing_pb2.Foobar
+        ```
+    </TabItem>
+    <TabItem value="pydantic" label="Pydantic">
+        ```python
+        import pydantic
+
+        from snowfall.stdlib.persistence.mongo import repository
+
+
+        class Foobar(pydantic.BaseModel):
+            id: str
+
+
+        class FoobarRepository(repository.PydanticRepository[Foobar]):
+            _model = Foobar
+        ```
+    </TabItem>
+    <TabItem value="dict" label="Dictionaries">
+        ```python
+        from snowfall.stdlib.persistence.mongo import repository
+
+        class FoobarRepository(repository.DefaultRepository):
+            pass
+        ```
+    </TabItem>
+</Tabs>
+
+## Queries
+
+When writing query methods for your repository, you **must** run your queries through
+the `_execute()` method. The first argument to `_execute()` is the method on your
+you want to run, and any other arguments will be passed as is to this method.
+
+As an example. Normally when querying a MongoDB collection, you'd write code similar
+to this:
+
+```python
+async def find_by_email(email: str) -> list[dict[str, Any]]:
+    # Do NOT do this!
+    return await self._collection.find({
+        "email": email,
+    })
+```
+
+With a repository class however, you should instead pass it through the `_execute()` method:
+
+```python
+async def find_by_email(email: str) -> resultset.ResultSet[Record]:
+    return await self._execute(
+        self._collection.find,
+        {
+            "email": email,
+        },
+    )
+```
+
+### Pagination
+
+When working with query functions that can return more than one document, it's
+beneficial to use pagination. The repository class implements pagination through
+cursors with the `_find_with_cursor()` method.
+
+To add support for cursors to the `find_by_name()` example above, simply use `_find_with_cursor()`
+instead of passing `self._collection.find` to `_execute()`.
+
+```python
+async def find_by_email(email: str, cursor: str | None = None) -> resultset.ResultSet[Record]:
+    return await self._find_with_cursor(
+        cur=cursor or ""
+        filter_={
+            "email": email,
+        },
+    )
+```
+
+To get the cursor for the next set of results, you can call `cursor()` on `resultset.ResultSet`.
+
+```python
+documents = repository.find_by_email("snowman@snowfalltravel.com")
+
+documents.limit(10)
+
+async for document in documents:
+    pass
+
+cursor = await documents.cursor()
+```
+
+
+### Sorting
+
+_To be written._
+
+### Nested Documents
+
+_To be written._
+
+## Indexes
+
+To add an index, you need to define it in the `_indexes` property on your repository.
+`_indexes` is expected to be a tuple of `pymongo.IndexModel` objects.
+
+```python
+import pymongo
+
+from snowfall.stdlib.persistence.mongo import repository
+
+class FoobarRepository(repository.DefaultRepository):
+    _indexes = (
+        pymongo.IndexModel("email", background=True),
+    )
+```
+
+## Mixins
+
+The Standard Library contains a handful of common queries exposed as mixins. Mixins
+are classes you can inherit to inject additional functionality into your repository,
+in this case the mixin's query function.
+
+All mixins are available in the module `snowfall.stdlib.persistence.mongo.mixins`.
+
+### AllMixin
+
+`AllMixin` adds the `all_()` method. This method can be used to retrieve all documents
+in a collection, paginated with a cursor.
+
+#### Arguments
+
+The `all_()` method takes two optional arguments:
+
+| Argument | Signature                        | Description                                                                                                                                                  |
+| -------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `cursor` | `str \| None = None`             | An optional string with the cursor of where to continue returning data from.                                                                                 |
+| `sort`   | `tuple[str, int] \| None = None` | An optional tuple with the field to sort on, as well as the direction. `pymongo.ASCENDING` and `pymongo.DESCENDING` should be used to specify the direction. |
+
+#### Return
+
+The `all_()` method returns `resultset.ResultSet[Record]`.
+
+### EstimatedCountMixin
+
+`EstimatedCountMixin` adds the `estimated_count()` method. This method can be used
+to retrieve an estimated count on the number of documents in the collection.
+
+#### Arguments
+
+The `estimated_count()` takes no arguments.
+
+#### Return
+
+The `estimated_count()` method returns `int`.
+
+### ExistsMixin
+
+`ExistsMixin` adds the `exists()` method. This method can be used to check if a document
+with a specific ID exists in the collection.
+
+#### Arguments
+
+The `exists()` method takes one argument:
+
+| Argument     | Signature | Description                                               |
+| ------------ | --------- | --------------------------------------------------------- |
+| `identifier` | `str`     | The identifier of the document to check the existance of. |
+
+#### Return
+
+The `exists()` method returns `bool`.
+
+### FindByIdMixin
+
+`FindByIdMixin` adds the `find_by_id()` method. The method can be used to find a
+document by its ID.
+
+#### Arguments
+
+The `find_by_id()` method takes one argument:
+
+| Argument      | Signature | Description                             |
+| ------------- | --------- | --------------------------------------- |
+| `document_id` | `str`     | The identifier of the document to find. |
+
+#### Return
+
+The `find_by_id()` method returns `Record` if the document is found, otherwise
+it returns `None`.
+
+### InsertMixin
+
+`InsertMixin` adds the `insert()` method. This method can be used to insert a document
+into the collection.
+
+#### Arguments
+
+The `insert()` method takes one argument:
+
+| Argument   | Signature | Description             |
+| ---------- | --------- | ----------------------- |
+| `document` | `Record`  | The document to insert. |
+
+#### Return
+
+The `insert()` method returns `Record`.
+
+### InsertManyMixin
+
+`InsertManyMixin` adds the `insert_many()` method. This method can be used to insert
+multiple documents into the collection.
+
+#### Arguments
+
+The `insert_many()` method takes one argument:
+
+| Argument    | Signature          | Description              |
+| ----------- | ------------------ | ------------------------ |
+| `documents` | `Sequence[Record]` | The documents to insert. |
+
+#### Return
+
+The `insert_many()` method returns `Sequence[Record]`.
+
+### UpsertMixin
+
+`UpsertMixin` adds the `upsert()` method. This method can be used to insert a document
+into the collection, replacing it if it already exists.
+
+#### Arguments
+
+The `upsert()` method takes one argument:
+
+| Argument   | Signature | Description             |
+| ---------- | --------- | ----------------------- |
+| `document` | `Record`  | The document to upsert. |
+
+#### Return
+
+The `upsert()` method returns `bool`.
+
+## Normalizers
+
+_To be written._
