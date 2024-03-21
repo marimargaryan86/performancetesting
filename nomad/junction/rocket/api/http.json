@@ -4,6 +4,7 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
+      "j_one_api_base_url": "https://one.junction.dev",
       "traefik_host_URL": "rocket.api.junction.dev"
     }
   },
@@ -12,6 +13,7 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
+      "j_one_api_base_url": "https://one.junction.travel/",
       "traefik_host_URL": "rocket.api.junction.travel"
     }
   },
@@ -20,6 +22,7 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
+      "j_one_api_base_url": "https://one.junction.dev",
       "traefik_host_URL": "rocket.api.sandbox.junction.dev"
     }
   }

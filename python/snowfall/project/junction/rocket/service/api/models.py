@@ -3,7 +3,16 @@ from datetime import date, datetime
 from enum import IntEnum
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel as PydanticBase
+from pydantic import ConfigDict, Field, alias_generators
+
+
+class BaseModel(PydanticBase):
+    model_config = ConfigDict(
+        alias_generator=alias_generators.to_camel,
+        populate_by_name=True,
+        from_attributes=True,
+    )
 
 
 class Passenger(BaseModel):
@@ -14,15 +23,19 @@ class AirSearchResult(BaseModel):
     id: uuid.UUID
 
 
-class AirSearchAttributes(BaseModel):
-    date: date
+class AirSearchCriteria(BaseModel):
+    departure_at: date
     origin: str
     destination: str
+
+
+class AirSearchAttributes(BaseModel):
+    criteria: AirSearchCriteria
     passengers: list[Passenger]
 
 
 class AirSearchRequestData(BaseModel):
-    type: Literal["searches"]
+    type: Literal["air-searches"]
     attributes: AirSearchAttributes
 
 

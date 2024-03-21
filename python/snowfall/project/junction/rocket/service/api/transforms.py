@@ -1,5 +1,8 @@
+import uuid
 from collections.abc import Mapping
 from typing import Any
+
+from pydantic import BaseModel
 
 from snowfall.project.junction.rocket.service.api import models, types
 from snowfall.project.junction.rocket.service.api.passengers import (
@@ -17,11 +20,16 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
         return SearchFlightsRequest(
             ods=[
                 OriginDestinationRequest(
-                    arrival_airport=attributes.destination,
-                    departure_airport=attributes.origin,
-                    departure_date=attributes.date,
+                    arrival_airport=attributes.criteria.destination,
+                    departure_airport=attributes.criteria.origin,
+                    departure_date=attributes.criteria.departure_at,
                 ),
             ],
             user_ids=passengers_to_fake_user_ids(attributes.passengers),
             # TODO(paul): add org_id when we decide on the auth
         )
+
+
+class AirSearchResultTransformer(types.AirSearchResultTransformer):
+    def transform(self, value: BaseModel) -> models.AirSearchResult:
+        return models.AirSearchResult(id=uuid.uuid4())

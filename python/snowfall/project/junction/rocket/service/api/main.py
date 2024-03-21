@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from typing import Any, NamedTuple
 
+import httpx
 import lagom
 from grpc import aio
 from lagom.integrations.starlette import StarletteIntegration
@@ -11,7 +12,12 @@ from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import (
     errors,
 )
-from snowfall.project.junction.rocket.service.api import air_search
+from snowfall.project.junction.rocket.service.api import (
+    air_search,
+    repositories,
+    transforms,
+    types,
+)
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -19,6 +25,11 @@ from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.service import application, grpc_factory
+from snowfall.vendor.junction_one.client import (
+    JunctionOneAuth,
+    JunctionOneClient,
+    TokenAuth,
+)
 
 
 class _Settings(starlette.Settings):
@@ -26,6 +37,7 @@ class _Settings(starlette.Settings):
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     j_one_api_key: str
     reseller_j1_credentials_mapping: dict[str, Any]
+    j_one_api_base_url: str
 
 
 class _Channels(NamedTuple):
@@ -59,8 +71,24 @@ async def _http(
         ).get_owner_from_jwt,
     )
 
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+
     container = lagom.Container()
-    # TODO(paul): Add all the dependencies.
+    container[JunctionOneClient] = JunctionOneClient(
+        api_base_url=app.settings.j_one_api_base_url,
+        http_client=http_client,
+        auth=TokenAuth(
+            JunctionOneAuth(
+                api_key=app.settings.j_one_api_key,
+                authorization="",  # TODO(paul): Add authorization
+            ),
+        ),
+    )
+    container[repositories.AbstractAirSearchRepo] = repositories.AirSearchRepo  # type: ignore[type-abstract]
+    container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
+        transforms.AirSearchRequestTransformer
+    )
+    container[types.AirSearchResultTransformer] = transforms.AirSearchResultTransformer  # type: ignore[type-abstract]
 
     integration = StarletteIntegration(container)
 

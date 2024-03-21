@@ -34,6 +34,10 @@ variable "count" {
   type = number
 }
 
+variable "j_one_api_base_url" {
+  type = string
+}
+
 job "junction-rocket-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -134,6 +138,7 @@ EOH
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://303cafc116e642efe7c538795b0c2e7a@sentry.snowfall.se/238"
+        J_ONE_API_BASE_URL    = "${var.j_one_api_base_url}"
       }
     }
   }
