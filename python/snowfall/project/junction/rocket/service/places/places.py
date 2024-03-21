@@ -272,6 +272,30 @@ async def get_places_within_radius(
     ]
 
 
+def resolve_city_search_capabilities(
+    city: Mapping[str, str],
+) -> models_pb2.ProviderMappings:
+    iata = city.get("iata")
+    benerail_station_id = city.get("benerail_station_id")
+    rail = None
+    air = None
+    if benerail_station_id:
+        rail = models_pb2.ProviderPlaceId(
+            snowfall_provider_id=constants.BENERAIL_ID,
+            provider_place_id=benerail_station_id,
+        )
+    if iata:
+        air = models_pb2.ProviderPlaceId(
+            snowfall_provider_id=constants.IATA_ID,
+            provider_place_id=iata,
+        )
+    return models_pb2.ProviderMappings(
+        rail=([rail] if rail else None),
+        air=([air] if air else None),
+        ferry=[],
+    )
+
+
 async def cities_to_places(
     cities: AsyncIterable[Mapping[str, str]],
     places_repository: PlaceRepository,
@@ -295,6 +319,7 @@ async def cities_to_places(
             coordinates,
             geocoding,
         )
+        search_capabilities = resolve_city_search_capabilities(city)
         yield models_pb2.Place(
             id=string.to_uuid(city["id"], _NAMESPACE),
             source_id=city["id"],
@@ -308,7 +333,7 @@ async def cities_to_places(
             ),
             city=None,
             type=models_pb2.TYPE_CITY,
-            search_capabilities=None,
+            search_capabilities=search_capabilities,
             contains=places_within,
         )
 

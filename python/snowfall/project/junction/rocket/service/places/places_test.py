@@ -9,6 +9,7 @@ from snowfall.project.junction.rocket.service.places.places import (
     cities_to_places,
     get_provider_places,
     osm_nodes_to_places,
+    resolve_city_search_capabilities,
     resolve_osm_properties,
     tag_all_non_cities_against_a_city,
     validate_name,
@@ -424,3 +425,110 @@ class TestPlaces(object):
                 type=models_pb2.TYPE_CITY,
             ),
         )
+
+    @pytest.mark.parametrize(
+        ("input_city", "expected_output"),
+        [
+            (
+                {
+                    "id": "an-id",
+                    "name": "a name",
+                    "longitude": 0,
+                    "latitude": "0",
+                    "iata": "",
+                    "benerail_station_id": "",
+                },
+                models_pb2.ProviderMappings(rail=None, air=None, ferry=None),
+            ),
+            (
+                {
+                    "id": "an-id",
+                    "name": "a name",
+                    "longitude": 0,
+                    "latitude": "0",
+                },
+                models_pb2.ProviderMappings(rail=None, air=None, ferry=None),
+            ),
+        ],
+    )
+    async def test_resolve_city_search_capabilities_returns_empty_when_none_found(
+        self,
+        input_city: Mapping[str, str],
+        expected_output: models_pb2.ProviderMappings,
+    ) -> None:
+        assert resolve_city_search_capabilities(city=input_city) == expected_output
+
+    @pytest.mark.parametrize(
+        ("input_city", "expected_output"),
+        [
+            (
+                {
+                    "id": "an-id",
+                    "name": "a name",
+                    "longitude": 0,
+                    "latitude": "0",
+                    "iata": "LHR",
+                    "benerail_station_id": "benerail-id",
+                },
+                models_pb2.ProviderMappings(
+                    rail=[
+                        models_pb2.ProviderPlaceId(
+                            snowfall_provider_id=constants.BENERAIL_ID,
+                            provider_place_id="benerail-id",
+                        ),
+                    ],
+                    air=[
+                        models_pb2.ProviderPlaceId(
+                            snowfall_provider_id=constants.IATA_ID,
+                            provider_place_id="LHR",
+                        ),
+                    ],
+                    ferry=None,
+                ),
+            ),
+            (
+                {
+                    "id": "an-id",
+                    "name": "a name",
+                    "longitude": 0,
+                    "latitude": "0",
+                    "iata": "LHR",
+                },
+                models_pb2.ProviderMappings(
+                    rail=None,
+                    air=[
+                        models_pb2.ProviderPlaceId(
+                            snowfall_provider_id=constants.IATA_ID,
+                            provider_place_id="LHR",
+                        ),
+                    ],
+                    ferry=None,
+                ),
+            ),
+            (
+                {
+                    "id": "an-id",
+                    "name": "a name",
+                    "longitude": 0,
+                    "latitude": "0",
+                    "benerail_station_id": "benerail-id",
+                },
+                models_pb2.ProviderMappings(
+                    rail=[
+                        models_pb2.ProviderPlaceId(
+                            snowfall_provider_id=constants.BENERAIL_ID,
+                            provider_place_id="benerail-id",
+                        ),
+                    ],
+                    air=None,
+                    ferry=None,
+                ),
+            ),
+        ],
+    )
+    async def test_resolve_city_search_capabilities_returns_capabilities_when_found(
+        self,
+        input_city: Mapping[str, str],
+        expected_output: models_pb2.ProviderMappings,
+    ) -> None:
+        assert resolve_city_search_capabilities(city=input_city) == expected_output
