@@ -2,7 +2,6 @@ import grpc
 
 from snowfall.project.junction.go.adapter import errors as adapter_errors
 from snowfall.project.pay.adapter import companies, currencies
-from snowfall.project.pay.service.companies.v1.models_pb2 import PaymentType
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
@@ -133,11 +132,8 @@ class TransactionsService(
             payment_type=payer.payment_type,
             payment_method=payer.payment_method,
             bill_id=bill.id,
-            status=models_pb2.TransactionStatus.TRANSACTION_STATUS_SUCCEEDED,
+            status=models_pb2.TransactionStatus.TRANSACTION_STATUS_PENDING,
         )
-
-        if payer.payment_type == PaymentType.PAYMENT_TYPE_CARD:
-            transaction.status = models_pb2.TransactionStatus.TRANSACTION_STATUS_PENDING
 
         inserted_transaction = await self._transactions.insert(transaction)
 
