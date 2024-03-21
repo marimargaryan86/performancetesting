@@ -50,29 +50,55 @@ class PlaceRepository(
             }),
         )
 
-    async def find_within_radius(
+    async def find_by_types(
         self,
-        cursor: str,
-        coordinates: latlng_pb2.LatLng,
-        radius: int,
+        types: Sequence[models_pb2.Type.ValueType],
+        cursor: str = "",
     ) -> resultset.ResultSet[models_pb2.Place]:
         return await self._find_with_cursor(
             cur=cursor,
-            filter_={
-                "coordinates": {
-                    "$nearSphere": {
-                        "$geometry": {
-                            "type": "Point",
-                            "coordinates": [
-                                coordinates.longitude,
-                                coordinates.latitude,
-                            ],
-                        },
-                        "$maxDistance": radius,
+            filter_=({"type": {"$in": types}}),
+        )
+
+    async def find_within_radius(
+        self,
+        coordinates: latlng_pb2.LatLng,
+        radius: int,
+        types: Sequence[models_pb2.Type.ValueType] | None = None,
+        cursor: str = "",
+    ) -> resultset.ResultSet[models_pb2.Place]:
+        filter_: dict[str, Any] = {
+            "coordinates": {
+                "$nearSphere": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            coordinates.longitude,
+                            coordinates.latitude,
+                        ],
                     },
+                    "$maxDistance": radius,
+                },
+            },
+        }
+
+        if types:
+            filter_["type"] = {"$in": types}
+
+        return await self._find_with_cursor(cur=cursor, filter_=filter_)
+
+    async def update_city(self, id_: str, city: models_pb2.PlaceIdentifier) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            {repository.mongo_id_key: id_},
+            {
+                "$set": {
+                    "city": {"_id": city.id, "name": city.name, "type": city.type},
+                    "updated_at": datetime.datetime.now(tz=datetime.UTC),
                 },
             },
         )
+        return update_result.modified_count != 0
 
 
 def validate_name(node: Mapping[str, Any]) -> str | None:
@@ -285,3 +311,40 @@ async def cities_to_places(
             search_capabilities=None,
             contains=places_within,
         )
+
+
+async def tag_all_non_cities_against_a_city(places_repository: PlaceRepository) -> None:
+    non_city_types = [
+        models_pb2.TYPE_AIRPORT,
+        models_pb2.TYPE_FERRY_PORT,
+        models_pb2.TYPE_RAILWAY_STATION,
+    ]
+
+    async for place in await places_repository.find_by_types(types=non_city_types):
+        closest_cities = await places_repository.find_within_radius(
+            coordinates=place.coordinates,
+            radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY,
+            types=[models_pb2.TYPE_CITY],
+        )
+
+        try:
+            closest_city = await closest_cities.take()
+        except StopAsyncIteration:
+            # No closest city, won't tag
+            continue
+
+        updated = await places_repository.update_city(
+            id_=place.id,
+            city=models_pb2.PlaceIdentifier(
+                id=closest_city.id,
+                name=closest_city.name,
+                type=models_pb2.TYPE_CITY,
+            ),
+        )
+
+        if not updated:
+            _logger.error(
+                "Error updating place with city",
+                place=place.id,
+                city=closest_city.id,
+            )

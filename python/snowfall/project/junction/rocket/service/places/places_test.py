@@ -10,6 +10,7 @@ from snowfall.project.junction.rocket.service.places.places import (
     get_provider_places,
     osm_nodes_to_places,
     resolve_osm_properties,
+    tag_all_non_cities_against_a_city,
     validate_name,
 )
 from snowfall.project.junction.rocket.service.places.typing import ProviderTypedDict
@@ -374,3 +375,52 @@ class TestPlaces(object):
             )
         ]
         assert places
+
+    async def mock_find_by_types(
+        self,
+        places: Sequence[models_pb2.Place],
+    ) -> AsyncIterable[models_pb2.Place]:
+        for place in places:
+            yield place
+
+    async def test_tag_all_non_cities_against_a_city_doesnt_update_if_no_close_city(
+        self,
+    ) -> None:
+        mock_repository = mock.AsyncMock()
+        mock_closest_cities_results = mock.AsyncMock()
+        mock_repository.find_by_types.return_value = self.mock_find_by_types(
+            places=[models_pb2.Place()],
+        )
+        mock_repository.find_within_radius.return_value = mock_closest_cities_results
+        mock_closest_cities_results.take.side_effect = StopAsyncIteration()
+
+        await tag_all_non_cities_against_a_city(places_repository=mock_repository)
+
+        mock_repository.update_city.assert_not_called()
+
+    async def test_tag_all_non_cities_against_a_city_updates_if_city_close(
+        self,
+    ) -> None:
+        close_city = models_pb2.Place(
+            id="an-id",
+            name="a name",
+            type=models_pb2.TYPE_CITY,
+        )
+        mock_repository = mock.AsyncMock()
+        mock_closest_cities_results = mock.AsyncMock()
+        mock_repository.find_by_types.return_value = self.mock_find_by_types(
+            places=[models_pb2.Place(id="an-id")],
+        )
+        mock_repository.find_within_radius.return_value = mock_closest_cities_results
+        mock_closest_cities_results.take.return_value = close_city
+
+        await tag_all_non_cities_against_a_city(mock_repository)
+
+        mock_repository.update_city.assert_called_once_with(
+            id_="an-id",
+            city=models_pb2.PlaceIdentifier(
+                id=close_city.id,
+                name=close_city.name,
+                type=models_pb2.TYPE_CITY,
+            ),
+        )
