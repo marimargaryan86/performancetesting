@@ -17,6 +17,7 @@
   import integrationInstancesClient from "~/integration-instances-client";
   import type * as OrySchemas from "~/integration/ory/schemas";
   import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
+  import { addToast } from "$lib/components/ui/toaster.svelte";
 
   const t = getTranslator();
   const pending = writable(false);
@@ -61,6 +62,30 @@
   function openDeleteUserDialog(): void {
     deleteUserDialog.open();
   }
+
+  function create(): void {
+    addToast({
+      data: {
+        description: "The resource was created!",
+        type: "success",
+      },
+    });
+
+    addToast({
+      data: {
+        description: "The resource is pending approval.",
+        type: "pending",
+      },
+    });
+
+    addToast({
+      data: {
+        description:
+          "There was an error. Please try again. This is a test message and can be safely ignored in development.",
+        type: "error",
+      },
+    });
+  }
 </script>
 
 <svelte:head>
@@ -77,14 +102,17 @@
 
 <StandardLayout pageTitle={$t("pages.adminControls.pages.users.title")}>
   <div slot="actions">
-    <a
-      variant="primary"
-      size="small"
-      href={routeConfig.routes.adminControls.routes.users.routes.create.root}
-    >
-      <Icon variant="plus" size="20px" />
-      {$t("actions.addUser")}
-    </a>
+    <div class="header-actions">
+      <button variant="primary" size="small" on:click={create}>Notify</button>
+      <a
+        variant="primary"
+        size="small"
+        href={routeConfig.routes.adminControls.routes.users.routes.create.root}
+      >
+        <Icon variant="plus" size="20px" />
+        {$t("actions.addUser")}
+      </a>
+    </div>
   </div>
 
   {#if users.length}
@@ -173,6 +201,15 @@
 <style>
   .users-table {
     height: 100%;
+  }
+
+  .header-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
   }
 
   .action-btn {

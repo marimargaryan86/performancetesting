@@ -55,6 +55,8 @@
   --color-semantic-success-100: #f0fbd4;
   --color-semantic-success-200: #dff8aa;
   --color-semantic-success-600: #60a51e;
+  --color-semantic-info-100: #d4e5ff;
+  --color-semantic-info-400: #6091ff;
 
   /* Alpha channel */
   --color-alpha-channel-black-50: rgb(0 0 0 / 0.5);

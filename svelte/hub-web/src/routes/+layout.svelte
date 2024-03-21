@@ -19,6 +19,7 @@
   import { Feature, getFeatureTools, setFeatures } from "$lib/utils/feature-flags";
   import DevTools from "$lib/components/partials/dev-tools.svelte";
   import { ensureDefined } from "$lib/utils/array";
+  import Toaster from "$lib/components/ui/toaster.svelte";
 
   export let data;
 
@@ -98,6 +99,8 @@
 {#if $featureTools.hasFeature(Feature.DEV_TOOLS)}
   <DevTools />
 {/if}
+
+<Toaster />
 
 <style>
   .workspace {

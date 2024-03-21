@@ -11,6 +11,7 @@
     | "calendar"
     | "car"
     | "checked"
+    | "checked-circular"
     | "clock-filled"
     | "clock-outlined"
     | "close"
