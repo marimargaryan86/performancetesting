@@ -1,17 +1,28 @@
 import asyncio
 import json
+import pathlib
 import pkgutil
 import random
-from collections.abc import Sequence
+from collections.abc import AsyncIterable, Mapping, Sequence
+from typing import Any
 
+import aiocsv
+import aiofiles
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
 from snowfall.project.junction.rocket.service.places import constants
+from snowfall.project.junction.rocket.service.places.places import (
+    PlaceRepository,
+    cities_to_places,
+    osm_nodes_to_places,
+    tag_all_non_cities_against_a_city,
+)
 from snowfall.project.junction.rocket.service.places.typing import ProviderTypedDict
 from snowfall.project.junction.rocket.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.logging import stdout
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory
 
 _logger = stdout.get_logger()
@@ -22,16 +33,16 @@ class _GeneratePlacesSettings(application.Settings):
     mongo_dsn: Sequence[AnyUrl]
 
 
-async def _generate_places(
+async def _generate_places(  # noqa: WPS231
     app: application.Application[_GeneratePlacesSettings],
 ) -> None:
     asyncio.get_running_loop().slow_callback_duration = 1
 
-    mongo = motor_asyncio.AsyncIOMotorClient(  # noqa: F841
+    mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(  # noqa: F841
+    geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
     )
 
@@ -42,7 +53,7 @@ async def _generate_places(
 
     if nodes_json is None:
         raise RuntimeError("No nodes.json file present")
-    nodes = json.loads(nodes_json.decode("utf-8"))  # noqa: F841
+    nodes = json.loads(nodes_json.decode("utf-8"))
 
     country_codes_to_countries_json = pkgutil.get_data(
         "snowfall.project.junction.rocket.service.places.main",
@@ -51,7 +62,7 @@ async def _generate_places(
 
     if country_codes_to_countries_json is None:
         raise RuntimeError("No country_codes_to_countries.json file present")
-    country_codes_to_countries = json.loads(  # noqa: F841
+    country_codes_to_countries = json.loads(
         country_codes_to_countries_json.decode("utf-8"),
     )
 
@@ -65,7 +76,12 @@ async def _generate_places(
         "ports.json",
     )
 
-    provider_json: ProviderTypedDict = {  # noqa: F841
+    cities_csv_path = filesystem.resource_path(
+        "snowfall.project.junction.rocket.service.places.main",
+        "cities_with_iatas_and_benerail_ids.csv",
+    )
+
+    provider_json: ProviderTypedDict = {
         models_pb2.TYPE_RAILWAY_STATION: {
             constants.BENERAIL_ID: (
                 json.loads(
@@ -79,6 +95,56 @@ async def _generate_places(
             constants.DF_ID: json.loads(df_json.decode("utf-8")) if df_json else [],
         },
     }
+
+    places_repo = PlaceRepository(collection=mongo.places.places)
+
+    await _generate_places_from_nodes_and_cities(
+        country_codes_to_countries=country_codes_to_countries,
+        geocoding_service=geocoding_service,
+        nodes=nodes,
+        places_repo=places_repo,
+        provider_json=provider_json,
+        cities_csv_path=cities_csv_path,
+    )
+
+
+async def cities_iterator(csv_path: pathlib.Path) -> AsyncIterable[Mapping[str, str]]:
+    async with aiofiles.open(csv_path) as cities_csv:
+        async for city_dict in aiocsv.AsyncDictReader(cities_csv):
+            yield city_dict
+
+
+async def _generate_places_from_nodes_and_cities(
+    country_codes_to_countries: Mapping[str, str],
+    geocoding_service: geocoding_pb2_grpc.GeocodingServiceStub,
+    nodes: Sequence[Mapping[str, Any]],
+    places_repo: PlaceRepository,
+    provider_json: ProviderTypedDict,
+    cities_csv_path: pathlib.Path,
+) -> None:
+    async for place in osm_nodes_to_places(  # noqa: WPS352
+        osm_nodes=nodes,
+        provider_jsons=provider_json,
+        geocoding=geocoding_service,
+        country_codes_to_countries=country_codes_to_countries,
+    ):
+        try:
+            await places_repo.insert(place)
+        except Exception:
+            _logger.exception("Issue storing place", place_source_id=place.source_id)
+
+    async for city in cities_to_places(  # noqa: WPS352
+        cities=cities_iterator(cities_csv_path),
+        places_repository=places_repo,
+        geocoding=geocoding_service,
+        country_codes_to_countries=country_codes_to_countries,
+    ):
+        try:
+            await places_repo.insert(city)
+        except Exception:
+            _logger.exception("Issue storing city place", city_source_id=city.source_id)
+
+    await tag_all_non_cities_against_a_city(places_repository=places_repo)
 
 
 if __name__ == "__main__":
