@@ -112,7 +112,8 @@
       bind:value={data.inbound}
       error={errors && "inbound" in errors ? errors.inbound?._errors : undefined}
       required
-      min={today}
+      min={data.outbound}
+      externalPlaceholder={data.outbound}
       includeTime
     />
   {/if}

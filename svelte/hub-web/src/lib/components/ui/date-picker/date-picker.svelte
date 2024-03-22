@@ -28,6 +28,7 @@
   export { externalMin as min };
   $: min = externalMin ? toCalendarDateTime(fromDate(externalMin, timeZone)) : undefined;
   export let includeTime = false;
+  export let externalPlaceholder: Date | undefined = undefined;
 
   let timePicker: TimePicker | undefined;
   $: scrollToSelectedTime = timePicker?.scrollToSelected;
@@ -59,7 +60,7 @@
   const {
     options,
     elements: { content, field, label, segment, trigger, ...calendarElements },
-    states: { segmentContents, open, ...calendarStates },
+    states: { segmentContents, open, placeholder, ...calendarStates },
     helpers: { isDateDisabled, isDateUnavailable, isDateSelected },
   } = createDatePicker({
     forceVisible: true,
@@ -86,6 +87,11 @@
   $: options.required.set(required);
   $: $value, (error = false);
   $: displayError = error instanceof Array ? error.join(", ") : error;
+  $: if (externalPlaceholder) {
+    const next = toCalendarDateTime(fromDate(externalPlaceholder, timeZone));
+
+    placeholder.set(next);
+  }
 </script>
 
 <div class="date-picker">
