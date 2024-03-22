@@ -120,7 +120,7 @@ done
 
 for f in "${NOMAD_FILES[@]}"; do
 	if grep -q -e "^variable \"docker_image\" {$" "${f}"; then
-		EXPECTED_REPOSITORY=$(dirname "${f#nomad/}" | sed -r 's|/|:|g; s|:([^:]*)$|/\1|; s|:|-|g')
+		EXPECTED_REPOSITORY=$(dirname "${f#nomad/}" | sed -r 's|/|:|g; 0,/:/{s/:/\//}; s|:|-|g')
 
 		if [[ -n ${CI_PROJECT_PATH+x} ]]; then
 			EXPECTED_REPOSITORY="${CI_PROJECT_PATH}/${EXPECTED_REPOSITORY}"
