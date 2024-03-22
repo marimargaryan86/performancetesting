@@ -1,4 +1,4 @@
-_BASE_IMAGE_SHA = "5e9c9e30b1a3ba73b10574792b719067a4bd30c25eea505e447ed49ff3bcde42"
+_BASE_IMAGE_SHA = "8b846d00ae9ef579801f7a44c19511187d9a9527ddeae2a6faedc6e9e035abec"
 
 
 def _generate_repository(build_file_dir, exclude: frozenset[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001
@@ -198,7 +198,8 @@ def go_image(  # type: ignore[no-untyped-def]
         image_tags=["{build_args.VERSION}"],
         repository=repository,
         instructions=[
-            "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
+            "ARG REGISTRY",
+            "FROM ${{REGISTRY}}chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
                 hash=_BASE_IMAGE_SHA,
             ),
             (
@@ -292,7 +293,8 @@ def python_image(  # type: ignore[no-untyped-def]
         image_tags=["{build_args.VERSION}"],
         repository=repository,
         instructions=[
-            "FROM cgr.dev/chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
+            "ARG REGISTRY",
+            "FROM ${{REGISTRY}}chainguard/wolfi-base:latest@sha256:{hash} AS runtime".format(
                 hash=_BASE_IMAGE_SHA,
             ),
             (
