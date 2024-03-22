@@ -6,7 +6,7 @@ from snowfall.project.pay.service.payments.v1 import (
     invoice_pb2,
     invoice_pb2_grpc,
 )
-from snowfall.stdlib import string
+from snowfall.stdlib import money, string
 
 
 class Client(abc.ABC):
@@ -26,11 +26,26 @@ class Client(abc.ABC):
     ) -> invoice_models_pb2.Invoice:
         """Create an invoice."""
 
+    @abc.abstractmethod
+    async def create_invoice_item(
+        self,
+        invoice_account_id: str,
+        invoice_id: str,
+        amount: money.Money,
+        description: str,
+    ) -> invoice_models_pb2.InvoiceItem:
+        """Create an invoice item."""
+
+    @abc.abstractmethod
+    async def finalize_invoice(self, invoice_id: str) -> None:
+        """Finalizing invoice."""
+
 
 class DictClient(Client):
     def __init__(self) -> None:
         self._invoice_accounts = {}  # type: ignore[var-annotated]
         self._invoices = {}  # type: ignore[var-annotated]
+        self._invoices_items = {}  # type: ignore[var-annotated]
 
     async def create_account(
         self,
@@ -61,6 +76,31 @@ class DictClient(Client):
 
         self._invoices[invoice.id] = invoice
         return invoice
+
+    async def create_invoice_item(
+        self,
+        invoice_account_id: str,
+        invoice_id: str,
+        amount: money.Money,
+        description: str,
+    ) -> invoice_models_pb2.InvoiceItem:
+        if invoice_account_id not in self._invoice_accounts:
+            raise errors.NotFoundError()
+
+        invoice_item = invoice_models_pb2.InvoiceItem(
+            invoice_account_id=invoice_account_id,
+            invoice_id=invoice_id,
+            amount=amount.protobuf(),
+            description=description,
+        )
+        self._invoices_items.setdefault(invoice_item.invoice_account_id, []).append(
+            invoice_item,
+        )
+        return invoice_item
+
+    async def finalize_invoice(self, invoice_id: str) -> None:
+        if invoice_id not in self._invoices:
+            raise errors.NotFoundError()
 
 
 class GrpcClient(Client):
@@ -101,3 +141,30 @@ class GrpcClient(Client):
         )
 
         return response.invoice
+
+    async def create_invoice_item(
+        self,
+        invoice_account_id: str,
+        invoice_id: str,
+        amount: money.Money,
+        description: str,
+    ) -> invoice_models_pb2.InvoiceItem:
+        request = invoice_pb2.CreateInvoiceItemRequest(
+            invoice_account_id=invoice_account_id,
+            invoice_id=invoice_id,
+            amount=amount.protobuf(),
+            description=description,
+        )
+        response = await errors.handle_grpc_errors(
+            self._client.CreateInvoiceItem(request),
+        )
+        return response.invoice_item
+
+    async def finalize_invoice(self, invoice_id: str) -> None:
+        await errors.handle_grpc_errors(
+            self._client.FinalizeInvoice(
+                invoice_pb2.FinalizeInvoiceRequest(
+                    invoice_id=invoice_id,
+                ),
+            ),
+        )

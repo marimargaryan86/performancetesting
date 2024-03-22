@@ -5,6 +5,7 @@ from snowfall.project.pay.service.payments.v1 import (
     invoice_pb2,
     invoice_pb2_grpc,
 )
+from snowfall.stdlib import money
 from snowfall.stdlib.transport.grpc import service
 
 
@@ -53,3 +54,32 @@ class InvoiceService(
             await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return invoice_pb2.CreateInvoiceResponse(invoice=invoice)
+
+    async def CreateInvoiceItem(  # type: ignore[override] # noqa: N802
+        self,
+        request: invoice_pb2.CreateInvoiceItemRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> invoice_pb2.CreateInvoiceItemResponse:
+        invoice_item = self._provider.create_invoice_item(
+            request.invoice_account_id,
+            request.invoice_id,
+            money.from_protobuf(request.amount),
+            request.description,
+        )
+
+        if invoice_item is None:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return invoice_pb2.CreateInvoiceItemResponse(
+            invoice_item=invoice_item,
+        )
+
+    async def FinalizeInvoice(  # type: ignore[override] # noqa: N802
+        self,
+        request: invoice_pb2.FinalizeInvoiceRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> invoice_pb2.FinalizeInvoiceResponse:
+        if not self._provider.finalize_invoice(request.invoice_id):
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return invoice_pb2.FinalizeInvoiceResponse()

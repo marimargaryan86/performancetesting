@@ -87,10 +87,18 @@ message Bill {
   string payment_intent_id = 8;
 }
 
+enum InvoiceStatus {
+  INVOICE_STATUS_UNSPECIFIED = 0;
+  INVOICE_STATUS_PENDING = 1;
+  INVOICE_STATUS_FAILED = 2;
+  INVOICE_STATUS_SUCCEEDED = 3;
+}
+
 message Invoice {
   string id = 1;
   string reseller_id = 2;
   string statement_path = 3;
   string external_reference_id = 4;
   repeated string transaction_ids = 5;
+  InvoiceStatus status = 6;
 }

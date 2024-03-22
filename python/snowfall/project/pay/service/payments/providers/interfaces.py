@@ -99,3 +99,17 @@ class InvoiceProvider(object):
         days_until_due: int,
     ) -> invoice_models_pb2.Invoice | None:
         """Create invoice."""
+
+    @abstractmethod
+    def create_invoice_item(
+        self,
+        invoice_account_id: str,
+        invoice_id: str,
+        amount: money.Money,
+        description: str,
+    ) -> invoice_models_pb2.InvoiceItem | None:
+        """Create an invoice item."""
+
+    @abstractmethod
+    def finalize_invoice(self, invoice_id: str) -> bool:
+        """Finalize invoice."""

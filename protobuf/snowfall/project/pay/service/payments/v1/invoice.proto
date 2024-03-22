@@ -3,12 +3,15 @@ syntax = "proto3";
 package snowfall.project.pay.service.payments.v1;
 
 import "snowfall/project/pay/service/payments/v1/invoice_models.proto";
+import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
 
 service InvoiceService {
   rpc CreateInvoiceAccount(CreateInvoiceAccountRequest) returns (CreateInvoiceAccountResponse) {}
   rpc CreateInvoice(CreateInvoiceRequest) returns (CreateInvoiceResponse) {}
+  rpc CreateInvoiceItem(CreateInvoiceItemRequest) returns (CreateInvoiceItemResponse) {}
+  rpc FinalizeInvoice(FinalizeInvoiceRequest) returns (FinalizeInvoiceResponse) {}
 }
 
 message CreateInvoiceAccountRequest {
@@ -28,3 +31,20 @@ message CreateInvoiceRequest {
 message CreateInvoiceResponse {
   Invoice invoice = 1;
 }
+
+message CreateInvoiceItemRequest {
+  string invoice_account_id = 1;
+  string invoice_id = 2;
+  snowfall.stdlib.v1.Money amount = 3;
+  string description = 4;
+}
+
+message CreateInvoiceItemResponse {
+  InvoiceItem invoice_item = 1;
+}
+
+message FinalizeInvoiceRequest {
+  string invoice_id = 1;
+}
+
+message FinalizeInvoiceResponse {}

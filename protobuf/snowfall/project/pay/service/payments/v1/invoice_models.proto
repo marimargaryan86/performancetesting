@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package snowfall.project.pay.service.payments.v1;
 
+import "snowfall/stdlib/v1/money.proto";
+
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/pay/service/payments/v1";
 
 message InvoiceAccount {
@@ -12,4 +14,12 @@ message InvoiceAccount {
 
 message Invoice {
   string id = 1;
+}
+
+message InvoiceItem {
+  string id = 1;
+  string invoice_account_id = 2;
+  string invoice_id = 3;
+  snowfall.stdlib.v1.Money amount = 4;
+  string description = 5;
 }
