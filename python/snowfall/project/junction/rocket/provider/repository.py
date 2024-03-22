@@ -124,8 +124,8 @@ class SearchResultRepository(Generic[_CriteriaType]):
         )
 
         async with search_result_cache:
-            searche_results = self._search_results(search_criteria, search_result_cache)
-            async for cached_search_result in searche_results:
+            search_results = self._search_results(search_criteria, search_result_cache)
+            async for cached_search_result in search_results:
                 yield cached_search_result
 
     async def _search_results(

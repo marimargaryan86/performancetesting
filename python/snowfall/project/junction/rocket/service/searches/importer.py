@@ -1,7 +1,9 @@
 import asyncio
+import contextlib
 import datetime
 
 import prometheus_client
+from pymongo import errors as pymongo_errors
 
 from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     searches_pb2,
@@ -177,10 +179,22 @@ class SearchResultImporter(object):
                 timeout=self._gateway_timeout.total_seconds(),
             )
 
-            await self._search_results.insert_many([
-                search_task_result.search_result
-                for search_task_result in response.search_task_results
-            ])
+            if response.search_task_results:
+                with contextlib.suppress(pymongo_errors.BulkWriteError):
+                    results = await self._search_results.insert_many(
+                        [
+                            search_task_result.search_result
+                            for search_task_result in response.search_task_results
+                        ],
+                        ordered=False,
+                    )
+
+                    search_result_ids = [search_result.id for search_result in results]
+
+                    await self._searches.add_search_result_ids(
+                        search_id=search.id,
+                        search_result_ids=search_result_ids,
+                    )
 
             if not response.is_in_progress:
                 break

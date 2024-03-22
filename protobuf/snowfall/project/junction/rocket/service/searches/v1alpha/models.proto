@@ -50,15 +50,16 @@ message CarRental {
 message Search { // old SimpleTripOfferSearch
   string id = 1;
   string reseller_id = 2;
-  snowfall.stdlib.v1.Trackable.Status status = 3;
-  google.protobuf.Timestamp expires_at = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
+  repeated string search_result_ids = 3;
+  snowfall.stdlib.v1.Trackable.Status status = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
   oneof search_criterion {
-    Mock mock = 7;
-    Rail rail = 8;
-    Ferry ferry = 9;
-    CarRental car_rental = 10;
+    Mock mock = 8;
+    Rail rail = 9;
+    Ferry ferry = 10;
+    CarRental car_rental = 11;
   }
 }
 

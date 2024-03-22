@@ -84,6 +84,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 search_results=repository.SearchResultRepository(
                     mongo.searches.search_results,
                 ),
+                searches=repository.SearchRepository(
+                    mongo.searches.searches,
+                    app.settings.default_ttl,
+                ),
                 offers=repository.OfferRepository(
                     mongo.searches.search_results,
                 ),

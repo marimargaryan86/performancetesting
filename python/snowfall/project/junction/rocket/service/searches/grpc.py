@@ -1,3 +1,4 @@
+import asyncio
 import typing
 
 import grpc
@@ -61,10 +62,12 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
     def __init__(
         self,
         search_results: repository.SearchResultRepository,
+        searches: repository.SearchRepository,
         offers: repository.OfferRepository,
         default_page_size: int,
     ):
         self._search_results = search_results
+        self._searches = searches
         self._offers = offers
         self._default_page_size = default_page_size
 
@@ -79,11 +82,22 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
         request: grpc_pb2.ListSearchResultsRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.ListSearchResultsResponse:
-        search_results = await self._search_results.find_by_search_id(request.search_id)
+        search = await self._searches.find_by_id(request.search_id)
+        if search is not None:
+            response = await asyncio.gather(
+                *[
+                    self._search_results.find_by_id(search_result_id)
+                    for search_result_id in search.search_result_ids
+                ],
+            )
 
-        return grpc_pb2.ListSearchResultsResponse(
-            search_results=[search_result async for search_result in search_results],
-        )
+            search_results = [result for result in response if result]
+
+            return grpc_pb2.ListSearchResultsResponse(
+                search_results=search_results,
+            )
+
+        return await context.abort(grpc.StatusCode.NOT_FOUND)
 
 
 class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):

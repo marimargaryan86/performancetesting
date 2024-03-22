@@ -157,6 +157,17 @@ class SearchRepository(
             filter_=filter_,
         )
 
+    async def add_search_result_ids(
+        self,
+        search_id: str,
+        search_result_ids: Sequence[str],
+    ) -> models_pb2.Search:
+        return await self._execute(
+            self._collection.update_one,
+            filter={"_id": search_id},
+            update={"$set": {"search_result_ids": search_result_ids}},
+        )
+
 
 class QuoteRepository(
     repository.ProtoRepository[models_pb2.Quote],
