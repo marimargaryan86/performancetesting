@@ -33,6 +33,10 @@
 /CODEOWNERS
 /docker-compose.yml
 
+[Rocket] @rocket-leads
+/openapi/junction/rocket_api/*.json
+/protobuf/snowfall/project/junction/rocket/**/*.proto
+
 [Specification][2] @backend-team-leads
 *.proto
 /openapi/**/*.json
