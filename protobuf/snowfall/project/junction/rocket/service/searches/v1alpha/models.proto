@@ -113,7 +113,16 @@ message FerryDetail {
 message CarRentalDetail {
   string id = 1;
   string result_detail_id = 2;
-  // TODO(reuben.t): add car model fields here etc.
+  optional string image_url = 3;
+  optional string model = 4;
+  optional uint32 seats_count = 5;
+  optional uint32 doors_count = 6;
+  optional string transmission = 7;
+  optional uint32 baggage_quantity = 8;
+  optional string vehicle_type = 9;
+  optional string vendor = 10;
+  optional bool unlimited_mileage = 11;
+  optional bool air_conditioner = 12;
 }
 
 message Passenger {
