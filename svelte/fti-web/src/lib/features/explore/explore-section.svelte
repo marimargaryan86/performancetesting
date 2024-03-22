@@ -13,16 +13,16 @@
   <div class="top-deals">
     <p class="title">Explore our top deals of the week</p>
     <p class="tag">Check out our top deals this week</p>
-    <button class="explore-deals">Explore</button>
+    <a href="/search" class="explore-deals">Explore</a>
   </div>
   <div class="holidays">
     <div class="holiday holiday-cruise">
       <p>Packages under €250pp</p>
-      <button>Explore</button>
+      <a href="/search">Explore</a>
     </div>
     <div class="holiday holiday-inclusive">
       <p>All-inclusive Holidays</p>
-      <button>Explore</button>
+      <a href="/search">Explore</a>
     </div>
   </div>
 </div>
@@ -87,6 +87,13 @@
     line-height: normal;
   }
 
+  .holiday a:hover,
+  .top-deals a:hover {
+    color: white;
+    text-decoration: none;
+    background-color: black;
+  }
+
   .tv-label {
     margin: 16px 0 20px;
     color: white;
@@ -145,8 +152,9 @@
     align-self: flex-end;
     width: 150px;
     margin-top: 8px;
-    padding: 14px 12px;
+    padding: 14px 0;
     color: var(--text-dark-text, #1c1c1c);
+    text-align: center;
     background: #ffffff;
     border: none;
     border-radius: 12px;
@@ -176,10 +184,13 @@
     line-height: normal;
   }
 
-  .holiday button {
+  .holiday a {
     align-self: flex-end;
-    padding: 12px 16px;
+    padding: 14px 18px;
     color: var(--text-dark-text, #1c1c1c);
+    font-size: 15px;
+    background-color: white;
+    border-radius: 8px;
   }
 
   .holiday-cruise {

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Navigation from "./navigation.svelte";
   import { setTranslator, type Locale } from "$lib/i18n";
   import { invalidateAll } from "$app/navigation";
   import { browser } from "$app/environment";
+  import Navigation from "../navigation.svelte";
 
   export let data;
 

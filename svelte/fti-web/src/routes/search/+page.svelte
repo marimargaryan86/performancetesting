@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
+  import LoadingScreen from "$lib/components/loading-screen.svelte";
   import SearchResultTile from "../../components/search-result-tile.svelte";
 </script>
 
@@ -6,16 +8,20 @@
   <title>Search Results</title>
 </svelte:head>
 
-<div class="page">
-  <div class="filter-sidebar">
-    <p>test</p>
-  </div>
-  <div class="main-content">
-    <div class="search-results">
-      <SearchResultTile />
+{#if browser}
+  <LoadingScreen />
+{:else}
+  <div class="page">
+    <div class="filter-sidebar">
+      <p>test</p>
+    </div>
+    <div class="main-content">
+      <div class="search-results">
+        <SearchResultTile />
+      </div>
     </div>
   </div>
-</div>
+{/if}
 
 <style>
   .page {
