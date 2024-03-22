@@ -2,14 +2,12 @@ import asyncio
 import json
 import pathlib
 import pkgutil
-import random
 from collections.abc import AsyncIterable, Mapping, Sequence
 from typing import Any
 
 import aiocsv
 import aiofiles
-from motor import motor_asyncio
-from pydantic import AnyUrl
+from pydantic import MongoDsn
 
 from snowfall.project.junction.rocket.service.places import constants
 from snowfall.project.junction.rocket.service.places.places import (
@@ -23,14 +21,14 @@ from snowfall.project.junction.rocket.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import application, grpc_factory
+from snowfall.stdlib.service import application, grpc_factory, mongo_factory
 
 _logger = stdout.get_logger()
 
 
 class _GeneratePlacesSettings(application.Settings):
     geodata_address: str
-    mongo_dsn: Sequence[AnyUrl]
+    mongo_dsn: MongoDsn
 
 
 async def _generate_places(  # noqa: WPS231
@@ -38,9 +36,7 @@ async def _generate_places(  # noqa: WPS231
 ) -> None:
     asyncio.get_running_loop().slow_callback_duration = 1
 
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )
+    mongo = await mongo_factory.make_database(app=app, dsn=app.settings.mongo_dsn)
 
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
