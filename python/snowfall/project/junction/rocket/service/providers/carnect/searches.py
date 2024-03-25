@@ -107,14 +107,11 @@ class SearchResultGenerator(object):
         veh_avails: Sequence[CarnectVehAvail],
     ) -> AsyncIterator[models_pb2.SearchResult]:
         for veh_avail in veh_avails:
-            result_detail_id = string.uuid()
             try:
-                offer = _parse_offer(veh_avail, result_detail_id)
+                offer = _parse_offer(veh_avail)
             except errors.FieldMissingError:
                 self._logger.exception("Missing field while parsing offer")
                 continue
-
-            origin, destination = _get_coordinates(veh_avails[0])
 
             yield models_pb2.SearchResult(
                 id=string.uuid(),
@@ -126,19 +123,8 @@ class SearchResultGenerator(object):
                 offers=[offer],
                 result_details=[
                     models_pb2.ResultDetail(
-                        id=result_detail_id,
-                        origin=common_pb2.Point(
-                            coordinates=latlng_pb2.LatLng(
-                                latitude=origin[0],
-                                longitude=origin[1],
-                            ),
-                        ),
-                        destination=common_pb2.Point(
-                            coordinates=latlng_pb2.LatLng(
-                                latitude=destination[0],
-                                longitude=destination[1],
-                            ),
-                        ),
+                        id=string.uuid(),
+                        car_rental=_get_car_rental_result_detail(veh_avail),
                     ),
                 ],
             )
@@ -172,7 +158,6 @@ def _split_coordinates(coordinate_pair: str) -> tuple[float, float]:
 
 def _parse_offer(
     veh_avail: CarnectVehAvail,
-    result_detail_id: str,
 ) -> models_pb2.Offer:
     offer_price = _get_offer_price(veh_avail)
 
@@ -183,14 +168,13 @@ def _parse_offer(
         ),
     ]
 
-    offer_detail = _get_offer_detail(veh_avail, result_detail_id)
-
     return models_pb2.Offer(
         id=string.uuid(),
         price=offer_price.protobuf(),
-        conditional_prices=_get_conditional_prices(veh_avail),
         price_breakdown=price_breakdown,
-        offer_details=[offer_detail],
+        car_rental=models_pb2.CarRentalOffer(
+            conditional_prices=_get_conditional_prices(veh_avail),
+        ),
     )
 
 
@@ -222,10 +206,10 @@ def _get_offer_price(  # noqa: WPS238
     )
 
 
-def _get_offer_detail(
+def _get_car_rental_result_detail(
     veh_avail: CarnectVehAvail,
-    result_detail_id: str,
-) -> models_pb2.OfferDetail:
+) -> models_pb2.CarRentalResultDetail:
+    origin, destination = _get_coordinates(veh_avail)
     image_url = get_optional_value(
         veh_avail,
         "veh_avail_core.vehicle.picture_url",
@@ -277,21 +261,29 @@ def _get_offer_detail(
         default=False,
     )
 
-    return models_pb2.OfferDetail(
-        car_rental_detail=models_pb2.CarRentalDetail(
-            id=string.uuid(),
-            result_detail_id=result_detail_id,
-            image_url=image_url,
-            model=model,
-            seats_count=_convert_to_integer(seats_count),
-            doors_count=_convert_to_integer(doors_count),
-            transmission=transmission,
-            baggage_quantity=_convert_to_integer(baggage_quantity),
-            vehicle_type=vehicle_type,
-            vendor=vendor,
-            unlimited_mileage=is_unlimited,
-            air_conditioner=veh_avail_air_condition,
+    return models_pb2.CarRentalResultDetail(
+        origin=common_pb2.Point(
+            coordinates=latlng_pb2.LatLng(
+                latitude=origin[0],
+                longitude=origin[1],
+            ),
         ),
+        destination=common_pb2.Point(
+            coordinates=latlng_pb2.LatLng(
+                latitude=destination[0],
+                longitude=destination[1],
+            ),
+        ),
+        image_url=image_url,
+        model=model,
+        seats_count=_convert_to_integer(seats_count),
+        doors_count=_convert_to_integer(doors_count),
+        transmission=transmission,
+        baggage_quantity=_convert_to_integer(baggage_quantity),
+        vehicle_type=vehicle_type,
+        vendor=vendor,
+        unlimited_mileage=is_unlimited,
+        air_conditioner=veh_avail_air_condition,
     )
 
 

@@ -74,45 +74,61 @@ message SearchResult { // old OfferGroup
 
 message Offer { // Old OfferOption
   string id = 1;
-  string initial_offer_id = 2;
-  snowfall.stdlib.v1.Money price = 3;
-  repeated ConditionalPrice conditional_prices = 4;
-  repeated PriceBreakdown price_breakdown = 5;
-  repeated OfferDetail offer_details = 6;
+  snowfall.stdlib.v1.Money price = 2;
+  repeated PriceBreakdown price_breakdown = 3;
+  oneof offer {
+    RailOffer rail = 4;
+    FerryOffer ferry = 5;
+    CarRentalOffer car_rental = 6;
+  }
+}
+
+message RailOffer {
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 1;
+}
+
+message FerryOffer {
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 1;
+}
+
+message CarRentalOffer {
+  repeated ConditionalPrice conditional_prices = 1;
 }
 
 message ResultDetail { // Old OfferSegment
   string id = 1;
-  snowfall.project.junction.go.v1.Point origin = 2;
-  snowfall.project.junction.go.v1.Point destination = 3;
-  bool outbound_segment = 4;
-  uint32 segment_sequence = 5;
-}
-
-message OfferDetail {
-  oneof detail {
-    RailDetail rail_detail = 1;
-    FerryDetail ferry_detail = 2;
-    CarRentalDetail car_rental_detail = 3;
+  oneof result_detail {
+    MockResultDetail mock = 2;
+    RailResultDetail rail = 3;
+    FerryResultDetail ferry = 4;
+    CarRentalResultDetail car_rental = 5;
   }
 }
 
-message RailDetail {
-  string id = 1;
-  string result_detail_id = 2;
-  snowfall.project.junction.go.v1.CabinClass cabin_class = 3;
-  // TODO(reuben.t): add ferry model fields here etc.
+message MockResultDetail {
+  snowfall.project.junction.go.v1.Point origin = 1;
+  snowfall.project.junction.go.v1.Point destination = 2;
+  bool outbound_segment = 3;
+  uint32 segment_sequence = 4;
 }
 
-message FerryDetail {
-  string id = 1;
-  string result_detail_id = 2;
-  // TODO(reuben.t): add ferry model fields here etc.
+message RailResultDetail {
+  snowfall.project.junction.go.v1.Point origin = 1;
+  snowfall.project.junction.go.v1.Point destination = 2;
+  bool outbound_segment = 3;
+  uint32 segment_sequence = 4;
 }
 
-message CarRentalDetail {
-  string id = 1;
-  string result_detail_id = 2;
+message FerryResultDetail {
+  snowfall.project.junction.go.v1.Point origin = 1;
+  snowfall.project.junction.go.v1.Point destination = 2;
+  bool outbound_segment = 3;
+  uint32 segment_sequence = 4;
+}
+
+message CarRentalResultDetail {
+  snowfall.project.junction.go.v1.Point origin = 1;
+  snowfall.project.junction.go.v1.Point destination = 2;
   optional string image_url = 3;
   optional string model = 4;
   optional uint32 seats_count = 5;

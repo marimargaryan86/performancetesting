@@ -54,28 +54,32 @@ class Generator(object):
         result_details = [
             models_pb2.ResultDetail(
                 id=string.uuid(),
-                origin=legacy_go_pb2.Point(
-                    name=search.origin,
+                mock=models_pb2.MockResultDetail(
+                    origin=legacy_go_pb2.Point(
+                        name=search.origin,
+                    ),
+                    destination=legacy_go_pb2.Point(
+                        name=search.destination,
+                    ),
+                    outbound_segment=True,
+                    segment_sequence=1,
                 ),
-                destination=legacy_go_pb2.Point(
-                    name=search.destination,
-                ),
-                outbound_segment=True,
-                segment_sequence=1,
             ),
         ]
         if search.outbound_search_result_id:
             result_details.append(
                 models_pb2.ResultDetail(
                     id=string.uuid(),
-                    origin=legacy_go_pb2.Point(
-                        name=search.destination,
+                    mock=models_pb2.MockResultDetail(
+                        origin=legacy_go_pb2.Point(
+                            name=search.destination,
+                        ),
+                        destination=legacy_go_pb2.Point(
+                            name=search.origin,
+                        ),
+                        outbound_segment=False,
+                        segment_sequence=2,
                     ),
-                    destination=legacy_go_pb2.Point(
-                        name=search.origin,
-                    ),
-                    outbound_segment=False,
-                    segment_sequence=2,
                 ),
             )
 

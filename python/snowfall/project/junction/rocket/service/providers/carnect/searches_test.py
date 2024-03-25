@@ -94,28 +94,31 @@ async def test_successful(  # noqa: WPS218
     assert result.provider_id == str(constants.PROVIDER_ID)
 
     result_detail = result.result_details[0]
-    assert math.isclose(result_detail.origin.coordinates.latitude, 50.846541)
-    assert math.isclose(result_detail.origin.coordinates.longitude, 4.351684)
-    assert math.isclose(result_detail.destination.coordinates.latitude, 49.003526)
-    assert math.isclose(result_detail.destination.coordinates.longitude, 2.569589)
+    assert math.isclose(result_detail.car_rental.origin.coordinates.latitude, 50.846541)
+    assert math.isclose(result_detail.car_rental.origin.coordinates.longitude, 4.351684)
+    assert math.isclose(
+        result_detail.car_rental.destination.coordinates.latitude,
+        49.003526,
+    )
+    assert math.isclose(
+        result_detail.car_rental.destination.coordinates.longitude,
+        2.569589,
+    )
 
     offer = result.offers[0]
-    assert len(offer.offer_details) == 1
     assert offer.price.units == 68
     assert offer.price.currency_code == "EUR"
 
-    offer_detail = offer.offer_details[0].car_rental_detail
-    assert offer_detail.result_detail_id == result_detail.id
     assert (
-        offer_detail.image_url
+        result_detail.car_rental.image_url
         == "https://vehicles.carhire-solutions.com/371/small/48252_MBMR.jpg"
     )
-    assert offer_detail.model == "A HYUNDAI I10"
-    assert offer_detail.seats_count == 4
-    assert offer_detail.doors_count == 2
-    assert offer_detail.transmission == "Manual"
-    assert offer_detail.baggage_quantity == 1
-    assert offer_detail.vehicle_type == "Car"
-    assert offer_detail.vendor == "Hertz"
-    assert offer_detail.unlimited_mileage
-    assert offer_detail.air_conditioner
+    assert result_detail.car_rental.model == "A HYUNDAI I10"
+    assert result_detail.car_rental.seats_count == 4
+    assert result_detail.car_rental.doors_count == 2
+    assert result_detail.car_rental.transmission == "Manual"
+    assert result_detail.car_rental.baggage_quantity == 1
+    assert result_detail.car_rental.vehicle_type == "Car"
+    assert result_detail.car_rental.vendor == "Hertz"
+    assert result_detail.car_rental.unlimited_mileage
+    assert result_detail.car_rental.air_conditioner
