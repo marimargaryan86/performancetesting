@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import grpc
 from pymongo.errors import DuplicateKeyError
@@ -13,6 +14,7 @@ from snowfall.project.pay.service.companies.v1 import (
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.grpc import rich_status, service
+from snowfall.vendor.consul.client import ConsulClient
 
 
 class CompaniesService(
@@ -23,9 +25,11 @@ class CompaniesService(
         self,
         companies: repositories.CompaniesRepository,
         invoice_client: invoice_payment.Client,
+        consul_client: ConsulClient,
     ):
         self._companies = companies
         self._invoice_client = invoice_client
+        self._consul = consul_client
         self._default_page_size = 20
 
     def get_name(self) -> str:
@@ -138,6 +142,10 @@ class CompaniesService(
             )
             company.payment_reference = invoice_account.id
             company = await self._companies.update(company)
+            await self._consul.put_key(
+                company.id,
+                json.dumps({"stripe_customer_id": invoice_account.id}).encode(),
+            )
 
         return company
 

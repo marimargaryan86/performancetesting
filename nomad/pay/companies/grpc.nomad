@@ -109,7 +109,7 @@ job "pay-companies-grpc" {
       driver = "docker"
 
       vault {
-        policies = ["currencycloud-${var.environment}"]
+        policies = ["currencycloud-${var.environment}", "companies-${var.environment}"]
       }
 
       template {
@@ -120,9 +120,13 @@ job "pay-companies-grpc" {
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_payments-${var.environment}"))}}
+CONSUL_API_BASE_URL={{(printf "http://%s:8500" (env "NOMAD_IP_grpc"))}}
 {{ with secret "kv/data/${var.environment}/currencycloud" }}
 CC_LOGIN={{ .Data.data.cc_login }}
 CC_API_KEY={{ .Data.data.cc_api_key }}
+{{ end }}
+{{ with secret "kv/data/${var.environment}/companies" }}
+CONSUL_API_TOKEN={{ .Data.data.consul_api_token }}
 {{ end }}
 EOH
       }

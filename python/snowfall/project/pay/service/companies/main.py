@@ -2,6 +2,7 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
+import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -13,6 +14,7 @@ from snowfall.project.pay.service.payments.v1 import (
 from snowfall.stdlib import money
 from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
+from snowfall.vendor.consul.client import ConsulClient
 
 
 class _GrpcSettings(application.Settings):
@@ -24,12 +26,24 @@ class _GrpcSettings(application.Settings):
     cc_login: str
     cc_api_key: str
     cc_address: str
+    consul_api_base_url: AnyUrl
+    consul_api_token: str
+    consul_api_version: str = "v1"
     currencies: Sequence[money.Currency]
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+
+    consul_client = ConsulClient(
+        api_base_url=str(app.settings.consul_api_base_url),
+        api_token=app.settings.consul_api_token,
+        version=app.settings.consul_api_version,
+        httpx_client=http_client,
     )
 
     grpc_server = server.create_server(
@@ -48,6 +62,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                         ),
                     ),
                 ),
+                consul_client=consul_client,
             ),
             grpc.ContactsService(
                 contacts=repositories.ContactsRepository(mongo.companies.contacts),
