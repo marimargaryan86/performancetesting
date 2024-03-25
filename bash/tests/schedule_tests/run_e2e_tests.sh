@@ -597,6 +597,58 @@ run_all_classic() {
 	progress_log "End to End Classic Schedules data processing, ALL DONE at $(date)"
 }
 
+run_hub_dev_server() {
+	printf "\n============================ STARTING Development Server (Junction Hub) ==================\n"
+	# Navigate to hub-web repository
+	cd svelte/hub-web || exit
+	# Start the development server in the background
+	printf "Starting development server...\n"
+	yarn run dev &
+	# Store the server's process ID so we can stop it later
+	SERVER_PID=$!
+	# Wait a little for the server to start up
+	sleep 10 # Adjust this based on how long your server takes to start
+	# Go back to the original directory
+	cd - || exit
+	printf "Development server started with PID: $SERVER_PID\n"
+	printf "\n============================ Development Server (Junction Hub) RUNNING ==================\n\n"
+}
+
+run_hub_onewaytrip_tests() {
+	printf "\n============================ RUN Onewaytrip Tests ==================\n"
+
+	run_hub_dev_server
+
+	# Execute the onewaytrip end-to-end test
+	printf "Executing onewaytrip end-to-end test...\n"
+	npx playwright test svelte/hub-web/e2e-tests/tests/onewaytrip.spec.ts --config svelte/hub-web/playwright.config.ts
+
+	# Stop any servers or services started specifically for this test
+	if [ -n "$SERVER_PID" ]; then
+		printf "Stopping development server...\n"
+		kill "$SERVER_PID"
+	fi
+
+	printf "\n============================ COMPLETED Onewaytrip Tests ==================\n\n"
+}
+
+run_hub_roundtrip_tests() {
+	printf "\n============================ RUN Roundtrip Tests ==================\n"
+	# Start the development server for junction hub
+	run_hub_dev_server
+
+	printf "Executing roundtrip end-to-end tests...\n"
+	npx playwright test svelte/hub-web/e2e-tests/tests/roundtrip.spec.ts --config svelte/hub-web/playwright.config.ts
+
+	# After tests completion, kill the development server
+	if [ -n "$SERVER_PID" ]; then
+		printf "Stopping development server...\n"
+		kill "$SERVER_PID"
+	fi
+
+	printf "\n============================ COMPLETED Roundtrip Tests ==================\n\n"
+}
+
 # Script MAIN starts HERE
 
 run_startup
