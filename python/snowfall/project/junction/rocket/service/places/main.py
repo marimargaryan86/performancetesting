@@ -1,4 +1,5 @@
 import asyncio
+import ipaddress
 import json
 import pathlib
 import pkgutil
@@ -10,6 +11,7 @@ import aiofiles
 from pydantic import MongoDsn
 
 from snowfall.project.junction.rocket.service.places import constants
+from snowfall.project.junction.rocket.service.places.grpc import PlacesService
 from snowfall.project.junction.rocket.service.places.places import (
     PlaceRepository,
     cities_to_places,
@@ -22,12 +24,20 @@ from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory, mongo_factory
+from snowfall.stdlib.transport.grpc import server
 
 _logger = stdout.get_logger()
 
 
 class _GeneratePlacesSettings(application.Settings):
     geodata_address: str
+    mongo_dsn: MongoDsn
+
+
+class _GrpcSettings(application.Settings):
+    default_page_size: int = 100
+    grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
+    grpc_port: int = 51055
     mongo_dsn: MongoDsn
 
 
@@ -143,6 +153,24 @@ async def _generate_places_from_nodes_and_cities(
     await tag_all_non_cities_against_a_city(places_repository=places_repo)
 
 
+async def _serve(app: application.Application[_GrpcSettings]) -> None:
+    mongo = await mongo_factory.make_database(app=app, dsn=app.settings.mongo_dsn)
+    grpc_server = server.create_server(
+        address=app.settings.grpc_address,
+        port=app.settings.grpc_port,
+        services=[
+            PlacesService(
+                places_repository=PlaceRepository(
+                    collection=mongo.places.places,
+                ),
+                default_page_size=app.settings.default_page_size,
+            ),
+        ],
+    )
+    async with grpc_server.serve() as running:
+        await running.wait_for_termination()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="places")
 
@@ -151,5 +179,10 @@ if __name__ == "__main__":
             name="generate-places",
             callback=_generate_places,
             settings_class=_GeneratePlacesSettings,
+        ),
+        application.Command(
+            name="grpc",
+            callback=_serve,
+            settings_class=_GrpcSettings,
         ),
     )

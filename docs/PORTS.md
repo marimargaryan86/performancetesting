@@ -69,3 +69,4 @@ The following ports are configured in local environments by default:
 | 51052 | rocket/gateway         | gRPC Server |
 | 51053 | rocket/mock            | gRPC Server |
 | 51054 | rocket/carnect         | gRPC Server |
+| 51055 | rocket/places          | gRPC Server |
