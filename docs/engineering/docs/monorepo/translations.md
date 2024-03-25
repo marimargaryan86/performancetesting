@@ -1,7 +1,3 @@
----
-sidebar_position: 6
----
-
 # Translations
 
 Across our monorepo we are marking user-facing strings for translation.

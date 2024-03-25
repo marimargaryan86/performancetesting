@@ -1,8 +1,3 @@
----
-sidebar_position: 5
-
----
-
 # Running a service
 
 Now that you have your environment set up and junction cloned, let's try running a service manually.
