@@ -1,8 +1,8 @@
 {
+  "private": true,
   "packageManager": "yarn@4.1.1",
   "name": "@snowfall/hub-web",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
