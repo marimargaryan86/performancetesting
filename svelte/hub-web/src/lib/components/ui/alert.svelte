@@ -17,6 +17,7 @@
 
 {#if show || !dismissable}
   <div
+    role="alert"
     class={className}
     {typography}
     class:alert={true}
