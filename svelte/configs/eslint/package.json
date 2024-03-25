@@ -1,5 +1,5 @@
 {
-  "packageManager": "yarn@4.0.2",
+  "packageManager": "yarn@4.1.1",
   "name": "@snowfall/eslint-config",
   "bin": {
     "eslint": "../../node_modules/eslint/bin/eslint.js"
