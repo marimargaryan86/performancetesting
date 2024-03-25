@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package snowfall.project.junction.rocket.service.orders.v1alpha;
+package snowfall.project.junction.rocket.service.bookings.v1alpha;
 
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/v1/models.proto";
@@ -11,35 +11,16 @@ import "snowfall/stdlib/v1/options.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 
-option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/orders/v1alpha";
-
-message Journey {
-  string id = 1;
-  repeated Order orders = 2;
-  string passenger_name_record = 3;
-  ContactDetails contact_details = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
-  string reseller_id = 7;
-  repeated string owner_reseller_ids = 8;
-}
-
-message Order {
-  string id = 1;
-  string journey_id = 2;
-  repeated Booking bookings = 3;
-  repeated Passenger passengers = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
-  snowfall.stdlib.v1.PostalAddress residence_address = 7;
-}
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/bookings/v1alpha";
 
 message Booking {
   string id = 1;
-  string order_id = 2;
-  oneof option {
-    TripOption trip_option = 3;
-  }
+  string reseller_id = 2;
+  string provider_id = 3;
+  string provider_name = 4;
+  TripOption trip_option = 5;
+  ProviderBooking provider_booking = 6;
+  repeated Passenger passengers = 7;
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
@@ -49,26 +30,17 @@ message Booking {
     STATUS_ERROR = 5;
     STATUS_CANCELLED = 6;
   }
-  Status status = 4;
-  string provider_name = 5;
-  string provider_id = 13;
-  snowfall.stdlib.v1.Money total_price = 6;
-  oneof result {
-    TripBooking trip_result = 7;
-  }
-  string raw_data = 8; // json
+  Status status = 8;
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;
-  string transaction_id = 11;
-  snowfall.stdlib.v1.Money provider_total_price = 12;
-  repeated string ticket_urls = 14;
 }
 
-message TripBooking {
-  string provider_booking_reference = 3;
+message ProviderBooking {
   string record_locator = 1;
-  repeated string operator_booking_references = 2;
-  google.protobuf.Timestamp created_at = 4;
+  string booking_reference = 2;
+  string raw_data = 3;
+  repeated string operator_booking_references = 4;
+  repeated string ticket_urls = 5;
 }
 
 message ContactDetails {
@@ -96,6 +68,9 @@ message Passenger {
   Gender gender = 4;
   snowfall.stdlib.v1.Date date_of_birth = 5;
   optional DocumentDetails doc_details = 6;
+  string place_of_birth = 7; // only for some ferries
+  ContactDetails contact_details = 8;
+  bool lead_passenger = 9;
 }
 
 message DocumentDetails {
@@ -113,20 +88,20 @@ message DocumentDetails {
 }
 
 message TripOption {
-  string id = 1;
-  string booking_id = 4;
-  string price_quote_id = 5;
-  string pay_quote_id = 6;
-  repeated TripOptionDetails details = 2;
-  snowfall.stdlib.v1.Money price = 3;
-  repeated snowfall.project.junction.rocket.service.searches.v1alpha.FareRule rules = 7;
+  string price_quote_id = 1;
+  snowfall.stdlib.v1.Money price = 2;
+  repeated TripOptionDetails details = 3;
+  repeated snowfall.project.junction.rocket.service.searches.v1alpha.FareRule rules = 4;
 }
 
 message TripOptionDetails {
-  string id = 3;
-  string booking_id = 4;
-  snowfall.project.junction.rocket.service.searches.v1alpha.ResultDetail result_detail = 1;
-  snowfall.project.junction.go.v1.CabinClass cabin_class = 2;
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 1;
+  oneof result_detail {
+    snowfall.project.junction.rocket.service.searches.v1alpha.MockResultDetail mock = 2;
+    snowfall.project.junction.rocket.service.searches.v1alpha.RailResultDetail rail = 3;
+    snowfall.project.junction.rocket.service.searches.v1alpha.FerryResultDetail ferry = 4;
+    snowfall.project.junction.rocket.service.searches.v1alpha.CarRentalResultDetail car_rental = 5;
+  }
 }
 
 message BookingCancellation {

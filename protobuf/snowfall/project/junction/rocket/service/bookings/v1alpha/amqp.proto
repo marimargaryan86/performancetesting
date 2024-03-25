@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.bookings.v1alpha;
+
+import "snowfall/project/junction/rocket/service/bookings/v1alpha/models.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/bookings/v1alpha";
+
+message PlaceBookingTask {
+  Booking booking = 1;
+}
+
+message HandleCancellationTask {
+  string cancellation_request_id = 1;
+}
