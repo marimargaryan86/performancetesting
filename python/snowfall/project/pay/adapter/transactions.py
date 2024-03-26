@@ -61,6 +61,14 @@ class Client(abc.ABC):
     ) -> grpc_pb2.GetTransactionsResponse:
         """Fetch all transaction resources."""
 
+    @abc.abstractmethod
+    async def update_invoice_status(
+        self,
+        external_reference_id: str,
+        status: models_pb2.InvoiceStatus.ValueType,
+    ) -> bool:
+        """Update the invoice status and corresponding transactions' statuses."""
+
 
 class DictClient(Client):
     def __init__(self, transactions: Sequence[models_pb2.Transaction]) -> None:
@@ -177,6 +185,13 @@ class DictClient(Client):
 
         return grpc_pb2.GetTransactionsResponse(transactions=transactions)
 
+    async def update_invoice_status(
+        self,
+        external_reference_id: str,
+        status: models_pb2.InvoiceStatus.ValueType,
+    ) -> bool:
+        return True
+
 
 class GrpcClient(Client):
     def __init__(
@@ -263,3 +278,18 @@ class GrpcClient(Client):
                 grpc_pb2.GetTransactionsRequest(ids=fields, selector=selector),
             ),
         )
+
+    async def update_invoice_status(
+        self,
+        external_reference_id: str,
+        status: models_pb2.InvoiceStatus.ValueType,
+    ) -> bool:
+        response = await errors.handle_grpc_errors(
+            self._transactions.UpdateTransactionStatuses(
+                grpc_pb2.UpdateTransactionStatusesRequest(
+                    external_reference_id=external_reference_id,
+                    status=status,
+                ),
+            ),
+        )
+        return response.is_success

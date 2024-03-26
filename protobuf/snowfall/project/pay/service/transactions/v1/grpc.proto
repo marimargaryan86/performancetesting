@@ -14,6 +14,7 @@ service TransactionsService {
   rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse) {}
   rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse) {}
   rpc UpdateTransactionStatus(UpdateTransactionStatusRequest) returns (UpdateTransactionStatusResponse) {}
+  rpc UpdateTransactionStatuses(UpdateTransactionStatusesRequest) returns (UpdateTransactionStatusesResponse) {}
 }
 
 service QuotationsService {
@@ -84,6 +85,15 @@ message UpdateTransactionStatusRequest {
 }
 
 message UpdateTransactionStatusResponse {
+  bool is_success = 1;
+}
+
+message UpdateTransactionStatusesRequest {
+  string external_reference_id = 1;
+  InvoiceStatus status = 2;
+}
+
+message UpdateTransactionStatusesResponse {
   bool is_success = 1;
 }
 

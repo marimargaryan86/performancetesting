@@ -121,6 +121,23 @@ class TransactionsRepository(
         )
         return update_result.matched_count != 0
 
+    async def update_statuses(
+        self,
+        ids: Sequence[str],
+        status: int,
+    ) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            filter={repository.mongo_id_key: {"$in": ids}},
+            update={
+                "$set": {
+                    "status": status,
+                },
+            },
+            upsert=False,
+        )
+        return update_result.matched_count != 0
+
 
 class QuotationsRepository(
     repository.ProtoRepository[models_pb2.Quotation],
@@ -222,3 +239,32 @@ class InvoiceRepository(
     mixins.InsertMixin[models_pb2.Invoice],
 ):
     _proto = models_pb2.Invoice
+    _indexes = (pymongo.IndexModel("external_reference_id", background=True),)
+
+    async def update_status(
+        self,
+        external_reference_id: str,
+        status: int,
+    ) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            filter={"external_reference_id": external_reference_id},
+            update={
+                "$set": {
+                    "status": status,
+                },
+            },
+            upsert=False,
+        )
+        return update_result.matched_count != 0
+
+    async def find_by_external_id(
+        self,
+        document_id: str,
+    ) -> models_pb2.Invoice | None:
+        return await self._execute(
+            self._collection.find_one,
+            {
+                "external_reference_id": document_id,
+            },
+        )

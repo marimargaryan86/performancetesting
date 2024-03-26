@@ -16,6 +16,7 @@ from snowfall.project.pay.service.transactions.v1.models_pb2 import (
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers
 from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
+from snowfall.project.pay.service.webhooks.states.stripe.invoice import InvoiceState
 from snowfall.project.pay.service.webhooks.states.stripe.refunds import RefundsState
 from snowfall.stdlib import string
 from snowfall.stdlib.integration.starlette import application
@@ -91,6 +92,17 @@ def refund_state(
 
 
 @pytest.fixture()
+def invoice_state(
+    stripe_api_key: str,
+    transactions_client: transactions.Client,
+) -> InvoiceState:
+    return InvoiceState(
+        stripe_api_key,
+        transactions_client,
+    )
+
+
+@pytest.fixture()
 def headers() -> dict[str, str]:
     return {}
 
@@ -98,11 +110,13 @@ def headers() -> dict[str, str]:
 @pytest.fixture()
 def webhook_app(
     refund_state: RefundsState,
+    invoice_sate: InvoiceState,
     secret_key: str,
     stripe_secret_key: str,
 ) -> applications.Starlette:
     return create_webhook_app(
         refund_state=refund_state,
+        invoice_sate=invoice_sate,
         secret_key=secret_key,
         stripe_secret_key=stripe_secret_key,
     )
@@ -110,6 +124,7 @@ def webhook_app(
 
 def create_webhook_app(
     refund_state: RefundsState,
+    invoice_sate: InvoiceState,
     secret_key: str,
     stripe_secret_key: str,
 ) -> applications.Starlette:
@@ -124,6 +139,7 @@ def create_webhook_app(
         routes=routers.get_routes(
             bootstrap.create_dependencies(
                 refunds_state=refund_state,
+                invoice_state=invoice_sate,
             ),
         ),
         openapi_path=None,

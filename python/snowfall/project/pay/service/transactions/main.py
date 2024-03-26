@@ -97,6 +97,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                         ),
                     ),
                 ),
+                invoices=transactions.InvoiceRepository(
+                    mongo.invoices.invoices,
+                ),
             ),
             QuotationsService(
                 quotations=transactions.QuotationsRepository(

@@ -12,6 +12,7 @@ from snowfall.project.pay.service.transactions.v1 import (
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers
 from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
+from snowfall.project.pay.service.webhooks.states.stripe.invoice import InvoiceState
 from snowfall.project.pay.service.webhooks.states.stripe.refunds import RefundsState
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette.handlers import client_error_handler
@@ -50,6 +51,10 @@ async def _http(
                     grpc_refunds_client,
                     grpc_transactions_client,
                     grpc_orders_client,
+                ),
+                invoice_state=InvoiceState(
+                    app.settings.stripe_api_key,
+                    grpc_transactions_client,
                 ),
             ),
         ),

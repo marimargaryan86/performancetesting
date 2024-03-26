@@ -1,3 +1,5 @@
+import types
+
 import grpc
 
 from snowfall.project.junction.go.adapter import errors as adapter_errors
@@ -6,6 +8,7 @@ from snowfall.project.pay.service.transactions.cache import UserSessionRepositor
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
     BillsRepository,
+    InvoiceRepository,
     QuotationsRepository,
     TransactionsRepository,
 )
@@ -18,6 +21,11 @@ from snowfall.stdlib import money, string
 from snowfall.stdlib.transport.grpc import service, sorting
 from snowfall.stdlib.v1 import money_pb2
 
+_TRANSACTION_STATUS_MAPPING = types.MappingProxyType({
+    models_pb2.InvoiceStatus.INVOICE_STATUS_SUCCEEDED: models_pb2.TransactionStatus.TRANSACTION_STATUS_SUCCEEDED,
+    models_pb2.InvoiceStatus.INVOICE_STATUS_FAILED: models_pb2.TransactionStatus.TRANSACTION_STATUS_FAILED,
+})
+
 
 class TransactionsService(
     service.Service,
@@ -28,8 +36,10 @@ class TransactionsService(
         transactions: TransactionsRepository,
         bills: BillsRepository,
         companies_client: companies.Client,
+        invoices: InvoiceRepository,
     ):
         self._transactions = transactions
+        self._invoices = invoices
         self._bills = bills
         self._companies = companies_client
         self._sort = {"created_at": "created_at"}
@@ -150,6 +160,29 @@ class TransactionsService(
                 request.status,
             ),
         )
+
+    async def UpdateTransactionStatuses(  # type: ignore[override]  # noqa: N802
+        self,
+        request: grpc_pb2.UpdateTransactionStatusesRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.UpdateTransactionStatusesResponse:
+        is_success = await self._invoices.update_status(
+            request.external_reference_id,
+            request.status,
+        )
+        if not is_success:
+            await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        invoice = await self._invoices.find_by_external_id(
+            request.external_reference_id,
+        )
+
+        is_success = await self._transactions.update_statuses(
+            list(invoice.transaction_ids),  # type: ignore[union-attr]
+            _TRANSACTION_STATUS_MAPPING[request.status],
+        )
+
+        return grpc_pb2.UpdateTransactionStatusesResponse(is_success=is_success)
 
     def _add_amount_to_bill_amount(
         self,

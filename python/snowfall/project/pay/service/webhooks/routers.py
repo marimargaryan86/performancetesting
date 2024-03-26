@@ -2,7 +2,7 @@ import lagom
 from lagom.integrations import starlette
 from starlette import routing
 
-from snowfall.project.pay.service.webhooks.routes import refunds
+from snowfall.project.pay.service.webhooks.routes import invoice, refunds
 
 
 def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
@@ -13,6 +13,12 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             "/stripe/refunds",
             refunds.Refunds,
             name="StripeRefunds",
+            methods=["POST"],
+        ),
+        integration.route(
+            "/stripe/invoices",
+            invoice.Invoices,
+            name="StripeInvoices",
             methods=["POST"],
         ),
     ]

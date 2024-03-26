@@ -1,8 +1,6 @@
-from typing import Never
-
 import lagom
 import stripe
-from starlette import endpoints, exceptions, requests, status
+from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.pay.service.webhooks.states.stripe import refunds
 
@@ -12,7 +10,7 @@ class Refunds(endpoints.HTTPEndpoint):
         self,
         request: requests.Request,
         refund_state: refunds.RefundsState = lagom.injectable,
-    ) -> Never:
+    ) -> responses.Response:
         try:
             event = stripe.Event.construct_from(
                 await request.json(),
@@ -25,11 +23,11 @@ class Refunds(endpoints.HTTPEndpoint):
 
         event_status = await refund_state.run(event)
         if event_status:
-            raise exceptions.HTTPException(
+            return responses.Response(
                 status_code=status.HTTP_200_OK,
-                detail="Refund is updated",
+                content="Refund is updated",
             )
-        raise exceptions.HTTPException(
+        return responses.Response(
             status_code=status.HTTP_202_ACCEPTED,
-            detail="Refund not found",
+            content="Refund not found",
         )
