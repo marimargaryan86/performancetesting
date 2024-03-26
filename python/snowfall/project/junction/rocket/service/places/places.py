@@ -86,7 +86,10 @@ class PlaceRepository(
                             coordinates.latitude,
                         ],
                     },
-                    "$maxDistance": radius,
+                    "$maxDistance": min(
+                        max(radius, 10),
+                        _RADIUS_TO_MATCH_PLACE_WITH_CITY,
+                    ),
                 },
             },
         }
