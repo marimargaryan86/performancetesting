@@ -80,7 +80,9 @@
   }
 </script>
 
-{#if $user}
+{#if $page.url.pathname.startsWith("/adapter")}
+  <slot />
+{:else if $user}
   <div class="workspace">
     <MainMenu />
 

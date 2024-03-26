@@ -8,8 +8,6 @@
   import { goto, invalidateAll } from "$app/navigation";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { getPageTitle } from "$lib/utils/page-title";
-  import { page } from "$app/stores";
-  import { sleep } from "$lib/utils/common";
   import { getTranslator } from "$lib/i18n";
 
   export let data;
@@ -22,42 +20,7 @@
   const t = getTranslator();
   const pending = writable<string | undefined>();
 
-  $: form && submitButton && checkHash($page.url.hash);
   $: ({ default: defaultGroup, ...groups } = data.flow.ui.groups);
-
-  async function checkHash(hash: string): Promise<void> {
-    const match = hash.match(/^#\/\?username=(?<username>.+)&password=(?<password>.+)$/);
-
-    if (!(match && form && submitButton instanceof HTMLButtonElement)) {
-      return;
-    }
-
-    const { username, password } = match.groups ?? {};
-
-    if (!(username && password)) {
-      return;
-    }
-
-    Object.values(data.flow.ui.groups)
-      .flat()
-      .forEach((node) => {
-        if (node.type !== "input") {
-          return;
-        }
-
-        if (node.attributes.name === "password") {
-          node.attributes.value = decodeURIComponent(password);
-        } else if (node.attributes.name === "identifier") {
-          node.attributes.value = decodeURIComponent(username);
-        }
-      });
-
-    data.flow = data.flow;
-
-    await sleep(10);
-
-    form.requestSubmit(submitButton);
-  }
 
   async function submit(
     event: Event & { currentTarget: EventTarget & HTMLFormElement },

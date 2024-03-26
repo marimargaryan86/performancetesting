@@ -99,6 +99,9 @@ export default {
           } as const;
         },
       },
+      adapter: {
+        root: "/adapter",
+      },
       knowledgeHub: {
         root: "/knowledge-hub",
       },

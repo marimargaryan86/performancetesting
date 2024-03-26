@@ -13,7 +13,7 @@
   import routeConfig from "$lib/route-config";
   import Icon from "$lib/components/icons/icon.svelte";
   import StatusBadge from "$lib/components/ui/status-badge.svelte";
-  import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load.js";
+  import { scrollLoad, type ScrollLoadFunc } from "$lib/directives/scroll-load";
   import integrationInstancesClient from "~/integration-instances-client";
   import type * as OrySchemas from "~/integration/ory/schemas";
   import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
