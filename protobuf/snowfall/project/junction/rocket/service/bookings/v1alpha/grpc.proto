@@ -2,22 +2,24 @@ syntax = "proto3";
 
 package snowfall.project.junction.rocket.service.bookings.v1alpha;
 
-import "google/protobuf/field_mask.proto";
 import "snowfall/project/junction/rocket/service/bookings/v1alpha/models.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/bookings/v1alpha";
 
 service BookingService {
+  rpc MakeBooking(MakeBookingRequest) returns (MakeBookingResponse) {}
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {}
-  rpc GetBookingDetails(GetBookingDetailsRequest) returns (GetBookingDetailsResponse) {}
-  rpc ListBookingDetails(ListBookingDetailsRequest) returns (ListBookingDetailsResponse) {}
-  rpc CreateCancellationRequest(CreateCancellationRequestRequest) returns (CreateCancellationRequestResponse) {}
-  rpc GetCancellationRequest(GetCancellationRequestRequest) returns (GetCancellationRequestResponse) {}
-  rpc GetBookingCancellation(GetBookingCancellationRequest) returns (GetBookingCancellationResponse) {}
-  rpc ListBookingCancellations(ListBookingCancellationsRequest) returns (ListBookingCancellationsResponse) {}
-  rpc HandleCancellationTicketCompleted(HandleCancellationTicketCompletedRequest) returns (HandleCancellationTicketCompletedResponse) {}
-  rpc UpdateBookingCancellation(UpdateBookingCancellationRequest) returns (UpdateBookingCancellationResponse) {}
+}
+
+message MakeBookingRequest {
+  string reseller_id = 1;
+  repeated Passenger passengers = 2;
+  TripOption trip_option = 3;
+}
+
+message MakeBookingResponse {
+  Booking booking = 1;
 }
 
 message GetBookingRequest {
@@ -73,21 +75,9 @@ message ListOfIds {
   repeated string ids = 1;
 }
 
-message CreateCancellationRequestRequest {
-  CancellationRequest cancellation_request = 1;
-}
-
-message CreateCancellationRequestResponse {
-  CancellationRequest cancellation_request = 1;
-}
-
 message GetCancellationRequestRequest {
   string id = 1;
   string reseller_id = 2;
-}
-
-message GetCancellationRequestResponse {
-  CancellationRequest cancellation_request = 1;
 }
 
 message ListBookingCancellationsRequest {
@@ -98,17 +88,9 @@ message ListBookingCancellationsRequest {
   string reseller_id = 3;
 }
 
-message ListBookingCancellationsResponse {
-  repeated BookingCancellation booking_cancellations = 1;
-}
-
 message GetBookingCancellationRequest {
   string booking_id = 1;
   string reseller_id = 2;
-}
-
-message GetBookingCancellationResponse {
-  BookingCancellation booking_cancellation = 1;
 }
 
 enum Status {
@@ -121,17 +103,4 @@ enum Status {
 message HandleCancellationTicketCompletedRequest {
   string ticket_id = 1;
   Status status = 2;
-}
-
-message HandleCancellationTicketCompletedResponse {
-  BookingCancellation booking_cancellation = 1;
-}
-
-message UpdateBookingCancellationRequest {
-  BookingCancellation booking_cancellation = 1;
-  google.protobuf.FieldMask update_mask = 2;
-}
-
-message UpdateBookingCancellationResponse {
-  BookingCancellation booking_cancellation = 1;
 }

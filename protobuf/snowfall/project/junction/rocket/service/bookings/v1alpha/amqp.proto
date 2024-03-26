@@ -9,7 +9,3 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 message PlaceBookingTask {
   Booking booking = 1;
 }
-
-message HandleCancellationTask {
-  string cancellation_request_id = 1;
-}

@@ -7,7 +7,6 @@ import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/project/junction/rocket/service/searches/v1alpha/models.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/money.proto";
-import "snowfall/stdlib/v1/options.proto";
 import "snowfall/stdlib/v1/phone_number.proto";
 import "snowfall/stdlib/v1/postal_address.proto";
 
@@ -102,35 +101,4 @@ message TripOptionDetails {
     snowfall.project.junction.rocket.service.searches.v1alpha.FerryResultDetail ferry = 4;
     snowfall.project.junction.rocket.service.searches.v1alpha.CarRentalResultDetail car_rental = 5;
   }
-}
-
-message BookingCancellation {
-  string id = 1;
-  string booking_id = 2;
-  string ticket_id = 3 [(snowfall.stdlib.v1.read_only) = true];
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_PENDING = 1;
-    STATUS_COMPLETED = 2;
-    STATUS_REJECTED = 3;
-    STATUS_NO_REFUND = 4;
-    STATUS_REFUND_DUE = 5;
-    STATUS_REFUND_ISSUED = 6;
-    STATUS_REFUND_FAILED = 7;
-  }
-  Status status = 4;
-  snowfall.stdlib.v1.Money refunded_us = 5;
-}
-
-message CancellationRequest {
-  string id = 1;
-  repeated BookingCancellation booking_cancellations = 2;
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_PENDING = 1;
-    STATUS_COMPLETED = 2;
-  }
-  Status status = 3 [(snowfall.stdlib.v1.read_only) = true];
-  google.protobuf.Timestamp created_at = 4 [(snowfall.stdlib.v1.read_only) = true];
-  string reseller_id = 5;
 }

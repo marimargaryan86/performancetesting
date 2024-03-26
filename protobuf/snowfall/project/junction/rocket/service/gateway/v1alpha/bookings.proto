@@ -7,24 +7,15 @@ import "snowfall/project/junction/rocket/provider/v1alpha/bookings.proto";
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/gateway/v1alpha";
 
 service BookingService {
-  rpc GetBookings(GetBookingsRequest) returns (GetBookingsResponse) {}
-  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
 }
 
-message CancelBookingRequest {
-  string booking_id = 1;
+message GetBookingRequest {
+  string id = 1;
 }
 
-message CancelBookingResponse {
-  snowfall.project.junction.rocket.provider.v1alpha.BookingCancellation cancellation = 1;
-}
-
-message GetBookingsRequest {
-  repeated string ids = 1;
-}
-
-message GetBookingsResponse {
-  repeated Booking bookings = 1;
+message GetBookingResponse {
+  Booking booking = 1;
 }
 
 message Booking {

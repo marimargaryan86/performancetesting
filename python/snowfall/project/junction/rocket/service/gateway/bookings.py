@@ -1,12 +1,5 @@
-import asyncio
-from collections.abc import Sequence
-from typing import cast
+from grpc import aio
 
-from grpc import StatusCode, aio
-
-from snowfall.project.junction.rocket.provider.v1alpha import (
-    bookings_pb2 as providers_pb2,
-)
 from snowfall.project.junction.rocket.service.gateway import providers
 from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2,
@@ -27,83 +20,25 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
     def register(self, server: aio.Server) -> None:
         bookings_pb2_grpc.add_BookingServiceServicer_to_server(self, server)
 
-    async def GetBookings(  # type: ignore[override] # noqa: N802
+    async def GetBooking(  # type: ignore[override] # noqa: N802
         self,
-        request: bookings_pb2.GetBookingsRequest,
+        request: bookings_pb2.GetBookingRequest,
         context: aio.ServicerContext,
-    ) -> bookings_pb2.GetBookingsResponse:
-        group_unmarshal_results_mapping = providers.unmarshal_resource_ids(request.ids)
-        bookings: list[bookings_pb2.Booking] = []
-        tasks = []
-
-        for provider_id, booking_ids in group_unmarshal_results_mapping.items():
-            provider = await self._providers.find_by_id(provider_id)
-
-            if not provider:
-                continue
-
-            tasks.append(get_bookings(provider, booking_ids))
-
-        for task in asyncio.as_completed(tasks):
-            bookings.extend(await task)
-
-        return bookings_pb2.GetBookingsResponse(bookings=bookings)
-
-    async def CancelBooking(  # type: ignore[override] # noqa: N802
-        self,
-        request: bookings_pb2.CancelBookingRequest,
-        context: aio.ServicerContext,
-    ) -> bookings_pb2.CancelBookingResponse:
-        ids = providers.unmarshal_resource_id(request.booking_id)
-
-        provider = await self._providers.find_by_id(ids.provider_id)
+    ) -> bookings_pb2.GetBookingResponse:
+        provider = await self._providers.find_by_id(request.id)
 
         if not provider:
-            return await context.abort(
-                StatusCode.UNAVAILABLE,
-                "Provider is unavailable",
-            )
+            return bookings_pb2.GetBookingResponse()
 
-        if not provider.booking_capabilities.supports_cancellation:
-            return await context.abort(StatusCode.UNIMPLEMENTED)
+        booking = await self._get_booking(provider, request.id)
 
-        try:
-            response = await provider.connection.bookings.CancelBooking(
-                providers_pb2.CancelBookingRequest(
-                    provider_booking_reference=ids.resource_id,
-                ),
-            )
-        except aio.AioRpcError as error:
-            self._logger.exception("Booking cancellation failed")
+        return bookings_pb2.GetBookingResponse(booking=booking)
 
-            return await context.abort(
-                code=StatusCode.INTERNAL,
-                details=str(error),
-            )
+    async def _get_booking(
+        self,
+        provider: providers.Provider,
+        booking_id: str,
+    ) -> bookings_pb2.Booking:
+        # TODO(reuben.t): replace with new fetch from provider protos
 
-        return bookings_pb2.CancelBookingResponse(
-            cancellation=response.cancellation,
-        )
-
-
-async def get_bookings(
-    provider: providers.Provider,
-    booking_ids: Sequence[str],
-) -> list[bookings_pb2.Booking]:
-    try:
-        response = cast(
-            providers_pb2.GetBookingsResponse,
-            await provider.connection.bookings.GetBookings(
-                providers_pb2.GetBookingsRequest(ids=booking_ids),
-            ),
-        )
-    except aio.AioRpcError:
-        return []
-
-    return [
-        bookings_pb2.Booking(
-            id=provider.marshal_resource_id(booking.id),
-            booking=booking,
-        )
-        for booking in response.bookings
-    ]
+        return bookings_pb2.Booking()
