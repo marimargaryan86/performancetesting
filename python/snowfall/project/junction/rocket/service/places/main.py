@@ -102,7 +102,7 @@ async def _generate_places(  # noqa: WPS231
         },
     }
 
-    places_repo = PlaceRepository(collection=mongo.places.places)
+    places_repo = PlaceRepository(collection=mongo.places)
 
     await _generate_places_from_nodes_and_cities(
         country_codes_to_countries=country_codes_to_countries,
@@ -161,7 +161,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         services=[
             PlacesService(
                 places_repository=PlaceRepository(
-                    collection=mongo.places.places,
+                    collection=mongo.places,
                 ),
                 default_page_size=app.settings.default_page_size,
             ),

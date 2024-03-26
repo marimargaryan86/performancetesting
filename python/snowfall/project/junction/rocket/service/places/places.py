@@ -22,6 +22,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 
 _RADIUS_TO_MATCH_NODE_WITH_PROVIDER_PLACE = 5000
 _RADIUS_TO_MATCH_PLACE_WITH_CITY = 50000
+_IATA_PATH = "search_capabilities.air.provider_place_id"
 _NAMESPACE = uuid.UUID("f9ec30af-54df-4bd3-8dd9-6c4b51341d6d")
 
 _logger = stdout.get_logger()
@@ -48,6 +49,14 @@ class PlaceRepository(
             filter_=({
                 repository.mongo_id_key: {"$in": identifiers} if identifiers else None,
             }),
+        )
+
+    async def find_by_iata(self, iata: str) -> models_pb2.Place | None:
+        return await self._execute(
+            self._collection.find_one,
+            {
+                _IATA_PATH: iata,
+            },
         )
 
     async def find_by_types(

@@ -1,4 +1,4 @@
-from grpc import aio
+from grpc import StatusCode, aio
 
 from snowfall.project.junction.rocket.service.places import places
 from snowfall.project.junction.rocket.service.places.v1alpha import (
@@ -26,28 +26,48 @@ class PlacesService(
     def register(self, server: aio.Server) -> None:
         places_pb2_grpc.add_PlacesServiceServicer_to_server(self, server)
 
-    def GetPlace(  # noqa: N802
+    async def GetPlace(  # type: ignore[override]  # noqa: N802
         self,
         request: places_pb2.GetPlaceRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceResponse:
-        raise NotImplementedError
+        place = await self._places.find_by_id(document_id=request.id)
+        if not place:
+            await context.abort(
+                code=StatusCode.NOT_FOUND,
+            )
+        return places_pb2.GetPlaceResponse(place=place)
 
-    def GetPlaceClosestToCoordinates(  # noqa: N802
+    async def GetPlaceClosestToCoordinates(  # type: ignore[override]  # noqa: N802
         self,
         request: places_pb2.GetPlaceClosestToCoordinatesRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceClosestToCoordinatesResponse:
-        raise NotImplementedError
+        closest_places = await self._places.find_within_radius(
+            coordinates=request.coordinates_and_radius.coordinates,
+            radius=request.coordinates_and_radius.radius,
+        )
+        try:
+            closest_place = await closest_places.take()
+        except StopAsyncIteration:
+            await context.abort(
+                code=StatusCode.NOT_FOUND,
+            )
+        return places_pb2.GetPlaceClosestToCoordinatesResponse(place=closest_place)  # type: ignore[possibly-undefined]
 
-    def GetPlaceByIata(  # noqa: N802
+    async def GetPlaceByIata(  # type: ignore[override]  # noqa: N802
         self,
         request: places_pb2.GetPlaceByIataRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceByIataResponse:
-        raise NotImplementedError
+        place = await self._places.find_by_iata(iata=request.iata)
+        if not place:
+            await context.abort(
+                code=StatusCode.NOT_FOUND,
+            )
+        return places_pb2.GetPlaceByIataResponse(place=place)
 
-    def ListPlaces(  # noqa: N802
+    async def ListPlaces(  # type: ignore[override]  # noqa: N802
         self,
         request: places_pb2.ListPlacesRequest,
         context: aio.ServicerContext,
