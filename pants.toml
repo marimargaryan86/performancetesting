@@ -72,6 +72,9 @@ interpreter_constraints = ["CPython==3.11.*"]
 [docker]
 use_buildx = true
 
+[export]
+resolve = ["python-default"]
+
 [flake8]
 requirements = [
   "flake8",
