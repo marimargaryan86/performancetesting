@@ -261,6 +261,9 @@ export default {
     deleteUser: "Are you sure you want to delete this user?",
     discardChangesTitle: "Discard changes?",
     discardChangesBody: "You have unsaved changes. Are you sure you want to discard your changes?",
+    userChangesSuccess: "Your changes have been saved successfully.",
+    userCreatePending: "User has been created and is pending approval.",
+    userError: "There was an error saving your changes. Please try again.",
   },
   tableHeaders: {
     id: "ID",

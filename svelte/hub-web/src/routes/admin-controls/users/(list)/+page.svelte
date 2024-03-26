@@ -63,7 +63,7 @@
     deleteUserDialog.open();
   }
 
-  function create(): void {
+  function createMockNotifications(): void {
     addToast({
       data: {
         description: "The resource was created!",
@@ -103,7 +103,7 @@
 <StandardLayout pageTitle={$t("pages.adminControls.pages.users.title")}>
   <div slot="actions">
     <div class="header-actions">
-      <button variant="primary" size="small" on:click={create}>Notify</button>
+      <button variant="primary" size="small" on:click={createMockNotifications}>Notify</button>
       <a
         variant="primary"
         size="small"

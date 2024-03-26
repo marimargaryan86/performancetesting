@@ -282,6 +282,9 @@ export default {
     discardChangesTitle: "¿Descartar los cambios?",
     discardChangesBody:
       "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir sin guardarlos?",
+    userChangesSuccess: "Tus cambios se han guardado con éxito.",
+    userCreatePending: "El usuario ha sido creado y está pendiente de aprobación.",
+    userError: "Hubo un error al guardar tus cambios. Por favor, inténtalo de nuevo.",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

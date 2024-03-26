@@ -1,4 +1,6 @@
 <script lang="ts">
+  import integrationInstancesClient from "~/integration-instances-client";
+  import * as OrySchemas from "~/integration/ory/schemas";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
   import SelectField from "$lib/components/ui/select-field.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
@@ -8,13 +10,14 @@
   import RoleOption from "./role-option.svelte";
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { writable } from "svelte/store";
-  import { sleep } from "$lib/utils/common";
-  import * as OrySchemas from "~/integration/ory/schemas";
   import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import type { PaginatedData } from "$lib/models/common";
   import type { BreadCrumb } from "$lib/models/ui";
   import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
   import DiscardUserChangesDialog from "$lib/components/pages/admin-controls/user/discard-user-changes-dialog.svelte";
+  import { goto } from "$app/navigation";
+  import routeConfig from "$lib/route-config";
+  import { addToast } from "$lib/components/ui/toaster.svelte";
 
   export let mode: "create" | "update";
   export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
@@ -32,6 +35,19 @@
   let selectedReseller: HubSchemas.Reseller | undefined = user?.reseller;
   let selectedRole: OrySchemas.UserRole;
 
+  // TODO(2024-03-06/alvin.s): Re-evaluate reactive var statements when MVP complete.
+  $: currentUser = user;
+  $: if (mode === "update") {
+    deleteUser = user as OrySchemas.User;
+  }
+  $: i18nTitleString = $t(`pages.adminControls.pages.users.pages.${mode}.title`);
+  $: pageTitle = mode === "update" && currentUser ? currentUser.email : i18nTitleString;
+  $: selectedRole = mode === "update" ? user?.role || "reseller-user" : "reseller-user";
+  $: resellerOptions = resellers?.data || [];
+  $: i18nSuccessMessage = $t("sentences.userChangesSuccess");
+  $: i18nPendingMessage = $t("sentences.userCreatePending");
+  $: i18nErrorMessage = $t("sentences.userError");
+
   function selectAdminRole(): void {
     selectedRole = "reseller-admin";
   }
@@ -47,22 +63,37 @@
 
     try {
       $pending = true;
-      // TODO: submit form data
-      await sleep(1000);
+
+      if (mode === "create") {
+        await createUser();
+        addToast({
+          data: {
+            description: i18nPendingMessage,
+            type: "pending",
+          },
+        });
+      } else if (mode === "update") {
+        await updateUser();
+        addToast({
+          data: {
+            description: i18nSuccessMessage,
+            type: "success",
+          },
+        });
+      }
+
+      goto(routeConfig.routes.adminControls.routes.users.root);
+    } catch (e) {
+      addToast({
+        data: {
+          description: i18nErrorMessage,
+          type: "error",
+        },
+      });
     } finally {
       $pending = false;
     }
   }
-
-  // TODO(2024-03-06/alvin.s): Re-evaluate reactive var statements when MVP complete.
-  $: currentUser = user;
-  $: if (mode === "update") {
-    deleteUser = user as OrySchemas.User;
-  }
-  $: i18nTitleString = $t(`pages.adminControls.pages.users.pages.${mode}.title`);
-  $: pageTitle = mode === "update" && currentUser ? currentUser.email : i18nTitleString;
-  $: selectedRole = mode === "update" ? user?.role || "reseller-user" : "reseller-user";
-  $: resellerOptions = resellers?.data || [];
 
   function formatResellerOption(reseller?: HubSchemas.Reseller): string {
     if (!reseller) {
@@ -78,6 +109,31 @@
 
   function openDiscardUserChangesDialog(): void {
     discardUserChangesDialog.open();
+  }
+
+  async function createUser(): Promise<void> {
+    const { email, role } = currentUser as unknown as HubSchemas.UserCreate;
+    const reseller = selectedReseller;
+    const resellerId = selectedReseller?.id || "";
+
+    if (email && email !== "" && role) {
+      await integrationInstancesClient.hub.users.create({
+        data: { email, role, resellerId, reseller },
+      });
+    }
+  }
+
+  async function updateUser(): Promise<void> {
+    const { id, email, role } = currentUser as unknown as HubSchemas.User;
+    const reseller = selectedReseller;
+    const resellerId = selectedReseller?.id || "";
+
+    if (email && email !== "" && role) {
+      await integrationInstancesClient.hub.users.update({
+        id,
+        data: { email, role, resellerId, reseller },
+      });
+    }
   }
 </script>
 
@@ -107,7 +163,7 @@
               label="Email address"
               required
               placeholder="Enter email address"
-              value={currentUser.email}
+              bind:value={currentUser.email}
             />
           </div>
         </div>
