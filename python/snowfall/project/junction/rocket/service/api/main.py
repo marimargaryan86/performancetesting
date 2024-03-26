@@ -3,7 +3,6 @@ import datetime
 from typing import Any, NamedTuple
 
 import httpx
-import lagom
 from grpc import aio
 from lagom.integrations.starlette import StarletteIntegration
 from starlette.middleware import Middleware, authentication
@@ -12,12 +11,18 @@ from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.go.adapter import (
     errors,
 )
+from snowfall.project.junction.rocket.adapter import (
+    search_results as search_results_adapter,
+)
 from snowfall.project.junction.rocket.service.api import (
     air_search,
+    dependencies,
     repositories,
+    router,
     transforms,
     types,
 )
+from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -34,6 +39,7 @@ from snowfall.vendor.junction_one.client import (
 
 class _Settings(starlette.Settings):
     authentication_address: str
+    searches_address: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     j_one_api_key: str
     reseller_j1_credentials_mapping: dict[str, Any]
@@ -42,6 +48,7 @@ class _Settings(starlette.Settings):
 
 class _Channels(NamedTuple):
     authentication: aio.Channel
+    searches: aio.Channel
 
 
 async def _http(
@@ -52,6 +59,10 @@ async def _http(
             grpc_factory.make_insecure_channel(
                 app,
                 app.settings.authentication_address,
+            ),
+            grpc_factory.make_insecure_channel(
+                app,
+                app.settings.searches_address,
             ),
         ),
     )
@@ -73,7 +84,11 @@ async def _http(
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
 
-    container = lagom.Container()
+    container = dependencies.create_dependencies(
+        search_results_client=search_results_adapter.GrpcClient(
+            grpc_pb2_grpc.SearchResultServiceStub(channels.searches),
+        ),
+    )
     container[JunctionOneClient] = JunctionOneClient(
         api_base_url=app.settings.j_one_api_base_url,
         http_client=http_client,
@@ -89,7 +104,6 @@ async def _http(
         transforms.AirSearchRequestTransformer
     )
     container[types.AirSearchResultTransformer] = transforms.AirSearchResultTransformer  # type: ignore[type-abstract]
-
     integration = StarletteIntegration(container)
 
     routes = [
@@ -108,6 +122,7 @@ async def _http(
             air_search.AirSearchStatus,
             name="AirSearchStatus",
         ),
+        *router.get_routes(container),
     ]
     asgi_app = starlette.create_starlette_app(
         routes=routes,

@@ -89,6 +89,11 @@ job "junction-rocket-api-http" {
               local_bind_port  = 8010
               destination_name = "authentication-${var.environment}"
             }
+
+            upstreams {
+              local_bind_port  = 8020
+              destination_name = "searches-${var.environment}"
+            }
           }
         }
       }
@@ -114,6 +119,7 @@ job "junction-rocket-api-http" {
         change_mode = "restart"
         data        = <<EOH
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
+SEARCHES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_searches-${var.environment}"))}}
 RESELLER_J1_CREDENTIALS_MAPPING={{keyOrDefault "${var.environment}/rocket-api/reseller-j1-credentials-mapping" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/rocket-api" }}
 J_ONE_API_KEY={{ .Data.data.j_one_api_key }}
