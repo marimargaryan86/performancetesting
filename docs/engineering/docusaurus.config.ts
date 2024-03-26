@@ -57,6 +57,10 @@ const config: Config = {
             id: 'junction-hub-api',
             spec: 'openapi/junction/hub_api/openapi.json',
           },
+          {
+            id: 'junction-rocket-api',
+            spec: 'openapi/junction/rocket_api/openapi.json',
+          },
         ],
       },
     ],

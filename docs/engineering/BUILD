@@ -12,6 +12,7 @@ custom_image(
         "//openapi/junction/pay_api:pay_api",
         "//openapi/junction/plus_poc_api:plus_poc_api",
         "//openapi/junction/hub_api:hub_api",
+        "//openapi/junction/rocket_api:rocket_api",
         ":source_files",
     ],
     instructions=[
