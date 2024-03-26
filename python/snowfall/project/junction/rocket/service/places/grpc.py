@@ -72,4 +72,12 @@ class PlacesService(
         request: places_pb2.ListPlacesRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.ListPlacesResponse:
-        raise NotImplementedError
+        found_places = await self._places.find_with_filters(
+            filters=request.filters,
+            cursor=request.page_token,
+        )
+        found_places.limit(limit=request.page_size)
+        return places_pb2.ListPlacesResponse(
+            places=[place async for place in found_places],
+            next_page_token=await found_places.cursor(),
+        )

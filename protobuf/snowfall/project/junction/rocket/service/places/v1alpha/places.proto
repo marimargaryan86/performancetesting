@@ -35,7 +35,7 @@ message Filters {
   string name = 1;
   Type type = 2;
   CoordinatesAndRadius coordinates_and_radius = 3;
-  PlaceIdentifier place_to_search_within = 4;
+  string place_to_search_within_id = 4;
 }
 
 message ListPlacesRequest {
@@ -46,6 +46,7 @@ message ListPlacesRequest {
 
 message ListPlacesResponse {
   repeated Place places = 1;
+  string next_page_token = 2;
 }
 
 service PlacesService {

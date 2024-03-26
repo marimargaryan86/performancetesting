@@ -12,7 +12,10 @@ from snowfall.project.junction.rocket.service.places.typing import (
     ProviderMappings,
     ProviderTypedDict,
 )
-from snowfall.project.junction.rocket.service.places.v1alpha import models_pb2
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    models_pb2,
+    places_pb2,
+)
 from snowfall.service.geodata.v1 import geocoding_pb2, geocoding_pb2_grpc
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
@@ -99,6 +102,45 @@ class PlaceRepository(
 
         return await self._find_with_cursor(cur=cursor, filter_=filter_)
 
+    async def find_with_filters(
+        self,
+        filters: places_pb2.Filters,
+        cursor: str = "",
+    ) -> resultset.ResultSet[models_pb2.Place]:
+        filter_: dict[str, Any] = {}
+        if filters.name:
+            filter_["name"] = {"$regex": filters.name, "$options": "i"}
+        if filters.type:
+            filter_["type"] = filters.type
+        if self._has_coordinates(filters.coordinates_and_radius):
+            coordinates = filters.coordinates_and_radius.coordinates
+            radius = min(
+                max(filters.coordinates_and_radius.radius, 100),
+                _RADIUS_TO_MATCH_PLACE_WITH_CITY,
+            )
+            filter_["coordinates"] = {
+                "$nearSphere": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            coordinates.longitude,
+                            coordinates.latitude,
+                        ],
+                    },
+                    "$maxDistance": radius,
+                },
+            }
+        if filters.place_to_search_within_id:
+            place_to_search_with = await self.find_by_id(
+                document_id=filters.place_to_search_within_id,
+            )
+            if place_to_search_with:
+                contained_ids = [
+                    identifier.id for identifier in place_to_search_with.contains
+                ]
+                filter_["_id"] = {"$in": contained_ids}
+        return await self._find_with_cursor(cur=cursor, filter_=filter_)
+
     async def update_city(self, id_: str, city: models_pb2.PlaceIdentifier) -> bool:
         update_result = await self._execute(
             self._collection.update_one,
@@ -111,6 +153,15 @@ class PlaceRepository(
             },
         )
         return update_result.modified_count != 0
+
+    def _has_coordinates(
+        self,
+        coordinates_and_radius: models_pb2.CoordinatesAndRadius,
+    ) -> bool:
+        return not (
+            coordinates_and_radius.coordinates.latitude == 0
+            and coordinates_and_radius.coordinates.longitude == 0
+        )
 
 
 def validate_name(node: Mapping[str, Any]) -> str | None:
