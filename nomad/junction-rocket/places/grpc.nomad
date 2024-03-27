@@ -62,7 +62,7 @@ job "junction-rocket-places-grpc" {
     }
 
     service {
-      name = "places-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "grpc"
       tags = ["grpc"]
 
@@ -77,7 +77,7 @@ job "junction-rocket-places-grpc" {
       }
     }
     service {
-      name = "places-${var.environment}"
+      name = "${JOB}-${var.environment}"
       port = "prometheus"
       tags = ["metrics"]
 
