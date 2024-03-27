@@ -16,7 +16,8 @@
         "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
         "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2",
         "ak@snowfalltravel.com:$2y$05$0iW1TCLAU7wtHL4aNnq0Meb05sLrj9v9YkzLpI4y8YdApt3y3RWQ6",
-        "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si"
+        "msm@snowfalltravel.com:$2y$05$pP/BDRnXN2jv9NBJiZWlteceTMSF9/5ouDKQWk96JD1UBP9tES2Si",
+        "armen.hovhannisyan@snowfalltravel.com:$2y$05$5eYdcKmdgCpEOfVuWLC9U.o2RPLWStesbD7F87Eo88rjgg6LhOpVW"
       ],
       "traefik_nomad_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
@@ -40,7 +41,8 @@
         "mari.m@snowfalltravel.com:$2y$05$uhwtijco0.lZbzqcDxWWwOL3vQSVsW.76aJcom78b50GD8glrtJ62",
         "artur.m@snowfalltravel.com:$2y$05$5PKyTh/CMBS3q1Ui8NnaCuUtfv3GT09.vLrMGoplq1dnQtjbczD.S",
         "paul.n@snowfalltravel.com:$2y$05$IMOSaUz435jYT6xgulmOs.avnrhuset1AXM8924CGqpVgFYtfx3xq",
-        "arthur.p@snowfalltravel.com:$2y$05$1Y6cMCRkjmC9rg7V4TMaiup0ZdhiGE11XJhwWbiIzcyQC8glTq1ey"
+        "arthur.p@snowfalltravel.com:$2y$05$1Y6cMCRkjmC9rg7V4TMaiup0ZdhiGE11XJhwWbiIzcyQC8glTq1ey",
+        "armen.hovhannisyan@snowfalltravel.com:$2y$05$5eYdcKmdgCpEOfVuWLC9U.o2RPLWStesbD7F87Eo88rjgg6LhOpVW"
       ],
       "traefik_consul_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
@@ -66,7 +68,8 @@
         "paul.n@snowfalltravel.com:$2y$05$IMOSaUz435jYT6xgulmOs.avnrhuset1AXM8924CGqpVgFYtfx3xq",
         "sandeep.s@snowfalltravel.com:$2y$05$BjzFAUXXWNgwbYRAZOqIuu1.qk/jYdYUN3tYde/6nIN0gNWibrqqS",
         "Grigor.M@snowfalltravel.com:$2y$05$ids6mlTkCAzQzdZGtce42OUQSRT8zaYGas9rg0/9d27y6r8grfssy",
-        "arthur.p@snowfalltravel.com:$2y$05$1Y6cMCRkjmC9rg7V4TMaiup0ZdhiGE11XJhwWbiIzcyQC8glTq1ey"
+        "arthur.p@snowfalltravel.com:$2y$05$1Y6cMCRkjmC9rg7V4TMaiup0ZdhiGE11XJhwWbiIzcyQC8glTq1ey",
+        "armen.hovhannisyan@snowfalltravel.com:$2y$05$5eYdcKmdgCpEOfVuWLC9U.o2RPLWStesbD7F87Eo88rjgg6LhOpVW"
       ],
       "traefik_vault_ui_users": [
         "ara@snowfalltravel.com:$2y$05$4YUMkM/Ka8xbPRN9pjJO0O/og964WHUf4NbjZBIMbd7hIYt6FWl/i",
@@ -77,7 +80,8 @@
         "sevak@snowfalltravel.com:$2y$05$bDjUgk9B1CITpYet2mGWReqjVpWKTGkg1VdbmCYZoQgBiQebJcvoC",
         "vm@snowfalltravel.com:$2y$05$Q6NFa5Ca9v6TcvccjuWyGeZbcQ6s2wFJckOEaSgHOzcIN59yWoLi2",
         "ak@snowfalltravel.com:$2y$05$0iW1TCLAU7wtHL4aNnq0Meb05sLrj9v9YkzLpI4y8YdApt3y3RWQ6",
-        "justin.k@snowfalltravel.com:$2y$05$CT0UuD8KoqXQo8RU2zziheZSsH91dQ96zQfd376fA3Sy9okDJLnPu"
+        "justin.k@snowfalltravel.com:$2y$05$CT0UuD8KoqXQo8RU2zziheZSsH91dQ96zQfd376fA3Sy9okDJLnPu",
+        "armen.hovhannisyan@snowfalltravel.com:$2y$05$5eYdcKmdgCpEOfVuWLC9U.o2RPLWStesbD7F87Eo88rjgg6LhOpVW"
       ],
       "ip_whitelist_sourcerange": [
         "13.53.111.11",
