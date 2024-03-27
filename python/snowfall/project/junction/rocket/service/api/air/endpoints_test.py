@@ -1,4 +1,3 @@
-import uuid
 from collections.abc import AsyncIterator, Mapping
 from typing import Any
 
@@ -32,7 +31,7 @@ RESULT_UUID = "a26bc204-61a4-405a-bf68-abdf8084cbb5"
 
 class FakeAirSearchResultTransformer(AirSearchResultTransformer):
     def transform(self, value: BaseModel) -> AirSearchResult:
-        return AirSearchResult(id=uuid.UUID(RESULT_UUID))
+        return AirSearchResult(id=RESULT_UUID, data=[])
 
 
 class FakeAirSearchRequestTransformer(AirSearchRequestTransformer):
@@ -48,7 +47,7 @@ class FakeAirSearchRepo(AbstractAirSearchRepo):
         self.inserted.append(value)
 
     def exists_id(self, search_id: str) -> bool:
-        return uuid.UUID(search_id) in {result.id for result in self.inserted}
+        return search_id in {result.id for result in self.inserted}
 
     def find_by_id(self, id_: str) -> AirSearchResult:
         assert len(self.inserted) == 1
@@ -119,7 +118,7 @@ def test_air_search_creation_and_storage(
     response = air_client.post("/air/searches", json={"origin": "LON"})
 
     assert response.status_code == 200
-    assert response.json() == {"id": RESULT_UUID}
+    assert response.json() == {"id": RESULT_UUID, "data": []}
 
     assert len(air_search_repo.inserted) == 1
     assert str(air_search_repo.inserted[0].id) == RESULT_UUID
@@ -145,7 +144,7 @@ def test_air_search_retrieval(
     air_client: TestClient,
     air_search_repo: FakeAirSearchRepo,
 ) -> None:
-    result = AirSearchResult(id=uuid.UUID(RESULT_UUID))
+    result = AirSearchResult(id=RESULT_UUID, data=[])
     air_search_repo.insert(result)
     response = air_client.get("/air/searches/123/results")
 

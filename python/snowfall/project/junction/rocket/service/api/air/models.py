@@ -1,9 +1,22 @@
-import uuid
-from datetime import date
+from datetime import date, datetime
+from enum import Enum
 from typing import Literal
 
+from pydantic import AwareDatetime, ConfigDict, NaiveDatetime, alias_generators
 from pydantic import BaseModel as PydanticBase
-from pydantic import ConfigDict, alias_generators
+
+AwareOrNaiveDatetime = AwareDatetime | NaiveDatetime
+
+
+class FareTypeEnum(Enum):
+    """Offer Fare Types."""
+
+    basic: str = "1"
+    standard: str = "2"
+    enhanced: str = "3"
+    premium: str = "4"
+    premium_plus: str = "5"
+    lux: str = "6"
 
 
 class BaseModel(PydanticBase):
@@ -18,14 +31,11 @@ class Passenger(BaseModel):
     date_of_birth: date
 
 
-class AirSearchResult(BaseModel):
-    id: uuid.UUID
-
-
 class AirSearchCriteria(BaseModel):
-    departure_at: date
+    departure_at: datetime
     origin: str
     destination: str
+    return_departure_at: datetime | None = None
 
 
 class AirSearchAttributes(BaseModel):
@@ -40,3 +50,43 @@ class AirSearchRequestData(BaseModel):
 
 class AirSearchRequest(BaseModel):
     data: AirSearchRequestData
+
+
+class SearchCapabilities(BaseModel):
+    rail: bool
+    air: bool
+    ferry: bool
+
+
+class Segment(BaseModel):
+    flight_number: str
+    airline: str
+    arrival_station: str
+    departure_station: str
+    departure_time: AwareOrNaiveDatetime
+    arrival_time: AwareOrNaiveDatetime
+    duration: int
+    segment_key: str
+    operating_airline: str
+
+
+class OfferSegment(BaseModel):
+    cabin: str
+    class_of_service: str
+
+
+class Offer(BaseModel):
+    price: float
+    currency: str
+    brand: str
+    segments: dict[str, OfferSegment]
+
+
+class AirSearchTrip(BaseModel):
+    offers: dict[str, list[Offer]]  # TODO(jeremy): Use FareTypeEnum as str
+    result_details: dict[str, Segment]
+
+
+class AirSearchResult(BaseModel):
+    id: str
+    data: list[AirSearchTrip]

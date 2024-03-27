@@ -20,7 +20,6 @@ from snowfall.project.junction.rocket.service.api import (
 )
 from snowfall.project.junction.rocket.service.api.air import (
     repositories,
-    transforms,
     types,
 )
 from snowfall.project.junction.rocket.service.api.air import (
@@ -28,6 +27,9 @@ from snowfall.project.junction.rocket.service.api.air import (
 )
 from snowfall.project.junction.rocket.service.api.air.middleware import (
     JunctionOneClientMiddleware,
+)
+from snowfall.project.junction.rocket.service.api.air.transforms import (
+    transforms as air_transforms,
 )
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
@@ -111,9 +113,11 @@ async def _http(
     )
     container[repositories.AbstractAirSearchRepo] = repositories.AirSearchRepo  # type: ignore[type-abstract]
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
-        transforms.AirSearchRequestTransformer
+        air_transforms.AirSearchRequestTransformer
     )
-    container[types.AirSearchResultTransformer] = transforms.AirSearchResultTransformer  # type: ignore[type-abstract]
+    container[types.AirSearchResultTransformer] = (  # type: ignore[type-abstract]
+        air_transforms.AirSearchResultTransformer
+    )
     integration = StarletteIntegration(container)
 
     routes = [

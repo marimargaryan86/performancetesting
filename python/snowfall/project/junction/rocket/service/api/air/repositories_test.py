@@ -1,5 +1,3 @@
-import uuid
-
 import pytest
 from mongomock_motor import MongoClient
 
@@ -20,7 +18,7 @@ def air_search_repo(mock_mongo_client: MongoClient) -> AirSearchRepo:
 
 
 def test_insert_air_search_result(air_search_repo: AirSearchRepo) -> None:
-    test_result = AirSearchResult(id=uuid.UUID(RESULT_UUID))
+    test_result = AirSearchResult(id=RESULT_UUID, data=[])
     air_search_repo.insert(test_result)
 
     inserted_document = air_search_repo.collection.find_one({"id": RESULT_UUID})
@@ -31,16 +29,16 @@ def test_insert_air_search_result(air_search_repo: AirSearchRepo) -> None:
 def test_existance(air_search_repo: AirSearchRepo) -> None:
     assert not air_search_repo.exists_id(RESULT_UUID)
 
-    air_search_repo.collection.insert_one({"id": RESULT_UUID})
+    air_search_repo.collection.insert_one({"id": RESULT_UUID, "data": []})
 
     assert air_search_repo.exists_id(RESULT_UUID)
 
 
 def test_find_by_id_air_search_result(air_search_repo: AirSearchRepo) -> None:
-    air_search_repo.collection.insert_one({"id": RESULT_UUID})
+    air_search_repo.collection.insert_one({"id": RESULT_UUID, "data": []})
 
     found_result = air_search_repo.find_by_id(RESULT_UUID)
-    assert found_result.id == uuid.UUID(RESULT_UUID)
+    assert found_result.id == RESULT_UUID
 
 
 def test_raises_if_no_such_collection(air_search_repo: AirSearchRepo) -> None:
