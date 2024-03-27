@@ -78,6 +78,11 @@ type SelectedDate =
     }
   | undefined;
 
+type SliderRange = {
+  from: number;
+  to: number;
+};
+
 type IconTypes =
   | "chevron-left"
   | "chevron-right"
@@ -105,16 +110,46 @@ type IconTypes =
   | "board-basis-full"
   | "thumbs-up-down"
   | "hot-tub"
-  | "chevron-down";
+  | "chevron-down"
+  | "half-moon"
+  | "beach"
+  | "wifi"
+  | "pool"
+  | "parking"
+  | "bar"
+  | "gym"
+  | "spa"
+  | "tick"
+  | "flight"
+  | "hotel"
+  | "transfer"
+  | "luggage";
 
-type SliderRange = {
-  from: number;
-  to: number;
+type AmenityIcons = "wifi" | "pool" | "parking" | "restaurant" | "bar" | "gym" | "beach" | "spa";
+
+type Amenities = {
+  label: string;
+  icon: AmenityIcons;
 };
 
 type BoardOptions = {
   title: string;
   icon: IconTypes;
+};
+
+type SearchResultTile = {
+  name: string;
+  location: string;
+  rating: number;
+  reviews: number;
+  checkIn: string;
+  checkOut: string;
+  cancellationFee: string;
+  amenities: Amenities[];
+  rebook: string;
+  included: IconTypes[];
+  price: number;
+  favourite: boolean;
 };
 
 export type {
@@ -129,6 +164,7 @@ export type {
   SearchOptions,
   Scroll,
   SelectedDate,
+  SearchResultTile,
   IconTypes,
   SliderRange,
   BoardOptions,
