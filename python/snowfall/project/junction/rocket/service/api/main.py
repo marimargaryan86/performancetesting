@@ -130,7 +130,7 @@ async def _http(
             ),
             Middleware(
                 JunctionOneClientMiddleware,
-                temporary_token_auth=temporary_token_auth,
+                token_auth=temporary_token_auth,
             ),
         ],
         openapi_path=filesystem.resource_path(

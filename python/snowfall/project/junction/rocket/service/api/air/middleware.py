@@ -23,5 +23,7 @@ class JunctionOneClientMiddleware(base.BaseHTTPMiddleware):
         request: Request,
         call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
+        if not request.user.is_authenticated:
+            return await call_next(request)
         with self._token_auth.temporary(request.user.username):
             return await call_next(request)
