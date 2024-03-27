@@ -12,6 +12,16 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
 
     return [
         integration.route(
+            "/car-rental/searches",
+            car_rental_search.CarSearch,
+            name="CreateCarRentalSearch",
+        ),
+        integration.route(
+            "/car-rental/searches/{searchId}",
+            car_rental_search.CarSearch,
+            name="ViewCarRentalSearch",
+        ),
+        integration.route(
             "/car-rental/searches/{searchId}/results",
             car_rental_search.CarSearchResults,
             name="ListCarSearchResults",

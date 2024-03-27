@@ -8,12 +8,13 @@ from lagom.integrations.starlette import StarletteIntegration
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
-from snowfall.project.junction.go.adapter import (
+from snowfall.project.junction.rocket.adapter import (
     errors,
 )
 from snowfall.project.junction.rocket.adapter import (
     search_results as search_results_adapter,
 )
+from snowfall.project.junction.rocket.adapter import searches as searches_adapter
 from snowfall.project.junction.rocket.service.api import (
     air_search,
     dependencies,
@@ -87,6 +88,9 @@ async def _http(
     container = dependencies.create_dependencies(
         search_results_client=search_results_adapter.GrpcClient(
             grpc_pb2_grpc.SearchResultServiceStub(channels.searches),
+        ),
+        searches_client=searches_adapter.GrpcClient(
+            grpc_pb2_grpc.SearchServiceStub(channels.searches),
         ),
     )
     container[JunctionOneClient] = JunctionOneClient(

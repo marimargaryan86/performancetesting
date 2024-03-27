@@ -8,7 +8,7 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.adapter import errors, search_results
+from snowfall.project.junction.rocket.adapter import errors, search_results, searches
 from snowfall.project.junction.rocket.service.api import dependencies, router
 from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
 from snowfall.stdlib.format import jwt
@@ -27,13 +27,20 @@ def search_results_client() -> search_results.DictClient:
 
 
 @pytest.fixture()
+def searches_client() -> searches.DictClient:
+    return searches.DictClient(fixtures.get_searches())
+
+
+@pytest.fixture()
 def app(
     search_results_client: search_results.Client,
+    searches_client: searches.Client,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
             dependencies.create_dependencies(
                 search_results_client=search_results_client,
+                searches_client=searches_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.rocket_api", "openapi.json"),
@@ -79,6 +86,15 @@ async def user(
     user.metadata["default_currency"] = "bar"
 
     return user
+
+
+@pytest.fixture()
+async def unauthorized_client(
+    client: httpx.AsyncClient,
+) -> httpx.AsyncClient:
+    client.headers.pop("Authorization")
+
+    return client
 
 
 @pytest.fixture()
