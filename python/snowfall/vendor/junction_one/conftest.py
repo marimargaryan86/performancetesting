@@ -7,10 +7,12 @@ import orjson
 import pytest
 
 from snowfall.stdlib.persistence import filesystem
-from snowfall.vendor.junction_one.client import (
+from snowfall.vendor.junction_one.auth import (
     JunctionOneAuth,
-    JunctionOneClient,
     TokenAuth,
+)
+from snowfall.vendor.junction_one.client import (
+    JunctionOneClient,
 )
 
 

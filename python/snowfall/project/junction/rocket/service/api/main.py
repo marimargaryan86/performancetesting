@@ -26,6 +26,9 @@ from snowfall.project.junction.rocket.service.api.air import (
 from snowfall.project.junction.rocket.service.api.air import (
     router as air_router,
 )
+from snowfall.project.junction.rocket.service.api.air.middleware import (
+    JunctionOneClientMiddleware,
+)
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
 )
@@ -37,11 +40,8 @@ from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
 from snowfall.stdlib.service import application, grpc_factory
-from snowfall.vendor.junction_one.client import (
-    JunctionOneAuth,
-    JunctionOneClient,
-    TokenAuth,
-)
+from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
+from snowfall.vendor.junction_one.client import JunctionOneClient
 
 
 class _Settings(starlette.Settings):
@@ -99,15 +99,15 @@ async def _http(
             grpc_pb2_grpc.SearchServiceStub(channels.searches),
         ),
     )
+
+    temporary_token_auth = TemporaryTokenAuth(
+        api_key=app.settings.j_one_api_key,
+        reseller_credentials_mapping=app.settings.reseller_j1_credentials_mapping,
+    )
     container[JunctionOneClient] = JunctionOneClient(
         api_base_url=app.settings.j_one_api_base_url,
         http_client=http_client,
-        auth=TokenAuth(
-            JunctionOneAuth(
-                api_key=app.settings.j_one_api_key,
-                authorization="",  # TODO(paul): Add authorization
-            ),
-        ),
+        auth=temporary_token_auth,
     )
     container[repositories.AbstractAirSearchRepo] = repositories.AirSearchRepo  # type: ignore[type-abstract]
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
@@ -127,6 +127,10 @@ async def _http(
                 cls=authentication.AuthenticationMiddleware,
                 backend=auth_backend,
                 on_error=handlers.auth_error_handler,
+            ),
+            Middleware(
+                JunctionOneClientMiddleware,
+                temporary_token_auth=temporary_token_auth,
             ),
         ],
         openapi_path=filesystem.resource_path(

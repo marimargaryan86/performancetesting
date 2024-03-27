@@ -1,6 +1,4 @@
-import dataclasses
 import inspect
-from collections.abc import AsyncGenerator
 from typing import Any, Literal
 
 import httpx
@@ -12,27 +10,6 @@ from snowfall.vendor.junction_one.models import base as models
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Method = Literal["GET", "POST"]
-
-
-@dataclasses.dataclass(frozen=True)
-class JunctionOneAuth(object):
-    authorization: str
-    api_key: str
-
-
-class TokenAuth(httpx.Auth):
-    def __init__(self, auth: JunctionOneAuth):
-        self._auth = auth
-
-    async def async_auth_flow(
-        self,
-        request: httpx.Request,
-    ) -> AsyncGenerator[httpx.Request, httpx.Response]:
-        request.headers.update({
-            "X-Api-Key": self._auth.api_key,
-            "Authorization": self._auth.authorization,
-        })
-        yield request
 
 
 class JunctionOneClient(object):
