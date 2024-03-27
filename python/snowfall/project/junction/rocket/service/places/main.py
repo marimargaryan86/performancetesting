@@ -3,12 +3,14 @@ import ipaddress
 import json
 import pathlib
 import pkgutil
+import random
 from collections.abc import AsyncIterable, Mapping, Sequence
 from typing import Any
 
 import aiocsv
 import aiofiles
-from pydantic import MongoDsn
+from motor import motor_asyncio
+from pydantic import AnyUrl
 
 from snowfall.project.junction.rocket.service.places import constants
 from snowfall.project.junction.rocket.service.places.grpc import PlacesService
@@ -23,7 +25,7 @@ from snowfall.project.junction.rocket.service.places.v1alpha import models_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import application, grpc_factory, mongo_factory
+from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
 
 _logger = stdout.get_logger()
@@ -31,14 +33,14 @@ _logger = stdout.get_logger()
 
 class _GeneratePlacesSettings(application.Settings):
     geodata_address: str
-    mongo_dsn: MongoDsn
+    mongo_dsn: Sequence[AnyUrl]
 
 
 class _GrpcSettings(application.Settings):
     default_page_size: int = 100
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 51055
-    mongo_dsn: MongoDsn
+    mongo_dsn: Sequence[AnyUrl]
 
 
 async def _generate_places(  # noqa: WPS231
@@ -46,7 +48,9 @@ async def _generate_places(  # noqa: WPS231
 ) -> None:
     asyncio.get_running_loop().slow_callback_duration = 1
 
-    mongo = await mongo_factory.make_database(app=app, dsn=app.settings.mongo_dsn)
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
 
     geocoding_service = geocoding_pb2_grpc.GeocodingServiceStub(
         await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
@@ -102,7 +106,7 @@ async def _generate_places(  # noqa: WPS231
         },
     }
 
-    places_repo = PlaceRepository(collection=mongo.places)
+    places_repo = PlaceRepository(collection=mongo.junction_places.places)
 
     await _generate_places_from_nodes_and_cities(
         country_codes_to_countries=country_codes_to_countries,
@@ -154,14 +158,16 @@ async def _generate_places_from_nodes_and_cities(
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
-    mongo = await mongo_factory.make_database(app=app, dsn=app.settings.mongo_dsn)
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
     grpc_server = server.create_server(
         address=app.settings.grpc_address,
         port=app.settings.grpc_port,
         services=[
             PlacesService(
                 places_repository=PlaceRepository(
-                    collection=mongo.places,
+                    collection=mongo.junction_places.places,
                 ),
                 default_page_size=app.settings.default_page_size,
             ),
