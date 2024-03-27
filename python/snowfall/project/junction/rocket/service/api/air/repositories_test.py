@@ -3,8 +3,8 @@ import uuid
 import pytest
 from mongomock_motor import MongoClient
 
-from snowfall.project.junction.rocket.service.api.models import AirSearchResult
-from snowfall.project.junction.rocket.service.api.repositories import AirSearchRepo
+from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
+from snowfall.project.junction.rocket.service.api.air.repositories import AirSearchRepo
 
 RESULT_UUID = "621f61c0-1605-471a-85f6-f930c8d29cb3"
 

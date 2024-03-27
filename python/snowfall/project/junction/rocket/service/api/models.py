@@ -1,7 +1,6 @@
 import uuid
-from datetime import date, datetime
+from datetime import datetime
 from enum import IntEnum
-from typing import Literal
 
 from pydantic import BaseModel as PydanticBase
 from pydantic import ConfigDict, Field, alias_generators
@@ -13,34 +12,6 @@ class BaseModel(PydanticBase):
         populate_by_name=True,
         from_attributes=True,
     )
-
-
-class Passenger(BaseModel):
-    date_of_birth: date
-
-
-class AirSearchResult(BaseModel):
-    id: uuid.UUID
-
-
-class AirSearchCriteria(BaseModel):
-    departure_at: date
-    origin: str
-    destination: str
-
-
-class AirSearchAttributes(BaseModel):
-    criteria: AirSearchCriteria
-    passengers: list[Passenger]
-
-
-class AirSearchRequestData(BaseModel):
-    type: Literal["air-searches"]
-    attributes: AirSearchAttributes
-
-
-class AirSearchRequest(BaseModel):
-    data: AirSearchRequestData
 
 
 class PlaceType(IntEnum):

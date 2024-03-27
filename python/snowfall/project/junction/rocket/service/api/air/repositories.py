@@ -5,7 +5,7 @@ import lagom
 import orjson
 from pymongo import MongoClient
 
-from snowfall.project.junction.rocket.service.api.models import AirSearchResult
+from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
 
 
 class AbstractAirSearchRepo(ABC):

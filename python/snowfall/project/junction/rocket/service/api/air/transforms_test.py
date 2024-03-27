@@ -2,7 +2,7 @@ from datetime import date
 
 import freezegun
 
-from snowfall.project.junction.rocket.service.api.transforms import (
+from snowfall.project.junction.rocket.service.api.air.transforms import (
     AirSearchRequestTransformer,
 )
 

@@ -4,8 +4,8 @@ from datetime import date
 import freezegun
 import pytest
 
-from snowfall.project.junction.rocket.service.api.models import Passenger
-from snowfall.project.junction.rocket.service.api.passengers import (
+from snowfall.project.junction.rocket.service.api.air.models import Passenger
+from snowfall.project.junction.rocket.service.api.air.passengers import (
     passengers_to_fake_user_ids,
 )
 

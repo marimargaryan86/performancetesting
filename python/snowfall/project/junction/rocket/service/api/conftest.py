@@ -3,13 +3,15 @@ from collections.abc import AsyncIterator, Mapping
 
 import httpx
 import pytest
+from lagom.integrations import starlette
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.adapter import errors, search_results, searches
-from snowfall.project.junction.rocket.service.api import dependencies, router
+from snowfall.project.junction.rocket.service.api import dependencies
+from snowfall.project.junction.rocket.service.api.car_rental import router
 from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
@@ -38,9 +40,11 @@ def app(
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
-            dependencies.create_dependencies(
-                search_results_client=search_results_client,
-                searches_client=searches_client,
+            starlette.StarletteIntegration(
+                dependencies.create_dependencies(
+                    search_results_client=search_results_client,
+                    searches_client=searches_client,
+                ),
             ),
         ),
         openapi_path=filesystem.resource_path("junction.rocket_api", "openapi.json"),

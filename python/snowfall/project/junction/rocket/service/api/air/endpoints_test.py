@@ -11,12 +11,12 @@ from pytest_mock import MockerFixture
 from starlette import applications
 from starlette.testclient import TestClient
 
-from snowfall.project.junction.rocket.service.api import air_search as routes
-from snowfall.project.junction.rocket.service.api.models import AirSearchResult
-from snowfall.project.junction.rocket.service.api.repositories import (
+from snowfall.project.junction.rocket.service.api.air import endpoints as routes
+from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
+from snowfall.project.junction.rocket.service.api.air.repositories import (
     AbstractAirSearchRepo,
 )
-from snowfall.project.junction.rocket.service.api.types import (
+from snowfall.project.junction.rocket.service.api.air.types import (
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
@@ -61,7 +61,7 @@ def air_search_repo() -> FakeAirSearchRepo:
 
 
 @pytest.fixture()
-def app(
+def air_app(
     junction_one_client: JunctionOneClient,
     air_search_repo: FakeAirSearchRepo,
 ) -> applications.Starlette:
@@ -91,8 +91,8 @@ def app(
 
 
 @pytest.fixture()
-def client(app: applications.Starlette) -> TestClient:
-    return TestClient(app)
+def air_client(air_app: applications.Starlette) -> TestClient:
+    return TestClient(air_app)
 
 
 @pytest.fixture()
@@ -107,7 +107,7 @@ def junction_one_client(http_client: httpx.AsyncClient) -> JunctionOneClient:
 
 
 def test_air_search_creation_and_storage(
-    client: TestClient,
+    air_client: TestClient,
     mocker: MockerFixture,
     air_search_repo: FakeAirSearchRepo,
 ) -> None:
@@ -116,7 +116,7 @@ def test_air_search_creation_and_storage(
         return_value=SearchFlightsResponse(),
     )
 
-    response = client.post("/air/searches", json={"origin": "LON"})
+    response = air_client.post("/air/searches", json={"origin": "LON"})
 
     assert response.status_code == 200
     assert response.json() == {"id": RESULT_UUID}
@@ -126,28 +126,28 @@ def test_air_search_creation_and_storage(
 
 
 def test_air_search_get_status(
-    client: TestClient,
+    air_client: TestClient,
     mocker: MockerFixture,
 ) -> None:
     mocker.patch(
         "snowfall.vendor.junction_one.client.JunctionOneClient.search_flights",
         return_value=SearchFlightsResponse(),
     )
-    client.post("/air/searches", json={"origin": "LON"})
+    air_client.post("/air/searches", json={"origin": "LON"})
 
-    response = client.get("/air/searches/{0}".format(RESULT_UUID))
+    response = air_client.get("/air/searches/{0}".format(RESULT_UUID))
 
     assert response.status_code == 200
     assert response.json()["status"] == "completed"
 
 
 def test_air_search_retrieval(
-    client: TestClient,
+    air_client: TestClient,
     air_search_repo: FakeAirSearchRepo,
 ) -> None:
     result = AirSearchResult(id=uuid.UUID(RESULT_UUID))
     air_search_repo.insert(result)
-    response = client.get("/air/searches/123/results")
+    response = air_client.get("/air/searches/123/results")
 
     assert response.status_code == 200
     assert response.json()["id"] == RESULT_UUID

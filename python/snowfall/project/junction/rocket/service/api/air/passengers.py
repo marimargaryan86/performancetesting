@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from datetime import UTC, date, datetime
 
-from snowfall.project.junction.rocket.service.api.models import Passenger
+from snowfall.project.junction.rocket.service.api.air.models import Passenger
 
 _adult = 18
 _infant = 2
