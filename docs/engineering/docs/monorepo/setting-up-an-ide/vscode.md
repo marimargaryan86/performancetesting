@@ -17,7 +17,7 @@ ___
 Before you start, you need to export a Python virtual environment from Pants, as well as the Python code generated from our protocol buffers.
 
 ```shell
-pants export --resolve=python-default
+pants export
 pants export-codegen protobuf/::
 ```
 
@@ -165,7 +165,7 @@ The following settings are entirely optional but recommened for improving your d
     {
       "match": "vendor/constraints.txt",
       "isAsync": true,
-      "cmd": "cd '${workspaceRoot}'; pants export --resolve=python-default",
+      "cmd": "cd '${workspaceRoot}'; pants export",
       "event": "onFileChange"
     }
   ],
