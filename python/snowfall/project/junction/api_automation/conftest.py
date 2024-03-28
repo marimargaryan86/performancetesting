@@ -16,11 +16,16 @@ from typing import Any
 
 import allure
 import httpx
+import hvac
 import pytest
 from pymongo import MongoClient
 
+from snowfall.project.junction.api_automation.service_objects.qa_client import (
+    QaClient,
+)
 from snowfall.project.junction.api_automation.test_functions.helper import (
     ConfigurationManager,
+    get_variable_from_server,
     get_variable_value,
 )
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
@@ -336,3 +341,45 @@ def mongo_client(host: str, api_token: str) -> MongoClient[Any]:
 @pytest.fixture()
 def config_manager(host: str, api_token: str) -> ConfigurationManager:
     return ConfigurationManager(host, api_token)
+
+
+def get_all_variable_values(host: str, api_token: str) -> dict[str, Any]:
+    vault_username, vault_password = api_token.split("+")
+    client = hvac.Client(url=host)
+    client.auth.userpass.login(username=vault_username, password=vault_password)
+    is_authenticated = client.is_authenticated()
+
+    if not is_authenticated:
+        return {}
+
+    environments = ["sandbox", "development", "production"]
+    for environment in environments:
+        returned_data = get_variable_from_server(client, environment)
+        if returned_data:
+            return returned_data["data"]["data"]
+    return {}
+
+
+@pytest.fixture(scope="package")
+@allure.title("Get variables from vault")  # type: ignore[misc]
+def config_variables(host: str, api_token: str) -> dict[str, Any]:
+    return get_all_variable_values(host, api_token)
+
+
+def create_qa_client(api_url: str, api_token: str, sentry_url: str) -> QaClient:
+    client_timeout = 20
+    return QaClient(
+        base_url=api_url,
+        auth=auth.TokenAuth(api_token),
+        token=api_token,
+        client=httpx.AsyncClient(timeout=client_timeout),
+        sentry_url=sentry_url,
+    )
+
+
+@pytest.fixture()
+@allure.title("Instantiate a test client for Junction API")  # type: ignore[misc]
+def qa_client(config_variables: Mapping[str, str], sentry_url: str) -> QaClient:
+    api_url = "{0}{1}".format(HTTPS_PREFIX, config_variables["rocket_api_host"])
+    token = config_variables["rocket_api_token_mock"]
+    return create_qa_client(api_url, token, sentry_url)
