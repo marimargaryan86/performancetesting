@@ -59,20 +59,18 @@ class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):
     def register(self, server: grpc.aio.Server) -> None:
         bookings_pb2_grpc.add_BookingServiceServicer_to_server(self, server)
 
-    async def GetBookings(  # type: ignore[override] # noqa: N802
+    async def GetBooking(  # type: ignore[override] # noqa: N802
         self,
-        request: bookings_pb2.GetBookingsRequest,
+        request: bookings_pb2.GetBookingRequest,
         context: grpc.aio.ServicerContext,
-    ) -> bookings_pb2.GetBookingsResponse:
-        booking_list: list[bookings_pb2.Booking] = []
+    ) -> bookings_pb2.GetBookingResponse:
+        try:
+            booking = await self._implementation.get(request.id)
+        except NotFoundError:
+            self._logger.warning("Booking not found", id=request.id)
+            return context.abort(grpc.StatusCode.NOT_FOUND)
 
-        for booking_id in request.ids:
-            try:
-                booking_list.append(await self._implementation.get(booking_id))
-            except NotFoundError:
-                self._logger.warning("Booking not found", id=booking_id)
-
-        return bookings_pb2.GetBookingsResponse(bookings=booking_list)
+        return bookings_pb2.GetBookingResponse(booking=booking)
 
     async def MakeBooking(  # type: ignore[override] # noqa: N802
         self,

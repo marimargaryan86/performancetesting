@@ -8,17 +8,17 @@ import "snowfall/stdlib/v1/money.proto";
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/provider/v1alpha";
 
 service BookingService {
-  rpc GetBookings(GetBookingsRequest) returns (GetBookingsResponse) {}
+  rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
   rpc MakeBooking(MakeBookingRequest) returns (MakeBookingResponse) {}
   rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
 }
 
-message GetBookingsRequest {
-  repeated string ids = 1;
+message GetBookingRequest {
+  string id = 1;
 }
 
-message GetBookingsResponse {
-  repeated Booking bookings = 1;
+message GetBookingResponse {
+  Booking booking = 1;
 }
 
 message MakeBookingRequest {

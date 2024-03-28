@@ -31,7 +31,6 @@ class _GrpcSettings(_BookingSettings, application.Settings):
     gateway_address: str
     grpc_address: ipaddress.IPv4Address = ipaddress.IPv4Address("127.0.0.1")
     grpc_port: int = 50051
-    smtp_dsn: pydantic.AnyUrl
 
 
 class _TicketEventsConsumerSettings(application.Settings):
@@ -108,7 +107,7 @@ async def _import(app: application.Application[_BookingSettings]) -> None:
         consumer_obj=consumer.Consumer(
             connection=connection,
             queue_name="{0}_bookings".format(app.name),
-            binds=[(types.Exchange("bookings"), "bookings.result.prices")],
+            binds=[(types.Exchange("bookings"), "bookings.results.prices")],
         ),
         booking_repository=repository.BookingRepository(
             mongo.bookings.bookings,

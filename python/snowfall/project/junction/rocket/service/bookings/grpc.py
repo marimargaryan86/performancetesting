@@ -1,3 +1,5 @@
+import asyncio
+
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.rocket.service.bookings import bookings
@@ -17,6 +19,7 @@ from snowfall.project.junction.rocket.service.bookings.v1alpha import (
 from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     meta_pb2_grpc,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.grpc import rich_status, service
 
@@ -64,6 +67,7 @@ class BookingService(
             )
         booking = await self._bookings.insert(
             document=models_pb2.Booking(
+                id=string.uuid(),
                 reseller_id=request.reseller_id,
                 trip_option=request.trip_option,
                 passengers=request.passengers,
@@ -81,7 +85,6 @@ class BookingService(
         context: aio.ServicerContext,
     ) -> bookings_pb2.GetBookingResponse:
         booking = await self._bookings.find_by_id(request.id)
-
         if booking is None:
             return await context.abort(StatusCode.NOT_FOUND)
 
@@ -103,8 +106,12 @@ class BookingService(
         bookings_result.limit(
             request.page_size if request.page_size else self._default_page_size,
         )
-        # TODO(reuben.t): get latest from GW
+
+        bookings_list = [booking async for booking in bookings_result]
+        latest_bookings = await asyncio.gather(
+            *[self._booking_handler.get_latest(booking) for booking in bookings_list],
+        )
         return bookings_pb2.ListBookingsResponse(
-            bookings=[],
+            bookings=latest_bookings,
             next_page_token=await bookings_result.cursor(),
         )

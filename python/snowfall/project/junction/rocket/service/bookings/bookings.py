@@ -11,6 +11,7 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2 as gateway_bookings_pb2,
 )
 from snowfall.project.junction.rocket.service.gateway.v1alpha import bookings_pb2_grpc
+from snowfall.stdlib import sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 
@@ -49,26 +50,31 @@ class BookingHandler(object):
         self,
         booking: models_pb2.Booking,
     ) -> models_pb2.Booking:
-        # TODO(reuben.t): fix this to single booking
+        gw_identifier = sequence.to_composite_id([
+            booking.provider_id,
+            booking.provider_booking.booking_reference,
+        ])
         try:
-            await self._gateway.GetBooking(
+            response = await self._gateway.GetBooking(
                 request=gateway_bookings_pb2.GetBookingRequest(
-                    id="",
+                    id=gw_identifier,
                 ),
                 timeout=self._timeout,
             )
         except grpc.aio.AioRpcError:
             self._logger.warning("Gateway service not available.")
             return booking
-        # TODO(reuben.t): implement local update
-        return models_pb2.Booking()
+
+        return await self.update_local_with_provider(
+            local_booking=booking,
+            provider_booking=response.booking,
+        )
 
     async def update_local_with_provider(
         self,
         local_booking: models_pb2.Booking,
         provider_booking: bookings_pb2.Booking,
     ) -> models_pb2.Booking:
-        # TODO(reuben.t): revisit fields
         local_booking.provider_booking.ticket_urls.extend(provider_booking.ticket_urls)
         if not _provider_booking_is_newer(local_booking, provider_booking):
             return local_booking

@@ -7,8 +7,16 @@ import pydantic
 from aio_pika import abc
 from redis import asyncio as aioredis
 
-from snowfall.project.junction.rocket.provider import meta, searches, service
+from snowfall.project.junction.rocket.provider import (
+    bookings as provider_bookings,
+)
+from snowfall.project.junction.rocket.provider import (
+    meta,
+    searches,
+    service,
+)
 from snowfall.project.junction.rocket.service.providers.mock import (
+    bookings,
     cache,
     pricing,
 )
@@ -16,8 +24,9 @@ from snowfall.project.junction.rocket.service.providers.mock import (
     searches as provider_searches,
 )
 from snowfall.project.junction.rocket.service.providers.mock.constant import PROVIDER_ID
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory
+from snowfall.stdlib.service import amqp_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 _PROVIDER_NAME = "Mock"
@@ -33,8 +42,15 @@ class _Settings(service.ProviderSettings):
     )
 
 
+class _BookingsSettings(service.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    redis_dsn: pydantic.RedisDsn
+    storage_dsn: service.AnyDsn
+
+
 class _PricingSettings(service.ProviderSettings):
     amqp_dsn: pydantic.AmqpDsn
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
 async def _meta_factory() -> meta.MetaImplementation:
@@ -65,7 +81,11 @@ async def _search_factory(
 
 async def _pricing(app: service.Application[_PricingSettings]) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
     quote_task_consumer = pricing.QuoteTaskConsumer(
         consumer_obj=consumer.Consumer(
             connection=connection,
@@ -76,9 +96,58 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
             producer_obj=producer.Producer(connection, types.Exchange("searches")),
             routing_key="searches.pricing_results",
         ),
+        quote_cache=cache.QuoteCache(
+            client=redis_client,
+        ),
+        ttl=app.settings.ttl,
     )
 
     await quote_task_consumer.consume()
+
+
+async def _bookings(app: service.Application[_BookingsSettings]) -> None:
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+
+    await bookings.Consumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_bookings".format(app.name),
+            binds=[(types.Exchange("bookings"), "bookings.prices")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("bookings"),
+        ),
+        booker=bookings.Booker(
+            quote_cache=cache.QuoteCache(
+                client=redis_client,
+            ),
+            booking_storage=storage,
+            provider_id=PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
+        ),
+    ).consume()
+
+
+async def _bookings_factory(
+    app: service.Application[_Settings],
+) -> provider_bookings.Implementation:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+
+    return provider_bookings.Implementation(
+        storage=storage,
+        transformer=bookings.Transformer().raw_to_booking,
+    )
 
 
 if __name__ == "__main__":
@@ -87,14 +156,18 @@ if __name__ == "__main__":
         settings_class=_Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,
+        bookings_factory=_bookings_factory,
     )
 
-    entrypoint.add_command(
+    entrypoint.enter_with_commands(
         service.Command(
             name="pricing",
             callback=_pricing,
             settings_class=_PricingSettings,
         ),
+        service.Command(
+            name="bookings",
+            callback=_bookings,
+            settings_class=_BookingsSettings,
+        ),
     )
-
-    entrypoint.enter()

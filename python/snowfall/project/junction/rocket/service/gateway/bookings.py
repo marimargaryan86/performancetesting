@@ -1,4 +1,4 @@
-from grpc import aio
+import grpc
 
 from snowfall.project.junction.rocket.service.gateway import providers
 from snowfall.project.junction.rocket.service.gateway.v1alpha import (
@@ -17,28 +17,28 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
     def get_name(self) -> str:
         return bookings_pb2.DESCRIPTOR.services_by_name["BookingService"].full_name
 
-    def register(self, server: aio.Server) -> None:
+    def register(self, server: grpc.aio.Server) -> None:
         bookings_pb2_grpc.add_BookingServiceServicer_to_server(self, server)
 
     async def GetBooking(  # type: ignore[override] # noqa: N802
         self,
         request: bookings_pb2.GetBookingRequest,
-        context: aio.ServicerContext,
+        context: grpc.aio.ServicerContext,
     ) -> bookings_pb2.GetBookingResponse:
-        provider = await self._providers.find_by_id(request.id)
+        provider_id, _booking_id = providers.unmarshal_resource_id(request.id)
+        provider = await self._providers.find_by_id(provider_id)
 
         if not provider:
-            return bookings_pb2.GetBookingResponse()
+            self._logger.warning("Unknown provider", provider_id=provider_id)
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        booking = await self._get_booking(provider, request.id)
+        try:
+            booking = await provider.connection.bookings.GetBooking(request.id)
+        except grpc.aio.AioRpcError:
+            self._logger.warning(
+                "Failed to retrieve booking from provider",
+                provider=provider.identifier,
+            )
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return bookings_pb2.GetBookingResponse(booking=booking)
-
-    async def _get_booking(
-        self,
-        provider: providers.Provider,
-        booking_id: str,
-    ) -> bookings_pb2.Booking:
-        # TODO(reuben.t): replace with new fetch from provider protos
-
-        return bookings_pb2.Booking()
