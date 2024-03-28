@@ -52,19 +52,9 @@ class TemporaryTokenAuth(httpx.Auth):
         self,
         request: httpx.Request,
     ) -> AsyncGenerator[httpx.Request, httpx.Response]:
-        try:
-            reseller_id = _reseller_id.get()
-        except LookupError as err:
-            raise ValueError("reseller_id not set") from err
-
-        creds = self._reseller_credentials_mapping.get(reseller_id)
-
-        if not creds:
-            raise ValueError("No credentials for reseller_id.")
-
         request.headers.update({
             "X-Api-Key": self._api_key,
-            "Authorization": creds["j1_authorization"],
+            "Authorization": self._get_creds()["j1_authorization"],
         })
 
         yield request
@@ -77,3 +67,19 @@ class TemporaryTokenAuth(httpx.Auth):
             yield
         finally:
             _reseller_id.reset(context_token)
+
+    def get_org_id(self) -> int:
+        return int(self._get_creds()["org_id"])
+
+    def _get_creds(self) -> J1Credentials:
+        try:
+            reseller_id = _reseller_id.get()
+        except LookupError as err:
+            raise ValueError("reseller_id not set") from err
+
+        creds = self._reseller_credentials_mapping.get(reseller_id)
+
+        if not creds:
+            raise ValueError("No credentials for reseller_id.")
+
+        return creds

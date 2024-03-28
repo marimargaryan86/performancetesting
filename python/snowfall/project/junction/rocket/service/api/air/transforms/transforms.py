@@ -17,7 +17,6 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
         self,
         value: Mapping[str, Any],
     ) -> j1.SearchFlightsRequest:
-        org_id = value.get("org_id")
         attributes = rocket.AirSearchRequest(**value).data.attributes
         ods = [
             j1.OriginDestinationRequest(
@@ -42,7 +41,6 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
         return j1.SearchFlightsRequest(
             ods=ods,
             user_ids=passengers_to_fake_user_ids(attributes.passengers),
-            org_id=org_id,
         )
 
     def _convert_datetime_to_date(
