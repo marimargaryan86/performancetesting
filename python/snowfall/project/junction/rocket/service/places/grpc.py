@@ -43,17 +43,13 @@ class PlacesService(
         request: places_pb2.GetPlaceClosestToCoordinatesRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceClosestToCoordinatesResponse:
-        closest_places = await self._places.find_within_radius(
+        closest_place = await self._places.find_closest_within_radius(
             coordinates=request.coordinates_and_radius.coordinates,
             radius=request.coordinates_and_radius.radius,
         )
-        try:
-            closest_place = await closest_places.take()
-        except StopAsyncIteration:
-            await context.abort(
-                code=StatusCode.NOT_FOUND,
-            )
-        return places_pb2.GetPlaceClosestToCoordinatesResponse(place=closest_place)  # type: ignore[possibly-undefined]
+        if not closest_place:
+            await context.abort(code=StatusCode.NOT_FOUND)
+        return places_pb2.GetPlaceClosestToCoordinatesResponse(place=closest_place)
 
     async def GetPlaceByIata(  # type: ignore[override]  # noqa: N802
         self,

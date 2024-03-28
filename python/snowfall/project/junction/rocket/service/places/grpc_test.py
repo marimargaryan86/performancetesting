@@ -144,9 +144,7 @@ class TestGrpc(object):
     ) -> None:
         place = models_pb2.Place(id="an-id")
         mock_repository = mock.AsyncMock()
-        closest_places_result = mock.AsyncMock()
-        closest_places_result.take.return_value = place
-        mock_repository.find_within_radius.return_value = closest_places_result
+        mock_repository.find_closest_within_radius.return_value = place
         places_service = PlacesService(
             places_repository=mock_repository,
             default_page_size=10,
@@ -160,7 +158,7 @@ class TestGrpc(object):
             ),
             context=grpc_context,
         )
-        mock_repository.find_within_radius.assert_called_once_with(
+        mock_repository.find_closest_within_radius.assert_called_once_with(
             coordinates=LatLng(latitude=0, longitude=0),
             radius=100,
         )
@@ -171,9 +169,7 @@ class TestGrpc(object):
         grpc_context: grpc.aio.ServicerContext,
     ) -> None:
         mock_repository = mock.AsyncMock()
-        within_radius_return = mock.AsyncMock()
-        within_radius_return.take.side_effect = StopAsyncIteration
-        mock_repository.find_within_radius.return_value = within_radius_return
+        mock_repository.find_closest_within_radius.return_value = None
         places_service = PlacesService(
             places_repository=mock_repository,
             default_page_size=10,
@@ -188,7 +184,7 @@ class TestGrpc(object):
                 ),
                 context=grpc_context,
             )
-        mock_repository.find_within_radius.assert_called_once_with(
+        mock_repository.find_closest_within_radius.assert_called_once_with(
             coordinates=LatLng(latitude=0, longitude=0),
             radius=100,
         )

@@ -102,6 +102,38 @@ class PlaceRepository(
 
         return await self._find_with_cursor(cur=cursor, filter_=filter_)
 
+    async def find_closest_within_radius(
+        self,
+        coordinates: latlng_pb2.LatLng,
+        radius: int,
+        type_: models_pb2.Type.ValueType | None = None,
+    ) -> models_pb2.Place | None:
+        filter_: dict[str, Any] = {
+            "coordinates": {
+                "$nearSphere": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            coordinates.longitude,
+                            coordinates.latitude,
+                        ],
+                    },
+                    "$maxDistance": min(
+                        max(radius, 10),
+                        _RADIUS_TO_MATCH_PLACE_WITH_CITY,
+                    ),
+                },
+            },
+        }
+
+        if type_:
+            filter_["type"] = type_
+
+        return await self._execute(
+            self._collection.find_one,
+            filter_,
+        )
+
     async def find_with_filters(
         self,
         filters: places_pb2.Filters,
