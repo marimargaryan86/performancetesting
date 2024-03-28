@@ -15,7 +15,7 @@ from snowfall.project.junction.go.service.orders.v1.orders_pb2_grpc import (
 from snowfall.project.junction.go.service.resellers.v1.resellers_pb2_grpc import (
     ResellerServiceStub,
 )
-from snowfall.project.pay.adapter import companies, currencies, refunds
+from snowfall.project.pay.adapter import companies, currencies, invoice_payment, refunds
 from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
@@ -23,18 +23,26 @@ from snowfall.project.pay.service.companies.v1.grpc_pb2_grpc import (
     CompaniesServiceStub,
 )
 from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
+from snowfall.project.pay.service.payments.v1.invoice_pb2_grpc import InvoiceServiceStub
 from snowfall.project.pay.service.refunds.v1.grpc_pb2_grpc import RefundsServiceStub
 from snowfall.project.pay.service.transactions import cache, smtp, transactions
 from snowfall.project.pay.service.transactions.generate_cancellation_csv import (
     CSVGeneratorCancellation,
 )
 from snowfall.project.pay.service.transactions.generate_csv import CSVGenerator
+from snowfall.project.pay.service.transactions.generate_statements import (
+    InvoiceGenerator,
+    StatementGenerator,
+)
 from snowfall.project.pay.service.transactions.grpc import (
     BillsService,
     QuotationsService,
     TransactionsService,
 )
-from snowfall.project.pay.service.transactions.reports_cron import NetsuiteReportJob
+from snowfall.project.pay.service.transactions.reports_cron import (
+    NetsuiteReportJob,
+    StatementReportJob,
+)
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import application, grpc_factory, redis_factory
 from snowfall.stdlib.transport.grpc import server
@@ -66,6 +74,17 @@ class _ReportsSettings(application.Settings):
 
 class _ReportsCancellationSettings(_ReportsSettings):
     refunds_address: str
+
+
+class _ReportsStatementsSettings(application.Settings):
+    mongo_dsn: Sequence[pydantic.AnyUrl]
+    smtp_dsn: pydantic.AnyUrl
+    storage_dsn: application.AnyDsn
+    companies_address: str
+    resellers_address: str
+    credit_card_address: str
+    orders_address: str
+    pay_email: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -240,6 +259,72 @@ async def _reports_cron_run_cancellation(
     await job.run()
 
 
+async def _reports_cron_statements(
+    app: application.Application[_ReportsStatementsSettings],
+) -> None:
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(
+            "{0}/statements/".format(str(app.settings.storage_dsn)),
+        ),
+    )
+
+    (
+        orders_channel,
+        reseller_channel,
+        companies_channel,
+        invoice_channel,
+    ) = await asyncio.gather(
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.orders_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.resellers_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.companies_address,
+        ),
+        grpc_factory.make_insecure_channel(
+            app,
+            app.settings.credit_card_address,
+        ),
+    )
+
+    invoice_generator = InvoiceGenerator(
+        transactions.TransactionsRepository(mongo.transactions.transactions),
+        transactions.InvoiceRepository(mongo.invoices.invoices),
+        resellers.GrpcClient(ResellerServiceStub(reseller_channel), timeout=100),
+        invoice_payment.GrpcClient(InvoiceServiceStub(invoice_channel), timeout=100),
+        companies.GrpcClient(CompaniesServiceStub(companies_channel), timeout=100),
+        statement_generator=StatementGenerator(
+            orders_client=orders.GrpcClient(
+                OrderServiceStub(orders_channel),
+                timeout=100,
+            ),
+        ),
+    )
+
+    job = StatementReportJob(
+        aiosmtplib.SMTP(
+            hostname=app.settings.smtp_dsn.host,
+            port=int(app.settings.smtp_dsn.port or 0) or None,
+            username=app.settings.smtp_dsn.username,
+            password=app.settings.smtp_dsn.password,
+        ),
+        storage=storage,
+        statement_creator=invoice_generator,
+        from_email=app.settings.pay_email,
+    )
+
+    await job.run()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="transactions")
 
@@ -254,5 +339,10 @@ if __name__ == "__main__":
             name="reports-cron-cancellation",
             callback=_reports_cron_run_cancellation,
             settings_class=_ReportsCancellationSettings,
+        ),
+        application.Command(
+            name="reports-cron-statement",
+            callback=_reports_cron_statements,
+            settings_class=_ReportsStatementsSettings,
         ),
     )

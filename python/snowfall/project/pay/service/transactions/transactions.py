@@ -28,7 +28,44 @@ class TransactionsRepository(
             {selector: selection_value},
         )
 
-    async def list_transactions(
+    async def list_transactions_for_invoices(
+        self,
+        filter_by_payer_ids: Sequence[str] = (),
+        from_date: datetime.date | None = None,
+        to_date: datetime.date | None = None,
+        payment_method: int | None = None,
+        payment_type: int | None = None,
+        status: int | None = None,
+        *,
+        invoice_id_is_not_exist: bool = False,
+    ) -> resultset.ResultSet[models_pb2.Transaction]:
+        filter_: dict[str, Any] = {}
+
+        if filter_by_payer_ids:
+            filter_["payer_id"] = {
+                "$in": list(filter_by_payer_ids),
+            }
+        if payment_method:
+            filter_["payment_method"] = payment_method
+        if payment_type:
+            filter_["payment_type"] = payment_type
+
+        if status:
+            filter_["status"] = status
+        if invoice_id_is_not_exist:
+            filter_["invoice_id"] = {"$exists": False}
+
+        filter_by_date = {}
+        if from_date:
+            filter_by_date["$gte"] = from_date
+        if to_date:
+            filter_by_date["$lte"] = to_date
+        if filter_by_date:
+            filter_["created_at"] = filter_by_date
+
+        return await self._find_with_cursor(filter_=filter_)
+
+    async def list_transactions(  # noqa: WPS231
         self,
         cursor: str = "",
         filter_by_ids: Sequence[str] = (),
@@ -63,7 +100,6 @@ class TransactionsRepository(
             filter_["payer_id"] = {
                 "$in": list(filter_by_payer_ids),
             }
-
         if filter_by_created_dates:
             created_dates = [
                 datetime.datetime.strptime(created_date, "%Y-%m-%d").astimezone(
@@ -115,6 +151,23 @@ class TransactionsRepository(
             update={
                 "$set": {
                     "status": status,
+                },
+            },
+            upsert=False,
+        )
+        return update_result.matched_count != 0
+
+    async def update_invoice_ids(
+        self,
+        transaction_ids: Sequence[str],
+        invoice_id: str,
+    ) -> bool:
+        update_result = await self._execute(
+            self._collection.update_one,
+            filter={repository.mongo_id_key: {"$in": transaction_ids}},
+            update={
+                "$set": {
+                    "invoice_id": invoice_id,
                 },
             },
             upsert=False,

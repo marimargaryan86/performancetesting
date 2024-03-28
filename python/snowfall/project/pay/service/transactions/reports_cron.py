@@ -1,11 +1,16 @@
 import datetime
-from pathlib import Path
+import pathlib
+
+import aiosmtplib
 
 from snowfall.project.pay.service.transactions import smtp
 from snowfall.project.pay.service.transactions.generate_cancellation_csv import (
     CSVGeneratorCancellation,
 )
 from snowfall.project.pay.service.transactions.generate_csv import CSVGenerator
+from snowfall.project.pay.service.transactions.generate_statements import (
+    InvoiceGenerator,
+)
 from snowfall.stdlib.persistence import filesystem
 
 
@@ -44,6 +49,43 @@ class NetsuiteReportJob(object):
             ),
         )
         await self._storage.put(
-            path=Path(self._csv_reporter.report_name(end_date)),
+            path=pathlib.Path(self._csv_reporter.report_name(end_date)),
             file_contents=(csv_data or "").encode(),
         )
+
+
+class StatementReportJob(object):
+    def __init__(
+        self,
+        smtp_client: aiosmtplib.SMTP,
+        storage: filesystem.Storage,
+        statement_creator: InvoiceGenerator,
+        from_email: str,
+    ) -> None:
+        self._smtp_client = smtp_client
+        self._storage = storage
+        self._statement_creator = statement_creator
+        self._from_email = from_email
+
+    async def run(self) -> None:
+        reports = await self._statement_creator.generate_statements()
+        for csv_data, file_path, to_email, file_name in reports:
+            await self._storage.put(
+                path=pathlib.Path(file_path),
+                file_contents=(csv_data or "").encode(),
+            )
+            email_client = smtp.EmailClient(
+                self._smtp_client,
+                from_email=self._from_email,
+                to_email=to_email,
+            )
+            await email_client.send_email(
+                subject="Statements",
+                body="Invoice Report",
+                attachment=smtp.Attachment(
+                    payload=csv_data or "",
+                    main_type="text",
+                    sub_type="csv",
+                    file_name=file_name,
+                ),
+            )
