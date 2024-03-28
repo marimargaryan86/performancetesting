@@ -7,6 +7,7 @@
   import { browser, dev } from "$app/environment";
   import { getTimeDeltaMs } from "$lib/utils/date-time";
   import * as Sentry from "@sentry/sveltekit";
+  import Smartlook from "smartlook-client";
   import integrationInstancesClient from "~/integration-instances-client";
   import { writable } from "svelte/store";
   import { setTranslator, type Locale, setTimeFormat } from "$lib/i18n";
@@ -46,6 +47,9 @@
     setLogoutTimer(data.sessionExpiresAt);
   }
   $: if ($user) {
+    if (Smartlook.initialized()) {
+      Smartlook.identify($user.id, { email: $user.email, role: $user.role });
+    }
     Sentry.setUser({ email: $user.email, id: $user.id });
   } else {
     Sentry.setUser(null);
