@@ -1,10 +1,14 @@
 import asyncio
 import datetime
+import random
+from collections.abc import Sequence
 from typing import Any, NamedTuple
 
 import httpx
+import pydantic
 from grpc import aio
 from lagom.integrations.starlette import StarletteIntegration
+from motor import motor_asyncio
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
@@ -53,6 +57,7 @@ class _Settings(starlette.Settings):
     j_one_api_key: str
     reseller_j1_credentials_mapping: dict[str, Any]
     j_one_api_base_url: str
+    mongo_dsn: Sequence[pydantic.AnyUrl]
 
 
 class _Channels(NamedTuple):
@@ -60,9 +65,7 @@ class _Channels(NamedTuple):
     searches: aio.Channel
 
 
-async def _http(
-    app: application.Application[_Settings],
-) -> None:
+async def _http(app: application.Application[_Settings]) -> None:
     channels = _Channels(
         *await asyncio.gather(
             grpc_factory.make_insecure_channel(
@@ -91,6 +94,10 @@ async def _http(
         ).get_owner_from_jwt,
     )
 
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
 
     container = dependencies.create_dependencies(
@@ -111,7 +118,9 @@ async def _http(
         http_client=http_client,
         auth=temporary_token_auth,
     )
-    container[repositories.AbstractAirSearchRepo] = repositories.AirSearchRepo  # type: ignore[type-abstract]
+    container[repositories.AbstractAirSearchRepo] = repositories.AirSearchRepo(  # type: ignore[type-abstract]
+        collection=mongo.searches.air_results,
+    )
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer
     )

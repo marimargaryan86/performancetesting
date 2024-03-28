@@ -43,13 +43,13 @@ class FakeAirSearchRepo(AbstractAirSearchRepo):
     def __init__(self) -> None:
         self.inserted: list[AirSearchResult] = []
 
-    def insert(self, value: AirSearchResult) -> None:
+    async def insert(self, value: AirSearchResult) -> None:
         self.inserted.append(value)
 
-    def exists_id(self, search_id: str) -> bool:
+    async def exists_id(self, search_id: str) -> bool:
         return search_id in {result.id for result in self.inserted}
 
-    def find_by_id(self, id_: str) -> AirSearchResult:
+    async def find_by_id(self, id_: str) -> AirSearchResult:
         assert len(self.inserted) == 1
         return self.inserted[0]
 
@@ -118,7 +118,12 @@ def test_air_search_creation_and_storage(
     response = air_client.post("/air/searches", json={"origin": "LON"})
 
     assert response.status_code == 200
-    assert response.json() == {"id": RESULT_UUID, "data": []}
+    assert response.json() == {
+        "id": RESULT_UUID,
+        "attributes": {
+            "status": "pending",
+        },
+    }
 
     assert len(air_search_repo.inserted) == 1
     assert str(air_search_repo.inserted[0].id) == RESULT_UUID
@@ -137,15 +142,15 @@ def test_air_search_get_status(
     response = air_client.get("/air/searches/{0}".format(RESULT_UUID))
 
     assert response.status_code == 200
-    assert response.json()["status"] == "completed"
+    assert response.json()["attributes"]["status"] == "completed"
 
 
-def test_air_search_retrieval(
+async def test_air_search_retrieval(
     air_client: TestClient,
     air_search_repo: FakeAirSearchRepo,
 ) -> None:
     result = AirSearchResult(id=RESULT_UUID, data=[])
-    air_search_repo.insert(result)
+    await air_search_repo.insert(result)
     response = air_client.get("/air/searches/123/results")
 
     assert response.status_code == 200

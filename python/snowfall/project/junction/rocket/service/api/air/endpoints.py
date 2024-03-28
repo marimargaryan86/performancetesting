@@ -26,9 +26,16 @@ class AirSearch(endpoints.HTTPEndpoint):
         response = await junction_one_client.search_flights(query)
         transformed = air_search_result_transformer.transform(response)
 
-        repo.insert(transformed)
+        await repo.insert(transformed)
 
-        json_model = transformed.model_dump_json(exclude_none=True)
+        response_model = {
+            "id": transformed.id,
+            "attributes": {
+                "status": "pending",
+            },
+        }
+
+        json_model = json.dumps(response_model)
         return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
 
 
@@ -38,13 +45,19 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
         request: requests.Request,
         repo: AbstractAirSearchRepo = lagom.injectable,
     ) -> responses.Response:
-        search_id = request.path_params["id"]
+        search_id: str = request.path_params["id"]
 
         search_status = (
-            "completed" if repo.exists_id(search_id=search_id) else "pending"
+            "completed" if await repo.exists_id(search_id=search_id) else "processing"
         )
-        json_model = json.dumps({"status": search_status})
+        response_model = {
+            "id": search_id,
+            "attributes": {
+                "status": search_status,
+            },
+        }
 
+        json_model = json.dumps(response_model)
         return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
 
 
@@ -54,7 +67,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
         request: requests.Request,
         repo: AbstractAirSearchRepo = lagom.injectable,
     ) -> responses.Response:
-        model = repo.find_by_id(request.path_params["id"])
+        model = await repo.find_by_id(request.path_params["id"])
         return responses.Response(
             status_code=status.HTTP_200_OK,
             content=model.model_dump_json(exclude_none=True),

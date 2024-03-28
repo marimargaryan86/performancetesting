@@ -1,5 +1,5 @@
 import pytest
-from mongomock_motor import MongoClient
+from mongomock_motor import AsyncMongoMockClient, AsyncMongoMockCollection
 
 from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
 from snowfall.project.junction.rocket.service.api.air.repositories import AirSearchRepo
@@ -8,39 +8,48 @@ RESULT_UUID = "621f61c0-1605-471a-85f6-f930c8d29cb3"
 
 
 @pytest.fixture()
-def mock_mongo_client() -> MongoClient:
-    return MongoClient()
+async def mock_collection() -> AsyncMongoMockCollection:
+    return AsyncMongoMockClient()["db"]["collection"]
 
 
 @pytest.fixture()
-def air_search_repo(mock_mongo_client: MongoClient) -> AirSearchRepo:
-    return AirSearchRepo(mock_mongo_client)
+async def air_search_repo(mock_collection: AsyncMongoMockCollection) -> AirSearchRepo:
+    return AirSearchRepo(collection=mock_collection)
 
 
-def test_insert_air_search_result(air_search_repo: AirSearchRepo) -> None:
+async def test_insert_air_search_result(
+    air_search_repo: AirSearchRepo,
+    mock_collection: AsyncMongoMockCollection,
+) -> None:
     test_result = AirSearchResult(id=RESULT_UUID, data=[])
-    air_search_repo.insert(test_result)
+    await air_search_repo.insert(test_result)
 
-    inserted_document = air_search_repo.collection.find_one({"id": RESULT_UUID})
+    inserted_document = await mock_collection.find_one({"id": RESULT_UUID})
     assert inserted_document is not None
     assert inserted_document["id"] == RESULT_UUID
 
 
-def test_existance(air_search_repo: AirSearchRepo) -> None:
-    assert not air_search_repo.exists_id(RESULT_UUID)
+async def test_existence(
+    air_search_repo: AirSearchRepo,
+    mock_collection: AsyncMongoMockCollection,
+) -> None:
+    assert not await air_search_repo.exists_id(RESULT_UUID)
 
-    air_search_repo.collection.insert_one({"id": RESULT_UUID, "data": []})
+    await mock_collection.insert_one({"id": RESULT_UUID, "data": []})
 
-    assert air_search_repo.exists_id(RESULT_UUID)
+    assert await air_search_repo.exists_id(RESULT_UUID)
 
 
-def test_find_by_id_air_search_result(air_search_repo: AirSearchRepo) -> None:
-    air_search_repo.collection.insert_one({"id": RESULT_UUID, "data": []})
+async def test_find_by_id_air_search_result(
+    air_search_repo: AirSearchRepo,
+    mock_collection: AsyncMongoMockCollection,
+) -> None:
+    await mock_collection.insert_one({"id": RESULT_UUID, "data": []})
 
-    found_result = air_search_repo.find_by_id(RESULT_UUID)
+    found_result = await air_search_repo.find_by_id(RESULT_UUID)
     assert found_result.id == RESULT_UUID
 
 
-def test_raises_if_no_such_collection(air_search_repo: AirSearchRepo) -> None:
+async def test_raises_if_no_such_collection(air_search_repo: AirSearchRepo) -> None:
     with pytest.raises(ValueError, match="No result for id:no_such_id"):
-        air_search_repo.find_by_id("no_such_id")
+        await air_search_repo.find_by_id("no_such_id")
