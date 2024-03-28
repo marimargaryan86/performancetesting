@@ -1,9 +1,16 @@
 import asyncio
 import contextlib
+import dataclasses
 from collections.abc import Iterable, Mapping
 
 import grpc
 
+from snowfall.project.junction.go.service.places.v1 import (
+    places_pb2 as locations_pb2,
+)
+from snowfall.project.junction.go.service.places.v1 import (
+    places_pb2_grpc as locations_pb2_grpc,
+)
 from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2,
     planner_pb2_grpc,
@@ -20,26 +27,41 @@ class _PlaceNotFoundError(ValueError):
     """Raised when a place is not found for a given set of coordinates."""
 
 
+@dataclasses.dataclass(frozen=True)
+class Segment(object):
+    origin: models_pb2.Place
+    destination: models_pb2.Place
+
+
+@dataclasses.dataclass(frozen=True)
+class Route(object):
+    segments: list[Segment]
+
+
 class Routes(object):
     def __init__(
         self,
         planner: planner_pb2_grpc.PlannerServiceStub,
         places: places_pb2_grpc.PlacesServiceStub,
+        locations: locations_pb2_grpc.LocationsServiceStub,
         place_search_radius: int,
     ):
         self._planner = planner
         self._places = places
+        self._locations = locations
         self._search_radius = place_search_radius
 
     async def find_routes(
         self,
-        origin: latlng_pb2.LatLng,
-        destination: latlng_pb2.LatLng,
-    ) -> list[list[tuple[models_pb2.Place, models_pb2.Place]]]:
+        origin: models_pb2.Place,
+        destination: models_pb2.Place,
+    ) -> list[Route]:
         route_response = await self._planner.FindRoutes(
             planner_pb2.FindRoutesRequest(
-                origins=[origin],
-                destinations=[destination],
+                origins=await self._find_location_coordinates(origin.coordinates),
+                destinations=await self._find_location_coordinates(
+                    destination.coordinates,
+                ),
             ),
         )
         segments = [
@@ -60,20 +82,46 @@ class Routes(object):
 
         return resolved_routes
 
+    async def _find_location_coordinates(
+        self,
+        coordinates: latlng_pb2.LatLng,
+    ) -> list[latlng_pb2.LatLng]:
+        found_locations = await self._locations.ListNearbyLocations(
+            locations_pb2.ListNearbyLocationsRequest(
+                coordinates=coordinates,
+                precision=locations_pb2.SearchPrecision(
+                    mode=locations_pb2.SearchPrecision.MODE_AREA,
+                ),
+            ),
+        )
+
+        return list(
+            {
+                location.coordinates.SerializeToString(
+                    deterministic=True,
+                ): location.coordinates
+                for location in found_locations.locations
+            }.values(),
+        )
+
     def _resolve_route(
         self,
         route: planner_pb2.FindRoutesResponse.Route,
         resolved_places: Mapping[bytes, models_pb2.Place],
-    ) -> list[tuple[models_pb2.Place, models_pb2.Place]]:
-        return [
-            (
-                resolved_places[segment.origin.SerializeToString(deterministic=True)],
-                resolved_places[
-                    segment.destination.SerializeToString(deterministic=True)
-                ],
-            )
-            for segment in route.segments
-        ]
+    ) -> Route:
+        return Route(
+            segments=[
+                Segment(
+                    origin=resolved_places[
+                        segment.origin.SerializeToString(deterministic=True)
+                    ],
+                    destination=resolved_places[
+                        segment.destination.SerializeToString(deterministic=True)
+                    ],
+                )
+                for segment in route.segments
+            ],
+        )
 
     async def _resolve_coordinates(
         self,

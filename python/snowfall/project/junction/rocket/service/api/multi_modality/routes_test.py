@@ -7,6 +7,15 @@ import grpc_testing
 import pytest
 import pytest_mock
 
+from snowfall.project.junction.go.service.places.v1 import (
+    models_pb2 as location_models_pb2,
+)
+from snowfall.project.junction.go.service.places.v1 import (
+    places_pb2 as locations_pb2,
+)
+from snowfall.project.junction.go.service.places.v1 import (
+    places_pb2_grpc as locations_pb2_grpc,
+)
 from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2,
     planner_pb2_grpc,
@@ -20,11 +29,37 @@ from snowfall.project.junction.rocket.service.places.v1alpha import (
 from snowfall.stdlib.v1 import latlng_pb2
 
 _Type = TypeVar("_Type")
+_LOCATIONS_MAPPING = types.MappingProxyType({
+    latlng_pb2.LatLng().SerializeToString(deterministic=True): [
+        location_models_pb2.Location(),
+    ],
+})
 _PLACE_MAPPING = types.MappingProxyType({
     latlng_pb2.LatLng().SerializeToString(deterministic=True): models_pb2.Place(
         id="foo",
     ),
 })
+
+
+async def _locations_lookup(
+    request: locations_pb2.ListNearbyLocationsRequest,
+) -> locations_pb2.ListNearbyLocationsResponse:
+    location_list = _LOCATIONS_MAPPING.get(
+        request.coordinates.SerializeToString(
+            deterministic=True,
+        ),
+    )
+
+    if not location_list:
+        raise grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+
+    return locations_pb2.ListNearbyLocationsResponse(
+        locations=location_list,
+    )
 
 
 async def _place_lookup(
@@ -63,6 +98,23 @@ def planner() -> planner_pb2_grpc.PlannerServiceStub:
 
 
 @pytest.fixture()
+def locations(
+    mocker: pytest_mock.MockerFixture,
+) -> locations_pb2_grpc.LocationsServiceStub:
+    locations = locations_pb2_grpc.LocationsServiceStub(
+        grpc_testing.channel([], grpc_testing.strict_real_time()),
+    )
+
+    mocker.patch.object(
+        locations,
+        "ListNearbyLocations",
+        side_effect=_locations_lookup,
+    )
+
+    return locations
+
+
+@pytest.fixture()
 def places(mocker: pytest_mock.MockerFixture) -> places_pb2_grpc.PlacesServiceStub:
     places = places_pb2_grpc.PlacesServiceStub(
         grpc_testing.channel([], grpc_testing.strict_real_time()),
@@ -81,8 +133,14 @@ def places(mocker: pytest_mock.MockerFixture) -> places_pb2_grpc.PlacesServiceSt
 def route_finder(
     planner: planner_pb2_grpc.PlannerServiceStub,
     places: places_pb2_grpc.PlacesServiceStub,
+    locations: locations_pb2_grpc.LocationsServiceStub,
 ) -> routes.Routes:
-    return routes.Routes(planner=planner, places=places, place_search_radius=0)
+    return routes.Routes(
+        planner=planner,
+        places=places,
+        locations=locations,
+        place_search_radius=0,
+    )
 
 
 async def test_no_routes_are_found(
@@ -96,8 +154,8 @@ async def test_no_routes_are_found(
         return_value=_make_awaitable(planner_pb2.FindRoutesResponse()),
     )
     found_routes = await route_finder.find_routes(
-        origin=latlng_pb2.LatLng(),
-        destination=latlng_pb2.LatLng(),
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
     )
 
     assert not len(found_routes)
@@ -120,8 +178,8 @@ async def test_routes_are_found(
         ),
     )
     found_routes = await route_finder.find_routes(
-        origin=latlng_pb2.LatLng(),
-        destination=latlng_pb2.LatLng(),
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
     )
 
     assert len(found_routes)
@@ -148,12 +206,12 @@ async def test_places_are_resolved(
         ),
     )
     found_routes = await route_finder.find_routes(
-        origin=latlng_pb2.LatLng(),
-        destination=latlng_pb2.LatLng(),
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
     )
 
     for route in found_routes:
-        assert route
+        assert route.segments
 
 
 async def test_duplicate_coordinates_are_resolved_only_once(
@@ -179,8 +237,8 @@ async def test_duplicate_coordinates_are_resolved_only_once(
     )
     spy = mocker.spy(places, "GetPlaceClosestToCoordinates")
     await route_finder.find_routes(
-        origin=latlng_pb2.LatLng(),
-        destination=latlng_pb2.LatLng(),
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
     )
     assert spy.call_count == 1
 
@@ -209,8 +267,8 @@ async def test_route_with_missing_place_is_discarded(
         ),
     )
     found_routes = await route_finder.find_routes(
-        origin=latlng_pb2.LatLng(),
-        destination=latlng_pb2.LatLng(),
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
     )
 
     assert not found_routes
@@ -245,8 +303,8 @@ async def test_valid_routes_are_not_discarded(
         ),
     )
     found_routes = await route_finder.find_routes(
-        origin=latlng_pb2.LatLng(),
-        destination=latlng_pb2.LatLng(),
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
     )
 
     assert len(found_routes) == 1
