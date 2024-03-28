@@ -10,7 +10,7 @@
   type InputEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
   type TValue = TType extends "number" ? number : TType extends "date" ? Date : string;
 
-  interface $$Props extends Omit<HTMLInputAttributes, "type" | "value"> {
+  interface $$Props extends Omit<HTMLInputAttributes, "type" | "value" | "readonly"> {
     label?: string;
     type?: TType;
     value?: TValue;
@@ -19,6 +19,7 @@
     helpText?: string;
     clearable?: boolean;
     ignorePasswordManagers?: boolean;
+    readonly?: boolean;
   }
 
   let className: HTMLInputAttributes["class"] = undefined;
@@ -37,6 +38,7 @@
   export let disabled: HTMLInputAttributes["disabled"] = false;
   export let role: HTMLInputAttributes["role"] = "textbox";
   export let ignorePasswordManagers: boolean | undefined = undefined;
+  export let readonly: boolean | undefined = undefined;
 
   let inputRef: HTMLInputElement;
 
@@ -103,6 +105,7 @@
       {type}
       {role}
       {disabled}
+      {readonly}
       value={displayValue}
       on:click
       on:focus
