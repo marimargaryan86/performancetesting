@@ -46,10 +46,10 @@
   $: if (browser && data.sessionExpiresAt) {
     setLogoutTimer(data.sessionExpiresAt);
   }
+  $: if (browser && $user) {
+    Smartlook.identify($user.id, { email: $user.email, role: $user.role });
+  }
   $: if ($user) {
-    if (Smartlook.initialized()) {
-      Smartlook.identify($user.id, { email: $user.email, role: $user.role });
-    }
     Sentry.setUser({ email: $user.email, id: $user.id });
   } else {
     Sentry.setUser(null);
