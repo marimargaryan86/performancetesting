@@ -117,6 +117,8 @@ def search_result_generator(
 def search_criteria_task_generator(
     search: models_pb2.Search,
 ) -> list[Criteria]:
+    if not search.HasField("mock"):
+        return []
     return [
         Criteria(
             origin=search.mock.origin.name,
