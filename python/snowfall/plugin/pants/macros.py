@@ -1,6 +1,29 @@
 _BASE_IMAGE_SHA = "8b846d00ae9ef579801f7a44c19511187d9a9527ddeae2a6faedc6e9e035abec"
 
 
+def protobuf_dependents_rules(additional: tuple[str] = ()) -> None:  # type: ignore[assignment]
+    __dependents_rules__(  # type: ignore[name-defined]  # noqa: F821
+        (
+            (
+                {"type": protobuf_sources, "path": "**/service/**"},  # type: ignore[name-defined]  # noqa: F821
+                {"type": protobuf_source, "path": "**/service/**"},  # type: ignore[name-defined]  # noqa: F821
+            ),
+            "./**",
+            *additional,
+            "!//protobuf/**",
+            "*",
+        ),
+        (
+            (protobuf_sources, protobuf_source),  # type: ignore[name-defined]  # noqa: F821
+            "./../**",
+            *additional,
+            "!//protobuf/**",
+            "*",
+        ),
+        ("*", "*"),
+    )
+
+
 def _generate_repository(build_file_dir, exclude: frozenset[str]) -> str:  # type: ignore[no-untyped-def]  # noqa: ANN001
     repository = "{base_url}/{namespace}/{name}".format(
         base_url=env("CI_PROJECT_PATH", "").strip("/"),  # type: ignore[name-defined]  # noqa: F821
