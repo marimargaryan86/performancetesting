@@ -5,6 +5,7 @@ pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
 unmatched_build_file_globs = "error"
 pants_ignore = "+['/golang/', 'node_modules']"
+plugins = ["snowfall.plugin.pants==1.3.4"]
 backend_packages = [
   "pants.backend.build_files.fmt.ruff",
   "pants.backend.codegen.protobuf.lint.buf",
@@ -27,6 +28,7 @@ backend_packages = [
   "pants.backend.shell.lint.shellcheck",
   "pants.backend.shell.lint.shfmt",
   "pants.backend.tools.taplo",
+  "snowfall.plugin.pants.nomad",
 ]
 
 [add-trailing-comma]

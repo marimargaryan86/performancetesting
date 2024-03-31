@@ -183,12 +183,6 @@ for f in "${NOMAD_FILES[@]}"; do
 				FAILURE=1
 			}
 		fi
-
-		nomad fmt -check -write=false "${f}" >/dev/null 2>&1 || {
-			echo "${f}: file is not formatted correctly"
-			FAILURE=1
-		}
-
 	done
 done
 

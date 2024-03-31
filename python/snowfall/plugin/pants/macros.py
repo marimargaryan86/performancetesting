@@ -63,7 +63,7 @@ def nomad_template(
             source="{filename}.json".format(filename=filename),
         )
 
-        file(  # type: ignore[name-defined]  # noqa: F821
+        nomad_job(  # type: ignore[name-defined]  # noqa: F821
             name="{name}_{filename}_nomad".format(name=name, filename=filename),
             source="{filename}.nomad".format(filename=filename),
         )
