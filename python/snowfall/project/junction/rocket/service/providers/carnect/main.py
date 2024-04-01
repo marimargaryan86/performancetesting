@@ -8,14 +8,19 @@ from aio_pika import abc
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.rocket.provider import meta, searches, service
-from snowfall.project.junction.rocket.service.providers.carnect import cache, criteria
+from snowfall.project.junction.rocket.service.providers.carnect import (
+    cache,
+    criteria,
+    pricing,
+)
 from snowfall.project.junction.rocket.service.providers.carnect import (
     searches as search_result_generator,
 )
 from snowfall.project.junction.rocket.service.providers.carnect.constants import (
     PROVIDER_ID,
 )
-from snowfall.stdlib.service import httpx_factory
+from snowfall.stdlib.service import amqp_factory, httpx_factory
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.carnect import client
 from snowfall.vendor.carnect import config as carnect_settings
 
@@ -83,6 +88,26 @@ async def _search_factory(
     )
 
 
+async def _pricing(
+    app: service.Application[_Settings],
+) -> None:
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    quote_task_consumer = pricing.QuoteTaskConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_pricing_consumer".format(app.name),
+            binds=[(types.Exchange("searches"), "searches.pricing")],
+        ),
+        quote_result_producer=pricing.QuoteResultProducer(
+            producer_obj=producer.Producer(amqp_connection, types.Exchange("searches")),
+            routing_key="searches.pricing_results",
+        ),
+        ttl=app.settings.ttl,
+    )
+
+    await quote_task_consumer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
         name="carnect",
@@ -90,5 +115,10 @@ if __name__ == "__main__":
         meta_factory=_meta_factory,
         search_factory=_search_factory,
     )
-
-    entrypoint.enter()
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="pricing",
+            callback=_pricing,
+            settings_class=_Settings,
+        ),
+    )
