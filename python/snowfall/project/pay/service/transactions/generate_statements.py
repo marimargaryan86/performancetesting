@@ -234,9 +234,6 @@ class InvoiceGenerator(object):
                 file_name,
             ))
 
-            # TODO @Grigor: need to fix currency problem, need to configure customers in
-            # the stripe to match with its default customer's currencies
-
             total_markups = money.total([
                 money.from_protobuf(transaction.amounts.total_markups)
                 for transaction in transactions
@@ -294,6 +291,7 @@ class InvoiceGenerator(object):
         stripe_invoice = await self._invoice_client.create_invoice(
             invoice_account_id,
             days_until_due=invoice_due_days,
+            currency=total_markups.currency.code,
         )
         await self._invoice_client.create_invoice_item(
             invoice_account_id,

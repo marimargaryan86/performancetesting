@@ -48,6 +48,7 @@ class InvoiceService(
         invoice = self._provider.create_invoice(
             invoice_account_id=request.invoice_account_id,
             days_until_due=request.days_until_due,
+            currency=request.currency,
         )
 
         if invoice is None:

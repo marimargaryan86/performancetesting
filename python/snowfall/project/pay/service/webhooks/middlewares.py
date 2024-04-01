@@ -27,9 +27,9 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         resolved_request = await resolve_request(request)
         payload = await resolved_request.body()
 
-        is_stripe = self.verify_stripe(payload, request.headers)
+        is_authenticated = self.verify_stripe(payload, request.headers)
 
-        if is_stripe:
+        if not is_authenticated:
             raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         return await call_next(resolved_request)
 

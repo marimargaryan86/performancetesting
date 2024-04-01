@@ -26,6 +26,7 @@ message CreateInvoiceAccountResponse {
 message CreateInvoiceRequest {
   string invoice_account_id = 1;
   int32 days_until_due = 2;
+  string currency = 3;
 }
 
 message CreateInvoiceResponse {

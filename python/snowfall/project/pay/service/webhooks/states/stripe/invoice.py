@@ -1,5 +1,6 @@
 import stripe
 
+from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.adapter import transactions
 from snowfall.project.pay.service.transactions.v1.models_pb2 import InvoiceStatus
 from snowfall.stdlib.logging import stdout
@@ -20,10 +21,13 @@ class InvoiceState(object):
         self,
         stripe_invoice: stripe.Invoice,
     ) -> bool:
-        return await self._transaction_client.update_invoice_status(
-            stripe_invoice.id,  # type: ignore[arg-type]
-            InvoiceStatus.INVOICE_STATUS_FAILED,
-        )
+        try:
+            return await self._transaction_client.update_invoice_status(
+                stripe_invoice.id,  # type: ignore[arg-type]
+                InvoiceStatus.INVOICE_STATUS_FAILED,
+            )
+        except errors.NotFoundError:
+            return False
 
     async def invoice_voided(self, stripe_invoice: stripe.Invoice) -> bool:
         return await self._transaction_client.update_invoice_status(

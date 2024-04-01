@@ -36,12 +36,22 @@ class StripeInvoice(interfaces.InvoiceProvider):
         self,
         invoice_account_id: str,
         days_until_due: int,
+        currency: str,
     ) -> invoice_models_pb2.Invoice | None:
+        payment_methods = ["card"]
+        if currency.lower() == "gbp":
+            payment_methods.append(
+                "customer_balance",
+            )
         try:
             stripe_invoice = stripe.Invoice.create(
                 customer=invoice_account_id,
                 collection_method="send_invoice",
                 days_until_due=days_until_due,
+                currency=currency,
+                payment_settings={
+                    "payment_method_types": payment_methods,  # type: ignore[typeddict-item]
+                },
             )
         except stripe.StripeError:
             return None

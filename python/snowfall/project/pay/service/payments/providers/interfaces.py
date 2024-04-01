@@ -97,6 +97,7 @@ class InvoiceProvider(object):
         self,
         invoice_account_id: str,
         days_until_due: int,
+        currency: str,
     ) -> invoice_models_pb2.Invoice | None:
         """Create invoice."""
 

@@ -23,6 +23,7 @@ class Client(abc.ABC):
         self,
         invoice_account_id: str,
         days_until_due: int,
+        currency: str,
     ) -> invoice_models_pb2.Invoice:
         """Create an invoice."""
 
@@ -66,6 +67,7 @@ class DictClient(Client):
         self,
         invoice_account_id: str,
         days_until_due: int,
+        currency: str,
     ) -> invoice_models_pb2.Invoice:
         if invoice_account_id not in self._invoice_accounts:
             raise errors.NotFoundError()
@@ -130,12 +132,14 @@ class GrpcClient(Client):
         self,
         invoice_account_id: str,
         days_until_due: int,
+        currency: str,
     ) -> invoice_models_pb2.Invoice:
         response = await errors.handle_grpc_errors(
             self._client.CreateInvoice(
                 invoice_pb2.CreateInvoiceRequest(
                     invoice_account_id=invoice_account_id,
                     days_until_due=days_until_due,
+                    currency=currency,
                 ),
             ),
         )
