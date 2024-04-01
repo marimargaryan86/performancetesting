@@ -195,7 +195,6 @@ class QuoteRepository(
 
     async def create(
         self,
-        search_result_id: str,
         offer_id: str,
     ) -> models_pb2.Quote:
         expires_at = timestamp_pb2.Timestamp()
@@ -205,7 +204,6 @@ class QuoteRepository(
 
         quote = models_pb2.Quote(
             id=string.uuid(),
-            search_result_id=search_result_id,
             offer_id=offer_id,
             expires_at=expires_at,
         )

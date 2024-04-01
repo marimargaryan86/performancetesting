@@ -23,11 +23,13 @@ class QuoteTaskConsumer(object):
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.QuoteTask],
         quote_result_producer: QuoteResultProducer,
+        search_result_cache: cache.SearchResultCache,
         quote_cache: cache.QuoteCache,
         ttl: datetime.timedelta,
     ):
         self._consumer = consumer_obj
         self._quote_result_producer = quote_result_producer
+        self._search_result_cache = search_result_cache
         self._quote_cache = quote_cache
         self._ttl = ttl
 
@@ -38,31 +40,36 @@ class QuoteTaskConsumer(object):
         self,
         message: types.Message[amqp_pb2.QuoteTask],
     ) -> None:
-        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
+        offer_cache = await self._search_result_cache.fetch(message.body.quote.offer_id)
 
-        price = money.from_string("100.00", money.Currency("EUR")).protobuf()
+        if not offer_cache:
+            return
+
+        expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
         await self._quote_cache.store(
             cache.MockDetails(
-                amount=100,
-                currency="EUR",
+                amount=offer_cache.amount,
+                currency=offer_cache.currency,
             ),
             expires_at=expires_at,
             key=message.body.quote.id,
         )
 
+        base_price_proto = money.from_string(
+            str(offer_cache.amount),
+            money.Currency(offer_cache.currency),
+        ).protobuf()
+
         quote_obj = models_pb2.Quote(
-            price=price,
+            price=base_price_proto,
             required_documents=[
                 models_pb2.Quote.Required.REQUIRED_PASSPORT_NUMBER,
             ],
             rules=[models_pb2.FareRule(title="Refund rules", body="No refund")],
             price_breakdown=[
                 models_pb2.PriceBreakdown(
-                    price=money.from_string(
-                        "100.00",
-                        money.Currency("EUR"),
-                    ).protobuf(),
+                    price=base_price_proto,
                     breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE,
                 ),
             ],

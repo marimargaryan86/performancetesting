@@ -50,6 +50,7 @@ class _BookingsSettings(service.Settings):
 
 class _PricingSettings(service.ProviderSettings):
     amqp_dsn: pydantic.AmqpDsn
+    redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
 
 
@@ -86,6 +87,7 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
         dsn=app.settings.redis_dsn,
         decode_responses=False,
     )
+
     quote_task_consumer = pricing.QuoteTaskConsumer(
         consumer_obj=consumer.Consumer(
             connection=connection,
@@ -95,6 +97,9 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
         quote_result_producer=pricing.QuoteResultProducer(
             producer_obj=producer.Producer(connection, types.Exchange("searches")),
             routing_key="searches.pricing_results",
+        ),
+        search_result_cache=cache.SearchResultCache(
+            client=redis_client,
         ),
         quote_cache=cache.QuoteCache(
             client=redis_client,
