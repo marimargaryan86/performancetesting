@@ -3,6 +3,9 @@ import httpx
 from snowfall.project.junction.api_automation.service_objects.air import (
     AirClient,
 )
+from snowfall.project.junction.api_automation.service_objects.car_rental import (
+    CarRentalClient,
+)
 from snowfall.project.junction.api_automation.service_objects.client_wrapper import (
     ClientWrapper,
 )
@@ -29,4 +32,5 @@ class QaClient(object):
         )
 
         self.air = AirClient(self._client_wrapper)
+        self.car_rental = CarRentalClient(self._client_wrapper)
         self.places = PlacesClient(self._client_wrapper)

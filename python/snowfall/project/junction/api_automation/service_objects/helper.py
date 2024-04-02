@@ -1,5 +1,7 @@
+import asyncio
 import json
-from collections.abc import Mapping
+import time
+from collections.abc import Callable, Mapping
 from itertools import starmap
 from typing import Any
 
@@ -51,3 +53,22 @@ def get_nested_attribute(data: Mapping[Any, Any], path: str) -> Any:  # noqa: WP
         return None
     else:
         return data
+
+
+async def poll_until_condition_met(
+    request_func: Callable[[], Any],
+    attribute_path: str,
+    success_value: Any,
+    error_message: str,
+    max_wait_time_seconds: int = 120,
+    polling_interval: int = 5,
+) -> Any:
+    stopwatch = time.time() + max_wait_time_seconds
+
+    while time.time() < stopwatch:
+        response = await request_func()
+        if get_nested_attribute(data=response, path=attribute_path) == success_value:
+            return response
+        await asyncio.sleep(polling_interval)
+
+    raise AssertionError(error_message)

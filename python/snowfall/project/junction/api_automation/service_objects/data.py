@@ -49,3 +49,17 @@ class AirResultData(BaseResult):
     @property
     def id(self) -> str:
         return get_nested_attribute(self._data, "data.id")
+
+
+class CarRentalResultData(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def id(self) -> str:
+        return get_nested_attribute(self._data, "data.id")
+
+    @property
+    def status(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.status")
