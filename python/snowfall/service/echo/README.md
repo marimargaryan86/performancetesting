@@ -15,7 +15,7 @@ Run it by using the instructions in the root README.md or CONTRIBUTING.md file.
 
 ```
 python main.py grpc
-grpcurl -plaintext -d "{\"echo\": \"hello\"}" localhost:50051 snowfall.project.junction.service.echo.v1.EchoService/Echo
+grpcurl -plaintext -d "{\"echo\": \"hello\"}" localhost:50051 snowfall.service.echo.v1.EchoService/Echo
 ```
 
 ## Prerequisites:
