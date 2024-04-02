@@ -12,15 +12,9 @@ from motor import motor_asyncio
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
-from snowfall.project.junction.rocket.adapter import (
-    errors,
-)
-from snowfall.project.junction.rocket.adapter import (
-    search_results as search_results_adapter,
-)
-from snowfall.project.junction.rocket.adapter import searches as searches_adapter
 from snowfall.project.junction.rocket.service.api import (
     dependencies,
+    errors,
 )
 from snowfall.project.junction.rocket.service.api.air import (
     repositories,
@@ -58,6 +52,7 @@ class _Settings(starlette.Settings):
     reseller_j1_credentials_mapping: dict[str, Any]
     j_one_api_base_url: str
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
 
 
 class _Channels(NamedTuple):
@@ -101,12 +96,9 @@ async def _http(app: application.Application[_Settings]) -> None:
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
 
     container = dependencies.create_dependencies(
-        search_results_client=search_results_adapter.GrpcClient(
-            grpc_pb2_grpc.SearchResultServiceStub(channels.searches),
-        ),
-        searches_client=searches_adapter.GrpcClient(
-            grpc_pb2_grpc.SearchServiceStub(channels.searches),
-        ),
+        grpc_timeout=app.settings.grpc_timeout,
+        searches=grpc_pb2_grpc.SearchServiceStub(channels.searches),
+        search_results=grpc_pb2_grpc.SearchResultServiceStub(channels.searches),
     )
 
     temporary_token_auth = TemporaryTokenAuth(

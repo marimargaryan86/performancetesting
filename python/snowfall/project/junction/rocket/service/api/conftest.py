@@ -1,18 +1,25 @@
 import datetime
 from collections.abc import AsyncIterator, Mapping
 
+import grpc
+import grpc_testing
 import httpx
 import pytest
+import pytest_mock
 from lagom.integrations import starlette
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.adapter import errors, search_results, searches
-from snowfall.project.junction.rocket.service.api import dependencies
+from snowfall.project.junction.rocket.service.api import dependencies, errors
 from snowfall.project.junction.rocket.service.api.car_rental import router
+from snowfall.project.junction.rocket.service.searches.v1alpha import (
+    grpc_pb2,
+    grpc_pb2_grpc,
+)
 from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
@@ -24,26 +31,54 @@ async def mock_jwt_to_reseller_id(token: str) -> str:
 
 
 @pytest.fixture()
-def search_results_client() -> search_results.DictClient:
-    return search_results.DictClient(fixtures.get_search_results())
+def searches(mocker: pytest_mock.MockerFixture) -> grpc_pb2_grpc.SearchServiceStub:
+    searches = grpc_pb2_grpc.SearchServiceStub(
+        grpc_testing.channel([], grpc_testing.strict_real_time()),
+    )
+
+    mocker.patch.object(
+        searches,
+        "EnqueueSearch",
+        side_effect=_create_search,
+    )
+    mocker.patch.object(
+        searches,
+        "GetSearch",
+        side_effect=_get_search,
+    )
+
+    return searches
 
 
 @pytest.fixture()
-def searches_client() -> searches.DictClient:
-    return searches.DictClient(fixtures.get_searches())
+def search_results(
+    mocker: pytest_mock.MockerFixture,
+) -> grpc_pb2_grpc.SearchResultServiceStub:
+    search_results = grpc_pb2_grpc.SearchResultServiceStub(
+        grpc_testing.channel([], grpc_testing.strict_real_time()),
+    )
+
+    mocker.patch.object(
+        search_results,
+        "ListSearchResults",
+        side_effect=_get_search_results,
+    )
+
+    return search_results
 
 
 @pytest.fixture()
 def app(
-    search_results_client: search_results.Client,
-    searches_client: searches.Client,
+    searches: grpc_pb2_grpc.SearchServiceStub,
+    search_results: grpc_pb2_grpc.SearchResultServiceStub,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
             starlette.StarletteIntegration(
                 dependencies.create_dependencies(
-                    search_results_client=search_results_client,
-                    searches_client=searches_client,
+                    grpc_timeout=datetime.timedelta(seconds=45),
+                    searches=searches,
+                    search_results=search_results,
                 ),
             ),
         ),
@@ -128,3 +163,42 @@ async def client(
         client.headers.update(dict(headers))
 
         yield client
+
+
+async def _create_search(
+    request: grpc_pb2.EnqueueSearchRequest,
+    timeout: datetime.datetime,
+) -> grpc_pb2.EnqueueSearchResponse:
+    return grpc_pb2.EnqueueSearchResponse(
+        search=fixtures.generate_search(string.uuid()),
+    )
+
+
+async def _get_search(
+    request: grpc_pb2.GetSearchRequest,
+    timeout: datetime.datetime,
+) -> grpc_pb2.GetSearchResponse:
+    if request.id not in fixtures.SEARCHES:
+        raise grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+
+    return grpc_pb2.GetSearchResponse(search=fixtures.generate_search(request.id))
+
+
+async def _get_search_results(
+    request: grpc_pb2.ListSearchResultsRequest,
+    timeout: datetime.datetime,
+) -> grpc_pb2.ListSearchResultsResponse:
+    if request.search_id not in fixtures.SEARCHES:
+        raise grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+
+    return grpc_pb2.ListSearchResultsResponse(
+        search_results=fixtures.get_search_results(),
+    )

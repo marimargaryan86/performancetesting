@@ -89,4 +89,4 @@ class TestListSearchResults(object):
 
         assert response.status_code == status.HTTP_200_OK
         results = response.json()
-        assert len(results["data"]) == 1
+        assert len(results["data"]) == 2

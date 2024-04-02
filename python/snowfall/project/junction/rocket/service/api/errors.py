@@ -1,12 +1,16 @@
-from collections.abc import Awaitable
-from typing import TypeVar
+import functools
+from collections.abc import Awaitable, Callable
+from typing import ParamSpec, TypeVar
 
 import grpc
 from google.protobuf import message
 from google.rpc import error_details_pb2
 
+from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.transport.grpc import rich_status
 
+_In = ParamSpec("_In")
+_Out = TypeVar("_Out")
 Proto = TypeVar("Proto", bound=message.Message)
 
 
@@ -34,19 +38,28 @@ class ForbiddenError(Exception):
     """Raised when a user does not have access to execute the requested operation."""
 
 
-async def handle_grpc_errors(grpc_request: Awaitable[Proto]) -> Proto:
-    try:
-        return await grpc_request
-    except grpc.aio.AioRpcError as err:
-        _handle_grpc_exception(err)
+def handle_grpc_errors(
+    func: Callable[_In, Awaitable[_Out]],
+) -> Callable[_In, Awaitable[_Out | models.JsonApiResponse]]:
+    @functools.wraps(func)
+    async def wrapper(
+        *args: _In.args,
+        **kwargs: _In.kwargs,
+    ) -> _Out | models.JsonApiResponse:
+        try:
+            return await func(*args, **kwargs)
+        except grpc.aio.AioRpcError as err:
+            _handle_grpc_exception(err)
 
-        match err.code():
-            case grpc.StatusCode.NOT_FOUND:
-                raise NotFoundError(err.details()) from err
-            case grpc.StatusCode.UNAVAILABLE:
-                raise ServiceUnavailableError(err.details()) from err
+            match err.code():
+                case grpc.StatusCode.NOT_FOUND:
+                    raise NotFoundError(err.details()) from err
+                case grpc.StatusCode.UNAVAILABLE:
+                    raise ServiceUnavailableError(err.details()) from err
 
-        raise UnhandledError(err.details()) from err
+            raise UnhandledError(err.details()) from err
+
+    return wrapper
 
 
 def _handle_bad_request(
