@@ -71,3 +71,4 @@ The following ports are configured in local environments by default:
 | 51054 | rocket/carnect         | gRPC Server |
 | 51055 | rocket/places          | gRPC Server |
 | 51056 | rocket/bookings        | gRPC Server |
+| 51058 | rocket/benerail        | gRPC Server |

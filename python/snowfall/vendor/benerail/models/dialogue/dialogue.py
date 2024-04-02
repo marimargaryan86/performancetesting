@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Sequence
 
 from pydantic.v1 import Field
 
@@ -37,7 +38,10 @@ class MarketSegment(BenerailBaseModel):
 
 class DialogueIdTripofferfiltersBody(BenerailBaseModel):
     trip_filter_id: str | None = None
-    passengers: list[str] | None = Field(None, description="array of passengerId's.")
+    passengers: Sequence[str] | None = Field(
+        None,
+        description="array of passengerId's.",
+    )
     return_trip_params: DialogueIdTripOfferFiltersReturnTripParams | None = None
     market_segment: MarketSegment | None = None
     requested_offer_parts: RequestedOfferParts | None = None

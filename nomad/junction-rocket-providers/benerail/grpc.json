@@ -1,0 +1,26 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://benerail-stg-apim.azure-api.net",
+      "bucket": "junction-rocket-provider-data-development"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "api_base_url": "https://benerail-prd-apim.azure-api.net",
+      "bucket": "junction-rocket-provider-data-production"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://benerail-stg-apim.azure-api.net",
+      "bucket": "junction-rocket-provider-data-sandbox"
+    }
+  }
+}

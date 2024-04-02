@@ -83,8 +83,13 @@ message Offer { // Old OfferOption
   }
 }
 
+message CabinDetails {
+  string result_id = 1;
+  snowfall.project.junction.go.v1.CabinClass cabin_class = 2;
+}
+
 message RailOffer {
-  snowfall.project.junction.go.v1.CabinClass cabin_class = 1;
+  repeated CabinDetails cabin_class = 1;
 }
 
 message FerryOffer {

@@ -1,0 +1,123 @@
+from __future__ import annotations
+
+import base64
+import contextlib
+import datetime
+import random
+import tempfile
+
+import httpx
+import pydantic
+from aio_pika import abc
+from motor import motor_asyncio
+from redis import asyncio as aioredis
+
+from snowfall.project.junction.rocket.provider import (
+    cabin_classes,
+    meta,
+    searches,
+    service,
+)
+from snowfall.project.junction.rocket.service.providers.benerail import (
+    adapter,
+    cache,
+    id_mapping,
+    train_stations,
+)
+from snowfall.project.junction.rocket.service.providers.benerail import (
+    searches as provider_searches,
+)
+from snowfall.project.junction.rocket.service.providers.benerail.constant import (
+    PROVIDER_ID,
+)
+from snowfall.stdlib import h3
+from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.vendor.benerail import client
+
+_PROVIDER_NAME = "Benerail"
+
+
+class _Settings(service.ProviderSettings):
+    ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    storage_dsn: service.AnyDsn
+    mongo_dsn: tuple[pydantic.AnyUrl]
+    subscription_key: str
+    api_base_url: pydantic.AnyUrl
+    cert_base64: str
+
+
+def cert_tmp_path(cert_base64: str) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(base64.b64decode(cert_base64))
+
+        return tmp_file.name
+
+
+async def _meta_factory() -> meta.MetaImplementation:
+    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+
+
+async def _search_factory(
+    app: service.Application[_Settings],
+    amqp_conn: abc.AbstractConnection,
+    redis_conn: aioredis.Redis[bytes],
+    stack: contextlib.AsyncExitStack,
+) -> searches.SearchImplementation[provider_searches.Criteria]:
+    stations = await train_stations.load_train_stations()
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    http_client = await stack.enter_async_context(
+        httpx.AsyncClient(
+            http2=True,
+            cert=cert_tmp_path(app.settings.cert_base64),
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    benerail_client = client.BenerailClient(
+        subscription_key=app.settings.subscription_key,
+        base_url=str(app.settings.api_base_url),
+        http_client=http_client,
+    )
+
+    benerail_adapter = adapter.BenerailOffersAdapter(
+        benerail_client=benerail_client,
+        train_station_repository=train_stations.TrainStationRepository(
+            train_stations=stations,
+        ),
+        provider_cabin_class_mapping=cabin_classes.CabinMappingRepository(
+            mongo.benerail.provider_cabin_mapping,
+        ),
+        offers_cache=cache.OffersCache(
+            client=redis.Client(redis_conn, prefix=app.name),
+        ),
+        ttl=app.settings.ttl,
+    )
+
+    return searches.SearchImplementation(
+        search_criteria_task_generator=provider_searches.CriteriaGenerator(
+            h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
+                mapping=stations,
+                resolution=8,
+            ),
+            _id_mapping=id_mapping.IdMappingRepository[train_stations.TrainStation](
+                mapping=stations,
+            ),
+        ).criteria_task_generator,
+        search_result_cache_key_generator=provider_searches.cache_key,
+        search_result_generator=benerail_adapter.gather_search_results,
+    )
+
+
+if __name__ == "__main__":
+    entrypoint = service.Entrypoint(
+        name="benerail",
+        settings_class=_Settings,
+        meta_factory=_meta_factory,
+        search_factory=_search_factory,
+    )
+
+    entrypoint.enter()
