@@ -23,14 +23,17 @@ from snowfall.project.junction.rocket.service.api.air import (
 from snowfall.project.junction.rocket.service.api.air import (
     router as air_router,
 )
-from snowfall.project.junction.rocket.service.api.air.middleware import (
-    JunctionOneClientMiddleware,
-)
 from snowfall.project.junction.rocket.service.api.air.transforms import (
     transforms as air_transforms,
 )
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
+)
+from snowfall.project.junction.rocket.service.api.hotel import (
+    router as hotel_router,
+)
+from snowfall.project.junction.rocket.service.api.middleware import (
+    JunctionOneClientMiddleware,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
@@ -123,6 +126,7 @@ async def _http(app: application.Application[_Settings]) -> None:
 
     routes = [
         *air_router.get_routes(integration),
+        *hotel_router.get_routes(integration),
         *car_rental_router.get_routes(integration),
     ]
     asgi_app = starlette.create_starlette_app(
