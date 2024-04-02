@@ -7,6 +7,7 @@ import httpx
 
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.rocket.service.providers.carnect import (
+    cache,
     constants,
     criteria,
     errors,
@@ -44,10 +45,12 @@ class SearchResultGenerator(object):
         self,
         carnect_client: client.CarnectClient,
         carnect_config: config.Config,
+        search_result_cache: cache.SearchResultCache,
         ttl: datetime.timedelta,
     ):
         self._client = carnect_client
         self._config = carnect_config
+        self._search_result_cache = search_result_cache
         self._logger = stdout.get_logger()
         self._ttl = ttl
 
@@ -84,6 +87,32 @@ class SearchResultGenerator(object):
         )
 
         async for search_result in search_results:
+            offer = search_result.offers[0]
+            details = search_result.result_details[0].car_rental
+            await self._search_result_cache.store(
+                cache.CarRentalResultDetails(
+                    origin=cache.Coordinates(
+                        latitude=details.origin.coordinates.latitude,
+                        longitude=details.origin.coordinates.longitude,
+                    ),
+                    destination=cache.Coordinates(
+                        latitude=details.destination.coordinates.latitude,
+                        longitude=details.destination.coordinates.longitude,
+                    ),
+                    departure_at=search_task.pickup_datetime,
+                    arrival_at=search_task.return_datetime,
+                    driver_age=search_task.driver_age,
+                    model=details.model,
+                    seats_count=details.seats_count,
+                    doors_count=details.doors_count,
+                    transmission=details.transmission,
+                    baggage_quantity=details.baggage_quantity,
+                    vehicle_type=details.vehicle_type,
+                    vendor=details.vendor,
+                ),
+                expires_at=datetime.datetime.now(datetime.UTC) + self._ttl,
+                key=offer.id,
+            )
             yield search_result
 
     def _get_veh_avails(

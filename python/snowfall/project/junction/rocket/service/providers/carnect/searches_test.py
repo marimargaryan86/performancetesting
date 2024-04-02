@@ -56,6 +56,7 @@ async def search_result_generator() -> searches.SearchResultGenerator:
             ),
         ),
         carnect_config=mock.Mock(name="CarnectConfig"),
+        search_result_cache=mock.AsyncMock(name="SearchResultCache"),
         ttl=datetime.timedelta(seconds=15),
     )
 

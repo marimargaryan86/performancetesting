@@ -19,7 +19,8 @@ from snowfall.project.junction.rocket.service.providers.carnect import (
 from snowfall.project.junction.rocket.service.providers.carnect.constants import (
     PROVIDER_ID,
 )
-from snowfall.stdlib.service import amqp_factory, httpx_factory
+from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import amqp_factory, httpx_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.carnect import client
 from snowfall.vendor.carnect import config as carnect_settings
@@ -78,6 +79,9 @@ async def _search_factory(
     result_generator = search_result_generator.SearchResultGenerator(
         carnect_client=carnect_client,
         carnect_config=carnect_config,
+        search_result_cache=cache.SearchResultCache(
+            client=redis.Client(redis_conn, prefix=app.name),
+        ),
         ttl=app.settings.ttl,
     )
 
@@ -91,6 +95,11 @@ async def _search_factory(
 async def _pricing(
     app: service.Application[_Settings],
 ) -> None:
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     quote_task_consumer = pricing.QuoteTaskConsumer(
         consumer_obj=consumer.Consumer(
@@ -102,6 +111,7 @@ async def _pricing(
             producer_obj=producer.Producer(amqp_connection, types.Exchange("searches")),
             routing_key="searches.pricing_results",
         ),
+        search_result_cache=cache.SearchResultCache(client=redis_client),
         ttl=app.settings.ttl,
     )
 

@@ -1,5 +1,6 @@
 import datetime
 
+from snowfall.project.junction.rocket.service.providers.carnect import cache
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     amqp_pb2,
     models_pb2,
@@ -21,10 +22,12 @@ class QuoteTaskConsumer(object):
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.QuoteTask],
         quote_result_producer: QuoteResultProducer,
+        search_result_cache: cache.SearchResultCache,
         ttl: datetime.timedelta,
     ):
         self._consumer = consumer_obj
         self._quote_result_producer = quote_result_producer
+        self._search_result_cache = search_result_cache
         self._ttl = ttl
 
     async def consume(self) -> None:
@@ -34,6 +37,11 @@ class QuoteTaskConsumer(object):
         self,
         message: types.Message[amqp_pb2.QuoteTask],
     ) -> None:
+        offer_cache = await self._search_result_cache.fetch(message.body.quote.offer_id)
+
+        if not offer_cache:
+            return
+
         quote_obj = models_pb2.Quote()
 
         await self._quote_result_producer.publish(
