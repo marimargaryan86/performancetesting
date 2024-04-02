@@ -10,6 +10,8 @@ service BookingService {
   rpc MakeBooking(MakeBookingRequest) returns (MakeBookingResponse) {}
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
   rpc ListBookings(ListBookingsRequest) returns (ListBookingsResponse) {}
+  rpc CreateBookingCancellation(CreateBookingCancellationRequest) returns (CreateBookingCancellationResponse) {}
+  rpc GetBookingCancellation(GetBookingCancellationRequest) returns (GetBookingCancellationResponse) {}
 }
 
 message MakeBookingRequest {
@@ -75,11 +77,6 @@ message ListOfIds {
   repeated string ids = 1;
 }
 
-message GetCancellationRequestRequest {
-  string id = 1;
-  string reseller_id = 2;
-}
-
 message ListBookingCancellationsRequest {
   oneof payload {
     ListOfIds ids = 1;
@@ -93,6 +90,10 @@ message GetBookingCancellationRequest {
   string reseller_id = 2;
 }
 
+message GetBookingCancellationResponse {
+  BookingCancellation booking_cancellation = 1;
+}
+
 enum Status {
   STATUS_UNSPECIFIED = 0;
   STATUS_REFUND_DUE = 1;
@@ -103,4 +104,13 @@ enum Status {
 message HandleCancellationTicketCompletedRequest {
   string ticket_id = 1;
   Status status = 2;
+}
+
+message CreateBookingCancellationRequest {
+  BookingCancellation booking_cancellation = 1;
+  string reseller_id = 2;
+}
+
+message CreateBookingCancellationResponse {
+  BookingCancellation booking_cancellation = 1;
 }

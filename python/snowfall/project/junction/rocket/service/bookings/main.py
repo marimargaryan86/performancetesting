@@ -6,12 +6,12 @@ import pydantic
 from motor import motor_asyncio
 
 from snowfall.project.junction.rocket.service.bookings import (
+    amqp,
     bookings,
+    grpc,
     importer,
     repository,
 )
-from snowfall.project.junction.rocket.service.bookings.amqp import BookingProducer
-from snowfall.project.junction.rocket.service.bookings.grpc import BookingService
 from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2_grpc,
     meta_pb2_grpc,
@@ -69,7 +69,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         app.settings.grpc_address,
         app.settings.grpc_port,
         [
-            BookingService(
+            grpc.BookingService(
                 gateway_meta=meta_pb2_grpc.MetaServiceStub(
                     gateway_channel,
                 ),
@@ -80,7 +80,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     fallback_bookings=booking_repository,
                 ),
                 booking_repository=booking_repository,
-                publisher=BookingProducer(
+                publisher=amqp.BookingProducer(
                     producer_obj=producer.Producer(
                         connection=amqp_connection,
                         exchange=types.Exchange("bookings"),
@@ -88,6 +88,17 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 default_page_size=app.settings.default_page_size,
                 environment=app.environment,
+                cancellations=grpc.Cancellations(
+                    repository=repository.BookingCancellationRepository(
+                        collection=mongo.bookings.cancellations,
+                    ),
+                    task_producer=amqp.BookingCancellationTaskProducer(
+                        producer_obj=producer.Producer(
+                            connection=amqp_connection,
+                            exchange=types.Exchange("bookings"),
+                        ),
+                    ),
+                ),
             ),
         ],
     )
