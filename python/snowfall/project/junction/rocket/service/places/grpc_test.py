@@ -1,31 +1,17 @@
-import contextlib
-from collections.abc import Iterator, Sequence
+from collections.abc import Sequence
 from typing import NoReturn
 from unittest import mock
 
 import grpc
 import pytest
-from google.protobuf import message, symbol_database
-from google.rpc import status_pb2
 
 from snowfall.project.junction.rocket.service.places.grpc import PlacesService
 from snowfall.project.junction.rocket.service.places.v1alpha import (
     models_pb2,
     places_pb2,
 )
+from snowfall.stdlib.transport.grpc import testing
 from snowfall.stdlib.v1.latlng_pb2 import LatLng
-
-
-class _AbortError(grpc.RpcError):
-    def __init__(
-        self,
-        code: grpc.StatusCode,
-        details: str | None,
-        trailing_metadata: tuple[tuple[str, str], ...] | None,
-    ):
-        self.code = code
-        self.details = details
-        self.trailing_metadata = trailing_metadata
 
 
 def _abort_context(
@@ -33,45 +19,11 @@ def _abort_context(
     trailing_metadata: tuple[tuple[str, str], ...] | None = None,
     details: str | None = None,
 ) -> NoReturn:
-    raise _AbortError(
+    raise testing.AbortError(
         code=code,
         details=details,
         trailing_metadata=trailing_metadata,
     )
-
-
-class _Aborted(object):
-    def __init__(self) -> None:
-        self.error = message.Message()
-        self.rich_status = message.Message()
-
-
-@contextlib.contextmanager
-def _assert_aborted(error_code: grpc.StatusCode) -> Iterator[_Aborted]:
-    aborted = _Aborted()
-
-    with pytest.raises(_AbortError) as exc_info:
-        yield aborted
-
-    assert exc_info.value.code == error_code
-    aborted.error = exc_info.value
-
-    if exc_info.value.trailing_metadata:
-        aborted.rich_status = _detail_from_trailing_metadata(
-            exc_info.value.trailing_metadata,
-        )
-
-
-def _detail_from_trailing_metadata(
-    trailing_metadata: tuple[tuple[str, str], ...],
-) -> message.Message:
-    status = status_pb2.Status.FromString(trailing_metadata[0][1])
-    detail = status.details[0]
-    detail_type = symbol_database.Default().GetSymbol(detail.TypeName())
-    unpacked = detail_type()
-    detail.Unpack(unpacked)
-
-    return unpacked
 
 
 @pytest.fixture()
@@ -131,7 +83,7 @@ class TestGrpc(object):
             places_repository=mock_repository,
             default_page_size=10,
         )
-        with _assert_aborted(grpc.StatusCode.NOT_FOUND):
+        with testing.assert_aborted(grpc.StatusCode.NOT_FOUND):
             await places_service.GetPlace(
                 request=places_pb2.GetPlaceRequest(id="an-id"),
                 context=grpc_context,
@@ -174,7 +126,7 @@ class TestGrpc(object):
             places_repository=mock_repository,
             default_page_size=10,
         )
-        with _assert_aborted(grpc.StatusCode.NOT_FOUND):
+        with testing.assert_aborted(grpc.StatusCode.NOT_FOUND):
             await places_service.GetPlaceClosestToCoordinates(
                 request=places_pb2.GetPlaceClosestToCoordinatesRequest(
                     coordinates_and_radius=models_pb2.CoordinatesAndRadius(
@@ -217,7 +169,7 @@ class TestGrpc(object):
             places_repository=mock_repository,
             default_page_size=10,
         )
-        with _assert_aborted(grpc.StatusCode.NOT_FOUND):
+        with testing.assert_aborted(grpc.StatusCode.NOT_FOUND):
             await places_service.GetPlaceByIata(
                 request=places_pb2.GetPlaceByIataRequest(iata="LHR"),
                 context=grpc_context,

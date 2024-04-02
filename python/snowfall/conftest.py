@@ -12,6 +12,7 @@ from redis import asyncio as aioredis
 
 pytest.register_assert_rewrite("snowfall.stdlib.integration.starlette.testing")
 pytest.register_assert_rewrite("snowfall.stdlib.testing.asserts")
+pytest.register_assert_rewrite("snowfall.stdlib.transport.grpc.testing")
 
 
 @pytest.fixture()

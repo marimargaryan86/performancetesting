@@ -1,11 +1,14 @@
+import contextlib
 import dataclasses
 import datetime
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Iterator
 from typing import Generic, TypeVar
 
 import grpc_testing
+import pytest
 from google.protobuf import message, symbol_database
-from grpc import StatusCode, aio
+from google.rpc import status_pb2
+from grpc import RpcError, StatusCode, aio
 
 from snowfall.stdlib.transport.grpc import service
 
@@ -61,4 +64,52 @@ class ServerTester(object):
             details=details,
             message=(await callback),
             trailing_metadata=trailing_metadata,
+        )
+
+
+class AbortError(RpcError):
+    def __init__(
+        self,
+        code: StatusCode,
+        details: str | None,
+        trailing_metadata: tuple[tuple[str, str], ...] | None,
+    ):
+        self.code = code
+        self.details = details
+        self.trailing_metadata = trailing_metadata
+
+
+class _Aborted(object):
+    def __init__(self) -> None:
+        self.error = message.Message()
+        self.rich_status = message.Message()
+
+
+def _detail_from_trailing_metadata(
+    trailing_metadata: tuple[tuple[str, str], ...],
+) -> message.Message:
+    status = status_pb2.Status.FromString(trailing_metadata[0][1])
+    detail = status.details[0]
+    detail_type = symbol_database.Default().GetSymbol(detail.TypeName())
+    unpacked = detail_type()
+    detail.Unpack(unpacked)
+
+    return unpacked
+
+
+@contextlib.contextmanager
+def assert_aborted(error_code: StatusCode) -> Iterator[_Aborted]:
+    aborted = _Aborted()
+
+    with pytest.raises(AbortError) as exc_info:
+        yield aborted
+
+    exc_value = exc_info.value  # noqa: WPS441
+
+    assert exc_value.code == error_code
+    aborted.error = exc_value
+
+    if exc_value.trailing_metadata:
+        aborted.rich_status = _detail_from_trailing_metadata(
+            exc_value.trailing_metadata,
         )

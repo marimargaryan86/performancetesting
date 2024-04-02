@@ -525,6 +525,7 @@ known-first-party = ["snowfall"]
   "S106",
 ]
 "python/snowfall/stdlib/testing/asserts.py" = ["S101", "S105", "S106"]
+"python/snowfall/stdlib/transport/grpc/testing.py" = ["S101"]
 "python/snowfall/vendor/carnect/models/**/*.py" = ["A003"]
 "python/snowfall/vendor/gubernator/gubernator_pb2.py" = ["E402", "ERA001"]
 "python/snowfall/vendor/gubernator/gubernator_pb2_grpc.py" = [
