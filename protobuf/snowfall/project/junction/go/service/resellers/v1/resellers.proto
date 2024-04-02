@@ -36,6 +36,13 @@ message ListResellersRequest {
   int32 page_size = 1;
   string page_token = 2;
   ListOfIds ids = 3;
+  message ResellerFilter {
+    string operator = 1;
+    oneof value {
+      string name = 2;
+    }
+  }
+  repeated ResellerFilter filter_by = 4;
 }
 
 message ListResellersResponse {

@@ -116,6 +116,7 @@ class ResellerService(
         resellers_res = await self._repository.find(
             identifiers=list(request.ids.ids),
             cursor=request.page_token,
+            filter_by=request.filter_by,
         )
 
         resellers_res.limit(
