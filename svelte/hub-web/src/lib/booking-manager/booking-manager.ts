@@ -7,6 +7,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { getRandomAlphaNumericString } from "$lib/utils/random";
 import integrationInstancesClient from "~/integration-instances-client";
 import { sleep } from "$lib/utils/common";
+import { dev } from "$app/environment";
 
 export const markupsModel: z.ZodType<Omit<MobileSchemas.MarkupsCreate, "orderId">> = z.object({
   serviceFee: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
@@ -159,7 +160,9 @@ export function getCookie<TStep extends Step>(
 }
 
 export function setCookie<TStep extends Step>(step: TStep, data: StepDataType<TStep>): void {
-  document.cookie = `booking-session=${encodeSessionCookie(getModel(step), data)}; path=/;`;
+  const secure = dev ? "" : "Secure;";
+  const sameSite = dev ? "lax" : "None";
+  document.cookie = `booking-session=${encodeSessionCookie(getModel(step), data)}; Path=/; SameSite=${sameSite}; ${secure}`;
 }
 
 async function search(

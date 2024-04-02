@@ -1,5 +1,5 @@
 <script lang="ts" context="module">
-  export const HUB_URL_COOKIE_NAME = "hub-url";
+  export const HUB_URL_COOKIE_NAME = dev ? "hub-url" : "__Secure-hub-url";
 </script>
 
 <script lang="ts">
@@ -7,6 +7,7 @@
   import { page } from "$app/stores";
   import { getTranslator } from "$lib/i18n";
   import { getPageTitle } from "$lib/utils/page-title";
+  import { dev } from "$app/environment";
   import { getUser } from "$lib/utils/permissions";
   import { onMount } from "svelte";
   import integrationInstancesClient from "~/integration-instances-client";
@@ -23,7 +24,9 @@
 
   function updateUrl(): void {
     url = frame?.contentWindow?.location.toString() ?? url;
-    document.cookie = `${HUB_URL_COOKIE_NAME}=${url}; path=/; samesite=lax;`;
+    const sameSite = dev ? "Lax" : "None";
+    const secure = dev ? "" : "Secure;";
+    document.cookie = `${HUB_URL_COOKIE_NAME}=${url}; Path=/; SameSite=${sameSite}; ${secure}`;
   }
 
   async function loginUser(): Promise<void> {

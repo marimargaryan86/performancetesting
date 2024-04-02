@@ -65,7 +65,7 @@
       dev ? undefined : `Secure`,
       "Path=/",
       "MaxAge=31536000",
-      `SameSite=${dev ? "lax" : "strict"}`,
+      `SameSite=${dev ? "Lax" : "None"}`,
     ]
       .filter(ensureDefined)
       .join("; ");

@@ -1,3 +1,4 @@
+import { dev } from "$app/environment";
 import { ensureDefined } from "./array";
 
 export function getCookie(name: string): string | undefined {
@@ -5,6 +6,7 @@ export function getCookie(name: string): string | undefined {
     return undefined;
   }
 
+  const cookieName = dev ? name : `__Secure-${name}`;
   const cookies = document.cookie
     .split(";")
     .map((item) => {
@@ -20,7 +22,7 @@ export function getCookie(name: string): string | undefined {
     })
     .filter(ensureDefined);
 
-  return cookies.find(([key]) => key === name)?.[1];
+  return cookies.find(([key]) => key === cookieName)?.[1];
 }
 
 export function deleteCookie(name: string): void {
@@ -28,15 +30,18 @@ export function deleteCookie(name: string): void {
     return;
   }
 
-  document.cookie = `${name}=; max-age=0; path=/`;
+  const cookieName = dev ? name : `__Secure-${name}`;
+  document.cookie = `${cookieName}=; MaxAge=0; Path=/`;
 }
 
 export function setCookie(name: string, value: string): void {
   if (typeof window === "undefined") {
     return;
   }
-
-  document.cookie = `${name}=${value}; path=/`;
+  const cookieName = dev ? name : `__Secure-${name}`;
+  const secure = dev ? "" : "Secure;";
+  const sameSite = dev ? "lax" : "None";
+  document.cookie = `${cookieName}=${value}; Path=/; SameSite=${sameSite}; ${secure}`;
 }
 
 export type Cookie = {

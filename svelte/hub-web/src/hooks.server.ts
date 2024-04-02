@@ -77,7 +77,7 @@ function localeHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<R
       httpOnly: false,
       secure: !dev,
       maxAge: 31536000,
-      sameSite: dev ? "lax" : "strict",
+      sameSite: dev ? "lax" : "none",
     });
   }
 
