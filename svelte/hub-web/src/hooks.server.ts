@@ -25,7 +25,7 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
     cookieStore.sessionMetaToken.delete(event);
 
     if (
-      !event.url.pathname.startsWith(routeConfig.routes.adapter.root) &&
+      !event.url.pathname.startsWith(routeConfig.routes.adapters.root) &&
       !event.url.pathname.startsWith(routeConfig.routes.login.root) &&
       !event.url.pathname.startsWith(routeConfig.routes.integration.routes.ory.root)
     ) {

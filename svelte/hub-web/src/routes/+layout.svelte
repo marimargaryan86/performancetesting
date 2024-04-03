@@ -21,6 +21,7 @@
   import DevTools from "$lib/components/partials/dev-tools.svelte";
   import { ensureDefined } from "$lib/utils/array";
   import Toaster from "$lib/components/ui/toaster.svelte";
+  import routeConfig from "$lib/route-config.js";
 
   export let data;
 
@@ -84,7 +85,7 @@
   }
 </script>
 
-{#if $page.url.pathname.startsWith("/adapter")}
+{#if $page.url.pathname.startsWith(routeConfig.routes.adapters.root)}
   <slot />
 {:else if $user}
   <div class="workspace">
