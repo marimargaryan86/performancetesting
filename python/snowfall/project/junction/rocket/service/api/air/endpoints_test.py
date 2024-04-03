@@ -12,10 +12,8 @@ from starlette.testclient import TestClient
 
 from snowfall.project.junction.rocket.service.api.air import endpoints as routes
 from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
-from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AbstractAirSearchRepo,
-)
 from snowfall.project.junction.rocket.service.api.air.types import (
+    AbstractAirSearchRepo,
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )

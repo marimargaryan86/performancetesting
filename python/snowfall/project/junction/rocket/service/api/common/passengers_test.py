@@ -5,7 +5,7 @@ import freezegun
 import pytest
 
 from snowfall.project.junction.rocket.service.api.air.models import Passenger
-from snowfall.project.junction.rocket.service.api.air.transforms.passengers import (
+from snowfall.project.junction.rocket.service.api.common.passengers import (
     passengers_to_fake_user_ids,
 )
 

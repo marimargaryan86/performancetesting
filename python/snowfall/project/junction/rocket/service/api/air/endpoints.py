@@ -3,10 +3,8 @@ import json
 import lagom
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AbstractAirSearchRepo,
-)
 from snowfall.project.junction.rocket.service.api.air.types import (
+    AbstractAirSearchRepo,
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )

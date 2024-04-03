@@ -4,6 +4,7 @@ from collections.abc import AsyncIterator, Mapping
 import grpc
 import grpc_testing
 import httpx
+import lagom
 import pytest
 import pytest_mock
 from lagom.integrations import starlette
@@ -12,7 +13,7 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api import dependencies, errors
+from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.car_rental import router
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -68,20 +69,23 @@ def search_results(
 
 
 @pytest.fixture()
-def app(
+def container(
     searches: grpc_pb2_grpc.SearchServiceStub,
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
-) -> applications.Starlette:
+) -> lagom.Container:
+    container = lagom.Container()
+
+    container[datetime.timedelta] = datetime.timedelta(seconds=45)
+    container[grpc_pb2_grpc.SearchServiceStub] = searches
+    container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
+
+    return container
+
+
+@pytest.fixture()
+def app(container: lagom.Container) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
-        routes=router.get_routes(
-            starlette.StarletteIntegration(
-                dependencies.create_dependencies(
-                    grpc_timeout=datetime.timedelta(seconds=45),
-                    searches=searches,
-                    search_results=search_results,
-                ),
-            ),
-        ),
+        routes=router.get_routes(starlette.StarletteIntegration(container)),
         openapi_path=filesystem.resource_path("junction.rocket_api", "openapi.json"),
         custom_middlewares=[
             Middleware(

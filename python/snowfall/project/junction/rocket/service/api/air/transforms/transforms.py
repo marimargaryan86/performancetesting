@@ -1,11 +1,13 @@
 from collections.abc import Mapping, Sequence
-from datetime import date, datetime
 from typing import Any
 
 from snowfall.project.junction.rocket.service.api.air import models as rocket
 from snowfall.project.junction.rocket.service.api.air import types
 from snowfall.project.junction.rocket.service.api.air.transforms import models as safej1
-from snowfall.project.junction.rocket.service.api.air.transforms.passengers import (
+from snowfall.project.junction.rocket.service.api.common.date import (
+    convert_datetime_to_date,
+)
+from snowfall.project.junction.rocket.service.api.common.passengers import (
     passengers_to_fake_user_ids,
 )
 from snowfall.stdlib import string
@@ -22,7 +24,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
             j1.OriginDestinationRequest(
                 arrival_airport=attributes.criteria.destination,
                 departure_airport=attributes.criteria.origin,
-                departure_date=self._convert_datetime_to_date(
+                departure_date=convert_datetime_to_date(
                     attributes.criteria.departure_at,
                 ),
             ),
@@ -32,7 +34,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
                 j1.OriginDestinationRequest(
                     arrival_airport=attributes.criteria.origin,
                     departure_airport=attributes.criteria.destination,
-                    departure_date=self._convert_datetime_to_date(
+                    departure_date=convert_datetime_to_date(
                         attributes.criteria.return_departure_at,
                     ),
                 ),
@@ -43,19 +45,12 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
             user_ids=passengers_to_fake_user_ids(attributes.passengers),
         )
 
-    def _convert_datetime_to_date(
-        self,
-        datetime_value: datetime,
-    ) -> date:
-        return datetime.fromisoformat(str(datetime_value)).date()
-
 
 class AirSearchResultTransformer(types.AirSearchResultTransformer):
     def transform(
         self,
         j1_response: j1.SearchFlightsResponse,
     ) -> rocket.AirSearchResult:
-        j1_response.model_dump()
         safe_j1_response = safej1.SearchFlightsResponse(**j1_response.model_dump())
 
         return rocket.AirSearchResult(

@@ -17,14 +17,7 @@ from snowfall.project.junction.rocket.service.api import (
     errors,
 )
 from snowfall.project.junction.rocket.service.api.air import (
-    repositories,
-    types,
-)
-from snowfall.project.junction.rocket.service.api.air import (
     router as air_router,
-)
-from snowfall.project.junction.rocket.service.api.air.transforms import (
-    transforms as air_transforms,
 )
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
@@ -35,7 +28,6 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.middleware import (
     JunctionOneClientMiddleware,
 )
-from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -99,30 +91,24 @@ async def _http(app: application.Application[_Settings]) -> None:
 
     http_client = await app.stack.enter_async_context(httpx.AsyncClient())
 
-    container = dependencies.create_dependencies(
-        grpc_timeout=app.settings.grpc_timeout,
-        searches=grpc_pb2_grpc.SearchServiceStub(channels.searches),
-        search_results=grpc_pb2_grpc.SearchResultServiceStub(channels.searches),
-    )
-
     temporary_token_auth = TemporaryTokenAuth(
         api_key=app.settings.j_one_api_key,
         reseller_credentials_mapping=app.settings.reseller_j1_credentials_mapping,
     )
-    container[JunctionOneClient] = JunctionOneClient(
+
+    junction_one_client = JunctionOneClient(
         api_base_url=app.settings.j_one_api_base_url,
         http_client=http_client,
         auth=temporary_token_auth,
     )
-    container[repositories.AbstractAirSearchRepo] = repositories.AirSearchRepo(  # type: ignore[type-abstract]
-        collection=mongo.searches.air_results,
+
+    container = dependencies.create_dependencies(
+        grpc_timeout=app.settings.grpc_timeout,
+        searches_channel=channels.searches,
+        junction_one_client=junction_one_client,
+        mongo=mongo,
     )
-    container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
-        air_transforms.AirSearchRequestTransformer
-    )
-    container[types.AirSearchResultTransformer] = (  # type: ignore[type-abstract]
-        air_transforms.AirSearchResultTransformer
-    )
+
     integration = StarletteIntegration(container)
 
     routes = [

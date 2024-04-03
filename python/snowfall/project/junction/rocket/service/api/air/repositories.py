@@ -1,23 +1,8 @@
-from abc import ABC, abstractmethod
-
 import orjson
 
 from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
+from snowfall.project.junction.rocket.service.api.air.types import AbstractAirSearchRepo
 from snowfall.stdlib.persistence.mongo import repository
-
-
-class AbstractAirSearchRepo(ABC):
-    @abstractmethod
-    async def insert(self, value: AirSearchResult) -> None:
-        "Insert."
-
-    @abstractmethod
-    async def exists_id(self, search_id: str) -> bool:
-        "ID exists."
-
-    @abstractmethod
-    async def find_by_id(self, id_: str) -> AirSearchResult:
-        "Find by id."
 
 
 class AirSearchRepo(repository.DefaultRepository, AbstractAirSearchRepo):
