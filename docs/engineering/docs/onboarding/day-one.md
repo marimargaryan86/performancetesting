@@ -56,7 +56,9 @@ insurance
 through [Vitality](https://www.vitality.co.uk/), if you're interested, reach out
 to [`@Jackie`][Jackie] on Slack!
 
-## Basic access
+## Technical Setup
+
+### Basic access
 
 You will need access to a few things, most systems can be logged into with your
 Snowfall Google account.
@@ -66,15 +68,31 @@ Please ensure you have access to:
 * [Gitlab](https://git.snowfall.se/junction) - Code and task management
 * [Sentry](https://sentry.snowfall.se) - Error management
 * [Grafana](https://grafana.snowfall.se/) - Logs and metrics
+* [Nomad Dev](https://nomad.junction.dev/) - Dev cluster (ask SRE for access)
+* [Consul Dev](https://consul.junction.dev/) - Service directory (ask SRE for access)
 * Junction VPN (If you're reading this, you already have this!)
 
-## Junction GO/HUB/PAY/PLUS setup
+### Understand Snowfall Development Practices
+
+Before jumping in, take some time to understand the [development practices](/docs/development/) we
+have established at Snowfall. In particular, skim through the following to get the right context:
+
+1. We use a [Monorepo](https://en.wikipedia.org/wiki/Monorepo), except for a few projects (notably Junction One).
+2. We use [trunk-based development](https://trunkbaseddevelopment.com/).
+3. We use [conventional
+commits](https://www.conventionalcommits.org/en/v1.0.0/) and have
+standardized on some [Git
+Etiquette](https://drive.google.com/drive/folders/1i5BdD4Ut76jee5kslsaeMaxDSzHAQzuc).
+4. On each Merge Request (MR), we enforce several style rules with our
+[CI/CD](/docs/development/ci-cd) and we require at least one approval.
+
+### Junction GO/HUB/PAY/PLUS setup
 
 Please refer to the steps in [Monorepo](/docs/monorepo/getting-started) as these
 will outline how to install the necessary tools required for development
 within GO/HUB/PAY/PLUS.
 
-## Junction ONE setup
+### Junction ONE setup
 
 :::info
 
@@ -119,6 +137,13 @@ different things we build, how we build them, and why.
 
 You can find a link to all the current recordings
 [here](https://www.notion.so/Knowledge-Fest-89b12f4c7ac645a18bb41f481f3e272c?pvs=4)
+
+In particular, there is an old but still very relevant [Junction tech overview
+series](https://www.notion.so/Junction-Videos-Tech-overview-deep-dives-e5e20703f1864a32bd8bd78b8eb97ee4)
+of recordings (several hours), that gives a lot of context on how we build
+software at Snowfall. We recommend that you watch this series at your own pace,
+over the coming few weeks. Just keep in mind this was recorded in 2022 and not
+everything is fully up-to-date.
 
 [Email Signature]:https://www.notion.so/Email-Signature-Setup-June-2022-d8e677f963814c51b3c34a0b2dd9f274#5c5447c54f3c491e8a695ff59734a307
 
