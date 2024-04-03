@@ -216,6 +216,21 @@ http:
   middlewares:
     gzip:
       compress: {}
+
+    security-headers:
+      headers:
+        referrerPolicy: strict-origin-when-cross-origin
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        frameDeny: true
+        permissionsPolicy: camera=(), fullscreen=(), microphone=()
+
+    csp-unsafe-headers:
+      headers:
+        contentSecurityPolicy: "default-src * 'unsafe-inline' 'unsafe-eval' data: blob: filesystem:; frame-ancestors *; form-action *; upgrade-insecure-requests;"
 EOH
       }
     }
