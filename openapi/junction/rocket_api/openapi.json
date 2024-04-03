@@ -27,12 +27,82 @@
       "x-displayName": "Car Rental"
     },
     {
+      "name": "hotel",
+      "description": "Hotel.",
+      "x-displayName": "Hotel"
+    },
+    {
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
     }
   ],
   "paths": {
+    "/hotel/searches": {
+      "post": {
+        "summary": "Create Hotel Search",
+        "tags": [
+          "hotel"
+        ],
+        "operationId": "post-hotel-searches",
+        "description": "Used to initiate a hotel search",
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/HotelSearchRequest"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "x-internal": true,
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
     "/air/searches": {
       "post": {
         "summary": "Create Air Search",
@@ -91,7 +161,11 @@
           }
         },
         "x-internal": true,
-        "security": [{"jwt": []}]
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
       }
     },
     "/air/searches/{searchId}": {
@@ -397,48 +471,122 @@
   },
   "components": {
     "schemas": {
-      "AirSearchRequest": {
-        "title": "Air Search Request",
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "uuid",
-              "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-              "readOnly": true
-            },
-            "type": {
-              "type": "string",
-              "enum": [
-                "air-searches"
-              ],
-              "example": "air-searches"
-            },
-            "attributes": {
-              "type": "object",
-              "required": [
-                "criteria",
-                "passengers"
-              ],
-              "properties": {
-                "criteria": {
-                  "$ref": "#/components/schemas/AirSearchCriteria"
-                },
-                "passengers": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Passenger"
-                  }
+      "HotelSearchRequest": {
+        "title": "Hotel Search Request",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hotel-searches"
+            ],
+            "example": "hotel-searches"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "checkinAt",
+              "checkoutAt",
+              "latitude",
+              "longitude",
+              "radius",
+              "passengers"
+            ],
+            "properties": {
+              "checkinAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "checkoutAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "minimum": -90,
+                "maximum": 90,
+                "example": 59.858611
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "minimum": -180,
+                "maximum": 180,
+                "example": 59.858611
+              },
+              "radius": {
+                "type": "number",
+                "format": "float",
+                "description": "In kilometres.",
+                "example": 20.5
+              },
+              "passengers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Passenger"
                 }
               }
             }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "x-examples": {}
+      },
+      "AirSearchRequest": {
+        "title": "Air Search Request",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
           },
-          "required": [
-            "id",
-            "type",
-            "attributes"
-          ],
-          "x-examples": {}
+          "type": {
+            "type": "string",
+            "enum": [
+              "air-searches"
+            ],
+            "example": "air-searches"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "criteria",
+              "passengers"
+            ],
+            "properties": {
+              "criteria": {
+                "$ref": "#/components/schemas/AirSearchCriteria"
+              },
+              "passengers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Passenger"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "x-examples": {}
       },
       "AirSearchCriteria": {
         "title": "Air Search Criteria",
