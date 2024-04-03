@@ -304,3 +304,11 @@ class TestClient(object):
 
         assert await prefixless_client.get("foo") == b"prefixless"
         assert await foobar_client.get("foo") == b"foobar"
+
+    async def test_mget(self, redis_client: aioredis.Redis[bytes]) -> None:
+        client = redis.Client(redis_client)
+
+        await client.put("foo", "bar")
+        await client.put("baz", "qux")
+
+        assert await client.mget(["foo", "baz"]) == [b"bar", b"qux"]

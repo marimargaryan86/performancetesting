@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import AsyncIterable
+from collections.abc import AsyncIterable, Sequence
 from typing import AnyStr, Generic
 
 from redis.asyncio import Redis, lock
@@ -172,6 +172,9 @@ class Client(Generic[AnyStr]):
 
     async def get(self, name: str) -> AnyStr | None:
         return await self._redis.get(self._prefix + name)
+
+    async def mget(self, names: Sequence[str]) -> list[AnyStr | None]:
+        return await self._redis.mget([self._prefix + name for name in names])
 
     def hash_(self, name: str) -> Hash[AnyStr]:
         return Hash(self._redis, self._prefix + name)

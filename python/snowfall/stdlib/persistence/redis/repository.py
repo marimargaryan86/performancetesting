@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import datetime
+from collections.abc import Sequence
 from typing import Generic, TypeVar
 
 from pydantic import v1 as pydantic
@@ -48,6 +49,18 @@ class PydanticRepository(Generic[Record]):
             return None
 
         return self._record_type.parse_raw(record_json)
+
+    async def mfetch(self, keys: Sequence[str]) -> list[Record | None]:
+        record_jsons = await self._redis.mget(keys)
+
+        return [
+            (
+                self._record_type.parse_raw(record_json)
+                if record_json is not None
+                else None
+            )
+            for record_json in record_jsons
+        ]
 
     @property
     @abc.abstractmethod
