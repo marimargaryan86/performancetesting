@@ -1,19 +1,8 @@
-import asyncio
-import datetime
-import random
-from collections.abc import Sequence
-from typing import Any, NamedTuple
-
-import httpx
-import pydantic
-from grpc import aio
 from lagom.integrations.starlette import StarletteIntegration
-from motor import motor_asyncio
 from starlette.middleware import Middleware, authentication
 
-from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket.service.api import (
-    dependencies,
+    bootstrap,
     errors,
 )
 from snowfall.project.junction.rocket.service.api.air import (
@@ -28,86 +17,17 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.middleware import (
     JunctionOneClientMiddleware,
 )
-from snowfall.service.authentication.v1 import oauth_pb2_grpc
-from snowfall.stdlib.format import jwt
+from snowfall.project.junction.rocket.service.api.settings import Settings
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
-from snowfall.stdlib.service import application, grpc_factory
+from snowfall.stdlib.service import application
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
-from snowfall.vendor.junction_one.client import JunctionOneClient
 
 
-class _Settings(starlette.Settings):
-    authentication_address: str
-    searches_address: str
-    ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
-    j_one_api_key: str
-    reseller_j1_credentials_mapping: dict[str, Any]
-    j_one_api_base_url: str
-    mongo_dsn: Sequence[pydantic.AnyUrl]
-    grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
-    reseller_pay_companies: dict[str, str]
-
-
-class _Channels(NamedTuple):
-    authentication: aio.Channel
-    searches: aio.Channel
-
-
-async def _http(app: application.Application[_Settings]) -> None:
-    channels = _Channels(
-        *await asyncio.gather(
-            grpc_factory.make_insecure_channel(
-                app,
-                app.settings.authentication_address,
-            ),
-            grpc_factory.make_insecure_channel(
-                app,
-                app.settings.searches_address,
-            ),
-        ),
-    )
-    auth_backend = stdlib_auth.JWTAuthenticationBackend(
-        stdlib_auth.OryAuth(
-            jwk_client=jwt.AsyncJWKClient(
-                jwk_url=auth_adapter.get_jwk_url(
-                    app.settings.authentication_address,
-                ),
-                key_ttl=app.settings.ory_jwk_ttl,
-            ),
-            client_resolver=auth_adapter.oauth_client_resolver(
-                oauth_client=oauth_pb2_grpc.OAuthServiceStub(
-                    channels.authentication,
-                ),
-            ),
-        ).get_owner_from_jwt,
-    )
-
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )
-
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-
-    temporary_token_auth = TemporaryTokenAuth(
-        api_key=app.settings.j_one_api_key,
-        reseller_credentials_mapping=app.settings.reseller_j1_credentials_mapping,
-    )
-
-    junction_one_client = JunctionOneClient(
-        api_base_url=app.settings.j_one_api_base_url,
-        http_client=http_client,
-        auth=temporary_token_auth,
-    )
-
-    container = dependencies.create_dependencies(
-        grpc_timeout=app.settings.grpc_timeout,
-        searches_channel=channels.searches,
-        junction_one_client=junction_one_client,
-        mongo=mongo,
-    )
+async def _http(app: application.Application[Settings]) -> None:
+    container = await bootstrap.create_dependencies(app)
 
     integration = StarletteIntegration(container)
 
@@ -116,17 +36,18 @@ async def _http(app: application.Application[_Settings]) -> None:
         *hotel_router.get_routes(integration),
         *car_rental_router.get_routes(integration),
     ]
+
     asgi_app = starlette.create_starlette_app(
         routes=routes,
         custom_middlewares=[
             Middleware(
                 cls=authentication.AuthenticationMiddleware,
-                backend=auth_backend,
+                backend=container[stdlib_auth.JWTAuthenticationBackend],
                 on_error=handlers.auth_error_handler,
             ),
             Middleware(
                 JunctionOneClientMiddleware,
-                token_auth=temporary_token_auth,
+                token_auth=container[TemporaryTokenAuth],
             ),
         ],
         openapi_path=filesystem.resource_path(
@@ -168,6 +89,6 @@ if __name__ == "__main__":
         application.Command(
             name="http",
             callback=_http,
-            settings_class=_Settings,
+            settings_class=Settings,
         ),
     )
