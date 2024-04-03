@@ -125,6 +125,7 @@ RESELLER_J1_CREDENTIALS_MAPPING={{keyOrDefault "${var.environment}/rocket-api/re
 {{ with secret "kv/data/${var.environment}/rocket-api" }}
 J_ONE_API_KEY={{ .Data.data.j_one_api_key }}
 {{ end }}
+RESELLER_PAY_COMPANIES={{keyOrDefault "${var.environment}/rocket-api/reseller-pay-companies" "{}" | toJSON }}
 EOH
       }
 

@@ -56,6 +56,7 @@ class _Settings(starlette.Settings):
     j_one_api_base_url: str
     mongo_dsn: Sequence[pydantic.AnyUrl]
     grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
+    reseller_pay_companies: dict[str, str]
 
 
 class _Channels(NamedTuple):
