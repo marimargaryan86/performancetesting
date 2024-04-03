@@ -45,6 +45,7 @@ async def _schema(app: application.Application[starlette.Settings]) -> None:
     )
     async with aiofiles.open(_schema_path, "w", encoding="locale") as file:
         await file.write(json.dumps(sch, ensure_ascii=False, indent=4))
+        await file.write("\n")
 
 
 if __name__ == "__main__":

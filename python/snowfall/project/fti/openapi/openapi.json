@@ -1,0 +1,769 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Example API",
+        "version": "1.0"
+    },
+    "paths": {
+        "/places": {
+            "get": {
+                "description": "Use this endpoint to list Places",
+                "summary": "List places",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "places": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/PlaceModel"
+                                            },
+                                            "title": "Places",
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "places"
+                                    ],
+                                    "title": "PlacesModel",
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "destination",
+                        "in": "query",
+                        "schema": {
+                            "default": null,
+                            "description": "If set, the endpoint returns places connected to this destination place.",
+                            "example": "ATH",
+                            "title": "Destination",
+                            "type": "string"
+                        },
+                        "description": "If set, the endpoint returns places connected to this destination place."
+                    }
+                ]
+            }
+        },
+        "/search/packages": {
+            "get": {
+                "description": "Use this endpoint to list offers for tour packages",
+                "summary": "List Package offers",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "packages": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/PackageModel"
+                                            },
+                                            "title": "Packages",
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "packages"
+                                    ],
+                                    "title": "PackagesModel",
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "default": "",
+                            "description": "Pagination cursor that defines your place in the list.",
+                            "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
+                            "title": "Cursor",
+                            "type": "string"
+                        },
+                        "description": "Pagination cursor that defines your place in the list."
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "default": 20,
+                            "description": "A limit on the number of objects to be returned, between 1 and 100.",
+                            "example": 20,
+                            "maximum": 100,
+                            "minimum": 1,
+                            "title": "Limit",
+                            "type": "integer"
+                        },
+                        "description": "A limit on the number of objects to be returned, between 1 and 100."
+                    },
+                    {
+                        "name": "destination",
+                        "in": "query",
+                        "schema": {
+                            "example": "Athens",
+                            "title": "Destination",
+                            "type": "string"
+                        },
+                        "description": "",
+                        "required": true
+                    },
+                    {
+                        "name": "arriveAt",
+                        "in": "query",
+                        "schema": {
+                            "description": "Starting date of the trip",
+                            "example": "1980-02-03",
+                            "format": "date",
+                            "title": "Arriveat",
+                            "type": "string"
+                        },
+                        "description": "Starting date of the trip",
+                        "required": true
+                    },
+                    {
+                        "name": "returnAt",
+                        "in": "query",
+                        "schema": {
+                            "description": "Returning date of the trip",
+                            "example": "1980-02-03",
+                            "format": "date",
+                            "title": "Returnat",
+                            "type": "string"
+                        },
+                        "description": "Returning date of the trip",
+                        "required": true
+                    },
+                    {
+                        "name": "numOfGuests",
+                        "in": "query",
+                        "schema": {
+                            "example": 3,
+                            "maximum": 4,
+                            "minimum": 1,
+                            "title": "Numofguests",
+                            "type": "integer"
+                        },
+                        "description": "",
+                        "required": true
+                    },
+                    {
+                        "name": "origin",
+                        "in": "query",
+                        "schema": {
+                            "example": "London",
+                            "title": "Origin",
+                            "type": "string"
+                        },
+                        "description": "",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        "/search/accommodations": {
+            "get": {
+                "description": "Use this endpoint to list offers for accommodation only",
+                "summary": "List Accommodation offers",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "accommodations": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/AccommodationModel"
+                                            },
+                                            "title": "Accommodations",
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "accommodations"
+                                    ],
+                                    "title": "AccommodationsModel",
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "default": "",
+                            "description": "Pagination cursor that defines your place in the list.",
+                            "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
+                            "title": "Cursor",
+                            "type": "string"
+                        },
+                        "description": "Pagination cursor that defines your place in the list."
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "default": 20,
+                            "description": "A limit on the number of objects to be returned, between 1 and 100.",
+                            "example": 20,
+                            "maximum": 100,
+                            "minimum": 1,
+                            "title": "Limit",
+                            "type": "integer"
+                        },
+                        "description": "A limit on the number of objects to be returned, between 1 and 100."
+                    },
+                    {
+                        "name": "destination",
+                        "in": "query",
+                        "schema": {
+                            "example": "Athens",
+                            "title": "Destination",
+                            "type": "string"
+                        },
+                        "description": "",
+                        "required": true
+                    },
+                    {
+                        "name": "arriveAt",
+                        "in": "query",
+                        "schema": {
+                            "description": "Starting date of the trip",
+                            "example": "1980-02-03",
+                            "format": "date",
+                            "title": "Arriveat",
+                            "type": "string"
+                        },
+                        "description": "Starting date of the trip",
+                        "required": true
+                    },
+                    {
+                        "name": "returnAt",
+                        "in": "query",
+                        "schema": {
+                            "description": "Returning date of the trip",
+                            "example": "1980-02-03",
+                            "format": "date",
+                            "title": "Returnat",
+                            "type": "string"
+                        },
+                        "description": "Returning date of the trip",
+                        "required": true
+                    },
+                    {
+                        "name": "numOfGuests",
+                        "in": "query",
+                        "schema": {
+                            "example": 3,
+                            "maximum": 4,
+                            "minimum": 1,
+                            "title": "Numofguests",
+                            "type": "integer"
+                        },
+                        "description": "",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        "/examples": {
+            "get": {
+                "description": "Use this endpoint to get Examples",
+                "summary": "List examples",
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "examples": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/ExampleModel"
+                                            },
+                                            "title": "Examples",
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "examples"
+                                    ],
+                                    "title": "ExamplesModel",
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "default": "",
+                            "description": "Pagination cursor that defines your place in the list.",
+                            "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
+                            "title": "Cursor",
+                            "type": "string"
+                        },
+                        "description": "Pagination cursor that defines your place in the list."
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "default": 20,
+                            "description": "A limit on the number of objects to be returned, between 1 and 100.",
+                            "example": 20,
+                            "maximum": 100,
+                            "minimum": 1,
+                            "title": "Limit",
+                            "type": "integer"
+                        },
+                        "description": "A limit on the number of objects to be returned, between 1 and 100."
+                    }
+                ]
+            },
+            "post": {
+                "description": "Use this endpoint to create an Example",
+                "summary": "Create example",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "additionalProperties": false,
+                                "properties": {
+                                    "exampleId": {
+                                        "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                                        "format": "uuid",
+                                        "readOnly": true,
+                                        "title": "Exampleid",
+                                        "type": "string"
+                                    },
+                                    "exampleNumber": {
+                                        "example": 20,
+                                        "title": "Examplenumber",
+                                        "type": "integer"
+                                    },
+                                    "exampleDetails": {
+                                        "title": "Exampledetails",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "exampleId",
+                                    "exampleNumber",
+                                    "exampleDetails"
+                                ],
+                                "title": "ExampleModel",
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "parameters": []
+            }
+        },
+        "/examples/{exampleId}": {
+            "get": {
+                "description": "Get an example based on the provided example id",
+                "summary": "Get example",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "exampleId": {
+                                            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                                            "format": "uuid",
+                                            "readOnly": true,
+                                            "title": "Exampleid",
+                                            "type": "string"
+                                        },
+                                        "exampleNumber": {
+                                            "example": 20,
+                                            "title": "Examplenumber",
+                                            "type": "integer"
+                                        },
+                                        "exampleDetails": {
+                                            "title": "Exampledetails",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "exampleId",
+                                        "exampleNumber",
+                                        "exampleDetails"
+                                    ],
+                                    "title": "ExampleModel",
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "exampleId",
+                        "in": "path",
+                        "schema": {
+                            "description": "The ID of the example",
+                            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                            "format": "uuid",
+                            "title": "Exampleid",
+                            "type": "string"
+                        },
+                        "description": "The ID of the example",
+                        "required": true
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "PlaceModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "name": {
+                        "example": "Athens",
+                        "title": "Name",
+                        "type": "string"
+                    },
+                    "country": {
+                        "example": "Greece",
+                        "title": "Country",
+                        "type": "string"
+                    },
+                    "latitude": {
+                        "example": 90.0,
+                        "title": "Latitude",
+                        "type": "number"
+                    },
+                    "longitude": {
+                        "example": 180.0,
+                        "title": "Longitude",
+                        "type": "number"
+                    },
+                    "iataCode": {
+                        "default": null,
+                        "example": "ATH",
+                        "nullable": true,
+                        "title": "Iatacode",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "country",
+                    "latitude",
+                    "longitude"
+                ],
+                "title": "PlaceModel",
+                "type": "object"
+            },
+            "AccommodationModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "type": {
+                        "example": "Hotel",
+                        "title": "Type",
+                        "type": "string"
+                    },
+                    "address": {
+                        "example": "Miracle street 69",
+                        "title": "Address",
+                        "type": "string"
+                    },
+                    "category": {
+                        "example": 4,
+                        "title": "Category",
+                        "type": "integer"
+                    },
+                    "rating": {
+                        "example": 3.8,
+                        "title": "Rating",
+                        "type": "number"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/PlaceModel"
+                    },
+                    "rooms": {
+                        "items": {
+                            "$ref": "#/components/schemas/AccommodationRoomModel"
+                        },
+                        "title": "Rooms",
+                        "type": "array"
+                    },
+                    "services": {
+                        "example": [
+                            "Pool",
+                            "Transfer"
+                        ],
+                        "items": {
+                            "type": "string"
+                        },
+                        "title": "Services",
+                        "type": "array"
+                    },
+                    "reviews": {
+                        "items": {
+                            "$ref": "#/components/schemas/ReviewModel"
+                        },
+                        "title": "Reviews",
+                        "type": "array"
+                    },
+                    "cancellationPolicy": {
+                        "example": "Flexible",
+                        "title": "Cancellationpolicy",
+                        "type": "string"
+                    },
+                    "cmsInfo": {
+                        "example": "Photos URL and stuff",
+                        "title": "Cmsinfo",
+                        "type": "string"
+                    },
+                    "tourOperator": {
+                        "example": "FTI tours",
+                        "title": "Touroperator",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "type",
+                    "address",
+                    "category",
+                    "rating",
+                    "location",
+                    "rooms",
+                    "services",
+                    "reviews",
+                    "cancellationPolicy",
+                    "cmsInfo",
+                    "tourOperator"
+                ],
+                "title": "AccommodationModel",
+                "type": "object"
+            },
+            "AccommodationRoomModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "roomLabel": {
+                        "example": "Double room",
+                        "title": "Roomlabel",
+                        "type": "string"
+                    },
+                    "numOfGuests": {
+                        "example": 2,
+                        "title": "Numofguests",
+                        "type": "integer"
+                    },
+                    "seaView": {
+                        "example": false,
+                        "title": "Seaview",
+                        "type": "boolean"
+                    },
+                    "includedMealOptions": {
+                        "example": [
+                            "All inclusive"
+                        ],
+                        "items": {
+                            "type": "string"
+                        },
+                        "title": "Includedmealoptions",
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "roomLabel",
+                    "numOfGuests",
+                    "seaView",
+                    "includedMealOptions"
+                ],
+                "title": "AccommodationRoomModel",
+                "type": "object"
+            },
+            "FlightModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "origin": {
+                        "$ref": "#/components/schemas/PlaceModel"
+                    },
+                    "destination": {
+                        "$ref": "#/components/schemas/PlaceModel"
+                    },
+                    "departureAt": {
+                        "example": "2019-08-24T14:15:22Z",
+                        "format": "date-time",
+                        "title": "Departureat",
+                        "type": "string"
+                    },
+                    "arrivingAt": {
+                        "example": "2019-08-24T14:15:22Z",
+                        "format": "date-time",
+                        "title": "Arrivingat",
+                        "type": "string"
+                    },
+                    "airline": {
+                        "example": "AA",
+                        "title": "Airline",
+                        "type": "string"
+                    },
+                    "cancellationPolicy": {
+                        "example": "Flexible",
+                        "title": "Cancellationpolicy",
+                        "type": "string"
+                    },
+                    "tourOperator": {
+                        "example": "FTI tours",
+                        "title": "Touroperator",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "origin",
+                    "destination",
+                    "departureAt",
+                    "arrivingAt",
+                    "airline",
+                    "cancellationPolicy",
+                    "tourOperator"
+                ],
+                "title": "FlightModel",
+                "type": "object"
+            },
+            "PackageModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "outbound": {
+                        "$ref": "#/components/schemas/FlightModel"
+                    },
+                    "inbound": {
+                        "$ref": "#/components/schemas/FlightModel"
+                    },
+                    "price": {
+                        "example": 120.0,
+                        "title": "Price",
+                        "type": "number"
+                    },
+                    "tourOperator": {
+                        "example": "FTI tours",
+                        "title": "Touroperator",
+                        "type": "string"
+                    },
+                    "accommodation": {
+                        "$ref": "#/components/schemas/AccommodationModel"
+                    },
+                    "tags": {
+                        "example": [
+                            "beach",
+                            "family",
+                            "sports"
+                        ],
+                        "items": {
+                            "type": "string"
+                        },
+                        "title": "Tags",
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "outbound",
+                    "inbound",
+                    "price",
+                    "tourOperator",
+                    "accommodation",
+                    "tags"
+                ],
+                "title": "PackageModel",
+                "type": "object"
+            },
+            "ReviewModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "userId": {
+                        "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                        "format": "uuid",
+                        "title": "Userid",
+                        "type": "string"
+                    },
+                    "details": {
+                        "example": "It was ok",
+                        "title": "Details",
+                        "type": "string"
+                    },
+                    "rating": {
+                        "example": 4.0,
+                        "title": "Rating",
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "userId",
+                    "details",
+                    "rating"
+                ],
+                "title": "ReviewModel",
+                "type": "object"
+            },
+            "ExampleModel": {
+                "additionalProperties": false,
+                "properties": {
+                    "exampleId": {
+                        "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                        "format": "uuid",
+                        "readOnly": true,
+                        "title": "Exampleid",
+                        "type": "string"
+                    },
+                    "exampleNumber": {
+                        "example": 20,
+                        "title": "Examplenumber",
+                        "type": "integer"
+                    },
+                    "exampleDetails": {
+                        "title": "Exampledetails",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "exampleId",
+                    "exampleNumber",
+                    "exampleDetails"
+                ],
+                "title": "ExampleModel",
+                "type": "object"
+            }
+        }
+    }
+}

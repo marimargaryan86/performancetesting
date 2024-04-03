@@ -31,17 +31,17 @@ class BaseModel(PydanticBaseModel):
 
 class PaginationQueryParams(BaseModel):
     cursor: str = Field(
+        default="",
         json_schema_extra={
-            "default": "",
             "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
             "description": "Pagination cursor that defines your place in the list.",
         },
     )
     limit: int = Field(
+        default=20,  # noqa: WPS432
         json_schema_extra={
             "minimum": 1,
             "maximum": 100,
-            "default": 20,  # noqa: WPS432
             "example": 20,  # noqa: WPS432
             "description": "A limit on the number of objects to be returned, between 1 and 100.",
         },
