@@ -6,7 +6,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestCurrencies(object):
+class TestCurrencies:
     async def test_get_all_currencies(
         self,
         client: httpx.AsyncClient,

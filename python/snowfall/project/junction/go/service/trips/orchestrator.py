@@ -37,7 +37,7 @@ class CantFulfillFullTripError(Exception):
     """Failed to get one or more trip groups or got empty one."""
 
 
-class TripOrchestrator(object):
+class TripOrchestrator:
     def __init__(
         self,
         planner: planner_pb2_grpc.PlannerServiceStub,
@@ -130,7 +130,7 @@ class TripOrchestrator(object):
 _OFFER_SEARCH_LIMIT = 50
 
 
-class OfferOrchestrator(object):
+class OfferOrchestrator:
     def __init__(
         self,
         offer_search_adapter: offer_searches.Client,

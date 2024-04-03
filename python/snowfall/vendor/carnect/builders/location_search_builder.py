@@ -9,7 +9,7 @@ from snowfall.vendor.carnect.models.service import (
 )
 
 
-class VehLocSearchCriterionBuilder(object):
+class VehLocSearchCriterionBuilder:
     def __init__(self) -> None:
         self._criterion = ItemSearchCriterionType()
 

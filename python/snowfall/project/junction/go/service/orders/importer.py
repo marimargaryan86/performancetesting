@@ -8,7 +8,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 
 
-class BookingImporter(object):
+class BookingImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[models_pb2.Booking],

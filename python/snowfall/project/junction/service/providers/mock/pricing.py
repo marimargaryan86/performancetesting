@@ -12,7 +12,7 @@ _RULE_TITLE = "FAKE FARE RULE"
 _RULE_BODY = "THIS PRICE QUOTE IS NOT GENUINE. IT ORIGINATES FROM THE MOCK PROVIDER"
 
 
-class Quoter(object):
+class Quoter:
     def __init__(
         self,
         option_cache: cache.OptionCache,
@@ -55,7 +55,7 @@ class Quoter(object):
         )
 
 
-class Consumer(object):
+class Consumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],

@@ -11,7 +11,7 @@ from snowfall.stdlib.transport.http import errors
 
 
 @dataclasses.dataclass(frozen=True)
-class RequestOptions(object):
+class RequestOptions:
     method: Literal[
         "GET",
         "POST",
@@ -35,7 +35,7 @@ def url_for_options(base_url: str, options: RequestOptions) -> httpx.URL:
     )
 
 
-class HttpClient(object):
+class HttpClient:
     def __init__(self, base_url: str, http_client: httpx.AsyncClient):
         self._base_url = base_url
         self._http_client = http_client

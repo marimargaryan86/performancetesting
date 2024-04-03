@@ -14,7 +14,7 @@ def _decode_log(capsys: capture.CaptureFixture[str]) -> dict[str, Any]:
     return orjson.loads(capsys.readouterr().out.strip())
 
 
-class TestStructlog(object):
+class TestStructlog:
     def test_format_is_json(self, capsys: capture.CaptureFixture[str]) -> None:
         stdout.configure_logger()
         logger = stdout.get_logger()
@@ -133,7 +133,7 @@ class TestStructlog(object):
         assert second_message.get("second") == "testing again"
 
 
-class TestStandardLogger(object):
+class TestStandardLogger:
     @pytest.mark.parametrize(
         ("level", "below"),
         [

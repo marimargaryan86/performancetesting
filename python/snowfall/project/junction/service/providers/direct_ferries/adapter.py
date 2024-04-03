@@ -33,7 +33,7 @@ class PassengerCountNotMatchingError(Exception):
     """Raised when the number of passengers changed during the booking."""
 
 
-class DfAdapter(object):
+class DfAdapter:
     def __init__(
         self,
         df_client: client.DfHttpClient,

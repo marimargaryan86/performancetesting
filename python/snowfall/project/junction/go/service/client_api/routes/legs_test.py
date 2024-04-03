@@ -7,7 +7,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestLegs(object):
+class TestLegs:
     async def test_unknown_leg_returns_not_found(
         self,
         client: httpx.AsyncClient,

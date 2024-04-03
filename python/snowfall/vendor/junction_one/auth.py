@@ -18,7 +18,7 @@ _reseller_id: contextvars.ContextVar[str] = contextvars.ContextVar("reseller_id"
 
 
 @dataclasses.dataclass(frozen=True)
-class JunctionOneAuth(object):
+class JunctionOneAuth:
     authorization: str
     api_key: str
 

@@ -4,7 +4,7 @@ from snowfall.vendor.ba_ndc.models import (
 )
 
 
-class OrderViewAdapter(object):
+class OrderViewAdapter:
     order_response: response_order_schemas.OrderResponse
 
     def __init__(

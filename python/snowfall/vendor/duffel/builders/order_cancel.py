@@ -13,7 +13,7 @@ class OrderCancelRequest(DuffelRequestBaseModel):
     order_data: OrderCancelRequestData = pydantic.Field(alias="data")
 
 
-class OrderCancelRequestBuilder(object):
+class OrderCancelRequestBuilder:
     def __init__(self) -> None:
         self._order_id: str | None = None
 

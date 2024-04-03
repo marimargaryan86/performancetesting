@@ -8,7 +8,7 @@ from snowfall.project.junction.rocket.provider.v1alpha import bookings_pb2
 from snowfall.stdlib.persistence import filesystem
 
 
-class _MockTransformer(object):
+class _MockTransformer:
     async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
         return bookings_pb2.Booking(
             id=raw.decode(),
@@ -29,7 +29,7 @@ def implementation(storage: filesystem.Storage) -> bookings.Implementation:
     )
 
 
-class TestImplementation(object):
+class TestImplementation:
     async def test_booking_can_be_retrieved(
         self,
         implementation: bookings.Implementation,

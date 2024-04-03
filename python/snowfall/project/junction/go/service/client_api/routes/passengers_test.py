@@ -5,7 +5,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestPassengers(object):
+class TestPassengers:
     async def test_passenger_genders_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,

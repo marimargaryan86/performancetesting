@@ -29,7 +29,7 @@ async def pre_setup_credit_card(
     return credit_card_payment
 
 
-class OrdersBase(object):
+class OrdersBase:
     async def create_order(
         self,
         authenticated_http_client: httpx.AsyncClient,

@@ -8,7 +8,7 @@ import httpx
 from snowfall.stdlib.logging import stdout
 
 
-class LogHandler(object):
+class LogHandler:
     def __init__(
         self,
         base_url: str | None = None,

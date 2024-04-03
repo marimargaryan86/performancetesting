@@ -10,7 +10,7 @@ SECRET_WORDS: tuple[str, ...] = (
 )
 
 
-class LogFilter(object):
+class LogFilter:
     def __init__(
         self,
         secret_words: tuple[str, ...] | None = SECRET_WORDS,

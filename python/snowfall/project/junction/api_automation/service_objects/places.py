@@ -7,7 +7,7 @@ from snowfall.project.junction.api_automation.service_objects.data import (
 )
 
 
-class PlacesClient(object):
+class PlacesClient:
     def __init__(self, client: ClientWrapper):
         self._client = client
 

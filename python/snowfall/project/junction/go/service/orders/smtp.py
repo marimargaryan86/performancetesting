@@ -3,7 +3,7 @@ from email.mime import multipart, text
 import aiosmtplib
 
 
-class EmailClient(object):
+class EmailClient:
     def __init__(self, client: aiosmtplib.SMTP):
         self._smtp = client
 

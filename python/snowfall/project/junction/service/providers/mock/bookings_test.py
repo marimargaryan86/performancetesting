@@ -34,7 +34,7 @@ async def booking(
     return await booker.book(place_order_task)
 
 
-class TestBooker(object):
+class TestBooker:
     async def test_unknown_price_quote_id_raises_error(
         self,
         booker: bookings.Booker,
@@ -56,7 +56,7 @@ class TestBooker(object):
         assert await booker.book(_generate_booking_task(price_quote_id)) is not None
 
 
-class TestBookingModel(object):
+class TestBookingModel:
     def test_is_confirmed(self, booking: orders_pb2.Booking) -> None:
         assert booking.status == orders_pb2.Booking.STATUS_CONFIRMED
 
@@ -74,7 +74,7 @@ class TestBookingModel(object):
         )
 
 
-class TestTripBookingModel(object):
+class TestTripBookingModel:
     def test_has_provider_booking_reference(self, booking: orders_pb2.Booking) -> None:
         assert booking.trip_result.provider_booking_reference
 

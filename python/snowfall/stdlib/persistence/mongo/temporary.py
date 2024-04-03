@@ -6,7 +6,7 @@ from motor import core
 from snowfall.stdlib import string
 
 
-class TemporaryDatabase(object):
+class TemporaryDatabase:
     def __init__(
         self,
         mongo: core.AgnosticClient,

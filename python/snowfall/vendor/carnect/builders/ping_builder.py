@@ -3,7 +3,7 @@ from __future__ import annotations
 from snowfall.vendor.carnect.models.service import PingRq
 
 
-class PingRqBuilder(object):
+class PingRqBuilder:
     def __init__(self) -> None:
         self._rq = PingRq()
 

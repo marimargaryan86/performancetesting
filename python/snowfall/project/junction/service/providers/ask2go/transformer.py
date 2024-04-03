@@ -23,7 +23,7 @@ _AdultMinAge = 18
 _InfantMaxAge = 2
 
 
-class OfferTransformer(object):
+class OfferTransformer:
     def __init__(
         self,
         repository: LocationRepository,

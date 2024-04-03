@@ -11,7 +11,7 @@ from snowfall.project.junction.provider import segment_grouper
 from snowfall.stdlib import h3
 
 
-class _IncrementalTime(object):
+class _IncrementalTime:
     _current = datetime.datetime.now(tz=datetime.UTC)
 
     @classmethod

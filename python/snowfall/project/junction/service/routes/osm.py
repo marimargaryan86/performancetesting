@@ -6,13 +6,13 @@ from snowfall.project.junction.v1 import stop_type_pb2
 
 
 @dataclasses.dataclass(frozen=True)
-class Metadata(object):
+class Metadata:
     iata: str | None
     icao: str | None
 
 
 @dataclasses.dataclass(frozen=True)
-class Node(object):
+class Node:
     ref: str
     name: str
     latitude: float

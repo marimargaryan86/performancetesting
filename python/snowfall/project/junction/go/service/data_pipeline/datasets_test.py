@@ -8,7 +8,7 @@ from snowfall.project.junction.go.service.data_pipeline.types import Dataset
 DATASETS_PATH = Path(__file__).with_name("datasets.json")
 
 
-class TestDatasets(object):
+class TestDatasets:
     async def test_datasets_valid(self) -> None:
         with DATASETS_PATH.open() as fl:
             datasets = json.load(fl)

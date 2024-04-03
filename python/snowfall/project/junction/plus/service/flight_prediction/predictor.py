@@ -9,7 +9,7 @@ from snowfall.project.junction.plus.service.flight_prediction.models import (
 )
 
 
-class Predictor(object):
+class Predictor:
     def __init__(
         self,
         sagemaker_endpoint: str,

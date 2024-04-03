@@ -17,7 +17,7 @@ from snowfall.vendor.karhoo import client, errors
 from snowfall.vendor.karhoo.models import location, quotes
 
 
-class TripOfferSearchConsumer(object):
+class TripOfferSearchConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripOfferSearchTask],

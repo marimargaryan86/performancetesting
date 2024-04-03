@@ -53,12 +53,12 @@ async def booking_id(
     return (await transactions_client.get(transaction_ids[0])).external_reference_id
 
 
-class StripeCustomer(object):
+class StripeCustomer:
     def __init__(self) -> None:
         self.id: str = "mock_stripe_customer_id"
 
 
-class StripeEphemeralKey(object):
+class StripeEphemeralKey:
     def __init__(self) -> None:
         self.secret: str = "mocked_ephemeral_key_secret"
 
@@ -81,7 +81,7 @@ def update_ory_identity(mocker: MockerFixture) -> str:
     )
 
 
-class StripePaymentIntent(object):
+class StripePaymentIntent:
     def __init__(self) -> None:
         self.client_secret: str = "what_a_time_to_be_alive"
         self.stripe_id = "mock_stripe_id"

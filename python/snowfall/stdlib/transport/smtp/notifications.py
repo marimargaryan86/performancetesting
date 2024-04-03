@@ -55,7 +55,7 @@ class HtmlNotification(BaseNotification):
 
 
 @dataclasses.dataclass(frozen=True)
-class Attachment(object):
+class Attachment:
     payload: str
     main_type: str
     sub_type: str

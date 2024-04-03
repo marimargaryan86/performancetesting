@@ -210,7 +210,7 @@ _company_headers = {
 }
 
 
-class CSVGenerator(object):
+class CSVGenerator:
     def __init__(
         self,
         transactions_repository: TransactionsRepository,

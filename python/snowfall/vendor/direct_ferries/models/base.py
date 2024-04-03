@@ -8,7 +8,7 @@ from snowfall.stdlib import string
 
 
 class CamelCaseBaseModel(pydantic.BaseModel):
-    class Config(object):
+    class Config:
         alias_generator = string.to_lower_camel
         allow_population_by_field_name = True
         keep_untouched = (functools.cached_property,)

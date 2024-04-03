@@ -32,5 +32,5 @@ class OffersCache(RedisRepository[OfferDetails]):
 
 
 @dataclasses.dataclass(frozen=True)
-class Cache(object):
+class Cache:
     offers_cache: OffersCache

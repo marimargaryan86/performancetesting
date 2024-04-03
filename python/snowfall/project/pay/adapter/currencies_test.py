@@ -8,7 +8,7 @@ from snowfall.project.pay.service.currencies.v1 import (
 from snowfall.stdlib.money import Currency
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_conversion_is_retrievable(
         self,
         currencies_client: currencies.Client,
@@ -25,7 +25,7 @@ class TestDictClient(object):
         assert conversion.amount == expected_amount_after
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     async def test_conversion_amount_is_retrievable(self) -> None:
         stub = mock.create_autospec(currencies_pb2_grpc.CurrencyServiceStub)
         stub.Convert = mock.AsyncMock(

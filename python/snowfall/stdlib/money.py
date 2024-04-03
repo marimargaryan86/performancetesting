@@ -29,7 +29,7 @@ def _nano_exponent(currency: Currency) -> int:
 
 
 @dataclasses.dataclass(frozen=True)
-class Money(object):
+class Money:
     amount: int
     currency: Currency
 

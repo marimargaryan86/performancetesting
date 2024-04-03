@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from snowfall.stdlib import money
 
 
-class CurrencyRepository(object):
+class CurrencyRepository:
     def __init__(self, available_currencies: Sequence[money.Currency]):
         sorted_currencies = sorted(
             available_currencies,

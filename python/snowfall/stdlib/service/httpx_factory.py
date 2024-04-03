@@ -14,7 +14,7 @@ _Settings = TypeVar("_Settings", bound=application.Settings)
 
 
 @dataclasses.dataclass(frozen=True)
-class Certificate(object):
+class Certificate:
     certificate_file: pathlib.Path
     key_file: pathlib.Path | None = None
     password: str | None = None

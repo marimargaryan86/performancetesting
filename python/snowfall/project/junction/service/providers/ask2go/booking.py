@@ -71,7 +71,7 @@ class BookingError(errors.Ask2GoError):
         self.details = details
 
 
-class BookingHandler(object):
+class BookingHandler:
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
     _counter_bookings = prometheus_client.Counter(
@@ -296,7 +296,7 @@ class BookingHandler(object):
             )
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
         self._provider_id = str(provider_identifier)
         self._provider_name = provider_name

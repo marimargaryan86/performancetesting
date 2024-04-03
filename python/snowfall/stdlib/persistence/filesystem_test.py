@@ -12,7 +12,7 @@ async def storage() -> AsyncIterator[filesystem.Storage]:
         yield storage_obj
 
 
-class TestStorage(object):
+class TestStorage:
     async def test_file_can_be_created(self, storage: filesystem.Storage) -> None:
         path = pathlib.Path("foo")
         body = b"foo"

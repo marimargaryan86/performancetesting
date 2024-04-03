@@ -27,7 +27,7 @@ from snowfall.stdlib.transport.amqp import consumer, types
 from snowfall.stdlib.v1 import latlng_pb2
 
 
-class _TripSearchContext(object):
+class _TripSearchContext:
     def __init__(
         self,
         repository: trips.TripSearchRepository,
@@ -107,7 +107,7 @@ def _search_journey_request(
     return request
 
 
-class TripSearchConsumer(object):
+class TripSearchConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripSearchTask],
@@ -163,7 +163,7 @@ def _trip_search_can_be_fulfilled(
     return all(bool(reference_group) for reference_group in trip_reference_groups)
 
 
-class TripCandidateSearchConsumer(object):
+class TripCandidateSearchConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripCandidateSearchTask],

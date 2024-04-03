@@ -17,7 +17,7 @@ from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.duffel.models.single_offer import SingleOfferResponse
 
 
-class TestPricingTransformer(object):
+class TestPricingTransformer:
     async def test_offer_to_price_quote_price(  # noqa: WPS218
         self,
         redis_client: aioredis.Redis[bytes],
@@ -55,7 +55,7 @@ class TestPricingTransformer(object):
         assert tax.breakdown_type == offers_pb2.PriceBreakdown.BREAKDOWN_TYPE_TAX
 
 
-class TestPriceQuoteConsumer(object):
+class TestPriceQuoteConsumer:
     async def test_price_quote_consumer(
         self,
         price_quote_consumer: pricing.PriceQuoteConsumer,

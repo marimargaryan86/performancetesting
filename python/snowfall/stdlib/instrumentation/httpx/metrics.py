@@ -5,7 +5,7 @@ from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: PLC2701
 
 
-class _RequestHandler(object):
+class _RequestHandler:
     _counter_requests = prometheus_client.Counter(
         "http_client_sent_requests_total",
         "Total number of requests sent.",
@@ -19,7 +19,7 @@ class _RequestHandler(object):
         ).inc()
 
 
-class _ResponseHandler(object):
+class _ResponseHandler:
     _counter_failed_requests = prometheus_client.Counter(
         "http_client_failed_requests_total",
         "Total number of failed requests.",

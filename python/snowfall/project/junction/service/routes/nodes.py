@@ -12,7 +12,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import latlng_pb2
 
 
-class NodeImporter(object):
+class NodeImporter:
     def __init__(
         self,
         geodata: geocoding_pb2_grpc.GeocodingServiceStub,

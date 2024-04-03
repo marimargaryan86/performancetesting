@@ -11,7 +11,7 @@ from snowfall.stdlib.format import protobuf
 _UNKNOWN_OFFER = "bf624a85-205a-4717-b4e7-a83f6ec8ecb9"
 
 
-class TestQuoter(object):
+class TestQuoter:
     async def test_unknown_option_id_raises_error(
         self,
         quoter: pricing.Quoter,
@@ -33,7 +33,7 @@ class TestQuoter(object):
         assert await quoter.generate_quote(option_id) is not None
 
 
-class TestPriceQuoteModel(object):
+class TestPriceQuoteModel:
     def test_has_id(self, price_quote: offers_pb2.PriceQuote) -> None:
         assert price_quote.id
 

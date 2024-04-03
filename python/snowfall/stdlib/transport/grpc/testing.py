@@ -29,7 +29,7 @@ class Response(Generic[_Response]):
     trailing_metadata: aio.Metadata
 
 
-class ServerTester(object):
+class ServerTester:
     _pool = symbol_database.Default().pool
 
     def __init__(self, srv: _Server) -> None:
@@ -79,7 +79,7 @@ class AbortError(RpcError):
         self.trailing_metadata = trailing_metadata
 
 
-class _Aborted(object):
+class _Aborted:
     def __init__(self) -> None:
         self.error = message.Message()
         self.rich_status = message.Message()

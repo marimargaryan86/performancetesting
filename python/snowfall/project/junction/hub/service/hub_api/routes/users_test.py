@@ -194,7 +194,7 @@ async def test_list_users_for_reseller_user(
     assert users[0]["id"] == conftest.IDENTITIY_IDS[0]
 
 
-class TestUserDataIncludesCompanyAndContacts(object):
+class TestUserDataIncludesCompanyAndContacts:
     async def test_user_data_includes_company_and_contacts(
         self,
         users_client: httpx.AsyncClient,

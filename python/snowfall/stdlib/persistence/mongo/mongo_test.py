@@ -141,7 +141,7 @@ _TEST_DATA = (
 )
 
 
-class TestSorting(object):
+class TestSorting:
     @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
     async def test_expected_orders(
         self,
@@ -233,7 +233,7 @@ class TestSorting(object):
             cursor = new_cursor
 
 
-class TestNestedSorting(object):
+class TestNestedSorting:
     @pytest.mark.parametrize(("sort", "expected"), _TEST_DATA)
     async def test_expected_orders(
         self,

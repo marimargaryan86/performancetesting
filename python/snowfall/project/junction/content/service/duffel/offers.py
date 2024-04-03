@@ -11,7 +11,7 @@ from snowfall.vendor.duffel.models import offer_request as offer_response
 _TIME_FORMAT = "%H:%M"
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, trip_parser: parsers.TripParser):
         self._trip_parser = trip_parser
 
@@ -43,7 +43,7 @@ class Transformer(object):
         ]
 
 
-class Offers(object):
+class Offers:
     def __init__(self, search_client: client.DuffelClient, transformer: Transformer):
         self._client = search_client
         self._transformer = transformer

@@ -69,7 +69,7 @@ def ory_client() -> client.OryClient:
     )
 
 
-class TestClient(object):
+class TestClient:
     async def test_get_session_with_invalid_cookie(
         self,
         httpx_mock: pytest_httpx.HTTPXMock,
@@ -223,7 +223,7 @@ class TestClient(object):
         assert not identities.next_page_token
 
 
-class TestSessionModel(object):
+class TestSessionModel:
     def test_session_has_identifier(self, session_model: models.Session) -> None:
         assert session_model.identifier
 

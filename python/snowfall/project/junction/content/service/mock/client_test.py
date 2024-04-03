@@ -55,7 +55,7 @@ def _generate_stop(ref: str) -> client.Stop:
     )
 
 
-class TestClient(object):
+class TestClient:
     def test_one_way_contains_results(
         self,
         mock_client: client.MockClient,
@@ -75,7 +75,7 @@ class TestClient(object):
         assert len(roundtrip_results) == len(one_way_results) ** 2
 
 
-class TestFarePrices(object):
+class TestFarePrices:
     @pytest.mark.parametrize(
         ("fake_trips", "expected"),
         [

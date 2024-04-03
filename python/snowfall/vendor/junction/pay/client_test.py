@@ -28,7 +28,7 @@ async def pay_client(
     )
 
 
-class TestPayClient(object):
+class TestPayClient:
     async def test_create_quote(
         self,
         pay_client: PayClient,

@@ -211,7 +211,7 @@ class GrpcClient(Client):
 
 
 @dataclasses.dataclass(frozen=True)
-class _UserInfo(object):
+class _UserInfo:
     id: str
     email: str
     metadata: Mapping[str, str] = dataclasses.field(default_factory=dict)
@@ -223,7 +223,7 @@ class _Version2Payload(jwt.Payload):
     version: str = dataclasses.field(default="2.0.0", init=False)
 
 
-class JWTFactory(object):
+class JWTFactory:
     def __init__(
         self,
         ttl: datetime.timedelta,

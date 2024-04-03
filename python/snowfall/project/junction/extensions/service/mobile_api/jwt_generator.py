@@ -10,7 +10,7 @@ class _ClientPayload(jwt.Payload):
     version: str
 
 
-class JwtGenerator(object):
+class JwtGenerator:
     def __init__(self, encoder: jwt.Encoder, token_version: str):
         self._encoder = encoder
         self._token_version = token_version

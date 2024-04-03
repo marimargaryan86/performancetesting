@@ -107,7 +107,7 @@ class StatusHandler(trackable.AnySizeStatusHandler):
         await self._repository.mark_as_processing(msg.id)
 
 
-class OfferImporter(object):
+class OfferImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[ExpectedMessages],
@@ -283,7 +283,7 @@ class OfferImporter(object):
         )
 
 
-class PriceQuoteImporter(object):
+class PriceQuoteImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TripPriceQuoteResult],

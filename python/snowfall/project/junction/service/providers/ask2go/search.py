@@ -100,7 +100,7 @@ class ResultsNotReadyError(Exception):
     """Raised when results haven't been processed yet."""
 
 
-class Adapter(object):
+class Adapter:
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,

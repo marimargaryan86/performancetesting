@@ -76,7 +76,7 @@ def to_route(
     )
 
 
-class Proxy(object):
+class Proxy:
     def __init__(
         self,
         client: httpx.AsyncClient,
@@ -163,7 +163,7 @@ class Health(endpoints.HTTPEndpoint):
 _EnumValue = TypeVar("_EnumValue", bound=int)
 
 
-class ListAndViewEnum(object):
+class ListAndViewEnum:
     def __init__(
         self,
         enum: enum_type_wrapper._EnumTypeWrapper[_EnumValue],

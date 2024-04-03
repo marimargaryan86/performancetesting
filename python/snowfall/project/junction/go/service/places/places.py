@@ -14,13 +14,13 @@ from snowfall.stdlib.persistence.mongo import mixins, normalizers, repository, r
 
 
 @dataclasses.dataclass(frozen=True)
-class PlaceTypeDistancePair(object):
+class PlaceTypeDistancePair:
     max_distance_meters: int
     location_type: models_pb2.Location.Type.ValueType
 
 
 @dataclasses.dataclass(frozen=True)
-class FindPlacesPerAreaFilter(object):
+class FindPlacesPerAreaFilter:
     latitude: float
     longitude: float
     type_distances: Sequence[PlaceTypeDistancePair]

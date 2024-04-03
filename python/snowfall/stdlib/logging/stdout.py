@@ -70,7 +70,7 @@ def configure_logger(
     _configure_standard_logger(level, common_processors, format_as_json=format_as_json)
 
 
-class LogContext(object):
+class LogContext:
     def __init__(self) -> None:
         self._keys: set[str] = set()
 

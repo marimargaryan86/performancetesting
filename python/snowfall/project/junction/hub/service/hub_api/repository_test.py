@@ -2,7 +2,7 @@ from snowfall.project.junction.hub.service.hub_api import repository
 from snowfall.project.junction.hub.service.hub_api.v1 import models_pb2
 
 
-class TestUsersRepository(object):
+class TestUsersRepository:
     async def test_find_by_id(
         self,
         user: models_pb2.User,

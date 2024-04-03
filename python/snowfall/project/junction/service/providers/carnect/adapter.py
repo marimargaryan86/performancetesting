@@ -469,7 +469,7 @@ def _get_leg(
     )
 
 
-class CarnectOfferMatcher(object):
+class CarnectOfferMatcher:
     def __init__(
         self,
         carnect_client: client.CarnectClient,
@@ -548,7 +548,7 @@ class CarnectOfferMatcher(object):
         )
 
 
-class CarnectOffersAdapter(object):
+class CarnectOffersAdapter:
     def __init__(
         self,
         carnect_client: client.CarnectClient,

@@ -13,7 +13,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.time import date_to_age
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(self, h3_mapping: h3.H3MappingRepository[train_stations.TrainStation]):
         self._mapping = h3_mapping
 

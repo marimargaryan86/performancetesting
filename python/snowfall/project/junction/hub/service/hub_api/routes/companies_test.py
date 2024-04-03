@@ -4,7 +4,7 @@ from snowfall.project.pay.fixtures import COMPANIES
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestCompanies(object):
+class TestCompanies:
     async def test_get_all_companies(
         self,
         client: httpx.AsyncClient,

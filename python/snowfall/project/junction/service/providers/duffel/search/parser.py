@@ -20,7 +20,7 @@ from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_slice import OfferSlice, OfferSliceSegment
 
 
-class OfferParser(object):
+class OfferParser:
     def __init__(
         self,
         default_ttl: datetime.timedelta,

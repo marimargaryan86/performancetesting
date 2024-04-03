@@ -116,7 +116,7 @@ async def find_journeys(
     ]
 
 
-class TestJourneys(object):
+class TestJourneys:
     async def test_created_journey_has_owners_with_not_found_reseller(
         self,
         resellers_client: Any,
@@ -499,7 +499,7 @@ class TestJourneys(object):
         assert len(journeys) == 1
 
 
-class TestOrders(object):
+class TestOrders:
     async def test_order_is_retrievable_by_id(
         self,
         order_repository: orders.OrderRepository,
@@ -510,7 +510,7 @@ class TestOrders(object):
         assert order_resource.id == order.id
 
 
-class TestBookings(object):
+class TestBookings:
     async def test_booking_can_be_retrieved(
         self,
         booking_repository: orders.BookingRepository,
@@ -522,7 +522,7 @@ class TestBookings(object):
         assert booking_id == booking.id
 
 
-class TestBookingDetails(object):
+class TestBookingDetails:
     async def test_booking_details_can_be_retrieved(
         self,
         booking_repository: orders.BookingRepository,
@@ -562,7 +562,7 @@ class TestBookingDetails(object):
         assert len([detail async for detail in details]) == 2
 
 
-class TestCancellationRequests(object):
+class TestCancellationRequests:
     async def test_cancellation_request_is_retrievable_by_id(
         self,
         cancellation_requests_repository: orders.CancellationRequestsRepository,
@@ -672,7 +672,7 @@ class TestCancellationRequests(object):
         assert updated.status == cancellation_request.status
 
 
-class TestBookingCancellations(object):
+class TestBookingCancellations:
     async def test_booking_cancellation_is_retrievable_by_id(
         self,
         booking_cancellations_repository: orders.BookingCancellationsRepository,

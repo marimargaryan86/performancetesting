@@ -8,7 +8,7 @@ from snowfall.stdlib.transport.amqp import types
 from snowfall.vendor.zendesk.client import ZendeskClient
 
 
-class TestNotificationsConsumer(object):
+class TestNotificationsConsumer:
     async def test_create_fetch_booked_ticket_support_ticket(
         self,
         notifications_consumer: consumer.NotificationsConsumer,

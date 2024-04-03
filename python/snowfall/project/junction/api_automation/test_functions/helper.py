@@ -14,9 +14,9 @@ from typing import Any
 
 import boto3
 import httpx
-import hvac
 import pandas as pd
 import stripe
+from hvac import Client, exceptions
 from pymongo import MongoClient
 
 from snowfall.project.junction.api_automation.test_functions.mobile_client import (
@@ -138,7 +138,7 @@ def get_variable_value(
     variable_name: str,
 ) -> str:
     vusername, vpassword = api_token.split("+")
-    client = hvac.Client(url=host)
+    client = Client(url=host)
     client.auth.userpass.login(username=vusername, password=vpassword)
     is_authenticated = client.is_authenticated()
     returned_data = {}
@@ -153,18 +153,18 @@ def get_variable_value(
 
 
 def get_variable_from_server(
-    client: hvac.Client,
+    client: Client,
     environment: str,
 ) -> dict[str, Any]:
     query = "kv/data/{e}/{s}".format(e=environment, s="api-automation")
     try:
         returned_data = client.read(query)
-    except hvac.exceptions.Forbidden:
+    except exceptions.Forbidden:
         returned_data = {}
     return returned_data
 
 
-class ConfigurationManager(object):
+class ConfigurationManager:
     def __init__(self, host: str, api_token: str) -> None:
         self.host = host
         self.api_token = api_token

@@ -106,7 +106,7 @@ async def orders(  # noqa: WPS217
     ).consume()
 
 
-class OrderConsumer(object):
+class OrderConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.PlaceOrderTask],

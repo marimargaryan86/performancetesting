@@ -18,7 +18,7 @@ from snowfall.stdlib.v1 import date_pb2
 
 
 @dataclasses.dataclass(frozen=True)
-class SearchCriteria(object):
+class SearchCriteria:
     origin: str
     destination: str
     passenger_dobs: Sequence[datetime.date]
@@ -54,7 +54,7 @@ def _generate_search_criteria(
 _MAX_PAX_NUMBER = 9
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[train_stations.TrainStation],
@@ -92,7 +92,7 @@ class CriteriaGenerator(object):
         return tasks
 
 
-class SearchCriteriaGenerator(object):
+class SearchCriteriaGenerator:
     def __init__(
         self,
         train_station_repository: train_stations.TrainStationRepository,

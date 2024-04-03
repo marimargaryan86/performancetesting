@@ -3,31 +3,31 @@ from collections.abc import Sequence
 
 
 @dataclasses.dataclass(frozen=True)
-class Price(object):
+class Price:
     amount: str
     currency: str
 
 
 @dataclasses.dataclass(frozen=True)
-class Leg(object):
+class Leg:
     origin_name: str
     destination_name: str
     departure_date: str
 
 
 @dataclasses.dataclass(frozen=True)
-class Segment(object):
+class Segment:
     operator: str
     legs: Sequence[Leg]
 
 
 @dataclasses.dataclass(frozen=True)
-class OperatorBookingReference(object):
+class OperatorBookingReference:
     operator_booking_reference: str
 
 
 @dataclasses.dataclass(frozen=True)
-class Booking(object):
+class Booking:
     booking_id: str
     price: Price
     provider_name: str
@@ -37,18 +37,18 @@ class Booking(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Passengers(object):
+class Passengers:
     first_name: str
     last_name: str
 
 
 @dataclasses.dataclass(frozen=True)
-class Order(object):
+class Order:
     order_id: str
     passengers: Sequence[Passengers]
 
 
 @dataclasses.dataclass(frozen=True)
-class Journey(object):
+class Journey:
     reseller_id: str
     passenger_name_record: str

@@ -14,19 +14,19 @@ _SORT_KEY = "sort"
 
 
 @dataclasses.dataclass(frozen=True)
-class PaginationQueryParams(object):
+class PaginationQueryParams:
     cursor: str | None = None
     limit: int = _PAGINATION_LIMIT_DEFAULT
 
 
 @dataclasses.dataclass(frozen=True)
-class SortQueryParams(object):
+class SortQueryParams:
     direction: sort_pb2.Sort.Order.ValueType = sort_pb2.Sort.ORDER_ASCENDING
     field: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
-class QueryParams(object):
+class QueryParams:
     pagination: PaginationQueryParams = dataclasses.field(
         default_factory=PaginationQueryParams,
     )

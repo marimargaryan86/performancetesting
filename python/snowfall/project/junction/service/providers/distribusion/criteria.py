@@ -16,7 +16,7 @@ from snowfall.stdlib.time import date_to_age
 _MAX_STATIONS = 8
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(self, h3_mapping: h3.H3MappingRepository[stations.Station]):
         self._mapping = h3_mapping
 

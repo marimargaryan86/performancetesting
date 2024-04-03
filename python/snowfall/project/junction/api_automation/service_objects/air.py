@@ -10,7 +10,7 @@ from snowfall.project.junction.api_automation.service_objects.data import (
 )
 
 
-class AirClient(object):
+class AirClient:
     def __init__(self, client: ClientWrapper):
         self._client = client
 

@@ -10,7 +10,7 @@ from snowfall.stdlib import string
 _GUESTS_URL = "/guests"
 
 
-class TestGuests(object):
+class TestGuests:
     async def test_guest_created(
         self,
         http_client: httpx.AsyncClient,

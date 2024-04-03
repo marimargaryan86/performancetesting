@@ -4,9 +4,6 @@ from collections.abc import Mapping, Sequence
 from grpc import StatusCode, aio
 
 from snowfall.project.junction.plus.service.notifications.models import (
-    permissions as config_vector_models,
-)
-from snowfall.project.junction.plus.service.notifications.models import (
     permissions as permission_models,
 )
 from snowfall.project.junction.plus.service.notifications.notifications import (
@@ -272,7 +269,7 @@ class ConfigurationVectorService(
     ) -> notifications_pb2.GetPermissionsResponse:
         permission_refs = self._cv_permissions.get(request.reseller_id, [])
         permissions = fill_permission_defaults(
-            config_vector_models.permission_defaults,
+            permission_models.permission_defaults,
             permission_refs,
         )
 

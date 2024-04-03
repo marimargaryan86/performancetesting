@@ -52,7 +52,7 @@ def parse_reservation_output_from_raw(
     return parser.from_bytes(response, service.ServiceSoapGetVehReservationOutput)
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, provider_identifier: uuid.UUID, provider_name: str):
         self._provider_id = str(provider_identifier)
         self._provider_name = provider_name
@@ -89,7 +89,7 @@ class _CarnectCancellationError(Exception):
     """Raised when there is a Carnect-related issue."""
 
 
-class BookingCancellationHandler(object):
+class BookingCancellationHandler:
     def __init__(
         self,
         carnect_client: client.CarnectClient,
@@ -228,7 +228,7 @@ class BookingCancellationHandler(object):
         return rs_adapter
 
 
-class BookingHandler(object):
+class BookingHandler:
     def __init__(
         self,
         carnect_client: client.CarnectClient,

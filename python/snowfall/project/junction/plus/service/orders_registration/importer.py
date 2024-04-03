@@ -12,7 +12,6 @@ from snowfall.project.junction.plus.adapter import (
 from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2 as notifications_pb2,
 )
-from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.project.junction.plus.service.notifications.v1 import (
     models_pb2 as notifications_models_pb2,
 )
@@ -26,7 +25,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
-class OrderImporter(object):
+class OrderImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.IncomingOrder],
@@ -49,13 +48,13 @@ class OrderImporter(object):
 
     async def publish_event(
         self,
-        order: models_pb2.PersistedOrder,
+        order: notifications_models_pb2.PersistedOrder,
     ) -> None:
-        notification_event = models_pb2.NotificationEvent(
+        notification_event = notifications_models_pb2.NotificationEvent(
             sender_id=order.reseller_id,
             receiver_id=order.subscriber_id,
             body=order,
-            event_type=models_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
+            event_type=notifications_models_pb2.NotificationEvent.TYPE_ORDER_CONFIRMATION,
         )
         await self._producer.publish(notification_event, "plus.events")
 

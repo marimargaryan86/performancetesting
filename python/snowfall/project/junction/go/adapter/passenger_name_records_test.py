@@ -9,7 +9,7 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
 )
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_passenger_name_record_is_creatable(
         self,
         passenger_name_records_client: passenger_name_records_adapter.Client,
@@ -18,7 +18,7 @@ class TestDictClient(object):
         assert isinstance(passenger_name_record.id, str)
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     async def test_single_order_is_retrievable(self) -> None:
         test_id = "test"
         proto = passenger_name_records_pb2.PassengerNameRecord(id=test_id)

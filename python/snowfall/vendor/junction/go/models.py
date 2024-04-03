@@ -21,7 +21,7 @@ def dict_factory_to_snake(input_dict: Mapping[str, Any]) -> dict[str, Any]:
 
 
 @dataclasses.dataclass(frozen=True)
-class TravelerDocument(object):
+class TravelerDocument:
     document_type: str
     document_number: str
     document_issue_country: str
@@ -31,7 +31,7 @@ class TravelerDocument(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Passenger(object):
+class Passenger:
     first_name: str
     last_name: str
     title: str
@@ -41,7 +41,7 @@ class Passenger(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Address(object):
+class Address:
     address_lines: Sequence[str]
     country_code: str
     postal_code: str
@@ -49,7 +49,7 @@ class Address(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class ContactDetails(object):
+class ContactDetails:
     email: str
     address: Address
     phone_number: str

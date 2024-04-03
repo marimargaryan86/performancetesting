@@ -8,7 +8,6 @@ import httpx
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.time import date_to_age
 from snowfall.stdlib.transport.http import client as http_client
-from snowfall.stdlib.transport.http import errors
 from snowfall.stdlib.transport.http import errors as http_errors
 from snowfall.vendor.save_a_train.enums import PassengerType
 from snowfall.vendor.save_a_train.exceptions import (
@@ -770,14 +769,14 @@ class _SATApiClient(http_client.HttpClient):
             try:
                 response = await httpx.AsyncClient().get(url)
             except httpx.TimeoutException as timeout_exc:
-                raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc
+                raise http_errors.TimeOutError.from_error(timeout_exc) from timeout_exc
             except httpx.RequestError as request_exc:
-                raise errors.RequestError.from_error(request_exc) from request_exc
+                raise http_errors.RequestError.from_error(request_exc) from request_exc
 
             try:
                 response.raise_for_status()
             except httpx.HTTPStatusError as exc:
-                raise errors.HttpStatusError.from_error(exc) from exc
+                raise http_errors.HttpStatusError.from_error(exc) from exc
 
         return response.content
 
@@ -815,7 +814,7 @@ class _SATApiClient(http_client.HttpClient):
         }
 
 
-class SATClient(object):
+class SATClient:
     """Save A Train API client library."""
 
     def __init__(

@@ -7,7 +7,7 @@ import httpx
 from snowfall.stdlib import string
 
 
-class ICouponClient(object):
+class ICouponClient:
     def __init__(
         self,
         api_url: str,

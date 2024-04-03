@@ -138,7 +138,7 @@ def _generate_offer_aggregates_recursive(
     return aggregates
 
 
-class OfferBucketRepository(object):
+class OfferBucketRepository:
     INBOUND_BUCKET_NAME = "inbound"  # noqa: WPS115
     OUTBOUND_BUCKET_NAME = "outbound"  # noqa: WPS115
     RESULTS_BUCKET_NAME = "results"  # noqa: WPS115
@@ -328,7 +328,7 @@ class OfferBucketRepository(object):
         return buckets
 
 
-class OfferAggregator(object):
+class OfferAggregator:
     _skippable_statuses = (trackable_pb2.Trackable.STATUS_FAILED,)
 
     _aggregated_total = prometheus_client.Counter(

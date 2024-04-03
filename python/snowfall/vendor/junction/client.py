@@ -4,7 +4,7 @@ from typing import Any
 import httpx
 
 
-class BaseClient(object):
+class BaseClient:
     def __init__(
         self,
         base_url: str,

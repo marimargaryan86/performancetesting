@@ -8,7 +8,7 @@ from snowfall.project.junction.service.routes.v1 import stops_pb2
 from snowfall.stdlib.logging import stdout
 
 
-class StopImporter(object):
+class StopImporter:
     def __init__(
         self,
         repository: repositories.StopRepository,

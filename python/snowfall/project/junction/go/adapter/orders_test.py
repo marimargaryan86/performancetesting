@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.orders.v1 import (
 )
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_order_is_retrievable(
         self,
         orders_client: orders.Client,
@@ -49,7 +49,7 @@ class TestDictClient(object):
         assert len(response.booking_cancellations) == 2
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @pytest.mark.parametrize(
         ("error", "expected"),
         [

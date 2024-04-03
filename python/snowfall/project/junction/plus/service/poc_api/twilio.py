@@ -1,7 +1,7 @@
 from twilio.rest import Client as twilioClient
 
 
-class TwilioClient(object):
+class TwilioClient:
     def __init__(self, sid: str, token: str, sender: str):
         self._client = twilioClient(sid, token)
         self._sender = sender

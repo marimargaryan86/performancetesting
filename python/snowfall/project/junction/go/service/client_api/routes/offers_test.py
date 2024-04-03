@@ -10,7 +10,7 @@ from snowfall.project.junction.go import fixtures
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestOffers(object):
+class TestOffers:
     async def test_unknown_offer_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -28,7 +28,7 @@ class TestOffers(object):
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-class TestOfferGroups(object):
+class TestOfferGroups:
     async def test_unknown_offer_group_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -50,7 +50,7 @@ class TestOfferGroups(object):
         )
 
 
-class TestOfferGroupDetails(object):
+class TestOfferGroupDetails:
     async def test_unknown_offer_group_details_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -77,7 +77,7 @@ class TestOfferGroupDetails(object):
         )
 
 
-class TestOfferOptions(object):
+class TestOfferOptions:
     async def test_unknown_offer_option_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -161,7 +161,7 @@ class TestOfferOptions(object):
         assert price_breakdown["breakdownType"] == expected_type
 
 
-class TestOfferOptionDetails(object):
+class TestOfferOptionDetails:
     async def test_unknown_offer_option_details_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -188,7 +188,7 @@ class TestOfferOptionDetails(object):
         )
 
 
-class TestOfferSearches(object):
+class TestOfferSearches:
     async def test_offer_search_unauthorized(
         self,
         client: httpx.AsyncClient,
@@ -454,7 +454,7 @@ class TestOfferSearches(object):
         assert len(response.json()["data"]) == expected
 
 
-class TestPriceQuote(object):
+class TestPriceQuote:
     async def test_unknown_price_quote_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -514,7 +514,7 @@ def _get_price_quote_request() -> dict[str, Any]:
     }
 
 
-class TestPriceQuotes(object):
+class TestPriceQuotes:
     async def test_price_quote_succeeds(
         self,
         client: httpx.AsyncClient,

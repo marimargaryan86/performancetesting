@@ -15,7 +15,7 @@ status_map: dict[str, Status.ValueType] = {
 }
 
 
-class TicketEventConsumer(object):
+class TicketEventConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.TicketChangedEvent],
@@ -51,7 +51,7 @@ class TicketEventConsumer(object):
             )
 
 
-class BookingCancellationsConsumer(object):
+class BookingCancellationsConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.HandleCancellationTask],

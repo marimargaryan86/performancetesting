@@ -11,7 +11,7 @@ from snowfall.project.junction.service.gateway import providers
 from snowfall.stdlib.persistence.redis import types
 
 
-class Factory(object):
+class Factory:
     def __init__(
         self,
         client: types.Client[bytes],
@@ -34,7 +34,7 @@ class Factory(object):
         )
 
 
-class Store(object):
+class Store:
     def __init__(
         self,
         client: types.Client[bytes],

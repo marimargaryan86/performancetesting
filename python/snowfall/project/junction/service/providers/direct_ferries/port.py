@@ -42,7 +42,7 @@ def load_ports() -> list[Port]:
     return [_make_port(port) for port in ports]
 
 
-class PortRepository(object):
+class PortRepository:
     def __init__(self, ports: Sequence[Port]) -> None:
         self._ports = {port.identifier: port for port in ports}
 

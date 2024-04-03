@@ -9,7 +9,7 @@ from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2, trips_
 from snowfall.project.junction.go.v1 import models_pb2
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_segment_is_retrievable(
         self,
         segments_client: segments.Client,
@@ -25,7 +25,7 @@ class TestDictClient(object):
             await segments_client.get(fixtures.NOT_FOUND)
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @pytest.mark.parametrize(
         ("error", "expected"),
         [

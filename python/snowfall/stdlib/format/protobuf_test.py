@@ -18,7 +18,7 @@ from snowfall.stdlib.v1 import date_pb2, datetime_pb2, testing_pb2
 _seconds = 1639696695
 
 
-class TestSerializer(object):
+class TestSerializer:
     def test_serialize(self) -> None:
         message = timestamp_pb2.Timestamp(seconds=_seconds)
         message_serialized = protobuf.AnySerializer.serialize(message)

@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.places.v1 import (
 )
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_location_is_retrievable(
         self,
         locations_client: locations.Client,
@@ -47,7 +47,7 @@ class TestDictClient(object):
         assert len(found_locations.locations) == 1
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @pytest.mark.parametrize(
         ("error", "expected"),
         [

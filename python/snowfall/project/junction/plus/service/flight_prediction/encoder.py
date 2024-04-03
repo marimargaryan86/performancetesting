@@ -7,7 +7,7 @@ from snowfall.project.junction.plus.service.flight_prediction.models import (
 )
 
 
-class Encoder(object):
+class Encoder:
     def encode(
         self,
         flight_info: encoder_models.FlightInfo,

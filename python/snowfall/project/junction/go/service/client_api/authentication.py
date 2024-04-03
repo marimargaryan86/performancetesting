@@ -4,7 +4,7 @@ from starlette import authentication
 from snowfall.stdlib.format import jwt
 
 
-class LegacyAuth(object):
+class LegacyAuth:
     def __init__(
         self,
         decoder: jwt.Decoder,

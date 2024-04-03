@@ -11,7 +11,7 @@ from snowfall.vendor.benerail.clients import (
 )
 
 
-class BenerailClient(object):
+class BenerailClient:
     def __init__(
         self,
         subscription_key: str,

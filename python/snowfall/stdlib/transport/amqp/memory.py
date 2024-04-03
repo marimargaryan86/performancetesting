@@ -9,7 +9,7 @@ from snowfall.stdlib.transport.amqp import protocol
 
 
 @dataclasses.dataclass(frozen=True)
-class _MessageContainer(object):
+class _MessageContainer:
     message: message.Message
     routing_key: str
     expiration: datetime.datetime | None

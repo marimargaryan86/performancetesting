@@ -80,7 +80,7 @@ async def offer_search_response(
     )
 
 
-class TestOffers(object):
+class TestOffers:
     async def test_one_way_contains_offers(
         self,
         offer_search_response: trips_pb2.SearchOffersResponse,
@@ -102,7 +102,7 @@ def offer_result(
     return offer_search_response.offers[0]
 
 
-class TestOfferModel(object):
+class TestOfferModel:
     async def test_offer_has_id(self, offer_result: trips_pb2.Offer) -> None:
         assert offer_result.id
 
@@ -131,7 +131,7 @@ def offer_request(
     )
 
 
-class TestOfferRequest(object):
+class TestOfferRequest:
     def test_passenger_with_age_is_added_to_request(
         self,
         offer_request: request_builder.OfferRequestData,

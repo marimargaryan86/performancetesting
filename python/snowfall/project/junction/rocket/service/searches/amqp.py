@@ -7,7 +7,7 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import (
 from snowfall.stdlib.transport.amqp import protocol, trackable
 
 
-class SearchProducer(object):
+class SearchProducer:
     def __init__(
         self,
         producer: trackable.TrackableProducer | protocol.Producer,
@@ -41,7 +41,7 @@ class SearchProducer(object):
             )
 
 
-class QuoteTaskProducer(object):
+class QuoteTaskProducer:
     def __init__(
         self,
         producer: protocol.Producer,

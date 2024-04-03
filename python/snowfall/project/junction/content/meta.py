@@ -8,7 +8,7 @@ from snowfall.stdlib.transport.grpc import service
 
 
 @dataclasses.dataclass(frozen=True)
-class MetaImplementation(object):
+class MetaImplementation:
     identifier: uuid.UUID
     name: str
     trip_search_capabilities: meta_pb2.TripSearchCapabilities | None = None

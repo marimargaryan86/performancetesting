@@ -12,7 +12,7 @@ from snowfall.stdlib.format import hcl2
 
 
 @dataclasses.dataclass(frozen=True)
-class Resolver(object):
+class Resolver:
     _dependency_lookup: Mapping[str, frozenset[str]]
     _service_dependencies: Mapping[str, frozenset[str]]
 
@@ -37,7 +37,7 @@ class Resolver(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _ResolvedTemplate(object):
+class _ResolvedTemplate:
     service: str
     needs: frozenset[str] = dataclasses.field(default_factory=frozenset)
     provides: frozenset[str] = dataclasses.field(default_factory=frozenset)
@@ -90,12 +90,12 @@ async def _resolve_from_service(
             )
 
             for proxy in sidecar.proxy:
-                for upstream in proxy.upstreams:
-                    needs.add(
-                        upstream.destination_name.removesuffix(
-                            "-${var.environment}",
-                        ),
+                needs.update(
+                    upstream.destination_name.removesuffix(
+                        "-${var.environment}",
                     )
+                    for upstream in proxy.upstreams
+                )
 
     return frozenset(needs), frozenset(provides)
 

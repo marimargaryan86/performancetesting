@@ -13,7 +13,7 @@ from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 _Method = Literal["GET", "POST"]
 
 
-class JunctionOneClient(object):
+class JunctionOneClient:
     def __init__(
         self,
         api_base_url: str,

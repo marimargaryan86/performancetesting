@@ -8,7 +8,7 @@ from snowfall.stdlib.persistence import cursor
 from snowfall.vendor.ory import models
 
 
-class OryClient(object):
+class OryClient:
     def __init__(
         self,
         base_url: str,

@@ -17,7 +17,7 @@ class TrainStation(h3.CoordinatesItem):
     name: str | None
 
 
-class TrainStationRepository(object):
+class TrainStationRepository:
     def __init__(
         self,
         train_stations: Sequence[TrainStation],

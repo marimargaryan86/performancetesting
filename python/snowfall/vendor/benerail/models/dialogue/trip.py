@@ -13,7 +13,7 @@ from snowfall.vendor.benerail.models.place import Place
 
 
 class TripFilter(BenerailBaseModel):
-    class Config(object):
+    class Config:
         json_encoders = MappingProxyType(
             {
                 datetime.datetime: lambda dt: dt.isoformat(timespec="minutes"),

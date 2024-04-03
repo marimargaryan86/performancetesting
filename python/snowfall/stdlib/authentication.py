@@ -6,7 +6,7 @@ class AuthenticationError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class User(object):
+class User:
     identifier: str
     email: str
     metadata: dict[str, object] = dataclasses.field(default_factory=dict)

@@ -8,7 +8,7 @@ from snowfall.project.junction.service.providers.ask2go.train_stations import (
 from snowfall.vendor.ask2go.models import offers
 
 
-class LocationRepository(object):
+class LocationRepository:
     def __init__(
         self,
         airport_repository: AirportRepository,

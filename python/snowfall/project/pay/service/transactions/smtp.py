@@ -5,14 +5,14 @@ import aiosmtplib
 
 
 @dataclasses.dataclass(frozen=True)
-class Attachment(object):
+class Attachment:
     payload: str
     main_type: str
     sub_type: str
     file_name: str
 
 
-class EmailClient(object):
+class EmailClient:
     def __init__(
         self,
         client: aiosmtplib.SMTP,

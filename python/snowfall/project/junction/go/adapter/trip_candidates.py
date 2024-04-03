@@ -9,7 +9,7 @@ from snowfall.stdlib.v1 import sort_pb2
 
 
 @dataclasses.dataclass(frozen=True)
-class ListTripCandidatesFilter(object):
+class ListTripCandidatesFilter:
     identifier: str
     limit: int | None = None
     cursor: str | None = None

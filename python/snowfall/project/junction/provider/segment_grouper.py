@@ -13,7 +13,7 @@ from snowfall.stdlib.format import protobuf
 
 
 @dataclass(frozen=True)
-class SubTrip(object):
+class SubTrip:
     trip_id: str
     origins: frozenset[str]
     destinations: frozenset[str]
@@ -23,7 +23,7 @@ class SubTrip(object):
 
 
 @dataclass(frozen=True)
-class TripCriteria(object):
+class TripCriteria:
     outbound: SubTrip
     inbound: SubTrip | None = None
 

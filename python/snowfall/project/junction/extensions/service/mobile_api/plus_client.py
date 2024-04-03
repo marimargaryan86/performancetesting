@@ -4,7 +4,7 @@ from typing import Any
 import httpx
 
 
-class PlusClient(object):
+class PlusClient:
     def __init__(
         self,
         api_url: str,

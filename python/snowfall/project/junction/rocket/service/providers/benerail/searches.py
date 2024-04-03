@@ -67,7 +67,7 @@ def _find_nearest_provider_place(
     return nearest_station.identifier, nearest_station.timezone
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[train_stations.TrainStation],

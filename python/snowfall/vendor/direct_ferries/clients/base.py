@@ -8,7 +8,7 @@ from snowfall.vendor.direct_ferries.clients import auth
 
 
 @dataclasses.dataclass(frozen=True)
-class RequestDetails(object):
+class RequestDetails:
     url: str
     method: str
     payload: str | None = None
@@ -16,7 +16,7 @@ class RequestDetails(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class ClientConfig(object):
+class ClientConfig:
     client_id: str
     client_secret: str
     api_url: str
@@ -25,7 +25,7 @@ class ClientConfig(object):
     api_version: str | None = "v1.0"
 
 
-class BaseClient(object):
+class BaseClient:
     """Direct Ferries API client library."""
 
     def __init__(

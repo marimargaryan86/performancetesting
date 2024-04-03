@@ -34,7 +34,7 @@ def grpc_context() -> grpc.aio.ServicerContext:
     return context
 
 
-class MockIteratorWithCursor(object):
+class MockIteratorWithCursor:
     def __init__(self, places: Sequence[models_pb2.Place]):
         self.iter = iter(places)
         self.limit_calls: list[int] = []
@@ -55,7 +55,7 @@ class MockIteratorWithCursor(object):
         self.limit_calls.append(limit)
 
 
-class TestGrpc(object):
+class TestGrpc:
     async def test_that_when_get_place_by_id_has_place_its_returned(
         self,
         grpc_context: grpc.aio.ServicerContext,

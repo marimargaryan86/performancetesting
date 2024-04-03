@@ -104,7 +104,7 @@ def existing_guest() -> models_pb2.Guest:
 
 
 @dataclasses.dataclass(frozen=True)
-class VerificationCode(object):
+class VerificationCode:
     email: str
     code: str
 

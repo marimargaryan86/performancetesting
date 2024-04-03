@@ -112,7 +112,7 @@ def stub(
     return stub
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_identity_is_retrievable(
         self,
         identities_client: identities.Client,
@@ -211,7 +211,7 @@ class TestDictClient(object):
         assert len(identities.identities) == 1
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     async def test_identity_is_retrievable(
         self,
         stub: identities_pb2_grpc.IdentitiesServiceStub,

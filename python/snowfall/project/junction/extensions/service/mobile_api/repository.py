@@ -20,7 +20,7 @@ def compile_regex(search_str: str) -> re.Pattern[str]:
     return re.compile(unidecode.unidecode(search_str), re.IGNORECASE)
 
 
-class RedisRepository(object):
+class RedisRepository:
     def __init__(
         self,
         redis_client: redis.Client[str],

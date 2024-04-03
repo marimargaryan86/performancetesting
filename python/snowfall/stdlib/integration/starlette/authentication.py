@@ -9,7 +9,7 @@ from snowfall.stdlib import authentication as stdlib_auth
 from snowfall.stdlib.format import jwt
 
 
-class OryAuth(object):
+class OryAuth:
     def __init__(
         self,
         jwk_client: jwt.AsyncJWKClient,

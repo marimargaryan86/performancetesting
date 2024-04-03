@@ -24,7 +24,7 @@ from snowfall.vendor.ask2go import client
 from snowfall.vendor.ask2go.models import seat_map
 
 
-class PriceQuoteConsumer(object):
+class PriceQuoteConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
@@ -71,7 +71,7 @@ class PriceQuoteConsumer(object):
         )
 
 
-class OrderConsumer(object):
+class OrderConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],
@@ -117,7 +117,7 @@ class OrderConsumer(object):
         )
 
 
-class SeatMapRpcServer(object):
+class SeatMapRpcServer:
     def __init__(
         self,
         address: str,

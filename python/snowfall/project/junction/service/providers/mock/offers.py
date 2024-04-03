@@ -123,7 +123,7 @@ def cache_key(search: Criteria) -> str:
     return string.uuid()
 
 
-class Generator(object):
+class Generator:
     def __init__(
         self,
         realistic_results: bool,  # noqa: FBT001

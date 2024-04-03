@@ -13,7 +13,7 @@ ResolvedMap = Mapping[str, models_pb2.Place]
 ResolverFunc = Callable[[frozenset[str]], Awaitable[ResolvedMap]]
 
 
-class Resolver(object):
+class Resolver:
     def __init__(
         self,
         stub: places_pb2_grpc.PlacesServiceStub,

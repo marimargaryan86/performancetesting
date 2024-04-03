@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.offers.v1.models_pb2 import (
 from snowfall.stdlib.transport.amqp.producer import Producer
 
 
-class MockResultSet(object):
+class MockResultSet:
     def __init__(self) -> None:
         self._offers = [
             Offer(

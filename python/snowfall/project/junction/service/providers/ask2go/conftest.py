@@ -66,7 +66,7 @@ async def load_json_fixture(
         return orjson.loads(await file_handle.read())
 
 
-class MagicMocker(object):
+class MagicMocker:
     def __init__(self, httpx_mock: pytest_httpx.HTTPXMock):
         self._mock = httpx_mock
         self._path = ""

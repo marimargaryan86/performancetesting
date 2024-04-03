@@ -50,7 +50,7 @@ def trip_result(
     return trip_results[0]
 
 
-class TestTripModel(object):
+class TestTripModel:
     def test_trips_have_fare_type(
         self,
         trip_results: Sequence[trips_pb2.Trip],
@@ -81,7 +81,7 @@ async def segment_with_stops(
     return trip_parser.segment_to_proto(segment_model)
 
 
-class TestSegmentModel(object):
+class TestSegmentModel:
     def test_locations(self, segments_results: Iterable[trips_pb2.Segment]) -> None:
         for segment in segments_results:
             self._assert_location(segment.origin)

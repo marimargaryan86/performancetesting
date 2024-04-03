@@ -4,7 +4,7 @@ import httpx
 from starlette import status
 
 
-class TestTransactions(object):
+class TestTransactions:
     async def test_get_all_transactions_success(
         self,
         client: httpx.AsyncClient,

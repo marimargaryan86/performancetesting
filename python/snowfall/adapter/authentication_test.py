@@ -94,7 +94,7 @@ def metadata_stub() -> sessions_pb2_grpc.SessionServiceStub:
     return stub
 
 
-class TestSessionCookieResolver(object):
+class TestSessionCookieResolver:
     async def test_grpc_error_raises_error(self) -> None:
         resolver = authentication.session_cookie_resolver(error_stub())
 

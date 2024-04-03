@@ -10,7 +10,7 @@ from snowfall.vendor.zendesk.models import (
 )
 
 
-class TestZendeskClient(object):
+class TestZendeskClient:
     async def test_create_support_ticket(
         self,
         httpx_mock: pytest_httpx.HTTPXMock,

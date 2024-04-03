@@ -21,7 +21,7 @@ _ADULT_YEARS = 12
 _CHILD_YEARS = 2
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[airports.Airport],

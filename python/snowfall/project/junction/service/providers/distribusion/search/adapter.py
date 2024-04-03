@@ -51,7 +51,7 @@ def offer_group_cache_key(task: amqp_pb2.SearchCriteriaTask) -> str:
     )
 
 
-class MarketingCarrierAdapter(object):
+class MarketingCarrierAdapter:
     def __init__(
         self,
         marketing_carrier: connections.MarketingCarrier,
@@ -189,7 +189,7 @@ class MarketingCarrierAdapter(object):
         return self._fare_classes
 
 
-class MarketingCarrierAdapters(object):
+class MarketingCarrierAdapters:
     def __init__(self) -> None:
         self._adapters = dict[str, MarketingCarrierAdapter]()
 
@@ -207,7 +207,7 @@ class MarketingCarrierAdapters(object):
         return adapter
 
 
-class DistribusionSearchAdapter(object):
+class DistribusionSearchAdapter:
     def __init__(
         self,
         distribusion_client: client.DistribusionClient,

@@ -3,7 +3,7 @@ import json_api_doc
 from starlette import status
 
 
-class TestUserGroup(object):
+class TestUserGroup:
     async def test_create_get_delete_user_group(
         self,
         authenticated_http_client: httpx.AsyncClient,
@@ -63,7 +63,7 @@ class TestUserGroup(object):
         assert response_get.json()["data"]["attributes"]["name"] == "NewGroupName"
 
 
-class TestUserGroupMembers(object):
+class TestUserGroupMembers:
     async def test_create_user_group_member(
         self,
         authenticated_http_client: httpx.AsyncClient,

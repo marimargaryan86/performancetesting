@@ -15,7 +15,7 @@ from snowfall.vendor.carnect.models.service import (
 )
 
 
-class CancelInfoTypeBuilder(object):
+class CancelInfoTypeBuilder:
     def __init__(self) -> None:
         self._builder = CancelInfoRqtype()
         self._builder.unique_id = []
@@ -34,7 +34,7 @@ class CancelInfoTypeBuilder(object):
         return person_name
 
 
-class CancelReservationRqBuilder(object):
+class CancelReservationRqBuilder:
     def __init__(self, conf: config.Config) -> None:
         self._rq = VehCancelResRq()
         self._pos = PosBuilder()

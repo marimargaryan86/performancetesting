@@ -8,7 +8,7 @@ from snowfall.stdlib.integration.starlette import messages, models, pagination_h
 
 
 @dataclasses.dataclass(frozen=True)
-class Places(object):
+class Places:
     _client: places.Client
 
     async def view(self, request: messages.Request) -> responses.Response:

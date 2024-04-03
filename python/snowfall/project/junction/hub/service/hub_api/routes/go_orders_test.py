@@ -25,7 +25,7 @@ def _get_cancellation_request_request() -> dict[str, Any]:
     }
 
 
-class TestBookingsByOrder(object):
+class TestBookingsByOrder:
     async def test_bookings_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,
@@ -34,7 +34,7 @@ class TestBookingsByOrder(object):
         )
 
 
-class TestBookingsDetailsByBooking(object):
+class TestBookingsDetailsByBooking:
     async def test_booking_details_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,
@@ -43,7 +43,7 @@ class TestBookingsDetailsByBooking(object):
         )
 
 
-class TestBookingsCancellation(object):
+class TestBookingsCancellation:
     async def test_cancellation_request_creation(
         self,
         client: httpx.AsyncClient,

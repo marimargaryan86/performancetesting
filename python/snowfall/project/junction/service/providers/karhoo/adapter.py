@@ -7,7 +7,6 @@ from typing import NamedTuple
 from snowfall.project.junction.go.service.offers.v1 import (
     models_pb2 as offer_models_pb2,
 )
-from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.service.providers.karhoo import (
     cache,
@@ -80,7 +79,7 @@ class QuoteResult(NamedTuple):
     quotes_response: karhoo_quotes.RequestQuotesResponse
 
 
-class KarhooOfferMatcher(object):
+class KarhooOfferMatcher:
     def __init__(self, karhoo_client: client.KarhooClient, ttl: datetime.timedelta):
         self._karhoo_client = karhoo_client
         self._wait = 1
@@ -133,7 +132,7 @@ class KarhooOfferMatcher(object):
         return cabin_class == offer_details.cabin_class
 
 
-class KarhooOffersAdapter(object):
+class KarhooOffersAdapter:
     def __init__(
         self,
         karhoo_client: client.KarhooClient,
@@ -247,7 +246,7 @@ class KarhooOffersAdapter(object):
                 offer_models_pb2.OfferSegmentDetails(
                     id=string.uuid(),
                     offer_segment_id=segment.id,
-                    cabin_class=models_pb2.CabinClass(
+                    cabin_class=common_pb2.CabinClass(
                         type=_get_cabin_class_from_tags(
                             quote.vehicle.tags if quote.vehicle else [],
                         ),
@@ -283,7 +282,7 @@ class KarhooOffersAdapter(object):
                 equipment=quote.vehicle.type if quote.vehicle else "",
             ),
             vendor=quote.fleet.name,
-            type=models_pb2.Schedule.TYPE_TAXI,
+            type=common_pb2.Schedule.TYPE_TAXI,
         )
 
     def _get_leg(
@@ -292,14 +291,14 @@ class KarhooOffersAdapter(object):
     ) -> offer_models_pb2.OfferSegmentLeg:
         return offer_models_pb2.OfferSegmentLeg(
             id=string.uuid(),
-            origin=models_pb2.Point(
+            origin=common_pb2.Point(
                 name="",
                 coordinates=search_task.origin,
                 time_zone=helper_functions.get_zone_for_coordinate(
                     coordinate=search_task.origin,
                 ).key,
             ),
-            destination=models_pb2.Point(
+            destination=common_pb2.Point(
                 name="",
                 coordinates=search_task.destination,
                 time_zone=helper_functions.get_zone_for_coordinate(

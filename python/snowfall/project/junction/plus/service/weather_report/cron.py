@@ -36,7 +36,7 @@ _WEATHER_CONDITION_GROUP_ICONS = types.MappingProxyType(
 )
 
 
-class WeatherReportCronJob(object):
+class WeatherReportCronJob:
     def __init__(
         self,
         monitoring_rules: monitoring_rules_adapter.Client,

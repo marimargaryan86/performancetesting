@@ -7,7 +7,7 @@ from snowfall.stdlib.v1 import money_pb2
 from snowfall.vendor.duffel.models.offer import Offer, OfferCondition
 
 
-class PriceQuoteTransformer(object):
+class PriceQuoteTransformer:
     def __init__(
         self,
         offer_cache: cache.OfferCache,

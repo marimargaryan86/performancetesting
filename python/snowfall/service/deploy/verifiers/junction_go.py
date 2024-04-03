@@ -37,7 +37,7 @@ from snowfall.stdlib.v1 import (
 )
 
 
-class OrdersFlow(object):
+class OrdersFlow:
     dependencies: ClassVar[protocols.Dependencies] = {
         ("offers", "grpc"),
         ("orders", "grpc"),

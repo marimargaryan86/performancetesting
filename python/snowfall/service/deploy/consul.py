@@ -5,7 +5,7 @@ from dns.rdtypes.IN import SRV as SRV_RECORD
 from dns.rdtypes.IN import A as A_RECORD
 
 
-class Resolver(object):
+class Resolver:
     def __init__(self, nameserver: tuple[str, int], environment: str) -> None:
         self._environment = environment
         self._resolver = asyncresolver.Resolver()

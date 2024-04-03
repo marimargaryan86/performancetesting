@@ -8,7 +8,7 @@ from snowfall.stdlib.logging import stdout
 logger = stdout.get_logger()
 
 
-class InvoiceState(object):
+class InvoiceState:
     def __init__(
         self,
         stripe_api_key: str,

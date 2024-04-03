@@ -16,7 +16,7 @@ from snowfall.vendor.carnect.models.service import (
 from snowfall.vendor.carnect.xml_datetime_tools import datetime_to_xml
 
 
-class VehicleRentalCoreBuilder(object):
+class VehicleRentalCoreBuilder:
     def __init__(self) -> None:
         self._core_type = VehicleRentalCoreType()
 

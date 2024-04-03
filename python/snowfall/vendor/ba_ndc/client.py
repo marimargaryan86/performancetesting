@@ -33,7 +33,7 @@ def _request_query_params(offer_id: UUID | None, order_id: UUID | None) -> Any:
     return {"orderId": order_id}
 
 
-class BaNdcClient(object):
+class BaNdcClient:
     def __init__(
         self,
         api_base_url: str,

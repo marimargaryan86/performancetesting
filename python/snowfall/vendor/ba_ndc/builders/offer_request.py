@@ -8,7 +8,7 @@ from snowfall.vendor.ba_ndc.models.request_offer_search_schemas import (
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
 
 
-class OffersRequestBuilder(object):
+class OffersRequestBuilder:
     def __init__(self) -> None:
         self._passengers: list[Passenger] = []
         self._trips: list[Trip] = []

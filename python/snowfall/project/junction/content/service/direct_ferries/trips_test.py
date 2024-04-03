@@ -77,7 +77,7 @@ def trip_searcher(
     )
 
 
-class TestTripSearcher(object):
+class TestTripSearcher:
     def test_one_way_contains_results(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,
@@ -230,7 +230,7 @@ def round_trip_segments_results(
     return [segment for trip in round_trip_result.trips for segment in trip.segments]
 
 
-class TestSegmentModel(object):
+class TestSegmentModel:
     def test_locations(self, segments_results: Iterable[trips_pb2.Segment]) -> None:
         for segment in segments_results:
             self._assert_location(segment.origin)
@@ -261,7 +261,7 @@ class TestSegmentModel(object):
         assert vehicle.name, "Vehicles should have a name"
 
 
-class TestRoundTripSegmentModel(object):
+class TestRoundTripSegmentModel:
     def test_locations(
         self,
         round_trip_segments_results: Iterable[trips_pb2.Segment],

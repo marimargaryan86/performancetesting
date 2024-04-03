@@ -51,7 +51,7 @@ def encrypted_payload(encoder: jwt.Encoder) -> str:
     return encoder.encode(jwt.Payload())
 
 
-class TestEncoder(object):
+class TestEncoder:
     def test_payload_is_encoded(self) -> None:
         encoder = jwt.Encoder()
         encoded = encoder.encode(jwt.Payload())
@@ -80,7 +80,7 @@ class TestEncoder(object):
             jwt.Encoder(private_key="Zm9v", algorithm="RS256")
 
 
-class TestDecoder(object):
+class TestDecoder:
     def test_unencrypted_payload_can_be_decoded(self, unencrypted_payload: str) -> None:
         decoder = jwt.Decoder()
         assert decoder.decode(unencrypted_payload)
@@ -140,7 +140,7 @@ def payload_with_unknown_kid(encoder: jwt.Encoder) -> str:
     return encoder.encode(jwt.Payload(), headers={"kid": "bazqux"})
 
 
-class TestJWKClient(object):
+class TestJWKClient:
     async def test_signing_keys_are_fetched_once(
         self,
         jwk_client: jwt.AsyncJWKClient,

@@ -15,7 +15,7 @@ from snowfall.vendor.carnect.models.service import (
 )
 
 
-class VehRetResRqBuilder(object):
+class VehRetResRqBuilder:
     def __init__(self, conf: config.Config) -> None:
         self._rq = VehRetResRq()
         self._rq.version = decimal.Decimal("1.0")

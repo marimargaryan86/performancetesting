@@ -36,7 +36,7 @@ async def search_flight(
 _TEMPERATURE = 0.2
 
 
-class AIBot(object):
+class AIBot:
     _system_setup = """
         You are a travel assistant and you should answer only to travel related questions.
         For anything else, you should respond with "unrelated question" message.

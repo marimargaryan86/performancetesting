@@ -6,7 +6,7 @@ from snowfall.project.junction.api_automation.service_objects.helper import (
 )
 
 
-class BaseResult(object):
+class BaseResult:
     def __init__(self, data: Mapping[str, Any]):
         self._data = data
 

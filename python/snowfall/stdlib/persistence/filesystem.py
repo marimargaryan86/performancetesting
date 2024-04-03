@@ -28,7 +28,7 @@ class NotFoundError(Exception):
     """Raised when a resource is not found."""
 
 
-class Storage(object):
+class Storage:
     def __init__(
         self,
         filesystem: asyn.AsyncFileSystem,
@@ -120,7 +120,7 @@ class Storage(object):
         )
 
 
-class PkgLoader(object):
+class PkgLoader:
     def __init__(self, pkg: str):
         self._pkg = pkg
 

@@ -3,7 +3,7 @@ import datetime
 from snowfall.stdlib.persistence.redis import types as redis
 
 
-class RateRepository(object):
+class RateRepository:
     def __init__(
         self,
         redis_client: redis.Client[str],

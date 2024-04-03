@@ -6,7 +6,7 @@ from starlette import status
 _CO2EMISSION_URL = "/co2-emissions"
 
 
-class TestCo2Emission(object):
+class TestCo2Emission:
     async def test_co2emission_post(
         self,
         authenticated_http_client: httpx.AsyncClient,

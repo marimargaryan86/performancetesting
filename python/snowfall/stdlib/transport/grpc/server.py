@@ -11,7 +11,7 @@ from snowfall.stdlib.transport.grpc import handler, logging, metrics, options, t
 from snowfall.stdlib.transport.grpc.service import HealthService, Service
 
 
-class Server(object):
+class Server:
     def __init__(self, server: grpc.aio.Server, address: str):
         self._address = address
         self._logger = stdout.get_logger()

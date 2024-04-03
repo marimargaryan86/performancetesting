@@ -16,7 +16,7 @@ class JunctionOneError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class ResponseMetaData(object):
+class ResponseMetaData:
     status_code: int
     body: str | None
 
@@ -33,7 +33,7 @@ class ResponseMetaData(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class RequestMetaData(object):
+class RequestMetaData:
     method: str
     url: str
     body: str | None

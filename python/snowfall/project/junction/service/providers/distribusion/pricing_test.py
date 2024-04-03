@@ -9,7 +9,7 @@ from snowfall.vendor.distribusion import conftest
 from snowfall.vendor.distribusion.models import connections
 
 
-class TestPriceQuoteConsumer(object):
+class TestPriceQuoteConsumer:
     async def test_process_message(
         self,
         price_quote_consumer: pricing.PriceQuoteConsumer,

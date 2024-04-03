@@ -18,7 +18,7 @@ ResolverFunc = Callable[
 
 
 @dataclasses.dataclass(frozen=True)
-class Resolver(object):
+class Resolver:
     resource: type[models.Resource]
     func: ResolverFunc
 
@@ -32,7 +32,7 @@ def add_resolver(resolver: Resolver) -> None:
     _resolvers[resolver.resource] = resolver
 
 
-class _IncludesResolver(object):
+class _IncludesResolver:
     def __init__(self, wanted_includes: frozenset[str]):
         self._known_resources: set[tuple[str, str]] = set()
         self._logger = stdout.get_logger()

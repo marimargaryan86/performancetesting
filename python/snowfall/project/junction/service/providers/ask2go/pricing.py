@@ -20,7 +20,7 @@ class PricingTimeoutError(Exception):
     """Raised when no successful pricing result is received within the time limit."""
 
 
-class Adapter(object):
+class Adapter:
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,

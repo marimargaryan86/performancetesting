@@ -36,7 +36,7 @@ class UnmarshalResult(NamedTuple):
 
 
 @dataclasses.dataclass(frozen=False)  # noqa: SF10
-class _ProviderWrapper(object):
+class _ProviderWrapper:
     provider: Provider
     is_healthy: bool = False
     _lock: asyncio.Lock = dataclasses.field(default_factory=asyncio.Lock)
@@ -107,7 +107,7 @@ class _ProviderWrapper(object):
         )
 
 
-class Collection(object):
+class Collection:
     def __init__(self, providers: Sequence[Provider]):
         self._providers = {
             provider.identifier: _ProviderWrapper(provider=provider)
@@ -165,7 +165,7 @@ class Collection(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Provider(object):
+class Provider:
     connection: Connection
     identifier: str
     name: str = ""
@@ -177,7 +177,7 @@ class Provider(object):
         return sequence.to_composite_id([self.identifier, resource_id])
 
 
-class Connection(object):
+class Connection:
     def __init__(self, channel: aio.Channel):
         self._channel = channel
         self._meta = meta_pb2_grpc.MetaServiceStub(self._channel)

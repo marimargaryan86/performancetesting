@@ -43,7 +43,7 @@ class BookingOffersCache(RedisRepository[BookingOfferDetails]):
 
 
 @dataclasses.dataclass(frozen=True)
-class Cache(object):
+class Cache:
     offers_cache: OffersCache
     booking_offers_cache: BookingOffersCache
 

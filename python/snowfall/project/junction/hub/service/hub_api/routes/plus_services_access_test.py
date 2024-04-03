@@ -2,7 +2,7 @@ import httpx
 from starlette import status
 
 
-class TestPlusServicesAccess(object):
+class TestPlusServicesAccess:
     async def test_updating_plus_services_access_for_the_reseller(
         self,
         client: httpx.AsyncClient,

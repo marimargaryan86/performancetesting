@@ -14,7 +14,7 @@ from snowfall.project.pay.service.transactions.generate_statements import (
 from snowfall.stdlib.persistence import filesystem
 
 
-class NetsuiteReportJob(object):
+class NetsuiteReportJob:
     def __init__(
         self,
         email_client: smtp.EmailClient,
@@ -54,7 +54,7 @@ class NetsuiteReportJob(object):
         )
 
 
-class StatementReportJob(object):
+class StatementReportJob:
     def __init__(
         self,
         smtp_client: aiosmtplib.SMTP,

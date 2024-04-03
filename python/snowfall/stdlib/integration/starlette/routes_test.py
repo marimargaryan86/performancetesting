@@ -6,13 +6,13 @@ from starlette import applications, routing, status
 from snowfall.stdlib.integration.starlette import routes
 
 
-class TestHealth(object):
+class TestHealth:
     async def test_health_status_code(self, test_client: httpx.AsyncClient) -> None:
         response = await test_client.get("/health")
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestProxy(object):
+class TestProxy:
     async def test_proxy(
         self,
         test_app_without_spec: applications.Starlette,

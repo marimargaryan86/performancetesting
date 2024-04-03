@@ -9,7 +9,7 @@ from snowfall.project.pay.service.transactions.v1 import (
 )
 
 
-class Quotes(object):
+class Quotes:
     def __init__(
         self,
         pay_transactions_service: pay_pb2_grpc.QuotationsServiceStub,

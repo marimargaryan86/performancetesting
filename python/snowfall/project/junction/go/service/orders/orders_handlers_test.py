@@ -10,7 +10,7 @@ from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 
 
-class TestCancellationTicketCompletedHandler(object):
+class TestCancellationTicketCompletedHandler:
     async def test_ticket_not_exists(
         self,
         cancellation_requests_repository: orders.CancellationRequestsRepository,

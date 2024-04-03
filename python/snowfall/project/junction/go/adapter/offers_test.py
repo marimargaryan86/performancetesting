@@ -14,7 +14,7 @@ from snowfall.project.junction.go.service.offers.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_offer_is_retrievable(
         self,
         offers_client: offers.Client,
@@ -81,7 +81,7 @@ class TestDictClient(object):
         assert len(offers_page.offers) == expected
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @pytest.mark.parametrize(
         ("error", "expected"),
         [

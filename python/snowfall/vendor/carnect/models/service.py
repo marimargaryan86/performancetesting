@@ -41,7 +41,7 @@ class AdvanceBookingOffsetDropTime(Enum):
 
 
 @dataclass
-class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
+class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard:
     acceptable_payment_card: list[
         "ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard.AcceptablePaymentCard"
     ] = field(
@@ -54,7 +54,7 @@ class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
     )
 
     @dataclass
-    class AcceptablePaymentCard(object):
+    class AcceptablePaymentCard:
         card_type: str | None = field(
             default=None,
             metadata={
@@ -86,7 +86,7 @@ class ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard(object):
 
 
 @dataclass
-class ArrayOfOperationScheduleTypeOperationTime(object):
+class ArrayOfOperationScheduleTypeOperationTime:
     operation_time: list["ArrayOfOperationScheduleTypeOperationTime.OperationTime"] = (
         field(
             default_factory=list,
@@ -99,7 +99,7 @@ class ArrayOfOperationScheduleTypeOperationTime(object):
     )
 
     @dataclass
-    class OperationTime(object):
+    class OperationTime:
         mon: bool | None = field(
             default=None,
             metadata={
@@ -194,7 +194,7 @@ class ArrayOfOperationScheduleTypeOperationTime(object):
 
 
 @dataclass
-class ArrayOfString(object):
+class ArrayOfString:
     additional_person_name: list[str] = field(
         default_factory=list,
         metadata={
@@ -206,8 +206,8 @@ class ArrayOfString(object):
 
 
 @dataclass
-class ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref(object):
-    class Meta(object):
+class ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref:
+    class Meta:
         name = "ArrayOfVehicleAvailRQAdditionalInfoTypeCoveragePref"
 
     coverage_pref: list[object] = field(
@@ -221,7 +221,7 @@ class ArrayOfVehicleAvailRqadditionalInfoTypeCoveragePref(object):
 
 
 @dataclass
-class ArrayOfVehicleChargeTypeTaxAmount(object):
+class ArrayOfVehicleChargeTypeTaxAmount:
     tax_amount: list["ArrayOfVehicleChargeTypeTaxAmount.TaxAmount"] = field(
         default_factory=list,
         metadata={
@@ -232,7 +232,7 @@ class ArrayOfVehicleChargeTypeTaxAmount(object):
     )
 
     @dataclass
-    class TaxAmount(object):
+    class TaxAmount:
         total: Decimal | None = field(
             default=None,
             metadata={
@@ -272,8 +272,8 @@ class ArrayOfVehicleChargeTypeTaxAmount(object):
 
 
 @dataclass
-class ArrayOfVehicleReservationRqadditionalInfoTypeCoveragePref(object):
-    class Meta(object):
+class ArrayOfVehicleReservationRqadditionalInfoTypeCoveragePref:
+    class Meta:
         name = "ArrayOfVehicleReservationRQAdditionalInfoTypeCoveragePref"
 
     coverage_pref: list[object] = field(
@@ -312,7 +312,7 @@ class CancelRuleTypeType(Enum):
 
 
 @dataclass
-class CompanyNameType(object):
+class CompanyNameType:
     value: str = field(
         default="",
         metadata={
@@ -376,7 +376,7 @@ class ContactPersonTypeShareSynchInd(Enum):
 
 
 @dataclass
-class CountryNameType(object):
+class CountryNameType:
     value: str = field(
         default="",
         metadata={
@@ -393,7 +393,7 @@ class CountryNameType(object):
 
 
 @dataclass
-class CoverageType(object):
+class CoverageType:
     details: list["CoveragePricedType"] = field(
         default_factory=list,
         metadata={
@@ -489,7 +489,7 @@ class EmailTypeShareSynchInd(Enum):
 
 
 @dataclass
-class EmployeeInfoType(object):
+class EmployeeInfoType:
     value: str = field(
         default="",
         metadata={
@@ -533,7 +533,7 @@ class EquipmentRestrictionType(Enum):
 
 
 @dataclass
-class FormattedTextTextType(object):
+class FormattedTextTextType:
     value: str = field(
         default="",
         metadata={
@@ -557,7 +557,7 @@ class FormattedTextTextType(object):
 
 
 @dataclass
-class FreeTextType(object):
+class FreeTextType:
     value: str = field(
         default="",
         metadata={
@@ -581,8 +581,8 @@ class IncludeExcludeType(Enum):
 
 
 @dataclass
-class InformationHeader1(object):
-    class Meta(object):
+class InformationHeader1:
+    class Meta:
         name = "InformationHeader"
 
     successfully: bool | None = field(
@@ -672,7 +672,7 @@ class LocationDetailVehicleInfoType(Enum):
 
 
 @dataclass
-class LocationType(object):
+class LocationType:
     value: str = field(
         default="",
         metadata={
@@ -701,7 +701,7 @@ class LoyaltyCertificateFormat(Enum):
 
 
 @dataclass
-class MonetaryRuleType(object):
+class MonetaryRuleType:
     value: str = field(
         default="",
         metadata={
@@ -774,7 +774,7 @@ class OnLocationServiceIdType(Enum):
 
 
 @dataclass
-class OtaResponse(object):
+class OtaResponse:
     pass
 
 
@@ -917,7 +917,7 @@ class RentalPaymentPrefType(Enum):
 
 
 @dataclass
-class StateProvType(object):
+class StateProvType:
     value: str = field(
         default="",
         metadata={
@@ -934,7 +934,7 @@ class StateProvType(object):
 
 
 @dataclass
-class StreetNmbrType(object):
+class StreetNmbrType:
     value: str = field(
         default="",
         metadata={
@@ -951,13 +951,13 @@ class StreetNmbrType(object):
 
 
 @dataclass
-class SuccessType(object):
+class SuccessType:
     pass
 
 
 @dataclass
-class TpaExtensionsType(object):
-    class Meta(object):
+class TpaExtensionsType:
+    class Meta:
         name = "TPA_ExtensionsType"
 
     any_element: list[object] = field(
@@ -1240,7 +1240,7 @@ class VehicleCoreTypeFuelType(Enum):
 
 
 @dataclass
-class VehicleEquipmentCoreType(object):
+class VehicleEquipmentCoreType:
     equip_type: str | None = field(
         default=None,
         metadata={
@@ -1275,7 +1275,7 @@ class VehicleTransmissionType(Enum):
 
 
 @dataclass
-class VehicleWhereAtFacilityType(object):
+class VehicleWhereAtFacilityType:
     value: str = field(
         default="",
         metadata={
@@ -1297,7 +1297,7 @@ class VendorLocationCounterLocInfo(Enum):
 
 
 @dataclass
-class AddressType(object):
+class AddressType:
     street_nmbr: Optional["AddressType.StreetNmbr"] = field(
         default=None,
         metadata={
@@ -1416,7 +1416,7 @@ class AddressType(object):
         )
 
     @dataclass
-    class BldgRoom(object):
+    class BldgRoom:
         value: str = field(
             default="",
             metadata={
@@ -1433,7 +1433,7 @@ class AddressType(object):
 
 
 @dataclass
-class ArrayOfMonetaryRuleType(object):
+class ArrayOfMonetaryRuleType:
     payment_rule: list[MonetaryRuleType] = field(
         default_factory=list,
         metadata={
@@ -1445,8 +1445,8 @@ class ArrayOfMonetaryRuleType(object):
 
 
 @dataclass
-class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref(object):
-    class Meta(object):
+class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref:
+    class Meta:
         name = "ArrayOfOTA_VehRateRuleRQRentalInfoSpecialEquipPref"
 
     special_equip_pref: list[
@@ -1461,7 +1461,7 @@ class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref(object):
     )
 
     @dataclass
-    class SpecialEquipPref(object):
+    class SpecialEquipPref:
         action: ActionType | None = field(
             default=None,
             metadata={
@@ -1472,7 +1472,7 @@ class ArrayOfOtaVehRateRuleRqrentalInfoSpecialEquipPref(object):
 
 
 @dataclass
-class ArrayOfRateQualifierTypeRateComment(object):
+class ArrayOfRateQualifierTypeRateComment:
     rate_comment: list["ArrayOfRateQualifierTypeRateComment.RateComment"] = field(
         default_factory=list,
         metadata={
@@ -1494,8 +1494,8 @@ class ArrayOfRateQualifierTypeRateComment(object):
 
 
 @dataclass
-class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref(object):
-    class Meta(object):
+class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref:
+    class Meta:
         name = "ArrayOfVehicleAvailRQCoreTypeSpecialEquipPref"
 
     special_equip_pref: list[
@@ -1510,7 +1510,7 @@ class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref(object):
     )
 
     @dataclass
-    class SpecialEquipPref(object):
+    class SpecialEquipPref:
         action: ActionType | None = field(
             default=None,
             metadata={
@@ -1521,7 +1521,7 @@ class ArrayOfVehicleAvailRqcoreTypeSpecialEquipPref(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation(object):
+class ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation:
     one_way_drop_location: list[
         "ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation.OneWayDropLocation"
     ] = field(
@@ -1545,7 +1545,7 @@ class ArrayOfVehicleLocationAdditionalDetailsTypeOneWayDropLocation(object):
 
 
 @dataclass
-class BankAcctType(object):
+class BankAcctType:
     bank_acct_name: str | None = field(
         default=None,
         metadata={
@@ -1610,7 +1610,7 @@ class CompanyNamePrefType(CompanyNameType):
 
 
 @dataclass
-class EmailType(object):
+class EmailType:
     value: str = field(
         default="",
         metadata={
@@ -1715,7 +1715,7 @@ class ErrorType(FreeTextType):
 
 
 @dataclass
-class OperationScheduleType(object):
+class OperationScheduleType:
     operation_times: ArrayOfOperationScheduleTypeOperationTime | None = field(
         default=None,
         metadata={
@@ -1748,7 +1748,7 @@ class OperationScheduleType(object):
 
 
 @dataclass
-class ParagraphType(object):
+class ParagraphType:
     text: list[FormattedTextTextType] = field(
         default_factory=list,
         metadata={
@@ -1850,7 +1850,7 @@ class ParagraphType(object):
 
 
 @dataclass
-class PaymentRulesType(object):
+class PaymentRulesType:
     payment_rule: list[MonetaryRuleType] = field(
         default_factory=list,
         metadata={
@@ -1862,7 +1862,7 @@ class PaymentRulesType(object):
 
 
 @dataclass
-class PersonNameType(object):
+class PersonNameType:
     name_prefix: list[str] = field(
         default_factory=list,
         metadata={
@@ -1943,8 +1943,8 @@ class PersonNameType(object):
 
 
 @dataclass
-class PingRq(object):
-    class Meta(object):
+class PingRq:
+    class Meta:
         name = "PingRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -2015,8 +2015,8 @@ class PingRq(object):
 
 
 @dataclass
-class UrlType(object):
-    class Meta(object):
+class UrlType:
+    class Meta:
         name = "URL_Type"
 
     value: str = field(
@@ -2056,8 +2056,8 @@ class UrlType(object):
 
 
 @dataclass
-class UniqueIdType(object):
-    class Meta(object):
+class UniqueIdType:
+    class Meta:
         name = "UniqueID_Type"
 
     company_name: CompanyNameType | None = field(
@@ -2106,7 +2106,7 @@ class UniqueIdType(object):
 
 
 @dataclass
-class VehicleArrivalDetailsType(object):
+class VehicleArrivalDetailsType:
     arrival_location: LocationType | None = field(
         default=None,
         metadata={
@@ -2155,8 +2155,8 @@ class VehicleArrivalDetailsType(object):
 
 
 @dataclass
-class VehicleCancelRqadditionalInfoType(object):
-    class Meta(object):
+class VehicleCancelRqadditionalInfoType:
+    class Meta:
         name = "VehicleCancelRQAdditionalInfoType"
 
     cust_loyalty: Optional["VehicleCancelRqadditionalInfoType.CustLoyalty"] = field(
@@ -2201,7 +2201,7 @@ class VehicleCancelRqadditionalInfoType(object):
     )
 
     @dataclass
-    class CustLoyalty(object):
+    class CustLoyalty:
         program_id: str | None = field(
             default=None,
             metadata={
@@ -2240,7 +2240,7 @@ class VehicleCancelRqadditionalInfoType(object):
         )
 
     @dataclass
-    class RentalInfo(object):
+    class RentalInfo:
         pick_up_location: LocationType | None = field(
             default=None,
             metadata={
@@ -2274,7 +2274,7 @@ class VehicleCancelRqadditionalInfoType(object):
 
 
 @dataclass
-class VehicleChargeType(object):
+class VehicleChargeType:
     tax_amounts: ArrayOfVehicleChargeTypeTaxAmount | None = field(
         default=None,
         metadata={
@@ -2350,7 +2350,7 @@ class VehicleChargeType(object):
     )
 
     @dataclass
-    class MinMax(object):
+    class MinMax:
         max_charge: Decimal | None = field(
             default=None,
             metadata={
@@ -2374,7 +2374,7 @@ class VehicleChargeType(object):
         )
 
     @dataclass
-    class Calculation(object):
+    class Calculation:
         unit_charge: Decimal | None = field(
             default=None,
             metadata={
@@ -2420,7 +2420,7 @@ class VehicleChargeType(object):
 
 
 @dataclass
-class VehicleCoreType(object):
+class VehicleCoreType:
     veh_type: Optional["VehicleCoreType.VehType"] = field(
         default=None,
         metadata={
@@ -2467,7 +2467,7 @@ class VehicleCoreType(object):
     )
 
     @dataclass
-    class VehType(object):
+    class VehType:
         vehicle_category: str | None = field(
             default=None,
             metadata={
@@ -2484,7 +2484,7 @@ class VehicleCoreType(object):
         )
 
     @dataclass
-    class VehClass(object):
+    class VehClass:
         size: str | None = field(
             default=None,
             metadata={
@@ -2495,7 +2495,7 @@ class VehicleCoreType(object):
 
 
 @dataclass
-class VehicleEquipmentType(object):
+class VehicleEquipmentType:
     description: str | None = field(
         default=None,
         metadata={
@@ -2528,7 +2528,7 @@ class VehicleEquipmentType(object):
 
 
 @dataclass
-class VehicleRentalCoreType(object):
+class VehicleRentalCoreType:
     pick_up_location: list["VehicleRentalCoreType.PickUpLocation"] = field(
         default_factory=list,
         metadata={
@@ -2638,8 +2638,8 @@ class VehicleRentalCoreType(object):
 
 
 @dataclass
-class VehicleResRsadditionalInfoType(object):
-    class Meta(object):
+class VehicleResRsadditionalInfoType:
+    class Meta:
         name = "VehicleResRSAdditionalInfoType"
 
     tpa_extensions: TpaExtensionsType | None = field(
@@ -2656,7 +2656,7 @@ class VehicleResRsadditionalInfoType(object):
 class VehicleReservationRqcoreTypeSpecialEquipPrefsSpecialEquipPref(
     VehicleEquipmentCoreType,
 ):
-    class Meta(object):
+    class Meta:
         name = "VehicleReservationRQCoreTypeSpecialEquipPrefsSpecialEquipPref"
 
     prefer_level: PreferLevelType = field(
@@ -2676,8 +2676,8 @@ class VehicleReservationRqcoreTypeSpecialEquipPrefsSpecialEquipPref(
 
 
 @dataclass
-class VehicleRetrieveResRsadditionalInfoType(object):
-    class Meta(object):
+class VehicleRetrieveResRsadditionalInfoType:
+    class Meta:
         name = "VehicleRetrieveResRSAdditionalInfoType"
 
     tpa_extensions: TpaExtensionsType | None = field(
@@ -2691,7 +2691,7 @@ class VehicleRetrieveResRsadditionalInfoType(object):
 
 
 @dataclass
-class VehicleSpecialReqPrefType(object):
+class VehicleSpecialReqPrefType:
     value: str = field(
         default="",
         metadata={
@@ -2708,7 +2708,7 @@ class VehicleSpecialReqPrefType(object):
 
 
 @dataclass
-class VehicleTourInfoType(object):
+class VehicleTourInfoType:
     tour_operator: CompanyNameType | None = field(
         default=None,
         metadata={
@@ -2781,7 +2781,7 @@ class WarningType(FreeTextType):
 
 @dataclass
 class InformationHeader(InformationHeader1):
-    class Meta(object):
+    class Meta:
         name = "informationHeader"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -2812,7 +2812,7 @@ class AddressInfoType(AddressType):
 
 
 @dataclass
-class ArrayOfErrorType(object):
+class ArrayOfErrorType:
     error: list[ErrorType] = field(
         default_factory=list,
         metadata={
@@ -2824,7 +2824,7 @@ class ArrayOfErrorType(object):
 
 
 @dataclass
-class ArrayOfVehicleCoreType(object):
+class ArrayOfVehicleCoreType:
     vehicle: list[VehicleCoreType] = field(
         default_factory=list,
         metadata={
@@ -2836,7 +2836,7 @@ class ArrayOfVehicleCoreType(object):
 
 
 @dataclass
-class ArrayOfWarningType(object):
+class ArrayOfWarningType:
     warning: list[WarningType] = field(
         default_factory=list,
         metadata={
@@ -2848,8 +2848,8 @@ class ArrayOfWarningType(object):
 
 
 @dataclass
-class CancelInfoRqtype(object):
-    class Meta(object):
+class CancelInfoRqtype:
+    class Meta:
         name = "CancelInfoRQType"
 
     unique_id: list[UniqueIdType] = field(
@@ -2879,7 +2879,7 @@ class CancelInfoRqtype(object):
 
 
 @dataclass
-class CoveragePricedType(object):
+class CoveragePricedType:
     coverage: CoverageType | None = field(
         default=None,
         metadata={
@@ -2906,7 +2906,7 @@ class CoveragePricedType(object):
 
 
 @dataclass
-class DocumentType(object):
+class DocumentType:
     doc_holder_name: str | None = field(
         default=None,
         metadata={
@@ -3040,7 +3040,7 @@ class DocumentType(object):
 
 
 @dataclass
-class FormattedTextSubSectionType(object):
+class FormattedTextSubSectionType:
     paragraph: list[ParagraphType] = field(
         default_factory=list,
         metadata={
@@ -3073,7 +3073,7 @@ class FormattedTextSubSectionType(object):
 
 
 @dataclass
-class ItemSearchCriterionType(object):
+class ItemSearchCriterionType:
     position: Optional["ItemSearchCriterionType.Position"] = field(
         default=None,
         metadata={
@@ -3153,7 +3153,7 @@ class ItemSearchCriterionType(object):
     )
 
     @dataclass
-    class Position(object):
+    class Position:
         latitude: str | None = field(
             default=None,
             metadata={
@@ -3194,7 +3194,7 @@ class ItemSearchCriterionType(object):
         )
 
     @dataclass
-    class RefPoint(object):
+    class RefPoint:
         value: str = field(
             default="",
             metadata={
@@ -3255,7 +3255,7 @@ class ItemSearchCriterionType(object):
         )
 
     @dataclass
-    class HotelRef(object):
+    class HotelRef:
         chain_code: str | None = field(
             default=None,
             metadata={
@@ -3342,7 +3342,7 @@ class ItemSearchCriterionType(object):
         )
 
     @dataclass
-    class Radius(object):
+    class Radius:
         distance: str | None = field(
             default=None,
             metadata={
@@ -3374,7 +3374,7 @@ class ItemSearchCriterionType(object):
 
 
 @dataclass
-class OffLocationServiceCoreType(object):
+class OffLocationServiceCoreType:
     address: Optional["OffLocationServiceCoreType.Address"] = field(
         default=None,
         metadata={
@@ -3411,7 +3411,7 @@ class OffLocationServiceCoreType(object):
 
 
 @dataclass
-class OperationSchedulesType(object):
+class OperationSchedulesType:
     operation_schedule: list[OperationScheduleType] = field(
         default_factory=list,
         metadata={
@@ -3444,7 +3444,7 @@ class OperationSchedulesType(object):
 
 
 @dataclass
-class PaymentCardType(object):
+class PaymentCardType:
     card_holder_name: str | None = field(
         default=None,
         metadata={
@@ -3556,7 +3556,7 @@ class PaymentCardType(object):
     )
 
     @dataclass
-    class CardIssuerName(object):
+    class CardIssuerName:
         bank_id: str | None = field(
             default=None,
             metadata={
@@ -3568,7 +3568,7 @@ class PaymentCardType(object):
 
 @dataclass
 class PingRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "PingRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -3664,7 +3664,7 @@ class PingRs(OtaResponse):
 
 
 @dataclass
-class RateQualifierType(object):
+class RateQualifierType:
     promo_desc: str | None = field(
         default=None,
         metadata={
@@ -3747,7 +3747,7 @@ class RateQualifierType(object):
 
 
 @dataclass
-class RelatedTravelerType(object):
+class RelatedTravelerType:
     unique_id: UniqueIdType | None = field(
         default=None,
         metadata={
@@ -3788,8 +3788,8 @@ class RelatedTravelerType(object):
 
 
 @dataclass
-class ServiceSoapGetPingInput(object):
-    class Meta(object):
+class ServiceSoapGetPingInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -3802,7 +3802,7 @@ class ServiceSoapGetPingInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         ping_rq: PingRq | None = field(
             default=None,
             metadata={
@@ -3814,7 +3814,7 @@ class ServiceSoapGetPingInput(object):
 
 
 @dataclass
-class SourceType(object):
+class SourceType:
     requestor_id: Optional["SourceType.RequestorId"] = field(
         default=None,
         metadata={
@@ -3921,7 +3921,7 @@ class SourceType(object):
         )
 
     @dataclass
-    class Position(object):
+    class Position:
         latitude: str | None = field(
             default=None,
             metadata={
@@ -3952,7 +3952,7 @@ class SourceType(object):
         )
 
     @dataclass
-    class BookingChannel(object):
+    class BookingChannel:
         company_name: CompanyNameType | None = field(
             default=None,
             metadata={
@@ -3996,7 +3996,7 @@ class VehicleChargePurposeType(VehicleChargeType):
 
 
 @dataclass
-class VehicleEquipmentPricedType(object):
+class VehicleEquipmentPricedType:
     equipment: VehicleEquipmentType | None = field(
         default=None,
         metadata={
@@ -4083,8 +4083,8 @@ class VehiclePrefType(VehicleCoreType):
 
 
 @dataclass
-class VehicleRetrieveResRqadditionalInfoType(object):
-    class Meta(object):
+class VehicleRetrieveResRqadditionalInfoType:
+    class Meta:
         name = "VehicleRetrieveResRQAdditionalInfoType"
 
     pick_up_location: LocationType | None = field(
@@ -4137,8 +4137,8 @@ class VehicleRetrieveResRqadditionalInfoType(object):
 
 
 @dataclass
-class VehicleRetrieveResRqcoreType(object):
-    class Meta(object):
+class VehicleRetrieveResRqcoreType:
+    class Meta:
         name = "VehicleRetrieveResRQCoreType"
 
     unique_id: UniqueIdType | None = field(
@@ -4175,7 +4175,7 @@ class VehicleRetrieveResRqcoreType(object):
     )
 
     @dataclass
-    class CustLoyalty(object):
+    class CustLoyalty:
         program_id: str | None = field(
             default=None,
             metadata={
@@ -4326,7 +4326,7 @@ class VehicleType(VehicleCoreType):
     )
 
     @dataclass
-    class VehMakeModel(object):
+    class VehMakeModel:
         model_year: XmlPeriod | None = field(
             default=None,
             metadata={
@@ -4350,7 +4350,7 @@ class VehicleType(VehicleCoreType):
         )
 
     @dataclass
-    class VehIdentity(object):
+    class VehIdentity:
         vehicle_asset_number: str | None = field(
             default=None,
             metadata={
@@ -4396,7 +4396,7 @@ class VehicleType(VehicleCoreType):
 
 
 @dataclass
-class WrittenConfInstType(object):
+class WrittenConfInstType:
     supplemental_data: ParagraphType | None = field(
         default=None,
         metadata={
@@ -4451,7 +4451,7 @@ class WrittenConfInstType(object):
 
 
 @dataclass
-class ArrayOfCoveragePricedType(object):
+class ArrayOfCoveragePricedType:
     priced_coverage: list[CoveragePricedType] = field(
         default_factory=list,
         metadata={
@@ -4463,7 +4463,7 @@ class ArrayOfCoveragePricedType(object):
 
 
 @dataclass
-class ArrayOfSourceType(object):
+class ArrayOfSourceType:
     source: list[SourceType] = field(
         default_factory=list,
         metadata={
@@ -4475,8 +4475,8 @@ class ArrayOfSourceType(object):
 
 
 @dataclass
-class ArrayOfVehicleAvailRqcoreTypeVehPref(object):
-    class Meta(object):
+class ArrayOfVehicleAvailRqcoreTypeVehPref:
+    class Meta:
         name = "ArrayOfVehicleAvailRQCoreTypeVehPref"
 
     veh_pref: list["ArrayOfVehicleAvailRqcoreTypeVehPref.VehPref"] = field(
@@ -4500,7 +4500,7 @@ class ArrayOfVehicleAvailRqcoreTypeVehPref(object):
 
 
 @dataclass
-class ArrayOfVehicleChargePurposeType(object):
+class ArrayOfVehicleChargePurposeType:
     vehicle_charge: list[VehicleChargePurposeType] = field(
         default_factory=list,
         metadata={
@@ -4512,7 +4512,7 @@ class ArrayOfVehicleChargePurposeType(object):
 
 
 @dataclass
-class ArrayOfVehicleChargePurposeType1(object):
+class ArrayOfVehicleChargePurposeType1:
     fee: list[VehicleChargePurposeType] = field(
         default_factory=list,
         metadata={
@@ -4524,7 +4524,7 @@ class ArrayOfVehicleChargePurposeType1(object):
 
 
 @dataclass
-class ArrayOfVehicleEquipmentPricedType(object):
+class ArrayOfVehicleEquipmentPricedType:
     priced_equip: list[VehicleEquipmentPricedType] = field(
         default_factory=list,
         metadata={
@@ -4536,7 +4536,7 @@ class ArrayOfVehicleEquipmentPricedType(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle(object):
+class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle:
     vehicle: list[
         "ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle.Vehicle"
     ] = field(
@@ -4560,9 +4560,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFeeVehicle(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge(
-    object,
-):
+class ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge:
     off_loc_service_charge: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCharge.OffLocServiceCharge"
     ] = field(
@@ -4587,9 +4585,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationServiceOffLocServiceCh
 
 
 @dataclass
-class ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge(
-    object,
-):
+class ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge:
     on_loc_service_charge: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceCharge.OnLocServiceCharge"
     ] = field(
@@ -4614,7 +4610,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationServiceOnLocServiceChar
 
 
 @dataclass
-class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge(object):
+class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge:
     equip_charge: list[
         "ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge.EquipCharge"
     ] = field(
@@ -4639,7 +4635,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipmentEquipCharge(objec
 
 
 @dataclass
-class CancelRuleType(object):
+class CancelRuleType:
     payment_card: PaymentCardType | None = field(
         default=None,
         metadata={
@@ -4679,7 +4675,7 @@ class CancelRuleType(object):
 
 
 @dataclass
-class ContactPersonType(object):
+class ContactPersonType:
     person_name: PersonNameType | None = field(
         default=None,
         metadata={
@@ -4787,7 +4783,7 @@ class ContactPersonType(object):
     )
 
     @dataclass
-    class Telephone(object):
+    class Telephone:
         rph: str | None = field(
             default=None,
             metadata={
@@ -4798,7 +4794,7 @@ class ContactPersonType(object):
 
 
 @dataclass
-class DirectBillType(object):
+class DirectBillType:
     company_name: Optional["DirectBillType.CompanyName"] = field(
         default=None,
         metadata={
@@ -4856,7 +4852,7 @@ class DirectBillType(object):
 
 
 @dataclass
-class FormattedTextType(object):
+class FormattedTextType:
     sub_section: list[FormattedTextSubSectionType] = field(
         default_factory=list,
         metadata={
@@ -4909,8 +4905,8 @@ class OffLocationServiceType(OffLocationServiceCoreType):
 
 
 @dataclass
-class ServiceSoapGetPingOutput(object):
-    class Meta(object):
+class ServiceSoapGetPingOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -4930,7 +4926,7 @@ class ServiceSoapGetPingOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         ping_rs: PingRs | None = field(
             default=None,
             metadata={
@@ -4948,7 +4944,7 @@ class ServiceSoapGetPingOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -4979,7 +4975,7 @@ class ServiceSoapGetPingOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -4991,7 +4987,7 @@ class ServiceSoapGetPingOutput(object):
 
 
 @dataclass
-class VehicleReservationSummaryType(object):
+class VehicleReservationSummaryType:
     conf_id: UniqueIdType | None = field(
         default=None,
         metadata={
@@ -5057,7 +5053,7 @@ class VehicleReservationSummaryType(object):
 
 
 @dataclass
-class AcceptablePaymentCardsInfoType(object):
+class AcceptablePaymentCardsInfoType:
     acceptable_payment_cards: (
         ArrayOfAcceptablePaymentCardsInfoTypeAcceptablePaymentCard | None
     ) = field(
@@ -5079,7 +5075,7 @@ class AcceptablePaymentCardsInfoType(object):
 
 
 @dataclass
-class ArrayOfCancelRuleType(object):
+class ArrayOfCancelRuleType:
     cancel_rule: list[CancelRuleType] = field(
         default_factory=list,
         metadata={
@@ -5091,7 +5087,7 @@ class ArrayOfCancelRuleType(object):
 
 
 @dataclass
-class ArrayOfFormattedTextType(object):
+class ArrayOfFormattedTextType:
     vendor_message: list[FormattedTextType] = field(
         default_factory=list,
         metadata={
@@ -5103,7 +5099,7 @@ class ArrayOfFormattedTextType(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo(object):
+class ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo:
     shuttle_info: list[
         "ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo.ShuttleInfo"
     ] = field(
@@ -5128,7 +5124,7 @@ class ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
+class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee:
     coverage_fee: list[
         "ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee.CoverageFee"
     ] = field(
@@ -5141,7 +5137,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
     )
 
     @dataclass
-    class CoverageFee(object):
+    class CoverageFee:
         charge: VehicleChargeType | None = field(
             default=None,
             metadata={
@@ -5172,7 +5168,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
         )
 
         @dataclass
-        class Deductible(object):
+        class Deductible:
             amount: Decimal | None = field(
                 default=None,
                 metadata={
@@ -5190,7 +5186,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverageCoverageFee(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo(object):
+class ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo:
     addl_driver_info: list[
         "ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo.AddlDriverInfo"
     ] = field(
@@ -5215,7 +5211,7 @@ class ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo(objec
 
 
 @dataclass
-class ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo(object):
+class ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo:
     age_info: list["ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo.AgeInfo"] = field(
         default_factory=list,
         metadata={
@@ -5238,7 +5234,7 @@ class ArrayOfVehicleLocationRequirementsTypeAgeAgeInfo(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationRequirementsTypeRequirementInfo(object):
+class ArrayOfVehicleLocationRequirementsTypeRequirementInfo:
     requirement_info: list[
         "ArrayOfVehicleLocationRequirementsTypeRequirementInfo.RequirementInfo"
     ] = field(
@@ -5263,7 +5259,7 @@ class ArrayOfVehicleLocationRequirementsTypeRequirementInfo(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
+class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService:
     off_location_service: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOffLocationService.OffLocationService"
     ] = field(
@@ -5276,7 +5272,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
     )
 
     @dataclass
-    class OffLocationService(object):
+    class OffLocationService:
         off_loc_service_desc: FormattedTextType | None = field(
             default=None,
             metadata={
@@ -5315,7 +5311,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOffLocationService(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
+class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService:
     on_location_service: list[
         "ArrayOfVehicleLocationServicesOfferedTypeOnLocationService.OnLocationService"
     ] = field(
@@ -5328,7 +5324,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
     )
 
     @dataclass
-    class OnLocationService(object):
+    class OnLocationService:
         on_loc_service_desc: FormattedTextType | None = field(
             default=None,
             metadata={
@@ -5367,7 +5363,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeOnLocationService(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
+class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment:
     special_equipment: list[
         "ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment.SpecialEquipment"
     ] = field(
@@ -5380,7 +5376,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
     )
 
     @dataclass
-    class SpecialEquipment(object):
+    class SpecialEquipment:
         equip_desc: FormattedTextType | None = field(
             default=None,
             metadata={
@@ -5409,7 +5405,7 @@ class ArrayOfVehicleLocationServicesOfferedTypeSpecialEquipment(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationVehiclesTypeVehicleInfo(object):
+class ArrayOfVehicleLocationVehiclesTypeVehicleInfo:
     vehicle_info: list["ArrayOfVehicleLocationVehiclesTypeVehicleInfo.VehicleInfo"] = (
         field(
             default_factory=list,
@@ -5434,7 +5430,7 @@ class ArrayOfVehicleLocationVehiclesTypeVehicleInfo(object):
 
 
 @dataclass
-class ArrayOfVehicleReservationSummaryType(object):
+class ArrayOfVehicleReservationSummaryType:
     veh_res_summary: list[VehicleReservationSummaryType] = field(
         default_factory=list,
         metadata={
@@ -5446,7 +5442,7 @@ class ArrayOfVehicleReservationSummaryType(object):
 
 
 @dataclass
-class OffLocationServicePricedType(object):
+class OffLocationServicePricedType:
     off_loc_service: OffLocationServiceType | None = field(
         default=None,
         metadata={
@@ -5466,7 +5462,7 @@ class OffLocationServicePricedType(object):
 
 
 @dataclass
-class PaymentFormType(object):
+class PaymentFormType:
     payment_card: PaymentCardType | None = field(
         default=None,
         metadata={
@@ -5562,7 +5558,7 @@ class PaymentFormType(object):
     )
 
     @dataclass
-    class Voucher(object):
+    class Voucher:
         series_code: str | None = field(
             default=None,
             metadata={
@@ -5607,7 +5603,7 @@ class PaymentFormType(object):
         )
 
     @dataclass
-    class LoyaltyRedemption(object):
+    class LoyaltyRedemption:
         loyalty_certificate: list[
             "PaymentFormType.LoyaltyRedemption.LoyaltyCertificate"
         ] = field(
@@ -5663,7 +5659,7 @@ class PaymentFormType(object):
         )
 
         @dataclass
-        class LoyaltyCertificate(object):
+        class LoyaltyCertificate:
             id_context: str | None = field(
                 default=None,
                 metadata={
@@ -5694,7 +5690,7 @@ class PaymentFormType(object):
             )
 
     @dataclass
-    class MiscChargeOrder(object):
+    class MiscChargeOrder:
         ticket_number: str | None = field(
             default=None,
             metadata={
@@ -5704,7 +5700,7 @@ class PaymentFormType(object):
         )
 
     @dataclass
-    class Cash(object):
+    class Cash:
         cash_indicator: bool = field(
             default=True,
             metadata={
@@ -5714,7 +5710,7 @@ class PaymentFormType(object):
         )
 
 
-class ServiceSoapGetPing(object):
+class ServiceSoapGetPing:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -5724,8 +5720,8 @@ class ServiceSoapGetPing(object):
 
 
 @dataclass
-class VehCancelResRq(object):
-    class Meta(object):
+class VehCancelResRq:
+    class Meta:
         name = "VehCancelResRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -5817,8 +5813,8 @@ class VehCancelResRq(object):
 
 
 @dataclass
-class VehLocDetailRq(object):
-    class Meta(object):
+class VehLocDetailRq:
+    class Meta:
         name = "VehLocDetailRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -5947,7 +5943,7 @@ class VehLocDetailRq(object):
         )
 
     @dataclass
-    class ResponseFilter(object):
+    class ResponseFilter:
         location_address_phone_indicator: bool = field(
             default=False,
             metadata={
@@ -5999,7 +5995,7 @@ class VehLocDetailRq(object):
         )
 
     @dataclass
-    class Date(object):
+    class Date:
         pick_up_date_time: str | None = field(
             default=None,
             metadata={
@@ -6016,7 +6012,7 @@ class VehLocDetailRq(object):
         )
 
     @dataclass
-    class Keyword(object):
+    class Keyword:
         code: str | None = field(
             default=None,
             metadata={
@@ -6027,8 +6023,8 @@ class VehLocDetailRq(object):
 
 
 @dataclass
-class VehLocationSearchRq(object):
-    class Meta(object):
+class VehLocationSearchRq:
+    class Meta:
         name = "VehLocationSearchRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -6140,8 +6136,8 @@ class VehLocationSearchRq(object):
 
 
 @dataclass
-class VehRateRuleRq(object):
-    class Meta(object):
+class VehRateRuleRq:
+    class Meta:
         name = "VehRateRuleRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -6253,7 +6249,7 @@ class VehRateRuleRq(object):
     )
 
     @dataclass
-    class RentalInfo(object):
+    class RentalInfo:
         veh_rental_core: VehicleRentalCoreType | None = field(
             default=None,
             metadata={
@@ -6328,7 +6324,7 @@ class VehRateRuleRq(object):
         )
 
         @dataclass
-        class CustLoyalty(object):
+        class CustLoyalty:
             program_id: str | None = field(
                 default=None,
                 metadata={
@@ -6367,7 +6363,7 @@ class VehRateRuleRq(object):
             )
 
         @dataclass
-        class RateQualifier(object):
+        class RateQualifier:
             travel_purpose: str | None = field(
                 default=None,
                 metadata={
@@ -6436,8 +6432,8 @@ class VehRateRuleRq(object):
 
 
 @dataclass
-class VehRetResRq(object):
-    class Meta(object):
+class VehRetResRq:
+    class Meta:
         name = "VehRetResRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -6529,7 +6525,7 @@ class VehRetResRq(object):
 
 
 @dataclass
-class VehicleAvailAdditionalInfoType(object):
+class VehicleAvailAdditionalInfoType:
     priced_coverages: ArrayOfCoveragePricedType | None = field(
         default=None,
         metadata={
@@ -6564,8 +6560,8 @@ class VehicleAvailAdditionalInfoType(object):
 
 
 @dataclass
-class VehicleAvailRqcoreType(object):
-    class Meta(object):
+class VehicleAvailRqcoreType:
+    class Meta:
         name = "VehicleAvailRQCoreType"
 
     rate_query_parameter_type: str | None = field(
@@ -6664,7 +6660,7 @@ class VehicleAvailRqcoreType(object):
     )
 
     @dataclass
-    class VendorPrefs(object):
+    class VendorPrefs:
         vendor_pref: list["VehicleAvailRqcoreType.VendorPrefs.VendorPref"] = field(
             default_factory=list,
             metadata={
@@ -6699,7 +6695,7 @@ class VehicleAvailRqcoreType(object):
             )
 
     @dataclass
-    class DriverType(object):
+    class DriverType:
         age: int | None = field(
             default=None,
             metadata={
@@ -6730,7 +6726,7 @@ class VehicleAvailRqcoreType(object):
         )
 
     @dataclass
-    class RateQualifier(object):
+    class RateQualifier:
         travel_purpose: str | None = field(
             default=None,
             metadata={
@@ -6775,7 +6771,7 @@ class VehicleAvailRqcoreType(object):
         )
 
     @dataclass
-    class RateRange(object):
+    class RateRange:
         min_rate: Decimal | None = field(
             default=None,
             metadata={
@@ -6807,7 +6803,7 @@ class VehicleAvailRqcoreType(object):
 
 
 @dataclass
-class VehicleLocationAdditionalFeesType(object):
+class VehicleLocationAdditionalFeesType:
     taxes: Optional["VehicleLocationAdditionalFeesType.Taxes"] = field(
         default=None,
         metadata={
@@ -6852,7 +6848,7 @@ class VehicleLocationAdditionalFeesType(object):
     )
 
     @dataclass
-    class Taxes(object):
+    class Taxes:
         tax: list["VehicleLocationAdditionalFeesType.Taxes.Tax"] = field(
             default_factory=list,
             metadata={
@@ -6892,7 +6888,7 @@ class VehicleLocationAdditionalFeesType(object):
         )
 
         @dataclass
-        class Tax(object):
+        class Tax:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -6917,7 +6913,7 @@ class VehicleLocationAdditionalFeesType(object):
             )
 
     @dataclass
-    class Fees(object):
+    class Fees:
         fee: list["VehicleLocationAdditionalFeesType.Fees.Fee"] = field(
             default_factory=list,
             metadata={
@@ -6947,7 +6943,7 @@ class VehicleLocationAdditionalFeesType(object):
             )
 
     @dataclass
-    class Surcharges(object):
+    class Surcharges:
         surcharge: list["VehicleLocationAdditionalFeesType.Surcharges.Surcharge"] = (
             field(
                 default_factory=list,
@@ -7000,7 +6996,7 @@ class VehicleLocationAdditionalFeesType(object):
             )
 
     @dataclass
-    class MiscellaneousCharges(object):
+    class MiscellaneousCharges:
         miscellaneous_charge: list[
             "VehicleLocationAdditionalFeesType.MiscellaneousCharges.MiscellaneousCharge"
         ] = field(
@@ -7044,7 +7040,7 @@ class VehicleLocationInformationType(FormattedTextType):
 
 
 @dataclass
-class VehicleRentalRateType(object):
+class VehicleRentalRateType:
     rate_distance: list["VehicleRentalRateType.RateDistance"] = field(
         default_factory=list,
         metadata={
@@ -7095,7 +7091,7 @@ class VehicleRentalRateType(object):
     )
 
     @dataclass
-    class RateDistance(object):
+    class RateDistance:
         unlimited: bool | None = field(
             default=None,
             metadata={
@@ -7127,7 +7123,7 @@ class VehicleRentalRateType(object):
         )
 
     @dataclass
-    class RateRestrictions(object):
+    class RateRestrictions:
         minimum_age: int | None = field(
             default=None,
             metadata={
@@ -7241,7 +7237,7 @@ class VehicleRentalRateType(object):
         )
 
     @dataclass
-    class RateGuarantee(object):
+    class RateGuarantee:
         description: FormattedTextTextType | None = field(
             default=None,
             metadata={
@@ -7280,7 +7276,7 @@ class VehicleRentalRateType(object):
         )
 
     @dataclass
-    class PickupReturnRule(object):
+    class PickupReturnRule:
         day_of_week: DayOfWeekType | None = field(
             default=None,
             metadata={
@@ -7316,7 +7312,7 @@ class VendorMessageType(FormattedTextType):
 
 
 @dataclass
-class ArrayOfVehicleLocationInformationType(object):
+class ArrayOfVehicleLocationInformationType:
     veh_rent_loc_info: list[VehicleLocationInformationType] = field(
         default_factory=list,
         metadata={
@@ -7328,7 +7324,7 @@ class ArrayOfVehicleLocationInformationType(object):
 
 
 @dataclass
-class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
+class ArrayOfVehicleLocationLiabilitiesTypeCoverage:
     coverage: list["ArrayOfVehicleLocationLiabilitiesTypeCoverage.Coverage"] = field(
         default_factory=list,
         metadata={
@@ -7339,7 +7335,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
     )
 
     @dataclass
-    class Coverage(object):
+    class Coverage:
         coverage_info: FormattedTextType | None = field(
             default=None,
             metadata={
@@ -7375,7 +7371,7 @@ class ArrayOfVehicleLocationLiabilitiesTypeCoverage(object):
 
 
 @dataclass
-class ArrayOfVendorMessageType(object):
+class ArrayOfVendorMessageType:
     vendor_message: list[VendorMessageType] = field(
         default_factory=list,
         metadata={
@@ -7387,8 +7383,8 @@ class ArrayOfVendorMessageType(object):
 
 
 @dataclass
-class CancelInfoRstype(object):
-    class Meta(object):
+class CancelInfoRstype:
+    class Meta:
         name = "CancelInfoRSType"
 
     cancel_rules: ArrayOfCancelRuleType | None = field(
@@ -7410,7 +7406,7 @@ class CancelInfoRstype(object):
 
 
 @dataclass
-class CustomerType(object):
+class CustomerType:
     person_name: PersonNameType | None = field(
         default=None,
         metadata={
@@ -7604,7 +7600,7 @@ class CustomerType(object):
     )
 
     @dataclass
-    class Telephone(object):
+    class Telephone:
         phone_tech_type: str | None = field(
             default=None,
             metadata={
@@ -7667,7 +7663,7 @@ class CustomerType(object):
         )
 
     @dataclass
-    class CitizenCountryName(object):
+    class CitizenCountryName:
         code: str | None = field(
             default=None,
             metadata={
@@ -7677,7 +7673,7 @@ class CustomerType(object):
         )
 
     @dataclass
-    class CustLoyalty(object):
+    class CustLoyalty:
         program_id: str | None = field(
             default=None,
             metadata={
@@ -7728,7 +7724,7 @@ class PaymentDetailType(PaymentFormType):
     )
 
     @dataclass
-    class PaymentAmount(object):
+    class PaymentAmount:
         amount: Decimal | None = field(
             default=None,
             metadata={
@@ -7746,8 +7742,8 @@ class PaymentDetailType(PaymentFormType):
 
 
 @dataclass
-class ServiceSoapGetVehCancelReservationInput(object):
-    class Meta(object):
+class ServiceSoapGetVehCancelReservationInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -7760,7 +7756,7 @@ class ServiceSoapGetVehCancelReservationInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_cancel_res_rq: VehCancelResRq | None = field(
             default=None,
             metadata={
@@ -7772,8 +7768,8 @@ class ServiceSoapGetVehCancelReservationInput(object):
 
 
 @dataclass
-class ServiceSoapGetVehLocDetailInput(object):
-    class Meta(object):
+class ServiceSoapGetVehLocDetailInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -7786,7 +7782,7 @@ class ServiceSoapGetVehLocDetailInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_loc_detail_rq: VehLocDetailRq | None = field(
             default=None,
             metadata={
@@ -7798,8 +7794,8 @@ class ServiceSoapGetVehLocDetailInput(object):
 
 
 @dataclass
-class ServiceSoapGetVehLocationSearchInput(object):
-    class Meta(object):
+class ServiceSoapGetVehLocationSearchInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -7812,7 +7808,7 @@ class ServiceSoapGetVehLocationSearchInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_location_search_rq: VehLocationSearchRq | None = field(
             default=None,
             metadata={
@@ -7824,8 +7820,8 @@ class ServiceSoapGetVehLocationSearchInput(object):
 
 
 @dataclass
-class ServiceSoapGetVehRateRuleInput(object):
-    class Meta(object):
+class ServiceSoapGetVehRateRuleInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -7838,7 +7834,7 @@ class ServiceSoapGetVehRateRuleInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_rate_rule_rq: VehRateRuleRq | None = field(
             default=None,
             metadata={
@@ -7850,8 +7846,8 @@ class ServiceSoapGetVehRateRuleInput(object):
 
 
 @dataclass
-class ServiceSoapGetVehRetReservationInput(object):
-    class Meta(object):
+class ServiceSoapGetVehRetReservationInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -7864,7 +7860,7 @@ class ServiceSoapGetVehRetReservationInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_ret_res_rq: VehRetResRq | None = field(
             default=None,
             metadata={
@@ -7876,7 +7872,7 @@ class ServiceSoapGetVehRetReservationInput(object):
 
 
 @dataclass
-class VehicleAvailCoreType(object):
+class VehicleAvailCoreType:
     vehicle: VehicleType | None = field(
         default=None,
         metadata={
@@ -7974,7 +7970,7 @@ class VehicleAvailCoreType(object):
     )
 
     @dataclass
-    class TotalCharge(object):
+    class TotalCharge:
         currency_code: str | None = field(
             default=None,
             metadata={
@@ -8081,7 +8077,7 @@ class VehicleAvailCoreType(object):
 
 
 @dataclass
-class VehicleLocationRequirementsType(object):
+class VehicleLocationRequirementsType:
     age: Optional["VehicleLocationRequirementsType.Age"] = field(
         default=None,
         metadata={
@@ -8128,7 +8124,7 @@ class VehicleLocationRequirementsType(object):
     )
 
     @dataclass
-    class Age(object):
+    class Age:
         age_surcharge: list["VehicleLocationRequirementsType.Age.AgeSurcharge"] = field(
             default_factory=list,
             metadata={
@@ -8161,7 +8157,7 @@ class VehicleLocationRequirementsType(object):
         )
 
         @dataclass
-        class AgeSurcharge(object):
+        class AgeSurcharge:
             age: str | None = field(
                 default=None,
                 metadata={
@@ -8178,7 +8174,7 @@ class VehicleLocationRequirementsType(object):
             )
 
     @dataclass
-    class AdditionalDriver(object):
+    class AdditionalDriver:
         addl_driver_infos: (
             ArrayOfVehicleLocationRequirementsTypeAdditionalDriverAddlDriverInfo | None
         ) = field(
@@ -8191,7 +8187,7 @@ class VehicleLocationRequirementsType(object):
         )
 
     @dataclass
-    class PaymentOptions(object):
+    class PaymentOptions:
         credit_card: AcceptablePaymentCardsInfoType | None = field(
             default=None,
             metadata={
@@ -8300,7 +8296,7 @@ class VehicleLocationRequirementsType(object):
         )
 
         @dataclass
-        class Cash(object):
+        class Cash:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -8311,7 +8307,7 @@ class VehicleLocationRequirementsType(object):
             )
 
         @dataclass
-        class Voucher(object):
+        class Voucher:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -8322,7 +8318,7 @@ class VehicleLocationRequirementsType(object):
             )
 
         @dataclass
-        class BankAcct(object):
+        class BankAcct:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -8333,7 +8329,7 @@ class VehicleLocationRequirementsType(object):
             )
 
         @dataclass
-        class DirectBill(object):
+        class DirectBill:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -8344,7 +8340,7 @@ class VehicleLocationRequirementsType(object):
             )
 
         @dataclass
-        class LoyaltyRedemption(object):
+        class LoyaltyRedemption:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -8355,7 +8351,7 @@ class VehicleLocationRequirementsType(object):
             )
 
         @dataclass
-        class MiscChargeOrder(object):
+        class MiscChargeOrder:
             info: FormattedTextType | None = field(
                 default=None,
                 metadata={
@@ -8367,7 +8363,7 @@ class VehicleLocationRequirementsType(object):
 
 
 @dataclass
-class VehicleLocationServicesOfferedType(object):
+class VehicleLocationServicesOfferedType:
     on_location_services: (
         ArrayOfVehicleLocationServicesOfferedTypeOnLocationService | None
     ) = field(
@@ -8409,7 +8405,7 @@ class VehicleLocationServicesOfferedType(object):
 
 
 @dataclass
-class VehicleLocationVehiclesType(object):
+class VehicleLocationVehiclesType:
     vehicle_infos: ArrayOfVehicleLocationVehiclesTypeVehicleInfo | None = field(
         default=None,
         metadata={
@@ -8461,7 +8457,7 @@ class VehicleLocationVehiclesType(object):
 
 
 @dataclass
-class VehicleSegmentCoreType(object):
+class VehicleSegmentCoreType:
     conf_id: list[UniqueIdType] = field(
         default_factory=list,
         metadata={
@@ -8543,7 +8539,7 @@ class VehicleSegmentCoreType(object):
     )
 
     @dataclass
-    class TotalCharge(object):
+    class TotalCharge:
         rate_total_amount: Decimal | None = field(
             default=None,
             metadata={
@@ -8568,7 +8564,7 @@ class VehicleSegmentCoreType(object):
 
 
 @dataclass
-class CustomerPrimaryAdditionalType(object):
+class CustomerPrimaryAdditionalType:
     primary: Optional["CustomerPrimaryAdditionalType.Primary"] = field(
         default=None,
         metadata={
@@ -8672,7 +8668,7 @@ class CustomerPrimaryAdditionalType(object):
 
 
 @dataclass
-class VehicleLocationAdditionalDetailsType(object):
+class VehicleLocationAdditionalDetailsType:
     veh_rent_loc_infos: ArrayOfVehicleLocationInformationType | None = field(
         default=None,
         metadata={
@@ -8733,7 +8729,7 @@ class VehicleLocationAdditionalDetailsType(object):
     )
 
     @dataclass
-    class Shuttle(object):
+    class Shuttle:
         shuttle_infos: (
             ArrayOfVehicleLocationAdditionalDetailsTypeShuttleShuttleInfo | None
         ) = field(
@@ -8755,7 +8751,7 @@ class VehicleLocationAdditionalDetailsType(object):
 
 
 @dataclass
-class VehicleLocationLiabilitiesType(object):
+class VehicleLocationLiabilitiesType:
     coverages: ArrayOfVehicleLocationLiabilitiesTypeCoverage | None = field(
         default=None,
         metadata={
@@ -8783,8 +8779,8 @@ class VehicleLocationLiabilitiesType(object):
 
 
 @dataclass
-class VehicleReservationRqadditionalInfoType(object):
-    class Meta(object):
+class VehicleReservationRqadditionalInfoType:
+    class Meta:
         name = "VehicleReservationRQAdditionalInfoType"
 
     special_req_pref: list[VehicleSpecialReqPrefType] = field(
@@ -8942,8 +8938,8 @@ class VehicleReservationRqadditionalInfoType(object):
 
 
 @dataclass
-class VehicleAvailRqadditionalInfoType(object):
-    class Meta(object):
+class VehicleAvailRqadditionalInfoType:
+    class Meta:
         name = "VehicleAvailRQAdditionalInfoType"
 
     customer: CustomerPrimaryAdditionalType | None = field(
@@ -9040,8 +9036,8 @@ class VehicleAvailRqadditionalInfoType(object):
 
 
 @dataclass
-class VehicleAvailRsadditionalInfoType(object):
-    class Meta(object):
+class VehicleAvailRsadditionalInfoType:
+    class Meta:
         name = "VehicleAvailRSAdditionalInfoType"
 
     customer: CustomerPrimaryAdditionalType | None = field(
@@ -9055,7 +9051,7 @@ class VehicleAvailRsadditionalInfoType(object):
 
 
 @dataclass
-class VehicleLocationDetailsType(object):
+class VehicleLocationDetailsType:
     address: list[AddressInfoType] = field(
         default_factory=list,
         metadata={
@@ -9125,7 +9121,7 @@ class VehicleLocationDetailsType(object):
     )
 
     @dataclass
-    class Telephone(object):
+    class Telephone:
         phone_tech_type: str | None = field(
             default=None,
             metadata={
@@ -9150,8 +9146,8 @@ class VehicleLocationDetailsType(object):
 
 
 @dataclass
-class VehicleReservationRqcoreType(object):
-    class Meta(object):
+class VehicleReservationRqcoreType:
+    class Meta:
         name = "VehicleReservationRQCoreType"
 
     unique_id: list[UniqueIdType] = field(
@@ -9277,7 +9273,7 @@ class VehicleReservationRqcoreType(object):
     )
 
     @dataclass
-    class DriverType(object):
+    class DriverType:
         age: int | None = field(
             default=None,
             metadata={
@@ -9308,7 +9304,7 @@ class VehicleReservationRqcoreType(object):
         )
 
     @dataclass
-    class SpecialEquipPrefs(object):
+    class SpecialEquipPrefs:
         special_equip_pref: list[
             VehicleReservationRqcoreTypeSpecialEquipPrefsSpecialEquipPref
         ] = field(
@@ -9329,7 +9325,7 @@ class VehicleReservationRqcoreType(object):
         )
 
     @dataclass
-    class RateDistance(object):
+    class RateDistance:
         unlimited: bool | None = field(
             default=None,
             metadata={
@@ -9361,7 +9357,7 @@ class VehicleReservationRqcoreType(object):
         )
 
     @dataclass
-    class TotalCharge(object):
+    class TotalCharge:
         rate_total_amount: Decimal | None = field(
             default=None,
             metadata={
@@ -9378,7 +9374,7 @@ class VehicleReservationRqcoreType(object):
         )
 
     @dataclass
-    class Queue(object):
+    class Queue:
         pseudo_city_code: str | None = field(
             default=None,
             metadata={
@@ -9417,8 +9413,8 @@ class VehicleReservationRqcoreType(object):
 
 
 @dataclass
-class VehAvailRateRq(object):
-    class Meta(object):
+class VehAvailRateRq:
+    class Meta:
         name = "VehAvailRateRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -9532,7 +9528,7 @@ class VehAvailRateRq(object):
 
 @dataclass
 class VehLocDetailRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehLocDetailRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -9678,7 +9674,7 @@ class VehLocDetailRs(OtaResponse):
     )
 
     @dataclass
-    class Date(object):
+    class Date:
         pick_up_date_time: str | None = field(
             default=None,
             metadata={
@@ -9697,7 +9693,7 @@ class VehLocDetailRs(OtaResponse):
 
 @dataclass
 class VehRateRuleRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehRateRuleRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -9937,7 +9933,7 @@ class VehRateRuleRs(OtaResponse):
         )
 
     @dataclass
-    class TotalCharge(object):
+    class TotalCharge:
         currency_code: str | None = field(
             default=None,
             metadata={
@@ -9961,7 +9957,7 @@ class VehRateRuleRs(OtaResponse):
         )
 
     @dataclass
-    class RateRules(object):
+    class RateRules:
         advance_booking: Optional["VehRateRuleRs.RateRules.AdvanceBooking"] = field(
             default=None,
             metadata={
@@ -10029,7 +10025,7 @@ class VehRateRuleRs(OtaResponse):
         )
 
         @dataclass
-        class AdvanceBooking(object):
+        class AdvanceBooking:
             absolute_deadline: str | None = field(
                 default=None,
                 metadata={
@@ -10067,7 +10063,7 @@ class VehRateRuleRs(OtaResponse):
             )
 
         @dataclass
-        class PickupReturnRules(object):
+        class PickupReturnRules:
             earliest_pickup: Optional[
                 "VehRateRuleRs.RateRules.PickupReturnRules.EarliestPickup"
             ] = field(
@@ -10097,7 +10093,7 @@ class VehRateRuleRs(OtaResponse):
             )
 
             @dataclass
-            class EarliestPickup(object):
+            class EarliestPickup:
                 day_of_week: DayOfWeekType | None = field(
                     default=None,
                     metadata={
@@ -10114,7 +10110,7 @@ class VehRateRuleRs(OtaResponse):
                 )
 
             @dataclass
-            class LatestPickup(object):
+            class LatestPickup:
                 day_of_week: DayOfWeekType | None = field(
                     default=None,
                     metadata={
@@ -10131,7 +10127,7 @@ class VehRateRuleRs(OtaResponse):
                 )
 
             @dataclass
-            class LatestReturn(object):
+            class LatestReturn:
                 day_of_week: DayOfWeekType | None = field(
                     default=None,
                     metadata={
@@ -10148,7 +10144,7 @@ class VehRateRuleRs(OtaResponse):
                 )
 
         @dataclass
-        class RateGuarantee(object):
+        class RateGuarantee:
             description: FormattedTextTextType | None = field(
                 default=None,
                 metadata={
@@ -10198,7 +10194,7 @@ class VehRateRuleRs(OtaResponse):
             )
 
             @dataclass
-            class AcceptablePayments(object):
+            class AcceptablePayments:
                 acceptable_payment: list[
                     "VehRateRuleRs.RateRules.PaymentRules.AcceptablePayments.AcceptablePayment"
                 ] = field(
@@ -10217,7 +10213,7 @@ class VehRateRuleRs(OtaResponse):
                 )
 
                 @dataclass
-                class AcceptablePayment(object):
+                class AcceptablePayment:
                     credit_card_code: str | None = field(
                         default=None,
                         metadata={
@@ -10227,7 +10223,7 @@ class VehRateRuleRs(OtaResponse):
                     )
 
         @dataclass
-        class CancelPenaltyInfo(object):
+        class CancelPenaltyInfo:
             deadline: list["VehRateRuleRs.RateRules.CancelPenaltyInfo.Deadline"] = (
                 field(
                     default_factory=list,
@@ -10269,7 +10265,7 @@ class VehRateRuleRs(OtaResponse):
             )
 
             @dataclass
-            class Deadline(object):
+            class Deadline:
                 absolute_deadline: str | None = field(
                     default=None,
                     metadata={
@@ -10300,7 +10296,7 @@ class VehRateRuleRs(OtaResponse):
                 )
 
             @dataclass
-            class PenaltyFee(object):
+            class PenaltyFee:
                 amount: Decimal | None = field(
                     default=None,
                     metadata={
@@ -10310,7 +10306,7 @@ class VehRateRuleRs(OtaResponse):
                 )
 
         @dataclass
-        class RateDeposit(object):
+        class RateDeposit:
             absolute_deadline: str | None = field(
                 default=None,
                 metadata={
@@ -10359,8 +10355,8 @@ class VehRateRuleRs(OtaResponse):
 
 
 @dataclass
-class VehResRq(object):
-    class Meta(object):
+class VehResRq:
+    class Meta:
         name = "VehResRQ"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -10472,7 +10468,7 @@ class VehResRq(object):
 
 
 @dataclass
-class VehicleAvailVendorInfoType(object):
+class VehicleAvailVendorInfoType:
     vendor_messages: ArrayOfVendorMessageType | None = field(
         default=None,
         metadata={
@@ -10524,7 +10520,7 @@ class VehicleAvailVendorInfoType(object):
 
 
 @dataclass
-class VehicleMatchedLocationType(object):
+class VehicleMatchedLocationType:
     location_detail: VehicleLocationDetailsType | None = field(
         default=None,
         metadata={
@@ -10551,7 +10547,7 @@ class VehicleMatchedLocationType(object):
 
 
 @dataclass
-class VehicleSegmentAdditionalInfoType(object):
+class VehicleSegmentAdditionalInfoType:
     payment_rules: ArrayOfMonetaryRuleType | None = field(
         default=None,
         metadata={
@@ -10626,7 +10622,7 @@ class VehicleSegmentAdditionalInfoType(object):
 
 
 @dataclass
-class ArrayOfVehicleMatchedLocationType(object):
+class ArrayOfVehicleMatchedLocationType:
     veh_matched_loc: list[VehicleMatchedLocationType] = field(
         default_factory=list,
         metadata={
@@ -10638,8 +10634,8 @@ class ArrayOfVehicleMatchedLocationType(object):
 
 
 @dataclass
-class ServiceSoapGetVehAvailRateInput(object):
-    class Meta(object):
+class ServiceSoapGetVehAvailRateInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -10652,7 +10648,7 @@ class ServiceSoapGetVehAvailRateInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_avail_rate_rq: VehAvailRateRq | None = field(
             default=None,
             metadata={
@@ -10664,8 +10660,8 @@ class ServiceSoapGetVehAvailRateInput(object):
 
 
 @dataclass
-class ServiceSoapGetVehLocDetailOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehLocDetailOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -10685,7 +10681,7 @@ class ServiceSoapGetVehLocDetailOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_loc_detail_rs: VehLocDetailRs | None = field(
             default=None,
             metadata={
@@ -10703,7 +10699,7 @@ class ServiceSoapGetVehLocDetailOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -10734,7 +10730,7 @@ class ServiceSoapGetVehLocDetailOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -10746,8 +10742,8 @@ class ServiceSoapGetVehLocDetailOutput(object):
 
 
 @dataclass
-class ServiceSoapGetVehRateRuleOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehRateRuleOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -10767,7 +10763,7 @@ class ServiceSoapGetVehRateRuleOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_rate_rule_rs: VehRateRuleRs | None = field(
             default=None,
             metadata={
@@ -10785,7 +10781,7 @@ class ServiceSoapGetVehRateRuleOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -10816,7 +10812,7 @@ class ServiceSoapGetVehRateRuleOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -10828,8 +10824,8 @@ class ServiceSoapGetVehRateRuleOutput(object):
 
 
 @dataclass
-class ServiceSoapGetVehReservationInput(object):
-    class Meta(object):
+class ServiceSoapGetVehReservationInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -10842,7 +10838,7 @@ class ServiceSoapGetVehReservationInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_res_rq: VehResRq | None = field(
             default=None,
             metadata={
@@ -10854,7 +10850,7 @@ class ServiceSoapGetVehReservationInput(object):
 
 
 @dataclass
-class VehicleReservationType(object):
+class VehicleReservationType:
     customer: CustomerPrimaryAdditionalType | None = field(
         default=None,
         metadata={
@@ -10934,7 +10930,7 @@ class VehicleReservationType(object):
 
 
 @dataclass
-class VehicleVendorAvailabilityType(object):
+class VehicleVendorAvailabilityType:
     vendor: CompanyNameType | None = field(
         default=None,
         metadata={
@@ -10961,7 +10957,7 @@ class VehicleVendorAvailabilityType(object):
     )
 
     @dataclass
-    class VehAvails(object):
+    class VehAvails:
         veh_avail: list["VehicleVendorAvailabilityType.VehAvails.VehAvail"] = field(
             default_factory=list,
             metadata={
@@ -10979,7 +10975,7 @@ class VehicleVendorAvailabilityType(object):
         )
 
         @dataclass
-        class VehAvail(object):
+        class VehAvail:
             veh_avail_core: VehicleAvailCoreType | None = field(
                 default=None,
                 metadata={
@@ -11008,7 +11004,7 @@ class VehicleVendorAvailabilityType(object):
             )
 
             @dataclass
-            class AdvanceBooking(object):
+            class AdvanceBooking:
                 absolute_deadline: str | None = field(
                     default=None,
                     metadata={
@@ -11047,7 +11043,7 @@ class VehicleVendorAvailabilityType(object):
 
 
 @dataclass
-class ArrayOfVehicleVendorAvailabilityType(object):
+class ArrayOfVehicleVendorAvailabilityType:
     veh_vendor_avail: list[VehicleVendorAvailabilityType] = field(
         default_factory=list,
         metadata={
@@ -11058,7 +11054,7 @@ class ArrayOfVehicleVendorAvailabilityType(object):
     )
 
 
-class ServiceSoapGetVehLocDetail(object):
+class ServiceSoapGetVehLocDetail:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -11067,7 +11063,7 @@ class ServiceSoapGetVehLocDetail(object):
     output = ServiceSoapGetVehLocDetailOutput
 
 
-class ServiceSoapGetVehRateRule(object):
+class ServiceSoapGetVehRateRule:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -11078,7 +11074,7 @@ class ServiceSoapGetVehRateRule(object):
 
 @dataclass
 class VehLocationSearchRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehLocationSearchRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -11183,8 +11179,8 @@ class VehLocationSearchRs(OtaResponse):
 
 
 @dataclass
-class VehicleCancelRsadditionalInfoType(object):
-    class Meta(object):
+class VehicleCancelRsadditionalInfoType:
+    class Meta:
         name = "VehicleCancelRSAdditionalInfoType"
 
     veh_reservation: VehicleReservationType | None = field(
@@ -11206,8 +11202,8 @@ class VehicleCancelRsadditionalInfoType(object):
 
 
 @dataclass
-class VehicleResRscoreType(object):
-    class Meta(object):
+class VehicleResRscoreType:
+    class Meta:
         name = "VehicleResRSCoreType"
 
     veh_reservation: VehicleReservationType | None = field(
@@ -11229,8 +11225,8 @@ class VehicleResRscoreType(object):
 
 
 @dataclass
-class VehicleRetrieveResRscoreType(object):
-    class Meta(object):
+class VehicleRetrieveResRscoreType:
+    class Meta:
         name = "VehicleRetrieveResRSCoreType"
 
     veh_reservation: VehicleReservationType | None = field(
@@ -11252,8 +11248,8 @@ class VehicleRetrieveResRscoreType(object):
 
 
 @dataclass
-class ServiceSoapGetVehLocationSearchOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehLocationSearchOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -11273,7 +11269,7 @@ class ServiceSoapGetVehLocationSearchOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_location_search_rs: VehLocationSearchRs | None = field(
             default=None,
             metadata={
@@ -11291,7 +11287,7 @@ class ServiceSoapGetVehLocationSearchOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -11322,7 +11318,7 @@ class ServiceSoapGetVehLocationSearchOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -11335,7 +11331,7 @@ class ServiceSoapGetVehLocationSearchOutput(object):
 
 @dataclass
 class VehCancelResRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehCancelResRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -11446,7 +11442,7 @@ class VehCancelResRs(OtaResponse):
 
 @dataclass
 class VehResRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehResRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -11555,7 +11551,7 @@ class VehResRs(OtaResponse):
 
 @dataclass
 class VehRetResRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehRetResRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -11654,8 +11650,8 @@ class VehRetResRs(OtaResponse):
 
 
 @dataclass
-class VehicleAvailRscoreType(object):
-    class Meta(object):
+class VehicleAvailRscoreType:
+    class Meta:
         name = "VehicleAvailRSCoreType"
 
     veh_rental_core: VehicleRentalCoreType | None = field(
@@ -11677,8 +11673,8 @@ class VehicleAvailRscoreType(object):
 
 
 @dataclass
-class ServiceSoapGetVehCancelReservationOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehCancelReservationOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -11698,7 +11694,7 @@ class ServiceSoapGetVehCancelReservationOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_cancel_res_rs: VehCancelResRs | None = field(
             default=None,
             metadata={
@@ -11716,7 +11712,7 @@ class ServiceSoapGetVehCancelReservationOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -11747,7 +11743,7 @@ class ServiceSoapGetVehCancelReservationOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -11758,7 +11754,7 @@ class ServiceSoapGetVehCancelReservationOutput(object):
         )
 
 
-class ServiceSoapGetVehLocationSearch(object):
+class ServiceSoapGetVehLocationSearch:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -11768,8 +11764,8 @@ class ServiceSoapGetVehLocationSearch(object):
 
 
 @dataclass
-class ServiceSoapGetVehReservationOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehReservationOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -11789,7 +11785,7 @@ class ServiceSoapGetVehReservationOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_res_rs: VehResRs | None = field(
             default=None,
             metadata={
@@ -11807,7 +11803,7 @@ class ServiceSoapGetVehReservationOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -11838,7 +11834,7 @@ class ServiceSoapGetVehReservationOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -11850,8 +11846,8 @@ class ServiceSoapGetVehReservationOutput(object):
 
 
 @dataclass
-class ServiceSoapGetVehRetReservationOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehRetReservationOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -11871,7 +11867,7 @@ class ServiceSoapGetVehRetReservationOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_ret_res_rs: VehRetResRs | None = field(
             default=None,
             metadata={
@@ -11889,7 +11885,7 @@ class ServiceSoapGetVehRetReservationOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -11920,7 +11916,7 @@ class ServiceSoapGetVehRetReservationOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -11933,7 +11929,7 @@ class ServiceSoapGetVehRetReservationOutput(object):
 
 @dataclass
 class VehAvailRateRs(OtaResponse):
-    class Meta(object):
+    class Meta:
         name = "VehAvailRateRS"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
@@ -12031,8 +12027,8 @@ class VehAvailRateRs(OtaResponse):
 
 
 @dataclass
-class ServiceSoapGetVehAvailRateOutput(object):
-    class Meta(object):
+class ServiceSoapGetVehAvailRateOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -12052,7 +12048,7 @@ class ServiceSoapGetVehAvailRateOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         veh_avail_rate_rs: VehAvailRateRs | None = field(
             default=None,
             metadata={
@@ -12070,7 +12066,7 @@ class ServiceSoapGetVehAvailRateOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -12101,7 +12097,7 @@ class ServiceSoapGetVehAvailRateOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -12112,7 +12108,7 @@ class ServiceSoapGetVehAvailRateOutput(object):
         )
 
 
-class ServiceSoapGetVehCancelReservation(object):
+class ServiceSoapGetVehCancelReservation:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -12121,7 +12117,7 @@ class ServiceSoapGetVehCancelReservation(object):
     output = ServiceSoapGetVehCancelReservationOutput
 
 
-class ServiceSoapGetVehReservation(object):
+class ServiceSoapGetVehReservation:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -12130,7 +12126,7 @@ class ServiceSoapGetVehReservation(object):
     output = ServiceSoapGetVehReservationOutput
 
 
-class ServiceSoapGetVehRetReservation(object):
+class ServiceSoapGetVehRetReservation:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -12139,7 +12135,7 @@ class ServiceSoapGetVehRetReservation(object):
     output = ServiceSoapGetVehRetReservationOutput
 
 
-class ServiceSoapGetVehAvailRate(object):
+class ServiceSoapGetVehAvailRate:
     style = "document"
     location = "https://ota2007a.carhire-solutions.com/service.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"

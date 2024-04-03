@@ -5,7 +5,7 @@ import httpx
 from snowfall.stdlib.logging import stdout
 
 
-class RequestLogHandler(object):
+class RequestLogHandler:
     def __init__(self) -> None:
         self._logger = stdout.get_logger()
 
@@ -16,7 +16,7 @@ class RequestLogHandler(object):
             self._logger.info("Request", content=request.content.decode("utf-8"))
 
 
-class ResponseLogHandler(object):
+class ResponseLogHandler:
     def __init__(self) -> None:
         self._logger = stdout.get_logger()
 

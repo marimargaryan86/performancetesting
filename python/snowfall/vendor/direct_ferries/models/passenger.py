@@ -46,7 +46,7 @@ class PassengerBase(base.CamelCaseBaseModel):
         allow_reuse=True,
     )(normalizers.datetime_str_to_date)
 
-    class Config(object):
+    class Config:
         json_encoders = MappingProxyType(
             {
                 datetime.date: lambda date_object: "{0}T00:00:00".format(

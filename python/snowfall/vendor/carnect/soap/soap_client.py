@@ -47,7 +47,7 @@ class Config(NamedTuple):
         return cls(**service_params)
 
 
-class TransportTypes(object):
+class TransportTypes:
     soap = "http://schemas.xmlsoap.org/soap/http"
 
 
@@ -60,7 +60,7 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-class SoapLogger(object):
+class SoapLogger:
     def __init__(
         self,
         secret_words: tuple[str, ...] | None = None,
@@ -118,7 +118,7 @@ class SoapLogger(object):
         file_path.write_text(data_content)
 
 
-class AsyncSoapTransport(object):
+class AsyncSoapTransport:
     def __init__(
         self,
         http_client: httpx.AsyncClient,
@@ -161,7 +161,7 @@ class AsyncSoapTransport(object):
 
 
 @dataclass  # noqa: SF10
-class AsyncSoapClient(object):
+class AsyncSoapClient:
     config: Config
     transport: AsyncSoapTransport
     parser: XmlParser = field(default_factory=XmlParser)

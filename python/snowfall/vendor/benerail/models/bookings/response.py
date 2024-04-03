@@ -1,7 +1,6 @@
 from pydantic.v1 import Field
 
 from snowfall.vendor.benerail.models import etag
-from snowfall.vendor.benerail.models import etag as etag_models
 from snowfall.vendor.benerail.models.base import BenerailBaseModel
 from snowfall.vendor.benerail.models.bookings.booking import (
     BookedOfferPart,
@@ -34,7 +33,7 @@ class GetBookingResponse(BaseResponse):
     response_result: Booking = Field(..., alias="result")
     dialogue_etag: str
 
-    def set_etags(self, etag_data: etag_models.EtagData) -> None:
+    def set_etags(self, etag_data: etag.EtagData) -> None:
         etag_data.dialogue_etag = self.dialogue_etag
         etag_data.booking_etag = self.etag
 
@@ -43,7 +42,7 @@ class GetOrderResponse(BaseResponse):
     response_result: Order = Field(..., alias="result")
     booking_etag: str
 
-    def set_etags(self, etag_data: etag_models.EtagData) -> None:
+    def set_etags(self, etag_data: etag.EtagData) -> None:
         etag_data.booking_etag = self.booking_etag
         etag_data.order_etag = self.etag
 
@@ -52,7 +51,7 @@ class GetSelectedOfferResponse(BaseResponse):
     response_result: SelectedOffer | None = Field(None, alias="result")
     order_etag: str
 
-    def set_etags(self, etag_data: etag_models.EtagData) -> None:
+    def set_etags(self, etag_data: etag.EtagData) -> None:
         etag_data.order_etag = self.order_etag
         etag_data.selected_offer_etag = self.etag
 

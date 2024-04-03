@@ -54,7 +54,7 @@ async def multi_city_response(
     )
 
 
-class TestTrips(object):
+class TestTrips:
     def test_one_way_contains_results(
         self,
         one_way_response: trips_pb2.SearchTripsResponse,

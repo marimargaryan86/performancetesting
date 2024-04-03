@@ -3,7 +3,6 @@ import datetime
 import phonenumbers
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2 as order_amqp_pb2
-from snowfall.project.junction.go.service.orders.v1 import models_pb2
 from snowfall.project.junction.go.service.orders.v1 import (
     models_pb2 as order_models_pb2,
 )
@@ -18,7 +17,7 @@ class PassengerCountNotMatchingError(Exception):
     """Raised when the number of passengers changed during the booking."""
 
 
-class BookingHandler(object):
+class BookingHandler:
     def __init__(self, df_client: client.DfHttpClient) -> None:
         self._client = df_client
 
@@ -90,7 +89,7 @@ def _fill_pax_details(
 
 def _fill_doc_details(
     quote_passenger: passenger.Passenger,
-    doc_details: models_pb2.DocumentDetails,
+    doc_details: order_models_pb2.DocumentDetails,
 ) -> None:
     if doc_details.nationality:
         quote_passenger.nationality = doc_details.nationality

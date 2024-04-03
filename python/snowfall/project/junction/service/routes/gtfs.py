@@ -16,7 +16,7 @@ _STOP_TIMES = "stop_times.txt"
 _STOPS = "stops.txt"
 
 
-class GtfsFile(object):
+class GtfsFile:
     def __init__(self, gtfs_file: zipfile.ZipFile, chunk_size: int = 100000):
         self._gtfs_file = gtfs_file
         self._chunk_size = chunk_size

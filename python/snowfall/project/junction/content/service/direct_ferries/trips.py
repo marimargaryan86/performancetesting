@@ -16,7 +16,6 @@ from snowfall.stdlib.time import date_to_age
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.models import leg, passenger, quote, request
-from snowfall.vendor.direct_ferries.models import request as request_models
 
 _CURRENCY = "EUR"
 
@@ -26,7 +25,7 @@ class CabinClass(NamedTuple):
     marketing_name: str
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, h3_port_mapping: h3.H3MappingRepository[port.Port]):
         self._h3_port_mapping = h3_port_mapping
 
@@ -142,7 +141,7 @@ def _datetime_to_utc_without_tz(date_time: datetime.datetime) -> datetime.dateti
     return date_time.astimezone(datetime.UTC).replace(tzinfo=None)
 
 
-class Trips(object):
+class Trips:
     def __init__(
         self,
         search_client: client.DfHttpClient,
@@ -238,7 +237,7 @@ class Trips(object):
         self,
         trip_request: trips_pb2.SearchTripsRequest.OneWay,
         passengers: Iterable[trips_pb2.SearchTripsRequest.Passenger],
-    ) -> request_models.QuoteRequest:
+    ) -> request.QuoteRequest:
         origins, destinations = self._get_ports(trip_request.criterion)
         leg_passengers = self._get_leg_passengers(passengers)
         departure_date_time = _datetime_to_utc_without_tz(

@@ -11,7 +11,7 @@ from snowfall.vendor.ba_ndc.models.request_order_schemas import (
 )
 
 
-class OrderRequestBuilder(object):
+class OrderRequestBuilder:
     def __init__(self, offer_id: uuid.UUID) -> None:
         self.residence_address: Address | None = None
         self._passengers: list[PassengerExtended] = []

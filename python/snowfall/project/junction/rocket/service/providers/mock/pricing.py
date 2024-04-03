@@ -9,7 +9,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
-class QuoteResultProducer(object):
+class QuoteResultProducer:
     def __init__(self, producer_obj: producer.Producer, routing_key: str):
         self._producer = producer_obj
         self._routing_key = routing_key
@@ -18,7 +18,7 @@ class QuoteResultProducer(object):
         await self._producer.publish(message, self._routing_key)
 
 
-class QuoteTaskConsumer(object):
+class QuoteTaskConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.QuoteTask],

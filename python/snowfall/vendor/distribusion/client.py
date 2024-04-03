@@ -38,7 +38,7 @@ def _get_response_error_message(response: httpx.Response) -> str:
     return "{0}: {1}".format(status.value, description or status.description)
 
 
-class DistribusionClient(object):
+class DistribusionClient:
     def __init__(
         self,
         api_base_url: str,

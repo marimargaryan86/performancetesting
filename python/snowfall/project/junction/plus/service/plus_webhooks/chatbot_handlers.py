@@ -44,7 +44,7 @@ _TIME_WINDOW_IN_HOURS = 48
 _HandlersResponse: TypeAlias = Sequence[Mapping[str, Any]]
 
 
-class MessageHandler(object):
+class MessageHandler:
     def __init__(
         self,
         redis_client: redis.Client[str],

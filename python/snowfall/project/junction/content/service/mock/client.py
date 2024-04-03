@@ -39,7 +39,7 @@ class Stop(h3.CoordinatesItem):
     rad_longitude: float
 
 
-class StopRepository(object):
+class StopRepository:
     def __init__(
         self,
         stops: Iterable[Mapping[str, Any]],
@@ -66,11 +66,11 @@ class StopRepository(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Route(object):
+class Route:
     stops: Sequence[Stop]
 
 
-class RouteRepository(object):
+class RouteRepository:
     def __init__(
         self,
         stop_repository: StopRepository,
@@ -89,14 +89,14 @@ class RouteRepository(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Company(object):
+class Company:
     flight_number: str
     name: str
     code: str
 
 
 @dataclasses.dataclass(frozen=True)
-class Segment(object):
+class Segment:
     origin: Stop
     destination: Stop
     departure_at: datetime.datetime
@@ -208,12 +208,12 @@ class Segment(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Trip(object):
+class Trip:
     segments: list[Segment]
 
 
 @dataclasses.dataclass(frozen=True)
-class Fare(object):
+class Fare:
     reference: str
     price: money.Money
     brand_type: fare_type_pb2.FareType.ValueType
@@ -221,7 +221,7 @@ class Fare(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class SearchResult(object):
+class SearchResult:
     trips: list[Trip]
     fares: list[Fare]
 
@@ -233,7 +233,7 @@ class SearchResult(object):
         )
 
 
-class FakeFareGenerator(object):
+class FakeFareGenerator:
     _air_base_cost = 15
     _air_travel_cost = 0.00075
     _air_base_modifier = 2.1
@@ -307,7 +307,7 @@ class FakeFareGenerator(object):
         )
 
 
-class MockClient(object):
+class MockClient:
     def __init__(self, route_repository: RouteRepository):
         self._routes = route_repository
 

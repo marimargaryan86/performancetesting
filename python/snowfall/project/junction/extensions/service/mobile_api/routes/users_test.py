@@ -39,7 +39,7 @@ async def _post_users(
     )
 
 
-class TestVerificationCode(object):
+class TestVerificationCode:
     async def test_verification_code_invalid_email(
         self,
         http_client: httpx.AsyncClient,
@@ -108,7 +108,7 @@ class TestVerificationCode(object):
         ).status_code == status.HTTP_401_UNAUTHORIZED
 
 
-class TestUsers(object):
+class TestUsers:
     async def test_user_created(
         self,
         http_client: httpx.AsyncClient,

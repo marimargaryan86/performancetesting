@@ -5,7 +5,7 @@ from snowfall.project.junction.rocket.service.bookings.v1alpha import (
 from snowfall.stdlib.transport.amqp import producer
 
 
-class BookingProducer(object):
+class BookingProducer:
     def __init__(self, producer_obj: producer.Producer):
         self._producer = producer_obj
 
@@ -21,7 +21,7 @@ class BookingProducer(object):
         )
 
 
-class BookingCancellationTaskProducer(object):
+class BookingCancellationTaskProducer:
     def __init__(self, producer_obj: producer.Producer):
         self._producer = producer_obj
 

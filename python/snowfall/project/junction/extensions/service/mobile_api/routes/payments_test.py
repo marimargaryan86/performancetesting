@@ -45,7 +45,7 @@ async def voucher(
     return voucher
 
 
-class TestPayments(object):
+class TestPayments:
     async def test_create_payment(
         self,
         authenticated_http_client: httpx.AsyncClient,

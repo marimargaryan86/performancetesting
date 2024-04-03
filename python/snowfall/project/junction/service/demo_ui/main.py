@@ -29,7 +29,7 @@ class _Settings(starlette.Settings):
     grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=10)
 
 
-class Routes(object):
+class Routes:
     def __init__(
         self,
         *,

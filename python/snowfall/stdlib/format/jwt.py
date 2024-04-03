@@ -19,7 +19,7 @@ def _match_kid(signing_keys: Sequence[jwt.PyJWK], kid: str) -> jwt.PyJWK | None:
     return None
 
 
-class AsyncJWKClient(object):
+class AsyncJWKClient:
     def __init__(
         self,
         jwk_url: str,
@@ -113,7 +113,7 @@ class AsyncJWKClient(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class Payload(object):
+class Payload:
     custom: Mapping[str, types.Primitive] = dataclasses.field(default_factory=dict)
     iss: str | None = None
     sub: str | None = None
@@ -124,7 +124,7 @@ class Payload(object):
     jti: str | None = None
 
 
-class Encoder(object):
+class Encoder:
     def __init__(
         self,
         private_key: str | None = None,
@@ -152,7 +152,7 @@ class Encoder(object):
         )
 
 
-class Decoder(object):
+class Decoder:
     def __init__(
         self,
         public_key: str | None = None,

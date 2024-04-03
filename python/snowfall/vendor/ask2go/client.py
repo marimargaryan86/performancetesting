@@ -19,7 +19,7 @@ from snowfall.vendor.ask2go.models import (
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
-class Ask2GoClient(object):
+class Ask2GoClient:
     def __init__(
         self,
         api_base_url: str,

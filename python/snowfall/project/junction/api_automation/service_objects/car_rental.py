@@ -14,7 +14,7 @@ from snowfall.project.junction.api_automation.service_objects.helper import (
 )
 
 
-class CarRentalClient(object):
+class CarRentalClient:
     def __init__(self, client: ClientWrapper):
         self._client = client
 

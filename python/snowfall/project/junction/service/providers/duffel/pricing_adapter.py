@@ -14,7 +14,7 @@ from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_request import OfferRequest
 
 
-class PricingAdapter(object):
+class PricingAdapter:
     def __init__(
         self,
         duffel_client: client.DuffelClient,
@@ -106,7 +106,7 @@ class PricingAdapter(object):
         ).hexdigest()
 
 
-class PricingAdapterFactory(object):
+class PricingAdapterFactory:
     def __init__(self, duffel_client_factory: DuffelClientFactory):
         self._duffel_client_factory = duffel_client_factory
 

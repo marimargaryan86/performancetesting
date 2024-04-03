@@ -31,7 +31,7 @@ def cache_key(search: Criteria) -> str:
     return string.uuid()
 
 
-class Generator(object):
+class Generator:
     def __init__(
         self,
         search_result_cache: cache.SearchResultCache,

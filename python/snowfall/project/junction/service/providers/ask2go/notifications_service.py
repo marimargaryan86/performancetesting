@@ -9,7 +9,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.vendor.ask2go import client
 
 
-class NotificationsServiceConsumer(object):
+class NotificationsServiceConsumer:
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,

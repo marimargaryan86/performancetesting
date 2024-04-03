@@ -28,7 +28,7 @@ class OfferRetrievalError(Exception):
     """Raised when an error occurs retrieving an offer."""
 
 
-class PayQuotes(object):
+class PayQuotes:
     def __init__(
         self,
         quotations_client: quotations.Client,
@@ -299,7 +299,7 @@ class PayQuotes(object):
         return price_breakdown
 
 
-class PayQuoteFetcher(object):
+class PayQuoteFetcher:
     def __init__(
         self,
         pay_quotes: PayQuotes,

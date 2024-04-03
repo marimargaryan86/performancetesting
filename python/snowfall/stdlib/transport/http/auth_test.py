@@ -7,7 +7,7 @@ import pytest_httpx
 from snowfall.stdlib.transport.http import auth
 
 
-class TestTemporaryTokenAuth(object):
+class TestTemporaryTokenAuth:
     async def test_unset_token_raised_error(self) -> None:
         token_auth = auth.TemporaryTokenAuth()
         client = httpx.AsyncClient(auth=token_auth)

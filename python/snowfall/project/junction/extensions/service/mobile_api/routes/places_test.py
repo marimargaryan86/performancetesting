@@ -6,7 +6,7 @@ from starlette import status
 _PLACES_URL = "/places"
 
 
-class TestPlaces(object):
+class TestPlaces:
     async def test_get_places(
         self,
         authenticated_http_client: httpx.AsyncClient,

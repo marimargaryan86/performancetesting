@@ -11,7 +11,7 @@ from snowfall.stdlib.v1 import money_pb2
 _EXPIRATION_MINUTES = 15
 
 
-class Quote(object):
+class Quote:
     def __init__(
         self,
         amount: int,

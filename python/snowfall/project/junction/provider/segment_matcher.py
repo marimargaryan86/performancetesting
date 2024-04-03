@@ -14,7 +14,7 @@ from snowfall.stdlib.logging import stdout
 
 
 @dataclasses.dataclass(frozen=True)
-class Requirement(object):
+class Requirement:
     departure_at: datetime.datetime
     departure_tz: zoneinfo.ZoneInfo
     arrival_at: datetime.datetime
@@ -41,7 +41,7 @@ class Requirement(object):
         )
 
 
-class SegmentMatcher(object):
+class SegmentMatcher:
     def __init__(
         self,
         segments: Sequence[models_pb2.Segment],

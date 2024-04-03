@@ -18,7 +18,7 @@ T = TypeVar("T")  # noqa: WPS111
 A = TypeVar("A", bound=AddressType)  # noqa: WPS111
 
 
-class PosSourceBuilder(object):
+class PosSourceBuilder:
     def __init__(self) -> None:
         self._source = SourceType()
 
@@ -41,7 +41,7 @@ class PosSourceBuilder(object):
         self._source.requestor_id.id_context = password
 
 
-class PosBuilder(object):
+class PosBuilder:
     def __init__(self) -> None:
         self._pos = ArrayOfSourceType()
 
@@ -63,7 +63,7 @@ class PosBuilder(object):
         return source
 
 
-class UniqueIdTypeBuilder(object):
+class UniqueIdTypeBuilder:
     def __init__(self) -> None:
         self._builder = UniqueIdType()
 
@@ -83,7 +83,7 @@ class UniqueIdTypeBuilder(object):
         return self
 
 
-class PersonNameTypeBuilder(object):
+class PersonNameTypeBuilder:
     def __init__(self) -> None:
         self._builder = PersonNameType()
 

@@ -61,7 +61,7 @@ def _generate_private_fares_keys(
     ]
 
 
-class OfferGrouper(object):
+class OfferGrouper:
     @classmethod
     def group_offers(
         cls,
@@ -100,12 +100,12 @@ class OfferGrouper(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class SearchCriteriaWrapper(object):
+class SearchCriteriaWrapper:
     search_criteria: OfferRequestData
     reseller_id: str
 
 
-class DuffelSearchAdapter(object):
+class DuffelSearchAdapter:
     def __init__(
         self,
         resellers_map: Mapping[str, Mapping[str, Any]],

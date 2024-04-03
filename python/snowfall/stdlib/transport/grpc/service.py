@@ -4,7 +4,7 @@ from grpc import aio
 from grpc_health.v1 import health, health_pb2_grpc
 
 
-class Service(object):
+class Service:
     @abstractmethod
     def get_name(self) -> str:
         raise NotImplementedError()

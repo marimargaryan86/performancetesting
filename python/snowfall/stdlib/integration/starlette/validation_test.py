@@ -87,7 +87,7 @@ async def _error_many_source_failure(request: requests.Request) -> responses.Res
     )
 
 
-class TestErrorValidation(object):
+class TestErrorValidation:
     async def test_error_source_validation_success(
         self,
         test_app: applications.Starlette,
@@ -116,7 +116,7 @@ class TestErrorValidation(object):
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-class TestResponseValidation(object):
+class TestResponseValidation:
     async def test_response_validation_failure_status_code(
         self,
         test_app: applications.Starlette,
@@ -150,7 +150,7 @@ class TestResponseValidation(object):
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestRequestValidation(object):
+class TestRequestValidation:
     async def test_request_validation_failure_status_code(
         self,
         test_app: applications.Starlette,

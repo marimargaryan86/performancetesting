@@ -14,7 +14,7 @@ ExchangeType = abc.ExchangeType
 
 
 @dataclasses.dataclass(frozen=True)
-class Exchange(object):
+class Exchange:
     name: str
     type_: ExchangeType = ExchangeType.TOPIC
 

@@ -5,7 +5,7 @@ from redis.asyncio import lock
 from snowfall.stdlib.persistence.redis import types as redis
 
 
-class UserSessionRepository(object):
+class UserSessionRepository:
     def __init__(
         self,
         redis_client: redis.Client[str],

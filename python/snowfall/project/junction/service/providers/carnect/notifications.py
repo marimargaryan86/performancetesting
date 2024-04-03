@@ -14,7 +14,7 @@ class EmailNotificationError(Exception):
     """General error while sending email notification."""
 
 
-class BookingNotification(object):
+class BookingNotification:
     def __init__(
         self,
         place_order_task: amqp_pb2.PlaceOrderTask,
@@ -75,7 +75,7 @@ class BookingNotification(object):
         )
 
 
-class EmailClient(object):
+class EmailClient:
     def __init__(self, client: aiosmtplib.SMTP, sender: str):
         self._smtp = client
         self._sender = sender

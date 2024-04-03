@@ -24,7 +24,7 @@ from snowfall.stdlib import money, string
 from snowfall.stdlib.logging import stdout
 
 
-class TransactionsFlow(object):
+class TransactionsFlow:
     dependencies: ClassVar[protocols.Dependencies] = {
         ("transactions", "grpc"),
         ("companies", "grpc"),

@@ -20,7 +20,7 @@ class CabinClass(NamedTuple):
     marketing_name: str
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self, trip_parser: parsers.TripParser):
         self._trip_parser = trip_parser
 
@@ -51,7 +51,7 @@ class Transformer(object):
         return list(results.values())
 
 
-class Trips(object):
+class Trips:
     def __init__(self, search_client: client.DuffelClient, transformer: Transformer):
         self._client = search_client
         self._transformer = transformer

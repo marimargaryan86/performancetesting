@@ -140,7 +140,7 @@ def _extract_data(
         csv_data[field] = value_func(db_model)
 
 
-class CSVGeneratorCancellation(object):
+class CSVGeneratorCancellation:
     def __init__(
         self,
         transactions_repository: TransactionsRepository,

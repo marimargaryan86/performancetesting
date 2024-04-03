@@ -63,7 +63,7 @@ def _models_to_csv(
     return file_name
 
 
-class GTFSGenerator(object):
+class GTFSGenerator:
     def __init__(self, output_dir: pathlib.Path) -> None:
         self._output_dir = output_dir
 

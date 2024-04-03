@@ -14,7 +14,7 @@ from snowfall.stdlib.format import protobuf
 
 
 @dataclasses.dataclass(frozen=True)
-class TripCandidateSearchRequest(object):
+class TripCandidateSearchRequest:
     criteria: Sequence[trips_pb2.TripCandidateSearchCriteria]
     passengers: Sequence[offer_models_pb2.Passenger]
     allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType]

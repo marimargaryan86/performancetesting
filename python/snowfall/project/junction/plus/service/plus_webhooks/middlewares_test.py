@@ -4,7 +4,7 @@ import httpx
 from starlette import status
 
 
-class TestCustomHeaderMiddleware(object):
+class TestCustomHeaderMiddleware:
     async def test_invalid_hmac(
         self,
         client: httpx.AsyncClient,
@@ -88,7 +88,7 @@ class TestCustomHeaderMiddleware(object):
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-class TestWhatsappMiddleware(object):
+class TestWhatsappMiddleware:
     async def test_valid_hmac(
         self,
         client: httpx.AsyncClient,

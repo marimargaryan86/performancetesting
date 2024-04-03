@@ -14,7 +14,7 @@ from snowfall.project.junction.api_automation.service_objects.places import (
 )
 
 
-class QaClient(object):
+class QaClient:
     def __init__(
         self,
         base_url: str,

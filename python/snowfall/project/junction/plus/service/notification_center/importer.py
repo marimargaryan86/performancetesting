@@ -14,7 +14,7 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
 
 
-class NotificationEventImporter(object):
+class NotificationEventImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[models_pb2.NotificationEvent],

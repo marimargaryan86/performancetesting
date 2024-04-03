@@ -5,7 +5,7 @@ from starlette import status
 from snowfall.project.junction.extensions.service.mobile_api import conftest
 
 
-class TestOffersQuotes(object):
+class TestOffersQuotes:
     async def test_offer_quote_created(
         self,
         authenticated_http_client: httpx.AsyncClient,

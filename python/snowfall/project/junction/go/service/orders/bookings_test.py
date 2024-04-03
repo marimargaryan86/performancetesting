@@ -39,7 +39,7 @@ async def mock_bookings(
     return MockedBookings(mongo_client.test.test)
 
 
-class TestRepository(object):
+class TestRepository:
     async def test_unavailable_service_returns_same_bookings(
         self,
         mock_bookings: orders.BookingRepository,
@@ -125,7 +125,7 @@ class TestRepository(object):
         )
 
 
-class TestUpdater(object):
+class TestUpdater:
     async def test_booking_is_updated(
         self,
         mock_bookings: orders.BookingRepository,

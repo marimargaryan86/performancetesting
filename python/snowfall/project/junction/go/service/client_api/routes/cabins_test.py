@@ -5,7 +5,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestCabins(object):
+class TestCabins:
     async def test_cabin_classes_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,

@@ -13,7 +13,7 @@ from snowfall.vendor.karhoo import client
 from snowfall.vendor.karhoo.models import bookings, passenger
 
 
-class BookingHandler(object):
+class BookingHandler:
     _poll_retries_limit = 10
     _wait_time_between_polling = 15
 

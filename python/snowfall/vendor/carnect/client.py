@@ -46,7 +46,7 @@ from snowfall.vendor.carnect.soap.soap_client import (
 )
 
 
-class CarnectClient(object):
+class CarnectClient:
     def __init__(self, http_client: httpx.AsyncClient, config: Config) -> None:
         self._config: Config = config
         self._transport = AsyncSoapTransport(

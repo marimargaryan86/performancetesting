@@ -13,7 +13,7 @@ from snowfall.project.junction.go.service.resellers.v1 import (
 )
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_reseller_is_retrievable(
         self,
         resellers_client: resellers.Client,
@@ -81,7 +81,7 @@ class TestDictClient(object):
         assert updated_reseller.default_currency == "USD"
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @property
     def reseller(self) -> models_pb2.Reseller:
         return models_pb2.Reseller(id=fixtures.RESELLERS[0])

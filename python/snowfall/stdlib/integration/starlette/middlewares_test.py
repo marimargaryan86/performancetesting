@@ -4,7 +4,7 @@ from starlette import applications, requests, responses
 _VALIDATION_PATH = "/validation"
 
 
-class TestValidationMiddleware(object):
+class TestValidationMiddleware:
     async def test_openapi_defaults_are_applied(
         self,
         test_app: applications.Starlette,

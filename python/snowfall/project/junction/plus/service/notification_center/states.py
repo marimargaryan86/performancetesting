@@ -12,7 +12,7 @@ from snowfall.project.junction.plus.service.notifications.v1 import models_pb2
 from snowfall.stdlib.logging import stdout
 
 
-class Channels(object):
+class Channels:
     _notifications_metrics = prometheus_client.Counter(
         "notifications_events_total",
         "Total number of notifications sent through notification center",

@@ -97,7 +97,7 @@ class StatusHandler(trackable.AnySizeStatusHandler):
         await self._search_repository.mark_as_processing(msg.id)
 
 
-class SearchResultImporter(object):
+class SearchResultImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[ExpectedMessages],
@@ -210,7 +210,7 @@ class SearchResultImporter(object):
         await self._searches.mark_as_completed(search.id)
 
 
-class QuoteResultImporter(object):
+class QuoteResultImporter:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.QuoteTaskResult],

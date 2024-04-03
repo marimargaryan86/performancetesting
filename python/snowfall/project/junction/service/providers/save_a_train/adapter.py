@@ -86,7 +86,7 @@ _CABIN_MAPPING = types.MappingProxyType(
 )
 
 
-class SaveATrainAdapter(object):
+class SaveATrainAdapter:
     _poll_retries_limit = 10
     _wait_time_between_polling = 1
 
@@ -578,7 +578,7 @@ def raise_http_error_with_text(http_error: errors.HttpStatusError) -> None:
     ) from http_error
 
 
-class Transformer(object):
+class Transformer:
     def __init__(
         self,
         provider_identifier: uuid.UUID,

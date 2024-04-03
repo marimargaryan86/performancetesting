@@ -11,7 +11,7 @@ from snowfall.stdlib import h3, time
 from snowfall.stdlib.format import protobuf
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(
         self,
         h3_port_mapping: h3.H3MappingRepository[port.Port],

@@ -41,7 +41,7 @@ def _get_response_error_message(response: httpx.Response) -> str:
     return "{0}: {1}, {2}".format(error_status, error_title, error_message)
 
 
-class DuffelClient(object):
+class DuffelClient:
     def __init__(
         self,
         api_base_url: str,

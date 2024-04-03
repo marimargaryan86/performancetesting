@@ -7,7 +7,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2, money_pb2
 
 
-class Transformer(object):
+class Transformer:
     def to_proto(
         self,
         search_results: Sequence[client.SearchResult],
@@ -45,7 +45,7 @@ class Transformer(object):
         )
 
 
-class Trips(object):
+class Trips:
     def __init__(self, search_client: client.MockClient, transformer: Transformer):
         self._client = search_client
         self._transformer = transformer

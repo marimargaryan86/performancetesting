@@ -40,7 +40,7 @@ def get_optional_value(obj: Any, accessor: str, default: Any) -> Any:
     return obj
 
 
-class SearchResultGenerator(object):
+class SearchResultGenerator:
     def __init__(
         self,
         carnect_client: client.CarnectClient,

@@ -145,7 +145,7 @@ class _SearchReturn(NamedTuple):
     response: provider_trips_pb2.SearchTripsResponse
 
 
-class Searcher(object):
+class Searcher:
     def __init__(
         self,
         cache_factory: trips_cache.Factory,

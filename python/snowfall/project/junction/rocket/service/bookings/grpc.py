@@ -37,7 +37,7 @@ async def _validate_cancellation(
 
 
 @dataclasses.dataclass(frozen=True)
-class Cancellations(object):
+class Cancellations:
     repository: booking_repositories.BookingCancellationRepository
     task_producer: amqp.BookingCancellationTaskProducer
 

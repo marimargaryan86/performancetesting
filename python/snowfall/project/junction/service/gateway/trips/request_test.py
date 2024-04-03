@@ -169,7 +169,7 @@ def _providers_factory(
     return wrapper
 
 
-class TestRequestGenerator(object):
+class TestRequestGenerator:
     @pytest.mark.parametrize(
         ("task", "capabilities", "expected"),
         [

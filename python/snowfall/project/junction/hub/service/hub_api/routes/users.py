@@ -22,7 +22,7 @@ from snowfall.stdlib.integration.starlette import (
 
 
 @dataclasses.dataclass(frozen=True)
-class Users(object):
+class Users:
     _identities_client: identities_adapter.Client
     _resellers_client: resellers.Client
     _users_repository: repository.UsersRepository

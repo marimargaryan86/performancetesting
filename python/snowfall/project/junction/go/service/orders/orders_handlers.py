@@ -27,7 +27,6 @@ from snowfall.project.junction.go.service.orders.v1 import (
 from snowfall.project.junction.provider.v1 import bookings_pb2 as provider_bookings_pb2
 from snowfall.project.pay.adapter import refunds as refunds_adapter
 from snowfall.project.pay.service.refunds.v1 import models_pb2 as refund_models_pb2
-from snowfall.project.pay.service.refunds.v1 import models_pb2 as refunds_model_pb2
 from snowfall.stdlib import money, sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -62,7 +61,7 @@ async def _get_journeys(
     return [journey async for journey in journeys_result]
 
 
-class CreateCancellationRequestHandler(object):
+class CreateCancellationRequestHandler:
     def __init__(
         self,
         request: orders_pb2.CreateCancellationRequestRequest,
@@ -230,7 +229,7 @@ async def _mark_booking_as_cancelled(
     await booking_repo.update(booking)
 
 
-class CancellationTicketCompletedHandler(object):
+class CancellationTicketCompletedHandler:
     def __init__(
         self,
         request: orders_pb2.HandleCancellationTicketCompletedRequest,
@@ -310,7 +309,7 @@ class CancellationTicketCompletedHandler(object):
                 )
                 await _mark_booking_as_cancelled(self._bookings, booking)
                 await self._refund_client.create(
-                    refund=refunds_model_pb2.Refund(
+                    refund=refund_models_pb2.Refund(
                         transaction_id=booking.transaction_id,
                     ),
                 )
@@ -418,7 +417,7 @@ def _create_journey_model(
 
 
 @dataclasses.dataclass(frozen=True)
-class _ManualItem(object):
+class _ManualItem:
     booking_id: str
     refunded_us: money.Money | None = None
 
@@ -476,7 +475,7 @@ def _booking_id_to_provider_cancellation(
     return booking_id_to_provider_cancellation
 
 
-class _BookingsContainer(object):
+class _BookingsContainer:
     def __init__(
         self,
         bookings: Sequence[models_pb2.Booking],
@@ -526,7 +525,7 @@ class _ProviderCancellationFailedError(Exception):
     """Raised when provider cancellation didn't succeed."""
 
 
-class CreateCancellationTaskHandler(object):
+class CreateCancellationTaskHandler:
     _final_statuses: ClassVar[set[models_pb2.BookingCancellation.Status.ValueType]] = {
         models_pb2.BookingCancellation.STATUS_REFUND_DUE,
         models_pb2.BookingCancellation.STATUS_NO_REFUND,

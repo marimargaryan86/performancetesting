@@ -91,7 +91,7 @@ async def price_quotes(
     ).consume()
 
 
-class PriceQuoteConsumer(object):
+class PriceQuoteConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],

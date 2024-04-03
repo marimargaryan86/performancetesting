@@ -32,7 +32,7 @@ class NoCacheExistsError(Exception):
     """Thrown when the cache for a search hasn't been created yet."""
 
 
-class SearchResultCache(object):
+class SearchResultCache:
     def __init__(
         self,
         cache_key: str,

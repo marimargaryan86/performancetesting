@@ -12,7 +12,7 @@ from snowfall.vendor.carnect.models.service import (
 )
 
 
-class PricedEquipmentAdapter(object):
+class PricedEquipmentAdapter:
     def __init__(self, priced_equip: VehicleEquipmentPricedType) -> None:
         self._adapter: VehicleEquipmentPricedType = priced_equip
 

@@ -240,7 +240,7 @@ _OFFER_RESULTS = (
 
 
 @freezegun.freeze_time(_OFFER_RESULT_DATE)
-class TestOfferBuckets(object):
+class TestOfferBuckets:
     @pytest.mark.parametrize(
         ("offer_results", "expected"),
         [
@@ -384,7 +384,7 @@ class TestOfferBuckets(object):
 
 
 @freezegun.freeze_time(_OFFER_RESULT_DATE)
-class TestAggregator(object):
+class TestAggregator:
     @pytest.mark.parametrize(
         ("offer_search", "offer_results", "expected"),
         [
@@ -463,7 +463,7 @@ class TestAggregator(object):
 
 
 @freezegun.freeze_time(_OFFER_RESULT_DATE)
-class TestSimpleSearchAggregator(object):
+class TestSimpleSearchAggregator:
     @pytest.mark.parametrize(
         ("offer_search", "offer_results", "expected"),
         [

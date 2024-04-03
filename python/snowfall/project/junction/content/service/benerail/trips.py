@@ -52,7 +52,7 @@ def _price_from_offer_info(
     ).protobuf()
 
 
-class Transformer(object):
+class Transformer:
     _cabin_class_to_fare_type: ClassVar[
         dict[
             models_pb2.CabinClass.Type.ValueType,
@@ -278,7 +278,7 @@ class Transformer(object):
         return label
 
 
-class Trips(object):
+class Trips:
     def __init__(
         self,
         benerail_adapter: adapter.BenerailAdapter,

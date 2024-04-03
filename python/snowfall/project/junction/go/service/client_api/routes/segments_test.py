@@ -4,7 +4,7 @@ from starlette import status
 from snowfall.project.junction.go import fixtures
 
 
-class TestSegments(object):
+class TestSegments:
     async def test_segment_unauthorized(self, client: httpx.AsyncClient) -> None:
         client.headers["Authorization"] = "invalid"
         response = await client.get("/segments/{id}".format(id=fixtures.SEGMENTS[0]))

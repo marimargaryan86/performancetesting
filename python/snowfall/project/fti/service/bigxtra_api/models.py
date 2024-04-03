@@ -8,7 +8,7 @@ from snowfall.stdlib import string
 
 
 class BaseModel(PydanticBaseModel):
-    class Config(object):
+    class Config:
         alias_generator = string.to_lower_camel
         populate_by_name = True
         extra = "forbid"

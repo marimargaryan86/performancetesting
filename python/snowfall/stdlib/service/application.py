@@ -49,7 +49,7 @@ NetworkPort = Annotated[int, pydantic.conint(ge=_MIN_PORT, le=_MAX_PORT)]
 
 
 @dataclasses.dataclass(frozen=True)
-class SentrySettings(object):
+class SentrySettings:
     additional_integrations: sentry.Integrations | None = None
     tag_keys: list[str] | None = None
 
@@ -95,7 +95,7 @@ class Command(Generic[_Settings]):
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
-class Entrypoint(object):
+class Entrypoint:
     name: str
     _group: click.Group = dataclasses.field(init=False)
     cli_tool: bool = False

@@ -7,7 +7,7 @@ from starlette import status
 from snowfall.project.pay.service.transactions.v1.models_pb2 import Quotation
 
 
-class TestTransactions(object):
+class TestTransactions:
     async def test_lower_limit_conversion_is_loged(
         self,
         client: httpx.AsyncClient,

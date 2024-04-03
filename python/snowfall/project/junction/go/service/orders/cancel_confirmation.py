@@ -12,7 +12,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.persistence import filesystem
 
 
-class EnvironmentURLs(object):
+class EnvironmentURLs:
     development_url = "https://hub.junction.dev/"
     sandbox_url = "https://hub.sandbox.junction.dev/"
     production_url = "https://hub.junction.travel/"

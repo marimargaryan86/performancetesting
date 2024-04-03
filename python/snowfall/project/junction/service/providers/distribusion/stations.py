@@ -30,7 +30,7 @@ class Station(h3.CoordinatesItem):
     name: str | None
 
 
-class StationRepository(object):
+class StationRepository:
     def __init__(
         self,
         stations: Sequence[Station],

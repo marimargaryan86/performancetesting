@@ -12,7 +12,7 @@ class Airport(h3.CoordinatesItem):
     iata_country_code: str
 
 
-class AirportRepository(object):
+class AirportRepository:
     def __init__(
         self,
         airports_data: Sequence[Mapping[str, Any]],

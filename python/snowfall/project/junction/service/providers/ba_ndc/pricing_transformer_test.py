@@ -15,7 +15,7 @@ from snowfall.vendor.ba_ndc.models.response_offer_search_schemas import (
 )
 
 
-class TestPricingTransformer(object):
+class TestPricingTransformer:
     async def test_offer_to_price_quote_price(  # noqa: WPS218
         self,
         redis_client: aioredis.Redis[bytes],

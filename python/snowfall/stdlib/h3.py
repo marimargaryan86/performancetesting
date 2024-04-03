@@ -11,7 +11,7 @@ from snowfall.stdlib.v1 import latlng_pb2
 
 
 @dataclasses.dataclass(frozen=True)
-class CoordinatesItem(object):
+class CoordinatesItem:
     identifier: str
     latitude: float
     longitude: float

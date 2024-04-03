@@ -14,7 +14,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import date_pb2, latlng_pb2
 
 
-class _IncrementalTime(object):
+class _IncrementalTime:
     _current = datetime.datetime(
         year=2022,
         month=4,

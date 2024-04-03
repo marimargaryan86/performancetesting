@@ -30,7 +30,7 @@ _RETRY_TTL = datetime.timedelta(hours=1)
 _RETRY_AFTER_SECONDS = 120
 
 
-class NotificationsConsumer(object):
+class NotificationsConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[sat_amqp_pb2.BookingNotificationTask],
@@ -98,7 +98,7 @@ class NotificationsConsumer(object):
             await message.requeue()
 
 
-class PriceQuoteConsumer(object):
+class PriceQuoteConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
@@ -166,7 +166,7 @@ class PriceQuoteConsumer(object):
         )
 
 
-class OrdersConsumer(object):
+class OrdersConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],

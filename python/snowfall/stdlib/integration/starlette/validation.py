@@ -88,7 +88,7 @@ def jsonschema_errors_to_errors(
         )
 
 
-class Validator(object):
+class Validator:
     def __init__(
         self,
         spec_path: pathlib.Path,

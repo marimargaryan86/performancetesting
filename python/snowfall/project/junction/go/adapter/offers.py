@@ -16,7 +16,7 @@ from snowfall.stdlib.v1 import sort_pb2
 
 
 @dataclasses.dataclass(frozen=True)
-class FindOffersByOfferSearchFilter(object):
+class FindOffersByOfferSearchFilter:
     identifier: str
     limit: int | None = None
     cursor: str | None = None
@@ -25,7 +25,7 @@ class FindOffersByOfferSearchFilter(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class FindOffersByOfferSearchesFilter(object):
+class FindOffersByOfferSearchesFilter:
     identifiers: Sequence[str]
     limit: int | None = None
     cursor: str | None = None

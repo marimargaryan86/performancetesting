@@ -25,7 +25,7 @@ _INFO_ATTR_REQUIREMENT_MAP = (
 TripSearchMessages = offers_amqp_pb2.TripOfferSearchTask | trackable_pb2.Trackable
 
 
-class PriceQuoteConsumer(object):
+class PriceQuoteConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[offers_amqp_pb2.TripPriceQuoteTask],
@@ -120,7 +120,7 @@ class PriceQuoteConsumer(object):
         ]
 
 
-class OrdersConsumer(object):
+class OrdersConsumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[orders_amqp_pb2.PlaceOrderTask],

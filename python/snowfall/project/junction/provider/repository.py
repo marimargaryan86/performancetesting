@@ -35,7 +35,7 @@ class NoCacheExistsError(Exception):
     """Thrown when the cache for an offer search hasn't been created yet."""
 
 
-class OfferGroupCache(object):
+class OfferGroupCache:
     def __init__(
         self,
         cache_key: str,

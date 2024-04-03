@@ -53,19 +53,19 @@ class OfferNotFoundError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class _CreatePassengersResponse(object):
+class _CreatePassengersResponse:
     dialogue_etag: str
     passengers_info: list[helper_models.PassengerInfo]
 
 
 @dataclasses.dataclass(frozen=True)
-class _CreateTripFilterResponse(object):
+class _CreateTripFilterResponse:
     trip_filter_id: str
     dialogue_etag: str
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripData(object):
+class _TripData:
     dialogue_id: str
     dialogue_etag: str
     create_passengers_response: _CreatePassengersResponse
@@ -73,7 +73,7 @@ class _TripData(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripDataCriterion(object):
+class _TripDataCriterion:
     origin: str
     destination: str
     departure_datetime: datetime.datetime
@@ -82,14 +82,14 @@ class _TripDataCriterion(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengers(object):
+class _TripOfferResponsesWithPassengers:
     passengers_info: Sequence[helper_models.PassengerInfo]
     trip_offer_responses: Sequence[t_o_response.GetTripOfferResponse]
     dialogue_info: helper_models.DialogueInfo
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengersCriterion(object):
+class _TripOfferResponsesWithPassengersCriterion:
     origin: str
     destination: str
     outbound_departure_datetime: datetime.datetime
@@ -98,7 +98,7 @@ class _TripOfferResponsesWithPassengersCriterion(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class GetOfferResponse(object):
+class GetOfferResponse:
     offer_obj: offer.Offer
     dialogue_info: helper_models.DialogueInfo
     passengers_info: Sequence[helper_models.PassengerInfo]
@@ -122,7 +122,7 @@ def _get_trip_offer_response(
     )
 
 
-class BenerailAdapter(object):
+class BenerailAdapter:
     def __init__(self, benerail_client: client.BenerailClient) -> None:
         self._client = benerail_client
 

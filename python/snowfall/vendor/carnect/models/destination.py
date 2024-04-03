@@ -6,7 +6,7 @@ __NAMESPACE__ = "http://www.opentravel.org/OTA/2003/05"
 
 
 @dataclass
-class Airport(object):
+class Airport:
     city_id: int | None = field(
         default=None,
         metadata={
@@ -61,7 +61,7 @@ class Airport(object):
 
 
 @dataclass
-class City(object):
+class City:
     name: str | None = field(
         default=None,
         metadata={
@@ -116,7 +116,7 @@ class City(object):
 
 
 @dataclass
-class Country(object):
+class Country:
     name: str | None = field(
         default=None,
         metadata={
@@ -143,7 +143,7 @@ class Country(object):
 
 
 @dataclass
-class ErrorMessage(object):
+class ErrorMessage:
     name: str | None = field(
         default=None,
         metadata={
@@ -171,8 +171,8 @@ class ErrorMessage(object):
 
 
 @dataclass
-class InformationHeader1(object):
-    class Meta(object):
+class InformationHeader1:
+    class Meta:
         name = "InformationHeader"
 
     successfully: bool | None = field(
@@ -203,7 +203,7 @@ class InformationHeader1(object):
 
 
 @dataclass
-class Region(object):
+class Region:
     name: str | None = field(
         default=None,
         metadata={
@@ -238,8 +238,8 @@ class Region(object):
 
 
 @dataclass
-class VehicleAirportRequest(object):
-    class Meta(object):
+class VehicleAirportRequest:
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     region_id: int | None = field(
@@ -276,8 +276,8 @@ class VehicleAirportRequest(object):
 
 
 @dataclass
-class VehicleCityRequest(object):
-    class Meta(object):
+class VehicleCityRequest:
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     region_id: int | None = field(
@@ -313,8 +313,8 @@ class VehicleCityRequest(object):
 
 
 @dataclass
-class VehicleCountryRequest(object):
-    class Meta(object):
+class VehicleCountryRequest:
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     language: str | None = field(
@@ -327,8 +327,8 @@ class VehicleCountryRequest(object):
 
 
 @dataclass
-class VehicleRegionRequest(object):
-    class Meta(object):
+class VehicleRegionRequest:
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     language: str | None = field(
@@ -348,7 +348,7 @@ class VehicleRegionRequest(object):
 
 
 @dataclass
-class ArrayOfAirport(object):
+class ArrayOfAirport:
     airport: list[Airport] = field(
         default_factory=list,
         metadata={
@@ -360,7 +360,7 @@ class ArrayOfAirport(object):
 
 
 @dataclass
-class ArrayOfCity(object):
+class ArrayOfCity:
     city: list[City] = field(
         default_factory=list,
         metadata={
@@ -372,7 +372,7 @@ class ArrayOfCity(object):
 
 
 @dataclass
-class ArrayOfCountry(object):
+class ArrayOfCountry:
     country: list[Country] = field(
         default_factory=list,
         metadata={
@@ -384,7 +384,7 @@ class ArrayOfCountry(object):
 
 
 @dataclass
-class ArrayOfErrorMessage(object):
+class ArrayOfErrorMessage:
     error_message: list[ErrorMessage] = field(
         default_factory=list,
         metadata={
@@ -397,7 +397,7 @@ class ArrayOfErrorMessage(object):
 
 
 @dataclass
-class ArrayOfRegion(object):
+class ArrayOfRegion:
     region: list[Region] = field(
         default_factory=list,
         metadata={
@@ -409,8 +409,8 @@ class ArrayOfRegion(object):
 
 
 @dataclass
-class DestinationSoapGetAirportsInput(object):
-    class Meta(object):
+class DestinationSoapGetAirportsInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -423,7 +423,7 @@ class DestinationSoapGetAirportsInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_airport_request: VehicleAirportRequest | None = field(
             default=None,
             metadata={
@@ -435,8 +435,8 @@ class DestinationSoapGetAirportsInput(object):
 
 
 @dataclass
-class DestinationSoapGetCitiesInput(object):
-    class Meta(object):
+class DestinationSoapGetCitiesInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -449,7 +449,7 @@ class DestinationSoapGetCitiesInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_city_request: VehicleCityRequest | None = field(
             default=None,
             metadata={
@@ -461,8 +461,8 @@ class DestinationSoapGetCitiesInput(object):
 
 
 @dataclass
-class DestinationSoapGetCountriesInput(object):
-    class Meta(object):
+class DestinationSoapGetCountriesInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -475,7 +475,7 @@ class DestinationSoapGetCountriesInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_country_request: VehicleCountryRequest | None = field(
             default=None,
             metadata={
@@ -487,8 +487,8 @@ class DestinationSoapGetCountriesInput(object):
 
 
 @dataclass
-class DestinationSoapGetRegionsInput(object):
-    class Meta(object):
+class DestinationSoapGetRegionsInput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -501,7 +501,7 @@ class DestinationSoapGetRegionsInput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_region_request: VehicleRegionRequest | None = field(
             default=None,
             metadata={
@@ -514,13 +514,13 @@ class DestinationSoapGetRegionsInput(object):
 
 @dataclass
 class InformationHeader(InformationHeader1):
-    class Meta(object):
+    class Meta:
         name = "informationHeader"
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
 
 @dataclass
-class DestinationResponse(object):
+class DestinationResponse:
     errors: ArrayOfErrorMessage | None = field(
         default=None,
         metadata={
@@ -533,7 +533,7 @@ class DestinationResponse(object):
 
 @dataclass
 class VehicleAirportResponse(DestinationResponse):
-    class Meta(object):
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     airports: ArrayOfAirport | None = field(
@@ -547,7 +547,7 @@ class VehicleAirportResponse(DestinationResponse):
 
 @dataclass
 class VehicleCityResponse(DestinationResponse):
-    class Meta(object):
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     cities: ArrayOfCity | None = field(
@@ -561,7 +561,7 @@ class VehicleCityResponse(DestinationResponse):
 
 @dataclass
 class VehicleCountryResponse(DestinationResponse):
-    class Meta(object):
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     countries: ArrayOfCountry | None = field(
@@ -575,7 +575,7 @@ class VehicleCountryResponse(DestinationResponse):
 
 @dataclass
 class VehicleRegionResponse(DestinationResponse):
-    class Meta(object):
+    class Meta:
         namespace = "http://www.opentravel.org/OTA/2003/05"
 
     regions: ArrayOfRegion | None = field(
@@ -588,8 +588,8 @@ class VehicleRegionResponse(DestinationResponse):
 
 
 @dataclass
-class DestinationSoapGetAirportsOutput(object):
-    class Meta(object):
+class DestinationSoapGetAirportsOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -609,7 +609,7 @@ class DestinationSoapGetAirportsOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_airport_response: VehicleAirportResponse | None = field(
             default=None,
             metadata={
@@ -627,7 +627,7 @@ class DestinationSoapGetAirportsOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -658,7 +658,7 @@ class DestinationSoapGetAirportsOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -670,8 +670,8 @@ class DestinationSoapGetAirportsOutput(object):
 
 
 @dataclass
-class DestinationSoapGetCitiesOutput(object):
-    class Meta(object):
+class DestinationSoapGetCitiesOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -691,7 +691,7 @@ class DestinationSoapGetCitiesOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_city_response: VehicleCityResponse | None = field(
             default=None,
             metadata={
@@ -709,7 +709,7 @@ class DestinationSoapGetCitiesOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -740,7 +740,7 @@ class DestinationSoapGetCitiesOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -752,8 +752,8 @@ class DestinationSoapGetCitiesOutput(object):
 
 
 @dataclass
-class DestinationSoapGetCountriesOutput(object):
-    class Meta(object):
+class DestinationSoapGetCountriesOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -773,7 +773,7 @@ class DestinationSoapGetCountriesOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_country_response: VehicleCountryResponse | None = field(
             default=None,
             metadata={
@@ -791,7 +791,7 @@ class DestinationSoapGetCountriesOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -822,7 +822,7 @@ class DestinationSoapGetCountriesOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -834,8 +834,8 @@ class DestinationSoapGetCountriesOutput(object):
 
 
 @dataclass
-class DestinationSoapGetRegionsOutput(object):
-    class Meta(object):
+class DestinationSoapGetRegionsOutput:
+    class Meta:
         name = "Envelope"
         namespace = "http://schemas.xmlsoap.org/soap/envelope/"
 
@@ -855,7 +855,7 @@ class DestinationSoapGetRegionsOutput(object):
     )
 
     @dataclass
-    class Body(object):
+    class Body:
         vehicle_region_response: VehicleRegionResponse | None = field(
             default=None,
             metadata={
@@ -873,7 +873,7 @@ class DestinationSoapGetRegionsOutput(object):
         )
 
         @dataclass
-        class Fault(object):
+        class Fault:
             faultcode: str | None = field(
                 default=None,
                 metadata={
@@ -904,7 +904,7 @@ class DestinationSoapGetRegionsOutput(object):
             )
 
     @dataclass
-    class Header(object):
+    class Header:
         information_header: InformationHeader | None = field(
             default=None,
             metadata={
@@ -915,7 +915,7 @@ class DestinationSoapGetRegionsOutput(object):
         )
 
 
-class DestinationSoapGetAirports(object):
+class DestinationSoapGetAirports:
     style = "document"
     location = "https://ota2007a.micronnexus-staging.com/destination.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -924,7 +924,7 @@ class DestinationSoapGetAirports(object):
     output = DestinationSoapGetAirportsOutput
 
 
-class DestinationSoapGetCities(object):
+class DestinationSoapGetCities:
     style = "document"
     location = "https://ota2007a.micronnexus-staging.com/destination.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -933,7 +933,7 @@ class DestinationSoapGetCities(object):
     output = DestinationSoapGetCitiesOutput
 
 
-class DestinationSoapGetCountries(object):
+class DestinationSoapGetCountries:
     style = "document"
     location = "https://ota2007a.micronnexus-staging.com/destination.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"
@@ -942,7 +942,7 @@ class DestinationSoapGetCountries(object):
     output = DestinationSoapGetCountriesOutput
 
 
-class DestinationSoapGetRegions(object):
+class DestinationSoapGetRegions:
     style = "document"
     location = "https://ota2007a.micronnexus-staging.com/destination.asmx"
     transport = "http://schemas.xmlsoap.org/soap/http"

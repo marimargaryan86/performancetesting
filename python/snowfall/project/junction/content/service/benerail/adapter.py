@@ -28,32 +28,32 @@ _logger = stdout.get_logger()
 
 
 @dataclasses.dataclass(frozen=True)
-class _PassengerInfo(object):
+class _PassengerInfo:
     identifier: str
     etag: str
     date_of_birth: datetime.date
 
 
 @dataclasses.dataclass(frozen=True)
-class _DialogueInfo(object):
+class _DialogueInfo:
     identifier: str
     etag: str
 
 
 @dataclasses.dataclass(frozen=True)
-class _CreatePassengersResponse(object):
+class _CreatePassengersResponse:
     dialogue_etag: str
     passengers_info: Sequence[_PassengerInfo]
 
 
 @dataclasses.dataclass(frozen=True)
-class _CreateTripFilterResponse(object):
+class _CreateTripFilterResponse:
     trip_filter_id: str
     dialogue_etag: str
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripData(object):
+class _TripData:
     dialogue_id: str
     dialogue_etag: str
     create_passengers_response: _CreatePassengersResponse
@@ -61,7 +61,7 @@ class _TripData(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripDataCriterion(object):
+class _TripDataCriterion:
     origin: str
     destination: str
     departure_datetime: datetime.datetime
@@ -70,14 +70,14 @@ class _TripDataCriterion(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengers(object):
+class _TripOfferResponsesWithPassengers:
     passengers_info: Sequence[_PassengerInfo]
     trip_offer_responses: Sequence[trip_offers_response.GetTripOfferResponse]
     dialogue_info: _DialogueInfo
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengersCriterion(object):
+class _TripOfferResponsesWithPassengersCriterion:
     origin: str
     destination: str
     outbound_departure_datetime: datetime.datetime
@@ -86,7 +86,7 @@ class _TripOfferResponsesWithPassengersCriterion(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class GetOfferResponse(object):
+class GetOfferResponse:
     offer: trip_offers_offer.Offer
     dialogue_info: _DialogueInfo
     passengers_info: Sequence[_PassengerInfo]
@@ -94,13 +94,13 @@ class GetOfferResponse(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class TripWithOffers(object):
+class TripWithOffers:
     trip: trips.Trip
     offers: list[trip_offers_offer.Offer]
 
 
 @dataclasses.dataclass(frozen=True)
-class TripWithTripOffer(object):
+class TripWithTripOffer:
     trip: trips.Trip
     trip_offer: trip_offers_trip_offers.TripOffer
 
@@ -140,7 +140,7 @@ async def _request_by_chunks(
                 yield response
 
 
-class BenerailAdapter(object):
+class BenerailAdapter:
     def __init__(self, benerail_client: client.BenerailClient) -> None:
         self._client = benerail_client
 

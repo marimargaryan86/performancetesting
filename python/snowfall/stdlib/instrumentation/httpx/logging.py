@@ -4,7 +4,7 @@ from snowfall.stdlib.instrumentation.httpx import _discovery  # noqa: PLC2701
 from snowfall.stdlib.logging import stdout
 
 
-class _ResponseHandler(object):
+class _ResponseHandler:
     def __init__(self) -> None:
         self._logger = stdout.get_logger()
 

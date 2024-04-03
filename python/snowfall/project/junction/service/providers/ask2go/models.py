@@ -95,7 +95,7 @@ def traveler_document_from_proto(
 
 
 @dataclasses.dataclass(frozen=True)
-class Requirement(object):
+class Requirement:
     departure_at: datetime.datetime
     departure_tz: zoneinfo.ZoneInfo
     arrival_at: datetime.datetime

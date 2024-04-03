@@ -9,7 +9,7 @@ from snowfall.vendor.currency_cloud.client import PaymentClient
 _CC_MAX_PAIR_SIZE = 2450
 
 
-class UpdateBackUpRatesJob(object):
+class UpdateBackUpRatesJob:
     def __init__(
         self,
         backup_rates: BackUpRatesRepository,

@@ -22,7 +22,7 @@ _TEMPERATURE = 0.6
 _TWILIO_BODY_LENGTH = 1600
 
 
-class AIBot(object):
+class AIBot:
     system_setup = """
         You are an AI travel assistant dedicated to creating personalized travel recommendations.
 Your role is to help users find the best travel options based on their specific interests but also to give suggestions if the user does not give you enough information until you are able to fill out the fetch_trip_offers function parameters.

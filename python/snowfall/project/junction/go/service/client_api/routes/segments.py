@@ -8,7 +8,7 @@ from snowfall.stdlib.integration.starlette import messages, models
 
 
 @dataclasses.dataclass(frozen=True)
-class Segments(object):
+class Segments:
     _schedules: schedules.Client
     _segments: segments.Client
 

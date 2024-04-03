@@ -68,7 +68,7 @@ def _get_cancellation_request_request() -> dict[str, Any]:
     }
 
 
-class TestJourneys(object):
+class TestJourneys:
     async def test_journeys_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,
@@ -77,7 +77,7 @@ class TestJourneys(object):
         )
 
 
-class TestOrdersByJourney(object):
+class TestOrdersByJourney:
     async def test_orders_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,
@@ -110,7 +110,7 @@ class TestOrdersByJourney(object):
         assert response.status_code == status.HTTP_201_CREATED
 
 
-class TestOrders(object):
+class TestOrders:
     async def test_order_can_be_placed(self, client: httpx.AsyncClient) -> None:
         response = await client.post(
             "/orders",
@@ -121,7 +121,7 @@ class TestOrders(object):
         assert response.status_code == status.HTTP_201_CREATED
 
 
-class TestBookingsCancellation(object):
+class TestBookingsCancellation:
     async def test_cancellation_request_creation(
         self,
         client: httpx.AsyncClient,
@@ -175,7 +175,7 @@ class TestBookingsCancellation(object):
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-class TestBookingsByOrder(object):
+class TestBookingsByOrder:
     async def test_bookings_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,
@@ -184,7 +184,7 @@ class TestBookingsByOrder(object):
         )
 
 
-class TestBookingsDetailsByBooking(object):
+class TestBookingsDetailsByBooking:
     async def test_booking_details_are_found(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,

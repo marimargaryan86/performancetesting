@@ -57,7 +57,7 @@ class OrderData(DuffelRequestBaseModel):
     order_data: OrderDataElements = pydantic.Field(alias="data")
 
 
-class OrderBuilder(object):
+class OrderBuilder:
     def __init__(self) -> None:
         self._passengers: list[OrderPassenger] = []
         self._payments: list[OrderPayment] = []

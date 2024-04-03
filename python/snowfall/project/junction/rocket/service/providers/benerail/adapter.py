@@ -53,19 +53,19 @@ class OfferNotFoundError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
-class _CreatePassengersResponse(object):
+class _CreatePassengersResponse:
     dialogue_etag: str
     passengers_info: list[helper_models.PassengerInfo]
 
 
 @dataclasses.dataclass(frozen=True)
-class _CreateTripFilterResponse(object):
+class _CreateTripFilterResponse:
     trip_filter_id: str
     dialogue_etag: str
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripData(object):
+class _TripData:
     dialogue_id: str
     dialogue_etag: str
     create_passengers_response: _CreatePassengersResponse
@@ -73,7 +73,7 @@ class _TripData(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripDataCriterion(object):
+class _TripDataCriterion:
     origin: str
     destination: str
     departure_datetime: datetime.datetime
@@ -82,7 +82,7 @@ class _TripDataCriterion(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengers(object):
+class _TripOfferResponsesWithPassengers:
     passengers_info: Sequence[helper_models.PassengerInfo]
     trip_offer_responses: Sequence[t_o_response.GetTripOfferResponse]
     dialogue_info: helper_models.DialogueInfo
@@ -90,7 +90,7 @@ class _TripOfferResponsesWithPassengers(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _ProcessOfferResult(object):
+class _ProcessOfferResult:
     dialogue_id: str
     trip_filter_id: str
     etag: str
@@ -99,7 +99,7 @@ class _ProcessOfferResult(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengersCriterion(object):
+class _TripOfferResponsesWithPassengersCriterion:
     origin: str
     destination: str
     outbound_departure_datetime: datetime.datetime
@@ -109,7 +109,7 @@ class _TripOfferResponsesWithPassengersCriterion(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithOutbound(object):
+class _TripOfferResponsesWithOutbound:
     origin: str
     destination: str
     outbound_departure_datetime: datetime.datetime
@@ -131,7 +131,7 @@ class RCodeLabelNotFoundError(Exception):
     """Raised when rcode retrieval fails."""
 
 
-class _BenerailAdapter(object):
+class _BenerailAdapter:
     def __init__(self, benerail_client: client.BenerailClient) -> None:
         self._client = benerail_client
 

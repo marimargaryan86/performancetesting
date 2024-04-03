@@ -14,7 +14,7 @@ from snowfall.vendor.duffel.models.offer import Offer
 
 
 @dataclasses.dataclass(frozen=True)
-class Requirement(object):
+class Requirement:
     departure_at: datetime.datetime
     arrival_at: datetime.datetime
 
@@ -41,7 +41,7 @@ class Requirement(object):
 Requirements = Sequence[Requirement]
 
 
-class Validator(object):
+class Validator:
     @abc.abstractmethod
     def matches(self, offer: Offer) -> bool:
         raise NotImplementedError()

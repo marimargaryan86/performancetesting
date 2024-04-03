@@ -2,7 +2,7 @@ import dataclasses
 
 
 @dataclasses.dataclass(frozen=True)
-class Ticket(object):
+class Ticket:
     journey_id: str
     order_id: str
     booking_id: str

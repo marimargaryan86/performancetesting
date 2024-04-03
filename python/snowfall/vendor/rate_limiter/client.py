@@ -20,7 +20,7 @@ from snowfall.vendor.rate_limiter.gubernator_pb2_grpc import V1Stub
 SECOND = 1000
 
 
-class Client(object):
+class Client:
     def __init__(
         self,
         stub: V1Stub,

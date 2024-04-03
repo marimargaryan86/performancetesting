@@ -7,7 +7,7 @@ PAGE_LIMIT_KEY = "page[limit]"
 
 
 @dataclasses.dataclass(frozen=True)
-class Pagination(object):
+class Pagination:
     cursor: str | None = None
     limit: int | None = None
 

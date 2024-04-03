@@ -8,7 +8,6 @@ from snowfall.stdlib.format.gtfs import enums as gtfs_enums
 from snowfall.stdlib.format.gtfs import models as gtfs_models
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.direct_ferries.models import route as df_route_models
-from snowfall.vendor.direct_ferries.models import timetable
 from snowfall.vendor.direct_ferries.models import timetable as df_timetable_models
 
 _DEPARTURE_ARRIVAL = ("departure", "arrival")
@@ -33,7 +32,7 @@ class StopTimeFields(pydantic.BaseModel):
     stop_sequence: int
 
 
-class DFDataConverter(object):
+class DFDataConverter:
     def __init__(
         self,
         timetable_responses: Sequence[df_timetable_models.TimetableResponse],
@@ -204,7 +203,7 @@ class DFDataConverter(object):
 
     def _yield_stop_times(
         self,
-        schedule: timetable.Timetable,
+        schedule: df_timetable_models.Timetable,
         route: df_route_models.Route,
     ) -> Generator[gtfs_models.StopTime, None, None]:
         departure_at_utc = schedule.departure_time.replace(

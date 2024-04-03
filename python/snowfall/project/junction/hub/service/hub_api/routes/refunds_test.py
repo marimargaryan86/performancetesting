@@ -4,7 +4,7 @@ from starlette import status
 from snowfall.project.pay import fixtures as pay_fixtures
 
 
-class TestRefunds(object):
+class TestRefunds:
     async def test_get_refund_position(
         self,
         client: httpx.AsyncClient,

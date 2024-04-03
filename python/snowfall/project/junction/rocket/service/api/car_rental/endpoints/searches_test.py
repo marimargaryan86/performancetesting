@@ -4,7 +4,7 @@ from starlette import status
 from snowfall.project.junction.rocket import fixtures
 
 
-class TestCreateSearch(object):
+class TestCreateSearch:
     async def test_create_search_is_successful(
         self,
         client: httpx.AsyncClient,
@@ -38,7 +38,7 @@ class TestCreateSearch(object):
         assert response.json()["data"]["id"]
 
 
-class TestGetSearch(object):
+class TestGetSearch:
     async def test_get_search_should_fail_when_unauthorized(
         self,
         unauthorized_client: httpx.AsyncClient,
@@ -76,7 +76,7 @@ class TestGetSearch(object):
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestListSearchResults(object):
+class TestListSearchResults:
     async def test_list_search_results_successful(
         self,
         client: httpx.AsyncClient,

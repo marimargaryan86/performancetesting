@@ -2,7 +2,7 @@ from snowfall.project.junction.go.service.orders.v1 import amqp_pb2, models_pb2
 from snowfall.stdlib.transport.amqp import producer
 
 
-class OrderProducer(object):
+class OrderProducer:
     def __init__(self, producer_obj: producer.Producer):
         self._producer = producer_obj
 

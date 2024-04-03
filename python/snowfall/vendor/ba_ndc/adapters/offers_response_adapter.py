@@ -10,7 +10,7 @@ from snowfall.vendor.ba_ndc.models import (
 )
 
 
-class OffersResponseAdapter(object):
+class OffersResponseAdapter:
     offers_response: response_offer_search_schemas.OfferSearchResponse
     segments: Mapping[str, response_common_offer_schemas.Segment]
     price_classes: Mapping[str, response_common_offer_schemas.PriceClass]

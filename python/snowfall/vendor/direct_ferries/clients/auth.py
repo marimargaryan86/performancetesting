@@ -5,12 +5,12 @@ import httpx
 
 
 @dataclasses.dataclass(frozen=True)
-class AuthServiceResponse(object):
+class AuthServiceResponse:
     token: str
     expires_at: datetime.datetime
 
 
-class AuthClient(object):
+class AuthClient:
     def __init__(
         self,
         http_client: httpx.AsyncClient,

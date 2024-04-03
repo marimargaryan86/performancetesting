@@ -45,7 +45,7 @@ class OfferRequestData(DuffelRequestBaseModel):
     offer_data: OfferRequestDataList = pydantic.Field(alias="data")
 
 
-class OffersRequestBuilder(object):
+class OffersRequestBuilder:
     def __init__(self) -> None:
         self._passengers: list[OfferRequestPassenger] = []
         self._slices: list[OfferRequestSlice] = []

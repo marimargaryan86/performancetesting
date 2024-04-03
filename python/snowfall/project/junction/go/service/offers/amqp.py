@@ -6,7 +6,7 @@ from snowfall.project.junction.go.service.offers.v1 import amqp_pb2, models_pb2
 from snowfall.stdlib.transport.amqp import protocol, trackable
 
 
-class OfferSearchProducer(object):
+class OfferSearchProducer:
     def __init__(
         self,
         producer: trackable.TrackableProducer | protocol.Producer,
@@ -51,7 +51,7 @@ class OfferSearchProducer(object):
             )
 
 
-class PriceQuoteProducer(object):
+class PriceQuoteProducer:
     def __init__(
         self,
         producer: protocol.Producer,

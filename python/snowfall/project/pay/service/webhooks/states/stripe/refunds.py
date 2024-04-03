@@ -19,7 +19,7 @@ _CANCELLATION_STATUS_MAPPING = types.MappingProxyType(
 )
 
 
-class RefundsState(object):
+class RefundsState:
     def __init__(
         self,
         stripe_api_key: str,

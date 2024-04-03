@@ -86,7 +86,7 @@ async def smtp_notifier(
     )
 
 
-class TestNotification(object):
+class TestNotification:
     async def test_notification_body(self, mock_notification: MockNotification) -> None:
         expected_body = (
             copy.copy(_MOCK_NOTIFICATION_TEMPLATE).strip().format(test_id=_TEST_ID)
@@ -102,7 +102,7 @@ class TestNotification(object):
         )
 
 
-class TestHtmlNotification(object):
+class TestHtmlNotification:
     async def test_html_notification_body(
         self,
         mock_html_notification: MockHtmlNotification,
@@ -128,7 +128,7 @@ class TestHtmlNotification(object):
         )
 
 
-class TestSmtpNotifier(object):
+class TestSmtpNotifier:
     async def test_smtp_notifier_send_no_sender_failure(
         self,
         mock_smtp_client: mock.AsyncMock,

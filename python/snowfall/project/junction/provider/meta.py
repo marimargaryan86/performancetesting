@@ -8,7 +8,7 @@ from snowfall.stdlib.transport.grpc import service
 
 
 @dataclasses.dataclass(frozen=True)
-class MetaImplementation(object):
+class MetaImplementation:
     identifier: uuid.UUID
     name: str
     booking_capabilities: meta_pb2.BookingCapabilities | None = None

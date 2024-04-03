@@ -11,7 +11,7 @@ from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import trip_searches
 
 
-class TestTrips(object):
+class TestTrips:
     async def test_missing_trip_returns_not_found(
         self,
         client: httpx.AsyncClient,
@@ -40,7 +40,7 @@ class TestTrips(object):
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestTripSearches(object):
+class TestTripSearches:
     async def test_malformed_trip_search_post_returns_bad_request(
         self,
         client: httpx.AsyncClient,

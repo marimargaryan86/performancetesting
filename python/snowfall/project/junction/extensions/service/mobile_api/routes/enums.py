@@ -10,7 +10,7 @@ from snowfall.stdlib.integration.starlette import models
 _ResourceFunction: TypeAlias = Callable[[], Awaitable[Mapping[str, Any]]]
 
 
-class CacheAndListEnum(object):
+class CacheAndListEnum:
     def __init__(
         self,
         resource_function: _ResourceFunction,

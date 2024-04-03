@@ -12,7 +12,7 @@ from snowfall.project.junction.plus.service.poc_api import airlines
 from snowfall.stdlib.persistence import filesystem
 
 
-class TravelFusionClient(object):
+class TravelFusionClient:
     def __init__(
         self,
         api_url: str,

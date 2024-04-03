@@ -11,7 +11,7 @@ class PayTransactionCreationError(Exception):
     """Raised when an error occurs creating a transaction in PAY."""
 
 
-class PayTransactionCreator(object):
+class PayTransactionCreator:
     def __init__(
         self,
         transactions_client: transactions.Client,

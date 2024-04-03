@@ -13,7 +13,7 @@ from snowfall.stdlib.format import protobuf
 
 
 @dataclasses.dataclass(frozen=True)
-class TripSearchRequest(object):
+class TripSearchRequest:
     origins: Sequence[models_pb2.Point]
     destinations: Sequence[models_pb2.Point]
     departure_after: datetime.datetime

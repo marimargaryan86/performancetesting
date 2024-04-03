@@ -21,7 +21,7 @@ from snowfall.vendor.ba_ndc.models import (
 from snowfall.vendor.ba_ndc.models.util import offer_enums, passenger_enums
 
 
-class OfferGrouper(object):
+class OfferGrouper:
     @classmethod
     def group_offers(
         cls,
@@ -68,7 +68,7 @@ class OfferGrouper(object):
         )
 
 
-class BaNdcSearchAdapter(object):
+class BaNdcSearchAdapter:
     def __init__(
         self,
         ba_ndc_client: client.BaNdcClient,

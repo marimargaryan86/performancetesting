@@ -33,7 +33,7 @@ class MissingIataError(Exception):
     """Raised when an airport is missing an IATA."""
 
 
-class Transformer(object):
+class Transformer:
     def __init__(
         self,
         airport_repository: airports.AirportRepository,
@@ -136,7 +136,7 @@ class Transformer(object):
         return money.from_string(amount, money.Currency(currency)).protobuf()
 
 
-class Trips(object):
+class Trips:
     def __init__(self, adapter: Adapter, transformer: Transformer):
         self._adapter = adapter
         self._transformer = transformer

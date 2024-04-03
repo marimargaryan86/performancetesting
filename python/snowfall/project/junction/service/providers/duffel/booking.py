@@ -30,7 +30,7 @@ from snowfall.vendor.duffel.builders.order_request import (
 from snowfall.vendor.duffel.models.order import Order, OrderResponse
 
 
-class Transformer(object):
+class Transformer:
     def __init__(
         self,
         provider_identifier: uuid.UUID,
@@ -66,7 +66,7 @@ class Transformer(object):
         )
 
 
-class BookingHandler(object):
+class BookingHandler:
     _poll_retries_limit = 10
     _wait_time_between_polling = 15
     _adult_years = 18

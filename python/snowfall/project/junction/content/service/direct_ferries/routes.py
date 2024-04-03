@@ -43,7 +43,7 @@ def load_routes() -> list[Route]:
     return [_make_route(route) for route in routes]
 
 
-class RouteRepository(object):
+class RouteRepository:
     def __init__(self) -> None:
         route_objects = load_routes()
 

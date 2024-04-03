@@ -73,7 +73,7 @@ _transaction_header = {
 logger = stdout.get_logger()
 
 
-class StatementGenerator(object):
+class StatementGenerator:
     def __init__(
         self,
         orders_client: orders_adapter.Client,
@@ -158,7 +158,7 @@ class StatementGenerator(object):
         return csv_data
 
 
-class InvoiceGenerator(object):
+class InvoiceGenerator:
     def __init__(
         self,
         transactions_repository: TransactionsRepository,

@@ -22,7 +22,7 @@ from snowfall.stdlib.logging import stdout
 _CC_MAX_PAIR_SIZE = 2450
 
 
-class CheckinCronJob(object):
+class CheckinCronJob:
     def __init__(
         self,
         monitoring_rules: monitoring_rules_adapter.Client,

@@ -32,7 +32,7 @@ _STATUS_MAPPING = types.MappingProxyType(
 _GATEWAY_GRPC_TIMEOUT_SECONDS = 15
 
 
-class BookingHandler(object):
+class BookingHandler:
     def __init__(
         self,
         gateway: bookings_pb2_grpc.BookingServiceStub,

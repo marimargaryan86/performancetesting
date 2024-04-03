@@ -10,7 +10,7 @@ class NoResultsError(Exception):
     """Raised when a result page has not results."""
 
 
-class Adapter(object):
+class Adapter:
     def __init__(
         self,
         ask2go_client: client.Ask2GoClient,

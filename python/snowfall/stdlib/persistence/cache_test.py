@@ -10,7 +10,7 @@ async def async_function(param: int) -> int:
     return param
 
 
-class TestCache(object):
+class TestCache:
     async def test_cache(self) -> None:
         async_function_mock = mock.AsyncMock(wraps=async_function)
         decorated_async_function = async_cache_ttl()(async_function_mock)

@@ -112,7 +112,7 @@ def remove_blank_string(
     }
 
 
-class PaymentClient(object):
+class PaymentClient:
     def __init__(
         self,
         base_url: str,

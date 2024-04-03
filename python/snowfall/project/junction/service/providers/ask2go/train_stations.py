@@ -13,7 +13,7 @@ class TrainStation(Airport):
     railname: str
 
 
-class TrainStationRepository(object):
+class TrainStationRepository:
     def __init__(self, train_stations: Collection[TrainStation]):
         self._by_code = {ts.identifier: ts for ts in train_stations}
 

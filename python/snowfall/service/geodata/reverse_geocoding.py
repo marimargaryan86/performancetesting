@@ -22,12 +22,12 @@ class LocationSearchParams(TypedDict):
 
 
 @dataclasses.dataclass(frozen=True)
-class Coordinates(object):
+class Coordinates:
     lat: float
     long: float
 
 
-class ReverseGeocoder(object):
+class ReverseGeocoder:
     def __init__(
         self,
         aws_location_client: client.LocationServiceClient,

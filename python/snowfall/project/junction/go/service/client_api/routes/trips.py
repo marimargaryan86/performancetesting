@@ -350,7 +350,7 @@ _ANY_DICT_TYPE = dict[str, Any]
 
 
 @dataclasses.dataclass(frozen=True)
-class TripCandidateSearches(object):
+class TripCandidateSearches:
     _trip_candidate_searches_client: trip_candidate_searches.Client
     _locations_client: locations.Client
     _reseller_currencies: Mapping[str, str]

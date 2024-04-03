@@ -5,7 +5,7 @@ from starlette import status
 from snowfall.project.junction.extensions.service.mobile_api import conftest
 
 
-class TestHandlers(object):
+class TestHandlers:
     async def test_go_errors_forwarded(
         self,
         authenticated_http_client: httpx.AsyncClient,

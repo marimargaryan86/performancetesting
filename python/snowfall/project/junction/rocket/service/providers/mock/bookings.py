@@ -14,7 +14,7 @@ from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
-class Booker(object):
+class Booker:
     def __init__(
         self,
         quote_cache: cache.QuoteCache,
@@ -67,7 +67,7 @@ class Booker(object):
         return new_booking
 
 
-class Consumer(object):
+class Consumer:
     def __init__(
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.PlaceBookingTask],
@@ -98,7 +98,7 @@ class Consumer(object):
         await message.ack()
 
 
-class Transformer(object):
+class Transformer:
     def __init__(self) -> None:
         self._serializer = protobuf.AnySerializer[models_pb2.Booking]()
 

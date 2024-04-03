@@ -19,7 +19,7 @@ class CabinClass(NamedTuple):
     marketing_name: str
 
 
-class TripParser(object):
+class TripParser:
     def trip_to_proto(self, trip: offer_slice.OfferSlice) -> trips_pb2.Trip:
         highest_cabin_class = self._get_highest_cabin_class(trip.segments)
 

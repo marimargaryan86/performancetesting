@@ -14,7 +14,7 @@ class UnknownError(Exception):
     """Raised when an unknown error is caught."""
 
 
-class Sessions(object):
+class Sessions:
     def __init__(self, ory_client: client.OryClient):
         self._client = ory_client
 

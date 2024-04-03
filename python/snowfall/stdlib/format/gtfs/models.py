@@ -19,7 +19,7 @@ def _timedelta_to_time(td: datetime.timedelta) -> str:
 
 
 class _BaseModel(pydantic.BaseModel):
-    class Config(object):
+    class Config:
         json_encoders = MappingProxyType(
             {
                 datetime.date: lambda date_obj: date_obj.strftime("%Y%m%d"),
@@ -198,7 +198,7 @@ class Transfer(_BaseModel):
 
 
 @dataclasses.dataclass(frozen=True)
-class Feed(object):
+class Feed:
     agencies: list[Agency]
     calendars: list[Calendar]
     calendar_dates: list[CalendarDate]

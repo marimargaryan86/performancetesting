@@ -18,7 +18,7 @@ from snowfall.project.junction.rocket.service.places.typing import ProviderTyped
 from snowfall.project.junction.rocket.service.places.v1alpha import models_pb2
 
 
-class TestPlaces(object):
+class TestPlaces:
     @pytest.mark.parametrize(
         ("input_node", "expected_output"),
         [

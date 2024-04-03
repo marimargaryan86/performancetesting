@@ -28,17 +28,17 @@ class _PlaceNotFoundError(ValueError):
 
 
 @dataclasses.dataclass(frozen=True)
-class Segment(object):
+class Segment:
     origin: models_pb2.Place
     destination: models_pb2.Place
 
 
 @dataclasses.dataclass(frozen=True)
-class Route(object):
+class Route:
     segments: list[Segment]
 
 
-class Routes(object):
+class Routes:
     def __init__(
         self,
         planner: planner_pb2_grpc.PlannerServiceStub,

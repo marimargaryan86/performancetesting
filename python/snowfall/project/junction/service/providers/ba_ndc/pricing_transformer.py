@@ -56,7 +56,7 @@ def _to_document_requirement(
     return required_docs
 
 
-class PriceQuoteTransformer(object):
+class PriceQuoteTransformer:
     def to_price_quote(
         self,
         price_quote_details_id: str,

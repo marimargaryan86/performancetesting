@@ -8,7 +8,7 @@ from snowfall.project.pay.service.payments.v1 import (
 from snowfall.stdlib import money
 
 
-class CreditCardProvider(object):
+class CreditCardProvider:
     @property
     @abstractmethod
     def name(self) -> str:
@@ -83,7 +83,7 @@ class CreditCardProvider(object):
         """Get refund."""
 
 
-class InvoiceProvider(object):
+class InvoiceProvider:
     @abstractmethod
     def create_account(
         self,

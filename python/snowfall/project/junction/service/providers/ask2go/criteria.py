@@ -27,7 +27,7 @@ _CHILD_YEARS = 2
 _AFFILIATE_ID = 24
 
 
-class CriteriaGenerator(object):
+class CriteriaGenerator:
     def __init__(
         self,
         h3_mapping: h3.H3MappingRepository[airports.Airport],

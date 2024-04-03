@@ -105,7 +105,7 @@ def _build_round_trip(
     )
 
 
-class Generator(object):
+class Generator:
     def __init__(
         self,
         providers_list: providers.Collection,

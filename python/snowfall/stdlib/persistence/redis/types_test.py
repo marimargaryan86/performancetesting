@@ -37,7 +37,7 @@ async def _test_expiration(client: redis.Client[bytes], key: object) -> None:
         _datetimes_are_equal_enough(await client.get_expires_at(key), get_val)
 
 
-class TestHash(object):
+class TestHash:
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_delete_get_length_put(
         self,
@@ -89,7 +89,7 @@ class TestHash(object):
         await asserts.assert_iterable(list_.to_iterable(), [b"foo", b"bar"])
 
 
-class TestList(object):
+class TestList:
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_length_pop_push(  # noqa: WPS217
         self,
@@ -130,7 +130,7 @@ class TestList(object):
         await asserts.assert_iterable(list_.to_iterable(), [b"foo", b"bar"])
 
 
-class TestSet(object):
+class TestSet:
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_add_has_remove(
         self,
@@ -170,7 +170,7 @@ class TestSet(object):
         await asserts.assert_iterable(set_.to_iterable(), [b"foo", b"bar"])
 
 
-class TestSortedSet(object):
+class TestSortedSet:
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_add_has_remove(
         self,
@@ -230,7 +230,7 @@ class TestSortedSet(object):
         )
 
 
-class TestClient(object):
+class TestClient:
     @pytest.mark.parametrize(*_PREFIX_PARAMETERS)
     async def test_delete_get_put(
         self,

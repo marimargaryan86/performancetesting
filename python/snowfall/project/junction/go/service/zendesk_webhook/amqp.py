@@ -4,7 +4,7 @@ from snowfall.project.junction.go.service.zendesk_webhook.v1 import amqp_pb2
 from snowfall.stdlib.transport.amqp import protocol, trackable
 
 
-class EventProducer(object):
+class EventProducer:
     def __init__(
         self,
         producer: trackable.TrackableProducer | protocol.Producer,

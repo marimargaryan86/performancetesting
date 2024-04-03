@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.schedules.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_leg_is_retrievable(
         self,
         legs_client: legs.Client,
@@ -35,7 +35,7 @@ class TestDictClient(object):
         assert len(found_legs.legs) == 2
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @pytest.mark.parametrize(
         ("error", "expected"),
         [

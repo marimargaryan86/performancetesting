@@ -32,7 +32,7 @@ class MigrateSettings(application.Settings):
 
 
 @dataclasses.dataclass(frozen=True)
-class Switcher(object):
+class Switcher:
     create_stripe_customers: bool
 
 

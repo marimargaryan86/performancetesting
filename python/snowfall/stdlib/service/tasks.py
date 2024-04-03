@@ -53,7 +53,7 @@ class Runner(Generic[_TaskResult]):
         await self._state_manager.mark_as_done(identifier)
 
 
-class _StateManager(object):
+class _StateManager:
     def __init__(
         self,
         client: types.Client[bytes],

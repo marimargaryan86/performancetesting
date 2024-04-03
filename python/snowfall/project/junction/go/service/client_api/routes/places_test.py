@@ -6,7 +6,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestPlaces(object):
+class TestPlaces:
     async def test_places(self, client: httpx.AsyncClient) -> None:
         await testing.test_list_and_view_endpoints(
             client=client,

@@ -295,7 +295,7 @@ class OfferOptionDetailsByOfferOption(endpoints.HTTPEndpoint):
 
 
 @dataclasses.dataclass(frozen=True)
-class OfferSearches(object):
+class OfferSearches:
     _legs_client: legs.Client
     _trips_client: trips.Client
     _offer_search_client: offer_searches.Client
@@ -478,7 +478,7 @@ class OffersByOfferSearch(endpoints.HTTPEndpoint):
 
 
 @dataclasses.dataclass(frozen=True)
-class SimpleOfferSearches(object):
+class SimpleOfferSearches:
     _offer_search_client: offer_searches.Client
     _places_client: places.Client
     _reseller_currencies: Mapping[str, str]
@@ -659,7 +659,7 @@ class PriceQuote(endpoints.HTTPEndpoint):
 
 
 @dataclasses.dataclass(frozen=True)
-class PriceQuotes(object):
+class PriceQuotes:
     _offers_client: offers.Client
     _price_quotes_client: price_quotes.Client
     _reseller_pay_companies: Mapping[str, str]

@@ -16,7 +16,7 @@ class NotFoundError(Exception):
     """Raised when a resource is not found."""
 
 
-class Implementation(object):
+class Implementation:
     def __init__(
         self,
         storage: filesystem.Storage,

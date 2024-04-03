@@ -118,7 +118,7 @@ def grpc_context() -> grpc.aio.ServicerContext:
     return context
 
 
-class TestService(object):
+class TestService:
     @pytest.mark.parametrize(
         ("trip_service_fixture", "field", "expected"),
         [
@@ -153,7 +153,7 @@ class TestService(object):
         )
 
 
-class TestTripSearch(object):
+class TestTripSearch:
     @pytest.mark.parametrize(
         ("search", "field"),
         [
@@ -229,7 +229,7 @@ class TestTripSearch(object):
         assert response.results
 
 
-class TestOfferSearch(object):
+class TestOfferSearch:
     @pytest.mark.parametrize(
         ("search", "field"),
         [

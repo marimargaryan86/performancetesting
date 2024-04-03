@@ -12,7 +12,7 @@ from snowfall.project.junction.go.service.schedules.v1 import (
 from snowfall.project.junction.go.v1 import models_pb2
 
 
-class TestDictClient(object):
+class TestDictClient:
     async def test_single_schedule_is_retrievable(
         self,
         schedules_client: schedules.Client,
@@ -41,7 +41,7 @@ class TestDictClient(object):
             assert schedule.id in fixtures.SCHEDULES
 
 
-class TestGrpcClient(object):
+class TestGrpcClient:
     @pytest.mark.parametrize(
         ("error", "expected"),
         [

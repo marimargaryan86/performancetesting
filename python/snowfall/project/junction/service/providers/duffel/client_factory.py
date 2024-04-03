@@ -7,7 +7,7 @@ from snowfall.vendor.duffel import client
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 
-class DuffelClientFactory(object):
+class DuffelClientFactory:
     def __init__(
         self,
         api_base_url: str,

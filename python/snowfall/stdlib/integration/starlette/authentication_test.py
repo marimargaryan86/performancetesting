@@ -14,7 +14,7 @@ async def mock_jwt_to_user_id(jwt: str) -> str:
     return "foo"
 
 
-class TestCookieAuth(object):
+class TestCookieAuth:
     async def test_missing_cookie_is_skipped(self) -> None:
         auth = authentication.CookieAuthenticationBackend(
             cookie_to_user=mock_cookie_to_user,
@@ -58,7 +58,7 @@ class TestCookieAuth(object):
         assert await auth.authenticate(conn)
 
 
-class TestJWTAuth(object):
+class TestJWTAuth:
     async def test_missing_jwt_is_skipped(self) -> None:
         auth = authentication.JWTAuthenticationBackend(
             jwt_to_user_id=mock_jwt_to_user_id,

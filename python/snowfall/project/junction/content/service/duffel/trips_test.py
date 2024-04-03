@@ -67,7 +67,7 @@ async def trip_search_response(
     )
 
 
-class TestTripSearcher(object):
+class TestTripSearcher:
     def test_one_way_contains_results(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,

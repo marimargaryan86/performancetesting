@@ -5,7 +5,7 @@ from typing import Any
 import httpx
 
 
-class FlightStatsClient(object):
+class FlightStatsClient:
     def __init__(
         self,
         api_url: str,

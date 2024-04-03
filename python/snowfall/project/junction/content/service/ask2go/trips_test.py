@@ -129,7 +129,7 @@ async def trip_search_response(
     )
 
 
-class TestTripSearcher(object):
+class TestTripSearcher:
     def test_one_way_contains_results(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,
@@ -192,7 +192,7 @@ async def segment(
     return trips_transformer.segment_to_proto(segment_model)
 
 
-class TestSegmentModel(object):
+class TestSegmentModel:
     def test_locations(self, segments_results: Iterable[trips_pb2.Segment]) -> None:
         for segment in segments_results:
             self._assert_location(segment.origin)

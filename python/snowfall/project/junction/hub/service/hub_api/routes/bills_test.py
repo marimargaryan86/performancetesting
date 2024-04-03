@@ -5,7 +5,7 @@ from snowfall.project.pay.fixtures import BILLS
 from snowfall.stdlib.integration.starlette import testing
 
 
-class TestBills(object):
+class TestBills:
     async def test_get_all_bills(
         self,
         client: httpx.AsyncClient,

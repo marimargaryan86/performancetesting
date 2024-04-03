@@ -177,7 +177,7 @@ class AnySizeStatusHandler(_AbstractStatusHandler):
             await self._on_processing(msg)
 
 
-class StatusReporter(object):
+class StatusReporter:
     def __init__(self, producer: protocol.Producer) -> None:
         self._producer = producer
 
@@ -209,7 +209,7 @@ class StatusReporter(object):
         )
 
 
-class ReportingMiddleware(object):
+class ReportingMiddleware:
     def __init__(self, status_reporter: StatusReporter) -> None:
         self._status_reporter = status_reporter
 

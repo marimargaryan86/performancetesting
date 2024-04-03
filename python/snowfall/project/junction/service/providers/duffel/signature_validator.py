@@ -11,7 +11,7 @@ def generate_signature(secret: bytes, payload: bytes, timestamp: str) -> str:
     return base64.b16encode(signature).lower().decode()
 
 
-class WebhookSignatureValidator(object):
+class WebhookSignatureValidator:
     def __init__(self, secret: str):
         self.secret = secret.encode("utf-8")
 

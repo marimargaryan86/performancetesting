@@ -11,7 +11,7 @@ from shapely import geometry
 _LookupFunc = Callable[[float, float], Awaitable[str | None]]  # noqa: WPS465
 
 
-class Geocoder(object):
+class Geocoder:
     def __init__(
         self,
         shp_file: shapefile.Reader,

@@ -10,7 +10,7 @@ import httpx
 
 
 @dataclasses.dataclass(frozen=True)
-class RequestMetaData(object):
+class RequestMetaData:
     method: str
     url: str
     body: str | None
@@ -25,7 +25,7 @@ class RequestMetaData(object):
 
 
 @dataclasses.dataclass(frozen=True)
-class ResponseMetaData(object):
+class ResponseMetaData:
     status_code: int
     body: str | None
 

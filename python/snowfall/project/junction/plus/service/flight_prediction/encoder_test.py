@@ -6,7 +6,7 @@ from snowfall.project.junction.plus.service.flight_prediction.models import (
 )
 
 
-class TestEncoder(object):
+class TestEncoder:
     def test_encode(self) -> None:  # noqa: WPS473
         expected_output = (
             "1418,1455,1433,1005,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,"

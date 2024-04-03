@@ -23,7 +23,7 @@ i-control-code = true
 i-dont-control-code = false
 show-violation-links = true
 noqa-require-code = true
-forbidden-inline-ignore = ["SF20", "SF21", "SF22"]
+forbidden-inline-ignore = ["SF21", "SF22"]
 nested-classes-whitelist = ["Config"]
 select = [
   "D0",     # flake8-deprecated
@@ -80,7 +80,7 @@ select = [
   "WPS303", # Forbid underscores (_) in numbers.
   "WPS304", # Forbid partial floats like .05 or 23..
   "WPS305", # Forbid f strings.
-  "WPS306", # Forbid writing classes without base classes.
+  "WPS306", # Forbid writing explicit object base class.
   "WPS307", # Forbid multiple if statements inside list comprehensions.
   "WPS310", # Forbid uppercase X, O, B, and E in numbers.
   "WPS311", # Forbid comparisons with multiple in checks.
@@ -195,6 +195,7 @@ select = [
   "WPS471", # Forbid consecutive slices.
   "WPS472", # Forbid getting first element using unpacking.
   "WPS473", # Limit empty lines in functions or methods body.
+  "WPS474", # Do not allow importing the same object under different aliases.
   "WPS501", # Forbid finally in try block without except block.
   "WPS504", # Forbid negated conditions together with else clause.
   "WPS505", # Forbid nested try blocks.
@@ -319,7 +320,6 @@ module = [
   "grpc_status.*",                          # https://github.com/nipunn1313/mypy-protobuf/issues/507
   "grpc_testing.*",                         # https://github.com/nipunn1313/mypy-protobuf/issues/507
   "h3.*",                                   # https://github.com/uber/h3-py/pull/216
-  "hvac.*",                                 # https://github.com/hvac/hvac/issues/800
   "isodate.*",
   "json_api_doc.*",
   "mongomock_motor.*",                      # https://github.com/michaelkryukov/mongomock_motor/issues/29
@@ -443,7 +443,6 @@ ignore = [
   "RUF027",  # Possible f-string without an `f` prefix
   "TD003",   # Missing issue link on the line following this TODO
   "TRY003",  # Avoid specifying long messages outside the exception class # TODO: fix
-  "UP004",   # Class inherits from `object`
   "UP030",   # Use implicit references for positional format fields
   "UP032",   # Use f-string instead of `format` call
   "W191",    # Indentation contains tabs. Incompatible with Ruff's formatter.

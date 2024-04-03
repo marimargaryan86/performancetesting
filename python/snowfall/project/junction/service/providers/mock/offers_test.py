@@ -10,7 +10,7 @@ from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 
 
-class TestResults(object):
+class TestResults:
     async def test_empty_trips_returns_no_results(
         self,
         searcher: provider_offers.TripOfferSearcher[offers.Criteria, offers.Criteria],
@@ -66,7 +66,7 @@ class TestResults(object):
         return [offer_group async for offer_group in searcher.search(offer_search)]
 
 
-class TestOfferGroupModel(object):
+class TestOfferGroupModel:
     def test_has_id(self, offer_group: offers_pb2.OfferGroup) -> None:
         assert offer_group.id
 
@@ -81,7 +81,7 @@ class TestOfferGroupModel(object):
         assert offer_group.segments
 
 
-class TestOfferSegmentModel(object):
+class TestOfferSegmentModel:
     def test_has_id(self, offer_segment: offers_pb2.OfferSegment) -> None:
         assert offer_segment.id
 
@@ -109,7 +109,7 @@ class TestOfferSegmentModel(object):
         assert offer_segment.vehicle.number
 
 
-class TestOfferSegmentLegModel(object):
+class TestOfferSegmentLegModel:
     def test_has_id(self, offer_segment_leg: offers_pb2.OfferSegmentLeg) -> None:
         assert offer_segment_leg.id
 
@@ -154,7 +154,7 @@ class TestOfferSegmentLegModel(object):
         )
 
 
-class TestOfferOptionModel(object):
+class TestOfferOptionModel:
     def test_has_id(self, offer_option: offers_pb2.Offer) -> None:
         assert offer_option.id
 
@@ -167,7 +167,7 @@ class TestOfferOptionModel(object):
         assert offer_option.brand_name == offers.BRAND_NAME
 
 
-class TestOfferSegmentDetails(object):
+class TestOfferSegmentDetails:
     def test_has_id(
         self,
         offer_segment_details: offers_pb2.OfferSegmentDetails,

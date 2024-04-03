@@ -72,7 +72,7 @@ async def test_token_can_be_retrieved(context_metadata: Any) -> None:
     assert token["client_id"] == "John Doe"
 
 
-class TestInterceptor(object):
+class TestInterceptor:
     _interceptor = metadata.MetadataContextClientInterceptor()
     _continuation = mock.AsyncMock(
         Callable[[aio.ClientCallDetails, message.Message], aio.UnaryUnaryCall],

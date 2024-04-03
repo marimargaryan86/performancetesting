@@ -87,7 +87,7 @@ async def trip_search_response(
 
 
 @pytest.mark.usefixtures("train_rcode_response", "cabin_class_rcode_response")
-class TestTripSearcher(object):
+class TestTripSearcher:
     def test_one_way_contains_results(
         self,
         trip_search_response: trips_pb2.SearchTripsResponse,
@@ -131,7 +131,7 @@ def segments_results(trip_result: trips_pb2.Result) -> list[trips_pb2.Segment]:
 
 
 @pytest.mark.usefixtures("train_rcode_response", "cabin_class_rcode_response")
-class TestSegmentModel(object):
+class TestSegmentModel:
     def test_locations(self, segments_results: Iterable[trips_pb2.Segment]) -> None:
         for segment in segments_results:
             self._assert_location(segment.origin)

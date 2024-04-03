@@ -35,7 +35,7 @@ def test_runner_without_ttl(
     )
 
 
-class TestRunner(object):
+class TestRunner:
     async def test_can_run(self, test_runner: tasks.Runner[testing_pb2.Foobar]) -> None:
         await test_runner.mark_as_in_progress("foobar")
         await test_runner.run("foobar", _result_generator())

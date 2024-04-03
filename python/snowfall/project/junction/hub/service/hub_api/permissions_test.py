@@ -35,7 +35,7 @@ def reseller_user_permissions() -> permissions.UserPermissions:
     return permissions.permissions_from_user(user_metadata)
 
 
-class TestCheckPermissions(object):
+class TestCheckPermissions:
     @pytest.mark.parametrize(
         ("action", "expectation"),
         [
