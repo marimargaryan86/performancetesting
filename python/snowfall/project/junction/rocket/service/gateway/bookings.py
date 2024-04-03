@@ -1,5 +1,8 @@
 import grpc
 
+from snowfall.project.junction.rocket.provider.v1alpha import (
+    bookings_pb2 as provider_bookings_pb2,
+)
 from snowfall.project.junction.rocket.service.gateway import providers
 from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2,
@@ -42,3 +45,39 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return bookings_pb2.GetBookingResponse(booking=booking)
+
+    async def CancelBooking(  # type: ignore[override] # noqa: N802
+        self,
+        request: bookings_pb2.CancelBookingRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> bookings_pb2.CancelBookingResponse:
+        ids = providers.unmarshal_resource_id(request.booking_id)
+
+        provider = await self._providers.find_by_id(ids.provider_id)
+
+        if not provider:
+            return await context.abort(
+                grpc.StatusCode.UNAVAILABLE,
+                "Provider is unavailable",
+            )
+
+        if not provider.booking_capabilities.supports_cancellation:
+            return await context.abort(grpc.StatusCode.UNIMPLEMENTED)
+
+        try:
+            response = await provider.connection.bookings.CancelBooking(
+                provider_bookings_pb2.CancelBookingRequest(
+                    provider_booking_reference=ids.resource_id,
+                ),
+            )
+        except grpc.aio.AioRpcError as error:
+            self._logger.exception("Booking cancellation failed")
+
+            return await context.abort(
+                code=grpc.StatusCode.INTERNAL,
+                details=str(error),
+            )
+
+        return bookings_pb2.CancelBookingResponse(
+            cancellation=response.cancellation,
+        )
