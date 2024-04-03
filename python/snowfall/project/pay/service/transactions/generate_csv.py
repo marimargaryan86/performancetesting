@@ -93,7 +93,7 @@ def extract_data(
     csv_data: dict[str, str],  # noqa: SF20
 ) -> None:
     for field, value_func in field_to_func.items():
-        if value_func.func == convert_amount_to_string:
+        if getattr(value_func, "func", value_func) == convert_amount_to_string:
             values = value_func(db_model)
             csv_data[field] = values[0]
             csv_data[field + " Currency"] = values[1]  # noqa: WPS336

@@ -10,9 +10,9 @@ class Settings(application.Settings):
     refunds_address: str
     transactions_address: str
     orders_address: str
-    secret_key: str
     stripe_api_key: str
-    stripe_secret_key: str
+    stripe_secret_key_for_refund: str
+    stripe_secret_key_for_invoice: str
 
 
 def create_dependencies(

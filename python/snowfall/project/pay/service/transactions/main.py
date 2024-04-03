@@ -259,7 +259,7 @@ async def _reports_cron_run_cancellation(
     await job.run()
 
 
-async def _reports_cron_statements(
+async def _generate_cron_invoices(
     app: application.Application[_ReportsStatementsSettings],
 ) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
@@ -268,7 +268,7 @@ async def _reports_cron_statements(
 
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(
-            "{0}/statements/".format(str(app.settings.storage_dsn)),
+            "{0}/invoices/".format(str(app.settings.storage_dsn)),
         ),
     )
 
@@ -341,8 +341,8 @@ if __name__ == "__main__":
             settings_class=_ReportsCancellationSettings,
         ),
         application.Command(
-            name="reports-cron-statement",
-            callback=_reports_cron_statements,
+            name="cron-generate-invoices",
+            callback=_generate_cron_invoices,
             settings_class=_ReportsStatementsSettings,
         ),
     )

@@ -1,3 +1,4 @@
+import json
 from collections.abc import Awaitable, Callable, Mapping
 from typing import Any
 
@@ -8,14 +9,16 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from snowfall.stdlib.integration.starlette.middlewares import resolve_request
 
 
-class HmacHeaderMiddleware(BaseHTTPMiddleware):
+class SignatureVerificationMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app: applications.Starlette,
-        stripe_secret_key: str,
+        stripe_secret_key_for_refund: str,
+        stripe_secret_key_for_invoice: str,
     ):
         super().__init__(app)
-        self._stripe_secret_key = stripe_secret_key
+        self._stripe_secret_key_for_refund = stripe_secret_key_for_refund
+        self._stripe_secret_key_for_invoice = stripe_secret_key_for_invoice
 
     async def dispatch(
         self,
@@ -25,9 +28,23 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         if request.scope["path"].endswith("health"):
             return await call_next(request)
         resolved_request = await resolve_request(request)
-        payload = await resolved_request.body()
+        body = await resolved_request.body()
 
-        is_authenticated = self.verify_stripe(payload, request.headers)
+        payload = json.loads(body)
+        is_authenticated = False
+
+        if payload["data"]["object"]["object"] == "invoice":
+            is_authenticated = self.verify_stripe(
+                body,
+                request.headers,
+                self._stripe_secret_key_for_invoice,
+            )
+        elif payload["data"]["object"]["object"] == "charge":
+            is_authenticated = self.verify_stripe(
+                body,
+                request.headers,
+                self._stripe_secret_key_for_refund,
+            )
 
         if not is_authenticated:
             raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -35,14 +52,15 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
 
     def verify_stripe(
         self,
-        payload: bytes,
+        body: bytes,
         headers: Mapping[str, Any],
+        secret_key: str,
     ) -> bool:
         try:
             stripe.Webhook.construct_event(  # type: ignore[no-untyped-call]
-                payload,
+                body,
                 headers.get("stripe-signature", ""),
-                self._stripe_secret_key,
+                secret_key,
             )
         except stripe.SignatureVerificationError:
             return False

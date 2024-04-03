@@ -140,9 +140,9 @@ ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 REFUNDS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_refunds-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/webhooks" }}
-SECRET_KEY={{ .Data.data.secret_key }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
-STRIPE_SECRET_KEY={{ .Data.data.stripe_secret_key }}
+STRIPE_SECRET_KEY_FOR_REFUND={{ .Data.data.stripe_secret_key_for_refund }}
+STRIPE_SECRET_KEY_FOR_INVOICE={{ .Data.data.stripe_secret_key_for_invoice }}
 {{ end }}
 EOH
       }

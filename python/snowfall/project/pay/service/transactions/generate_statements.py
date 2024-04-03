@@ -36,6 +36,7 @@ _orders = (
     "Booking Departure Date",
     "Traveler Forename",
     "Traveler Surname",
+    "Travel Cost",
     "Service Fee",
     "Booking Reference",
     "Payment Method",
@@ -59,8 +60,19 @@ _order_header = {
     ),
 }
 
+
+def travel_cost(transaction_model: models_pb2.Transaction) -> str:
+    return str(
+        money.total([
+            money.from_protobuf(transaction_model.amounts.base_converted),
+            money.from_protobuf(transaction_model.amounts.tax_converted),
+        ]),
+    )
+
+
 _transaction_header = {
     "Date Booked": partial(get_value, key="created_at"),
+    "Travel Cost": travel_cost,
     "Service Fee": partial(
         convert_amount_to_string,
         key="amounts.total_markups",
@@ -181,6 +193,12 @@ class InvoiceGenerator:
         reports = []
         for reseller in resellers:
             company = await self._company_client.get(reseller.company_id)
+            not_ready_for_generation = (
+                not company.HasField("invoice_generation_date")
+                or not company.invoice_generation_frequency
+            )
+            if not_ready_for_generation:
+                continue
             invoice_generation_date = protobuf.protobuf_to_date(
                 company.invoice_generation_date,
             )

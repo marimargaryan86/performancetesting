@@ -21,13 +21,10 @@ class InvoiceState:
         self,
         stripe_invoice: stripe.Invoice,
     ) -> bool:
-        try:
-            return await self._transaction_client.update_invoice_status(
-                stripe_invoice.id,  # type: ignore[arg-type]
-                InvoiceStatus.INVOICE_STATUS_FAILED,
-            )
-        except errors.NotFoundError:
-            return False
+        return await self._transaction_client.update_invoice_status(
+            stripe_invoice.id,  # type: ignore[arg-type]
+            InvoiceStatus.INVOICE_STATUS_FAILED,
+        )
 
     async def invoice_voided(self, stripe_invoice: stripe.Invoice) -> bool:
         return await self._transaction_client.update_invoice_status(
@@ -45,6 +42,9 @@ class InvoiceState:
         event_type = event["type"].replace(".", "_")
         if hasattr(self, event_type):  # noqa: WPS421
             logger.info("Occurred event", event_name=event_type)
-            return await getattr(self, event_type)(event["data"]["object"])
+            try:
+                return await getattr(self, event_type)(event["data"]["object"])
+            except errors.NotFoundError:
+                return False
         logger.error("Unhandled event", event_name=event_type)
         return False

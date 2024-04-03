@@ -1,0 +1,20 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "bucket": "junction-pay-development"
+    }
+  },
+  "production": {
+    "deploy": true,
+    "variables": {
+      "bucket": "junction-pay-production"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "bucket": "junction-pay-sandbox"
+    }
+  }
+}

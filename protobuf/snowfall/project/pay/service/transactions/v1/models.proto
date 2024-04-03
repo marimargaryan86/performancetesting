@@ -101,4 +101,5 @@ message Invoice {
   string external_reference_id = 4;
   repeated string transaction_ids = 5;
   InvoiceStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
 }

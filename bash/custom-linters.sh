@@ -138,7 +138,7 @@ for f in "${NOMAD_FILES[@]}"; do
 
 	if [[ "${SENTRY_PROJECTS[$EXPECTED_SENTRY_PROJECT]-0}" -ne 0 ]]; then
 		if grep -q "SENTRY_DSN" "${f}" && ! grep -q "SENTRY_DSN.*\/${SENTRY_PROJECTS[$EXPECTED_SENTRY_PROJECT]}\"" "${f}"; then
-			echo "${f}: invalid Sentry DSN"
+			echo "${f}: invalid Sentry DSN. Expected project (${EXPECTED_SENTRY_PROJECT})"
 			FAILURE=1
 		fi
 

@@ -11,7 +11,9 @@ from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers
-from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
+from snowfall.project.pay.service.webhooks.middlewares import (
+    SignatureVerificationMiddleware,
+)
 from snowfall.project.pay.service.webhooks.states.stripe.invoice import InvoiceState
 from snowfall.project.pay.service.webhooks.states.stripe.refunds import RefundsState
 from snowfall.stdlib.integration.starlette import application as starlette
@@ -60,8 +62,9 @@ async def _http(
         ),
         custom_middlewares=[
             Middleware(
-                HmacHeaderMiddleware,
-                stripe_secret_key=app.settings.stripe_secret_key,
+                SignatureVerificationMiddleware,
+                stripe_secret_key_for_refund=app.settings.stripe_secret_key_for_refund,
+                stripe_secret_key_for_invoice=app.settings.stripe_secret_key_for_invoice,
             ),
         ],
         openapi_path=None,

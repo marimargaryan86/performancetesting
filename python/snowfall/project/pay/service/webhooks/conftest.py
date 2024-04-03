@@ -15,7 +15,9 @@ from snowfall.project.pay.service.transactions.v1.models_pb2 import (
     Transaction,
 )
 from snowfall.project.pay.service.webhooks import bootstrap, routers
-from snowfall.project.pay.service.webhooks.middlewares import HmacHeaderMiddleware
+from snowfall.project.pay.service.webhooks.middlewares import (
+    SignatureVerificationMiddleware,
+)
 from snowfall.project.pay.service.webhooks.states.stripe.invoice import InvoiceState
 from snowfall.project.pay.service.webhooks.states.stripe.refunds import RefundsState
 from snowfall.stdlib import string
@@ -23,7 +25,12 @@ from snowfall.stdlib.integration.starlette import application
 
 
 @pytest.fixture()
-def stripe_secret_key() -> str:
+def stripe_secret_key_for_refund() -> str:
+    return "Very-Secret-Key"
+
+
+@pytest.fixture()
+def stripe_secret_key_for_invoice() -> str:
     return "Very-Secret-Key"
 
 
@@ -111,29 +118,29 @@ def headers() -> dict[str, str]:
 def webhook_app(
     refund_state: RefundsState,
     invoice_sate: InvoiceState,
-    secret_key: str,
-    stripe_secret_key: str,
+    stripe_secret_key_for_refund: str,
+    stripe_secret_key_for_invoice: str,
 ) -> applications.Starlette:
     return create_webhook_app(
         refund_state=refund_state,
         invoice_sate=invoice_sate,
-        secret_key=secret_key,
-        stripe_secret_key=stripe_secret_key,
+        stripe_secret_key_for_refund=stripe_secret_key_for_refund,
+        stripe_secret_key_for_invoice=stripe_secret_key_for_invoice,
     )
 
 
 def create_webhook_app(
     refund_state: RefundsState,
     invoice_sate: InvoiceState,
-    secret_key: str,
-    stripe_secret_key: str,
+    stripe_secret_key_for_refund: str,
+    stripe_secret_key_for_invoice: str,
 ) -> applications.Starlette:
     return application.create_starlette_app(
         custom_middlewares=[
             Middleware(
-                HmacHeaderMiddleware,
-                secret_key=secret_key,
-                stripe_secret_key=stripe_secret_key,
+                SignatureVerificationMiddleware,
+                stripe_secret_key_for_refund=stripe_secret_key_for_refund,
+                stripe_secret_key_for_invoice=stripe_secret_key_for_invoice,
             ),
         ],
         routes=routers.get_routes(
