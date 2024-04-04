@@ -1,7 +1,17 @@
 __dependents_rules__(
     (
+        ("//vendor#fakeredis",),
+        "//python/snowfall/conftest.py",
+        "!*",
+    ),
+    (
         ("//vendor#freezegun",),
         "**_test.py",
+        "!*",
+    ),
+    (
+        ("//vendor#mongomock-motor",),
+        "//python/snowfall/conftest.py",
         "!*",
     ),
     (

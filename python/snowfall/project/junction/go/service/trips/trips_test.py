@@ -2,8 +2,8 @@ import datetime
 import uuid
 
 import freezegun
-import mongomock_motor
 import pytest
+from motor import motor_asyncio
 
 from snowfall.project.junction.go.service.planner.v1 import planner_pb2
 from snowfall.project.junction.go.service.trips import trips
@@ -47,10 +47,11 @@ def search_journey_response() -> planner_pb2.SearchJourneyResponse:
 
 
 async def test_trip_and_segments_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
     search_journey_response: planner_pb2.SearchJourneyResponse,
 ) -> None:
     trips_repo = trips.TripRepository(
-        mongomock_motor.AsyncMongoMockClient()["tests"]["test"],
+        mongo_client["tests"]["test"],
         datetime.timedelta(days=1),
     )
 
@@ -83,10 +84,11 @@ async def _insert_trip_search(
 
 @freezegun.freeze_time("2022-04-20T08:30:30Z")
 async def test_trip_search_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
     search_journey_response: planner_pb2.SearchJourneyResponse,
 ) -> None:
     repo = trips.TripSearchRepository(
-        mongomock_motor.AsyncMongoMockClient()["tests"]["test"],
+        mongo_client["tests"]["test"],
         datetime.timedelta(days=1),
     )
 

@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import datetime
 from collections.abc import AsyncIterator, Mapping
 
 import httpx
 import openai
 import pytest
-from fakeredis import aioredis as fakeredis
+from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware
 from twilio.request_validator import RequestValidator
@@ -208,9 +210,9 @@ def notification_event_publisher_client() -> (
 
 
 @pytest.fixture()
-def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
+def redis_client(decoding_redis_client: aioredis.Redis[str]) -> redis.Client[str]:
     return redis.Client(
-        redis_client,
+        decoding_redis_client,
         prefix="junction-plus",
     )
 

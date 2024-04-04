@@ -1,8 +1,8 @@
 from unittest import mock
 
-import mongomock_motor
 import pytest
 import stripe
+from motor import motor_asyncio
 
 from snowfall.project.pay.service.payments.providers.stripe.repositories import (
     PaymentUsersRepository,
@@ -13,11 +13,6 @@ from snowfall.stdlib import string
 from snowfall.stdlib.logging import stdout
 
 _logger = stdout.get_logger()
-
-
-@pytest.fixture()
-def mongo_client() -> mongomock_motor.AsyncMongoMockClient:
-    return mongomock_motor.AsyncMongoMockClient()
 
 
 @pytest.fixture()
@@ -40,7 +35,7 @@ def stripe_user() -> credit_card_models_pb2.PaymentUser:
 
 @pytest.fixture()
 async def stripe_client(
-    mongo_client: mongomock_motor.AsyncMongoMockClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
     stripe_user: credit_card_models_pb2.PaymentUser,
     stripe_test_key: str,
 ) -> Stripe:

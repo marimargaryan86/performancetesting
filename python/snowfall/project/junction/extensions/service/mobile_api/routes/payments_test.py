@@ -1,8 +1,8 @@
 import datetime
 
 import httpx
-import mongomock_motor
 import pytest
+from motor import motor_asyncio
 from starlette import status
 
 from snowfall.project.junction.extensions.service.mobile_api.v1alpha import models_pb2
@@ -25,7 +25,7 @@ async def payment_intent(
 
 @pytest.fixture()
 async def voucher(
-    vouchers_repository: mongomock_motor.AsyncMongoMockDatabase,
+    vouchers_repository: motor_asyncio.AsyncIOMotorDatabase,
     payment_intent: credit_card_models_pb2.CreditCardPayment,
 ) -> models_pb2.Voucher:
     voucher_money = money.Money(23, money.Currency("USD"))

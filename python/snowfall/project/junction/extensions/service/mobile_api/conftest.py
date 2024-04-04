@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import dataclasses
 import datetime
@@ -15,8 +17,8 @@ import lagom
 import orjson
 import pytest
 from bson import json_util
-from fakeredis import aioredis as fakeredis
 from motor import motor_asyncio
+from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -191,7 +193,7 @@ def _create_app(
 
 
 @pytest.fixture()
-def redis_client(decoding_redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
+def redis_client(decoding_redis_client: aioredis.Redis[str]) -> redis.Client[str]:
     return redis.Client(
         decoding_redis_client,
         prefix="mobile-api",

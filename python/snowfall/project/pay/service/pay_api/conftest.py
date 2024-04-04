@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import datetime
 import pathlib
 from collections.abc import AsyncIterator, Mapping, Sequence
 
 import httpx
 import pytest
-from fakeredis import aioredis as fakeredis
+from redis import asyncio as aioredis
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -103,9 +105,9 @@ def _create_admin_app(
 
 
 @pytest.fixture()
-def redis_client(redis_client: fakeredis.FakeRedis) -> redis.Client[str]:
+def redis_client(decoding_redis_client: aioredis.Redis[str]) -> redis.Client[str]:
     return redis.Client(
-        redis_client,
+        decoding_redis_client,
         prefix="pay_api",
     )
 
