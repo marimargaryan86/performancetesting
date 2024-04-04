@@ -117,8 +117,8 @@
 //     "scikit-learn==1.4.1.post1",
 //     "sentry-sdk==1.44.0",
 //     "setuptools==69.2.0",
-//     "snowfall.plugin.flake8==1.5.0",
-//     "snowfall.stdlib.format.filter-parser==1.5.0",
+//     "snowfall.plugin.flake8==1.5.1",
+//     "snowfall.stdlib.format.filter-parser==1.5.1",
 //     "starlette==0.37.2",
 //     "stripe==8.9.0",
 //     "structlog-sentry==2.1.0",
@@ -8144,31 +8144,31 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "2f9a39bbd206dda1f294fa6303881c7c6af70c7f0807c367e103403b75171c2a",
-              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/2f9a39bbd206dda1f294fa6303881c7c6af70c7f0807c367e103403b75171c2a/snowfall.plugin.flake8-1.5.0-py3-none-any.whl"
+              "hash": "0f583230d00c5c857d2b21d1a952f1b10a78e3334a1e5fb78eb5f3fd34f7361d",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/0f583230d00c5c857d2b21d1a952f1b10a78e3334a1e5fb78eb5f3fd34f7361d/snowfall.plugin.flake8-1.5.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "bd5ec2eb03290f4c8281625713b573dc4f5e4b381b8a0b4dce1ab320db255ec4",
-              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/bd5ec2eb03290f4c8281625713b573dc4f5e4b381b8a0b4dce1ab320db255ec4/snowfall.plugin.flake8-1.5.0.tar.gz"
+              "hash": "ecc69443d147d6270dcbd364c49c4baf69fe02cde4de6dba01ac1843d9b25622",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/ecc69443d147d6270dcbd364c49c4baf69fe02cde4de6dba01ac1843d9b25622/snowfall.plugin.flake8-1.5.1.tar.gz"
             }
           ],
           "project_name": "snowfall-plugin-flake8",
           "requires_dists": [],
           "requires_python": "<3.12,>=3.9",
-          "version": "1.5.0"
+          "version": "1.5.1"
         },
         {
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ddb3c61ac70f5a4ac0d301b682726c54b5c52315c873b55ddad043834d3a4690",
-              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/ddb3c61ac70f5a4ac0d301b682726c54b5c52315c873b55ddad043834d3a4690/snowfall.stdlib.format.filter_parser-1.5.0-py3-none-any.whl"
+              "hash": "fa0056885c02f5d38a1ebbea5666337fa47a98627eb52d6ba9cb1f0cc37b98d9",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/fa0056885c02f5d38a1ebbea5666337fa47a98627eb52d6ba9cb1f0cc37b98d9/snowfall.stdlib.format.filter_parser-1.5.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1e2dca1aa400aba607f6d0db2ae99afeec09feccd6e8dd369d8d88c47dc178a6",
-              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/1e2dca1aa400aba607f6d0db2ae99afeec09feccd6e8dd369d8d88c47dc178a6/snowfall.stdlib.format.filter_parser-1.5.0.tar.gz"
+              "hash": "2eaf80891c32fc59583ce874921edc1f70faa70b90b7d04d4417e93a4cb91ec2",
+              "url": "https://git.snowfall.se/api/v4/projects/677/packages/pypi/files/2eaf80891c32fc59583ce874921edc1f70faa70b90b7d04d4417e93a4cb91ec2/snowfall.stdlib.format.filter_parser-1.5.1.tar.gz"
             }
           ],
           "project_name": "snowfall-stdlib-format-filter-parser",
@@ -8176,7 +8176,7 @@
             "antlr4-python3-runtime==4.13.1"
           ],
           "requires_python": "<3.12,>=3.9",
-          "version": "1.5.0"
+          "version": "1.5.1"
         },
         {
           "artifacts": [
@@ -10424,8 +10424,8 @@
     "scikit-learn==1.4.1.post1",
     "sentry-sdk==1.44.0",
     "setuptools==69.2.0",
-    "snowfall.plugin.flake8==1.5.0",
-    "snowfall.stdlib.format.filter-parser==1.5.0",
+    "snowfall.plugin.flake8==1.5.1",
+    "snowfall.stdlib.format.filter-parser==1.5.1",
     "starlette==0.37.2",
     "stripe==8.9.0",
     "structlog-sentry==2.1.0",

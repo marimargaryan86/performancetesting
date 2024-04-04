@@ -106,8 +106,8 @@ scikit-learn==1.4.1.post1
 sentry-sdk==1.44.0
 setuptools==69.2.0
 Shapely==2.0.3
-snowfall.plugin.flake8==1.5.0
-snowfall.stdlib.format.filter-parser==1.5.0
+snowfall.plugin.flake8==1.5.1
+snowfall.stdlib.format.filter-parser==1.5.1
 starlette==0.37.2
 stripe==8.9.0
 structlog==24.1.0
