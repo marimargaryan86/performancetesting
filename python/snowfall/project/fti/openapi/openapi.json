@@ -37,16 +37,7 @@
                 },
                 "parameters": [
                     {
-                        "name": "destination",
-                        "in": "query",
-                        "schema": {
-                            "default": null,
-                            "description": "If set, the endpoint returns places connected to this destination place.",
-                            "example": "ATH",
-                            "title": "Destination",
-                            "type": "string"
-                        },
-                        "description": "If set, the endpoint returns places connected to this destination place."
+                        "$ref": "#/components/parameters/destination"
                     }
                 ]
             }
@@ -83,91 +74,25 @@
                 },
                 "parameters": [
                     {
-                        "name": "cursor",
-                        "in": "query",
-                        "schema": {
-                            "default": "",
-                            "description": "Pagination cursor that defines your place in the list.",
-                            "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
-                            "title": "Cursor",
-                            "type": "string"
-                        },
-                        "description": "Pagination cursor that defines your place in the list."
+                        "$ref": "#/components/parameters/cursor"
                     },
                     {
-                        "name": "limit",
-                        "in": "query",
-                        "schema": {
-                            "default": 20,
-                            "description": "A limit on the number of objects to be returned, between 1 and 100.",
-                            "example": 20,
-                            "maximum": 100,
-                            "minimum": 1,
-                            "title": "Limit",
-                            "type": "integer"
-                        },
-                        "description": "A limit on the number of objects to be returned, between 1 and 100."
+                        "$ref": "#/components/parameters/limit"
                     },
                     {
-                        "name": "destination",
-                        "in": "query",
-                        "schema": {
-                            "example": "Athens",
-                            "title": "Destination",
-                            "type": "string"
-                        },
-                        "description": "",
-                        "required": true
+                        "$ref": "#/components/parameters/destination"
                     },
                     {
-                        "name": "arriveAt",
-                        "in": "query",
-                        "schema": {
-                            "description": "Starting date of the trip",
-                            "example": "1980-02-03",
-                            "format": "date",
-                            "title": "Arriveat",
-                            "type": "string"
-                        },
-                        "description": "Starting date of the trip",
-                        "required": true
+                        "$ref": "#/components/parameters/arriveAt"
                     },
                     {
-                        "name": "returnAt",
-                        "in": "query",
-                        "schema": {
-                            "description": "Returning date of the trip",
-                            "example": "1980-02-03",
-                            "format": "date",
-                            "title": "Returnat",
-                            "type": "string"
-                        },
-                        "description": "Returning date of the trip",
-                        "required": true
+                        "$ref": "#/components/parameters/returnAt"
                     },
                     {
-                        "name": "numOfGuests",
-                        "in": "query",
-                        "schema": {
-                            "example": 3,
-                            "maximum": 4,
-                            "minimum": 1,
-                            "title": "Numofguests",
-                            "type": "integer"
-                        },
-                        "description": "",
-                        "required": true
+                        "$ref": "#/components/parameters/numOfGuests"
                     },
                     {
-                        "name": "origin",
-                        "in": "query",
-                        "schema": {
-                            "example": "London",
-                            "title": "Origin",
-                            "type": "string"
-                        },
-                        "description": "",
-                        "required": true
+                        "$ref": "#/components/parameters/origin"
                     }
                 ]
             }
@@ -204,80 +129,22 @@
                 },
                 "parameters": [
                     {
-                        "name": "cursor",
-                        "in": "query",
-                        "schema": {
-                            "default": "",
-                            "description": "Pagination cursor that defines your place in the list.",
-                            "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
-                            "title": "Cursor",
-                            "type": "string"
-                        },
-                        "description": "Pagination cursor that defines your place in the list."
+                        "$ref": "#/components/parameters/cursor"
                     },
                     {
-                        "name": "limit",
-                        "in": "query",
-                        "schema": {
-                            "default": 20,
-                            "description": "A limit on the number of objects to be returned, between 1 and 100.",
-                            "example": 20,
-                            "maximum": 100,
-                            "minimum": 1,
-                            "title": "Limit",
-                            "type": "integer"
-                        },
-                        "description": "A limit on the number of objects to be returned, between 1 and 100."
+                        "$ref": "#/components/parameters/limit"
                     },
                     {
-                        "name": "destination",
-                        "in": "query",
-                        "schema": {
-                            "example": "Athens",
-                            "title": "Destination",
-                            "type": "string"
-                        },
-                        "description": "",
-                        "required": true
+                        "$ref": "#/components/parameters/destination"
                     },
                     {
-                        "name": "arriveAt",
-                        "in": "query",
-                        "schema": {
-                            "description": "Starting date of the trip",
-                            "example": "1980-02-03",
-                            "format": "date",
-                            "title": "Arriveat",
-                            "type": "string"
-                        },
-                        "description": "Starting date of the trip",
-                        "required": true
+                        "$ref": "#/components/parameters/arriveAt"
                     },
                     {
-                        "name": "returnAt",
-                        "in": "query",
-                        "schema": {
-                            "description": "Returning date of the trip",
-                            "example": "1980-02-03",
-                            "format": "date",
-                            "title": "Returnat",
-                            "type": "string"
-                        },
-                        "description": "Returning date of the trip",
-                        "required": true
+                        "$ref": "#/components/parameters/returnAt"
                     },
                     {
-                        "name": "numOfGuests",
-                        "in": "query",
-                        "schema": {
-                            "example": 3,
-                            "maximum": 4,
-                            "minimum": 1,
-                            "title": "Numofguests",
-                            "type": "integer"
-                        },
-                        "description": "",
-                        "required": true
+                        "$ref": "#/components/parameters/numOfGuests"
                     }
                 ]
             }
@@ -314,30 +181,10 @@
                 },
                 "parameters": [
                     {
-                        "name": "cursor",
-                        "in": "query",
-                        "schema": {
-                            "default": "",
-                            "description": "Pagination cursor that defines your place in the list.",
-                            "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
-                            "title": "Cursor",
-                            "type": "string"
-                        },
-                        "description": "Pagination cursor that defines your place in the list."
+                        "$ref": "#/components/parameters/cursor"
                     },
                     {
-                        "name": "limit",
-                        "in": "query",
-                        "schema": {
-                            "default": 20,
-                            "description": "A limit on the number of objects to be returned, between 1 and 100.",
-                            "example": 20,
-                            "maximum": 100,
-                            "minimum": 1,
-                            "title": "Limit",
-                            "type": "integer"
-                        },
-                        "description": "A limit on the number of objects to be returned, between 1 and 100."
+                        "$ref": "#/components/parameters/limit"
                     }
                 ]
             },
@@ -434,17 +281,7 @@
                 },
                 "parameters": [
                     {
-                        "name": "exampleId",
-                        "in": "path",
-                        "schema": {
-                            "description": "The ID of the example",
-                            "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
-                            "format": "uuid",
-                            "title": "Exampleid",
-                            "type": "string"
-                        },
-                        "description": "The ID of the example",
-                        "required": true
+                        "$ref": "#/components/parameters/exampleId"
                     }
                 ]
             }
@@ -763,6 +600,108 @@
                 ],
                 "title": "ExampleModel",
                 "type": "object"
+            }
+        },
+        "parameters": {
+            "destination": {
+                "name": "destination",
+                "in": "query",
+                "schema": {
+                    "example": "Athens",
+                    "title": "Destination",
+                    "type": "string"
+                },
+                "description": "",
+                "required": true
+            },
+            "cursor": {
+                "name": "cursor",
+                "in": "query",
+                "schema": {
+                    "default": "",
+                    "description": "Pagination cursor that defines your place in the list.",
+                    "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D",
+                    "title": "Cursor",
+                    "type": "string"
+                },
+                "description": "Pagination cursor that defines your place in the list."
+            },
+            "limit": {
+                "name": "limit",
+                "in": "query",
+                "schema": {
+                    "default": 20,
+                    "description": "A limit on the number of objects to be returned, between 1 and 100.",
+                    "example": 20,
+                    "maximum": 100,
+                    "minimum": 1,
+                    "title": "Limit",
+                    "type": "integer"
+                },
+                "description": "A limit on the number of objects to be returned, between 1 and 100."
+            },
+            "arriveAt": {
+                "name": "arriveAt",
+                "in": "query",
+                "schema": {
+                    "description": "Starting date of the trip",
+                    "example": "1980-02-03",
+                    "format": "date",
+                    "title": "Arriveat",
+                    "type": "string"
+                },
+                "description": "Starting date of the trip",
+                "required": true
+            },
+            "returnAt": {
+                "name": "returnAt",
+                "in": "query",
+                "schema": {
+                    "description": "Returning date of the trip",
+                    "example": "1980-02-03",
+                    "format": "date",
+                    "title": "Returnat",
+                    "type": "string"
+                },
+                "description": "Returning date of the trip",
+                "required": true
+            },
+            "numOfGuests": {
+                "name": "numOfGuests",
+                "in": "query",
+                "schema": {
+                    "example": 3,
+                    "maximum": 4,
+                    "minimum": 1,
+                    "title": "Numofguests",
+                    "type": "integer"
+                },
+                "description": "",
+                "required": true
+            },
+            "origin": {
+                "name": "origin",
+                "in": "query",
+                "schema": {
+                    "example": "London",
+                    "title": "Origin",
+                    "type": "string"
+                },
+                "description": "",
+                "required": true
+            },
+            "exampleId": {
+                "name": "exampleId",
+                "in": "path",
+                "schema": {
+                    "description": "The ID of the example",
+                    "example": "04f83af5-10bb-4a0f-1881-03e1e690f0f5",
+                    "format": "uuid",
+                    "title": "Exampleid",
+                    "type": "string"
+                },
+                "description": "The ID of the example",
+                "required": true
             }
         }
     }

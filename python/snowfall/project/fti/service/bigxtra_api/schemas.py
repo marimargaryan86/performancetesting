@@ -61,7 +61,7 @@ class SchemaGenerator(BaseSchemaGenerator):
         schema = dict(self.base_schema)
         schema.setdefault("paths", {})
         schema.setdefault("components", {})
-        components: dict[str, Any] = {"schemas": {}}
+        components: dict[str, Any] = {"schemas": {}, "parameters": {}}
         endpoints_info = self.get_endpoints(self._routes)
         for endpoint in endpoints_info:
             signature = SchemaGenerator._endpoints.get(endpoint.func, {})
@@ -72,12 +72,24 @@ class SchemaGenerator(BaseSchemaGenerator):
                 query_params = signature.get(
                     "query_parameters",
                 ).model_json_schema()
-                parameters.extend(extract_parameters(query_params, "query"))
+                extracted_params = extract_parameters(query_params, "query")
+                for query_parameter in extracted_params:
+                    components["parameters"][query_parameter["name"]] = query_parameter
+                parameters.extend([
+                    {"$ref": "#/components/parameters/{0}".format(param["name"])}
+                    for param in extracted_params
+                ])
             if "path_parameters" in signature:
                 path_parameters = signature.get(
                     "path_parameters",
                 ).model_json_schema()
-                parameters.extend(extract_parameters(path_parameters, "path"))
+                extracted_params = extract_parameters(path_parameters, "path")
+                for path_parameter in extracted_params:
+                    components["parameters"][path_parameter["name"]] = path_parameter
+                parameters.extend([
+                    {"$ref": "#/components/parameters/{0}".format(param["name"])}
+                    for param in extracted_params
+                ])
             if "description" in signature:
                 endpoint_schema["description"] = signature.get("description")
             if "summary" in signature:
