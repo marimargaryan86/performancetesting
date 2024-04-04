@@ -361,6 +361,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/searchId"
+        },
+        {
+          "$ref": "#/components/parameters/carRentalSearchResultInclude"
         }
       ],
       "get": {
@@ -385,6 +388,9 @@
                           "items": {
                             "$ref": "#/components/schemas/CarRentalSearchResult"
                           }
+                        },
+                        "included": {
+                          "$ref": "#/components/schemas/CarRentalSearchResultIncluded"
                         }
                       },
                       "required": [
@@ -1252,6 +1258,142 @@
         ],
         "description": "A unique identifier for each place."
       },
+      "Price": {
+        "title": "Price",
+        "description": "Amount and currency.",
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "format": "currency",
+            "example": "EUR"
+          },
+          "amount": {
+            "type": "string",
+            "example": "13.37"
+          }
+        },
+        "required": [
+          "currency",
+          "amount"
+        ]
+      },
+      "ConditionalPrice": {
+        "title": "Conditional Price",
+        "description": "Additional fees that may or may not be included in total price",
+        "type": "object",
+        "properties": {
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "description": {
+            "type": "string",
+            "example": "one-way fee",
+            "nullable": true
+          },
+          "includedInTotal": {
+            "type": "boolean",
+            "example": false,
+            "nullable": true
+          }
+        },
+        "required": [
+          "price"
+        ]
+      },
+      "PriceBreakdown": {
+        "title": "Price Breakdown",
+        "description": "Breakdown of price into its individual components (base fare, tax, etc)",
+        "type": "object",
+        "properties": {
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "breakdownType": {
+            "type": "string",
+            "example": "tax",
+            "enum": [
+              "base-fare",
+              "tax"
+            ]
+          }
+        },
+        "required": [
+          "price",
+          "breakdownType"
+        ]
+      },
+      "CarRentalOffer": {
+        "title": "Car Rental Offer",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offers"
+                ],
+                "example": "offers"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "price",
+                  "priceBreakdown",
+                  "conditionalPrices"
+                ],
+                "properties": {
+                  "price": {
+                    "$ref": "#/components/schemas/Price"
+                  },
+                  "priceBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
+                  "conditionalPrices": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ConditionalPrice"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          }
+        ],
+        "description": "Result of searching for offers. Used for creating an Order."
+      },
+      "CarRentalSearchResultIncluded": {
+        "title": "OfferIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/CarRentalOffer"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "offers": "#/components/schemas/CarRentalOffer"
+            }
+          }
+        }
+      },
       "Error": {
         "title": "Error",
         "type": "object",
@@ -1489,6 +1631,26 @@
       }
     },
     "parameters": {
+      "carRentalSearchResultInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "offers"
+            ]
+          },
+          "example": [
+            "offers"
+          ]
+        },
+        "description": "Customize which related resources to return.",
+        "style": "form",
+        "explode": false
+      },
       "searchId": {
         "name": "searchId",
         "in": "path",

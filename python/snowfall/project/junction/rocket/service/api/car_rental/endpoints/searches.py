@@ -140,7 +140,13 @@ class CarSearchResults(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
             limit=pagination.limit,
         )
-
+        included = []
+        if "offers" in request.scope["parsed_query_string"].get("include", []):
+            included = [
+                search_models.OfferResource.from_proto(offer)
+                for search_result in items_page.sequence
+                for offer in search_result.offers
+            ]
         return await messages.create_response(
             body=models.Body(
                 data=[
@@ -157,6 +163,7 @@ class CarSearchResults(endpoints.HTTPEndpoint):
                     items_page.cursor,
                     pagination,
                 ),
+                included=included,
             ),
             request=request,
         )
