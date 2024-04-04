@@ -35,6 +35,11 @@
       "name": "internal",
       "description": "Endpoints not for public use.",
       "x-displayName": "Internal"
+    },
+    {
+      "name": "places",
+      "description": "Places.",
+      "x-displayName": "Places"
     }
   ],
   "paths": {
@@ -411,6 +416,137 @@
             "$ref": "#/components/parameters/page-limit"
           }
         ]
+      }
+    },
+    "/places": {
+      "get": {
+        "summary": "List Places",
+        "tags": [
+          "places"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/filterNameLike"
+          },
+          {
+            "$ref": "#/components/parameters/filterTypeEq"
+          },
+          {
+            "$ref": "#/components/parameters/filterIataEq"
+          },
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "name": "query[coordinates]",
+            "in": "query",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "minLength": 2,
+              "maxLength": 3,
+              "example": [
+                -123.4567,
+                45.6789
+              ]
+            },
+            "description": "Specifies a point to search for nearby places, within a radius ( radius is in meters ). Defined as `longitude,latitude,radius`"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "minItems": 0,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/Place"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "operationId": "get-places",
+        "description": "Used to retrieve places."
+      }
+    },
+    "/places/{placeId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/placeId"
+        }
+      ],
+      "get": {
+        "summary": "Get Place",
+        "tags": [
+          "places"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/Place"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "operationId": "get-places-id",
+        "description": "Used to lookup data for a Place Identifier."
       }
     },
     "/health": {
@@ -934,6 +1070,188 @@
         ],
         "description": "A Coordinate represented via latitude and longitude"
       },
+      "Place": {
+        "title": "Place",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "places"
+                ],
+                "example": "places"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "placeType",
+                  "latitude",
+                  "longitude",
+                  "countryCode",
+                  "countryName",
+                  "timeZone",
+                  "searchCapabilities"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Venice Marco Polo Airport",
+                    "readOnly": true
+                  },
+                  "placeType": {
+                    "$ref": "#/components/schemas/PlaceType"
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 59.651164062,
+                    "minimum": -90,
+                    "maximum": 90
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 17.917829662,
+                    "minimum": -180,
+                    "maximum": 180
+                  },
+                  "countryCode": {
+                    "type": "string",
+                    "format": "country",
+                    "example": "IT",
+                    "readOnly": true
+                  },
+                  "countryName": {
+                    "type": "string",
+                    "format": "country",
+                    "example": "Italy",
+                    "readOnly": true
+                  },
+                  "iataCode": {
+                    "type": "string",
+                    "example": "VCE",
+                    "pattern": "^[A-Z]{3}$",
+                    "nullable": true,
+                    "readOnly": true
+                  },
+                  "timeZone": {
+                    "type": "string",
+                    "example": "Europe/Rome",
+                    "readOnly": true
+                  },
+                  "searchCapabilities": {
+                    "$ref": "#/components/schemas/SearchCapabilities"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-08-24T14:15:22Z",
+                    "readOnly": true
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "city",
+                  "contains"
+                ],
+                "properties": {
+                  "city": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/PlaceIdentifier"
+                      }
+                    }
+                  },
+                  "contains": {
+                    "title": "Contains",
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/PlaceIdentifier"
+                        },
+                        "minLength": 0
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "A place is an indexed reference to a location that can serve as an origin or destination."
+      },
+      "PlaceType": {
+        "title": "Place Type",
+        "type": "string",
+        "enum": [
+          "unspecified",
+          "city",
+          "railway-station",
+          "airport",
+          "ferry-port"
+        ],
+        "example": "airport"
+      },
+      "PlaceIdentifier": {
+        "title": "Place Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "name": {
+            "type": "string",
+            "example": "Rubano",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "city",
+              "railway-station",
+              "airport",
+              "ferry-port"
+            ],
+            "example": "city"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ],
+        "description": "A unique identifier for each place."
+      },
       "Error": {
         "title": "Error",
         "type": "object",
@@ -987,6 +1305,32 @@
         "required": [
           "status",
           "detail"
+        ]
+      },
+      "SearchCapabilities": {
+        "type": "object",
+        "title": "SearchCapabilities",
+        "properties": {
+          "rail": {
+            "title": "Rail",
+            "type": "boolean",
+            "example": false
+          },
+          "air": {
+            "title": "Air",
+            "type": "boolean",
+            "example": true
+          },
+          "ferry": {
+            "title": "Ferry",
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "rail",
+          "air",
+          "ferry"
         ]
       },
       "SelfLink": {
@@ -1156,6 +1500,17 @@
         },
         "description": "Search identifier"
       },
+      "placeId": {
+        "name": "placeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Place identifier"
+      },
       "page-cursor": {
         "name": "page[cursor]",
         "in": "query",
@@ -1179,6 +1534,64 @@
           "example": 20
         },
         "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "filterIataEq": {
+        "name": "filter[iata][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "maxLength": 1,
+          "items": {
+            "pattern": "^[A-Z]{3}$",
+            "type": "string",
+            "example": "BER",
+            "maxLength": 3,
+            "minLength": 3
+          },
+          "example": [
+            "BER"
+          ]
+        },
+        "description": "Filters Place based on the value of iata code.",
+        "style": "form",
+        "explode": false
+      },
+      "filterTypeEq": {
+        "name": "filter[type][eq]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "unspecified",
+              "city",
+              "railway-station",
+              "airport",
+              "ferry-port"
+            ],
+            "example": "city"
+          },
+          "example": [
+            "city"
+          ]
+        },
+        "description": "Filters Place based on the value of place type.",
+        "style": "form",
+        "explode": false
+      },
+      "filterNameLike": {
+        "name": "filter[name][like]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 3,
+          "example": "foo"
+        },
+        "description": "Filters Place based on the value of place name."
       }
     },
     "securitySchemes": {
