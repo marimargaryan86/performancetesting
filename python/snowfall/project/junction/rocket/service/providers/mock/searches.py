@@ -68,6 +68,12 @@ class Generator:
                     vendor_code="EZ",
                     unlimited_mileage=True,
                     air_conditioner=True,
+                    pickup_at=protobuf.datetime_to_protobuf_datetime(
+                        search.pickup_datetime,
+                    ),
+                    return_at=protobuf.datetime_to_protobuf_datetime(
+                        search.return_datetime,
+                    ),
                 ),
             ),
         ]

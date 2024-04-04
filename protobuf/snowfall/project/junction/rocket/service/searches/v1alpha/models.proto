@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/date.proto";
+import "snowfall/stdlib/v1/datetime.proto";
 import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/searches/v1alpha";
@@ -115,6 +116,8 @@ message MockResultDetail {
   snowfall.project.junction.go.v1.Point destination = 2;
   bool outbound_segment = 3;
   uint32 segment_sequence = 4;
+  snowfall.stdlib.v1.DateTime departure_date = 5;
+  snowfall.stdlib.v1.DateTime arrival_date = 6;
 }
 
 message RailResultDetail {
@@ -122,6 +125,8 @@ message RailResultDetail {
   snowfall.project.junction.go.v1.Point destination = 2;
   bool outbound_segment = 3;
   uint32 segment_sequence = 4;
+  snowfall.stdlib.v1.DateTime departure_date = 5;
+  snowfall.stdlib.v1.DateTime arrival_date = 6;
 }
 
 message FerryResultDetail {
@@ -129,6 +134,8 @@ message FerryResultDetail {
   snowfall.project.junction.go.v1.Point destination = 2;
   bool outbound_segment = 3;
   uint32 segment_sequence = 4;
+  snowfall.stdlib.v1.DateTime departure_date = 5;
+  snowfall.stdlib.v1.DateTime arrival_date = 6;
 }
 
 message CarRentalResultDetail {
@@ -145,6 +152,8 @@ message CarRentalResultDetail {
   optional bool air_conditioner = 12;
   optional string vendor_name = 13;
   optional string vendor_code = 14;
+  snowfall.stdlib.v1.DateTime pickup_at = 15;
+  snowfall.stdlib.v1.DateTime return_at = 16;
 }
 
 message Passenger {

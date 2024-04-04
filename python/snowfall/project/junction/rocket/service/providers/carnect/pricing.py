@@ -1,5 +1,8 @@
 import datetime
 
+import timezonefinder
+from dateutil import tz
+
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.rocket.service.providers.carnect import cache, criteria
 from snowfall.project.junction.rocket.service.providers.carnect.searches import (
@@ -20,6 +23,8 @@ from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.v1 import latlng_pb2
 from snowfall.vendor.carnect import client, config
 from snowfall.vendor.carnect.adapters import veh_avail_rate_adapter
+
+_tz_finder = timezonefinder.TimezoneFinder()
 
 
 class QuoteResultProducer:
@@ -147,6 +152,43 @@ class QuoteTaskConsumer:
         )
 
         rs_adapter = veh_avail_rate_adapter.VehAvailRateAdapter(response)
+        rental_core = rs_adapter.rental_core()
+
+        if not rental_core:
+            self._logger.error("Rental core is missing")
+
+            return None
+
+        pick_up_date_time: datetime.datetime | None = None
+        return_date_time: datetime.datetime | None = None
+
+        if rental_core.pick_up_date_time:
+            pick_up_date_time = rental_core.pick_up_date_time.to_datetime()
+
+        if rental_core.return_date_time:
+            return_date_time = rental_core.return_date_time.to_datetime()
+
+        if not pick_up_date_time or not return_date_time:
+            self._logger.error("Pickup or return date time is missing")
+
+            return None
+
+        pickup_at = pick_up_date_time.astimezone(
+            tz.gettz(
+                _tz_finder.timezone_at(
+                    lat=search_task.origin.coordinates.latitude,
+                    lng=search_task.origin.coordinates.longitude,
+                ),
+            ),
+        )
+        return_at = return_date_time.astimezone(
+            tz.gettz(
+                _tz_finder.timezone_at(
+                    lat=search_task.destination.coordinates.latitude,
+                    lng=search_task.destination.coordinates.longitude,
+                ),
+            ),
+        )
 
         if not rs_adapter.is_success():
             self._logger.error(
@@ -164,7 +206,11 @@ class QuoteTaskConsumer:
             )
 
             for veh_avail in veh_avails:
-                details = get_car_rental_result_detail(veh_avail)
+                details = get_car_rental_result_detail(
+                    veh_avail,
+                    pickup_at,
+                    return_at,
+                )
                 if self._match_details(details, offer_details):
                     return veh_avail
         return None

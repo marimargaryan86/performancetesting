@@ -5,6 +5,7 @@ from snowfall.vendor.carnect.adapters.common import (
 )
 from snowfall.vendor.carnect.models.service import (
     ServiceSoapGetVehAvailRateOutput,
+    VehicleRentalCoreType,
     VehicleVendorAvailabilityType,
 )
 
@@ -38,3 +39,9 @@ class VehAvailRateAdapter(BaseAdapter):
             return self._rs.veh_avail_rscore.veh_vendor_avails.veh_vendor_avail
 
         return []
+
+    def rental_core(self) -> VehicleRentalCoreType | None:
+        if self._rs and self._rs.veh_avail_rscore:
+            return self._rs.veh_avail_rscore.veh_rental_core
+
+        return None

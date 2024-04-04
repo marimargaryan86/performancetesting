@@ -4,6 +4,8 @@ from collections.abc import AsyncIterator, Sequence
 from typing import Any
 
 import httpx
+import timezonefinder
+from dateutil import tz
 
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.rocket.service.providers.carnect import (
@@ -29,6 +31,9 @@ _TYPE_GEO_COORDINATES = "6"
 _LOCATION_CODE_CONTEXT = "3"
 _REQ_RESP_VERSION = "large"
 _COVERAGE_TYPE_CANCELLATION_FEE = "CF"
+
+
+_tz_finder = timezonefinder.TimezoneFinder()
 
 
 def get_optional_value(obj: Any, accessor: str, default: Any) -> Any:
@@ -81,9 +86,15 @@ class SearchResultGenerator:
             return
 
         veh_avails = self._get_veh_avails(rs_adapter.available())
+        rental_core = rs_adapter.rental_core()
+
+        if not rental_core:
+            raise ValueError("Rental core is missing")
+
         search_results = self._generate_search_results(
             search_task,
             veh_avails,
+            rental_core,
         )
 
         async for search_result in search_results:
@@ -135,7 +146,37 @@ class SearchResultGenerator:
         self,
         search_task: criteria.Criteria,
         veh_avails: Sequence[CarnectVehAvail],
+        rental_core: service.VehicleRentalCoreType,
     ) -> AsyncIterator[models_pb2.SearchResult]:
+        pick_up_date_time: datetime.datetime | None = None
+        return_date_time: datetime.datetime | None = None
+
+        if rental_core.pick_up_date_time:
+            pick_up_date_time = rental_core.pick_up_date_time.to_datetime()
+
+        if rental_core.return_date_time:
+            return_date_time = rental_core.return_date_time.to_datetime()
+
+        if not pick_up_date_time or not return_date_time:
+            raise ValueError("Pickup or return date time is missing")
+
+        pickup_at = pick_up_date_time.astimezone(
+            tz.gettz(
+                _tz_finder.timezone_at(
+                    lat=search_task.origin.coordinates.latitude,
+                    lng=search_task.origin.coordinates.longitude,
+                ),
+            ),
+        )
+        return_at = return_date_time.astimezone(
+            tz.gettz(
+                _tz_finder.timezone_at(
+                    lat=search_task.destination.coordinates.latitude,
+                    lng=search_task.destination.coordinates.longitude,
+                ),
+            ),
+        )
+
         for veh_avail in veh_avails:
             try:
                 offer = parse_offer(veh_avail)
@@ -154,7 +195,11 @@ class SearchResultGenerator:
                 result_details=[
                     models_pb2.ResultDetail(
                         id=string.uuid(),
-                        car_rental=get_car_rental_result_detail(veh_avail),
+                        car_rental=get_car_rental_result_detail(
+                            veh_avail=veh_avail,
+                            pickup_at=pickup_at,
+                            return_at=return_at,
+                        ),
                     ),
                 ],
             )
@@ -273,6 +318,8 @@ def get_fare_rules(
 
 def get_car_rental_result_detail(
     veh_avail: CarnectVehAvail,
+    pickup_at: datetime.datetime,
+    return_at: datetime.datetime,
 ) -> models_pb2.CarRentalResultDetail:
     origin, destination = _get_coordinates(veh_avail)
     image_url = get_optional_value(
@@ -353,6 +400,8 @@ def get_car_rental_result_detail(
         vendor_code=vendor_code,
         unlimited_mileage=is_unlimited,
         air_conditioner=veh_avail_air_condition,
+        pickup_at=protobuf.datetime_to_protobuf_datetime(pickup_at),
+        return_at=protobuf.datetime_to_protobuf_datetime(return_at),
     )
 
 
