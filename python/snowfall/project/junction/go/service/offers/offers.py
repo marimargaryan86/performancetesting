@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
@@ -323,7 +323,7 @@ class OfferSearchRepository(
 
     def __init__(
         self,
-        collection: core.AgnosticCollection,
+        collection: motor_asyncio.AsyncIOMotorCollection,
         ttl: datetime.timedelta,
     ):
         super().__init__(collection)

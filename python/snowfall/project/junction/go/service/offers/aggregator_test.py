@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 
 import freezegun
 import pytest
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.go.service.offers import aggregator, offers
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2
@@ -436,7 +436,7 @@ class TestAggregator:
         self,
         offer_searches_repository: offers.OfferSearchRepository,
         offer_aggregator: aggregator.OfferAggregator,
-        offer_aggregate_collection: core.AgnosticCollection,
+        offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
         offer_search: offer_protos.OfferSearch,
         offer_results: Sequence[offer_protos.OfferGroup],
         expected: Sequence[Sequence[str]],
@@ -504,7 +504,7 @@ class TestSimpleSearchAggregator:
         self,
         offer_searches_repository: offers.OfferSearchRepository,
         offer_aggregator: aggregator.OfferAggregator,
-        offer_aggregate_collection: core.AgnosticCollection,
+        offer_aggregate_collection: motor_asyncio.AsyncIOMotorCollection,
         offer_search: offer_protos.OfferSearch,
         offer_results: Sequence[offer_protos.OfferGroup],
         expected: Sequence[Sequence[str]],

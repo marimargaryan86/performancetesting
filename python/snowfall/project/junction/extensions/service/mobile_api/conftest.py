@@ -12,11 +12,11 @@ import aiofiles
 import aiosmtplib
 import httpx
 import lagom
-import mongomock_motor
 import orjson
 import pytest
 from bson import json_util
 from fakeredis import aioredis as fakeredis
+from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
@@ -160,8 +160,10 @@ async def places_fixture() -> Sequence[dict[str, Any]]:
 
 
 @pytest.fixture()
-def mongo_test_db() -> mongomock_motor.AsyncMongoMockDatabase:
-    return mongomock_motor.AsyncMongoMockClient()["tests"]
+def mongo_test_db(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> motor_asyncio.AsyncIOMotorDatabase:
+    return mongo_client["tests"]
 
 
 def _create_app(
@@ -205,7 +207,7 @@ def smtp_client() -> smtp.EmailClient:
 
 @pytest.fixture()
 async def notification_tokens_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.NotificationTokensRepository:
     return repository.NotificationTokensRepository(
         mongo_test_db["notifications"],
@@ -214,7 +216,7 @@ async def notification_tokens_repository(
 
 @pytest.fixture()
 async def preferences_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.PreferencesRepository:
     return repository.PreferencesRepository(
         mongo_test_db["preferences"],
@@ -223,7 +225,7 @@ async def preferences_repository(
 
 @pytest.fixture()
 async def vouchers_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.VouchersRepository:
     return repository.VouchersRepository(
         mongo_test_db["vouchers"],
@@ -232,7 +234,7 @@ async def vouchers_repository(
 
 @pytest.fixture()
 async def loyalty_programs_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.LoyaltyProgramsRepository:
     return repository.LoyaltyProgramsRepository(
         mongo_test_db["air_loyalty"],
@@ -241,7 +243,7 @@ async def loyalty_programs_repository(
 
 @pytest.fixture()
 async def orders_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.OrdersRepository:
     return repository.OrdersRepository(
         mongo_test_db["orders"],
@@ -250,7 +252,7 @@ async def orders_repository(
 
 @pytest.fixture()
 async def user_groups_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.UserGroupsRepository:
     return repository.UserGroupsRepository(
         mongo_test_db["user_groups"],
@@ -259,7 +261,7 @@ async def user_groups_repository(
 
 @pytest.fixture()
 async def users_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
     existing_user: ExistingUser,
 ) -> repository.UsersRepository:
     users_repo = repository.UsersRepository(
@@ -273,7 +275,7 @@ async def users_repository(
 
 @pytest.fixture()
 async def guests_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
     existing_guest: models_pb2.Guest,
 ) -> repository.GuestsRepository:
     guests_repo = repository.GuestsRepository(
@@ -312,7 +314,7 @@ async def enums_values_repository(
 
 @pytest.fixture()
 async def places_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
     places_fixture: Sequence[Mapping[str, Any]],
 ) -> repository.PlacesRepository:
     places_repo = repository.PlacesRepository(
@@ -324,7 +326,7 @@ async def places_repository(
 
 @pytest.fixture()
 async def markups_repository(
-    mongo_test_db: mongomock_motor.AsyncMongoMockDatabase,
+    mongo_test_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> repository.MarkupsRepository:
     return repository.MarkupsRepository(
         mongo_test_db["markups"],

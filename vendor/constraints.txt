@@ -71,7 +71,7 @@
 //     "matrix-nio==0.24.0",
 //     "mongomock-motor==0.0.29",
 //     "more-itertools==10.2.0",
-//     "motor==3.3.1",
+//     "motor==3.4.0",
 //     "mypy-boto3-location==1.34.18",
 //     "mypy-protobuf==3.4.0",
 //     "mypy==1.9.0",
@@ -4896,18 +4896,18 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "a0dee83ad0d47b353932ac37467ba397b1e649ce7e3eea7f5a90554883d7cdbe",
-              "url": "https://files.pythonhosted.org/packages/d1/b3/7be664976abdb25912ed987ea2cf9416fd8c9b3d035ab0455f56f06474a7/motor-3.3.1-py3-none-any.whl"
+              "hash": "4b1e1a0cc5116ff73be2c080a72da078f2bb719b53bc7a6bb9e9a2f7dcd421ed",
+              "url": "https://files.pythonhosted.org/packages/c1/94/e09b22a1501ac8960de4d6ff4e8d21fb7ef67063a3f4454823886fee43b5/motor-3.4.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c5eb400e27d722a3db03a9826656b6d13acf9b6c70c2fb4604f474eac9da5be4",
-              "url": "https://files.pythonhosted.org/packages/c5/3a/7bc74c77b07162bdbdf7792d6a75a763d7d29a58e6eab32dcff53f7b4fc6/motor-3.3.1.tar.gz"
+              "hash": "c89b4e4eb2e711345e91c7c9b122cb68cce0e5e869ed0387dd0acb10775e3131",
+              "url": "https://files.pythonhosted.org/packages/7c/21/53f0bff417d234d025602ec01f0bd437a53ba43daefc62f8d8bc9d51812a/motor-3.4.0.tar.gz"
             }
           ],
           "project_name": "motor",
           "requires_dists": [
-            "aiohttp; extra == \"test\"",
+            "aiohttp!=3.8.6; extra == \"test\"",
             "mockupdb; extra == \"test\"",
             "motor[encryption]; extra == \"test\"",
             "pymongo<5,>=4.5",
@@ -4922,7 +4922,7 @@
             "tornado>=5; extra == \"test\""
           ],
           "requires_python": ">=3.7",
-          "version": "3.3.1"
+          "version": "3.4.0"
         },
         {
           "artifacts": [
@@ -10378,7 +10378,7 @@
     "matrix-nio==0.24.0",
     "mongomock-motor==0.0.29",
     "more-itertools==10.2.0",
-    "motor==3.3.1",
+    "motor==3.4.0",
     "mypy-boto3-location==1.34.18",
     "mypy-protobuf==3.4.0",
     "mypy==1.9.0",

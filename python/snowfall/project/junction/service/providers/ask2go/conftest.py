@@ -12,7 +12,7 @@ import httpx
 import orjson
 import pytest
 import pytest_httpx
-from motor import core
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import airports, cabin_classes, notifications
@@ -251,7 +251,7 @@ def booking_handler(
 
 @pytest.fixture()
 async def provider_cabin_class_mapping(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(
         collection=mongo_client.test.provider_cabin_mapping,

@@ -10,7 +10,7 @@ import httpx
 import orjson
 import pytest
 from aio_pika import Connection, connection
-from motor import core
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
@@ -78,7 +78,7 @@ def train_station_repository() -> train_stations.TrainStationRepository:
 
 @pytest.fixture()
 async def provider_cabin_class_mapping(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(collection=mongo_client.test.test)
 

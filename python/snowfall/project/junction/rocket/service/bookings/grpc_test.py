@@ -4,7 +4,7 @@ from unittest import mock
 
 import grpc
 import pytest
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.rocket.service.bookings import (
     amqp,
@@ -51,7 +51,7 @@ def grpc_context() -> grpc.aio.ServicerContext:
 
 @pytest.fixture()
 async def booking_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repository.BookingRepository:
     return repository.BookingRepository(
         collection=mongo_client.test.bookings,
@@ -60,7 +60,7 @@ async def booking_repository(
 
 @pytest.fixture()
 async def booking_cancellation_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repository.BookingCancellationRepository:
     return repository.BookingCancellationRepository(
         collection=mongo_client.test.cancellations,

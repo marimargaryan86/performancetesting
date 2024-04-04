@@ -10,7 +10,7 @@ import httpx
 import orjson
 import pytest
 from google.protobuf.timestamp_pb2 import Timestamp
-from motor import core
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.provider import notifications as base_notifications
@@ -64,7 +64,7 @@ def train_station_repository() -> TrainStationRepository:
 
 @pytest.fixture()
 async def provider_cabin_class_mapping(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> CabinMappingRepository:
     return CabinMappingRepository(
         collection=mongo_client.test.provider_cabin_mapping,

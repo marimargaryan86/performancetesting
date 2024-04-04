@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import cast
 
 import mongomock_motor
 import pytest
 from fakeredis import FakeServer
 from fakeredis import aioredis as fakeredis
-from motor import core
+from motor import motor_asyncio
 from redis import asyncio as aioredis
 
 pytest.register_assert_rewrite("snowfall.stdlib.integration.starlette.testing")
@@ -16,8 +15,8 @@ pytest.register_assert_rewrite("snowfall.stdlib.transport.grpc.testing")
 
 
 @pytest.fixture()
-def mongo_client() -> core.AgnosticClient:
-    return cast(core.AgnosticClient, mongomock_motor.AsyncMongoMockClient())
+def mongo_client() -> motor_asyncio.AsyncIOMotorClient:
+    return mongomock_motor.AsyncMongoMockClient()
 
 
 @pytest.fixture()

@@ -10,7 +10,7 @@ import httpx
 import json_api_doc
 from authlib.integrations import httpx_client
 from dateutil import relativedelta
-from motor import core, motor_asyncio
+from motor import motor_asyncio
 from pydantic import AnyUrl, HttpUrl
 
 from snowfall.project.junction.extensions.service.mobile_api import smtp
@@ -67,7 +67,7 @@ async def orders_report(app: application.Application[Settings]) -> None:
 
 
 async def _generate_report(
-    orders_repository: core.AgnosticCollection,
+    orders_repository: motor_asyncio.AsyncIOMotorCollection,
     junction_client: client.Client,
 ) -> Sequence[Mapping[str, str | int | float]]:
     junction_orders = []

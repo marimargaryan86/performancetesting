@@ -7,7 +7,7 @@ import httpx
 import orjson
 import pytest
 import pytest_httpx
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.content.service.ask2go import trips
 from snowfall.project.junction.provider import airports, cabin_classes
@@ -26,7 +26,7 @@ _DEPARTURE_DATE = datetime.date(2023, 2, 23)
 
 @pytest.fixture()
 async def cabin_class_repo(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> cabin_classes.CabinMappingRepository:
     return cabin_classes.CabinMappingRepository(
         collection=mongo_client.test.provider_cabin_mapping,

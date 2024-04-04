@@ -5,7 +5,7 @@ from typing import Any
 
 import pymongo
 import pytest
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1 import testing_pb2
@@ -96,21 +96,21 @@ class NestedMockRepository(
 
 @pytest.fixture()
 async def foobar_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> FoobarRepository:
     return FoobarRepository(mongo_client.test.test)
 
 
 @pytest.fixture()
 async def mock_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> MockRepository:
     return MockRepository(mongo_client.test.test)
 
 
 @pytest.fixture()
 async def nested_mock_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> NestedMockRepository:
     return NestedMockRepository(mongo_client.test.test)
 

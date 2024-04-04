@@ -6,7 +6,7 @@ from unittest import mock
 import grpc
 import more_itertools
 import pytest
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.go.service.gateway.v1 import (
     bookings_pb2,
@@ -34,7 +34,7 @@ class MockedBookings(orders.BookingRepository):
 
 @pytest.fixture()
 async def mock_bookings(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.BookingRepository:
     return MockedBookings(mongo_client.test.test)
 

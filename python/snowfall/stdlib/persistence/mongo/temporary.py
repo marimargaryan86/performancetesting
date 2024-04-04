@@ -1,7 +1,7 @@
 import asyncio
 import types
 
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.stdlib import string
 
@@ -9,7 +9,7 @@ from snowfall.stdlib import string
 class TemporaryDatabase:
     def __init__(
         self,
-        mongo: core.AgnosticClient,
+        mongo: motor_asyncio.AsyncIOMotorClient,
         prefix: str = "",
     ) -> None:
         self._mongo = mongo
@@ -18,7 +18,7 @@ class TemporaryDatabase:
             random=string.random(8),
         )
 
-    async def __aenter__(self) -> core.AgnosticDatabase:
+    async def __aenter__(self) -> motor_asyncio.AsyncIOMotorDatabase:
         return self._mongo[self._db_name]
 
     async def __aexit__(

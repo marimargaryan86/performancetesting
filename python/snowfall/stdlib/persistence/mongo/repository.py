@@ -5,7 +5,7 @@ import datetime
 import functools
 import types
 from collections.abc import Callable, Mapping
-from typing import Any, Generic, Protocol, TypeVar, cast
+from typing import Any, Generic, Protocol, TypeVar
 
 import pydantic
 import pymongo
@@ -118,16 +118,13 @@ def create_sort(
 
 
 def _configure_collection(
-    collection: core.AgnosticCollection,
-) -> core.AgnosticCollection:
+    collection: motor_asyncio.AsyncIOMotorCollection,
+) -> motor_asyncio.AsyncIOMotorCollection:
     try:
-        return cast(
-            core.AgnosticCollection,
-            collection.with_options(
-                codec_options=collection.codec_options.with_options(
-                    tz_aware=True,
-                    tzinfo=datetime.UTC,
-                ),
+        return collection.with_options(
+            codec_options=collection.codec_options.with_options(
+                tz_aware=True,
+                tzinfo=datetime.UTC,
             ),
         )
     except NotImplementedError:
@@ -136,7 +133,7 @@ def _configure_collection(
 
 
 class RepositoryProtocol(Protocol[Record]):
-    _collection: core.AgnosticCollection
+    _collection: motor_asyncio.AsyncIOMotorCollection
 
     @property
     def _coder(self) -> coders.BaseCoder[Record]:
@@ -183,7 +180,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
     def __init__(
         self,
-        collection: core.AgnosticCollection,
+        collection: motor_asyncio.AsyncIOMotorCollection,
         timeout: datetime.timedelta = _DEFAULT_TIMEOUT,
     ) -> None:
         self._collection = _configure_collection(collection)

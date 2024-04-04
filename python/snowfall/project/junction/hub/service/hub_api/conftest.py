@@ -5,7 +5,7 @@ from unittest import mock
 import httpx
 import pytest
 from google.protobuf import struct_pb2
-from motor import core
+from motor import motor_asyncio
 from starlette import applications, middleware
 from starlette.middleware import authentication as auth_middleware
 
@@ -292,7 +292,7 @@ async def user() -> hub_models_pb2.User:
 
 @pytest.fixture()
 async def users_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
     user: hub_models_pb2.User,
 ) -> repository.UsersRepository:
     users_repository = repository.UsersRepository(

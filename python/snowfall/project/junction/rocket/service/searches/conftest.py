@@ -4,7 +4,7 @@ import datetime
 from unittest import mock
 
 import pytest
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.rocket.service.searches import amqp, grpc, repository
 from snowfall.stdlib.transport.amqp import producer
@@ -13,7 +13,7 @@ from snowfall.stdlib.transport.grpc import testing
 
 @pytest.fixture()
 async def search_result_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repository.SearchResultRepository:
     return repository.SearchResultRepository(
         collection=mongo_client.test.search_results,
@@ -22,14 +22,14 @@ async def search_result_repository(
 
 @pytest.fixture()
 async def offer_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repository.OfferRepository:
     return repository.OfferRepository(collection=mongo_client.test.offers)
 
 
 @pytest.fixture()
 async def repository_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repository.SearchRepository:
     return repository.SearchRepository(
         collection=mongo_client.test.searches,
@@ -39,7 +39,7 @@ async def repository_repository(
 
 @pytest.fixture()
 async def quote_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> repository.QuoteRepository:
     return repository.QuoteRepository(
         mongo_client.test.quotes,

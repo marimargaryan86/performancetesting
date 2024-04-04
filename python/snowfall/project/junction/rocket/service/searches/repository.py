@@ -3,7 +3,7 @@ from collections.abc import Sequence
 
 import pymongo
 from google.protobuf import timestamp_pb2
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib import string
@@ -114,7 +114,7 @@ class SearchRepository(
 
     def __init__(
         self,
-        collection: core.AgnosticCollection,
+        collection: motor_asyncio.AsyncIOMotorCollection,
         ttl: datetime.timedelta,
     ):
         super().__init__(collection)
@@ -183,7 +183,7 @@ class QuoteRepository(
 
     def __init__(
         self,
-        collection: core.AgnosticCollection,
+        collection: motor_asyncio.AsyncIOMotorCollection,
         ttl: datetime.timedelta | None = None,
     ):
         super().__init__(collection)

@@ -5,7 +5,7 @@ from unittest import mock
 
 import httpx
 import pytest
-from motor import core
+from motor import motor_asyncio
 
 from snowfall.project.junction.go.adapter import passenger_name_records
 from snowfall.project.junction.go.service.orders import (
@@ -43,7 +43,7 @@ def resellers_client() -> Any:
 
 @pytest.fixture()
 async def journey_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
     pnr_client: passenger_name_records.Client,
     resellers_client: Any,
 ) -> orders.JourneyRepository:
@@ -56,7 +56,7 @@ async def journey_repository(
 
 @pytest.fixture()
 async def order_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.OrderRepository:
     return orders.OrderRepository(
         collection=mongo_client.test.journeys,
@@ -65,7 +65,7 @@ async def order_repository(
 
 @pytest.fixture()
 async def booking_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.BookingRepository:
     return orders.BookingRepository(
         collection=mongo_client.test.journeys,
@@ -74,7 +74,7 @@ async def booking_repository(
 
 @pytest.fixture()
 async def booking_details_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.BookingDetailsRepository:
     return orders.BookingDetailsRepository(
         collection=mongo_client.test.journeys,
@@ -83,7 +83,7 @@ async def booking_details_repository(
 
 @pytest.fixture()
 async def cancellation_requests_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.CancellationRequestsRepository:
     return orders.CancellationRequestsRepository(
         collection=mongo_client.test.order_cancellations,
@@ -92,7 +92,7 @@ async def cancellation_requests_repository(
 
 @pytest.fixture()
 async def booking_cancellations_repository(
-    mongo_client: core.AgnosticClient,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> orders.BookingCancellationsRepository:
     return orders.BookingCancellationsRepository(
         collection=mongo_client.test.order_cancellations,
