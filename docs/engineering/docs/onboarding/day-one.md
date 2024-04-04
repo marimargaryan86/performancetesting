@@ -70,6 +70,7 @@ Please ensure you have access to:
 * [Grafana](https://grafana.snowfall.se/) - Logs and metrics
 * [Nomad Dev](https://nomad.junction.dev/) - Dev cluster (ask SRE for access)
 * [Consul Dev](https://consul.junction.dev/) - Service directory (ask SRE for access)
+* The `engineering@snowfalltravel.com` distribution list (ask SRE for getting added to it)
 * Junction VPN (If you're reading this, you already have this!)
 
 ### Understand Snowfall Development Practices

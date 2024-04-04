@@ -85,3 +85,12 @@ The repository can then be cloned from GitLab with the following command:
 ```shell
 git clone git@git.snowfall.se:junction/junction.git
 ```
+
+## Next Steps
+
+Now that your environment is properly set up for development, we suggest you follow the following guides:
+
+1. Setup your favorite IDE ([PyCharm](/docs/monorepo/setting-up-an-ide/pycharm) or [Visual Studio Code](/docs/monorepo/setting-up-an-ide/vscode)).
+2. Understand the [high-level architecture of Junction](/docs/monorepo/architecture).
+3. Take a [deep dive into the codebase](/docs/monorepo/code-deep-dive) to learn how the monorepo is organized.
+4. Learn how to [run your first service](/docs/monorepo/running-a-service).
