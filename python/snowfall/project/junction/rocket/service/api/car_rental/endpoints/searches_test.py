@@ -31,7 +31,6 @@ class TestCreateSearch:
         response = await client.post(
             "/car-rental/searches",
             json=payload,
-            headers={"Content-Type": "application/vnd.api+json"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED

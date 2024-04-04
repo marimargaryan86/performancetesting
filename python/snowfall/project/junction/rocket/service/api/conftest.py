@@ -7,13 +7,19 @@ import httpx
 import lagom
 import pytest
 import pytest_mock
-from lagom.integrations import starlette
+from lagom.integrations.starlette import StarletteIntegration
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api import errors, fakes
+from snowfall.project.junction.rocket.service.api.air import endpoints as routes
+from snowfall.project.junction.rocket.service.api.air.types import (
+    AbstractAirSearchRepo,
+    AirSearchRequestTransformer,
+    AirSearchResultTransformer,
+)
 from snowfall.project.junction.rocket.service.api.car_rental import router
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -25,6 +31,23 @@ from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import filesystem
+from snowfall.vendor.junction_one.client import JunctionOneClient
+
+
+@pytest.fixture()
+def air_search_repo() -> fakes.FakeAirSearchRepo:
+    return fakes.FakeAirSearchRepo()
+
+
+@pytest.fixture()
+async def http_client() -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient() as http_client:
+        yield http_client
+
+
+@pytest.fixture()
+def junction_one_client(http_client: httpx.AsyncClient) -> JunctionOneClient:
+    return JunctionOneClient(api_base_url="https://localhost/", http_client=http_client)
 
 
 async def mock_jwt_to_reseller_id(token: str) -> str:
@@ -72,20 +95,41 @@ def search_results(
 def container(
     searches: grpc_pb2_grpc.SearchServiceStub,
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
+    junction_one_client: JunctionOneClient,
+    air_search_repo: fakes.FakeAirSearchRepo,
 ) -> lagom.Container:
     container = lagom.Container()
 
     container[datetime.timedelta] = datetime.timedelta(seconds=45)
     container[grpc_pb2_grpc.SearchServiceStub] = searches
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
+    container[JunctionOneClient] = junction_one_client
+    container[AbstractAirSearchRepo] = air_search_repo  # type: ignore[type-abstract]
+    container[AirSearchRequestTransformer] = fakes.FakeAirSearchRequestTransformer  # type: ignore[type-abstract]
+    container[AirSearchResultTransformer] = fakes.FakeAirSearchResultTransformer  # type: ignore[type-abstract]
 
     return container
 
 
 @pytest.fixture()
 def app(container: lagom.Container) -> applications.Starlette:
+    integration = StarletteIntegration(container)
+    route_list = [
+        *router.get_routes(integration),
+        integration.route("/air/searches", routes.AirSearch, name="AirSearch"),
+        integration.route(
+            "/air/searches/{id}/results",
+            routes.AirSearchRetrieval,
+            name="AirSearchRetrieval",
+        ),
+        integration.route(
+            "/air/searches/{id}",
+            routes.AirSearchStatus,
+            name="AirSearchStatus",
+        ),
+    ]
     asgi_app = application.create_starlette_app(
-        routes=router.get_routes(starlette.StarletteIntegration(container)),
+        routes=route_list,
         openapi_path=filesystem.resource_path("junction.rocket_api", "openapi.json"),
         custom_middlewares=[
             Middleware(
@@ -150,6 +194,7 @@ def jwt_token(user: auth_models_pb2.User) -> str:
 @pytest.fixture()
 def headers(jwt_token: str) -> dict[str, str]:
     return {
+        "Content-Type": "application/vnd.api+json",
         "Accept": "application/vnd.api+json",
         "Authorization": "Bearer {0}".format(jwt_token),
     }
