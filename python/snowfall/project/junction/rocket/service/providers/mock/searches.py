@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from collections.abc import AsyncIterator, Callable, Sequence
+from collections.abc import AsyncIterator, Callable
 
 import faker
 from google.protobuf import message
@@ -18,16 +18,16 @@ _TIMESTAMP_PB_FACTOR = 1e9
 
 
 @dataclasses.dataclass(frozen=True)
-class Criteria(message.Message):
-    origin: str
-    destination: str
-    passenger_dobs: Sequence[datetime.date]
-    outbound_departure_datetime: datetime.datetime
-    inbound_departure_datetime: datetime.datetime
-    outbound_search_result_id: str | None = None
+class CarRentalCriteria(message.Message):
+    search_id: str
+    origin: legacy_go_pb2.Point
+    destination: legacy_go_pb2.Point
+    pickup_datetime: datetime.datetime
+    return_datetime: datetime.datetime
+    driver_age: int
 
 
-def cache_key(search: Criteria) -> str:
+def cache_key(search: CarRentalCriteria) -> str:
     return string.uuid()
 
 
@@ -42,7 +42,7 @@ class Generator:
 
     async def generate(
         self,
-        search: Criteria,
+        search: CarRentalCriteria,
     ) -> AsyncIterator[models_pb2.SearchResult]:
         fake = faker.Faker()
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
@@ -54,34 +54,28 @@ class Generator:
         result_details = [
             models_pb2.ResultDetail(
                 id=string.uuid(),
-                mock=models_pb2.MockResultDetail(
-                    origin=legacy_go_pb2.Point(
-                        name=search.origin,
-                    ),
-                    destination=legacy_go_pb2.Point(
-                        name=search.destination,
-                    ),
-                    outbound_segment=True,
-                    segment_sequence=1,
+                car_rental=models_pb2.CarRentalResultDetail(
+                    origin=search.origin,
+                    destination=search.destination,
+                    image_url="www.example.com/image",
+                    model="ferrari",
+                    seats_count=2,
+                    doors_count=2,
+                    transmission="manual",
+                    baggage_quantity=1,
+                    vehicle_type="car",
+                    vendor="enzo",
+                    unlimited_mileage=True,
+                    air_conditioner=True,
                 ),
             ),
         ]
-        if search.outbound_search_result_id:
-            result_details.append(
-                models_pb2.ResultDetail(
-                    id=string.uuid(),
-                    mock=models_pb2.MockResultDetail(
-                        origin=legacy_go_pb2.Point(
-                            name=search.destination,
-                        ),
-                        destination=legacy_go_pb2.Point(
-                            name=search.origin,
-                        ),
-                        outbound_segment=False,
-                        segment_sequence=2,
-                    ),
-                ),
-            )
+
+        conditional_price = models_pb2.ConditionalPrice(
+            price=price.protobuf(),
+            description="This is a conditional price",
+            included_in_total=False,
+        )
 
         yield models_pb2.SearchResult(
             id=string.uuid(),
@@ -97,6 +91,9 @@ class Generator:
                         expires_at=expires_at,
                     ),
                     price=price.protobuf(),
+                    car_rental=models_pb2.CarRentalOffer(
+                        conditional_prices=[conditional_price],
+                    ),
                 ),
             ],
             result_details=result_details,
@@ -105,9 +102,9 @@ class Generator:
 
 def search_result_generator(
     generator: Generator,
-) -> Callable[[Criteria], AsyncIterator[models_pb2.SearchResult]]:
+) -> Callable[[CarRentalCriteria], AsyncIterator[models_pb2.SearchResult]]:
     def wrapper(
-        search_criteria: Criteria,
+        search_criteria: CarRentalCriteria,
     ) -> AsyncIterator[models_pb2.SearchResult]:
         return generator.generate(search_criteria)
 
@@ -116,26 +113,29 @@ def search_result_generator(
 
 def search_criteria_task_generator(
     search: models_pb2.Search,
-) -> list[Criteria]:
-    if not search.HasField("mock"):
+) -> list[CarRentalCriteria]:
+    if search.HasField("car_rental"):
+        return car_rental_task_generator(search)
+    return []
+
+
+def car_rental_task_generator(
+    search: models_pb2.Search,
+) -> list[CarRentalCriteria]:
+    pickup_datetime = protobuf.protobuf_to_datetime(search.car_rental.pickup_at)
+    far_future = datetime.datetime(2050, 1, 1, tzinfo=datetime.UTC)  # noqa: WPS432
+    # This is for QA, to mock 0 results from a provider. E.g. too far in future
+    if pickup_datetime >= far_future:
         return []
     return [
-        Criteria(
-            origin=search.mock.origin.name,
-            destination=search.mock.destination.name,
-            passenger_dobs=[
-                protobuf.protobuf_to_date(search.mock.passengers[0].date_of_birth),
-            ],
-            outbound_departure_datetime=protobuf.protobuf_to_datetime(
-                search.mock.departure_date,
+        CarRentalCriteria(
+            search_id=search.id,
+            origin=search.car_rental.origin,
+            destination=search.car_rental.destination,
+            pickup_datetime=pickup_datetime,
+            return_datetime=protobuf.protobuf_to_datetime(
+                search.car_rental.return_at,
             ),
-            inbound_departure_datetime=protobuf.protobuf_to_datetime(
-                search.mock.return_date,
-            ),
-            outbound_search_result_id=(
-                search.mock.outbound_search_result_id
-                if search.mock.outbound_search_result_id
-                else None
-            ),
+            driver_age=search.car_rental.driver_age,
         ),
     ]

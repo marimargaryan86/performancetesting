@@ -63,7 +63,7 @@ async def _search_factory(
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
-) -> searches.SearchImplementation[provider_searches.Criteria]:
+) -> searches.SearchImplementation[provider_searches.CarRentalCriteria]:
     search_result_generator = provider_searches.search_result_generator(
         generator=provider_searches.Generator(
             search_result_cache=cache.SearchResultCache(
