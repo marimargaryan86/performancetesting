@@ -141,9 +141,10 @@ message CarRentalResultDetail {
   optional string transmission = 7;
   optional uint32 baggage_quantity = 8;
   optional string vehicle_type = 9;
-  optional string vendor = 10;
   optional bool unlimited_mileage = 11;
   optional bool air_conditioner = 12;
+  optional string vendor_name = 13;
+  optional string vendor_code = 14;
 }
 
 message Passenger {

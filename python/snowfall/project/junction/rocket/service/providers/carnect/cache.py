@@ -13,7 +13,7 @@ class Coordinates(RedisRecord):
     longitude: float
 
 
-class CarRentalResultDetails(RedisRecord):
+class CarRentalResultDetail(RedisRecord):
     origin: Coordinates
     destination: Coordinates
     departure_at: datetime.datetime
@@ -25,13 +25,26 @@ class CarRentalResultDetails(RedisRecord):
     transmission: str
     baggage_quantity: int
     vehicle_type: str
-    vendor: str | None
+    vendor_name: str | None
+    vendor_code: str | None
 
 
-class SearchResultCache(RedisRepository[CarRentalResultDetails]):
+class SearchResultCache(RedisRepository[CarRentalResultDetail]):
     """Stores search result in the cache."""
 
-    _record_type: type[CarRentalResultDetails] = CarRentalResultDetails
+    _record_type: type[CarRentalResultDetail] = CarRentalResultDetail
+
+
+class PriceQuote(RedisRecord):
+    """Stores price quotes in the cache."""
+
+    quote_id: str
+
+
+class QuoteCache(RedisRepository[PriceQuote]):
+    """Stores pricing details in the cache."""
+
+    _record_type: type[PriceQuote] = PriceQuote
 
 
 def generate_cache_key(search: criteria.Criteria) -> str:

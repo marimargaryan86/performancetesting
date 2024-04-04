@@ -69,7 +69,7 @@ class SearchResultGenerator:
         search_task: criteria.Criteria,
     ) -> AsyncIterator[models_pb2.SearchResult]:
         response = await self._client.get_avail_rate(
-            _build_request(search_task, self._config),
+            build_request(search_task, self._config),
         )
         rs_adapter = veh_avail_rate_adapter.VehAvailRateAdapter(response)
         if not rs_adapter.is_success():
@@ -90,7 +90,7 @@ class SearchResultGenerator:
             offer = search_result.offers[0]
             details = search_result.result_details[0].car_rental
             await self._search_result_cache.store(
-                cache.CarRentalResultDetails(
+                cache.CarRentalResultDetail(
                     origin=cache.Coordinates(
                         latitude=details.origin.coordinates.latitude,
                         longitude=details.origin.coordinates.longitude,
@@ -108,7 +108,8 @@ class SearchResultGenerator:
                     transmission=details.transmission,
                     baggage_quantity=details.baggage_quantity,
                     vehicle_type=details.vehicle_type,
-                    vendor=details.vendor,
+                    vendor_name=details.vendor_name,
+                    vendor_code=details.vendor_code,
                 ),
                 expires_at=datetime.datetime.now(datetime.UTC) + self._ttl,
                 key=offer.id,
@@ -137,7 +138,7 @@ class SearchResultGenerator:
     ) -> AsyncIterator[models_pb2.SearchResult]:
         for veh_avail in veh_avails:
             try:
-                offer = _parse_offer(veh_avail)
+                offer = parse_offer(veh_avail)
             except errors.FieldMissingError:
                 self._logger.exception("Missing field while parsing offer")
                 continue
@@ -153,7 +154,7 @@ class SearchResultGenerator:
                 result_details=[
                     models_pb2.ResultDetail(
                         id=string.uuid(),
-                        car_rental=_get_car_rental_result_detail(veh_avail),
+                        car_rental=get_car_rental_result_detail(veh_avail),
                     ),
                 ],
             )
@@ -185,7 +186,7 @@ def _split_coordinates(coordinate_pair: str) -> tuple[float, float]:
     return float(lat), float(lng)
 
 
-def _parse_offer(
+def parse_offer(
     veh_avail: CarnectVehAvail,
 ) -> models_pb2.Offer:
     offer_price = _get_offer_price(veh_avail)
@@ -235,7 +236,42 @@ def _get_offer_price(  # noqa: WPS238
     )
 
 
-def _get_car_rental_result_detail(
+def get_fare_rules(
+    veh_avail: CarnectVehAvail,
+) -> list[models_pb2.FareRule]:
+    priced_coverages = get_optional_value(
+        veh_avail,
+        "veh_avail_info.priced_coverages.priced_coverage",
+        [],
+    )
+
+    fare_rules = []
+
+    for priced_coverage in priced_coverages:
+        details = get_optional_value(priced_coverage, "coverage.details", [])
+        coverage_code = get_optional_value(priced_coverage, "coverage.code", None)
+
+        for detail in details:
+            charge = detail.charge
+
+            if (  # noqa: WPS337
+                not charge
+                or not charge.description
+                or coverage_code != _COVERAGE_TYPE_CANCELLATION_FEE
+            ):
+                continue
+
+            fare_rules.append(
+                models_pb2.FareRule(
+                    title="Cancellation conditions",
+                    body=charge.description,
+                ),
+            )
+
+    return fare_rules
+
+
+def get_car_rental_result_detail(
     veh_avail: CarnectVehAvail,
 ) -> models_pb2.CarRentalResultDetail:
     origin, destination = _get_coordinates(veh_avail)
@@ -269,7 +305,10 @@ def _get_car_rental_result_detail(
         "veh_avail_core.vehicle.baggage_quantity",
         None,
     )
-    vendor = get_optional_value(veh_avail, "veh_avail_core.vendor.value", "")
+
+    vendor_name = get_optional_value(veh_avail, "veh_avail_core.vendor.value", "")
+    vendor_code = get_optional_value(veh_avail, "veh_avail_core.vendor.code", "")
+
     veh_category_id = get_optional_value(
         veh_avail,
         "veh_avail_core.vehicle.veh_type.vehicle_category",
@@ -310,7 +349,8 @@ def _get_car_rental_result_detail(
         transmission=transmission,
         baggage_quantity=_convert_to_integer(baggage_quantity),
         vehicle_type=vehicle_type,
-        vendor=vendor,
+        vendor_name=vendor_name,
+        vendor_code=vendor_code,
         unlimited_mileage=is_unlimited,
         air_conditioner=veh_avail_air_condition,
     )
@@ -363,7 +403,7 @@ def _convert_to_integer(value: str | None) -> int | None:
         return None
 
 
-def _build_request(
+def build_request(
     search_task: criteria.Criteria,
     carnect_config: config.Config,
     vendor_code: str | None = None,

@@ -1,15 +1,13 @@
 import dataclasses
 import datetime
 
-from google.protobuf import message
-
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 
 
 @dataclasses.dataclass(frozen=True)
-class Criteria(message.Message):
+class Criteria:
     search_id: str
     origin: common_pb2.Point
     destination: common_pb2.Point

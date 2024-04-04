@@ -95,12 +95,34 @@ async def _search_factory(
 async def _pricing(
     app: service.Application[_Settings],
 ) -> None:
+    carnect_config = carnect_settings.Config(
+        timeout=app.settings.ttl.seconds,
+        base_url=str(app.settings.api_base_url),
+        export_soap_requests=True,
+        username=app.settings.api_username,
+        password=app.settings.api_password,
+        is_test=app.settings.is_test,
+    )
+
+    carnect_client = client.CarnectClient(
+        http_client=await httpx_factory.make_client(
+            app,
+            timeout=app.settings.api_timeout,
+        ),
+        config=carnect_config,
+    )
+
     redis_client = await redis_factory.make_client(
         app=app,
         dsn=app.settings.redis_dsn,
         decode_responses=False,
     )
-    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    amqp_connection = await amqp_factory.make_connection(
+        app=app,
+        dsn=app.settings.amqp_dsn,
+    )
+
     quote_task_consumer = pricing.QuoteTaskConsumer(
         consumer_obj=consumer.Consumer(
             connection=amqp_connection,
@@ -112,6 +134,9 @@ async def _pricing(
             routing_key="searches.pricing_results",
         ),
         search_result_cache=cache.SearchResultCache(client=redis_client),
+        quote_cache=cache.QuoteCache(client=redis_client),
+        carnect_client=carnect_client,
+        carnect_config=carnect_config,
         ttl=app.settings.ttl,
     )
 

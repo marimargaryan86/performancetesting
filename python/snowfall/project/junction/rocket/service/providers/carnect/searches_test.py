@@ -120,6 +120,7 @@ async def test_successful(  # noqa: WPS218
     assert result_detail.car_rental.transmission == "Manual"
     assert result_detail.car_rental.baggage_quantity == 1
     assert result_detail.car_rental.vehicle_type == "Car"
-    assert result_detail.car_rental.vendor == "Hertz"
+    assert result_detail.car_rental.vendor_name == "Hertz"
+    assert result_detail.car_rental.vendor_code == "ZE"
     assert result_detail.car_rental.unlimited_mileage
     assert result_detail.car_rental.air_conditioner
