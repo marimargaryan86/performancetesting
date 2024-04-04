@@ -1,4 +1,4 @@
 nomad_template(
-    ["grpc"],
+    ["grpc", "pricing"],
     "python/snowfall/project/junction/rocket/service/providers/carnect:main",
 )

@@ -1,0 +1,26 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://ota2007a.micronnexus-staging.com/service.asmx",
+      "bucket": "junction-provider-data-development"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://ota2007a.carhire-solutions.com/service.asmx",
+      "bucket": "junction-provider-data-production"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "api_base_url": "https://ota2007a.micronnexus-staging.com/service.asmx",
+      "bucket": "junction-provider-data-sandbox"
+    }
+  }
+}
