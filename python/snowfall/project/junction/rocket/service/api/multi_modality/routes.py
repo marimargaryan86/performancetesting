@@ -56,14 +56,21 @@ class Routes:
         origin: models_pb2.Place,
         destination: models_pb2.Place,
     ) -> list[Route]:
-        route_response = await self._planner.FindRoutes(
-            planner_pb2.FindRoutesRequest(
-                origins=await self._find_location_coordinates(origin.coordinates),
-                destinations=await self._find_location_coordinates(
-                    destination.coordinates,
+        try:
+            route_response = await self._planner.FindRoutes(
+                planner_pb2.FindRoutesRequest(
+                    origins=await self._find_location_coordinates(origin.coordinates),
+                    destinations=await self._find_location_coordinates(
+                        destination.coordinates,
+                    ),
                 ),
-            ),
-        )
+            )
+        except grpc.aio.AioRpcError as err:
+            if err.code() == grpc.StatusCode.INVALID_ARGUMENT:
+                return []
+
+            raise
+
         segments = [
             segment for route in route_response.routes for segment in route.segments
         ]

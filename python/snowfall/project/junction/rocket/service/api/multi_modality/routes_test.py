@@ -1,6 +1,6 @@
 import asyncio
 import types
-from typing import TypeVar
+from typing import NoReturn, TypeVar
 
 import grpc
 import grpc_testing
@@ -41,6 +41,21 @@ _PLACE_MAPPING = types.MappingProxyType({
 })
 
 
+def _grpc_error(status: grpc.StatusCode) -> grpc.aio.AioRpcError:
+    return grpc.aio.AioRpcError(
+        code=status,
+        initial_metadata=grpc.aio.Metadata(),
+        trailing_metadata=grpc.aio.Metadata(),
+    )
+
+
+def _awaitable_error(status: grpc.StatusCode) -> asyncio.Future[NoReturn]:
+    future = asyncio.Future[NoReturn]()
+    future.set_exception(_grpc_error(status))
+
+    return future
+
+
 async def _locations_lookup(
     request: locations_pb2.ListNearbyLocationsRequest,
 ) -> locations_pb2.ListNearbyLocationsResponse:
@@ -51,11 +66,7 @@ async def _locations_lookup(
     )
 
     if not location_list:
-        raise grpc.aio.AioRpcError(
-            code=grpc.StatusCode.NOT_FOUND,
-            initial_metadata=grpc.aio.Metadata(),
-            trailing_metadata=grpc.aio.Metadata(),
-        )
+        raise _grpc_error(grpc.StatusCode.NOT_FOUND)
 
     return locations_pb2.ListNearbyLocationsResponse(
         locations=location_list,
@@ -72,11 +83,7 @@ async def _place_lookup(
     )
 
     if not place:
-        raise grpc.aio.AioRpcError(
-            code=grpc.StatusCode.NOT_FOUND,
-            initial_metadata=grpc.aio.Metadata(),
-            trailing_metadata=grpc.aio.Metadata(),
-        )
+        raise _grpc_error(grpc.StatusCode.NOT_FOUND)
 
     return places_pb2.GetPlaceClosestToCoordinatesResponse(
         place=place,
@@ -152,6 +159,24 @@ async def test_no_routes_are_found(
         planner,
         "FindRoutes",
         return_value=_make_awaitable(planner_pb2.FindRoutesResponse()),
+    )
+    found_routes = await route_finder.find_routes(
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
+    )
+
+    assert not len(found_routes)
+
+
+async def test_no_routes_are_found_for_missing_locations(
+    route_finder: routes.Routes,
+    planner: planner_pb2_grpc.PlannerServiceStub,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    mocker.patch.object(
+        planner,
+        "FindRoutes",
+        return_value=_awaitable_error(grpc.StatusCode.INVALID_ARGUMENT),
     )
     found_routes = await route_finder.find_routes(
         origin=models_pb2.Place(),
