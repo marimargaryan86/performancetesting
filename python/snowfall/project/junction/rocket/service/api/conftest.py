@@ -14,9 +14,12 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.conftest import mongomock_motor  # type: ignore [attr-defined]
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api import errors, fakes
+from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.air import endpoints as routes
 from snowfall.project.junction.rocket.service.api.air.repositories import AirSearchRepo
+from snowfall.project.junction.rocket.service.api.air.transforms import (
+    transforms as air_transforms,
+)
 from snowfall.project.junction.rocket.service.api.air.types import (
     AbstractAirSearchRepo,
     AirSearchRequestTransformer,
@@ -113,8 +116,12 @@ def container(
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
     container[JunctionOneClient] = junction_one_client
     container[AbstractAirSearchRepo] = air_search_repo  # type: ignore[type-abstract]
-    container[AirSearchRequestTransformer] = fakes.FakeAirSearchRequestTransformer  # type: ignore[type-abstract]
-    container[AirSearchResultTransformer] = fakes.FakeAirSearchResultTransformer  # type: ignore[type-abstract]
+    container[AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
+        air_transforms.AirSearchRequestTransformer
+    )
+    container[AirSearchResultTransformer] = (  # type: ignore[type-abstract]
+        air_transforms.AirSearchResultTransformer
+    )
     container[hotel_types.AbstractHotelSearchRepo] = hotel_search_repo  # type: ignore[type-abstract]
     container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
         hotel_transformers.HotelSearchRequestTransformer
