@@ -28,6 +28,22 @@ enum BillingType {
   BILLING_TYPE_FIXED = 2;
 }
 
+enum VerticalType {
+  VERTICAL_TYPE_UNSPECIFIED = 0;
+  VERTICAL_TYPE_AIR = 1;
+  VERTICAL_TYPE_RAIL = 2;
+  VERTICAL_TYPE_FERRY = 3;
+  VERTICAL_TYPE_HOTEL = 4;
+  VERTICAL_TYPE_BUS = 5;
+  VERTICAL_TYPE_CAR = 6;
+}
+
+message VerticalFee {
+  VerticalType vertical_type = 1;
+  BillingType billing_type = 2;
+  float value = 3;
+}
+
 message Company {
   string id = 1;
   string name = 2;
@@ -46,6 +62,7 @@ message Company {
   int32 invoice_due_days = 16;
   int32 invoice_generation_frequency = 17;
   snowfall.stdlib.v1.Date invoice_generation_date = 18;
+  repeated VerticalFee vertical_fees = 19;
 }
 
 message Contact {
