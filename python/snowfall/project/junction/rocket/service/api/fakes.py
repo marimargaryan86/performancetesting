@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
 from snowfall.project.junction.rocket.service.api.air.types import (
-    AbstractAirSearchRepo,
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
@@ -24,17 +23,3 @@ class FakeAirSearchResultTransformer(AirSearchResultTransformer):
 class FakeAirSearchRequestTransformer(AirSearchRequestTransformer):
     def transform(self, value: Mapping[str, Any]) -> SearchFlightsRequest:
         return SearchFlightsRequest()
-
-
-class FakeAirSearchRepo(AbstractAirSearchRepo):
-    def __init__(self) -> None:
-        self.inserted: list[AirSearchResult] = []
-
-    async def insert(self, value: AirSearchResult) -> None:
-        self.inserted.append(value)
-
-    async def exists_id(self, search_id: str) -> bool:
-        return search_id in {result.id for result in self.inserted}
-
-    async def find_by_id(self, id_: str) -> AirSearchResult:
-        return self.inserted[0]

@@ -16,6 +16,15 @@ from snowfall.project.junction.rocket.service.api.air import (
 from snowfall.project.junction.rocket.service.api.air.transforms import (
     transforms as air_transforms,
 )
+from snowfall.project.junction.rocket.service.api.hotel import (
+    repositories as hotel_repositories,
+)
+from snowfall.project.junction.rocket.service.api.hotel import (
+    transformers as hotel_transforms,
+)
+from snowfall.project.junction.rocket.service.api.hotel import (
+    types as hotel_types,
+)
 from snowfall.project.junction.rocket.service.api.settings import Settings
 from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
@@ -96,6 +105,15 @@ async def create_dependencies(
     )
     container[types.AirSearchResultTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchResultTransformer
+    )
+    container[hotel_types.AbstractHotelSearchRepo] = hotel_repositories.HotelSearchRepo(  # type: ignore[type-abstract]
+        collection=mongo.searches.hotel_results,
+    )
+    container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
+        hotel_transforms.HotelSearchRequestTransformer
+    )
+    container[hotel_types.HotelSearchResultTransformer] = (  # type: ignore[type-abstract]
+        hotel_transforms.HotelSearchResultTransformer
     )
 
     return container

@@ -7,20 +7,6 @@ from snowfall.project.junction.rocket.service.api.air.repositories import AirSea
 RESULT_UUID = "621f61c0-1605-471a-85f6-f930c8d29cb3"
 
 
-@pytest.fixture()
-async def mock_collection(
-    mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> motor_asyncio.AsyncIOMotorCollection:
-    return mongo_client["db"]["collection"]
-
-
-@pytest.fixture()
-async def air_search_repo(
-    mock_collection: motor_asyncio.AsyncIOMotorCollection,
-) -> AirSearchRepo:
-    return AirSearchRepo(collection=mock_collection)
-
-
 async def test_insert_air_search_result(
     air_search_repo: AirSearchRepo,
     mock_collection: motor_asyncio.AsyncIOMotorCollection,

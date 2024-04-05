@@ -14,13 +14,13 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             name="AirSearch",
         ),
         integration.route(
-            "/air/searches/{id:str}/results",
-            endpoints.AirSearchRetrieval,
-            name="AirSearchRetrieval",
-        ),
-        integration.route(
             "/air/searches/{id:str}",
             endpoints.AirSearchStatus,
             name="AirSearchStatus",
+        ),
+        integration.route(
+            "/air/searches/{id:str}/results",
+            endpoints.AirSearchRetrieval,
+            name="AirSearchRetrieval",
         ),
     ]

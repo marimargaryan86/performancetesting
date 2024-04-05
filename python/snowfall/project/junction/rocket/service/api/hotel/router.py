@@ -14,13 +14,13 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             name="HotelSearch",
         ),
         integration.route(
-            "/hotel/searches/{id:str}/results",
-            endpoints.HotelSearchRetrieval,
-            name="HotelSearchRetrieval",
-        ),
-        integration.route(
             "/hotel/searches/{id:str}",
             endpoints.HotelSearchStatus,
             name="HotelSearchStatus",
+        ),
+        integration.route(
+            "/hotel/searches/{id:str}/results",
+            endpoints.HotelSearchRetrieval,
+            name="HotelSearchRetrieval",
         ),
     ]

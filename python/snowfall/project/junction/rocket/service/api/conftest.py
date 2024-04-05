@@ -12,15 +12,27 @@ from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
+from snowfall.conftest import mongomock_motor  # type: ignore [attr-defined]
 from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api import errors, fakes
 from snowfall.project.junction.rocket.service.api.air import endpoints as routes
+from snowfall.project.junction.rocket.service.api.air.repositories import AirSearchRepo
 from snowfall.project.junction.rocket.service.api.air.types import (
     AbstractAirSearchRepo,
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
-from snowfall.project.junction.rocket.service.api.car_rental import router
+from snowfall.project.junction.rocket.service.api.car_rental import (
+    router as car_rental_router,
+)
+from snowfall.project.junction.rocket.service.api.hotel import router as hotel_router
+from snowfall.project.junction.rocket.service.api.hotel import (
+    transformers as hotel_transformers,
+)
+from snowfall.project.junction.rocket.service.api.hotel import types as hotel_types
+from snowfall.project.junction.rocket.service.api.hotel.repositories import (
+    HotelSearchRepo,
+)
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -32,11 +44,6 @@ from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction_one.client import JunctionOneClient
-
-
-@pytest.fixture()
-def air_search_repo() -> fakes.FakeAirSearchRepo:
-    return fakes.FakeAirSearchRepo()
 
 
 @pytest.fixture()
@@ -96,7 +103,8 @@ def container(
     searches: grpc_pb2_grpc.SearchServiceStub,
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
     junction_one_client: JunctionOneClient,
-    air_search_repo: fakes.FakeAirSearchRepo,
+    air_search_repo: AirSearchRepo,
+    hotel_search_repo: HotelSearchRepo,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -107,6 +115,13 @@ def container(
     container[AbstractAirSearchRepo] = air_search_repo  # type: ignore[type-abstract]
     container[AirSearchRequestTransformer] = fakes.FakeAirSearchRequestTransformer  # type: ignore[type-abstract]
     container[AirSearchResultTransformer] = fakes.FakeAirSearchResultTransformer  # type: ignore[type-abstract]
+    container[hotel_types.AbstractHotelSearchRepo] = hotel_search_repo  # type: ignore[type-abstract]
+    container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
+        hotel_transformers.HotelSearchRequestTransformer
+    )
+    container[hotel_types.HotelSearchResultTransformer] = (  # type: ignore[type-abstract]
+        hotel_transformers.HotelSearchResultTransformer
+    )
 
     return container
 
@@ -115,7 +130,8 @@ def container(
 def app(container: lagom.Container) -> applications.Starlette:
     integration = StarletteIntegration(container)
     route_list = [
-        *router.get_routes(integration),
+        *car_rental_router.get_routes(integration),
+        *hotel_router.get_routes(integration),
         integration.route("/air/searches", routes.AirSearch, name="AirSearch"),
         integration.route(
             "/air/searches/{id}/results",
@@ -251,3 +267,22 @@ async def _get_search_results(
     return grpc_pb2.ListSearchResultsResponse(
         search_results=fixtures.get_search_results(),
     )
+
+
+@pytest.fixture()
+async def mock_collection() -> mongomock_motor.AsyncMongoMockCollection:
+    return mongomock_motor.AsyncMongoMockClient()["db"]["collection"]
+
+
+@pytest.fixture()
+async def air_search_repo(
+    mock_collection: mongomock_motor.AsyncMongoMockCollection,
+) -> AirSearchRepo:
+    return AirSearchRepo(collection=mock_collection)
+
+
+@pytest.fixture()
+async def hotel_search_repo(
+    mock_collection: mongomock_motor.AsyncMongoMockCollection,
+) -> HotelSearchRepo:
+    return HotelSearchRepo(collection=mock_collection)

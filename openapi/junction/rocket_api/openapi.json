@@ -108,6 +108,82 @@
         ]
       }
     },
+    "/hotel/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Hotel Search status",
+        "tags": [
+          "hotel"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-hotel-searches-id",
+        "description": "Used to lookup the status of a hotel search."
+      }
+    },
+    "/hotel/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Hotel Search results",
+        "tags": [
+          "hotel"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-hotel-searches-id-results",
+        "description": "Used to lookup data for a hotel search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
     "/air/searches": {
       "post": {
         "summary": "Create Air Search",
