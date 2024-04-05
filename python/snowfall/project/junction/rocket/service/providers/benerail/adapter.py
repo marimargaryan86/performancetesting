@@ -197,11 +197,13 @@ class _BenerailAdapter:
             )
         if isinstance(criterion, _TripOfferResponsesWithPassengersCriterion):
             return dialogue.DialogueIdTripOfferFiltersReturnTripParams(
-                inward_date_time=criterion.return_departure_after.isoformat(
-                    timespec="seconds",
-                )
-                if criterion.return_departure_after
-                else None,
+                inward_date_time=(
+                    criterion.return_departure_after.isoformat(
+                        timespec="seconds",
+                    )
+                    if criterion.return_departure_after
+                    else None
+                ),
             )
         raise AttributeError
 
@@ -622,6 +624,7 @@ class BenerailOffersAdapter(_BenerailAdapter):
         )
         return [
             models_pb2.ResultDetail(
+                id=string.uuid(),
                 rail=models_pb2.RailResultDetail(
                     origin=legacy_models_pb2.Point(
                         ref=origin.identifier,
