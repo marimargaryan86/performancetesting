@@ -1,78 +1,108 @@
 import datetime
 
-from google.protobuf import json_format, timestamp_pb2
+import freezegun
+import pytest
+from google.protobuf import timestamp_pb2
 
-from snowfall.stdlib.persistence.mongo import normalizers
-from snowfall.stdlib.v1 import latlng_pb2, testing_pb2
+from snowfall.stdlib.persistence.mongo import coders, testing
+from snowfall.stdlib.v1 import latlng_pb2
 
 _MONGO_ID_KEY = "_id"
 _LATITUDE = 59.85882
 _LONGITUDE = 17.63889
 
 
-def test_id_normalizer() -> None:
-    expected = testing_pb2.Foobar(id="foobar")
-    normalized = normalizers.normalize(
-        testing_pb2.Foobar.DESCRIPTOR,
-        json_format.MessageToDict(expected, preserving_proto_field_name=True),
+def test_id_normalizer_protobuf() -> None:
+    coder = coders.ProtoCoder(testing.FoobarProto)
+    document = testing.FoobarProto(
+        id="foobar",
+        nested_foobar=testing.FoobarProto(id="bazqux"),
     )
+    encoded = coder.encode(document)
+    assert encoded["_id"] == "foobar"
+    assert encoded["nested_foobar"]["_id"] == "bazqux"
+    decoded = coder.decode(encoded)
+    assert document.id == decoded.id
+    assert document.nested_foobar.id == decoded.nested_foobar.id
 
-    assert normalized == {_MONGO_ID_KEY: "foobar"}
 
-    actual: testing_pb2.Foobar = json_format.ParseDict(
-        normalizers.denormalize(testing_pb2.Foobar.DESCRIPTOR, normalized),
-        testing_pb2.Foobar(),
+def test_id_normalizer_pydantic() -> None:
+    coder = coders.PydanticCoder(testing.FoobarModel)
+    document = testing.FoobarModel(
+        id="foobar",
+        nested_foobar=testing.FoobarModel(id="bazqux"),
     )
+    encoded = coder.encode(document)
+    assert encoded["_id"] == "foobar"
+    assert encoded["nested_foobar"]["_id"] == "bazqux"
+    decoded = coder.decode(encoded)
+    assert document.model_dump() == decoded.model_dump()
 
-    assert expected == actual
 
-
-def test_id_normalizer_nested() -> None:
-    expected = testing_pb2.RepeatedFoobar(foobars=[testing_pb2.Foobar(id="foobar")])
-    normalized = normalizers.normalize(
-        testing_pb2.RepeatedFoobar.DESCRIPTOR,
-        json_format.MessageToDict(expected, preserving_proto_field_name=True),
+def test_id_normalizer_nested_protobuf() -> None:
+    coder = coders.ProtoCoder(testing.RepeatedFoobarProto)
+    document = testing.RepeatedFoobarProto(
+        foobars=[
+            testing.FoobarProto(
+                id="foobar",
+                nested_foobar=testing.FoobarProto(id="bazqux"),
+            ),
+        ],
     )
+    encoded = coder.encode(document)
+    assert encoded["foobars"][0]["_id"] == "foobar"
+    assert encoded["foobars"][0]["nested_foobar"]["_id"] == "bazqux"
+    decoded = coder.decode(encoded)
+    assert document.foobars[0].id == decoded.foobars[0].id
+    assert document.foobars[0].nested_foobar.id == decoded.foobars[0].nested_foobar.id
 
-    assert normalized == {"foobars": [{_MONGO_ID_KEY: "foobar"}]}
 
-    actual: testing_pb2.RepeatedFoobar = json_format.ParseDict(
-        normalizers.denormalize(testing_pb2.RepeatedFoobar.DESCRIPTOR, normalized),
-        testing_pb2.RepeatedFoobar(),
+def test_id_normalizer_nested_pydantic() -> None:
+    coder = coders.PydanticCoder(testing.RepeatedFoobarModel)
+    document = testing.RepeatedFoobarModel(
+        foobars=[
+            testing.FoobarModel(
+                id="foobar",
+                nested_foobar=testing.FoobarModel(id="bazqux"),
+            ),
+        ],
     )
-
-    assert expected == actual
-
-
-def test_latlng_normalizer() -> None:
-    expected = latlng_pb2.LatLng(latitude=_LATITUDE, longitude=_LONGITUDE)
-    normalized = normalizers.normalize(
-        latlng_pb2.LatLng.DESCRIPTOR,
-        json_format.MessageToDict(expected, preserving_proto_field_name=True),
-    )
-
-    assert normalized == {"type": "Point", "coordinates": [_LONGITUDE, _LATITUDE]}
-
-    actual: latlng_pb2.LatLng = json_format.ParseDict(
-        normalizers.denormalize(latlng_pb2.LatLng.DESCRIPTOR, normalized),
-        latlng_pb2.LatLng(),
-    )
-
-    assert expected == actual
+    encoded = coder.encode(document)
+    assert encoded["foobars"][0]["_id"] == "foobar"
+    assert encoded["foobars"][0]["nested_foobar"]["_id"] == "bazqux"
+    decoded = coder.decode(encoded)
+    assert document.model_dump() == decoded.model_dump()
 
 
+@pytest.mark.parametrize(
+    ("coder", "document"),
+    [
+        (
+            coders.ProtoCoder(latlng_pb2.LatLng),
+            latlng_pb2.LatLng(latitude=_LATITUDE, longitude=_LONGITUDE),
+        ),
+    ],
+)
+def test_latlng_normalizer(
+    coder: coders.ProtoCoder[latlng_pb2.LatLng],
+    document: latlng_pb2.LatLng,
+) -> None:
+    encoded = coder.encode(document)
+    assert encoded == {"type": "Point", "coordinates": [_LONGITUDE, _LATITUDE]}
+    decoded = coder.decode(encoded)
+    assert document == decoded
+
+
+@freezegun.freeze_time(
+    datetime.datetime(year=2024, month=1, day=1, tzinfo=datetime.UTC),
+)
 def test_timestamp_normalizer() -> None:
-    expected_dt = datetime.datetime.now(tz=datetime.UTC)
-    expected_ts = timestamp_pb2.Timestamp()
-    expected_ts.FromDatetime(expected_dt)
-    normalized = normalizers.normalize(
-        timestamp_pb2.Timestamp.DESCRIPTOR,
-        json_format.MessageToDict(expected_ts, preserving_proto_field_name=True),
-    )
-
-    actual_ts: timestamp_pb2.Timestamp = json_format.ParseDict(
-        normalizers.denormalize(timestamp_pb2.Timestamp.DESCRIPTOR, normalized),
-        timestamp_pb2.Timestamp(),
-    )
-
-    assert expected_dt == actual_ts.ToDatetime(tzinfo=datetime.UTC)
+    expected = datetime.datetime.now(tz=datetime.UTC)
+    coder = coders.ProtoCoder(timestamp_pb2.Timestamp)
+    document = timestamp_pb2.Timestamp()
+    document.FromDatetime(expected)
+    encoded = coder.encode(document)
+    assert encoded == expected
+    decoded = coder.decode(encoded)
+    assert document == decoded
+    assert expected == decoded.ToDatetime(tzinfo=datetime.UTC)

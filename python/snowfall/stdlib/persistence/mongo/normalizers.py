@@ -2,9 +2,11 @@ import abc
 import collections
 import datetime
 import functools
-from collections.abc import Mapping
+import inspect
+import types
+from collections.abc import Mapping, Sequence
 from enum import IntEnum
-from typing import Any, TypeGuard, TypeVar, cast
+from typing import Any, TypeVar, cast, get_args, get_origin
 
 import pydantic
 from dateutil import parser
@@ -261,17 +263,32 @@ def _pydantic_to_types_map(
         types_map[model_type] = {}
 
         for field_name, field in model.model_fields.items():
-            if _is_pydantic_model(field.annotation):
-                types_map[model_type][field_name] = _class_fqn(field.annotation)
-                queue.append(field.annotation)
+            maybe_pydantic = _maybe_get_pydantic_model(field.annotation)
+
+            if maybe_pydantic:
+                types_map[model_type][field_name] = _class_fqn(maybe_pydantic)
+                queue.append(maybe_pydantic)
 
     return types_map
 
 
-def _is_pydantic_model(
-    annotation: type[pydantic.BaseModel] | None,
-) -> TypeGuard[type[pydantic.BaseModel]]:
-    return annotation is not None and issubclass(annotation, pydantic.BaseModel)
+def _maybe_get_pydantic_model(
+    annotation: type[Any] | None,
+) -> type[pydantic.BaseModel] | None:
+    if inspect.isclass(annotation) and issubclass(annotation, pydantic.BaseModel):
+        return annotation
+
+    if get_origin(annotation) not in {list, Sequence, types.UnionType}:
+        return None
+
+    all_pydantic_args = {
+        arg for arg in get_args(annotation) if issubclass(arg, pydantic.BaseModel)
+    }
+
+    if len(all_pydantic_args) > 1:
+        raise NotImplementedError("Complex types are not yet supported.")
+
+    return next(iter(all_pydantic_args)) if all_pydantic_args else None
 
 
 def _metadata_to_types_map(metadata: _Metadata) -> _TypesMap:

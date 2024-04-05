@@ -3,7 +3,6 @@ import contextlib
 from collections.abc import Mapping
 from typing import Any, Generic, Protocol, TypeGuard, TypeVar, cast
 
-import orjson
 import pydantic
 from google.protobuf import json_format, message, timestamp_pb2
 
@@ -83,16 +82,9 @@ class PydanticCoder(Generic[Model], BaseCoder[Model]):
         with contextlib.suppress(KeyError):
             as_dict["id"] = str(as_dict["id"])
 
-        return self._model.model_validate_json(orjson.dumps(as_dict))
+        return self._model.model_validate(as_dict)
 
     def encode(self, model: Model) -> dict[str, Any]:
-        as_dict = dict(
-            orjson.loads(
-                model.model_dump_json(
-                    exclude_defaults=True,
-                    exclude_none=True,
-                ),
-            ),
-        )
+        as_dict = model.model_dump(mode="json")
 
         return normalizers.normalize(self._model, as_dict)
