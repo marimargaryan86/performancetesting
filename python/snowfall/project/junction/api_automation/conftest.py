@@ -47,6 +47,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--API-TOKEN", action="store", help="api token to execute calls")
     parser.addoption("--DEPARTURE_AFTER", action="store", help="departure after")
     parser.addoption("--HOST", action="store", help="prod dev or any other host")
+    parser.addoption("--BASIC_TOKEN", action="store", help="token to use with ORY")
+    parser.addoption("--ORY_URL", action="store", help="url to get access token")
+    parser.addoption("--LOCAL_API_URL", action="store", help="url to run locally")
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -363,7 +366,7 @@ def get_all_variable_values(host: str, api_token: str) -> dict[str, Any]:
 @pytest.fixture(scope="package")
 @allure.title("Get variables from vault")  # type: ignore[misc]
 def config_variables(host: str, api_token: str) -> dict[str, Any]:
-    return get_all_variable_values(host, api_token)
+    return get_all_variable_values(host=host, api_token=api_token)
 
 
 def create_qa_client(api_url: str, api_token: str, sentry_url: str) -> QaClient:
@@ -377,9 +380,51 @@ def create_qa_client(api_url: str, api_token: str, sentry_url: str) -> QaClient:
     )
 
 
+@pytest.fixture(scope="session", autouse=True)
+def basic_token(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption(name="BASIC_TOKEN")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def ory_url(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption(name="ORY_URL")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def local_api_url(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption(name="LOCAL_API_URL")
+
+
+async def get_access_token_from_ory(
+    ory_url: str,
+    basic_token: str,
+) -> str:
+    async with httpx.AsyncClient() as http_client:
+        request = await http_client.post(
+            ory_url,
+            headers={"Authorization": "Basic {0}".format(basic_token)},
+            data={"grant_type": "client_credentials"},
+        )
+    return request.json()["access_token"]
+
+
 @pytest.fixture()
 @allure.title("Instantiate a test client for Junction API")  # type: ignore[misc]
-def qa_client(config_variables: Mapping[str, str], sentry_url: str) -> QaClient:
-    api_url = "{0}{1}".format(HTTPS_PREFIX, config_variables["rocket_api_host"])
-    token = config_variables["rocket_api_token_mock"]
-    return create_qa_client(api_url, token, sentry_url)
+async def qa_client(
+    config_variables: Mapping[str, str],
+    sentry_url: str,
+    basic_token: str,
+    ory_url: str,
+    local_api_url: str,
+) -> QaClient:
+    url_part = local_api_url if local_api_url else config_variables["rocket_api_host"]
+
+    api_url = "{0}{1}".format(HTTPS_PREFIX, url_part)
+    if basic_token and ory_url:
+        access_token = await get_access_token_from_ory(
+            ory_url=ory_url,
+            basic_token=basic_token,
+        )
+    else:
+        access_token = config_variables["rocket_api_token_mock"]
+    return create_qa_client(api_url, access_token, sentry_url)

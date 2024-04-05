@@ -30,12 +30,12 @@ async def test_car_rental_search(
     )
     assert car_rental_search.id
 
-    car_rental_search = await qa_client.car_rental.wait_for_search_result(
-        car_rental_search.id,
+    car_rental_search = await qa_client.car_rental.wait_for_completed_search(
+        search_id=car_rental_search.id,
     )
     assert car_rental_search.status == "completed"
 
-    car_rental_offers = await qa_client.car_rental.get_search_result(
-        car_rental_search.id,
+    car_rental_offers = await qa_client.car_rental.get_offers(
+        search_id=car_rental_search.id,
     )
     assert car_rental_offers.id
