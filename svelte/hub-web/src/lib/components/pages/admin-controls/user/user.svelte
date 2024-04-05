@@ -1,8 +1,8 @@
 <script lang="ts">
+  import type { MaybePromise } from "@sveltejs/kit";
   import integrationInstancesClient from "~/integration-instances-client";
   import * as OrySchemas from "~/integration/ory/schemas";
   import StandardLayout from "$lib/components/page/standard-layout.svelte";
-  import SelectField from "$lib/components/ui/select-field.svelte";
   import { getPageTitle } from "$lib/utils/page-title";
   import Icon from "$lib/components/icons/icon.svelte";
   import { getTranslator } from "$lib/i18n";
@@ -18,6 +18,7 @@
   import { goto } from "$app/navigation";
   import routeConfig from "$lib/route-config";
   import { addToast } from "$lib/components/ui/toaster.svelte";
+  import AutocompleteField from "$lib/components/ui/autocomplete-field.svelte";
 
   export let mode: "create" | "update";
   export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
@@ -30,7 +31,6 @@
   const t = getTranslator();
   const pending = writable(false);
 
-  let resellerOptions: HubSchemas.Reseller[];
   let formCompleted: boolean = true;
   let selectedReseller: HubSchemas.Reseller | undefined = user?.reseller;
   let selectedRole: OrySchemas.UserRole;
@@ -43,7 +43,6 @@
   $: i18nTitleString = $t(`pages.adminControls.pages.users.pages.${mode}.title`);
   $: pageTitle = mode === "update" && currentUser ? currentUser.email : i18nTitleString;
   $: selectedRole = mode === "update" ? user?.role || "reseller-user" : "reseller-user";
-  $: resellerOptions = resellers?.data || [];
   $: i18nSuccessMessage = $t("sentences.userChangesSuccess");
   $: i18nPendingMessage = $t("sentences.userCreatePending");
   $: i18nErrorMessage = $t("sentences.userError");
@@ -93,6 +92,24 @@
     } finally {
       $pending = false;
     }
+  }
+
+  function findResellerStub(query: string): MaybePromise<HubSchemas.Reseller[]> {
+    if (!resellers || query.length < 3) {
+      return new Promise((r) => r(resellers?.data ?? []));
+    }
+
+    const lowerCaseQuery = query.toLowerCase();
+
+    return resellers?.data.reduce((acc: HubSchemas.Reseller[], reseller) => {
+      const lowerCaseResellerName = reseller.name.toLowerCase();
+
+      if (lowerCaseResellerName.includes(lowerCaseQuery)) {
+        acc.push(reseller);
+      }
+
+      return acc;
+    }, []);
   }
 
   function formatResellerOption(reseller?: HubSchemas.Reseller): string {
@@ -209,19 +226,19 @@
 
         <div class="section">
           <div class="section-title">
-            <span typography="title-medium">Resellers</span>
+            <span typography="title-medium">Resellers Search</span>
             <span class="subtitle" typography="body-medium">
-              Add or remove resellers of the user
+              Search and add or remove resellers of the user
             </span>
           </div>
           <div class="fields-container">
-            <SelectField
-              required
+            <AutocompleteField
               label="Resellers"
-              placeholder="Add resellers"
-              options={resellerOptions}
-              formatter={formatResellerOption}
+              required
+              placeholder="Type 3+ characters to search"
               bind:value={selectedReseller}
+              autocomplete={findResellerStub}
+              formatter={formatResellerOption}
             />
           </div>
         </div>
