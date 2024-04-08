@@ -21,6 +21,15 @@ func In[T comparable](a []T, b T) bool {
 	return false
 }
 
+func Index[T comparable](a []T, b T) int {
+	for i := range a {
+		if b == a[i] {
+			return i
+		}
+	}
+	return -1
+}
+
 func Map[T comparable, T2 comparable](input []T, callback func(T) T2) []T2 {
 	output := make([]T2, len(input))
 	for k, v := range input {

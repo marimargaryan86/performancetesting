@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"git.snowfall.se/junction/junction/golang/legacy"
 	planner "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/service/planner/v1"
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	v1 "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/v1"
@@ -15,15 +16,19 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"math"
+	"sort"
 	"strings"
 	"time"
 )
 
 type PlannerServiceServer struct {
 	planner.UnimplementedPlannerServiceServer
-	Planner *raptor.Planner
-	Stops   map[h3.Cell][]*planner.Stop
-	Logger  *zap.SugaredLogger
+	Planner    *raptor.Planner
+	Stops      map[h3.Cell][]*planner.Stop
+	Logger     *zap.SugaredLogger
+	Repository *legacy.Repository
 }
 
 var scheduleTypeToSegmentType map[models.Schedule_Type]v1.SegmentType
@@ -101,6 +106,7 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 	departureAfter = time.Date(departureAfter.Year(), departureAfter.Month(), departureAfter.Day(), 0, 0, 0, 0, time.UTC)
 	departureBefore := departureAfter.AddDate(0, 0, 1)
 	departureBefore = time.Date(departureBefore.Year(), departureBefore.Month(), departureBefore.Day(), 4, 0, 0, 0, departureBefore.Location())
+	tripCutoff := departureAfter.Add(48 * time.Hour)
 
 	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
 	copy(allowedSegmentTypes, req.AllowedSegmentTypes)
@@ -118,12 +124,11 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 	}
 
 	routes := make([]*planner.FindRoutesResponse_Route, 0, len(results))
-	seen := make(map[string]struct{}, len(results))
+	seen := make(map[string]*planner.FindRoutesResponse_Route, len(results))
 
 	for _, r := range results {
 		route := &planner.FindRoutesResponse_Route{
-			Segments:            make([]*planner.FindRoutesResponse_Segment, 0, len(r.Segments)),
-			EstimatedTravelTime: durationpb.New(r.Segments[len(r.Segments)-1].Arrive.Sub(r.Segments[0].Depart)),
+			Segments: make([]*planner.FindRoutesResponse_Segment, 0, len(r.Segments)),
 		}
 
 		for _, s := range r.Segments {
@@ -153,12 +158,89 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 		}
 
 		routeString := route.String()
+		route.EstimatedTravelTime = durationpb.New(r.Segments[len(r.Segments)-1].Arrive.Sub(r.Segments[0].Depart))
 
-		if _, ok := seen[routeString]; ok {
+		if v, ok := seen[routeString]; ok {
+			if v.EstimatedTravelTime.AsDuration() > route.EstimatedTravelTime.AsDuration() {
+				v.EstimatedTravelTime = route.EstimatedTravelTime
+			}
 			continue
 		}
 
-		seen[routeString] = struct{}{}
+		minNumDepartures := uint32(math.MaxUint32)
+		segmentIdx := 0
+
+		for _, s := range r.Segments {
+			if len(s.Stops) == 0 {
+				continue
+			}
+
+			origin := ps.Repository.ScheduleStopBySequence(s.Stops[0].Sequence)
+			destination := ps.Repository.ScheduleStopBySequence(s.Stops[len(s.Stops)-1].Sequence)
+			schedules := ps.Repository.RouteBySequence(s.RouteIndex).GetSchedules()
+			idx := sliceutil.Index(schedules, s.ScheduleIndex)
+			numDepartures := uint32(1)
+			departureTimes := []*timestamppb.Timestamp{
+				timestamppb.New(time.Unix(int64(ps.Repository.ScheduleStopBySequence(
+					ps.Repository.ScheduleBySequence(s.ScheduleIndex).ScheduleStops[origin.Order],
+				).DepartureAt), 0)),
+			}
+
+			for i := idx - 1; i >= 0; i-- {
+				deparatureAt := time.Unix(int64(ps.Repository.ScheduleStopBySequence(
+					ps.Repository.ScheduleBySequence(schedules[i]).ScheduleStops[origin.Order],
+				).DepartureAt), 0)
+
+				if deparatureAt.After(tripCutoff) {
+					continue
+				}
+
+				if deparatureAt.Before(departureAfter) {
+					break
+				}
+
+				departureTimes = append(departureTimes, timestamppb.New(deparatureAt))
+
+				if deparatureAt.Before(departureBefore) {
+					numDepartures++
+				}
+			}
+
+			for i := idx + 1; i < len(schedules); i++ {
+				deparatureAt := time.Unix(int64(ps.Repository.ScheduleStopBySequence(
+					ps.Repository.ScheduleBySequence(schedules[i]).ScheduleStops[origin.Order],
+				).DepartureAt), 0)
+
+				if deparatureAt.Before(departureAfter) {
+					continue
+				}
+
+				if deparatureAt.After(tripCutoff) {
+					break
+				}
+
+				departureTimes = append(departureTimes, timestamppb.New(deparatureAt))
+
+				if deparatureAt.Before(departureBefore) {
+					numDepartures++
+				}
+			}
+
+			if numDepartures < minNumDepartures {
+				minNumDepartures = numDepartures
+			}
+
+			sort.Slice(departureTimes, func(i, j int) bool {
+				return departureTimes[i].Seconds < departureTimes[j].Seconds
+			})
+
+			route.Segments[segmentIdx].EstimatedDepartureTimes = departureTimes
+			route.Segments[segmentIdx].EstimatedTravelTime = durationpb.New(time.Duration(destination.ArrivalAt-origin.DepartureAt) * time.Second)
+			segmentIdx++
+		}
+
+		route.EstimatedDailyDepartures = minNumDepartures
+		seen[routeString] = route
 		routes = append(routes, route)
 	}
 

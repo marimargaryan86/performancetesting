@@ -128,9 +128,10 @@ func serve(cmd *cobra.Command, args []string) error {
 	grpcServer := grpc.NewServer()
 	healthgrpc.RegisterHealthServer(grpcServer, health.NewServer())
 	planner.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
-		Planner: raptor.NewPlanner(repository, stopsMap, sugar),
-		Stops:   stopsMap,
-		Logger:  sugar,
+		Planner:    raptor.NewPlanner(repository, stopsMap, sugar),
+		Stops:      stopsMap,
+		Logger:     sugar,
+		Repository: repository,
 	})
 	reflection.Register(grpcServer)
 

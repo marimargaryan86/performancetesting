@@ -20,17 +20,19 @@ type Trip struct {
 }
 
 type Segment struct {
-	Id         uuid.UUID
-	ScheduleId uuid.UUID
-	Depart     time.Time
-	Arrive     time.Time
-	Stops      []*Stop
-	Type       models.Schedule_Type
+	Id            uuid.UUID
+	ScheduleId    uuid.UUID
+	ScheduleIndex uint64
+	RouteIndex    uint64
+	Depart        time.Time
+	Arrive        time.Time
+	Stops         []*Stop
+	Type          models.Schedule_Type
 }
 
 type Stop struct {
 	Id       string
-	Sequence int64
+	Sequence uint64
 	Cell     h3.Cell
 }
 
@@ -73,7 +75,7 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 
 					stops = append(stops, &Stop{
 						Id:       sScheduleStop.Id,
-						Sequence: int64(sScheduleStop.Sequence),
+						Sequence: sScheduleStop.Sequence,
 						Cell:     h3.Cell(sStopCellInt),
 					})
 				}
@@ -88,12 +90,14 @@ func (p *Planner) toJourneySet(destination *planner.Stop, connections map[uint64
 				}
 
 				segments = append(segments, &Segment{
-					Id:         uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "\x00"))),
-					ScheduleId: uuid.MustParse(v.schedule.Id),
-					Stops:      stops,
-					Depart:     time.Unix(int64(depart), 0),
-					Arrive:     time.Unix(int64(arrive), 0),
-					Type:       v.schedule.Type,
+					Id:            uuid.NewSHA1(namespace, []byte(strings.Join(segmentIdParts, "\x00"))),
+					ScheduleId:    uuid.MustParse(v.schedule.Id),
+					ScheduleIndex: v.schedule.Sequence,
+					RouteIndex:    v.schedule.Route,
+					Stops:         stops,
+					Depart:        time.Unix(int64(depart), 0),
+					Arrive:        time.Unix(int64(arrive), 0),
+					Type:          v.schedule.Type,
 				})
 
 				dest = org
