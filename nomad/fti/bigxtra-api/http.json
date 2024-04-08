@@ -3,7 +3,7 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "bigxtra.junction.dev"
+      "traefik_host_URL": "bigxtra.api.junction.dev"
     }
   },
   "sandbox": {
