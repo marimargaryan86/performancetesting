@@ -129,6 +129,43 @@ class OfferResource(models.Resource):
 class ResultDetailResource(models.Resource):
     api_type: typing.ClassVar[str] = "result-details"
 
+    @classmethod
+    def from_proto(cls, result_detail: models_pb2.ResultDetail) -> ResultDetailResource:
+        return cls(
+            id=result_detail.id,
+            type=ResultDetailResource.api_type,
+            attributes={
+                "imageUrl": result_detail.car_rental.image_url or None,
+                "model": result_detail.car_rental.model or None,
+                "seatsCount": (
+                    result_detail.car_rental.seats_count
+                    if result_detail.car_rental.HasField("seats_count")
+                    else None
+                ),
+                "doorsCount": (
+                    result_detail.car_rental.doors_count
+                    if result_detail.car_rental.HasField("doors_count")
+                    else None
+                ),
+                "transmission": result_detail.car_rental.transmission.lower() or None,
+                "baggageQuantity": (
+                    result_detail.car_rental.baggage_quantity
+                    if result_detail.car_rental.HasField("baggage_quantity")
+                    else None
+                ),
+                "vehicleType": result_detail.car_rental.vehicle_type or None,
+                "vendor": result_detail.car_rental.vendor_name or None,
+                "unlimitedMileage": result_detail.car_rental.unlimited_mileage or None,
+                "airConditioning": result_detail.car_rental.air_conditioner or None,
+                "pickupAt": protobuf.protobuf_to_datetime(
+                    result_detail.car_rental.pickup_at,
+                ),
+                "returnAt": protobuf.protobuf_to_datetime(
+                    result_detail.car_rental.return_at,
+                ),
+            },
+        )
+
 
 class SearchResultResource(models.Resource):
     api_type: typing.ClassVar[str] = "search-results"

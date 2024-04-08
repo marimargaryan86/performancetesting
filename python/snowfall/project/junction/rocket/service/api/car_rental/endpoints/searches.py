@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Sequence
 
 import lagom
 import timezonefinder
@@ -25,6 +26,7 @@ from snowfall.stdlib.integration.starlette import (
 from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
+_IncludesType = search_models.ResultDetailResource | search_models.OfferResource
 
 
 class CarSearch(endpoints.HTTPEndpoint):
@@ -140,13 +142,7 @@ class CarSearchResults(endpoints.HTTPEndpoint):
             cursor=pagination.cursor,
             limit=pagination.limit,
         )
-        included = []
-        if "offers" in request.scope["parsed_query_string"].get("include", []):
-            included = [
-                search_models.OfferResource.from_proto(offer)
-                for search_result in items_page.sequence
-                for offer in search_result.offers
-            ]
+
         return await messages.create_response(
             body=models.Body(
                 data=[
@@ -163,7 +159,28 @@ class CarSearchResults(endpoints.HTTPEndpoint):
                     items_page.cursor,
                     pagination,
                 ),
-                included=included,
+                included=self._resolve_included(items_page.sequence, request),
             ),
             request=request,
         )
+
+    def _resolve_included(
+        self,
+        search_results: Sequence[models_pb2.SearchResult],
+        request: requests.Request,
+    ) -> list[_IncludesType]:
+        included: list[_IncludesType] = []
+        requested_includes = request.scope["parsed_query_string"].get("include", [])
+        if "offers" in requested_includes:
+            included.extend([
+                search_models.OfferResource.from_proto(offer)
+                for search_result in search_results
+                for offer in search_result.offers
+            ])
+        if "resultDetails" in requested_includes:
+            included.extend([
+                search_models.ResultDetailResource.from_proto(result_detail)
+                for search_result in search_results
+                for result_detail in search_result.result_details
+            ])
+        return included

@@ -1460,15 +1460,130 @@
           "oneOf": [
             {
               "$ref": "#/components/schemas/CarRentalOffer"
+            },
+            {
+              "$ref": "#/components/schemas/CarRentalResultDetail"
             }
           ],
           "discriminator": {
             "propertyName": "type",
             "mapping": {
-              "offers": "#/components/schemas/CarRentalOffer"
+              "offers": "#/components/schemas/CarRentalOffer",
+              "result-details": "#/components/schemas/CarRentalResultDetail"
             }
           }
         }
+      },
+      "CarRentalResultDetail": {
+        "title": "Car Rental Result Detail",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "result-details"
+                ],
+                "example": "result-details"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "pickupLocation": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "returnLocation": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "imageUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "example": "https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "model": {
+                    "type": "string",
+                    "example": "Fiat 500",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "seatsCount": {
+                    "type": "integer",
+                    "example": 4,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "doorsCount": {
+                    "type": "integer",
+                    "example": 2,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "transmission": {
+                    "type": "string",
+                    "example": "manual",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "baggageQuantity": {
+                    "type": "integer",
+                    "example": 3,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "vehicleType": {
+                    "type": "string",
+                    "example": "Station Wagon",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "example": "Sixt",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "unlimitedMileage": {
+                    "type": "boolean",
+                    "example": true,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "airConditioning": {
+                    "type": "boolean",
+                    "example": false,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "pickupAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "returnAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          }
+        ],
+        "description": "Result of searching for offers."
       },
       "Error": {
         "title": "Error",
@@ -1716,7 +1831,8 @@
           "items": {
             "type": "string",
             "enum": [
-              "offers"
+              "offers",
+              "resultDetails"
             ]
           },
           "example": [

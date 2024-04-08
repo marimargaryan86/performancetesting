@@ -84,8 +84,13 @@ class TestListSearchResults:
             "/car-rental/searches/{searchId}/results".format(
                 searchId=fixtures.SEARCHES[0],
             ),
+            params={"include": "offers,resultDetails"},
         )
 
         assert response.status_code == status.HTTP_200_OK
         results = response.json()
         assert len(results["data"]) == 2
+
+        included_types = [resource["type"] for resource in results["included"]]
+        assert "offers" in included_types
+        assert "result-details" in included_types

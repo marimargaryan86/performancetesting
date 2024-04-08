@@ -10,6 +10,7 @@ from snowfall.stdlib.v1 import (
     amqp_pb2,
     date_pb2,
     latlng_pb2,
+    money_pb2,
 )
 
 NOT_FOUND = "00000000-0000-0000-0000-000000000000"
@@ -55,16 +56,40 @@ def generate_search(identifier: str) -> searches_pb2.Search:
     )
 
 
+def generate_offer(offer_id: str) -> searches_pb2.Offer:
+    return searches_pb2.Offer(
+        id=offer_id,
+        price=money_pb2.Money(currency_code="EUR"),
+        price_breakdown=[],
+        car_rental=searches_pb2.CarRentalOffer(conditional_prices=[]),
+    )
+
+
+def generate_result_detail(result_detail_id: str) -> searches_pb2.ResultDetail:
+    return searches_pb2.ResultDetail(
+        id=result_detail_id,
+        car_rental=searches_pb2.CarRentalResultDetail(
+            origin=generate_point(string.uuid()),
+            destination=generate_point(string.uuid()),
+            pickup_at=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+            return_at=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+        ),
+    )
+
+
 def generate_search_result(identifier: str) -> searches_pb2.SearchResult:
     return searches_pb2.SearchResult(
         id=identifier,
         search_id=SEARCHES[0],
         provider_id=PROVIDERS[0],
         expires_at=EXPIRES_AT,
-        offers=[searches_pb2.Offer(id=offer) for offer in OFFERS],
+        offers=[generate_offer(offer) for offer in OFFERS],
         result_details=[
-            searches_pb2.ResultDetail(id=result_detail)
-            for result_detail in RESULT_DETAILS
+            generate_result_detail(result_detail) for result_detail in RESULT_DETAILS
         ],
     )
 
