@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"strings"
 	"time"
 )
@@ -95,9 +96,21 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 		return &planner.FindRoutesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	departureTime := time.Now()
-	departureTime = time.Date(departureTime.Year(), departureTime.Month(), departureTime.Day(), 0, 0, 0, 0, time.UTC)
-	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureTime, make([]models.Schedule_Type, 0), -1)
+	departureAfter := time.Now()
+	departureAfter = departureAfter.AddDate(0, 0, 1)
+	departureAfter = time.Date(departureAfter.Year(), departureAfter.Month(), departureAfter.Day(), 0, 0, 0, 0, time.UTC)
+	departureBefore := departureAfter.AddDate(0, 0, 1)
+	departureBefore = time.Date(departureBefore.Year(), departureBefore.Month(), departureBefore.Day(), 4, 0, 0, 0, departureBefore.Location())
+
+	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
+	copy(allowedSegmentTypes, req.AllowedSegmentTypes)
+
+	maxConnections := -1
+	if req.MaximumConnections != nil {
+		maxConnections = int(*req.MaximumConnections)
+	}
+
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureAfter, departureBefore, allowedSegmentTypes, maxConnections)
 
 	if err != nil {
 		ps.Logger.Error(err)
@@ -105,10 +118,12 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 	}
 
 	routes := make([]*planner.FindRoutesResponse_Route, 0, len(results))
+	seen := make(map[string]struct{}, len(results))
 
 	for _, r := range results {
 		route := &planner.FindRoutesResponse_Route{
-			Segments: make([]*planner.FindRoutesResponse_Segment, 0, len(r.Segments)),
+			Segments:            make([]*planner.FindRoutesResponse_Segment, 0, len(r.Segments)),
+			EstimatedTravelTime: durationpb.New(r.Segments[len(r.Segments)-1].Arrive.Sub(r.Segments[0].Depart)),
 		}
 
 		for _, s := range r.Segments {
@@ -137,6 +152,13 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 			})
 		}
 
+		routeString := route.String()
+
+		if _, ok := seen[routeString]; ok {
+			continue
+		}
+
+		seen[routeString] = struct{}{}
 		routes = append(routes, route)
 	}
 

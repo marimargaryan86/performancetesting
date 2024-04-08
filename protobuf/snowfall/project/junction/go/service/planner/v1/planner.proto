@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package snowfall.project.junction.go.service.planner.v1;
 
+import "google/protobuf/duration.proto";
 import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/datetime.proto";
@@ -30,6 +31,8 @@ message SearchJourneyResponse {
 message FindRoutesRequest {
   repeated snowfall.stdlib.v1.LatLng origins = 1;
   repeated snowfall.stdlib.v1.LatLng destinations = 2;
+  optional uint32 maximum_connections = 3;
+  repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 4;
 }
 
 message FindRoutesResponse {
@@ -41,6 +44,7 @@ message FindRoutesResponse {
 
   message Route {
     repeated Segment segments = 1;
+    google.protobuf.Duration estimated_travel_time = 2;
   }
 
   repeated Route routes = 1;
