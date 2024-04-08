@@ -68,7 +68,7 @@ def create_starlette_app(
         case "local":
             validation_mode = middlewares.ValidationMode.eager
         case "development":
-            validation_mode = middlewares.ValidationMode.disabled
+            validation_mode = middlewares.ValidationMode.lazy
 
     if openapi_path:
         stack.append(
