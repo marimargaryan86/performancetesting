@@ -203,6 +203,29 @@ async def test_delete_trip(
     )
 
 
+async def test_get_seat_maps_with_ref(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-travel-seatmaps.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/travel/flight/seatmap-",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    response = await junction_one_client.seat_maps_with_refs(
+        auto_models.FlightSeatMapRequest(
+            refs=["12345"],
+            reward_programs=None,
+        ),
+    )
+
+    assert response == auto_models.FlightSeatMapResponseResponse(**fixture["data"])
+
+
 async def test_search_flights(
     junction_one_client: JunctionOneClient,
     httpx_mock: pytest_httpx.HTTPXMock,

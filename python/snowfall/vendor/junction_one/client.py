@@ -216,6 +216,21 @@ class JunctionOneClient:
 
         return auto_models.ReservationFieldResponse(**response.data)
 
+    async def seat_maps_with_refs(
+        self,
+        query: auto_models.FlightSeatMapRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.FlightSeatMapResponseResponse:
+        response = await self._make_request(
+            "POST",
+            "/v1/travel/flight/seatmap-",
+            query,
+            rate_limit_timeout=rate_limit_timeout,
+            encode_json=True,
+        )
+
+        return auto_models.FlightSeatMapResponseResponse(**response.data)
+
     async def search_flights(
         self,
         query: auto_models.SearchFlightsRequest,
