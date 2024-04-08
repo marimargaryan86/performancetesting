@@ -27,3 +27,8 @@ pants --force --output=all test python/snowfall/project/junction/api_automation/
 --DESTINATION=53672c83-a75c-5263-a6df-4b9280bc363c \
 --HOST=api.junction.dev
 ```
+
+# Junction API Tests
+For Junction API Acceptance Test instructions see:
+
+./junction_api_test/README.md
