@@ -8,11 +8,11 @@ import lagom
 import pytest
 import pytest_mock
 from lagom.integrations.starlette import StarletteIntegration
+from motor import motor_asyncio
 from starlette import applications
 from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
-from snowfall.conftest import mongomock_motor  # type: ignore [attr-defined]
 from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.air import endpoints as routes
@@ -277,19 +277,21 @@ async def _get_search_results(
 
 
 @pytest.fixture()
-async def mock_collection() -> mongomock_motor.AsyncMongoMockCollection:
-    return mongomock_motor.AsyncMongoMockClient()["db"]["collection"]
+async def mock_collection(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> motor_asyncio.AsyncIOMotorCollection:
+    return mongo_client["db"]["collection"]
 
 
 @pytest.fixture()
 async def air_search_repo(
-    mock_collection: mongomock_motor.AsyncMongoMockCollection,
+    mock_collection: motor_asyncio.AsyncIOMotorCollection,
 ) -> AirSearchRepo:
     return AirSearchRepo(collection=mock_collection)
 
 
 @pytest.fixture()
 async def hotel_search_repo(
-    mock_collection: mongomock_motor.AsyncMongoMockCollection,
+    mock_collection: motor_asyncio.AsyncIOMotorCollection,
 ) -> HotelSearchRepo:
     return HotelSearchRepo(collection=mock_collection)
