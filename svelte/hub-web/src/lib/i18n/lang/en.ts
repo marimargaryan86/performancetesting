@@ -264,6 +264,7 @@ export default {
     userChangesSuccess: "Your changes have been saved successfully.",
     userCreatePending: "User has been created and is pending approval.",
     userError: "There was an error saving your changes. Please try again.",
+    userDeleteSuccess: "User has been deleted successfully.",
   },
   tableHeaders: {
     id: "ID",

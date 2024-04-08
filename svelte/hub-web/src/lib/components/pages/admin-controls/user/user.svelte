@@ -55,6 +55,10 @@
     selectedRole = "reseller-user";
   }
 
+  function navigateToUserRootRoute(): void {
+    goto(routeConfig.routes.adminControls.routes.users.root);
+  }
+
   async function submit(): Promise<void> {
     if ($pending) {
       return;
@@ -81,7 +85,7 @@
         });
       }
 
-      goto(routeConfig.routes.adminControls.routes.users.root);
+      navigateToUserRootRoute();
     } catch (e) {
       addToast({
         data: {
@@ -161,7 +165,12 @@
 </svelte:head>
 
 {#if mode === "update"}
-  <DeleteUserDialog maxWidth={"482px"} bind:this={deleteUserDialog} user={deleteUser} />
+  <DeleteUserDialog
+    maxWidth={"482px"}
+    bind:this={deleteUserDialog}
+    user={deleteUser}
+    on:delete={navigateToUserRootRoute}
+  />
 {/if}
 
 <DiscardUserChangesDialog maxWidth={"482px"} bind:this={discardUserChangesDialog} />

@@ -285,6 +285,7 @@ export default {
     userChangesSuccess: "Tus cambios se han guardado con éxito.",
     userCreatePending: "El usuario ha sido creado y está pendiente de aprobación.",
     userError: "Hubo un error al guardar tus cambios. Por favor, inténtalo de nuevo.",
+    userDeleteSuccess: "El usuario ha sido borrado con éxito.",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

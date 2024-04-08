@@ -18,6 +18,7 @@
   import type * as OrySchemas from "~/integration/ory/schemas";
   import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
   import { addToast } from "$lib/components/ui/toaster.svelte";
+  import { invalidateAll } from "$app/navigation";
 
   const t = getTranslator();
   const pending = writable(false);
@@ -63,6 +64,10 @@
     deleteUserDialog.open();
   }
 
+  function reload(): void {
+    invalidateAll();
+  }
+
   function createMockNotifications(): void {
     addToast({
       data: {
@@ -98,7 +103,12 @@
   </title>
 </svelte:head>
 
-<DeleteUserDialog maxWidth={"482px"} bind:this={deleteUserDialog} user={selectedUser} />
+<DeleteUserDialog
+  maxWidth={"482px"}
+  bind:this={deleteUserDialog}
+  user={selectedUser}
+  on:delete={reload}
+/>
 
 <StandardLayout pageTitle={$t("pages.adminControls.pages.users.title")}>
   <div slot="actions">
