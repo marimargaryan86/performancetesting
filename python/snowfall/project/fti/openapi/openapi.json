@@ -285,6 +285,17 @@
                     }
                 ]
             }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health",
+                "description": "Check the application health",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     },
     "components": {

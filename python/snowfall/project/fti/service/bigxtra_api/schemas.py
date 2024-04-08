@@ -26,8 +26,9 @@ class SchemaGenerator(BaseSchemaGenerator):
     _endpoints: ClassVar[dict[Handler, Any]] = {}
     _routes: ClassVar[list[BaseRoute]] = []
 
-    def __init__(self, base_schema: Mapping[str, Any]) -> None:
+    def __init__(self, base_schema: Mapping[str, Any], *, health: bool = True) -> None:
         self.base_schema = base_schema
+        self.health = health
 
     @classmethod
     def schema(
@@ -135,6 +136,8 @@ class SchemaGenerator(BaseSchemaGenerator):
             endpoint_schema["parameters"] = parameters
             schema["paths"][endpoint.path][endpoint.http_method] = endpoint_schema
         schema["components"] = components
+        if self.health:
+            add_health(schema)
         return schema
 
 
@@ -155,3 +158,13 @@ def extract_parameters(
             field["required"] = True
         fields.append(field)
     return fields
+
+
+def add_health(schema: Mapping[str, Any]) -> None:
+    schema["paths"]["/health"] = {
+        "get": {
+            "summary": "Health",
+            "description": "Check the application health",
+            "responses": {"200": {"description": "OK"}},
+        },
+    }
