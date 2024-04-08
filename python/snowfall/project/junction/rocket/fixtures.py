@@ -52,7 +52,7 @@ def generate_search(identifier: str) -> searches_pb2.Search:
         reseller_id=RESELLER_ID,
         expires_at=EXPIRES_AT,
         status=amqp_pb2.Trackable.Status.STATUS_COMPLETED,
-        mock=generate_mock_one_way_search_criterion(),
+        rail=generate_rail_one_way_search_criterion(),
     )
 
 
@@ -94,11 +94,11 @@ def generate_search_result(identifier: str) -> searches_pb2.SearchResult:
     )
 
 
-def generate_mock_one_way_search_criterion() -> searches_pb2.Mock:
-    return searches_pb2.Mock(
+def generate_rail_one_way_search_criterion() -> searches_pb2.Rail:
+    return searches_pb2.Rail(
         origin=generate_point(string.uuid()),
         destination=generate_point(string.uuid()),
-        departure_date=protobuf.datetime_to_protobuf(
+        departure_after=protobuf.datetime_to_protobuf(
             datetime.datetime.now(tz=datetime.UTC),
         ),
         passengers=[

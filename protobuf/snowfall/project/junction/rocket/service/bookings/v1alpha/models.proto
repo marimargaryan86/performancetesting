@@ -97,10 +97,9 @@ message TripOption {
 message TripOptionDetails {
   snowfall.project.junction.go.v1.CabinClass cabin_class = 1;
   oneof result_detail {
-    snowfall.project.junction.rocket.service.searches.v1alpha.MockResultDetail mock = 2;
-    snowfall.project.junction.rocket.service.searches.v1alpha.RailResultDetail rail = 3;
-    snowfall.project.junction.rocket.service.searches.v1alpha.FerryResultDetail ferry = 4;
-    snowfall.project.junction.rocket.service.searches.v1alpha.CarRentalResultDetail car_rental = 5;
+    snowfall.project.junction.rocket.service.searches.v1alpha.RailResultDetail rail = 2;
+    snowfall.project.junction.rocket.service.searches.v1alpha.FerryResultDetail ferry = 3;
+    snowfall.project.junction.rocket.service.searches.v1alpha.CarRentalResultDetail car_rental = 4;
   }
 }
 
