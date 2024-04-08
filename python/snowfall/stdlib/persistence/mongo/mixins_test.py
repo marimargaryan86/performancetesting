@@ -1,11 +1,12 @@
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+import pydantic
 import pytest
 from _pytest import fixtures  # noqa: WPS436
 from motor import motor_asyncio
 
-from snowfall.stdlib.persistence.mongo import mixins, testing
+from snowfall.stdlib.persistence.mongo import mixins, repository, testing
 
 
 class DefaultRepository(
@@ -45,6 +46,18 @@ class PydanticRepository(
     mixins.UpsertMixin[testing.FoobarModel],
 ):
     """PydanticRepository with mixins."""
+
+
+class RequiredPropertyModel(pydantic.BaseModel):
+    id: str
+    required_attribute: str
+
+
+class RequiredPropertyRepository(
+    repository.PydanticRepository[RequiredPropertyModel],
+    mixins.ExistsMixin[RequiredPropertyModel],
+):
+    _model = RequiredPropertyModel
 
 
 _AnyRepository = DefaultRepository | ProtoRepository | PydanticRepository
@@ -114,6 +127,15 @@ async def test_exists_mixin(
     assert not await initialized_repository.exists("foobar")
     await mongo_collection.insert_one({"_id": "foobar"})
     assert await initialized_repository.exists("foobar")
+
+
+async def test_exists_with_required_pydantic_property(
+    mongo_collection: motor_asyncio.AsyncIOMotorCollection,
+) -> None:
+    required_repo = RequiredPropertyRepository(mongo_collection)
+    assert not await required_repo.exists("foobar")
+    await mongo_collection.insert_one({"_id": "foobar"})
+    assert await required_repo.exists("foobar")
 
 
 @pytest.mark.parametrize(

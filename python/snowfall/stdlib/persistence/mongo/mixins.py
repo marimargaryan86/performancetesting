@@ -35,7 +35,7 @@ class ExistsMixin(Generic[Record], repository.RepositoryProtocol[Record]):
             await self._execute(
                 self._collection.find_one,
                 {repository.mongo_id_key: identifier},
-                {repository.mongo_id_key: 1},
+                projection={repository.mongo_id_key: 1},
             )
             is not None
         )

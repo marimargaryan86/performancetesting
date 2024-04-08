@@ -251,6 +251,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
             filter_=filter_pre_cursor,
             sort=sort,
             unmarshalled_cursor=unmarshalled_cursor,
+            has_projection="projection" in kwargs,
         )
 
     async def _parse_result(
@@ -258,7 +259,9 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
         possible_cursor: Any,
         filter_: Mapping[str, Any],
         sort: tuple[str, int] | None,
-        unmarshalled_cursor: cursor_pb2.Cursor | None = None,
+        unmarshalled_cursor: cursor_pb2.Cursor | None,
+        *,
+        has_projection: bool,
     ) -> Any:
         if isinstance(possible_cursor, motor_asyncio.AsyncIOMotorCursor):
             return resultset.DocumentResultSet[Record](
@@ -280,7 +283,7 @@ class _AbstractRepository(abc.ABC, Generic[Record]):
 
         possible_document = await possible_cursor
 
-        if isinstance(possible_document, dict):
+        if isinstance(possible_document, dict) and not has_projection:
             return self._coder.decode(possible_document)
 
         return possible_document
