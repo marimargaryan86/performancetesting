@@ -49,12 +49,16 @@ def get_search_results() -> list[searches_pb2.SearchResult]:
 def generate_search(
     identifier: str,
     search_request: searches_pb2.Search | None = None,
+    status: amqp_pb2.Trackable.Status.ValueType | None = None,
 ) -> searches_pb2.Search:
+    if not status:
+        status = amqp_pb2.Trackable.STATUS_COMPLETED
+
     search = searches_pb2.Search(
         id=identifier,
         reseller_id=RESELLER_ID,
         expires_at=EXPIRES_AT,
-        status=amqp_pb2.Trackable.Status.STATUS_COMPLETED,
+        status=status,
         rail=generate_rail_one_way_search_criterion(),
         search_result_ids=list(SEARCH_RESULTS),
     )

@@ -52,11 +52,11 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2_grpc,
 )
 from snowfall.service.authentication.v1 import models_pb2 as auth_models_pb2
-from snowfall.stdlib import string
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.v1 import amqp_pb2
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
 
@@ -242,16 +242,20 @@ async def client(
 
 async def _create_search(
     request: grpc_pb2.EnqueueSearchRequest,
-    timeout: datetime.datetime,
+    timeout: datetime.datetime | None = None,
 ) -> grpc_pb2.EnqueueSearchResponse:
     return grpc_pb2.EnqueueSearchResponse(
-        search=fixtures.generate_search(string.uuid(), request.search),
+        search=fixtures.generate_search(
+            fixtures.SEARCHES[0],
+            request.search,
+            amqp_pb2.Trackable.STATUS_PENDING,
+        ),
     )
 
 
 async def _get_search(
     request: grpc_pb2.GetSearchRequest,
-    timeout: datetime.datetime,
+    timeout: datetime.datetime | None = None,
 ) -> grpc_pb2.GetSearchResponse:
     if request.id not in fixtures.SEARCHES:
         raise grpc.aio.AioRpcError(
@@ -265,7 +269,7 @@ async def _get_search(
 
 async def _get_search_results(
     request: grpc_pb2.ListSearchResultsRequest,
-    timeout: datetime.datetime,
+    timeout: datetime.datetime | None = None,
 ) -> grpc_pb2.ListSearchResultsResponse:
     if request.search_id not in fixtures.SEARCHES:
         raise grpc.aio.AioRpcError(
