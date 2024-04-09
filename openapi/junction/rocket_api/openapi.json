@@ -204,6 +204,24 @@
               }
             }
           },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AirSearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -231,7 +249,7 @@
                 "type": "object",
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/AirSearchRequest"
+                    "$ref": "#/components/schemas/AirSearch"
                   }
                 },
                 "required": [
@@ -763,47 +781,88 @@
         ],
         "x-examples": {}
       },
-      "AirSearchRequest": {
-        "title": "Air Search Request",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "air-searches"
-            ],
-            "example": "air-searches"
-          },
-          "attributes": {
+      "AirSearch": {
+        "allOf": [
+          {
             "type": "object",
-            "required": [
-              "criteria",
-              "passengers"
-            ],
             "properties": {
-              "criteria": {
-                "$ref": "#/components/schemas/AirSearchCriteria"
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
               },
-              "passengers": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Passenger"
+              "type": {
+                "type": "string",
+                "enum": [
+                  "air-searches"
+                ],
+                "example": "air-searches"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "criteria",
+                  "passengers"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  },
+                  "criteria": {
+                    "$ref": "#/components/schemas/AirSearchCriteria"
+                  },
+                  "passengers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Passenger"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "properties": {
+                  "selectedOutboundOffer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OfferIdentifier"
+                      }
+                    }
+                  }
                 }
               }
-            }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        },
-        "required": [
-          "id",
-          "type",
-          "attributes"
         ],
+        "title": "Air Search",
         "x-examples": {}
       },
       "AirSearchCriteria": {
