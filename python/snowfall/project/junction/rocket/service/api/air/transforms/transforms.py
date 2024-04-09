@@ -4,9 +4,6 @@ from typing import Any
 from snowfall.project.junction.rocket.service.api.air import models as rocket
 from snowfall.project.junction.rocket.service.api.air import types
 from snowfall.project.junction.rocket.service.api.air.transforms import models as safej1
-from snowfall.project.junction.rocket.service.api.common.date import (
-    convert_datetime_to_date,
-)
 from snowfall.project.junction.rocket.service.api.common.passengers import (
     passengers_to_fake_user_ids,
 )
@@ -24,9 +21,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
             j1.OriginDestinationRequest(
                 arrival_airport=attributes.criteria.destination,
                 departure_airport=attributes.criteria.origin,
-                departure_date=convert_datetime_to_date(
-                    attributes.criteria.departure_at,
-                ),
+                departure_date=attributes.criteria.departure_at.date(),
             ),
         ]
         if attributes.criteria.return_departure_at:
@@ -34,9 +29,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
                 j1.OriginDestinationRequest(
                     arrival_airport=attributes.criteria.origin,
                     departure_airport=attributes.criteria.destination,
-                    departure_date=convert_datetime_to_date(
-                        attributes.criteria.return_departure_at,
-                    ),
+                    departure_date=attributes.criteria.return_departure_at.date(),
                 ),
             )
 
