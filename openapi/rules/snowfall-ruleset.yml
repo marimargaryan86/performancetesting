@@ -11,5 +11,6 @@ extends:
   - rules/paths.yml
   - rules/property-names.yml
   - rules/request-bodies.yml
+  - rules/response-bodies.yml
   - rules/schema-names.yml
   - rules/titles.yml

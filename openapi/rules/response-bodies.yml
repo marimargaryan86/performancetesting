@@ -1,0 +1,9 @@
+---
+functions:
+  - ensureRequiredFields
+rules:
+  response-bodies:
+    severity: warn
+    given: "$.paths[*].[*].responses.[*].content"
+    then:
+      function: ensureRequiredFields

@@ -26,7 +26,7 @@ const getKeyInAllOf = (allOf) => {
     )
 }
 
-let ensureRequiredFields = (input, options, context) => {
+let ensureRequiredResourceFields = (input, options, context) => {
     if (options.required === undefined) {
         return
     }
@@ -40,19 +40,19 @@ let ensureRequiredFields = (input, options, context) => {
 
     if (input.hasOwnProperty("oneOf")) {
         for (const oneOf of input.oneOf) {
-            errors.concat(ensureRequiredFields(oneOf, options, context))
+            errors.concat(ensureRequiredResourceFields(oneOf, options, context))
         }
 
         return errors
     } else if (input.hasOwnProperty("anyOf")) {
         for (const anyOf of input.anyOf) {
-            errors.concat(ensureRequiredFields(anyOf, options, context))
+            errors.concat(ensureRequiredResourceFields(anyOf, options, context))
         }
 
         return errors
     } else if (input.hasOwnProperty("items") && input.items.hasOwnProperty("oneOf")) {
         for (const oneOf of input.items.oneOf) {
-            errors.concat(ensureRequiredFields(oneOf, options, context))
+            errors.concat(ensureRequiredResourceFields(oneOf, options, context))
         }
 
         return errors
@@ -75,4 +75,4 @@ let ensureRequiredFields = (input, options, context) => {
     return errors
 }
 
-export default ensureRequiredFields
+export default ensureRequiredResourceFields
