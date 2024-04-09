@@ -67,7 +67,7 @@ class AirOffersResult:
         return get_nested_attribute(self._data, "data")
 
 
-class CarRentalResultData(BaseResult):
+class CarRentalSearchResult(BaseResult):
     def __init__(self, data: Mapping[str, Any]):
         super().__init__(data)
         self._data = data
@@ -79,3 +79,13 @@ class CarRentalResultData(BaseResult):
     @property
     def status(self) -> str:
         return get_nested_attribute(self._data, "data.attributes.status")
+
+
+class CarRentalOfferResult(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def offers(self) -> str:
+        return get_nested_attribute(self._data, "data.0.relationships.offers")
