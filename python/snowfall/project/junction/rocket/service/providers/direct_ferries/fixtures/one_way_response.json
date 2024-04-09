@@ -1,0 +1,273 @@
+{
+  "data": {
+    "quotes": [
+      {
+        "quoteToken": "M4auOrU4iI1NtmRZXl1TItjojgUL0y9KthVqCdjd7SjTaqBTqF8V74wWPeQHlfdbfxeGmSKgx2ROwRve6SIJMcc91Tp9bqbEj+42ECVeg/nSNZ+FX+dbyUgslincve9LxGVGZAlcw/j0OB4HIm1BVCyxJvZzeJ5KoKepqI8iqu7P60Z0XEfBUxbtBHhO7eYlbh6uBh/GqWG2WwnHmUXQDwa39eWsllhErp0LL6xmhLNe1RLX3coTHia3FljdrOWs",
+        "createdDateTime": "2024-04-02T02:15:06",
+        "selectedCurrency": "EUR",
+        "partnerCode": "F5152",
+        "isDifferentOutboundReturn": false,
+        "returnAlternativeRoutes": false,
+        "isSuccess": true,
+        "price": {
+          "totalInSelectedCurrency": 104.0
+        },
+        "isSpecialOffer": false,
+        "isOpenTicket": false,
+        "hasTicketTypes": true,
+        "hasAccommodations": true,
+        "legs": [
+          {
+            "ticketReference": "",
+            "minAgeForAccommodation": 0,
+            "isReturnLeg": false,
+            "operator": {
+              "id": 13,
+              "name": "Stena Line"
+            },
+            "routeId": 81,
+            "routeName": "Hook of Holland - Harwich",
+            "departurePortName": "Hook of Holland",
+            "departurePortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+            "departurePortId": 33,
+            "departurePortCode": "NLMDK",
+            "departureDateTime": "2024-05-15T14:15:00",
+            "arrivalPortName": "Harwich",
+            "arrivalPortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+            "arrivalPortId": 29,
+            "arrivalPortCode": "GBHRW",
+            "arrivalDateTime": "2024-05-15T19:45:00",
+            "durationMinutes": 390,
+            "isAccommodationCompulsory": false,
+            "latestCheckInMinutes": 60,
+            "ship": {
+              "name": "",
+              "onboardFacilities": []
+            },
+            "vehicles": [
+              {
+                "typeId": 2,
+                "makeModelId": 2056,
+                "make": "Standard",
+                "model": "Car",
+                "height": 179,
+                "length": 469
+              }
+            ],
+            "passengers": [
+              {
+                "id": 0,
+                "title": "",
+                "ageRange": {
+                  "from": 18,
+                  "to": 64
+                },
+                "type": "Adult",
+                "isWheelchairUser": false,
+                "sequenceNo": 1,
+                "isLeadPassenger": true,
+                "email": "",
+                "telephone": "",
+                "dateOfBirth": "",
+                "placeOfBirth": "",
+                "passportNumber": "",
+                "passportStartDate": "",
+                "passportExpiryDate": "",
+                "nationality": "",
+                "cityCode": "",
+                "extraInfo": {
+                  "ticketReference": "",
+                  "visaNumber": "",
+                  "visaExpiry": ""
+                }
+              },
+              {
+                "id": 0,
+                "title": "",
+                "ageRange": {
+                  "from": 7,
+                  "to": 7
+                },
+                "type": "Child",
+                "isWheelchairUser": false,
+                "sequenceNo": 2,
+                "isLeadPassenger": false,
+                "email": "",
+                "telephone": "",
+                "dateOfBirth": "",
+                "placeOfBirth": "",
+                "passportNumber": "",
+                "passportStartDate": "",
+                "passportExpiryDate": "",
+                "nationality": "",
+                "cityCode": "",
+                "extraInfo": {
+                  "ticketReference": "",
+                  "visaNumber": "",
+                  "visaExpiry": ""
+                }
+              }
+            ],
+            "accommodations": [],
+            "extras": [],
+            "meals": [],
+            "pdfUrl": "",
+            "barcodeUrl": "",
+            "pets": []
+          }
+        ],
+        "petInstructions": "",
+        "ticketConditions": "This ticket is non-refundable",
+        "quoteMessages": "",
+        "accommodationMessage": "If available, onboard accommodation/seating/extras may be selected on the following page.  ",
+        "requiredPassengerInformation": [
+          "Nationality"
+        ],
+        "culture": "en-GB"
+      },
+      {
+        "quoteToken": "fWq3hOsDehyJQVQr78Hbx9oTP1dWYPtNMXK7ArbF6N9GO4JK4svvHQ8cYWaQAilrtjjuUYMjsDozv1lK9/KVWCoZ41MzmRuQdKi4Fet6yQktEsW+rlMfj7qpyPr7Um8keVX2HpclaQFI7kme/6JTO6ADfaf4x+nst4+p1JHKi8zWs30mFFSkTFzYme7ugyJv9Zm+Tt/CtVUmfgigeG7BH1cbZUm63ATuvd9Ba6oVvBqYnxMLhqlREp9yEqmtH/NA",
+        "createdDateTime": "2024-04-02T02:15:06",
+        "selectedCurrency": "EUR",
+        "partnerCode": "F5152",
+        "isDifferentOutboundReturn": false,
+        "returnAlternativeRoutes": false,
+        "isSuccess": true,
+        "price": {
+          "totalInSelectedCurrency": 104.0
+        },
+        "isSpecialOffer": false,
+        "isOpenTicket": false,
+        "hasTicketTypes": true,
+        "hasAccommodations": true,
+        "legs": [
+          {
+            "ticketReference": "",
+            "minAgeForAccommodation": 0,
+            "isReturnLeg": false,
+            "operator": {
+              "id": 13,
+              "name": "Stena Line"
+            },
+            "routeId": 81,
+            "routeName": "Hook of Holland - Harwich",
+            "departurePortName": "Hook of Holland",
+            "departurePortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+            "departurePortId": 33,
+            "departurePortCode": "NLMDK",
+            "departureDateTime": "2024-05-15T22:00:00",
+            "arrivalPortName": "Harwich",
+            "arrivalPortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+            "arrivalPortId": 29,
+            "arrivalPortCode": "GBHRW",
+            "arrivalDateTime": "2024-05-16T06:30:00",
+            "durationMinutes": 570,
+            "isAccommodationCompulsory": true,
+            "latestCheckInMinutes": 60,
+            "ship": {
+              "name": "",
+              "onboardFacilities": []
+            },
+            "vehicles": [
+              {
+                "typeId": 2,
+                "makeModelId": 2056,
+                "make": "Standard",
+                "model": "Car",
+                "height": 179,
+                "length": 469
+              }
+            ],
+            "passengers": [
+              {
+                "id": 0,
+                "title": "",
+                "ageRange": {
+                  "from": 18,
+                  "to": 64
+                },
+                "type": "Adult",
+                "isWheelchairUser": false,
+                "sequenceNo": 1,
+                "isLeadPassenger": true,
+                "email": "",
+                "telephone": "",
+                "dateOfBirth": "",
+                "placeOfBirth": "",
+                "passportNumber": "",
+                "passportStartDate": "",
+                "passportExpiryDate": "",
+                "nationality": "",
+                "cityCode": "",
+                "extraInfo": {
+                  "ticketReference": "",
+                  "visaNumber": "",
+                  "visaExpiry": ""
+                }
+              },
+              {
+                "id": 0,
+                "title": "",
+                "ageRange": {
+                  "from": 7,
+                  "to": 7
+                },
+                "type": "Child",
+                "isWheelchairUser": false,
+                "sequenceNo": 2,
+                "isLeadPassenger": false,
+                "email": "",
+                "telephone": "",
+                "dateOfBirth": "",
+                "placeOfBirth": "",
+                "passportNumber": "",
+                "passportStartDate": "",
+                "passportExpiryDate": "",
+                "nationality": "",
+                "cityCode": "",
+                "extraInfo": {
+                  "ticketReference": "",
+                  "visaNumber": "",
+                  "visaExpiry": ""
+                }
+              }
+            ],
+            "accommodations": [
+              {
+                "accommodationId": 16026,
+                "capacity": 2,
+                "description": "2 berth cabin (Inside, Lower Deck) - Included in Price",
+                "isCabin": true,
+                "isDeckSpace": false,
+                "isSeat": false,
+                "isShared": false,
+                "price": 10.0,
+                "quantity": 1,
+                "availability": 99,
+                "gender": {
+                  "id": "Unknown",
+                  "name": "Unknown"
+                },
+                "minimumOccupancy": 1
+              }
+            ],
+            "extras": [],
+            "meals": [],
+            "pdfUrl": "",
+            "barcodeUrl": "",
+            "pets": []
+          }
+        ],
+        "petInstructions": "",
+        "ticketConditions": "This ticket is non-refundable",
+        "quoteMessages": "",
+        "accommodationMessage": "Onboard Accommodation/Seating of '2 berth cabin (Inside, Lower Deck)' has been used for the outbound journey for this quote.  This may be changed on the following page if required.  ",
+        "requiredPassengerInformation": [
+          "Nationality"
+        ],
+        "culture": "en-GB"
+      }
+    ]
+  },
+  "status": "success"
+}

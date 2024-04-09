@@ -9,17 +9,17 @@ The following ports should be used as default for various network protocols and
 services. Please note that ports must always be configurable through environment
 variables.
 
-| Port  | Description       |
-|:-----:|:------------------|
-|  80   | HTTP Server       |
-| 50051 | gRPC Server       |
+| Port  | Description |
+| :---: | :---------- |
+|  80   | HTTP Server |
+| 50051 | gRPC Server |
 
 ## Port Assignments
 
 The following ports are configured in local environments by default:
 
 | Port  | Service                | Description |
-|:-----:|:-----------------------|:------------|
+| :---: | :--------------------- | :---------- |
 | 8000  | client-api             | HTTP Server |
 | 8001  | mobile-api             | HTTP Server |
 | 8003  | pay-api                | HTTP Server |
@@ -71,4 +71,5 @@ The following ports are configured in local environments by default:
 | 51054 | rocket/carnect         | gRPC Server |
 | 51055 | rocket/places          | gRPC Server |
 | 51056 | rocket/bookings        | gRPC Server |
+| 51057 | rocket/direct_ferries  | gRPC Server |
 | 51058 | rocket/benerail        | gRPC Server |

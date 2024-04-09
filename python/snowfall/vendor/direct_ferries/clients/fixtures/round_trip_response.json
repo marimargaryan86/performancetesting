@@ -1,0 +1,684 @@
+{
+  "quotes": [
+    {
+      "quoteToken": "dSOqvtrwIexA3vdHbpBM95DM7rRZ0VwMFKT/Ssilapk2apyBJ+IJ1f5euPqUiHFL3K2uOeH4Sw1KiIpiaVQ0Mu7Fvqj78SdQeeaR7hY1TFiIZGgeH5WIUe6Vuk2WphMGW24eXJXsd7tU7GyUtcsMDxON0SY8Bk6b9oOIF/6bB2Jn/eQsg7/ixAK0QyZCj+NyImTHpzqUT8fTn/2MqkQdLs8gWNxv7J12cDZSokKA/Hd1lehAlO+eOhHm+pO3Ivz3Bi81gNiMa+Yimsihsx9pfwEmGCS4KV8O2muWCqowI1k=",
+      "createdDateTime": "2024-03-06T17: 17: 44",
+      "selectedCurrency": "EUR",
+      "partnerCode": "F5152",
+      "isDifferentOutboundReturn": "True",
+      "returnAlternativeRoutes": "False",
+      "isSuccess": "True",
+      "price": {
+        "totalInSelectedCurrency": 104.0
+      },
+      "isSpecialOffer": "False",
+      "isOpenTicket": "False",
+      "hasTicketTypes": "True",
+      "hasAccommodations": "True",
+      "legs": [
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "False",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 81,
+          "routeName": "Hook of Holland - Harwich",
+          "departurePortName": "Hook of Holland",
+          "departurePortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "departurePortId": 33,
+          "departurePortCode": "NLMDK",
+          "departureDateTime": "2024-04-23T14: 15: 00",
+          "arrivalPortName": "Harwich",
+          "arrivalPortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "arrivalPortId": 29,
+          "arrivalPortCode": "GBHRW",
+          "arrivalDateTime": "2024-04-23T19: 45: 00",
+          "durationMinutes": 390,
+          "isAccommodationCompulsory": "False",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        },
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "True",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 33,
+          "routeName": "Harwich - Hook of Holland",
+          "departurePortName": "Harwich",
+          "departurePortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "departurePortId": 29,
+          "departurePortCode": "GBHRW",
+          "departureDateTime": "2024-04-25T09: 00: 00",
+          "arrivalPortName": "Hook of Holland",
+          "arrivalPortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "arrivalPortId": 33,
+          "arrivalPortCode": "NLMDK",
+          "arrivalDateTime": "2024-04-25T17: 15: 00",
+          "durationMinutes": 435,
+          "isAccommodationCompulsory": "False",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        }
+      ],
+      "petInstructions": "",
+      "ticketConditions": "This ticket is non-refundable",
+      "quoteMessages": "",
+      "accommodationMessage": "If available, onboard accommodation/seating/extras may be selected on the following page.  ",
+      "requiredPassengerInformation": [
+        "Nationality"
+      ],
+      "culture": "en-GB"
+    },
+    {
+      "quoteToken": "8m3vq8eOBC6o3Df05bxLSs/C1uNSTv53G1yV9AOenScKsGEWMa83SmUuZXqWJ9GFpVBBGfkv/yqTYUlRpRk8d6gvoY8Oo2AiJfBRaHLrz4f7bHddmdt1VdbpCCY4+Sbctwe/XUGiZLN2fvXv58Qx9xs2vSYxvfTfg1oiWrGXtT5yc7B2ERJFOlMR7H9B73sjT6wzLIUYUHRXmb+rDa6O7ewZx+vZOb+fEEjB6o3HlT2uHFqz9BgFEwa2Ujzckqb3gX5SjQ0nlF7wsJu3CSmiFASZfFrTDgfWRUwfzNcKDWU=",
+      "createdDateTime": "2024-03-06T17: 17: 44",
+      "selectedCurrency": "EUR",
+      "partnerCode": "F5152",
+      "isDifferentOutboundReturn": "True",
+      "returnAlternativeRoutes": "False",
+      "isSuccess": "True",
+      "price": {
+        "totalInSelectedCurrency": 104.0
+      },
+      "isSpecialOffer": "False",
+      "isOpenTicket": "False",
+      "hasTicketTypes": "True",
+      "hasAccommodations": "True",
+      "legs": [
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "False",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 81,
+          "routeName": "Hook of Holland - Harwich",
+          "departurePortName": "Hook of Holland",
+          "departurePortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "departurePortId": 33,
+          "departurePortCode": "NLMDK",
+          "departureDateTime": "2024-04-23T14: 15: 00",
+          "arrivalPortName": "Harwich",
+          "arrivalPortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "arrivalPortId": 29,
+          "arrivalPortCode": "GBHRW",
+          "arrivalDateTime": "2024-04-23T19: 45: 00",
+          "durationMinutes": 390,
+          "isAccommodationCompulsory": "False",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        },
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "True",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 33,
+          "routeName": "Harwich - Hook of Holland",
+          "departurePortName": "Harwich",
+          "departurePortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "departurePortId": 29,
+          "departurePortCode": "GBHRW",
+          "departureDateTime": "2024-04-25T23: 00: 00",
+          "arrivalPortName": "Hook of Holland",
+          "arrivalPortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "arrivalPortId": 33,
+          "arrivalPortCode": "NLMDK",
+          "arrivalDateTime": "2024-04-26T08: 00: 00",
+          "durationMinutes": 480,
+          "isAccommodationCompulsory": "True",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [
+            {
+              "accommodationId": 22182,
+              "capacity": 1,
+              "description": "Deck Space - Included in Price",
+              "isCabin": "False",
+              "isDeckSpace": "False",
+              "isSeat": "True",
+              "isShared": "False",
+              "price": 10.0,
+              "quantity": 1,
+              "availability": 99,
+              "gender": {
+                "id": "Unknown",
+                "name": "Unknown"
+              },
+              "minimumOccupancy": 1
+            }
+          ],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        }
+      ],
+      "petInstructions": "",
+      "ticketConditions": "This ticket is non-refundable",
+      "quoteMessages": "",
+      "accommodationMessage": "Onboard Accommodation/Seating of 'Deck Space' has been used for the return journey for this quote.  This may be changed on the following page if required.  ",
+      "requiredPassengerInformation": [
+        "Nationality"
+      ],
+      "culture": "en-GB"
+    },
+    {
+      "quoteToken": "wG27QSyHZKO9kK/10cff6qwA/AC9SqEdYzWLOqoEQk8oE8bDbQ/M93tBX8AG46zpTgRUq/CZ9f2AMse4pRvvuXMusfDopaxwwOC8cXlwiTYc0ZwS4Fpt23evvGQBgicRLSQ/W2PRGG+By5dFOpndOi1RfW8LctLl3dSc0rlMCN/MfuaayvoQ32IfpExL1G3h5p1NZ9JH89V/GFINpgwhBX3dc+9dSxDhdRbf831kCbV22F+CHGUTO8IpQHrP4sTlFdVcR/u3icIHBhj57nzns5IwlKxr3Fyua9XMN0UhcDc=",
+      "createdDateTime": "2024-03-06T17: 17: 44",
+      "selectedCurrency": "EUR",
+      "partnerCode": "F5152",
+      "isDifferentOutboundReturn": "True",
+      "returnAlternativeRoutes": "False",
+      "isSuccess": "True",
+      "price": {
+        "totalInSelectedCurrency": 104.0
+      },
+      "isSpecialOffer": "False",
+      "isOpenTicket": "False",
+      "hasTicketTypes": "True",
+      "hasAccommodations": "True",
+      "legs": [
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "False",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 81,
+          "routeName": "Hook of Holland - Harwich",
+          "departurePortName": "Hook of Holland",
+          "departurePortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "departurePortId": 33,
+          "departurePortCode": "NLMDK",
+          "departureDateTime": "2024-04-23T22: 00: 00",
+          "arrivalPortName": "Harwich",
+          "arrivalPortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "arrivalPortId": 29,
+          "arrivalPortCode": "GBHRW",
+          "arrivalDateTime": "2024-04-24T06: 30: 00",
+          "durationMinutes": 570,
+          "isAccommodationCompulsory": "True",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [
+            {
+              "accommodationId": 22182,
+              "capacity": 1,
+              "description": "Deck Space - Included in Price",
+              "isCabin": "False",
+              "isDeckSpace": "False",
+              "isSeat": "True",
+              "isShared": "False",
+              "price": 10.0,
+              "quantity": 1,
+              "availability": 99,
+              "gender": {
+                "id": "Unknown",
+                "name": "Unknown"
+              },
+              "minimumOccupancy": 1
+            }
+          ],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        },
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "True",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 33,
+          "routeName": "Harwich - Hook of Holland",
+          "departurePortName": "Harwich",
+          "departurePortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "departurePortId": 29,
+          "departurePortCode": "GBHRW",
+          "departureDateTime": "2024-04-25T09: 00: 00",
+          "arrivalPortName": "Hook of Holland",
+          "arrivalPortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "arrivalPortId": 33,
+          "arrivalPortCode": "NLMDK",
+          "arrivalDateTime": "2024-04-25T17: 15: 00",
+          "durationMinutes": 435,
+          "isAccommodationCompulsory": "False",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        }
+      ],
+      "petInstructions": "",
+      "ticketConditions": "This ticket is non-refundable",
+      "quoteMessages": "",
+      "accommodationMessage": "Onboard Accommodation/Seating of 'Deck Space' has been used for the outbound journey for this quote.  This may be changed on the following page if required.  ",
+      "requiredPassengerInformation": [
+        "Nationality"
+      ],
+      "culture": "en-GB"
+    },
+    {
+      "quoteToken": "5O+ObcOgG4XXg37tApr87HkUbfCQyY0A2EfNT8OOD5LKF1qX2dfRHSRklZq+H/Ug9wHcuWZBij/REz0FMT2L9nBr1geUOvKyZ086DCBsaOMFnLxc7t/iWjIHatNUUKWWjvj0AR+JtMoDy4jNnmLIagCiwzVZRSPCZsNyipNIKHNaj1/jLr4+hQN1CPdsZuPXpXGChmT8+u3eayMLRwDaL0GIRmvjowcfi/qm2Im3DpVFlf7SiQzTeFRJoc+5JHTlTDNRXptYx7+BTwTfqSYuGglxsVB5npqH6dCXnIB9EjI=",
+      "createdDateTime": "2024-03-06T17: 17: 44",
+      "selectedCurrency": "EUR",
+      "partnerCode": "F5152",
+      "isDifferentOutboundReturn": "True",
+      "returnAlternativeRoutes": "False",
+      "isSuccess": "True",
+      "price": {
+        "totalInSelectedCurrency": 104.0
+      },
+      "isSpecialOffer": "False",
+      "isOpenTicket": "False",
+      "hasTicketTypes": "True",
+      "hasAccommodations": "True",
+      "legs": [
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "False",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 81,
+          "routeName": "Hook of Holland - Harwich",
+          "departurePortName": "Hook of Holland",
+          "departurePortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "departurePortId": 33,
+          "departurePortCode": "NLMDK",
+          "departureDateTime": "2024-04-23T22: 00: 00",
+          "arrivalPortName": "Harwich",
+          "arrivalPortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "arrivalPortId": 29,
+          "arrivalPortCode": "GBHRW",
+          "arrivalDateTime": "2024-04-24T06: 30: 00",
+          "durationMinutes": 570,
+          "isAccommodationCompulsory": "True",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [
+            {
+              "accommodationId": 22182,
+              "capacity": 1,
+              "description": "Deck Space - Included in Price",
+              "isCabin": "False",
+              "isDeckSpace": "False",
+              "isSeat": "True",
+              "isShared": "False",
+              "price": 10.0,
+              "quantity": 1,
+              "availability": 99,
+              "gender": {
+                "id": "Unknown",
+                "name": "Unknown"
+              },
+              "minimumOccupancy": 1
+            }
+          ],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        },
+        {
+          "ticketReference": "",
+          "minAgeForAccommodation": 0,
+          "isReturnLeg": "True",
+          "operator": {
+            "id": 13,
+            "name": "Stena Line"
+          },
+          "routeId": 33,
+          "routeName": "Harwich - Hook of Holland",
+          "departurePortName": "Harwich",
+          "departurePortAddress": "Harwich International Port, Parkeston Quay, Parkeston, Harwich CO12 4SX",
+          "departurePortId": 29,
+          "departurePortCode": "GBHRW",
+          "departureDateTime": "2024-04-25T23: 00: 00",
+          "arrivalPortName": "Hook of Holland",
+          "arrivalPortAddress": "Havennummer 911, Stationsweg 10, 3151 HS Hoek van Holland, Netherlands",
+          "arrivalPortId": 33,
+          "arrivalPortCode": "NLMDK",
+          "arrivalDateTime": "2024-04-26T08: 00: 00",
+          "durationMinutes": 480,
+          "isAccommodationCompulsory": "True",
+          "latestCheckInMinutes": 60,
+          "ship": {
+            "name": "",
+            "onboardFacilities": []
+          },
+          "vehicles": [],
+          "passengers": [
+            {
+              "id": 0,
+              "title": "",
+              "ageRange": {
+                "from": 18,
+                "to": 64
+              },
+              "type": "Adult",
+              "isWheelchairUser": "False",
+              "sequenceNo": 1,
+              "isLeadPassenger": "True",
+              "email": "",
+              "telephone": "",
+              "dateOfBirth": "",
+              "placeOfBirth": "",
+              "passportNumber": "",
+              "passportStartDate": "",
+              "passportExpiryDate": "",
+              "nationality": "",
+              "cityCode": "",
+              "extraInfo": {
+                "ticketReference": "",
+                "visaNumber": "",
+                "visaExpiry": ""
+              }
+            }
+          ],
+          "accommodations": [
+            {
+              "accommodationId": 22182,
+              "capacity": 1,
+              "description": "Deck Space - Included in Price",
+              "isCabin": "False",
+              "isDeckSpace": "False",
+              "isSeat": "True",
+              "isShared": "False",
+              "price": 10.0,
+              "quantity": 1,
+              "availability": 99,
+              "gender": {
+                "id": "Unknown",
+                "name": "Unknown"
+              },
+              "minimumOccupancy": 1
+            }
+          ],
+          "extras": [],
+          "meals": [],
+          "pdfUrl": "",
+          "barcodeUrl": "",
+          "pets": []
+        }
+      ],
+      "petInstructions": "",
+      "ticketConditions": "This ticket is non-refundable",
+      "quoteMessages": "",
+      "accommodationMessage": "Includes 'Deck Space' in both directions.  This may be changed on the following page if required.  ",
+      "requiredPassengerInformation": [
+        "Nationality"
+      ],
+      "culture": "en-GB"
+    }
+  ]
+}

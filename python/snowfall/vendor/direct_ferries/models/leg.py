@@ -40,6 +40,7 @@ class LegBase(base.CamelCaseBaseModel):
     route_id: int
     departure_date_time: datetime.datetime
     passengers: Sequence[passenger.PassengerBase]
+    vehicles: Sequence[vehicle.Vehicle] | None
 
 
 class Leg(LegBase):

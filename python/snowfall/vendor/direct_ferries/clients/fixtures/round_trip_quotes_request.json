@@ -1,0 +1,85 @@
+{
+  "quote": {
+    "selected_currency": "EUR",
+    "partner_code": "F5152",
+    "is_different_outbound_return": true,
+    "return_alternative_routes": false,
+    "is_open_ticket": false,
+    "legs": [
+      {
+        "is_return_leg": false,
+        "route_id": 81,
+        "departure_date_time": "2024-04-15T12:00:00",
+        "passengers": [
+          {
+            "age_range": {
+              "age_from": 34,
+              "age_to": 34
+            },
+            "is_wheelchair_user": false,
+            "is_lead_passenger": true,
+            "first_name": null,
+            "sur_name": null,
+            "email": null,
+            "telephone": null,
+            "nationality": null,
+            "passport_number": null,
+            "passport_place_of_issue": null,
+            "date_of_birth": null
+          }
+        ],
+        "vehicles": [
+          {
+            "type_id": 2,
+            "make_model_id": null,
+            "make": null,
+            "model": null,
+            "height": null,
+            "length": null,
+            "additional_height": null,
+            "additional_length": null,
+            "trailer": null,
+            "registration": null
+          }
+        ]
+      },
+      {
+        "is_return_leg": true,
+        "route_id": 33,
+        "departure_date_time": "2024-04-17T12:00:00",
+        "passengers": [
+          {
+            "age_range": {
+              "age_from": 34,
+              "age_to": 34
+            },
+            "is_wheelchair_user": false,
+            "is_lead_passenger": true,
+            "first_name": null,
+            "sur_name": null,
+            "email": null,
+            "telephone": null,
+            "nationality": null,
+            "passport_number": null,
+            "passport_place_of_issue": null,
+            "date_of_birth": null
+          }
+        ],
+        "vehicles": [
+          {
+            "type_id": 2,
+            "make_model_id": null,
+            "make": null,
+            "model": null,
+            "height": null,
+            "length": null,
+            "additional_height": null,
+            "additional_length": null,
+            "trailer": null,
+            "registration": null
+          }
+        ]
+      }
+    ]
+  }
+}

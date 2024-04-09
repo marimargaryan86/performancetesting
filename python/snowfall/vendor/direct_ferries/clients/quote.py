@@ -20,14 +20,16 @@ class QuoteClient(base.BaseClient):
     ) -> Sequence[quote.Quote]:
         request.quote.partner_code = self._config.partner_code
 
+        url = "{0}/api/{1}/Quotes/get-quotes-request".format(
+            self._config.api_url,
+            self._config.api_version,
+        )
+
         response_data = (
             await self._make_request(
                 request_details=base.RequestDetails(
                     method=_POST_METHOD,
-                    url="{0}/api/{1}/Quotes/get-quotes-request".format(
-                        self._config.api_url,
-                        self._config.api_version,
-                    ),
+                    url=url,
                     payload=request.json(by_alias=True),
                     query_params=httpx.QueryParams(self._request_params),
                 ),

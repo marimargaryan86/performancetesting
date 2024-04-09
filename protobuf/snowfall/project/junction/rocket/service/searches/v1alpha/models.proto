@@ -28,7 +28,8 @@ message Ferry {
   google.protobuf.Timestamp departure_before = 4;
   google.protobuf.Timestamp return_date = 5;
   repeated Passenger passengers = 6;
-  string outbound_search_result_id = 7;
+  repeated Vehicle vehicles = 7;
+  string outbound_search_result_id = 8;
 }
 
 message CarRental {
@@ -84,7 +85,7 @@ message RailOffer {
 }
 
 message FerryOffer {
-  snowfall.project.junction.go.v1.CabinClass cabin_class = 1;
+  string ferry_result_detail_id = 1;
 }
 
 message CarRentalOffer {
@@ -112,10 +113,17 @@ message RailResultDetail {
 message FerryResultDetail {
   snowfall.project.junction.go.v1.Point origin = 1;
   snowfall.project.junction.go.v1.Point destination = 2;
-  bool outbound_segment = 3;
-  uint32 segment_sequence = 4;
-  snowfall.stdlib.v1.DateTime departure_date = 5;
-  snowfall.stdlib.v1.DateTime arrival_date = 6;
+  FerryOperator ferry_operator = 3;
+  bool outbound_segment = 4;
+  uint32 segment_sequence = 5;
+  int32 duration_in_minutes = 6;
+  snowfall.stdlib.v1.DateTime departure_date = 7;
+  snowfall.stdlib.v1.DateTime arrival_date = 8;
+}
+
+message FerryOperator {
+  int32 id = 1;
+  string name = 2;
 }
 
 message CarRentalResultDetail {
@@ -134,6 +142,21 @@ message CarRentalResultDetail {
   optional string vendor_code = 14;
   snowfall.stdlib.v1.DateTime pickup_at = 15;
   snowfall.stdlib.v1.DateTime return_at = 16;
+}
+
+message Vehicle {
+  enum TypeId {
+    TYPE_ID_UNSPECIFIED = 0;
+    TYPE_ID_BICYCLE = 1;
+    TYPE_ID_CAR = 2;
+    TYPE_ID_CAMPER_OR_MOTORHOME = 3;
+    TYPE_ID_MOTORCYCLE_AND_SIDECAR = 5;
+    TYPE_ID_MOTORCYCLE = 7;
+    TYPE_ID_MINIBUS = 10;
+    TYPE_ID_VAN = 11;
+    reserved 4, 6, 8, 9;
+  }
+  TypeId type_id = 1;
 }
 
 message Passenger {

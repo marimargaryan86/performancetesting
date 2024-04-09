@@ -12,12 +12,12 @@ class Trailer(base.CamelCaseBaseModel):
 
 class Vehicle(base.CamelCaseBaseModel):
     type_id: int
-    make_model_id: int
-    make: int
-    model: str
-    height: int
-    length: int
-    additional_height: int
-    additional_length: float
+    make_model_id: int | None
+    make: str | None
+    model: str | None
+    height: int | None
+    length: int | None
+    additional_height: int | None
+    additional_length: float | None
     trailer: Trailer | None
-    registration: str
+    registration: str | None

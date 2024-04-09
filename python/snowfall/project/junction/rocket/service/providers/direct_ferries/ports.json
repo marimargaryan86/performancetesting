@@ -1,0 +1,4755 @@
+[
+  {
+    "id": "PHBCD",
+    "name": "Bacolod City",
+    "latitude": 10.676888,
+    "longitude": 122.940024,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHMIC",
+    "name": "Cagayan De Oro",
+    "latitude": 8.491202,
+    "longitude": 124.664474,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHILO",
+    "name": "Iloilo City",
+    "latitude": 10.690951,
+    "longitude": 122.58341,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHMNL",
+    "name": "Manila",
+    "latitude": 14.602619,
+    "longitude": 120.957801,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHWAW",
+    "name": "Batangas",
+    "latitude": 13.753806,
+    "longitude": 121.040466,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHCLP",
+    "name": "Calapan City",
+    "latitude": 13.429882,
+    "longitude": 121.194535,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHMPH",
+    "name": "Caticlan Jetty Port",
+    "latitude": 11.928086,
+    "longitude": 121.949448,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHODI",
+    "name": "Odiongan",
+    "latitude": 12.417317,
+    "longitude": 121.988421,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHROM",
+    "name": "Romblon",
+    "latitude": 12.578273,
+    "longitude": 122.268732,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHRXS",
+    "name": "Roxas City",
+    "latitude": 11.603229,
+    "longitude": 122.707054,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHCEB",
+    "name": "Cebu City",
+    "latitude": 10.292211,
+    "longitude": 123.909196,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHIGN",
+    "name": "Iligan City",
+    "latitude": 8.231469,
+    "longitude": 124.23178,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHNAS",
+    "name": "Nasipit (Butuan City)",
+    "latitude": 8.976919,
+    "longitude": 125.335519,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHOZC",
+    "name": "Ozamiz City",
+    "latitude": 8.137684,
+    "longitude": 123.844433,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHTAG",
+    "name": "Tagbilaran",
+    "latitude": 9.649844,
+    "longitude": 123.846684,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHDPL",
+    "name": "Dipolog City",
+    "latitude": 8.637531,
+    "longitude": 123.383325,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHDGT",
+    "name": "Dumaguete City",
+    "latitude": 9.311622,
+    "longitude": 123.311572,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHZAM",
+    "name": "Zamboanga City",
+    "latitude": 6.900884,
+    "longitude": 122.076063,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHLEY",
+    "name": "Leyte",
+    "latitude": 11.001066,
+    "longitude": 124.60611,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "PHPPS",
+    "name": "Palawan (Coron)",
+    "latitude": 11.989561,
+    "longitude": 120.212942,
+    "timezone": "Asia/Manila"
+  },
+  {
+    "id": "THPKB",
+    "name": "Pakbara",
+    "latitude": 6.860494,
+    "longitude": 99.721676,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THSNT",
+    "name": "Koh Lipe (Pattaya Beach)",
+    "latitude": 6.486908,
+    "longitude": 99.303225,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "ITBRI",
+    "name": "Bari",
+    "latitude": 41.132512,
+    "longitude": 16.867576,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ALDRZ",
+    "name": "Durres",
+    "latitude": 41.313922,
+    "longitude": 19.455799,
+    "timezone": "Europe/Tirane"
+  },
+  {
+    "id": "ITAOI",
+    "name": "Ancona",
+    "latitude": 43.623037,
+    "longitude": 13.508484,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITTRS",
+    "name": "Trieste",
+    "latitude": 45.657128,
+    "longitude": 13.766105,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "GRPIR",
+    "name": "Piraeus",
+    "latitude": 37.945219,
+    "longitude": 23.638791,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPTR",
+    "name": "Poros (Saronic Islands)",
+    "latitude": 37.49995,
+    "longitude": 23.45123,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRVOL",
+    "name": "Volos",
+    "latitude": 39.35774,
+    "longitude": 22.944262,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJSI",
+    "name": "Skiathos",
+    "latitude": 39.162151,
+    "longitude": 23.492146,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSKO",
+    "name": "Chora (Skopelos)",
+    "latitude": 39.121021,
+    "longitude": 23.732234,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRALO",
+    "name": "Alonissos",
+    "latitude": 39.144426,
+    "longitude": 23.865507,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAEG",
+    "name": "Aegina",
+    "latitude": 37.744462,
+    "longitude": 23.425014,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAGG",
+    "name": "Agistri",
+    "latitude": 37.708812,
+    "longitude": 23.366098,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRMEA",
+    "name": "Methana",
+    "latitude": 37.580117,
+    "longitude": 23.393625,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRGLO",
+    "name": "Glossa (Skopelos)",
+    "latitude": 39.167271,
+    "longitude": 23.613609,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPAS",
+    "name": "Paros",
+    "latitude": 37.0872,
+    "longitude": 25.14936,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKRE",
+    "name": "Sifnos",
+    "latitude": 36.99033,
+    "longitude": 24.67413,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKMS",
+    "name": "Kimolos",
+    "latitude": 36.78539,
+    "longitude": 24.580767,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRADL",
+    "name": "Milos",
+    "latitude": 36.723361,
+    "longitude": 24.444939,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRZAQ",
+    "name": "Serifos",
+    "latitude": 37.141585,
+    "longitude": 24.518778,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "TRTAS",
+    "name": "Tasucu",
+    "latitude": 36.310977,
+    "longitude": 33.897918,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "CYKYR",
+    "name": "Kyrenia",
+    "latitude": 35.342064,
+    "longitude": 33.330182,
+    "timezone": "Asia/Famagusta"
+  },
+  {
+    "id": "TRMER",
+    "name": "Mersin",
+    "latitude": 36.804168,
+    "longitude": 34.65508,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "CYFMG",
+    "name": "Famagusta (Magusa)",
+    "latitude": 35.123735,
+    "longitude": 33.947641,
+    "timezone": "Asia/Famagusta"
+  },
+  {
+    "id": "MYTGG",
+    "name": "Merang Jetty",
+    "latitude": 5.533737,
+    "longitude": 102.947097,
+    "timezone": "Asia/Kuala_Lumpur"
+  },
+  {
+    "id": "MYRDN",
+    "name": "Redang Island (Village Jetty)",
+    "latitude": 5.756842,
+    "longitude": 103.005138,
+    "timezone": "Asia/Kuala_Lumpur"
+  },
+  {
+    "id": "DZBJA",
+    "name": "Bejaia",
+    "latitude": 36.751186,
+    "longitude": 5.092168,
+    "timezone": "Africa/Algiers"
+  },
+  {
+    "id": "FRMRS",
+    "name": "Marseille",
+    "latitude": 43.306927,
+    "longitude": 5.363345,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "DZORN",
+    "name": "Oran",
+    "latitude": 35.709258,
+    "longitude": -0.6455378,
+    "timezone": "Africa/Algiers"
+  },
+  {
+    "id": "ESBCN",
+    "name": "Barcelona",
+    "latitude": 41.372139,
+    "longitude": 2.177535,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "DZALG",
+    "name": "Algiers",
+    "latitude": 36.777121,
+    "longitude": 3.063699,
+    "timezone": "Africa/Algiers"
+  },
+  {
+    "id": "ESALC",
+    "name": "Alicante",
+    "latitude": 38.339182,
+    "longitude": -0.478871,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "DZSKI",
+    "name": "Skikda",
+    "latitude": 36.885044,
+    "longitude": 6.906967,
+    "timezone": "Africa/Algiers"
+  },
+  {
+    "id": "ITGOA",
+    "name": "Genoa",
+    "latitude": 44.408401,
+    "longitude": 8.911629,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "GRHYD",
+    "name": "Hydra",
+    "latitude": 37.351003,
+    "longitude": 23.466585,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSPE",
+    "name": "Spetses",
+    "latitude": 37.269363,
+    "longitude": 23.154689,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "JPMIS",
+    "name": "Misumi",
+    "latitude": 32.606566,
+    "longitude": 130.471083,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPMAT",
+    "name": "Matsushima (Maeshima)",
+    "latitude": 32.527107,
+    "longitude": 130.425205,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "MAPTM",
+    "name": "Tangier Med",
+    "latitude": 35.891206,
+    "longitude": -5.494752,
+    "timezone": "Africa/Casablanca"
+  },
+  {
+    "id": "ESALG",
+    "name": "Algeciras",
+    "latitude": 36.1301257,
+    "longitude": -5.4423721,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "THPKT",
+    "name": "Phuket (Rassada Pier)",
+    "latitude": 7.875595,
+    "longitude": 98.415077,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THKRV",
+    "name": "Koh Phi Phi (Tonsai Pier)",
+    "latitude": 7.738572,
+    "longitude": 98.770861,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "GRCFU",
+    "name": "Corfu",
+    "latitude": 39.626243,
+    "longitude": 19.90743,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "ITVCE",
+    "name": "Venice",
+    "latitude": 45.434012,
+    "longitude": 12.304237,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "GRHER",
+    "name": "Heraklion",
+    "latitude": 35.343336,
+    "longitude": 25.143059,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRCHQ",
+    "name": "Chania",
+    "latitude": 35.51873,
+    "longitude": 24.019937,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRGPA",
+    "name": "Patras",
+    "latitude": 38.255108,
+    "longitude": 21.736815,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRIGO",
+    "name": "Igoumenitsa",
+    "latitude": 39.48759,
+    "longitude": 20.256686,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRRHO",
+    "name": "Rhodes",
+    "latitude": 36.446781,
+    "longitude": 28.232555,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSYM",
+    "name": "Symi (Simi)",
+    "latitude": 36.615879,
+    "longitude": 27.83744,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAKO",
+    "name": "Agios Konstantinos",
+    "latitude": 38.758722,
+    "longitude": 22.859664,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRMTI",
+    "name": "Mantoudi",
+    "latitude": 38.808922,
+    "longitude": 23.524353,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKYL",
+    "name": "Glyfa",
+    "latitude": 38.952471,
+    "longitude": 22.969843,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRANL",
+    "name": "Agnontas (Skopelos)",
+    "latitude": 39.082887,
+    "longitude": 23.710561,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSLA",
+    "name": "Souvala (Aegina)",
+    "latitude": 37.773269,
+    "longitude": 23.448252,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAMR",
+    "name": "Agia Marina (Aegina)",
+    "latitude": 37.743884,
+    "longitude": 23.538403,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "ESIBZ",
+    "name": "Ibiza",
+    "latitude": 38.912915,
+    "longitude": 1.435279,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESFLD",
+    "name": "Formentera",
+    "latitude": 38.73477,
+    "longitude": 1.417065,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESDBO",
+    "name": "Playa d'en Bossa (Ibiza)",
+    "latitude": 38.89654,
+    "longitude": 1.415163,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "IDSNR",
+    "name": "Sanur",
+    "latitude": -8.707227,
+    "longitude": 115.262719,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "IDDPS",
+    "name": "Nusa Lembongan (Jungut Batu Beach)",
+    "latitude": -8.679574,
+    "longitude": 115.442836,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "ITBDS",
+    "name": "Brindisi",
+    "latitude": 40.645903,
+    "longitude": 17.962475,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ALVOA",
+    "name": "Vlora",
+    "latitude": 40.449233,
+    "longitude": 19.480755,
+    "timezone": "Europe/Tirane"
+  },
+  {
+    "id": "PTHOR",
+    "name": "Horta",
+    "latitude": 38.537764,
+    "longitude": -28.622046,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTSRP",
+    "name": "Sao Roque",
+    "latitude": 38.530876,
+    "longitude": -28.319069,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTVNC",
+    "name": "Vila Nova do Corvo",
+    "latitude": 39.671868,
+    "longitude": -31.109787,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTSCF",
+    "name": "Santa Cruz",
+    "latitude": 39.454516,
+    "longitude": -31.12478,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTVEL",
+    "name": "Velas",
+    "latitude": 38.678099,
+    "longitude": -28.202806,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTPDL",
+    "name": "Ponta Delgada",
+    "latitude": 37.736267,
+    "longitude": -25.656205,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTPRV",
+    "name": "Praia da Vitoria",
+    "latitude": 38.711687,
+    "longitude": -27.052445,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTVDP",
+    "name": "Vila do Porto",
+    "latitude": 36.94148,
+    "longitude": -25.148554,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTPRG",
+    "name": "Vila da Praia",
+    "latitude": 39.052585,
+    "longitude": -27.968945,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTLAJ",
+    "name": "Lajes",
+    "latitude": 39.378463,
+    "longitude": -31.167341,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "PTMAD",
+    "name": "Madalena",
+    "latitude": 38.536235,
+    "longitude": -28.533173,
+    "timezone": "Atlantic/Azores"
+  },
+  {
+    "id": "FJNAN",
+    "name": "Denarau",
+    "latitude": -17.772584,
+    "longitude": 177.381219,
+    "timezone": "Pacific/Fiji"
+  },
+  {
+    "id": "FJYAS",
+    "name": "Barefoot Kuata Island",
+    "latitude": -17.166819,
+    "longitude": 177.193224,
+    "timezone": "Pacific/Fiji"
+  },
+  {
+    "id": "FJBXL",
+    "name": "Blue Lagoon Beach Resort",
+    "latitude": -16.913186,
+    "longitude": 177.387403,
+    "timezone": "Pacific/Fiji"
+  },
+  {
+    "id": "BSHBI",
+    "name": "Harbour Island",
+    "latitude": 25.49957,
+    "longitude": -76.637993,
+    "timezone": "America/Nassau"
+  },
+  {
+    "id": "BSNAS",
+    "name": "Nassau",
+    "latitude": 25.077649,
+    "longitude": -77.322801,
+    "timezone": "America/Nassau"
+  },
+  {
+    "id": "BSSWL",
+    "name": "Spanish Wells",
+    "latitude": 25.542862,
+    "longitude": -76.74802,
+    "timezone": "America/Nassau"
+  },
+  {
+    "id": "MXLAP",
+    "name": "La Paz",
+    "latitude": 24.275385,
+    "longitude": -110.327186,
+    "timezone": "America/Mazatlan"
+  },
+  {
+    "id": "MXTPB",
+    "name": "Topolobampo",
+    "latitude": 25.590948,
+    "longitude": -109.058705,
+    "timezone": "America/Mazatlan"
+  },
+  {
+    "id": "MXMZT",
+    "name": "Mazatlan",
+    "latitude": 23.187167,
+    "longitude": -106.41879,
+    "timezone": "America/Mazatlan"
+  },
+  {
+    "id": "ESDNA",
+    "name": "Denia",
+    "latitude": 38.841011,
+    "longitude": 0.114305,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESCMC",
+    "name": "Ciutadella",
+    "latitude": 39.988392,
+    "longitude": 3.826932,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESPMI",
+    "name": "Palma",
+    "latitude": 39.551922,
+    "longitude": 2.626312,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESALD",
+    "name": "Alcudia",
+    "latitude": 39.835941,
+    "longitude": 3.141848,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESCEU",
+    "name": "Ceuta",
+    "latitude": 35.895039,
+    "longitude": -5.321664,
+    "timezone": "Africa/Ceuta"
+  },
+  {
+    "id": "ESLEI",
+    "name": "Almeria",
+    "latitude": 36.834775,
+    "longitude": -2.467504,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "MANDR",
+    "name": "Nador",
+    "latitude": 35.266155,
+    "longitude": -2.923881,
+    "timezone": "Africa/Casablanca"
+  },
+  {
+    "id": "ESMLN",
+    "name": "Melilla",
+    "latitude": 35.291734,
+    "longitude": -2.928967,
+    "timezone": "Africa/Ceuta"
+  },
+  {
+    "id": "ESAGP",
+    "name": "Malaga",
+    "latitude": 36.715185,
+    "longitude": -4.41792,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESSAA",
+    "name": "Ibiza San Antonio",
+    "latitude": 38.977402,
+    "longitude": 1.298329,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESVLC",
+    "name": "Valencia",
+    "latitude": 39.45336,
+    "longitude": -0.323539,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "FRSET",
+    "name": "Sete",
+    "latitude": 43.402958,
+    "longitude": 3.702114,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "ESMOT",
+    "name": "Motril",
+    "latitude": 36.724666,
+    "longitude": -3.527834,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "DZMOS",
+    "name": "Mostaganem",
+    "latitude": 35.935177,
+    "longitude": 0.074912,
+    "timezone": "Africa/Algiers"
+  },
+  {
+    "id": "MAAHU",
+    "name": "Al Hoceima",
+    "latitude": 35.248007,
+    "longitude": -3.922065,
+    "timezone": "Africa/Casablanca"
+  },
+  {
+    "id": "USFLL",
+    "name": "Fort Lauderdale",
+    "latitude": 26.088161,
+    "longitude": -80.115652,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "BSFPO",
+    "name": "Freeport",
+    "latitude": 26.528548,
+    "longitude": -78.755064,
+    "timezone": "America/Nassau"
+  },
+  {
+    "id": "BSBIM",
+    "name": "Bimini",
+    "latitude": 25.753403,
+    "longitude": -79.280169,
+    "timezone": "America/Nassau"
+  },
+  {
+    "id": "IDAMI",
+    "name": "Gili Air",
+    "latitude": -8.363885,
+    "longitude": 116.082379,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "AUSYD",
+    "name": "Barangaroo",
+    "latitude": -33.864377,
+    "longitude": 151.200885,
+    "timezone": "Australia/Sydney"
+  },
+  {
+    "id": "AUWGZ",
+    "name": "Manly",
+    "latitude": -33.799612,
+    "longitude": 151.284255,
+    "timezone": "Australia/Sydney"
+  },
+  {
+    "id": "SGBKM",
+    "name": "HarbourFront Centre",
+    "latitude": 1.262067,
+    "longitude": 103.817899,
+    "timezone": "Asia/Singapore"
+  },
+  {
+    "id": "IDBTM",
+    "name": "Batam Centre",
+    "latitude": 1.131275,
+    "longitude": 104.056058,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDSKP",
+    "name": "Sekupang",
+    "latitude": 1.124407,
+    "longitude": 103.927452,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDBUR",
+    "name": "Harbour Bay",
+    "latitude": 1.153247,
+    "longitude": 103.996785,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "SGTAM",
+    "name": "Tanah Merah",
+    "latitude": 1.312206,
+    "longitude": 103.988193,
+    "timezone": "Asia/Singapore"
+  },
+  {
+    "id": "IDKID",
+    "name": "Bandar Bentan Telani",
+    "latitude": 1.160275,
+    "longitude": 104.32,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "ESOZL",
+    "name": "Orzola",
+    "latitude": 29.22384,
+    "longitude": -13.451746,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESCHR",
+    "name": "La Graciosa (Caleta del Sebo)",
+    "latitude": 29.229483,
+    "longitude": -13.501792,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ITPIO",
+    "name": "Piombino",
+    "latitude": 42.930112,
+    "longitude": 10.545158,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPFE",
+    "name": "Portoferraio",
+    "latitude": 42.812512,
+    "longitude": 10.3228851,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "IDBOA",
+    "name": "Benoa Harbour",
+    "latitude": -8.740886,
+    "longitude": 115.212913,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "NZWLG",
+    "name": "Wellington",
+    "latitude": -41.264455,
+    "longitude": 174.786794,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "NZPCN",
+    "name": "Picton",
+    "latitude": -41.285259,
+    "longitude": 174.006738,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "IDLOM",
+    "name": "Teluk Kode",
+    "latitude": -8.393949,
+    "longitude": 116.099573,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "TRBXN",
+    "name": "Bodrum",
+    "latitude": 37.031927,
+    "longitude": 27.426911,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "GRKGS",
+    "name": "Kos",
+    "latitude": 36.89802,
+    "longitude": 27.289634,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "TRDEK",
+    "name": "Turgutreis",
+    "latitude": 37.001972,
+    "longitude": 27.258775,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "GRLRS",
+    "name": "Leros",
+    "latitude": 37.13042,
+    "longitude": 26.86005,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPSE",
+    "name": "Kalymnos",
+    "latitude": 36.94768,
+    "longitude": 26.98627,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "THTRT",
+    "name": "Laem Sok",
+    "latitude": 12.046733,
+    "longitude": 102.586415,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THBKK",
+    "name": "Bangkok",
+    "latitude": 13.760426,
+    "longitude": 100.498014,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THPYX",
+    "name": "Pattaya",
+    "latitude": 12.928836,
+    "longitude": 100.867432,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THRYG",
+    "name": "Koh Samed",
+    "latitude": 12.554113,
+    "longitude": 101.450316,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THTDX",
+    "name": "Trat Airport",
+    "latitude": 12.281349,
+    "longitude": 102.324367,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "USBOS",
+    "name": "Boston",
+    "latitude": 42.360192,
+    "longitude": -71.047651,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "USPVC",
+    "name": "Provincetown",
+    "latitude": 42.049458,
+    "longitude": -70.18117,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "USSLM",
+    "name": "Salem",
+    "latitude": 42.522351,
+    "longitude": -70.881535,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "FRCER",
+    "name": "Cherbourg",
+    "latitude": 49.6447405,
+    "longitude": -1.6055271,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "GBPME",
+    "name": "Portsmouth",
+    "latitude": 50.81042,
+    "longitude": -1.09132,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "IEROE",
+    "name": "Rosslare",
+    "latitude": 52.2526952,
+    "longitude": -6.3349998,
+    "timezone": "Europe/Dublin"
+  },
+  {
+    "id": "IEORK",
+    "name": "Cork",
+    "latitude": 51.8322215,
+    "longitude": -8.3233472,
+    "timezone": "Europe/Dublin"
+  },
+  {
+    "id": "FRROS",
+    "name": "Roscoff",
+    "latitude": 48.7209379,
+    "longitude": -3.9687364,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "ESBIO",
+    "name": "Bilbao",
+    "latitude": 43.3537621,
+    "longitude": -3.0722262,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "FRCFR",
+    "name": "Caen",
+    "latitude": 49.2838078,
+    "longitude": -0.2519519,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "GBPOO",
+    "name": "Poole",
+    "latitude": 50.7095694,
+    "longitude": -1.9933319,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "FRLEH",
+    "name": "Le Havre",
+    "latitude": 49.4850954,
+    "longitude": 0.1144622,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "GBPLY",
+    "name": "Plymouth",
+    "latitude": 50.3643314,
+    "longitude": -4.1585226,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "ESSDR",
+    "name": "Santander",
+    "latitude": 43.4589392,
+    "longitude": -3.808739,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "FRSML",
+    "name": "St Malo",
+    "latitude": 48.6419669,
+    "longitude": -2.0236824,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "THKLA",
+    "name": "Koh Lanta (Saladan Pier)",
+    "latitude": 7.648269,
+    "longitude": 99.041702,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THTRG",
+    "name": "Koh Mook (Charlie Beach Resort)",
+    "latitude": 7.360118,
+    "longitude": 99.294872,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THKAN",
+    "name": "Koh Kradan",
+    "latitude": 7.31218,
+    "longitude": 99.257065,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THPKN",
+    "name": "Koh Bulon (Pansand Resort)",
+    "latitude": 6.828233,
+    "longitude": 99.540581,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "MYLGK",
+    "name": "Langkawi (Kuah Jetty)",
+    "latitude": 6.306317,
+    "longitude": 99.851141,
+    "timezone": "Asia/Kuala_Lumpur"
+  },
+  {
+    "id": "ARBUE",
+    "name": "Buenos Aires",
+    "latitude": -34.624621,
+    "longitude": -58.362294,
+    "timezone": "America/Argentina/Buenos_Aires"
+  },
+  {
+    "id": "UYMVD",
+    "name": "Montevideo",
+    "latitude": -34.903589,
+    "longitude": -56.213341,
+    "timezone": "America/Montevideo"
+  },
+  {
+    "id": "UYCDS",
+    "name": "Colonia del Sacramento",
+    "latitude": -34.476125,
+    "longitude": -57.842851,
+    "timezone": "America/Montevideo"
+  },
+  {
+    "id": "UYPDP",
+    "name": "Punta del Este",
+    "latitude": -34.957269,
+    "longitude": -54.938617,
+    "timezone": "America/Montevideo"
+  },
+  {
+    "id": "KHKOS",
+    "name": "Sihanoukville",
+    "latitude": 10.606473,
+    "longitude": 103.52132,
+    "timezone": "Asia/Phnom_Penh"
+  },
+  {
+    "id": "USCGF",
+    "name": "Cape May",
+    "latitude": 38.968759,
+    "longitude": -74.959456,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "USLWP",
+    "name": "Lewes",
+    "latitude": 38.782125,
+    "longitude": -75.118512,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "ITNAP",
+    "name": "Naples",
+    "latitude": 40.838798,
+    "longitude": 14.25622,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPRJ",
+    "name": "Capri",
+    "latitude": 40.557023,
+    "longitude": 14.239526,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITCML",
+    "name": "Casamicciola",
+    "latitude": 40.749354,
+    "longitude": 13.906041,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPRO",
+    "name": "Procida",
+    "latitude": 40.766209,
+    "longitude": 14.027073,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITISH",
+    "name": "Ischia",
+    "latitude": 40.7456165,
+    "longitude": 13.9364888,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPOZ",
+    "name": "Pozzuoli",
+    "latitude": 40.823195,
+    "longitude": 14.11799,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITSAL",
+    "name": "Salerno",
+    "latitude": 40.676366,
+    "longitude": 14.746163,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITMSN",
+    "name": "Messina",
+    "latitude": 38.189119,
+    "longitude": 15.563035,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "USAOU",
+    "name": "Avalon",
+    "latitude": 33.344422,
+    "longitude": -118.321737,
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "USDPT",
+    "name": "Dana Point",
+    "latitude": 33.460111,
+    "longitude": -117.692015,
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "USLGB",
+    "name": "Long Beach",
+    "latitude": 33.763798,
+    "longitude": -118.198971,
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "USSPQ",
+    "name": "San Pedro LA",
+    "latitude": 33.749633,
+    "longitude": -118.274602,
+    "timezone": "America/Los_Angeles"
+  },
+  {
+    "id": "DKHIR",
+    "name": "Hirtshals",
+    "latitude": 57.59331,
+    "longitude": 9.966853,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "NOKRS",
+    "name": "Kristiansand",
+    "latitude": 58.144127,
+    "longitude": 7.985199,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOOSL",
+    "name": "Oslo",
+    "latitude": 59.90225,
+    "longitude": 10.740756,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "DEKEL",
+    "name": "Kiel",
+    "latitude": 54.317449,
+    "longitude": 10.141153,
+    "timezone": "Europe/Berlin"
+  },
+  {
+    "id": "NOTRF",
+    "name": "Sandefjord",
+    "latitude": 59.125787,
+    "longitude": 10.224795,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "SESMD",
+    "name": "Stromstad",
+    "latitude": 58.934427,
+    "longitude": 11.170349,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "NOLAR",
+    "name": "Larvik",
+    "latitude": 59.0409,
+    "longitude": 10.04493,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "GGGCI",
+    "name": "Guernsey",
+    "latitude": 49.457288,
+    "longitude": -2.529023,
+    "timezone": "Europe/Guernsey"
+  },
+  {
+    "id": "JESTH",
+    "name": "Jersey (St Helier)",
+    "latitude": 49.179347,
+    "longitude": -2.115726,
+    "timezone": "Europe/Jersey"
+  },
+  {
+    "id": "COADZ",
+    "name": "San Andres",
+    "latitude": 12.579836,
+    "longitude": -81.693616,
+    "timezone": "America/Bogota"
+  },
+  {
+    "id": "COPVA",
+    "name": "Providencia",
+    "latitude": 13.380937,
+    "longitude": -81.370141,
+    "timezone": "America/Bogota"
+  },
+  {
+    "id": "FRAJA",
+    "name": "Ajaccio",
+    "latitude": 41.922094,
+    "longitude": 8.742671,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "ITPTO",
+    "name": "Porto Torres",
+    "latitude": 40.838197,
+    "longitude": 8.376946,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "FRNCE",
+    "name": "Nice",
+    "latitude": 43.693671,
+    "longitude": 7.288077,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "FRILR",
+    "name": "Ile Rousse",
+    "latitude": 42.641338,
+    "longitude": 8.939813,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "FRTLN",
+    "name": "Toulon",
+    "latitude": 43.116351,
+    "longitude": 5.933679,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "FRPVO",
+    "name": "Porto Vecchio",
+    "latitude": 41.587475,
+    "longitude": 9.292395,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "ITGAI",
+    "name": "Golfo Aranci",
+    "latitude": 40.994686,
+    "longitude": 9.621556,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITLIV",
+    "name": "Livorno",
+    "latitude": 43.554458,
+    "longitude": 10.303202,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "FRBIA",
+    "name": "Bastia",
+    "latitude": 42.701551,
+    "longitude": 9.453499,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "ITTPS",
+    "name": "Trapani",
+    "latitude": 38.014045,
+    "longitude": 12.50728,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITSVN",
+    "name": "Savona",
+    "latitude": 44.264587,
+    "longitude": 8.447789,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITCVV",
+    "name": "Civitavecchia",
+    "latitude": 42.097722,
+    "longitude": 11.780618,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "TNTUN",
+    "name": "Tunis",
+    "latitude": 36.810786,
+    "longitude": 10.304034,
+    "timezone": "Africa/Tunis"
+  },
+  {
+    "id": "TNZRZ",
+    "name": "Zarzis",
+    "latitude": 33.495547,
+    "longitude": 11.117872,
+    "timezone": "Africa/Tunis"
+  },
+  {
+    "id": "HKSHW",
+    "name": "Hong Kong (Sheung Wan)",
+    "latitude": 22.289655,
+    "longitude": 114.15268,
+    "timezone": "Asia/Hong_Kong"
+  },
+  {
+    "id": "MOMFM",
+    "name": "Macau (Taipa)",
+    "latitude": 22.165598,
+    "longitude": 113.578835,
+    "timezone": "Asia/Macau"
+  },
+  {
+    "id": "HKKWN",
+    "name": "Kowloon",
+    "latitude": 22.298785,
+    "longitude": 114.164748,
+    "timezone": "Asia/Hong_Kong"
+  },
+  {
+    "id": "HKTSI",
+    "name": "Hong Kong Airport (Skypier)",
+    "latitude": 22.317546,
+    "longitude": 113.944691,
+    "timezone": "Asia/Hong_Kong"
+  },
+  {
+    "id": "SVLUN",
+    "name": "La Union",
+    "latitude": 13.339148,
+    "longitude": -87.842006,
+    "timezone": "America/El_Salvador"
+  },
+  {
+    "id": "NIPTI",
+    "name": "Potosi",
+    "latitude": 13.006687,
+    "longitude": -87.501036,
+    "timezone": "America/Managua"
+  },
+  {
+    "id": "AUAIR",
+    "name": "Airlie Beach (Port of Airlie)",
+    "latitude": -20.266736,
+    "longitude": 148.711466,
+    "timezone": "Australia/Brisbane"
+  },
+  {
+    "id": "AUHTI",
+    "name": "Hamilton Island Marina",
+    "latitude": -20.34662,
+    "longitude": 148.951413,
+    "timezone": "Australia/Lindeman"
+  },
+  {
+    "id": "AUDDI",
+    "name": "Daydream Island",
+    "latitude": -20.253941,
+    "longitude": 148.814656,
+    "timezone": "Australia/Brisbane"
+  },
+  {
+    "id": "AUJHQ",
+    "name": "Shute Harbour",
+    "latitude": -20.29345,
+    "longitude": 148.786463,
+    "timezone": "Australia/Brisbane"
+  },
+  {
+    "id": "GPTRS",
+    "name": "Trois Rivieres (Basse-Terre)",
+    "latitude": 15.968258,
+    "longitude": -61.644585,
+    "timezone": "America/Guadeloupe"
+  },
+  {
+    "id": "GPLSS",
+    "name": "Les Saintes (Terre-de-Haut)",
+    "latitude": 15.868344,
+    "longitude": -61.582682,
+    "timezone": "America/Guadeloupe"
+  },
+  {
+    "id": "GRAND",
+    "name": "Andros",
+    "latitude": 37.88477,
+    "longitude": 24.73562,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJMK",
+    "name": "Mykonos",
+    "latitude": 37.4646,
+    "longitude": 25.3244,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKOF",
+    "name": "Koufonissi",
+    "latitude": 36.93142,
+    "longitude": 25.60222,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJNX",
+    "name": "Naxos",
+    "latitude": 37.10622,
+    "longitude": 25.37144,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRRAF",
+    "name": "Rafina",
+    "latitude": 38.02228,
+    "longitude": 24.00914,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJSY",
+    "name": "Syros",
+    "latitude": 37.4409,
+    "longitude": 24.9412,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRTIN",
+    "name": "Tinos",
+    "latitude": 37.5390,
+    "longitude": 25.1561,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "KRINC",
+    "name": "Incheon",
+    "latitude": 37.464662,
+    "longitude": 126.625092,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "CNDAL",
+    "name": "Dalian",
+    "latitude": 38.926906,
+    "longitude": 121.653945,
+    "timezone": "Asia/Shanghai"
+  },
+  {
+    "id": "RUFIP",
+    "name": "Vladivostok",
+    "latitude": 43.113099,
+    "longitude": 131.8847,
+    "timezone": "Asia/Vladivostok"
+  },
+  {
+    "id": "KRTGH",
+    "name": "Donghae",
+    "latitude": 37.543188,
+    "longitude": 129.11515,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "JPSMN",
+    "name": "Sakaiminato",
+    "latitude": 35.547603,
+    "longitude": 133.252652,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "TRAYV",
+    "name": "Kucukkuyu",
+    "latitude": 39.545034,
+    "longitude": 26.607922,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "GRPET",
+    "name": "Petra (Lesvos)",
+    "latitude": 39.338174,
+    "longitude": 26.17843,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "SENYN",
+    "name": "Nynashamn",
+    "latitude": 58.904768,
+    "longitude": 17.955351,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "SEVBY",
+    "name": "Visby",
+    "latitude": 57.634691,
+    "longitude": 18.279411,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "SEOSK",
+    "name": "Oskarshamn",
+    "latitude": 57.263908,
+    "longitude": 16.458131,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "SEVVK",
+    "name": "Vastervik",
+    "latitude": 57.749517,
+    "longitude": 16.675703,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "SEKPS",
+    "name": "Kapellskar",
+    "latitude": 59.721078,
+    "longitude": 19.063318,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "EEPLN",
+    "name": "Paldiski",
+    "latitude": 59.333055,
+    "longitude": 24.077826,
+    "timezone": "Europe/Tallinn"
+  },
+  {
+    "id": "LTKLJ",
+    "name": "Klaipeda",
+    "latitude": 55.660884,
+    "longitude": 21.147137,
+    "timezone": "Europe/Vilnius"
+  },
+  {
+    "id": "SEKAN",
+    "name": "Karlshamn",
+    "latitude": 56.16013,
+    "longitude": 14.81691,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "DKFDH",
+    "name": "Frederikshavn",
+    "latitude": 57.437224,
+    "longitude": 10.53915,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "NLIJM",
+    "name": "Amsterdam (Ijmuiden)",
+    "latitude": 52.46227,
+    "longitude": 4.586356,
+    "timezone": "Europe/Amsterdam"
+  },
+  {
+    "id": "GBNCL",
+    "name": "Newcastle",
+    "latitude": 54.992868,
+    "longitude": -1.448924,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "DKNHN",
+    "name": "Copenhagen",
+    "latitude": 55.701146,
+    "longitude": 12.595911,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "GRNIS",
+    "name": "Nisyros",
+    "latitude": 36.61874,
+    "longitude": 27.17124,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPMS",
+    "name": "Patmos",
+    "latitude": 37.32557,
+    "longitude": 26.54373,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKZS",
+    "name": "Kastelorizo",
+    "latitude": 36.150924,
+    "longitude": 29.588362,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRTIL",
+    "name": "Tilos",
+    "latitude": 36.4145,
+    "longitude": 27.38694,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRLIP",
+    "name": "Lipsi",
+    "latitude": 37.29463,
+    "longitude": 26.767901,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAGN",
+    "name": "Agathonisi",
+    "latitude": 37.457838,
+    "longitude": 26.966825,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRHAL",
+    "name": "Chalki",
+    "latitude": 36.22206,
+    "longitude": 27.612792,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAKI",
+    "name": "Agios Kirikos",
+    "latitude": 37.61311,
+    "longitude": 26.294741,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRFOU",
+    "name": "Fournoi",
+    "latitude": 37.577846,
+    "longitude": 26.479751,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJTY",
+    "name": "Astypalea",
+    "latitude": 36.57313,
+    "longitude": 26.34026,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPYT",
+    "name": "Pythagorio",
+    "latitude": 37.687507,
+    "longitude": 26.94443,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRARD",
+    "name": "Arki",
+    "latitude": 37.381713,
+    "longitude": 26.73562,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "EEMUG",
+    "name": "Muuga",
+    "latitude": 59.481023,
+    "longitude": 24.980456,
+    "timezone": "Europe/Tallinn"
+  },
+  {
+    "id": "FIVSS",
+    "name": "Vuosaari",
+    "latitude": 60.220617,
+    "longitude": 25.174092,
+    "timezone": "Europe/Helsinki"
+  },
+  {
+    "id": "FIHEL",
+    "name": "Helsinki",
+    "latitude": 60.163547,
+    "longitude": 24.963255,
+    "timezone": "Europe/Helsinki"
+  },
+  {
+    "id": "EETLL",
+    "name": "Tallinn",
+    "latitude": 59.444781,
+    "longitude": 24.762797,
+    "timezone": "Europe/Tallinn"
+  },
+  {
+    "id": "SEGRH",
+    "name": "Grisslehamn",
+    "latitude": 60.099312,
+    "longitude": 18.813368,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "FIECK",
+    "name": "Eckero",
+    "latitude": 60.224023,
+    "longitude": 19.536095,
+    "timezone": "Europe/Mariehamn"
+  },
+  {
+    "id": "DECUX",
+    "name": "Cuxhaven",
+    "latitude": 53.871166,
+    "longitude": 8.709497,
+    "timezone": "Europe/Berlin"
+  },
+  {
+    "id": "DEBRB",
+    "name": "Brunsbuttel",
+    "latitude": 53.887345,
+    "longitude": 9.091694,
+    "timezone": "Europe/Berlin"
+  },
+  {
+    "id": "TRCES",
+    "name": "Cesme",
+    "latitude": 38.3229,
+    "longitude": 26.2974,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "GRJKH",
+    "name": "Chios",
+    "latitude": 38.36902,
+    "longitude": 26.13828,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSAI",
+    "name": "Sami",
+    "latitude": 38.25212,
+    "longitude": 20.64596,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRZTH",
+    "name": "Zakynthos",
+    "latitude": 37.7795,
+    "longitude": 20.901414,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "ALSAR",
+    "name": "Saranda",
+    "latitude": 39.871079,
+    "longitude": 20.003305,
+    "timezone": "Europe/Tirane"
+  },
+  {
+    "id": "FRCQF",
+    "name": "Calais",
+    "latitude": 50.967792,
+    "longitude": 1.850343,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "GBFOL",
+    "name": "Folkestone",
+    "latitude": 51.096633,
+    "longitude": 1.118261,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "IDSAU",
+    "name": "Rote",
+    "latitude": -10.723708,
+    "longitude": 123.043907,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "IDKOE",
+    "name": "Tenau (Kupang)",
+    "latitude": -10.195967,
+    "longitude": 123.52706,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "IDPLM",
+    "name": "Palembang",
+    "latitude": -2.980219,
+    "longitude": 104.77717,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDMUO",
+    "name": "Muntok",
+    "latitude": -2.083853,
+    "longitude": 105.132607,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDTJQ",
+    "name": "Tanjung Pandan (Belitung)",
+    "latitude": -2.74607,
+    "longitude": 107.628544,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDPGX",
+    "name": "Pangkal Pinang",
+    "latitude": -2.099088,
+    "longitude": 106.129986,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDBTJ",
+    "name": "Aceh",
+    "latitude": 5.564915,
+    "longitude": 95.293681,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDSBG",
+    "name": "Sabang",
+    "latitude": 5.826844,
+    "longitude": 95.347035,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDGRE",
+    "name": "Gresik",
+    "latitude": -7.155324,
+    "longitude": 112.662406,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDKAT",
+    "name": "Kalianget",
+    "latitude": -7.054997,
+    "longitude": 113.945119,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDAJS",
+    "name": "Kangean Island",
+    "latitude": -6.838751,
+    "longitude": 115.228647,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDJEP",
+    "name": "Jepara",
+    "latitude": -6.590556,
+    "longitude": 110.647837,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDANK",
+    "name": "Jakarta (Kali Adem)",
+    "latitude": -6.10495,
+    "longitude": 106.77173,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDJUT",
+    "name": "Tidung Island",
+    "latitude": -5.799306,
+    "longitude": 106.499677,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "DOSDQ",
+    "name": "Santo Domingo",
+    "latitude": 18.476187,
+    "longitude": -69.881809,
+    "timezone": "America/Santo_Domingo"
+  },
+  {
+    "id": "PRSJU",
+    "name": "San Juan",
+    "latitude": 18.463196,
+    "longitude": -66.113164,
+    "timezone": "America/Puerto_Rico"
+  },
+  {
+    "id": "PAELC",
+    "name": "Panama City (Old Trump Tower)",
+    "latitude": 8.97564,
+    "longitude": -79.506244,
+    "timezone": "America/Panama"
+  },
+  {
+    "id": "PASAB",
+    "name": "Saboga Island",
+    "latitude": 8.626934,
+    "longitude": -79.068428,
+    "timezone": "America/Panama"
+  },
+  {
+    "id": "PAOTD",
+    "name": "Contadora Island",
+    "latitude": 8.632797,
+    "longitude": -79.035118,
+    "timezone": "America/Panama"
+  },
+  {
+    "id": "PANMG",
+    "name": "Viveros Island",
+    "latitude": 8.47742,
+    "longitude": -78.979204,
+    "timezone": "America/Panama"
+  },
+  {
+    "id": "ALHMR",
+    "name": "Himare",
+    "latitude": 40.1007541817143,
+    "longitude": 19.7412192683226,
+    "timezone": "Europe/Tirane"
+  },
+  {
+    "id": "FILAN",
+    "name": "Langnas",
+    "latitude": 60.116807,
+    "longitude": 20.299033,
+    "timezone": "Europe/Mariehamn"
+  },
+  {
+    "id": "DETRV",
+    "name": "Travemunde",
+    "latitude": 53.948006,
+    "longitude": 10.858424,
+    "timezone": "Europe/Berlin"
+  },
+  {
+    "id": "FINLI",
+    "name": "Naantali",
+    "latitude": 60.4578,
+    "longitude": 22.044475,
+    "timezone": "Europe/Helsinki"
+  },
+  {
+    "id": "SEMMA",
+    "name": "Malmo",
+    "latitude": 55.613553,
+    "longitude": 13.002663,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "NOBGO",
+    "name": "Bergen",
+    "latitude": 60.395055,
+    "longitude": 5.322322,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOSVG",
+    "name": "Stavanger",
+    "latitude": 58.920986,
+    "longitude": 5.582556,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOLAD",
+    "name": "Langesund",
+    "latitude": 59.006429,
+    "longitude": 9.746665,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "ESACE",
+    "name": "Arrecife",
+    "latitude": 28.97124,
+    "longitude": -13.526337,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESLPA",
+    "name": "Las Palmas",
+    "latitude": 28.142295,
+    "longitude": -15.41517,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESQFU",
+    "name": "Corralejo",
+    "latitude": 28.740053,
+    "longitude": -13.86362,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESQLY",
+    "name": "Playa Blanca",
+    "latitude": 28.859084,
+    "longitude": -13.833665,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESVGR",
+    "name": "Valle Gran Rey",
+    "latitude": 28.080944,
+    "longitude": -17.332579,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESSSG",
+    "name": "San Sebastian de la Gomera",
+    "latitude": 28.0883038,
+    "longitude": -17.1079481,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESPPS",
+    "name": "Playa Santiago",
+    "latitude": 28.028008,
+    "longitude": -17.193389,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESLCR",
+    "name": "Los Cristianos",
+    "latitude": 28.046057,
+    "longitude": -16.716986,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESCUT",
+    "name": "Morro Jable",
+    "latitude": 28.04744,
+    "longitude": -14.361169,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESSPC",
+    "name": "Santa Cruz de La Palma",
+    "latitude": 28.677787,
+    "longitude": -17.766491,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESHUV",
+    "name": "Huelva",
+    "latitude": 37.1486511,
+    "longitude": -6.8779354,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESSCT",
+    "name": "Santa Cruz de Tenerife",
+    "latitude": 28.45592,
+    "longitude": -16.24747,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESAGA",
+    "name": "Agaete",
+    "latitude": 28.099667,
+    "longitude": -15.71237,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESTRF",
+    "name": "Tarifa",
+    "latitude": 36.010428,
+    "longitude": -5.602743,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "MATNG",
+    "name": "Tangier",
+    "latitude": 35.7912161759112,
+    "longitude": -5.80012717923165,
+    "timezone": "Africa/Casablanca"
+  },
+  {
+    "id": "USMIA",
+    "name": "Miami",
+    "latitude": 25.774776,
+    "longitude": -80.177404,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "NZAKL",
+    "name": "Auckland",
+    "latitude": -36.842996,
+    "longitude": 174.766889,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "NZWKE",
+    "name": "Waiheke",
+    "latitude": -36.780706,
+    "longitude": 174.991394,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "NZDEV",
+    "name": "Devonport (Auckland)",
+    "latitude": -36.833358,
+    "longitude": 174.795331,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "NZCMV",
+    "name": "Coromandel",
+    "latitude": -36.810678,
+    "longitude": 175.468491,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "HRSUP",
+    "name": "Supetar",
+    "latitude": 43.385766,
+    "longitude": 16.55386,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRMAK",
+    "name": "Makarska",
+    "latitude": 43.294814,
+    "longitude": 17.015188,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRBOL",
+    "name": "Bol",
+    "latitude": 43.26092,
+    "longitude": 16.657401,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRHVA",
+    "name": "Hvar",
+    "latitude": 43.170077,
+    "longitude": 16.441137,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRSPU",
+    "name": "Split",
+    "latitude": 43.502402,
+    "longitude": 16.441984,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "IDLBR",
+    "name": "Gili Gede",
+    "latitude": -8.741133,
+    "longitude": 115.924712,
+    "timezone": "Asia/Makassar"
+  },
+  {
+    "id": "GRKTP",
+    "name": "Katapola (Amorgos)",
+    "latitude": 36.82809,
+    "longitude": 25.86569,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRIOS",
+    "name": "Ios",
+    "latitude": 36.7235,
+    "longitude": 25.27227,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJTR",
+    "name": "Thira (Santorini)",
+    "latitude": 36.3863,
+    "longitude": 25.42947,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRFOL",
+    "name": "Folegandros",
+    "latitude": 36.614346,
+    "longitude": 24.950351,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRRET",
+    "name": "Rethymno",
+    "latitude": 35.371207,
+    "longitude": 24.477802,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "ITCNT",
+    "name": "Cesenatico",
+    "latitude": 44.204989,
+    "longitude": 12.397749,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "HRROV",
+    "name": "Rovinj",
+    "latitude": 45.081792,
+    "longitude": 13.634143,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRLSZ",
+    "name": "Mali Losinj",
+    "latitude": 44.538856,
+    "longitude": 14.464295,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "ITPES",
+    "name": "Pesaro",
+    "latitude": 43.921483,
+    "longitude": 12.906661,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "HRNVL",
+    "name": "Novalja",
+    "latitude": 44.557922,
+    "longitude": 14.875274,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "ITPMO",
+    "name": "Palermo",
+    "latitude": 38.128143,
+    "longitude": 13.363409,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITOLB",
+    "name": "Olbia",
+    "latitude": 40.923687,
+    "longitude": 9.522153,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ESMAH",
+    "name": "Mahon",
+    "latitude": 39.890357,
+    "longitude": 4.26688,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ITTRI",
+    "name": "Palermo Termini Imerese",
+    "latitude": 37.98607,
+    "longitude": 13.704297,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "MFMAR",
+    "name": "Philipsburg",
+    "latitude": 18.019911,
+    "longitude": -63.043008,
+    "timezone": "America/Lower_Princes"
+  },
+  {
+    "id": "BLGUS",
+    "name": "Gustavia",
+    "latitude": 17.899861,
+    "longitude": -62.85118,
+    "timezone": "America/St_Barthelemy"
+  },
+  {
+    "id": "BQSAB",
+    "name": "Saba",
+    "latitude": 17.615829,
+    "longitude": -63.251479,
+    "timezone": "America/Kralendijk"
+  },
+  {
+    "id": "VNSGN",
+    "name": "Ho Chi Minh City",
+    "latitude": 10.77365,
+    "longitude": 106.70694,
+    "timezone": "Asia/Ho_Chi_Minh"
+  },
+  {
+    "id": "VNVUT",
+    "name": "Vung Tau",
+    "latitude": 10.350705,
+    "longitude": 107.066649,
+    "timezone": "Asia/Ho_Chi_Minh"
+  },
+  {
+    "id": "VNVIC",
+    "name": "Can Gio",
+    "latitude": 10.417259,
+    "longitude": 106.971946,
+    "timezone": "Asia/Ho_Chi_Minh"
+  },
+  {
+    "id": "ITCAG",
+    "name": "Cagliari",
+    "latitude": 39.212954,
+    "longitude": 9.112151,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITATX",
+    "name": "Arbatax",
+    "latitude": 39.940771,
+    "longitude": 9.706335,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITTMI",
+    "name": "Termoli",
+    "latitude": 42.00522,
+    "longitude": 15.001874,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITTQR",
+    "name": "San Domino (Tremiti)",
+    "latitude": 42.1207,
+    "longitude": 15.498286,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITRGG",
+    "name": "Rodi Garganico",
+    "latitude": 41.932249,
+    "longitude": 15.890042,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITTMT",
+    "name": "San Nicola (Tremiti)",
+    "latitude": 42.119345,
+    "longitude": 15.502236,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPCH",
+    "name": "Peschici",
+    "latitude": 41.949385,
+    "longitude": 16.009857,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITVIE",
+    "name": "Vieste",
+    "latitude": 41.888078,
+    "longitude": 16.176982,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITFCV",
+    "name": "Capojale",
+    "latitude": 41.915026,
+    "longitude": 15.672675,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "KRWND",
+    "name": "Wando",
+    "latitude": 34.316561,
+    "longitude": 126.760679,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "KRCHA",
+    "name": "Jeju",
+    "latitude": 33.519603,
+    "longitude": 126.533242,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "KRCJA",
+    "name": "Chuja",
+    "latitude": 33.94445,
+    "longitude": 126.328809,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "KRYOS",
+    "name": "Yeosu",
+    "latitude": 34.754435,
+    "longitude": 127.752925,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "JPSMJ",
+    "name": "Shin Moji",
+    "latitude": 33.871417,
+    "longitude": 130.985937,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPUKB",
+    "name": "Kobe",
+    "latitude": 34.69228,
+    "longitude": 135.256201,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPIZT",
+    "name": "Izumi Otsu (Osaka)",
+    "latitude": 34.515551,
+    "longitude": 135.398245,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "DERSK",
+    "name": "Rostock",
+    "latitude": 54.151138,
+    "longitude": 12.101183,
+    "timezone": "Europe/Berlin"
+  },
+  {
+    "id": "EGHRG",
+    "name": "Hurghada",
+    "latitude": 27.230708,
+    "longitude": 33.845966,
+    "timezone": "Africa/Cairo"
+  },
+  {
+    "id": "EGTOR",
+    "name": "Sharm el-Sheikh",
+    "latitude": 27.856471,
+    "longitude": 34.279848,
+    "timezone": "Africa/Cairo"
+  },
+  {
+    "id": "GBZDA",
+    "name": "Southsea",
+    "latitude": 50.7851596480213,
+    "longitude": -1.09969968460534,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBRYD",
+    "name": "Ryde",
+    "latitude": 50.732676,
+    "longitude": -1.15828,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "USHYA",
+    "name": "Hyannis",
+    "latitude": 41.650903,
+    "longitude": -70.276966,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "USACK",
+    "name": "Nantucket",
+    "latitude": 41.286106,
+    "longitude": -70.096328,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "USOB2",
+    "name": "Oak Bluffs",
+    "latitude": 41.458608,
+    "longitude": -70.554464,
+    "timezone": "America/New_York"
+  },
+  {
+    "id": "FRBON",
+    "name": "Bonifacio",
+    "latitude": 41.388594,
+    "longitude": 9.157003,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "ITSTE",
+    "name": "Santa Teresa di Gallura",
+    "latitude": 41.238165,
+    "longitude": 9.194403,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "GBDVR",
+    "name": "Dover",
+    "latitude": 51.126179,
+    "longitude": 1.327189,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "IEDFA",
+    "name": "Dublin",
+    "latitude": 53.347831,
+    "longitude": -6.198448,
+    "timezone": "Europe/Dublin"
+  },
+  {
+    "id": "GBHLY",
+    "name": "Holyhead",
+    "latitude": 53.3092695,
+    "longitude": -4.6294525,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBPEM",
+    "name": "Pembroke",
+    "latitude": 51.696807,
+    "longitude": -4.953482,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "JPISG",
+    "name": "Ishigaki",
+    "latitude": 24.337197,
+    "longitude": 124.155491,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPYAE",
+    "name": "Taketomi",
+    "latitude": 24.335797,
+    "longitude": 124.093606,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "GBSVZ",
+    "name": "St Mary's",
+    "latitude": 49.918427,
+    "longitude": -6.316499,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBPEN",
+    "name": "Penzance",
+    "latitude": 50.11743,
+    "longitude": -5.528755,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "HRSGD",
+    "name": "Stari Grad",
+    "latitude": 43.18079,
+    "longitude": 16.5764,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "MEBAR",
+    "name": "Bar",
+    "latitude": 42.096552910613,
+    "longitude": 19.088612062727,
+    "timezone": "Europe/Podgorica"
+  },
+  {
+    "id": "HRDBV",
+    "name": "Dubrovnik",
+    "latitude": 42.658454,
+    "longitude": 18.08562,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRZAD",
+    "name": "Zadar",
+    "latitude": 44.116796,
+    "longitude": 15.227737,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "KRPUS",
+    "name": "Busan",
+    "latitude": 35.103162,
+    "longitude": 129.041139,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "JPHKT",
+    "name": "Hakata (Fukuoka)",
+    "latitude": 33.60497,
+    "longitude": 130.399223,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPHTK",
+    "name": "Tsushima (Hitakatsu)",
+    "latitude": 34.655874,
+    "longitude": 129.469604,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "AUPEA",
+    "name": "Penneshaw",
+    "latitude": -35.717116,
+    "longitude": 137.942249,
+    "timezone": "Australia/Adelaide"
+  },
+  {
+    "id": "GRPIS",
+    "name": "Ithaka (Pisaetos)",
+    "latitude": 38.34848,
+    "longitude": 20.68532,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPKE",
+    "name": "Poros (Kefalonia)",
+    "latitude": 38.147522,
+    "longitude": 20.782988,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPAX",
+    "name": "Paxi",
+    "latitude": 39.196863,
+    "longitude": 20.186796,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "HRPUY",
+    "name": "Pula",
+    "latitude": 44.87479,
+    "longitude": 13.848165,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "HRPOR",
+    "name": "Porec",
+    "latitude": 45.226814,
+    "longitude": 13.591756,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "JPNAH",
+    "name": "Naha",
+    "latitude": 26.223899,
+    "longitude": 127.683844,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPZMM",
+    "name": "Tonaki Island",
+    "latitude": 26.372021,
+    "longitude": 127.140714,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPUEO",
+    "name": "Kume Island",
+    "latitude": 26.341365,
+    "longitude": 126.753117,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "FRPRP",
+    "name": "Propriano",
+    "latitude": 41.678477,
+    "longitude": 8.897231,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "MYNTL",
+    "name": "Penang",
+    "latitude": 5.419158,
+    "longitude": 100.34441,
+    "timezone": "Asia/Kuala_Lumpur"
+  },
+  {
+    "id": "MYPGG",
+    "name": "Tanjung Belungkor",
+    "latitude": 1.456483,
+    "longitude": 104.066127,
+    "timezone": "Asia/Kuala_Lumpur"
+  },
+  {
+    "id": "SGCHG",
+    "name": "Changi",
+    "latitude": 1.373006,
+    "longitude": 104.008346,
+    "timezone": "Asia/Singapore"
+  },
+  {
+    "id": "THCPH",
+    "name": "Koh Tao (Mae Haad Pier)",
+    "latitude": 10.084164,
+    "longitude": 99.824123,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "THURT",
+    "name": "Koh Phangan (Thong Sala Pier)",
+    "latitude": 9.710922,
+    "longitude": 99.982471,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "CNLYG",
+    "name": "Lianyungang",
+    "latitude": 34.742955,
+    "longitude": 119.423914,
+    "timezone": "Asia/Shanghai"
+  },
+  {
+    "id": "AUTSV",
+    "name": "Townsville",
+    "latitude": -19.255733,
+    "longitude": 146.826957,
+    "timezone": "Australia/Brisbane"
+  },
+  {
+    "id": "IDTJB",
+    "name": "Tanjung Balai",
+    "latitude": 0.987858,
+    "longitude": 103.436538,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "IDTNJ",
+    "name": "Tanjung Pinang",
+    "latitude": 0.932009,
+    "longitude": 104.438143,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "FRGFR",
+    "name": "Granville",
+    "latitude": 48.832012,
+    "longitude": -1.603703,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "FRCRT",
+    "name": "Carteret",
+    "latitude": 49.370931,
+    "longitude": -1.789527,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "FRDIL",
+    "name": "Dielette",
+    "latitude": 49.553475,
+    "longitude": -1.862569,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "GBSRX",
+    "name": "Sark",
+    "latitude": 49.433473,
+    "longitude": -2.341571,
+    "timezone": "Europe/Guernsey"
+  },
+  {
+    "id": "KHPNH",
+    "name": "Phnom Penh",
+    "latitude": 11.575223,
+    "longitude": 104.927549,
+    "timezone": "Asia/Phnom_Penh"
+  },
+  {
+    "id": "VNXLO",
+    "name": "Chau Doc",
+    "latitude": 10.70702,
+    "longitude": 105.127544,
+    "timezone": "Asia/Ho_Chi_Minh"
+  },
+  {
+    "id": "ESBUE",
+    "name": "Bueu",
+    "latitude": 42.328209,
+    "longitude": -8.78763,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESVGO",
+    "name": "Vigo",
+    "latitude": 42.242041,
+    "longitude": -8.72631,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESCAG",
+    "name": "Cangas",
+    "latitude": 42.261685,
+    "longitude": -8.783736,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESHVC",
+    "name": "Sanxenxo",
+    "latitude": 42.397867,
+    "longitude": -8.804326,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESZJN",
+    "name": "Portonovo",
+    "latitude": 42.393973,
+    "longitude": -8.822199,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "TRKUS",
+    "name": "Kusadasi",
+    "latitude": 37.861862,
+    "longitude": 27.255168,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "GRVAT",
+    "name": "Vathi",
+    "latitude": 37.757473,
+    "longitude": 26.971296,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "MYBST",
+    "name": "Kuala Besut Jetty",
+    "latitude": 5.830669,
+    "longitude": 102.558155,
+    "timezone": "Asia/Kuala_Lumpur"
+  },
+  {
+    "id": "JPOAR",
+    "name": "Oarai",
+    "latitude": 36.308645,
+    "longitude": 140.572384,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPTMK",
+    "name": "Tomakomai",
+    "latitude": 42.638407,
+    "longitude": 141.638475,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "KRGHG",
+    "name": "Nokdong (Goheung)",
+    "latitude": 34.522157,
+    "longitude": 127.145404,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "JPWAK",
+    "name": "Wakayama",
+    "latitude": 34.217489,
+    "longitude": 135.146023,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPTKS",
+    "name": "Tokushima",
+    "latitude": 34.056455,
+    "longitude": 134.584156,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "OMKHS",
+    "name": "Khasab",
+    "latitude": 26.205276,
+    "longitude": 56.249407,
+    "timezone": "Asia/Muscat"
+  },
+  {
+    "id": "OMSOH",
+    "name": "Shinas",
+    "latitude": 24.748067,
+    "longitude": 56.4690543,
+    "timezone": "Asia/Muscat"
+  },
+  {
+    "id": "AEDBP",
+    "name": "Dibba",
+    "latitude": 25.609333,
+    "longitude": 56.292352,
+    "timezone": "Asia/Dubai"
+  },
+  {
+    "id": "OMMSH",
+    "name": "Shannah",
+    "latitude": 20.74344,
+    "longitude": 58.749105,
+    "timezone": "Asia/Muscat"
+  },
+  {
+    "id": "IRQSM",
+    "name": "Qeshm",
+    "latitude": 26.967081,
+    "longitude": 56.272946,
+    "timezone": "Asia/Tehran"
+  },
+  {
+    "id": "ESCAD",
+    "name": "Cadiz",
+    "latitude": 36.532105,
+    "longitude": -6.291604,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ESFUE",
+    "name": "Puerto del Rosario",
+    "latitude": 28.49552,
+    "longitude": -13.853953,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ESVDH",
+    "name": "Valverde",
+    "latitude": 27.780487,
+    "longitude": -17.90117,
+    "timezone": "Atlantic/Canary"
+  },
+  {
+    "id": "ITVTT",
+    "name": "Ventotene",
+    "latitude": 40.798916,
+    "longitude": 13.43291,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPNZ",
+    "name": "Ponza",
+    "latitude": 40.894509,
+    "longitude": 12.963663,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITRRO",
+    "name": "Sorrento",
+    "latitude": 40.629686,
+    "longitude": 14.375396,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITCAS",
+    "name": "Castellammare di Stabia",
+    "latitude": 40.693369,
+    "longitude": 14.47047,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITTRC",
+    "name": "Terracina",
+    "latitude": 41.28392,
+    "longitude": 13.199412,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITAMA",
+    "name": "Amalfi",
+    "latitude": 40.632394,
+    "longitude": 14.60153,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPOS",
+    "name": "Positano",
+    "latitude": 40.627271,
+    "longitude": 14.487119,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITVEQ",
+    "name": "Seiano",
+    "latitude": 40.659808,
+    "longitude": 14.418179,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "FRIRK",
+    "name": "Dunkirk",
+    "latitude": 51.019455,
+    "longitude": 2.187545,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "NOFLA",
+    "name": "Fl\u00e5m",
+    "latitude": 60.863852,
+    "longitude": 7.118368,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOSJE",
+    "name": "Selje",
+    "latitude": 62.045276,
+    "longitude": 5.342455,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOSOG",
+    "name": "Sogndal",
+    "latitude": 61.229765,
+    "longitude": 7.10451,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOFNN",
+    "name": "Vardetangen",
+    "latitude": 60.809894,
+    "longitude": 4.968692,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOGUL",
+    "name": "Mj\u00f8mna",
+    "latitude": 60.924107,
+    "longitude": 4.899043,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOEVV",
+    "name": "Sollibotn",
+    "latitude": 60.981102,
+    "longitude": 5.073862,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NORTL",
+    "name": "Rysjedalsvika",
+    "latitude": 61.117678,
+    "longitude": 5.092199,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOLRI",
+    "name": "Lavik",
+    "latitude": 61.104812,
+    "longitude": 5.508177,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOHYR",
+    "name": "Nordeide",
+    "latitude": 61.16568,
+    "longitude": 5.96249,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOVIS",
+    "name": "Vik",
+    "latitude": 61.088845,
+    "longitude": 6.57718,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOBLS",
+    "name": "Balestrand",
+    "latitude": 61.210186,
+    "longitude": 6.536935,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOLEK",
+    "name": "Leikanger",
+    "latitude": 61.185381,
+    "longitude": 6.809052,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOAUL",
+    "name": "Aurland",
+    "latitude": 60.906927,
+    "longitude": 7.186617,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOASL",
+    "name": "Askvoll",
+    "latitude": 61.346336,
+    "longitude": 5.063212,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOFRO",
+    "name": "Flor\u00f8",
+    "latitude": 61.600588,
+    "longitude": 5.024483,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOKVG",
+    "name": "Sm\u00f8rhamn",
+    "latitude": 61.778064,
+    "longitude": 4.946749,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOMAY",
+    "name": "M\u00e5l\u00f8y",
+    "latitude": 61.938199,
+    "longitude": 5.118797,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "GBABD",
+    "name": "Aberdeen",
+    "latitude": 57.14475,
+    "longitude": -2.091694,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBLER",
+    "name": "Lerwick",
+    "latitude": 60.162586,
+    "longitude": -1.157556,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBKWL",
+    "name": "Kirkwall",
+    "latitude": 58.986457,
+    "longitude": -2.960365,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBSNS",
+    "name": "Stromness",
+    "latitude": 58.964692,
+    "longitude": -3.294075,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBSCR",
+    "name": "Scrabster",
+    "latitude": 58.61148,
+    "longitude": -3.544164,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "BZBZE",
+    "name": "Belize City",
+    "latitude": 17.495172,
+    "longitude": -88.186663,
+    "timezone": "America/Belize"
+  },
+  {
+    "id": "BZSPR",
+    "name": "San Pedro",
+    "latitude": 17.920614,
+    "longitude": -87.960489,
+    "timezone": "America/Belize"
+  },
+  {
+    "id": "BZCUK",
+    "name": "Caye Caulker",
+    "latitude": 17.74278,
+    "longitude": -88.02348,
+    "timezone": "America/Belize"
+  },
+  {
+    "id": "GBHUL",
+    "name": "Hull",
+    "latitude": 53.74387,
+    "longitude": -0.273821,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "NLRTM",
+    "name": "Rotterdam",
+    "latitude": 51.9438262,
+    "longitude": 4.1298122,
+    "timezone": "Europe/Amsterdam"
+  },
+  {
+    "id": "BEZEE",
+    "name": "Zeebrugge",
+    "latitude": 51.3398613,
+    "longitude": 3.1848123,
+    "timezone": "Europe/Brussels"
+  },
+  {
+    "id": "NLAMS",
+    "name": "Amsterdam (via Rotterdam)",
+    "latitude": 51.944979,
+    "longitude": 4.130945,
+    "timezone": "Europe/Amsterdam"
+  },
+  {
+    "id": "GBYRK",
+    "name": "York (via Hull)",
+    "latitude": 53.74387,
+    "longitude": -0.273821,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBCYN",
+    "name": "Cairnryan",
+    "latitude": 54.961577,
+    "longitude": -5.01513,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBLAR",
+    "name": "Larne",
+    "latitude": 54.84924,
+    "longitude": -5.796061,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBLIV",
+    "name": "Liverpool",
+    "latitude": 53.443438,
+    "longitude": -3.005946,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "CAHWS",
+    "name": "Keats Landing",
+    "latitude": 49.394671,
+    "longitude": -123.483626,
+    "timezone": "America/Vancouver"
+  },
+  {
+    "id": "CAWVR",
+    "name": "Horseshoe Bay",
+    "latitude": 49.376015,
+    "longitude": -123.271584,
+    "timezone": "America/Vancouver"
+  },
+  {
+    "id": "CACAU",
+    "name": "Coal Harbour",
+    "latitude": 49.290958,
+    "longitude": -123.126591,
+    "timezone": "America/Vancouver"
+  },
+  {
+    "id": "JPOSA",
+    "name": "Osaka",
+    "latitude": 34.643182,
+    "longitude": 135.421331,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "GBILL",
+    "name": "Gills Bay",
+    "latitude": 58.639272,
+    "longitude": -3.161209,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBSGP",
+    "name": "St Margaret's Hope",
+    "latitude": 58.832021,
+    "longitude": -2.96224,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "DKRNN",
+    "name": "Ronne",
+    "latitude": 55.099643,
+    "longitude": 14.689568,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "PLSWI",
+    "name": "Swinoujscie",
+    "latitude": 53.899193,
+    "longitude": 14.256628,
+    "timezone": "Europe/Warsaw"
+  },
+  {
+    "id": "SEYST",
+    "name": "Ystad",
+    "latitude": 55.425093,
+    "longitude": 13.830929,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "PLGDN",
+    "name": "Gdansk",
+    "latitude": 54.405069,
+    "longitude": 18.663669,
+    "timezone": "Europe/Warsaw"
+  },
+  {
+    "id": "ITSFE",
+    "name": "San Felice Circeo",
+    "latitude": 41.225767,
+    "longitude": 13.092743,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "PTPXO",
+    "name": "Porto Santo",
+    "latitude": 33.060091,
+    "longitude": -16.310378,
+    "timezone": "Atlantic/Madeira"
+  },
+  {
+    "id": "PTFNC",
+    "name": "Funchal",
+    "latitude": 32.6413396,
+    "longitude": -16.916687,
+    "timezone": "Atlantic/Madeira"
+  },
+  {
+    "id": "JPSHS",
+    "name": "Shimonoseki",
+    "latitude": 33.94781,
+    "longitude": 130.926362,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "GBCOW",
+    "name": "Cowes",
+    "latitude": 50.758979,
+    "longitude": -1.28988,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBSOU",
+    "name": "Southampton",
+    "latitude": 50.895684,
+    "longitude": -1.406808,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "NORSE",
+    "name": "Rosendal",
+    "latitude": 59.986309,
+    "longitude": 6.007822,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "NOFES",
+    "name": "Flesland",
+    "latitude": 60.291377,
+    "longitude": 5.206005,
+    "timezone": "Europe/Oslo"
+  },
+  {
+    "id": "AURTS",
+    "name": "Rottnest Island",
+    "latitude": -31.995531,
+    "longitude": 115.542429,
+    "timezone": "Australia/Perth"
+  },
+  {
+    "id": "AUPER",
+    "name": "Perth (Barrack Street)",
+    "latitude": -31.959936,
+    "longitude": 115.858395,
+    "timezone": "Australia/Perth"
+  },
+  {
+    "id": "AUFRE",
+    "name": "Fremantle (B-Shed)",
+    "latitude": -32.053568,
+    "longitude": 115.741145,
+    "timezone": "Australia/Perth"
+  },
+  {
+    "id": "AUNFM",
+    "name": "North Fremantle (Northport)",
+    "latitude": -32.053239,
+    "longitude": 115.728754,
+    "timezone": "Australia/Perth"
+  },
+  {
+    "id": "AUHLR",
+    "name": "Hillarys",
+    "latitude": -31.825208,
+    "longitude": 115.739967,
+    "timezone": "Australia/Perth"
+  },
+  {
+    "id": "THPKK",
+    "name": "Hua Hin",
+    "latitude": 12.513918,
+    "longitude": 99.980302,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "JPKIJ",
+    "name": "Niigata",
+    "latitude": 37.93807,
+    "longitude": 139.068797,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPRYO",
+    "name": "Ryotsu",
+    "latitude": 38.081212,
+    "longitude": 138.437939,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPNAO",
+    "name": "Naoetsu",
+    "latitude": 37.182511,
+    "longitude": 138.25091,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPOSG",
+    "name": "Ogi",
+    "latitude": 37.814713,
+    "longitude": 138.28033,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "HNLCE",
+    "name": "La Ceiba",
+    "latitude": 15.793784,
+    "longitude": -86.762055,
+    "timezone": "America/Tegucigalpa"
+  },
+  {
+    "id": "HNRTB",
+    "name": "Roatan",
+    "latitude": 16.328478,
+    "longitude": -86.499548,
+    "timezone": "America/Tegucigalpa"
+  },
+  {
+    "id": "THKYO",
+    "name": "Koh Yao Noi (Manoh Pier)",
+    "latitude": 8.093578,
+    "longitude": 98.587322,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "DKGED",
+    "name": "Gedser",
+    "latitude": 54.573536,
+    "longitude": 11.926625,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "DEPUT",
+    "name": "Puttgarden",
+    "latitude": 54.503349,
+    "longitude": 11.22925,
+    "timezone": "Europe/Berlin"
+  },
+  {
+    "id": "DKROF",
+    "name": "Rodby",
+    "latitude": 54.654731,
+    "longitude": 11.351473,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "TRMRM",
+    "name": "Marmaris",
+    "latitude": 36.849406,
+    "longitude": 28.27919,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "PAAMD",
+    "name": "Panama City (Flamenco Island)",
+    "latitude": 8.911598,
+    "longitude": -79.522622,
+    "timezone": "America/Panama"
+  },
+  {
+    "id": "AUWAL",
+    "name": "Wallaroo",
+    "latitude": -33.926234,
+    "longitude": 137.623879,
+    "timezone": "Australia/Adelaide"
+  },
+  {
+    "id": "AUEPR",
+    "name": "Lucky Bay",
+    "latitude": -33.707371,
+    "longitude": 137.040513,
+    "timezone": "Australia/Adelaide"
+  },
+  {
+    "id": "GRANA",
+    "name": "Anafi",
+    "latitude": 36.34309,
+    "longitude": 25.7699,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRTRS",
+    "name": "Thirasia",
+    "latitude": 36.452848,
+    "longitude": 25.344005,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAOK",
+    "name": "Karpathos",
+    "latitude": 35.50971,
+    "longitude": 27.21525,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSHC",
+    "name": "Schinoussa",
+    "latitude": 36.87048,
+    "longitude": 25.51011,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAMO",
+    "name": "Aegiali (Amorgos)",
+    "latitude": 36.90157,
+    "longitude": 25.97582,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRIRA",
+    "name": "Iraklia",
+    "latitude": 36.86324,
+    "longitude": 25.47027,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRDON",
+    "name": "Donoussa",
+    "latitude": 37.09914,
+    "longitude": 25.79405,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSII",
+    "name": "Sikinos",
+    "latitude": 36.67452,
+    "longitude": 25.143719,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKSJ",
+    "name": "Kasos",
+    "latitude": 35.418647,
+    "longitude": 26.921664,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRDIA",
+    "name": "Diafani",
+    "latitude": 35.755766,
+    "longitude": 27.210552,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKEA",
+    "name": "Kea",
+    "latitude": 37.660955,
+    "longitude": 24.312693,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKYT",
+    "name": "Kythnos",
+    "latitude": 37.390857,
+    "longitude": 24.396392,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRLAV",
+    "name": "Lavrio",
+    "latitude": 37.713394,
+    "longitude": 24.061,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRANI",
+    "name": "Sitia",
+    "latitude": 35.212435,
+    "longitude": 26.111554,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRJIK",
+    "name": "Evdilos",
+    "latitude": 37.630853,
+    "longitude": 26.178483,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKAR",
+    "name": "Karlovassi",
+    "latitude": 37.79512,
+    "longitude": 26.68012,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRAGO",
+    "name": "Agios Efstratios",
+    "latitude": 39.539357,
+    "longitude": 24.988296,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKVA",
+    "name": "Kavala",
+    "latitude": 40.932138,
+    "longitude": 24.412123,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRMYR",
+    "name": "Limnos (Myrina)",
+    "latitude": 39.874202,
+    "longitude": 25.060109,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSKG",
+    "name": "Thessaloniki",
+    "latitude": 40.63381,
+    "longitude": 22.93479,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKIT",
+    "name": "Kythira",
+    "latitude": 36.269678,
+    "longitude": 23.078705,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPOA",
+    "name": "Antikythira",
+    "latitude": 35.882345,
+    "longitude": 23.290071,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKIS",
+    "name": "Kissamos",
+    "latitude": 35.517572,
+    "longitude": 23.637337,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRKST",
+    "name": "Karystos",
+    "latitude": 38.01327,
+    "longitude": 24.41841,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "AUDRW",
+    "name": "Cullen Bay",
+    "latitude": -12.451721,
+    "longitude": 130.819848,
+    "timezone": "Australia/Darwin"
+  },
+  {
+    "id": "AUBRT",
+    "name": "Wurrumiyanga",
+    "latitude": -11.757373,
+    "longitude": 130.641012,
+    "timezone": "Australia/Darwin"
+  },
+  {
+    "id": "NZGBZ",
+    "name": "Great Barrier (Tryphena)",
+    "latitude": -36.32032,
+    "longitude": 175.486008,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "NZHMB",
+    "name": "Half Moon Bay (Auckland)",
+    "latitude": -36.879931,
+    "longitude": 174.89664,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "CNHMN",
+    "name": "Humen",
+    "latitude": 22.812912,
+    "longitude": 113.668677,
+    "timezone": "Asia/Shanghai"
+  },
+  {
+    "id": "ISSTY",
+    "name": "Stykkisholmur",
+    "latitude": 65.077894,
+    "longitude": -22.724013,
+    "timezone": "Atlantic/Reykjavik"
+  },
+  {
+    "id": "ISBRJ",
+    "name": "Brjanslaekur",
+    "latitude": 65.530131,
+    "longitude": -23.190396,
+    "timezone": "Atlantic/Reykjavik"
+  },
+  {
+    "id": "ISFEY",
+    "name": "Flatey",
+    "latitude": 65.371525,
+    "longitude": -22.928592,
+    "timezone": "Atlantic/Reykjavik"
+  },
+  {
+    "id": "THKSM",
+    "name": "Koh Samui (Bangrak Pier)",
+    "latitude": 9.564463,
+    "longitude": 100.062244,
+    "timezone": "Asia/Bangkok"
+  },
+  {
+    "id": "KRMOK",
+    "name": "Mokpo",
+    "latitude": 34.782093,
+    "longitude": 126.382176,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "KRJDO",
+    "name": "Usuyeong",
+    "latitude": 34.588439,
+    "longitude": 126.311562,
+    "timezone": "Asia/Seoul"
+  },
+  {
+    "id": "JPOTR",
+    "name": "Otaru",
+    "latitude": 43.190846,
+    "longitude": 141.01878,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPMAI",
+    "name": "Maizuru",
+    "latitude": 35.481662,
+    "longitude": 135.391929,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPAXT",
+    "name": "Akita",
+    "latitude": 39.755022,
+    "longitude": 140.058491,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPTRG",
+    "name": "Tsuruga",
+    "latitude": 35.678747,
+    "longitude": 136.072376,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "IDUTC",
+    "name": "Waterfront",
+    "latitude": 1.079087,
+    "longitude": 103.93097,
+    "timezone": "Asia/Jakarta"
+  },
+  {
+    "id": "ITLIP",
+    "name": "Lipari",
+    "latitude": 38.469555,
+    "longitude": 14.956121,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPAN",
+    "name": "Panarea",
+    "latitude": 38.637954,
+    "longitude": 15.076987,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITSLA",
+    "name": "Salina",
+    "latitude": 38.557982,
+    "longitude": 14.873364,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITSTR",
+    "name": "Stromboli",
+    "latitude": 38.797744,
+    "longitude": 15.239571,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITVUL",
+    "name": "Vulcano",
+    "latitude": 38.415384,
+    "longitude": 14.961512,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITUST",
+    "name": "Ustica",
+    "latitude": 38.709155,
+    "longitude": 13.196794,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITFAV",
+    "name": "Favignana",
+    "latitude": 37.933192,
+    "longitude": 12.327113,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITLEV",
+    "name": "Levanzo",
+    "latitude": 37.986515,
+    "longitude": 12.342025,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITMMO",
+    "name": "Marettimo",
+    "latitude": 37.966469,
+    "longitude": 12.076497,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPNL",
+    "name": "Pantelleria",
+    "latitude": 36.831398,
+    "longitude": 11.939305,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITMLZ",
+    "name": "Milazzo",
+    "latitude": 38.218946,
+    "longitude": 15.244214,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITRIN",
+    "name": "Rinella",
+    "latitude": 38.547546,
+    "longitude": 14.828012,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITALI",
+    "name": "Alicudi",
+    "latitude": 38.533997,
+    "longitude": 14.360619,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITFPO",
+    "name": "Filicudi",
+    "latitude": 38.561688,
+    "longitude": 14.58074,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPEM",
+    "name": "Porto Empedocle",
+    "latitude": 37.287494,
+    "longitude": 13.525451,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITLMP",
+    "name": "Lampedusa",
+    "latitude": 35.498343,
+    "longitude": 12.603811,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITLIU",
+    "name": "Linosa",
+    "latitude": 35.863064,
+    "longitude": 12.852692,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITGOS",
+    "name": "Ginostra (Stromboli)",
+    "latitude": 38.785338,
+    "longitude": 15.189565,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "TRFET",
+    "name": "Fethiye",
+    "latitude": 36.622864,
+    "longitude": 29.105368,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "TRKAS",
+    "name": "Kas",
+    "latitude": 36.197756,
+    "longitude": 29.640841,
+    "timezone": "Europe/Istanbul"
+  },
+  {
+    "id": "FJMNF",
+    "name": "Mana Island",
+    "latitude": -17.675963,
+    "longitude": 177.105917,
+    "timezone": "Pacific/Fiji"
+  },
+  {
+    "id": "FJCST",
+    "name": "Castaway Island",
+    "latitude": -17.735286,
+    "longitude": 177.129318,
+    "timezone": "Pacific/Fiji"
+  },
+  {
+    "id": "FJPTF",
+    "name": "Malolo Island",
+    "latitude": -17.744334,
+    "longitude": 177.146961,
+    "timezone": "Pacific/Fiji"
+  },
+  {
+    "id": "KHKKZ",
+    "name": "Koh Rong Samloem (Soon Noeng Port)",
+    "latitude": 10.572135,
+    "longitude": 103.320412,
+    "timezone": "Asia/Phnom_Penh"
+  },
+  {
+    "id": "SESTO",
+    "name": "Stockholm",
+    "latitude": 59.345445,
+    "longitude": 18.117678,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "RUVAO",
+    "name": "St Petersburg",
+    "latitude": 59.929528,
+    "longitude": 30.2318,
+    "timezone": "Europe/Moscow"
+  },
+  {
+    "id": "IMDGS",
+    "name": "Douglas",
+    "latitude": 54.147154,
+    "longitude": -4.467616,
+    "timezone": "Europe/Isle_of_Man"
+  },
+  {
+    "id": "GBBRK",
+    "name": "Liverpool Birkenhead",
+    "latitude": 53.402445,
+    "longitude": -3.017979,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBBEL",
+    "name": "Belfast",
+    "latitude": 54.612939,
+    "longitude": -5.910387,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBHYM",
+    "name": "Heysham",
+    "latitude": 54.033719,
+    "longitude": -2.912385,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBFIS",
+    "name": "Fishguard",
+    "latitude": 52.0088985,
+    "longitude": -4.9887523,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "SEGOT",
+    "name": "Gothenburg",
+    "latitude": 57.701298,
+    "longitude": 11.945615,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "PLGDY",
+    "name": "Gdynia",
+    "latitude": 54.545285,
+    "longitude": 18.50441,
+    "timezone": "Europe/Warsaw"
+  },
+  {
+    "id": "SEKAA",
+    "name": "Karlskrona",
+    "latitude": 56.165065,
+    "longitude": 15.632236,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "DKGRE",
+    "name": "Grenaa",
+    "latitude": 56.408577,
+    "longitude": 10.925603,
+    "timezone": "Europe/Copenhagen"
+  },
+  {
+    "id": "SEVAG",
+    "name": "Varberg",
+    "latitude": 57.108085,
+    "longitude": 12.243512,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "GBHRW",
+    "name": "Harwich",
+    "latitude": 51.94743,
+    "longitude": 1.2533101,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "NLMDK",
+    "name": "Hook of Holland",
+    "latitude": 51.9754793,
+    "longitude": 4.1255803,
+    "timezone": "Europe/Amsterdam"
+  },
+  {
+    "id": "SETRG",
+    "name": "Trelleborg",
+    "latitude": 55.372045,
+    "longitude": 13.155066,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "LVVNT",
+    "name": "Ventspils",
+    "latitude": 57.397809,
+    "longitude": 21.545262,
+    "timezone": "Europe/Riga"
+  },
+  {
+    "id": "LVLPX",
+    "name": "Liepaja",
+    "latitude": 56.523696,
+    "longitude": 21.002641,
+    "timezone": "Europe/Riga"
+  },
+  {
+    "id": "SEHAD",
+    "name": "Halmstad",
+    "latitude": 56.654576,
+    "longitude": 12.856087,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "NZBLU",
+    "name": "Bluff",
+    "latitude": -46.598925,
+    "longitude": 168.346612,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "NZSZS",
+    "name": "Oban (Stewart Island)",
+    "latitude": -46.897202,
+    "longitude": 168.130394,
+    "timezone": "Pacific/Auckland"
+  },
+  {
+    "id": "AUSRR",
+    "name": "Dunwich (North Stradbroke Island)",
+    "latitude": -27.503362,
+    "longitude": 153.400985,
+    "timezone": "Australia/Brisbane"
+  },
+  {
+    "id": "AUTLA",
+    "name": "Cleveland (Brisbane)",
+    "latitude": -27.528259,
+    "longitude": 153.284309,
+    "timezone": "Australia/Brisbane"
+  },
+  {
+    "id": "FIMHQ",
+    "name": "Mariehamn",
+    "latitude": 60.092926,
+    "longitude": 19.927204,
+    "timezone": "Europe/Mariehamn"
+  },
+  {
+    "id": "FITKU",
+    "name": "Turku",
+    "latitude": 60.435283,
+    "longitude": 22.21736,
+    "timezone": "Europe/Helsinki"
+  },
+  {
+    "id": "LVRIX",
+    "name": "Riga",
+    "latitude": 56.961029,
+    "longitude": 24.093533,
+    "timezone": "Europe/Riga"
+  },
+  {
+    "id": "JPKOJ",
+    "name": "Kagoshima",
+    "latitude": 31.591411,
+    "longitude": 130.567131,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPIIN",
+    "name": "Nishinoomote",
+    "latitude": 30.731592,
+    "longitude": 130.990805,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPMNO",
+    "name": "Miyanoura",
+    "latitude": 30.432282,
+    "longitude": 130.572199,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPANB",
+    "name": "Anbo",
+    "latitude": 30.317387,
+    "longitude": 130.658761,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPIBS",
+    "name": "Ibusuki",
+    "latitude": 31.241172,
+    "longitude": 130.65241,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPTYO",
+    "name": "Tokyo (Takeshiba)",
+    "latitude": 35.654194,
+    "longitude": 139.763684,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPMOT",
+    "name": "Izu Oshima",
+    "latitude": 34.751888,
+    "longitude": 139.352112,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPKRH",
+    "name": "Kurihama",
+    "latitude": 35.220516,
+    "longitude": 139.715186,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPSHO",
+    "name": "Toshima",
+    "latitude": 34.532607,
+    "longitude": 139.280325,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPNIJ",
+    "name": "Niijima",
+    "latitude": 34.368944,
+    "longitude": 139.243666,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPSKN",
+    "name": "Shikinejima",
+    "latitude": 34.334275,
+    "longitude": 139.216497,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPAMI",
+    "name": "Atami",
+    "latitude": 35.08997,
+    "longitude": 139.076502,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPITJ",
+    "name": "Ito",
+    "latitude": 34.971899,
+    "longitude": 139.103415,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPTTY",
+    "name": "Tateyama",
+    "latitude": 34.985613,
+    "longitude": 139.848637,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPINR",
+    "name": "Inatori",
+    "latitude": 34.771166,
+    "longitude": 139.042443,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPYOK",
+    "name": "Yokohama",
+    "latitude": 35.451829,
+    "longitude": 139.64751,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPMYE",
+    "name": "Miyakejima",
+    "latitude": 34.080125,
+    "longitude": 139.564816,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPMKR",
+    "name": "Mikurajima",
+    "latitude": 33.896581,
+    "longitude": 139.588194,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPHAC",
+    "name": "Hachijojima",
+    "latitude": 33.123443,
+    "longitude": 139.818773,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "ITCVX",
+    "name": "Cavo",
+    "latitude": 42.859113,
+    "longitude": 10.422568,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITCPA",
+    "name": "Capraia",
+    "latitude": 43.05038,
+    "longitude": 9.83563,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITRMA",
+    "name": "Rio Marina",
+    "latitude": 42.815364,
+    "longitude": 10.431028,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPIA",
+    "name": "Pianosa",
+    "latitude": 42.58769,
+    "longitude": 10.100494,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITPSS",
+    "name": "Porto Santo Stefano",
+    "latitude": 42.435745,
+    "longitude": 11.122254,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITGPR",
+    "name": "Giglio",
+    "latitude": 42.35961,
+    "longitude": 10.921008,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "FRDPE",
+    "name": "Dieppe",
+    "latitude": 49.933623,
+    "longitude": 1.088022,
+    "timezone": "Europe/Paris"
+  },
+  {
+    "id": "GBNHV",
+    "name": "Newhaven",
+    "latitude": 50.790324,
+    "longitude": 0.054631,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "DZGHZ",
+    "name": "Ghazaouet",
+    "latitude": 35.101000172055,
+    "longitude": -1.8640691331251,
+    "timezone": "Africa/Algiers"
+  },
+  {
+    "id": "ESGAN",
+    "name": "Gandia",
+    "latitude": 38.994893,
+    "longitude": -0.151416,
+    "timezone": "Europe/Madrid"
+  },
+  {
+    "id": "ITTAA",
+    "name": "Cetara",
+    "latitude": 40.645875,
+    "longitude": 14.702111,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITIOI",
+    "name": "Maiori",
+    "latitude": 40.649315,
+    "longitude": 14.635662,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITMN2",
+    "name": "Minori",
+    "latitude": 40.6494,
+    "longitude": 14.627277,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITIES",
+    "name": "Vietri sul mare",
+    "latitude": 40.667945,
+    "longitude": 14.727874,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "CNSHK",
+    "name": "Shenzhen (Shekou)",
+    "latitude": 22.476947,
+    "longitude": 113.914659,
+    "timezone": "Asia/Shanghai"
+  },
+  {
+    "id": "CNSZP",
+    "name": "Shenzhen Airport (Fu Yong)",
+    "latitude": 22.602029,
+    "longitude": 113.813479,
+    "timezone": "Asia/Shanghai"
+  },
+  {
+    "id": "CNPNS",
+    "name": "Tuen Mun",
+    "latitude": 22.371232,
+    "longitude": 113.965939,
+    "timezone": "Asia/Hong_Kong"
+  },
+  {
+    "id": "GRMJT",
+    "name": "Mytilene",
+    "latitude": 39.1043392,
+    "longitude": 26.5609067,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "ATSHT",
+    "name": "Vienna",
+    "latitude": 48.212062,
+    "longitude": 16.377836,
+    "timezone": "Europe/Vienna"
+  },
+  {
+    "id": "SKBAB",
+    "name": "Bratislava",
+    "latitude": 48.139409,
+    "longitude": 17.106762,
+    "timezone": "Europe/Bratislava"
+  },
+  {
+    "id": "JPYWH",
+    "name": "Yawatahama",
+    "latitude": 33.457687,
+    "longitude": 132.417033,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPBPU",
+    "name": "Beppu",
+    "latitude": 33.300081,
+    "longitude": 131.503384,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPUSK",
+    "name": "Usuki",
+    "latitude": 33.126534,
+    "longitude": 131.810536,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "CAVAN",
+    "name": "Vancouver",
+    "latitude": 49.289196,
+    "longitude": -123.116344,
+    "timezone": "America/Vancouver"
+  },
+  {
+    "id": "CAVIC",
+    "name": "Victoria",
+    "latitude": 48.421568,
+    "longitude": -123.372352,
+    "timezone": "America/Vancouver"
+  },
+  {
+    "id": "SIPIR",
+    "name": "Piran",
+    "latitude": 45.527518,
+    "longitude": 13.567163,
+    "timezone": "Europe/Ljubljana"
+  },
+  {
+    "id": "HRUMG",
+    "name": "Umag",
+    "latitude": 45.43386,
+    "longitude": 13.51741,
+    "timezone": "Europe/Zagreb"
+  },
+  {
+    "id": "ITCTA",
+    "name": "Catania",
+    "latitude": 37.499121,
+    "longitude": 15.095623,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "MTMLA",
+    "name": "Valletta",
+    "latitude": 35.886143,
+    "longitude": 14.501728,
+    "timezone": "Europe/Malta"
+  },
+  {
+    "id": "ITPZL",
+    "name": "Pozzallo",
+    "latitude": 36.71657,
+    "longitude": 14.830416,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "MTMGZ",
+    "name": "Gozo",
+    "latitude": 36.0242980578738,
+    "longitude": 14.2988057389005,
+    "timezone": "Europe/Malta"
+  },
+  {
+    "id": "BLSBH",
+    "name": "Saint Barthelemy",
+    "latitude": 17.896288,
+    "longitude": -62.850709,
+    "timezone": "America/St_Barthelemy"
+  },
+  {
+    "id": "SEUME",
+    "name": "Umea",
+    "latitude": 63.68091,
+    "longitude": 20.342045,
+    "timezone": "Europe/Stockholm"
+  },
+  {
+    "id": "FIVAA",
+    "name": "Vaasa",
+    "latitude": 63.088199,
+    "longitude": 21.555927,
+    "timezone": "Europe/Helsinki"
+  },
+  {
+    "id": "GBFBU",
+    "name": "Fishbourne",
+    "latitude": 50.732479,
+    "longitude": -1.21319,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBLYM",
+    "name": "Lymington",
+    "latitude": 50.75743,
+    "longitude": -1.528977,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "GBYMO",
+    "name": "Yarmouth",
+    "latitude": 50.70449,
+    "longitude": -1.498722,
+    "timezone": "Europe/London"
+  },
+  {
+    "id": "JPKOH",
+    "name": "Kohama",
+    "latitude": 24.34479,
+    "longitude": 123.991795,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPKRJ",
+    "name": "Kuroshima",
+    "latitude": 24.253421,
+    "longitude": 124.001492,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPSNI",
+    "name": "Iriomote Ohara",
+    "latitude": 24.272515,
+    "longitude": 123.883056,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "JPHTO",
+    "name": "Hatoma",
+    "latitude": 24.467773,
+    "longitude": 123.820747,
+    "timezone": "Asia/Tokyo"
+  },
+  {
+    "id": "CNYIK",
+    "name": "Yingkou",
+    "latitude": 40.280822,
+    "longitude": 122.124252,
+    "timezone": "Asia/Shanghai"
+  },
+  {
+    "id": "GRAXD",
+    "name": "Alexandroupoli",
+    "latitude": 40.845245,
+    "longitude": 25.879002,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSAM",
+    "name": "Samothraki",
+    "latitude": 40.474279,
+    "longitude": 25.471438,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRERM",
+    "name": "Ermioni",
+    "latitude": 37.385929,
+    "longitude": 23.248178,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPHE",
+    "name": "Porto Heli",
+    "latitude": 37.294369,
+    "longitude": 23.164019,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRPAA",
+    "name": "Psara",
+    "latitude": 38.540458,
+    "longitude": 25.563785,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRINO",
+    "name": "Oinousses",
+    "latitude": 38.515012,
+    "longitude": 26.21548,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "GRSGR",
+    "name": "Sigri",
+    "latitude": 39.21198,
+    "longitude": 25.8489,
+    "timezone": "Europe/Athens"
+  },
+  {
+    "id": "ITREG",
+    "name": "Reggio Calabria",
+    "latitude": 38.123297,
+    "longitude": 15.652206,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITMRA",
+    "name": "Marsala",
+    "latitude": 37.792323,
+    "longitude": 12.434694,
+    "timezone": "Europe/Rome"
+  },
+  {
+    "id": "ITVVA",
+    "name": "Vibo Valentia",
+    "latitude": 38.715978,
+    "longitude": 16.12681,
+    "timezone": "Europe/Rome"
+  }
+]

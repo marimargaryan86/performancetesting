@@ -1,0 +1,32 @@
+{
+    "quote": {
+        "culture": "en-GB",
+        "selectedCurrency": "EUR",
+        "partnerCode": "F5152",
+        "isDifferentOutboundReturn": false,
+        "returnAlternativeRoutes": false,
+        "isOpenTicket": false,
+        "legs": [
+            {
+                "isReturnLeg": false,
+                "routeId": "54",
+                "departureDateTime": "2024-04-14T10:00:00",
+                "vehicles": [
+                    {
+                        "typeId": 2
+                    }
+                ],
+                "passengers": [
+                    {
+                        "ageRange": {
+                            "from": 18,
+                            "to": 18
+                        },
+                        "isWheelchairUser": false,
+                        "isLeadPassenger": true
+                    }
+                ]
+            }
+        ]
+    }
+}
