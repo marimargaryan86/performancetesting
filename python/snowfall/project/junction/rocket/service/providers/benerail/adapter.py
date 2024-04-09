@@ -646,9 +646,21 @@ class BenerailOffersAdapter(_BenerailAdapter):
                     ),
                     outbound_segment=not bool(is_outbound_segment),
                     segment_sequence=idx + 1,
+                    departure_date=protobuf.datetime_to_protobuf_datetime(
+                        datetime.datetime.strptime(
+                            timed_leg.departure_at,
+                            "%Y-%m-%dT%H:%M:%S%z",
+                        ),
+                    ),
+                    arrival_date=protobuf.datetime_to_protobuf_datetime(
+                        datetime.datetime.strptime(
+                            timed_leg.arrival_at,
+                            "%Y-%m-%dT%H:%M:%S%z",
+                        ),
+                    ),
                 ),
             )
-            for idx in range(len(timed_legs))
+            for idx, timed_leg in enumerate(timed_legs)
         ]
 
     def _parse_currency(self, currency_string: str) -> money.Currency:
