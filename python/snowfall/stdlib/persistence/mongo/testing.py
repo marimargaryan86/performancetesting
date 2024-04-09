@@ -28,6 +28,10 @@ class FoobarModel(pydantic.BaseModel):
     read_only_struct: Mapping[str, object] = pydantic.Field(default_factory=dict)
 
 
+class ListOrNoneModel(pydantic.BaseModel):
+    tags: list[str] | None = None
+
+
 class RepeatedFoobarModel(pydantic.BaseModel):
     """Pydantic version of testing_pb2.RepeatedFoobar."""
 

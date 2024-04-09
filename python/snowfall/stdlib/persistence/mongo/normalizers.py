@@ -282,7 +282,9 @@ def _maybe_get_pydantic_model(
         return None
 
     all_pydantic_args = {
-        arg for arg in get_args(annotation) if issubclass(arg, pydantic.BaseModel)
+        arg
+        for arg in get_args(annotation)
+        if isinstance(arg, type) and issubclass(arg, pydantic.BaseModel)
     }
 
     if len(all_pydantic_args) > 1:

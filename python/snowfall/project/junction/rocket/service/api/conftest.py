@@ -16,12 +16,13 @@ from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.air import endpoints as routes
-from snowfall.project.junction.rocket.service.api.air.repositories import AirSearchRepo
+from snowfall.project.junction.rocket.service.api.air.repositories import (
+    AirSearchRepository,
+)
 from snowfall.project.junction.rocket.service.api.air.transforms import (
     transforms as air_transforms,
 )
 from snowfall.project.junction.rocket.service.api.air.types import (
-    AbstractAirSearchRepo,
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
@@ -34,7 +35,7 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 )
 from snowfall.project.junction.rocket.service.api.hotel import types as hotel_types
 from snowfall.project.junction.rocket.service.api.hotel.repositories import (
-    HotelSearchRepo,
+    HotelSearchRepository,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -106,8 +107,8 @@ def container(
     searches: grpc_pb2_grpc.SearchServiceStub,
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
     junction_one_client: JunctionOneClient,
-    air_search_repo: AirSearchRepo,
-    hotel_search_repo: HotelSearchRepo,
+    air_search_repo: AirSearchRepository,
+    hotel_search_repo: HotelSearchRepository,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -115,14 +116,14 @@ def container(
     container[grpc_pb2_grpc.SearchServiceStub] = searches
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
     container[JunctionOneClient] = junction_one_client
-    container[AbstractAirSearchRepo] = air_search_repo  # type: ignore[type-abstract]
+    container[AirSearchRepository] = air_search_repo
     container[AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer
     )
     container[AirSearchResultTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchResultTransformer
     )
-    container[hotel_types.AbstractHotelSearchRepo] = hotel_search_repo  # type: ignore[type-abstract]
+    container[HotelSearchRepository] = hotel_search_repo
     container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
         hotel_transformers.HotelSearchRequestTransformer
     )
@@ -286,12 +287,12 @@ async def mock_collection(
 @pytest.fixture()
 async def air_search_repo(
     mock_collection: motor_asyncio.AsyncIOMotorCollection,
-) -> AirSearchRepo:
-    return AirSearchRepo(collection=mock_collection)
+) -> AirSearchRepository:
+    return AirSearchRepository(collection=mock_collection)
 
 
 @pytest.fixture()
 async def hotel_search_repo(
     mock_collection: motor_asyncio.AsyncIOMotorCollection,
-) -> HotelSearchRepo:
-    return HotelSearchRepo(collection=mock_collection)
+) -> HotelSearchRepository:
+    return HotelSearchRepository(collection=mock_collection)

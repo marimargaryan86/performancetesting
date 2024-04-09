@@ -16,17 +16,3 @@ class AirSearchRequestTransformer(ABC):
     @abstractmethod
     def transform(self, value: Mapping[str, Any]) -> j1.SearchFlightsRequest:
         "Transform."
-
-
-class AbstractAirSearchRepo(ABC):
-    @abstractmethod
-    async def insert(self, value: AirSearchResult) -> None:
-        "Insert."
-
-    @abstractmethod
-    async def exists_id(self, search_id: str) -> bool:
-        "ID exists."
-
-    @abstractmethod
-    async def find_by_id(self, id_: str) -> AirSearchResult:
-        "Find by id."

@@ -97,7 +97,7 @@ async def create_dependencies(
         http_client=await app.stack.enter_async_context(httpx.AsyncClient()),
         auth=container[TemporaryTokenAuth],
     )
-    container[types.AbstractAirSearchRepo] = repositories.AirSearchRepo(  # type: ignore[type-abstract]
+    container[repositories.AirSearchRepository] = repositories.AirSearchRepository(
         collection=mongo.searches.air_results,
     )
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
@@ -106,8 +106,10 @@ async def create_dependencies(
     container[types.AirSearchResultTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchResultTransformer
     )
-    container[hotel_types.AbstractHotelSearchRepo] = hotel_repositories.HotelSearchRepo(  # type: ignore[type-abstract]
-        collection=mongo.searches.hotel_results,
+    container[hotel_repositories.HotelSearchRepository] = (
+        hotel_repositories.HotelSearchRepository(
+            collection=mongo.searches.hotel_results,
+        )
     )
     container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
         hotel_transforms.HotelSearchRequestTransformer

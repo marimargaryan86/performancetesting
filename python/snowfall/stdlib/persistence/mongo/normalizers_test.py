@@ -39,6 +39,15 @@ def test_id_normalizer_pydantic() -> None:
     assert document.model_dump() == decoded.model_dump()
 
 
+def test_should_allow_list_or_none_type() -> None:
+    coder = coders.PydanticCoder(testing.ListOrNoneModel)
+    document = testing.ListOrNoneModel()
+    encoded = coder.encode(document)
+    assert encoded["tags"] is None
+    decoded = coder.decode(encoded)
+    assert document.model_dump() == decoded.model_dump()
+
+
 def test_id_normalizer_nested_protobuf() -> None:
     coder = coders.ProtoCoder(testing.RepeatedFoobarProto)
     document = testing.RepeatedFoobarProto(
