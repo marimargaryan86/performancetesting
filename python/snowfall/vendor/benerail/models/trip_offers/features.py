@@ -39,7 +39,7 @@ class BookableStatus(BenerailBaseModel):
     )
     status_value: ConstrainedStr | None = Field(
         None,
-        example="urn:bnds:bookable_status:BOOKABLE",
+        example="urn:bnds:doffer_status:BOOKABLE",
         alias="value",
-        regex="^urn:[a-z]*:bookable_status:[A-Z_]*$",
+        # regex="^urn:[a-zA-Z]+:doffer_status:[A-Z_]+$", todo: bring back once in prod
     )

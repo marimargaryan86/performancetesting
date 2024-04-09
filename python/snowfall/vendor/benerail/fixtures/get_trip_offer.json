@@ -127,8 +127,8 @@
             }
         ],
         "bookableStatus": {
-            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bdws:bookable_status:BOOKABLE",
-            "value": "urn:bdws:bookable_status:BOOKABLE"
+            "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bdws:doffer_status:BOOKABLE",
+            "value": "urn:bdws:doffer_status:BOOKABLE"
         },
         "accommodationType": {
             "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bnds:accommodation_type:SEAT",

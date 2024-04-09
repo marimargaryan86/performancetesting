@@ -109,8 +109,8 @@
       }
     ],
     "bookable_status": {
-      "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bdws:bookable_status:BOOKABLE",
-      "status_value": "urn:bdws:bookable_status:BOOKABLE"
+      "href": "https://benerail-stg-apim.azure-api.net/rcode/rcode/value/urn:bdws:doffer_status:BOOKABLE",
+      "status_value": "urn:bdws:doffer_status:BOOKABLE"
     }
   }
 }
