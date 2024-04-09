@@ -104,7 +104,7 @@ class QuoteTaskConsumer:
             expires_at=expires_at,
         )
         quote_obj = models_pb2.Quote(
-            id=price_quote_id,
+            id=str(price_quote_id),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             price=offer.price,
             price_breakdown=offer.price_breakdown,

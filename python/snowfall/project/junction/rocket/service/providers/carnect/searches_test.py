@@ -1,11 +1,5 @@
 import datetime
 import math
-from unittest import mock
-
-import aiofiles
-import pytest
-from xsdata.formats.dataclass import parsers
-from xsdata.formats.dataclass.parsers import config as parsers_config
 
 from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
 from snowfall.project.junction.rocket.service.providers.carnect import (
@@ -14,51 +8,7 @@ from snowfall.project.junction.rocket.service.providers.carnect import (
     searches,
 )
 from snowfall.stdlib import string
-from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import latlng_pb2
-from snowfall.vendor.carnect.models import service as carnect_service
-
-
-async def get_avail_rate_response() -> carnect_service.ServiceSoapGetVehAvailRateOutput:
-    parser = parsers.XmlParser(
-        config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
-    )
-    response = await _load_xml_fixture("get_avail_rate.xml")
-    return parser.from_bytes(response, carnect_service.ServiceSoapGetVehAvailRateOutput)
-
-
-async def _load_xml_fixture(
-    file_name: str,
-    package: str | None = None,
-) -> bytes:
-    if not package:
-        package = __name__
-
-    file_path = filesystem.resource_path(
-        package=package,
-        resource="fixtures/{file_name}.xml".format(
-            file_name=file_name.removesuffix(".xml"),
-        ),
-    )
-
-    async with aiofiles.open(file_path, "rb") as file_handle:
-        return await file_handle.read()
-
-
-@pytest.fixture()
-async def search_result_generator() -> searches.SearchResultGenerator:
-    return searches.SearchResultGenerator(
-        carnect_client=mock.Mock(
-            name="CarnectClient",
-            get_avail_rate=mock.AsyncMock(
-                name="get_avail_rate",
-                return_value=await get_avail_rate_response(),
-            ),
-        ),
-        carnect_config=mock.Mock(name="CarnectConfig"),
-        search_result_cache=mock.AsyncMock(name="SearchResultCache"),
-        ttl=datetime.timedelta(seconds=15),
-    )
 
 
 async def test_successful(  # noqa: WPS218
