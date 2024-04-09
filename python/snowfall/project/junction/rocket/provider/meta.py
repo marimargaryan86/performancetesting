@@ -11,6 +11,7 @@ from snowfall.stdlib.transport.grpc import service
 class MetaImplementation:
     identifier: uuid.UUID
     name: str
+    search_capabilities: meta_pb2.SearchCapabilities
     booking_capabilities: meta_pb2.BookingCapabilities | None = None
 
 
@@ -19,10 +20,12 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
         self,
         provider_id: uuid.UUID,
         provider_name: str,
+        search_capabilities: meta_pb2.SearchCapabilities,
         booking_capabilities: meta_pb2.BookingCapabilities | None = None,
     ):
         self._provider_id = str(provider_id)
         self._provider_name = provider_name
+        self._search_capabilities = search_capabilities
         self._booking_capabilities = booking_capabilities
 
     def get_name(self) -> str:
@@ -38,6 +41,7 @@ class MetaService(service.Service, meta_pb2_grpc.MetaServiceServicer):
     ) -> meta_pb2.GetCapabilitiesResponse:
         return meta_pb2.GetCapabilitiesResponse(
             booking_capabilities=self._booking_capabilities,
+            search_capabilities=self._search_capabilities,
         )
 
     async def GetIdentity(  # type: ignore[override] # noqa: N802

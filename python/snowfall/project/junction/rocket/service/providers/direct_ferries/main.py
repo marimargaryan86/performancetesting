@@ -7,6 +7,7 @@ from aio_pika import abc
 from redis import asyncio as aioredis
 
 from snowfall.project.junction.rocket.provider import meta, searches, service
+from snowfall.project.junction.rocket.provider.v1alpha import meta_pb2
 from snowfall.project.junction.rocket.service.providers.direct_ferries import (
     cache,
     config,
@@ -25,7 +26,11 @@ _API_TIMEOUT_DEFAULT_SECONDS = 40
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=constant.PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(
+        identifier=constant.PROVIDER_ID,
+        name=_PROVIDER_NAME,
+        search_capabilities=meta_pb2.SearchCapabilities(ferry=True),
+    )
 
 
 def _create_client(

@@ -16,6 +16,7 @@ from snowfall.project.junction.rocket.provider.v1alpha import (
     meta_pb2_grpc,
     searches_pb2_grpc,
 )
+from snowfall.project.junction.rocket.service.searches.v1alpha import amqp_pb2
 from snowfall.stdlib import sequence
 from snowfall.stdlib.logging import stdout
 
@@ -104,6 +105,7 @@ class _ProviderWrapper:
             connection=self.provider.connection,
             identifier=meta_response.id,
             name=meta_response.name,
+            search_capabilities=capabilities_response.search_capabilities,
             booking_capabilities=capabilities_response.booking_capabilities,
         )
 
@@ -170,12 +172,26 @@ class Provider:
     connection: Connection
     identifier: str
     name: str = ""
+    search_capabilities: meta_pb2.SearchCapabilities = dataclasses.field(
+        default_factory=meta_pb2.SearchCapabilities,
+    )
     booking_capabilities: meta_pb2.BookingCapabilities = dataclasses.field(
         default_factory=meta_pb2.BookingCapabilities,
     )
 
     def marshal_resource_id(self, resource_id: str) -> str:
         return sequence.to_composite_id([self.identifier, resource_id])
+
+    def has_search_capability_for(self, msg: amqp_pb2.SearchTask) -> bool:
+        match msg.search.WhichOneof("search_criterion"):
+            case "car_rental":
+                return self.search_capabilities.car_rental
+            case "ferry":
+                return self.search_capabilities.ferry
+            case "rail":
+                return self.search_capabilities.rail
+            case _:
+                return False
 
 
 class Connection:

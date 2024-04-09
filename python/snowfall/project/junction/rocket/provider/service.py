@@ -68,6 +68,7 @@ def _grpc_command(  # noqa: WPS217
             meta.MetaService(
                 provider_id=meta_implementation.identifier,
                 provider_name=meta_implementation.name,
+                search_capabilities=meta_implementation.search_capabilities,
                 booking_capabilities=meta_implementation.booking_capabilities,
             ),
         ]

@@ -13,6 +13,7 @@ message GetCapabilitiesRequest {}
 
 message GetCapabilitiesResponse {
   BookingCapabilities booking_capabilities = 1;
+  SearchCapabilities search_capabilities = 2;
 }
 
 message GetIdentityRequest {}
@@ -24,4 +25,10 @@ message GetIdentityResponse {
 
 message BookingCapabilities {
   bool supports_cancellation = 1;
+}
+
+message SearchCapabilities {
+  bool rail = 1;
+  bool ferry = 2;
+  bool car_rental = 3;
 }

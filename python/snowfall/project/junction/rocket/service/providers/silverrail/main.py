@@ -13,6 +13,7 @@ from snowfall.project.junction.rocket.provider import (
     searches,
     service,
 )
+from snowfall.project.junction.rocket.provider.v1alpha import meta_pb2
 from snowfall.project.junction.rocket.service.providers.silverrail import (
     adapter,
     cache,
@@ -47,7 +48,11 @@ def cert_tmp_path(cert_base64: str) -> str:
 
 
 async def _meta_factory() -> meta.MetaImplementation:
-    return meta.MetaImplementation(identifier=PROVIDER_ID, name=_PROVIDER_NAME)
+    return meta.MetaImplementation(
+        identifier=PROVIDER_ID,
+        name=_PROVIDER_NAME,
+        search_capabilities=meta_pb2.SearchCapabilities(rail=True),
+    )
 
 
 async def _search_factory(
