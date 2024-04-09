@@ -18,17 +18,22 @@
   "tags": [
     {
       "name": "air",
-      "description": "Air.",
+      "description": "Air",
       "x-displayName": "Air"
     },
     {
       "name": "car-rental",
-      "description": "Car rental.",
+      "description": "Car rental",
       "x-displayName": "Car Rental"
     },
     {
+      "name": "ferry",
+      "description": "Ferry",
+      "x-displayName": "Ferry"
+    },
+    {
       "name": "hotel",
-      "description": "Hotel.",
+      "description": "Hotel",
       "x-displayName": "Hotel"
     },
     {
@@ -40,150 +45,14 @@
       "name": "places",
       "description": "Places.",
       "x-displayName": "Places"
+    },
+    {
+      "name": "rail",
+      "description": "Rail",
+      "x-displayName": "Rail"
     }
   ],
   "paths": {
-    "/hotel/searches": {
-      "post": {
-        "summary": "Create Hotel Search",
-        "tags": [
-          "hotel"
-        ],
-        "operationId": "post-hotel-searches",
-        "description": "Used to initiate a hotel search",
-        "responses": {
-          "200": {
-            "description": "Created",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Hotel Search Response"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/HotelSearchRequest"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        },
-        "x-internal": true,
-        "security": [
-          {
-            "jwt": []
-          }
-        ]
-      }
-    },
-    "/hotel/searches/{searchId}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/searchId"
-        }
-      ],
-      "get": {
-        "summary": "Get Hotel Search status",
-        "tags": [
-          "hotel"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Hotel Search Response"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-hotel-searches-id",
-        "description": "Used to lookup the status of a hotel search."
-      }
-    },
-    "/hotel/searches/{searchId}/results": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/searchId"
-        }
-      ],
-      "get": {
-        "summary": "List Hotel Search results",
-        "tags": [
-          "hotel"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Hotel Search Response"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-hotel-searches-id-results",
-        "description": "Used to lookup data for a hotel search.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ]
-      }
-    },
     "/air/searches": {
       "post": {
         "summary": "Create Air Search",
@@ -518,6 +387,307 @@
         ]
       }
     },
+    "/ferry/searches": {
+      "post": {
+        "summary": "Create Ferry Search",
+        "operationId": "post-ferry-searches",
+        "description": "Used to initiate a ferry search",
+        "tags": [
+          "ferry"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/FerrySearch"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FerrySearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/ferry/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Ferry Search",
+        "operationId": "get-ferry-searches-id",
+        "description": "Used to lookup data for a Search Identifier.",
+        "tags": [
+          "ferry"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/FerrySearch"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/ferry/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Ferry Search Results",
+        "operationId": "get-ferry-searches-id-results",
+        "description": "Used to retrieve Search Results for Ferries",
+        "tags": [
+          "ferry"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "minItems": 0,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/FerrySearchResult"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/hotel/searches": {
+      "post": {
+        "summary": "Create Hotel Search",
+        "tags": [
+          "hotel"
+        ],
+        "operationId": "post-hotel-searches",
+        "description": "Used to initiate a hotel search",
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/HotelSearchRequest"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "x-internal": true,
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/hotel/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Hotel Search status",
+        "tags": [
+          "hotel"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-hotel-searches-id",
+        "description": "Used to lookup the status of a hotel search."
+      }
+    },
+    "/hotel/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Hotel Search results",
+        "tags": [
+          "hotel"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-hotel-searches-id-results",
+        "description": "Used to lookup data for a hotel search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
     "/places": {
       "get": {
         "summary": "List Places",
@@ -649,6 +819,166 @@
         "description": "Used to lookup data for a Place Identifier."
       }
     },
+    "/rail/searches": {
+      "post": {
+        "summary": "Create Rail Search",
+        "operationId": "post-rail-searches",
+        "description": "Used to initiate a rail search",
+        "tags": [
+          "rail"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/RailSearch"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RailSearch"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/rail/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Rail Search",
+        "operationId": "get-rail-searches-id",
+        "description": "Used to lookup data for a Search Identifier.",
+        "tags": [
+          "rail"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/RailSearch"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/rail/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Rail Search Results",
+        "operationId": "get-rail-searches-id-results",
+        "description": "Used to retrieve Search Results for Rail",
+        "tags": [
+          "rail"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "minItems": 0,
+                          "uniqueItems": true,
+                          "items": {
+                            "$ref": "#/components/schemas/RailSearchResult"
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ]
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextLink"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -707,81 +1037,8 @@
   },
   "components": {
     "schemas": {
-      "HotelSearchRequest": {
-        "title": "Hotel Search Request",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "hotel-searches"
-            ],
-            "example": "hotel-searches"
-          },
-          "attributes": {
-            "type": "object",
-            "required": [
-              "checkinAt",
-              "checkoutAt",
-              "latitude",
-              "longitude",
-              "radius",
-              "passengers"
-            ],
-            "properties": {
-              "checkinAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2019-08-24T14:15:22Z"
-              },
-              "checkoutAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2019-08-24T14:15:22Z"
-              },
-              "latitude": {
-                "type": "number",
-                "format": "float",
-                "minimum": -90,
-                "maximum": 90,
-                "example": 59.858611
-              },
-              "longitude": {
-                "type": "number",
-                "format": "float",
-                "minimum": -180,
-                "maximum": 180,
-                "example": 59.858611
-              },
-              "radius": {
-                "type": "number",
-                "format": "float",
-                "description": "In kilometres.",
-                "example": 20.5
-              },
-              "passengers": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Passenger"
-                }
-              }
-            }
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "attributes"
-        ],
-        "x-examples": {}
-      },
       "AirSearch": {
+        "title": "Air Search",
         "allOf": [
           {
             "type": "object",
@@ -861,9 +1118,7 @@
           {
             "$ref": "#/components/schemas/SelfLink"
           }
-        ],
-        "title": "Air Search",
-        "x-examples": {}
+        ]
       },
       "AirSearchCriteria": {
         "title": "Air Search Criteria",
@@ -894,23 +1149,255 @@
           "departureAt"
         ]
       },
-      "Passenger": {
-        "title": "Passenger",
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "John Smith"
-          },
-          "dateOfBirth": {
-            "type": "string",
-            "format": "date",
-            "example": "2000-01-01"
+      "CarRentalOffer": {
+        "title": "Car Rental Offer",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "offers"
+                ],
+                "example": "offers"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "price",
+                  "priceBreakdown",
+                  "conditionalPrices"
+                ],
+                "properties": {
+                  "price": {
+                    "$ref": "#/components/schemas/Price"
+                  },
+                  "priceBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PriceBreakdown"
+                    }
+                  },
+                  "conditionalPrices": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ConditionalPrice"
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
           }
-        },
-        "required": [
-          "dateOfBirth"
-        ]
+        ],
+        "description": "Result of searching for offers. Used for creating an Order."
+      },
+      "CarRentalResultDetail": {
+        "title": "Car Rental Result Detail",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "result-details"
+                ],
+                "example": "result-details"
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "pickupLocation": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "returnLocation": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "imageUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "example": "https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "model": {
+                    "type": "string",
+                    "example": "Fiat 500",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "seatsCount": {
+                    "type": "integer",
+                    "example": 4,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "doorsCount": {
+                    "type": "integer",
+                    "example": 2,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "transmission": {
+                    "type": "string",
+                    "example": "manual",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "baggageQuantity": {
+                    "type": "integer",
+                    "example": 3,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "vehicleType": {
+                    "type": "string",
+                    "example": "Station Wagon",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "example": "Sixt",
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "unlimitedMileage": {
+                    "type": "boolean",
+                    "example": true,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "airConditioning": {
+                    "type": "boolean",
+                    "example": false,
+                    "readOnly": true,
+                    "nullable": true
+                  },
+                  "pickupAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "returnAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          }
+        ],
+        "description": "Result of searching for offers."
+      },
+      "CarRentalSearch": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "car-searches"
+                ],
+                "example": "car-searches"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "driverAge",
+                  "expiresAt",
+                  "status",
+                  "pickupAt",
+                  "returnAt",
+                  "pickupLocation",
+                  "returnLocation"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  },
+                  "driverAge": {
+                    "type": "number",
+                    "format": "int32",
+                    "example": 32
+                  },
+                  "pickupAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "returnAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "pickupLocation": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "returnLocation": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "title": "Car Rental Search",
+        "x-examples": {}
       },
       "CarRentalSearchIdentifier": {
         "title": "Car Rental Search Identifier",
@@ -934,50 +1421,6 @@
           "type"
         ],
         "description": "A unique identifier for car rental search."
-      },
-      "OfferIdentifier": {
-        "title": "Offer Identifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "offers"
-            ],
-            "example": "offers"
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
-      },
-      "ResultDetailIdentifier": {
-        "title": "Result Detail Identifier",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "result-details"
-            ],
-            "example": "result-details"
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
       },
       "CarRentalSearchResult": {
         "title": "Car Rental Search Result",
@@ -1077,114 +1520,49 @@
         ],
         "description": "Search result representing offer for specified origin and destination."
       },
-      "NextLink": {
-        "title": "Next Link",
+      "CarRentalSearchResultIncluded": {
+        "title": "OfferIncluded",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/CarRentalOffer"
+            },
+            {
+              "$ref": "#/components/schemas/CarRentalResultDetail"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "offers": "#/components/schemas/CarRentalOffer",
+              "result-details": "#/components/schemas/CarRentalResultDetail"
+            }
+          }
+        }
+      },
+      "ConditionalPrice": {
+        "title": "Conditional Price",
+        "description": "Additional fees that may or may not be included in total price",
         "type": "object",
         "properties": {
-          "links": {
-            "type": "object",
-            "required": [
-              "next"
-            ],
-            "properties": {
-              "next": {
-                "type": "string",
-                "format": "uri",
-                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
-                "readOnly": true
-              }
-            },
-            "readOnly": true
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "description": {
+            "type": "string",
+            "example": "one-way fee",
+            "nullable": true
+          },
+          "includedInTotal": {
+            "type": "boolean",
+            "example": false,
+            "nullable": true
           }
         },
         "required": [
-          "links"
+          "price"
         ]
-      },
-      "CarRentalSearch": {
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "car-searches"
-                ],
-                "example": "car-searches"
-              },
-              "attributes": {
-                "type": "object",
-                "required": [
-                  "driverAge",
-                  "expiresAt",
-                  "status",
-                  "pickupAt",
-                  "returnAt",
-                  "pickupLocation",
-                  "returnLocation"
-                ],
-                "properties": {
-                  "expiresAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "readOnly": true,
-                    "example": "2019-08-24T14:15:22Z"
-                  },
-                  "status": {
-                    "type": "string",
-                    "readOnly": true,
-                    "enum": [
-                      "unspecified",
-                      "pending",
-                      "processing",
-                      "completed",
-                      "failed"
-                    ],
-                    "example": "completed"
-                  },
-                  "driverAge": {
-                    "type": "number",
-                    "format": "int32",
-                    "example": 32
-                  },
-                  "pickupAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2019-08-24T14:15:22Z"
-                  },
-                  "returnAt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "example": "2019-08-24T14:15:22Z"
-                  },
-                  "pickupLocation": {
-                    "$ref": "#/components/schemas/Coordinates"
-                  },
-                  "returnLocation": {
-                    "$ref": "#/components/schemas/Coordinates"
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          },
-          {
-            "$ref": "#/components/schemas/SelfLink"
-          }
-        ],
-        "title": "Car Rental Search",
-        "x-examples": {}
       },
       "Coordinates": {
         "title": "Coordinates",
@@ -1210,6 +1588,340 @@
           }
         ],
         "description": "A Coordinate represented via latitude and longitude"
+      },
+      "FerrySearch": {
+        "title": "Ferry Search",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ferry-searches"
+                ],
+                "example": "ferry-searches"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "expiresAt",
+                  "status",
+                  "departureAfter",
+                  "returnAt",
+                  "origin",
+                  "destination",
+                  "passengers"
+                ],
+                "properties": {
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true,
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "status": {
+                    "type": "string",
+                    "readOnly": true,
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
+                  },
+                  "departureAfter": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "returnAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
+                  },
+                  "origin": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "destination": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "passengers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Passenger"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "selectedOutboundOffer"
+                ],
+                "properties": {
+                  "selectedOutboundOffer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OfferIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ]
+      },
+      "FerrySearchIdentifier": {
+        "title": "Ferry Search Identifier",
+        "description": "A unique identifier for ferry search.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ferry-searches"
+            ],
+            "example": "ferry-searches"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "FerrySearchResult": {
+        "title": "Ferry Search Result",
+        "description": "Search result representing offer for specified origin and destination.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "search-results"
+            ],
+            "example": "search-results"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "expiresAt"
+            ],
+            "properties": {
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z",
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "offers",
+              "resultDetails",
+              "search"
+            ],
+            "properties": {
+              "offers": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferIdentifier"
+                    }
+                  }
+                }
+              },
+              "resultDetails": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ResultDetailIdentifier"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "search": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/FerrySearchIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ]
+      },
+      "HotelSearchRequest": {
+        "title": "Hotel Search Request",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hotel-searches"
+            ],
+            "example": "hotel-searches"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "checkinAt",
+              "checkoutAt",
+              "latitude",
+              "longitude",
+              "radius",
+              "passengers"
+            ],
+            "properties": {
+              "checkinAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "checkoutAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "minimum": -90,
+                "maximum": 90,
+                "example": 59.858611
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "minimum": -180,
+                "maximum": 180,
+                "example": 59.858611
+              },
+              "radius": {
+                "type": "number",
+                "format": "float",
+                "description": "In kilometres.",
+                "example": 20.5
+              },
+              "passengers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Passenger"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "x-examples": {}
+      },
+      "OfferIdentifier": {
+        "title": "Offer Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "offers"
+            ],
+            "example": "offers"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "Passenger": {
+        "title": "Passenger",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Smith"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "example": "2000-01-01"
+          }
+        },
+        "required": [
+          "dateOfBirth"
+        ]
       },
       "Place": {
         "title": "Place",
@@ -1413,29 +2125,6 @@
           "amount"
         ]
       },
-      "ConditionalPrice": {
-        "title": "Conditional Price",
-        "description": "Additional fees that may or may not be included in total price",
-        "type": "object",
-        "properties": {
-          "price": {
-            "$ref": "#/components/schemas/Price"
-          },
-          "description": {
-            "type": "string",
-            "example": "one-way fee",
-            "nullable": true
-          },
-          "includedInTotal": {
-            "type": "boolean",
-            "example": false,
-            "nullable": true
-          }
-        },
-        "required": [
-          "price"
-        ]
-      },
       "PriceBreakdown": {
         "title": "Price Breakdown",
         "description": "Breakdown of price into its individual components (base fare, tax, etc)",
@@ -1458,8 +2147,8 @@
           "breakdownType"
         ]
       },
-      "CarRentalOffer": {
-        "title": "Car Rental Offer",
+      "RailSearch": {
+        "title": "Rail Search",
         "allOf": [
           {
             "type": "object",
@@ -1473,156 +2162,46 @@
               "type": {
                 "type": "string",
                 "enum": [
-                  "offers"
+                  "rail-searches"
                 ],
-                "example": "offers"
+                "example": "rail-searches"
               },
               "attributes": {
                 "type": "object",
                 "required": [
-                  "price",
-                  "priceBreakdown",
-                  "conditionalPrices"
+                  "expiresAt",
+                  "status",
+                  "departureAfter",
+                  "returnAt",
+                  "origin",
+                  "destination",
+                  "passengers"
                 ],
                 "properties": {
-                  "price": {
-                    "$ref": "#/components/schemas/Price"
-                  },
-                  "priceBreakdown": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/PriceBreakdown"
-                    }
-                  },
-                  "conditionalPrices": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/ConditionalPrice"
-                    }
-                  }
-                }
-              }
-            },
-            "required": [
-              "id",
-              "type",
-              "attributes"
-            ]
-          }
-        ],
-        "description": "Result of searching for offers. Used for creating an Order."
-      },
-      "CarRentalSearchResultIncluded": {
-        "title": "OfferIncluded",
-        "type": "array",
-        "items": {
-          "oneOf": [
-            {
-              "$ref": "#/components/schemas/CarRentalOffer"
-            },
-            {
-              "$ref": "#/components/schemas/CarRentalResultDetail"
-            }
-          ],
-          "discriminator": {
-            "propertyName": "type",
-            "mapping": {
-              "offers": "#/components/schemas/CarRentalOffer",
-              "result-details": "#/components/schemas/CarRentalResultDetail"
-            }
-          }
-        }
-      },
-      "CarRentalResultDetail": {
-        "title": "Car Rental Result Detail",
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-                "readOnly": true
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "result-details"
-                ],
-                "example": "result-details"
-              },
-              "attributes": {
-                "type": "object",
-                "properties": {
-                  "pickupLocation": {
-                    "$ref": "#/components/schemas/Coordinates"
-                  },
-                  "returnLocation": {
-                    "$ref": "#/components/schemas/Coordinates"
-                  },
-                  "imageUrl": {
+                  "expiresAt": {
                     "type": "string",
-                    "format": "uri",
-                    "example": "https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg",
+                    "format": "date-time",
                     "readOnly": true,
-                    "nullable": true
+                    "example": "2019-08-24T14:15:22Z"
                   },
-                  "model": {
+                  "status": {
                     "type": "string",
-                    "example": "Fiat 500",
                     "readOnly": true,
-                    "nullable": true
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "processing",
+                      "completed",
+                      "failed"
+                    ],
+                    "example": "completed"
                   },
-                  "seatsCount": {
-                    "type": "integer",
-                    "example": 4,
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "doorsCount": {
-                    "type": "integer",
-                    "example": 2,
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "transmission": {
+                  "departureAfter": {
                     "type": "string",
-                    "example": "manual",
-                    "readOnly": true,
-                    "nullable": true
+                    "format": "date-time",
+                    "example": "2019-08-24T14:15:22Z"
                   },
-                  "baggageQuantity": {
-                    "type": "integer",
-                    "example": 3,
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "vehicleType": {
-                    "type": "string",
-                    "example": "Station Wagon",
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "vendor": {
-                    "type": "string",
-                    "example": "Sixt",
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "unlimitedMileage": {
-                    "type": "boolean",
-                    "example": true,
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "airConditioning": {
-                    "type": "boolean",
-                    "example": false,
-                    "readOnly": true,
-                    "nullable": true
-                  },
-                  "pickupAt": {
+                  "departureBefore": {
                     "type": "string",
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
@@ -1631,6 +2210,37 @@
                     "type": "string",
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
+                  },
+                  "origin": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "destination": {
+                    "$ref": "#/components/schemas/Coordinates"
+                  },
+                  "passengers": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Passenger"
+                    }
+                  }
+                }
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "selectedOutboundOffer"
+                ],
+                "properties": {
+                  "selectedOutboundOffer": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/OfferIdentifier"
+                      }
+                    }
                   }
                 }
               }
@@ -1640,9 +2250,199 @@
               "type",
               "attributes"
             ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
           }
-        ],
-        "description": "Result of searching for offers."
+        ]
+      },
+      "RailSearchIdentifier": {
+        "title": "Rail Search Identifier",
+        "description": "A unique identifier for rail search.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "rail-searches"
+            ],
+            "example": "rail-searches"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "RailSearchResult": {
+        "title": "Rail Search Result",
+        "description": "Search result representing offer for specified origin and destination.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "search-results"
+            ],
+            "example": "search-results"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "expiresAt"
+            ],
+            "properties": {
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z",
+                "readOnly": true
+              }
+            }
+          },
+          "relationships": {
+            "type": "object",
+            "required": [
+              "offers",
+              "resultDetails",
+              "search"
+            ],
+            "properties": {
+              "offers": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OfferIdentifier"
+                    }
+                  }
+                }
+              },
+              "resultDetails": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "oneOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/ResultDetailIdentifier"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "search": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/RailSearchIdentifier"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes",
+          "relationships"
+        ]
+      },
+      "ResultDetailIdentifier": {
+        "title": "Result Detail Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "result-details"
+            ],
+            "example": "result-details"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "SearchCapabilities": {
+        "type": "object",
+        "title": "SearchCapabilities",
+        "properties": {
+          "rail": {
+            "title": "Rail",
+            "type": "boolean",
+            "example": false
+          },
+          "air": {
+            "title": "Air",
+            "type": "boolean",
+            "example": true
+          },
+          "ferry": {
+            "title": "Ferry",
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "rail",
+          "air",
+          "ferry"
+        ]
+      },
+      "NextLink": {
+        "title": "Next Link",
+        "type": "object",
+        "properties": {
+          "links": {
+            "type": "object",
+            "required": [
+              "next"
+            ],
+            "properties": {
+              "next": {
+                "type": "string",
+                "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
+                "readOnly": true
+              }
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "links"
+        ]
       },
       "Error": {
         "title": "Error",
@@ -1697,32 +2497,6 @@
         "required": [
           "status",
           "detail"
-        ]
-      },
-      "SearchCapabilities": {
-        "type": "object",
-        "title": "SearchCapabilities",
-        "properties": {
-          "rail": {
-            "title": "Rail",
-            "type": "boolean",
-            "example": false
-          },
-          "air": {
-            "title": "Air",
-            "type": "boolean",
-            "example": true
-          },
-          "ferry": {
-            "title": "Ferry",
-            "type": "boolean",
-            "example": false
-          }
-        },
-        "required": [
-          "rail",
-          "air",
-          "ferry"
         ]
       },
       "SelfLink": {

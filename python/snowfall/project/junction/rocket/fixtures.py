@@ -46,14 +46,29 @@ def get_search_results() -> list[searches_pb2.SearchResult]:
     return [generate_search_result(identifier) for identifier in SEARCH_RESULTS]
 
 
-def generate_search(identifier: str) -> searches_pb2.Search:
-    return searches_pb2.Search(
+def generate_search(
+    identifier: str,
+    search_request: searches_pb2.Search | None = None,
+) -> searches_pb2.Search:
+    search = searches_pb2.Search(
         id=identifier,
         reseller_id=RESELLER_ID,
         expires_at=EXPIRES_AT,
         status=amqp_pb2.Trackable.Status.STATUS_COMPLETED,
         rail=generate_rail_one_way_search_criterion(),
+        search_result_ids=list(SEARCH_RESULTS),
     )
+
+    if search_request:
+        match search_request.WhichOneof("search_criterion"):
+            case "rail":
+                search.rail.CopyFrom(search_request.rail)
+            case "ferry":
+                search.ferry.CopyFrom(search_request.ferry)
+            case "car_rental":
+                search.car_rental.CopyFrom(search_request.car_rental)
+
+    return search
 
 
 def generate_offer(offer_id: str) -> searches_pb2.Offer:

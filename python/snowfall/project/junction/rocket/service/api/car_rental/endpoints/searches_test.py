@@ -4,8 +4,8 @@ from starlette import status
 from snowfall.project.junction.rocket import fixtures
 
 
-class TestCreateSearch:
-    async def test_create_search_is_successful(
+class TestCarRentalCreateSearch:
+    async def test_create_car_rental_search_is_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -37,8 +37,8 @@ class TestCreateSearch:
         assert response.json()["data"]["id"]
 
 
-class TestGetSearch:
-    async def test_get_search_should_fail_when_unauthorized(
+class TestCarRentalGetSearch:
+    async def test_get_car_rental_search_should_fail_when_unauthorized(
         self,
         unauthorized_client: httpx.AsyncClient,
     ) -> None:
@@ -50,7 +50,7 @@ class TestGetSearch:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    async def test_get_search_should_fail_when_not_existing_search_id_provided(
+    async def test_get_car_rental_search_should_fail_when_not_existing_search_id_provided(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -62,7 +62,7 @@ class TestGetSearch:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_get_search_is_successful(
+    async def test_get_car_rental_search_is_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -75,8 +75,8 @@ class TestGetSearch:
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestListSearchResults:
-    async def test_list_search_results_successful(
+class TestCarRentalListSearchResults:
+    async def test_list_car_rental_search_results_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:

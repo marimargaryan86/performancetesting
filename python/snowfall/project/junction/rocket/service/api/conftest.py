@@ -15,7 +15,9 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api import errors
-from snowfall.project.junction.rocket.service.api.air import endpoints as routes
+from snowfall.project.junction.rocket.service.api.air import (
+    router as air_router,
+)
 from snowfall.project.junction.rocket.service.api.air.repositories import (
     AirSearchRepository,
 )
@@ -29,13 +31,21 @@ from snowfall.project.junction.rocket.service.api.air.types import (
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
 )
-from snowfall.project.junction.rocket.service.api.hotel import router as hotel_router
+from snowfall.project.junction.rocket.service.api.ferry import (
+    router as ferry_router,
+)
+from snowfall.project.junction.rocket.service.api.hotel import (
+    router as hotel_router,
+)
 from snowfall.project.junction.rocket.service.api.hotel import (
     transformers as hotel_transformers,
 )
 from snowfall.project.junction.rocket.service.api.hotel import types as hotel_types
 from snowfall.project.junction.rocket.service.api.hotel.repositories import (
     HotelSearchRepository,
+)
+from snowfall.project.junction.rocket.service.api.rail import (
+    router as rail_router,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -138,19 +148,11 @@ def container(
 def app(container: lagom.Container) -> applications.Starlette:
     integration = StarletteIntegration(container)
     route_list = [
+        *air_router.get_routes(integration),
         *car_rental_router.get_routes(integration),
+        *ferry_router.get_routes(integration),
         *hotel_router.get_routes(integration),
-        integration.route("/air/searches", routes.AirSearch, name="AirSearch"),
-        integration.route(
-            "/air/searches/{id}/results",
-            routes.AirSearchRetrieval,
-            name="AirSearchRetrieval",
-        ),
-        integration.route(
-            "/air/searches/{id}",
-            routes.AirSearchStatus,
-            name="AirSearchStatus",
-        ),
+        *rail_router.get_routes(integration),
     ]
     asgi_app = application.create_starlette_app(
         routes=route_list,
@@ -243,7 +245,7 @@ async def _create_search(
     timeout: datetime.datetime,
 ) -> grpc_pb2.EnqueueSearchResponse:
     return grpc_pb2.EnqueueSearchResponse(
-        search=fixtures.generate_search(string.uuid()),
+        search=fixtures.generate_search(string.uuid(), request.search),
     )
 
 
