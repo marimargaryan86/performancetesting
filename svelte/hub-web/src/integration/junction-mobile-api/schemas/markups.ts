@@ -1,6 +1,8 @@
 import * as CommonSchemas from "~/integration/common/schemas";
-import type { Order, OrderSchema } from "./order";
+import type { Order } from "./order";
 import type { IncludedMapping } from "./included";
+import type { Specification } from "./__generated__";
+import type { PostCreatedResponse, PostRequest } from "~/integration/common/types";
 
 export type Markups = {
   id: string;
@@ -13,29 +15,14 @@ export type Markups = {
   order?: Order;
 };
 
-export type MarkupsSchema = {
-  id: string;
-  type: "markups";
-  attributes: {
-    serviceFee: CommonSchemas.PriceSchema;
-    agencyMarkup: CommonSchemas.PriceSchema;
-    totalToCollect: CommonSchemas.PriceSchema;
-    createdAt: string;
-    updatedAt: string;
-  };
-  relationships: {
-    order: { data: Pick<OrderSchema, "id" | "type"> };
-  };
-};
+export type MarkupsSchema = PostCreatedResponse<Specification, "/orders/markups">["data"];
 
 export type MarkupsCreate = Pick<
   Markups,
   "orderId" | "serviceFee" | "agencyMarkup" | "totalToCollect"
 >;
 
-export type MarkupsCreateSchema = Pick<MarkupsSchema, "type" | "relationships"> & {
-  attributes: Pick<MarkupsSchema["attributes"], "serviceFee" | "agencyMarkup" | "totalToCollect">;
-};
+export type MarkupsCreateSchema = PostRequest<Specification, "/orders/markups">["data"];
 
 export const markupsParser = {
   toModel: (data: MarkupsSchema, included?: IncludedMapping): Markups => {

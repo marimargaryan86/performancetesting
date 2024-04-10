@@ -1,6 +1,8 @@
 import * as CommonSchemas from "~/integration/common/schemas";
-import type { TripCandidateSearch, TripCandidateSearchSchema } from "./trip-candidate";
+import type { TripCandidateSearch } from "./trip-candidate";
 import { tripOfferPassengerParser } from "./offer-search";
+import type { Specification } from "./__generated__";
+import type { PostCreatedResponse, PostRequest } from "~/integration/common/types";
 
 export type SimpleOfferSearchCriteria = {
   origin: CommonSchemas.Coordinates;
@@ -10,15 +12,7 @@ export type SimpleOfferSearchCriteria = {
   windowH?: number;
 };
 
-export type SimpleOfferSearchCriteriaSchema = {
-  origin: CommonSchemas.CoordinatesSchema;
-  destination: CommonSchemas.CoordinatesSchema;
-  departureAfter: string;
-  departureBefore?: string | null;
-  arrivalBefore?: string | null;
-  returnDepartureBefore?: string | null;
-  returnDepartureAfter?: string | null;
-};
+export type SimpleOfferSearchCriteriaSchema = SimpleOfferSearchSchema["attributes"]["criteria"];
 
 export const simpleOfferSearchCriteriaParser = {
   toModel: (
@@ -80,12 +74,10 @@ export type SimpleOfferSearch = Omit<TripCandidateSearch, "criteria"> & {
   criteria: SimpleOfferSearchCriteria;
 };
 
-export type SimpleOfferSearchSchema = Omit<TripCandidateSearchSchema, "type" | "attributes"> & {
-  type: "simple-offer-searches";
-  attributes: Omit<TripCandidateSearchSchema["attributes"], "criteria"> & {
-    criteria: SimpleOfferSearchCriteriaSchema;
-  };
-};
+export type SimpleOfferSearchSchema = PostCreatedResponse<
+  Specification,
+  "/simple-offers/searches"
+>["data"];
 
 export type SimpleOfferSearchCreate = Pick<
   SimpleOfferSearch,
@@ -94,12 +86,10 @@ export type SimpleOfferSearchCreate = Pick<
   sessionToken?: string;
 };
 
-export type SimpleOfferSearchCreateSchema = Pick<SimpleOfferSearchSchema, "relationships"> &
-  Pick<SimpleOfferSearchSchema, "type"> & {
-    attributes: Pick<SimpleOfferSearchSchema["attributes"], "criteria" | "passengers"> & {
-      sessionToken?: string;
-    };
-  };
+export type SimpleOfferSearchCreateSchema = PostRequest<
+  Specification,
+  "/simple-offers/searches"
+>["data"];
 
 export const simpleOffserSearchParser = {
   toModel: (data: SimpleOfferSearchSchema): SimpleOfferSearch => {
@@ -112,7 +102,8 @@ export const simpleOffserSearchParser = {
       status: data.attributes.status,
       expiresAt: new Date(data.attributes.expiresAt),
       passengers: data.attributes.passengers.map(tripOfferPassengerParser.toModel),
-      allowedSegmentTypes: data.relationships?.allowedSegmentTypes?.data.map(({ id }) => id) ?? [],
+      allowedSegmentTypes: (data.relationships?.allowedSegmentTypes?.data.map(({ id }) => id) ??
+        []) as CommonSchemas.LegType["id"][],
       criteria: simpleOfferSearchCriteriaParser.toModel(data.attributes.criteria, isCarSearch),
     };
   },

@@ -1,7 +1,9 @@
 import type { IncludedMapping } from "./included";
-import type { Order, OrderSchema } from "./order";
+import type { Order } from "./order";
 import * as CommonSchemas from "~/integration/common/schemas";
-import type { BookingCancellation, BookingCancellationSchema } from "./cancellation";
+import type { BookingCancellation } from "./cancellation";
+import type { Specification } from "./__generated__";
+import type { GetIncluded, GetOKResponse } from "~/integration/common/types";
 
 export type TripBookingDetails = {
   id: string;
@@ -18,23 +20,10 @@ export type TripBookingDetails = {
   legType?: CommonSchemas.LegType;
 };
 
-export type TripBookingDetailsSchema = {
-  id: string;
-  type: "trip-booking-details";
-  attributes: {
-    cabinClassName: string;
-    vendor: string;
-    operator: string | null;
-    routeIdentifiers: CommonSchemas.RouteIdentifiersSchema;
-    legs: CommonSchemas.OfferSegmentLegSchema[];
-  };
-  relationships: {
-    booking: { data: Pick<TripBookingSchema, "id" | "type"> };
-    cabinClass: { data: Pick<CommonSchemas.CabinClassSchema, "id" | "type"> };
-    legType: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type TripBookingDetailsSchema = GetIncluded<
+  GetOKResponse<Specification, "/orders/{orderId}">,
+  "trip-booking-details"
+>;
 
 export const tripBookingDetailsParser = {
   toModel: (data: TripBookingDetailsSchema, included?: IncludedMapping): TripBookingDetails => {
@@ -83,29 +72,17 @@ export type TripBooking = {
   cancellation?: BookingCancellation;
 };
 
-export type TripBookingSchema = {
-  id: string;
-  type: "trip-bookings";
-  attributes: {
-    totalPrice: CommonSchemas.PriceSchema;
-    operatorBookingReferences: string[];
-    externalReference: string;
-    ticketUrls?: string[];
-  };
-  relationships: {
-    order: { data: Pick<OrderSchema, "id" | "type"> };
-    status: { data: Pick<BookingStatusSchema, "id" | "type"> };
-    details?: { data?: Pick<TripBookingDetailsSchema, "id" | "type">[] };
-    bookingCancellation: { data: Pick<BookingCancellationSchema, "id" | "type"> | null } | null;
-  };
-  links: { self: string };
-};
+export type TripBookingSchema = GetIncluded<
+  GetOKResponse<Specification, "/orders/{orderId}">,
+  "trip-bookings"
+>;
 
 export const tripBookingParser = {
   toModel: (data: TripBookingSchema, included?: IncludedMapping): TripBooking => {
     const orderId = data.relationships.order.data.id;
     const detailsIds = data.relationships.details?.data?.map(({ id }) => id) ?? [];
-    const cancellationId = data.relationships.bookingCancellation?.data?.id;
+    // TODO(2024-04-09): Check why this isn't in the spec
+    // const cancellationId = data.relationships.bookingCancellation?.data?.id;
 
     return {
       id: data.id,
@@ -115,13 +92,14 @@ export const tripBookingParser = {
       ticketUrls: data.attributes.ticketUrls ?? [],
       operatorBookingReferences: data.attributes.operatorBookingReferences,
       externalReference: data.attributes.externalReference,
-      status: data.relationships.status.data.id,
+      status: data.relationships.status.data.id as BookingStatusSchema["id"],
       orderId,
       order: included?.orders?.find(({ id }) => id === orderId),
       detailsIds,
       detailsList: included?.tripBookingDetails?.filter(({ id }) => detailsIds.includes(id)) ?? [],
-      cancellationId,
-      cancellation: included?.bookingCancellations?.find(({ id }) => id === cancellationId),
+      // TODO(2024-04-09): Check why this isn't in the spec
+      // cancellationId,
+      // cancellation: included?.bookingCancellations?.find(({ id }) => id === cancellationId),
     };
   },
 };

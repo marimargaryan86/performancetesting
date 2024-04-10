@@ -1,6 +1,8 @@
 import * as CommonSchemas from "~/integration/common/schemas";
 import type { IncludedMapping } from "./included";
-import type { Order, OrderSchema } from "./order";
+import type { Order } from "./order";
+import type { Specification } from "./__generated__";
+import type { GetIncluded, GetOKResponse } from "~/integration/common/types";
 
 export type ContactDetails = {
   email: string;
@@ -8,11 +10,7 @@ export type ContactDetails = {
   phone: string;
 };
 
-export type ContactDetailsSchema = {
-  email: string;
-  address: Required<Omit<CommonSchemas.EnhancedAddressDetailsSchema, "state">>;
-  phoneNumber: string;
-};
+export type ContactDetailsSchema = JourneySchema["attributes"]["contactDetails"];
 
 export const contactDetailsParser = {
   toModel: (data: ContactDetailsSchema): ContactDetails => ({
@@ -33,24 +31,14 @@ export const contactDetailsParser = {
 
 export type Journey = {
   id: string;
+  createdAt: Date;
   reference: string;
   contact: ContactDetails;
   orderIds: string[];
   orders: Order[];
 };
 
-export type JourneySchema = {
-  id: string;
-  type: "journeys";
-  attributes: {
-    reference: string;
-    contactDetails: ContactDetailsSchema;
-  };
-  relationships: {
-    orders: { data: Pick<OrderSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type JourneySchema = GetIncluded<GetOKResponse<Specification, "/orders">, "journeys">;
 
 export const journeyParser = {
   toModel: (data: JourneySchema, included?: IncludedMapping): Journey => {
@@ -58,6 +46,7 @@ export const journeyParser = {
 
     return {
       id: data.id,
+      createdAt: new Date(data.attributes.createdAt),
       reference: data.attributes.reference,
       contact: contactDetailsParser.toModel(data.attributes.contactDetails),
       orderIds,

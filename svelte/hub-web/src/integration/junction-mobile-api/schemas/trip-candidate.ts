@@ -1,9 +1,7 @@
 import * as CommonSchemas from "~/integration/common/schemas";
-import {
-  tripOfferPassengerParser,
-  type TripOfferPassenger,
-  type TripOfferPassengerSchema,
-} from "./offer-search";
+import { tripOfferPassengerParser, type TripOfferPassenger } from "./offer-search";
+import type { Specification } from "./__generated__";
+import type { PostCreatedResponse, PostRequest } from "~/integration/common/types";
 
 export type TripCandidateSearchCriteria = {
   origin: CommonSchemas.CoordinatesSearchable;
@@ -13,13 +11,8 @@ export type TripCandidateSearchCriteria = {
   maximumConnections?: number;
 };
 
-export type TripCandidateSearchCriteriaSchema = {
-  origin: CommonSchemas.CoordinatesSearchableSchema;
-  destination: CommonSchemas.CoordinatesSearchableSchema;
-  departureAfter: string;
-  departureBefore?: string;
-  maximumConnections?: number;
-};
+export type TripCandidateSearchCriteriaSchema =
+  TripCandidateSearchSchema["attributes"]["criteria"][number];
 
 export const tripCandidateSearchCriteriaParser = {
   toModel: (data: TripCandidateSearchCriteriaSchema): TripCandidateSearchCriteria => ({
@@ -47,20 +40,10 @@ export type TripCandidateSearch = {
   allowedSegmentTypes?: CommonSchemas.LegType["id"][];
 };
 
-export type TripCandidateSearchSchema = {
-  id: string;
-  type: "trip-candidate-searches";
-  attributes: {
-    expiresAt: string;
-    status: "unspecified" | "pending" | "processing" | "completed" | "failed";
-    criteria: TripCandidateSearchCriteriaSchema[];
-    passengers: TripOfferPassengerSchema[];
-  };
-  relationships?: {
-    allowedSegmentTypes?: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type TripCandidateSearchSchema = PostCreatedResponse<
+  Specification,
+  "/trip-candidates/searches"
+>["data"];
 
 export type TripCandidateSearchCreate = Pick<
   TripCandidateSearch,
@@ -69,14 +52,10 @@ export type TripCandidateSearchCreate = Pick<
   sessionToken?: string;
 };
 
-export type TripCandidateSearchCreateSchema = Pick<
-  TripCandidateSearchSchema,
-  "type" | "relationships"
-> & {
-  attributes: Pick<TripCandidateSearchSchema["attributes"], "criteria" | "passengers"> & {
-    sessionToken?: string;
-  };
-};
+export type TripCandidateSearchCreateSchema = PostRequest<
+  Specification,
+  "/trip-candidates/searches"
+>["data"];
 
 export const tripCandidateSearchParser = {
   toModel: (data: TripCandidateSearchSchema): TripCandidateSearch => ({
@@ -85,7 +64,9 @@ export const tripCandidateSearchParser = {
     status: data.attributes.status,
     criteria: data.attributes.criteria.map(tripCandidateSearchCriteriaParser.toModel),
     passengers: data.attributes.passengers.map(tripOfferPassengerParser.toModel),
-    allowedSegmentTypes: data.relationships?.allowedSegmentTypes?.data.map(({ id }) => id),
+    allowedSegmentTypes: data.relationships?.allowedSegmentTypes?.data.map(
+      ({ id }) => id,
+    ) as CommonSchemas.LegType["id"][],
   }),
   toCreateSchema: (data: TripCandidateSearchCreate): TripCandidateSearchCreateSchema => ({
     type: "trip-candidate-searches",

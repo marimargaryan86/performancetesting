@@ -1,14 +1,18 @@
 import { dev } from "$app/environment";
 
-type Pointer<TSchema> = keyof TSchema extends string
-  ?
-      | `/${keyof TSchema}`
-      | {
-          [key in keyof TSchema]: TSchema[key] extends Record<string, unknown>
-            ? `/${key}${Pointer<TSchema[key]>}`
-            : `/${key}`;
-        }[keyof TSchema]
-  : never;
+type Pointer<
+  TSchema,
+  TRecord = TSchema extends Record<string, unknown>
+    ? { [key in keyof TSchema as string extends key ? never : key]: key }
+    : never,
+  TKeys extends keyof TRecord = keyof TRecord,
+> = {
+  [key in TKeys]: key extends string
+    ? key extends keyof TSchema
+      ? `/${key}${Pointer<TSchema[key]>}`
+      : ""
+    : never;
+}[TKeys];
 
 export type ApiError<TSchema> = {
   errors: {

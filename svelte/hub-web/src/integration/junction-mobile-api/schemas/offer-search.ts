@@ -1,14 +1,14 @@
+import type { PostCreatedResponse } from "~/integration/common/types";
+import type { Specification } from "./__generated__";
 import type { IncludedMapping } from "./included";
-import { loyaltyCardParser, type LoyaltyCard, type LoyaltyCardSchema } from "./loyalty-card";
-import type { Offer, OfferSchema } from "./offer";
+import { loyaltyCardParser, type LoyaltyCard } from "./loyalty-card";
+import type { Offer } from "./offer";
 
 export type TripOfferPassenger = {
   birthDate: Date;
 };
 
-export type TripOfferPassengerSchema = {
-  dateOfBirth: string;
-};
+export type TripOfferPassengerSchema = TripOfferSearchSchema["attributes"]["passengers"][number];
 
 export const tripOfferPassengerParser = {
   toModel: (data: TripOfferPassengerSchema): TripOfferPassenger => ({
@@ -33,20 +33,7 @@ export type TripOfferSearch = {
   offers: Offer[];
 };
 
-export type TripOfferSearchSchema = {
-  id: string;
-  type: "trip-offer-searches";
-  attributes: {
-    expiresAt: string;
-    passengers: TripOfferPassengerSchema[];
-    loyalty?: LoyaltyCardSchema;
-    status: "unspecified" | "pending" | "processing" | "completed" | "failed";
-  };
-  relationships: {
-    offers: { data: Pick<OfferSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type TripOfferSearchSchema = PostCreatedResponse<Specification, "/offers/searches">["data"];
 
 export const tripOfferSearchParser = {
   toModel: (data: TripOfferSearchSchema, included?: IncludedMapping): TripOfferSearch => {

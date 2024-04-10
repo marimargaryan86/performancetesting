@@ -1,5 +1,7 @@
 import * as CommonSchemas from "~/integration/common/schemas";
 import { z } from "zod";
+import type { Specification } from "./__generated__";
+import type { PostOKResponse, PostRequest } from "~/integration/common/types";
 
 export const paymentModel = z.object({
   id: z.string(),
@@ -10,27 +12,19 @@ export const paymentModel = z.object({
 
 export type Payment = z.infer<typeof paymentModel>;
 
-export type PaymentSchema = {
-  id: string;
-  type: "payments";
-  attributes: {
-    clientSecret: string;
-    ephemeralKey?: string;
-    customerId?: string;
-  };
-};
+export type PaymentSchema = NonNullable<PostOKResponse<Specification, "/payments">["data"]>;
 
-export type PaymentCreateSchema = Pick<PaymentSchema, "type"> & {
-  attributes: CommonSchemas.PriceSchema;
-};
+type PaymentCreateSchema = PostRequest<Specification, "/payments">["data"];
 
 export const paymentParser = {
-  toModel: (data: PaymentSchema): Payment => ({
-    id: data.id,
-    clientSecret: data.attributes.clientSecret,
-    ephemeralKey: data.attributes.ephemeralKey,
-    customerId: data.attributes.customerId,
-  }),
+  toModel: (data: PaymentSchema): Payment => {
+    return {
+      id: data.id,
+      clientSecret: data.attributes.clientSecret,
+      ephemeralKey: data.attributes.ephemeralKey,
+      customerId: data.attributes.customerId,
+    };
+  },
   toCreateSchema: (data: CommonSchemas.Price): PaymentCreateSchema => ({
     type: "payments",
     attributes: CommonSchemas.priceParser.toSchema(data),

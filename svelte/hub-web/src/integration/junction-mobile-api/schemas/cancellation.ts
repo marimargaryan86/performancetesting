@@ -1,5 +1,7 @@
-import type { TripBooking, TripBookingSchema } from "./booking";
+import type { TripBooking } from "./booking";
+import type { Specification } from "./__generated__";
 import type { IncludedMapping } from "./included";
+import type { GetIncluded, GetOKResponse, PostRequest } from "~/integration/common/types";
 
 export type BookingCancellationStatus =
   | "unspecified"
@@ -17,17 +19,10 @@ export type BookingCancellation = {
   booking?: TripBooking;
 };
 
-export type BookingCancellationSchema = {
-  id: string;
-  type: "booking-cancellation";
-  attributes: {
-    status: BookingCancellationStatus;
-  };
-  relationships: {
-    booking: { data: Pick<TripBookingSchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type BookingCancellationSchema = GetIncluded<
+  GetOKResponse<Specification, "/orders/{orderId}">,
+  "booking-cancellation"
+>;
 
 export const bookingCancellationParser = {
   toModel: (data: BookingCancellationSchema, included?: IncludedMapping): BookingCancellation => {
@@ -51,22 +46,15 @@ export type CancellationRequest = {
 
 export type CancellationRequestCreate = Pick<CancellationRequest, "bookingIds">;
 
-export type CancellationRequestSchema = {
-  id: string;
-  type: "cancellation-request";
-  attributes: {
-    status: "unspecified" | "pending" | "completed";
-  };
-  relationships: {
-    bookings: { data: Pick<TripBookingSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type CancellationRequestSchema = GetOKResponse<
+  Specification,
+  "/cancellations/requests/{cancellationRequestId}"
+>["data"];
 
-export type CantellationRequestCreateSchema = Pick<
-  CancellationRequestSchema,
-  "type" | "relationships"
->;
+export type CancellationRequestCreateSchema = PostRequest<
+  Specification,
+  "/cancellations/requests"
+>["data"];
 
 export const cancellationRequestParsers = {
   toModel: (data: CancellationRequestSchema, included?: IncludedMapping): CancellationRequest => {
@@ -79,7 +67,7 @@ export const cancellationRequestParsers = {
       bookings: included?.tripBookings?.filter(({ id }) => bookingIds.includes(id)) ?? [],
     };
   },
-  toCreateSchema: (data: CancellationRequestCreate): CantellationRequestCreateSchema => ({
+  toCreateSchema: (data: CancellationRequestCreate): CancellationRequestCreateSchema => ({
     type: "cancellation-request",
     relationships: {
       bookings: { data: data.bookingIds.map((id) => ({ id, type: "trip-bookings" })) },

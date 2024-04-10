@@ -1,11 +1,11 @@
+import type { GetIncluded, GetOKResponse } from "~/integration/common/types";
+import type { Specification } from "./__generated__";
 import type { IncludedMapping } from "./included";
 import * as CommonSchemas from "~/integration/common/schemas";
 
-export type OfferSegmentDetailAmenity = "unspecified" | "unavailable" | "available" | "included";
+export type OfferSegmentDetailAmenity = OfferSegmentDetailAmenitySchema["availability"];
 
-export type OfferSegmentDetailAmenitySchema = {
-  availability: "unspecified" | "unavailable" | "available" | "included";
-};
+export type OfferSegmentDetailAmenitySchema = OfferSegmentDetailAmenitiesSchema["entertainment"];
 
 export const offerSegmentDetailAmenityParser = {
   toModel: (data: OfferSegmentDetailAmenitySchema): OfferSegmentDetailAmenity => data.availability,
@@ -17,15 +17,12 @@ export type OfferSegmentDetailAmenities = {
   food: OfferSegmentDetailAmenity;
   power: OfferSegmentDetailAmenity;
   wifi: OfferSegmentDetailAmenity;
+  unlimitedMilage?: OfferSegmentDetailAmenity;
+  airConditioner?: OfferSegmentDetailAmenity;
 };
 
-export type OfferSegmentDetailAmenitiesSchema = {
-  beverage: OfferSegmentDetailAmenitySchema;
-  entertainment: OfferSegmentDetailAmenitySchema;
-  food: OfferSegmentDetailAmenitySchema;
-  power: OfferSegmentDetailAmenitySchema;
-  wifi: OfferSegmentDetailAmenitySchema;
-};
+export type OfferSegmentDetailAmenitiesSchema =
+  TripOfferOptionDetailsSchema["attributes"]["amenities"];
 
 export const offerSegmentDetailAmenitiesParser = {
   toModel: (data: OfferSegmentDetailAmenitiesSchema): OfferSegmentDetailAmenities => ({
@@ -34,6 +31,12 @@ export const offerSegmentDetailAmenitiesParser = {
     food: offerSegmentDetailAmenityParser.toModel(data.food),
     power: offerSegmentDetailAmenityParser.toModel(data.power),
     wifi: offerSegmentDetailAmenityParser.toModel(data.wifi),
+    unlimitedMilage: data.unlimitedMileage
+      ? offerSegmentDetailAmenityParser.toModel(data.unlimitedMileage)
+      : undefined,
+    airConditioner: data.airConditioner
+      ? offerSegmentDetailAmenityParser.toModel(data.airConditioner)
+      : undefined,
   }),
 };
 
@@ -47,19 +50,10 @@ export type TripOfferOptionDetails = {
   cabinClass?: CommonSchemas.CabinClass;
 };
 
-export type TripOfferOptionDetailsSchema = {
-  id: string;
-  type: "trip-offer-option-details";
-  attributes: {
-    cabinClassName: string;
-    amenities: OfferSegmentDetailAmenitiesSchema;
-  };
-  relationships: {
-    details: { data: Pick<TripOfferGroupDetailsSchema, "id" | "type"> };
-    cabinClass: { data: Pick<CommonSchemas.CabinClassSchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type TripOfferOptionDetailsSchema = GetIncluded<
+  GetOKResponse<Specification, "/trip-candidates/searches/{tripCandidateSearchId}/offers">,
+  "trip-offer-option-details"
+>;
 
 export const tripOfferOptionDetailsParser = {
   toModel: (
@@ -95,24 +89,10 @@ export type TripOfferGroupDetails = {
   legType?: CommonSchemas.LegType;
 };
 
-export type TripOfferGroupDetailsSchema = {
-  id: string;
-  type: "trip-offer-group-details";
-  attributes: {
-    legs: CommonSchemas.OfferSegmentLegSchema[];
-    vendor: string;
-    operator: string | null;
-    routeIdentifiers: CommonSchemas.RouteIdentifiersSchema;
-    sequences: {
-      trip: number;
-      segment: number;
-    };
-  };
-  relationships: {
-    legType: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type TripOfferGroupDetailsSchema = GetIncluded<
+  GetOKResponse<Specification, "/trip-candidates/searches/{tripCandidateSearchId}/offers">,
+  "trip-offer-group-details"
+>;
 
 export const tripOfferGroupDetailsParser = {
   toModel: (
@@ -137,19 +117,16 @@ export const tripOfferGroupDetailsParser = {
 };
 
 export type ApplicableTo = {
-  birthDateAfter: Date;
-  birthDateBefore: Date;
+  birthDateAfter?: Date;
+  birthDateBefore?: Date;
 };
 
-export type ApplicableToSchema = {
-  dateOfBirthAfter: string;
-  dateOfBirthBefore: string;
-};
+export type ApplicableToSchema = TripOfferOptionPenaltyBaggageAllowanceSchema["applicableTo"];
 
 export const applicableToParser = {
   toModel: (data: ApplicableToSchema): ApplicableTo => ({
-    birthDateAfter: new Date(data.dateOfBirthAfter),
-    birthDateBefore: new Date(data.dateOfBirthBefore),
+    birthDateAfter: data.dateOfBirthAfter ? new Date(data.dateOfBirthAfter) : undefined,
+    birthDateBefore: data.dateOfBirthBefore ? new Date(data.dateOfBirthBefore) : undefined,
   }),
 };
 
@@ -158,10 +135,8 @@ export type TripOfferOptionPenaltyBaggageAllowance = {
   applicableTo: ApplicableTo;
 };
 
-export type TripOfferOptionPenaltyBaggageAllowanceSchema = {
-  isIncluded: boolean;
-  applicableTo: ApplicableToSchema;
-};
+export type TripOfferOptionPenaltyBaggageAllowanceSchema =
+  OfferOptionSchema["attributes"]["baggageAllowances"][number];
 
 export const tripOfferOptionPenaltyBaggageAllowanceParser = {
   toModel: (
@@ -184,20 +159,10 @@ export type OfferOption = {
   detailsList: TripOfferOptionDetails[];
 };
 
-export type OfferOptionSchema = {
-  id: string;
-  type: "offer-options";
-  attributes: {
-    price: CommonSchemas.PriceSchema;
-    priceBreakdown?: CommonSchemas.PriceBreakdownSchema[];
-    brandName: string;
-    baggageAllowances: TripOfferOptionPenaltyBaggageAllowanceSchema[];
-  };
-  relationships: {
-    details: { data: Pick<TripOfferOptionDetailsSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type OfferOptionSchema = GetIncluded<
+  GetOKResponse<Specification, "/trip-candidates/searches/{tripCandidateSearchId}/offers">,
+  "offer-options"
+>;
 
 export const offerOptionParser = {
   toModel: (data: OfferOptionSchema, included?: IncludedMapping): OfferOption => {
@@ -231,19 +196,10 @@ export type OfferGroup = {
   detailsList: TripOfferGroupDetails[];
 };
 
-export type OfferGroupSchema = {
-  id: string;
-  type: "offer-groups";
-  attributes: object;
-  relationships: {
-    options: { data: Pick<OfferOptionSchema, "id" | "type">[] };
-    details: { data: Pick<TripOfferGroupDetailsSchema, "id" | "type">[] };
-  };
-  meta?: {
-    providerId?: string;
-  };
-  links: { self: string };
-};
+export type OfferGroupSchema = GetIncluded<
+  GetOKResponse<Specification, "/trip-candidates/searches/{tripCandidateSearchId}/offers">,
+  "offer-groups"
+>;
 
 export const offerGroupParser = {
   toModel: (data: OfferGroupSchema, included?: IncludedMapping): OfferGroup => {
@@ -268,17 +224,10 @@ export type Offer = {
   groups: OfferGroup[];
 };
 
-export type OfferSchema = {
-  id: string;
-  type: "offers";
-  attributes: {
-    expiresAt: string;
-  };
-  relationships: {
-    groups: { data: Pick<OfferGroupSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type OfferSchema = GetOKResponse<
+  Specification,
+  "/trip-candidates/searches/{tripCandidateSearchId}/offers"
+>["data"][number];
 
 export const offerParser = {
   toModel: (data: OfferSchema, included?: IncludedMapping): Offer => {

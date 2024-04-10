@@ -1,24 +1,17 @@
 import * as CommonSchemas from "~/integration/common/schemas";
-import {
-  applicableToParser,
-  type ApplicableTo,
-  type ApplicableToSchema,
-  type OfferOptionSchema,
-  type OfferSchema,
-  type Offer,
-  type OfferOption,
-} from "./offer";
+import { applicableToParser, type ApplicableTo, type Offer, type OfferOption } from "./offer";
 import type { IncludedMapping } from "./included";
+import type { Specification } from "./__generated__";
+import type { PostCreatedResponse, PostRequest } from "~/integration/common/types";
 
 export type OfferSegmentDetailRule = {
   title: string;
   body: string;
 };
 
-export type OfferSegmentDetailRuleSchema = {
-  title: string;
-  body: string;
-};
+export type OfferSegmentDetailRuleSchema = NonNullable<
+  TripOfferPriceQuoteSchema["attributes"]
+>["rules"][number];
 
 export const offerSegmentDetailRuleParser = {
   toModel: (data: OfferSegmentDetailRuleSchema): OfferSegmentDetailRule => ({ ...data }),
@@ -26,23 +19,17 @@ export const offerSegmentDetailRuleParser = {
 
 export type TripOfferOptionPenalty = {
   applicableTo: ApplicableTo;
-  penaltyType: "exchange" | "refund";
+  penaltyType: TripOfferOptionPenaltySchema["penaltyType"];
   changeable?: boolean;
   refundable: boolean;
   conditionsApply?: boolean;
-  applicability: "before" | "after";
+  applicability: TripOfferOptionPenaltySchema["applicability"];
   price?: CommonSchemas.Price;
 };
 
-export type TripOfferOptionPenaltySchema = {
-  applicableTo: ApplicableToSchema;
-  penaltyType: "exchange" | "refund";
-  changeable?: boolean;
-  refundable: boolean;
-  conditionsApply?: boolean;
-  applicability: "before" | "after";
-  price: CommonSchemas.PriceSchema | null;
-};
+export type TripOfferOptionPenaltySchema = NonNullable<
+  TripOfferPriceQuoteSchema["attributes"]
+>["penalties"][number];
 
 export const tripOfferOptionPenaltyParser = {
   toModel: (data: TripOfferOptionPenaltySchema): TripOfferOptionPenalty => ({
@@ -91,24 +78,10 @@ export type TripOfferPriceQuoteCompleted = Omit<TripOfferPriceQuote, "status" | 
   };
 };
 
-export type TripOfferPriceQuoteSchema = {
-  id: string;
-  type: "trip-offer-price-quotes";
-  attributes: {
-    expiresAt: string;
-    price: CommonSchemas.PriceSchema | null;
-    priceBreakdown?: CommonSchemas.PriceBreakdownSchema[] | null;
-    penalties: TripOfferOptionPenaltySchema[];
-    required: RequiredFields[];
-    rules: OfferSegmentDetailRuleSchema[];
-    status: "unspecified" | "pending" | "processing" | "completed" | "failed";
-  };
-  relationships: {
-    offer: { data: Pick<OfferSchema, "id" | "type"> };
-    options: { data: Pick<OfferOptionSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type TripOfferPriceQuoteSchema = PostCreatedResponse<
+  Specification,
+  "/offers/quotes"
+>["data"];
 
 export type TripOfferPriceQuoteCreate = {
   sessionToken?: string;
@@ -116,15 +89,14 @@ export type TripOfferPriceQuoteCreate = {
   optionIds: string[];
 };
 
-export type TripOfferPriceQuoteCreateSchema = Pick<
-  TripOfferPriceQuoteSchema,
-  "type" | "relationships"
-> & {
-  attributes?: { sessionToken?: string };
-};
+export type TripOfferPriceQuoteCreateSchema = PostRequest<Specification, "/offers/quotes">["data"];
 
 export const tripOfferPriceQuoteParser = {
   toModel: (data: TripOfferPriceQuoteSchema, included?: IncludedMapping): TripOfferPriceQuote => {
+    if (!data.attributes) {
+      throw new Error("Attributes are missing");
+    }
+
     const offerId = data.relationships.offer.data.id;
     const optionIds = data.relationships.options.data.map(({ id }) => id);
 
