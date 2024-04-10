@@ -11,5 +11,6 @@ message PlaceBookingTask {
 }
 
 message HandleBookingCancellationTask {
-  BookingCancellation booking_cancellation = 1;
+  string booking_cancellation_id = 1;
+  string booking_id = 2;
 }

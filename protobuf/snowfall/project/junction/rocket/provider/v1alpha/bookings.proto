@@ -75,7 +75,7 @@ message BookingCancellation {
     STATUS_UNSPECIFIED = 0;
     STATUS_NO_REFUND = 1;
     STATUS_REFUND_DUE = 2;
-    STATUS_REFUND_FAILED = 3;
+    STATUS_CANCELLATION_FAILED = 3;
   }
   Status status = 2;
   snowfall.stdlib.v1.Money refunded_us = 3;

@@ -65,11 +65,27 @@ class BookingRepository(
             replacement=replacement,
         )
 
+    async def update_status(
+        self,
+        identifier: str,
+        status: models_pb2.Booking.Status.ValueType,
+    ) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {repository.mongo_id_key: identifier},
+            {
+                "$set": {
+                    "status": status,
+                },
+            },
+        )
+
 
 class BookingCancellationRepository(
     repository.ProtoRepository[models_pb2.BookingCancellation],
     mixins.FindByIdMixin[models_pb2.BookingCancellation],
     mixins.InsertMixin[models_pb2.BookingCancellation],
+    mixins.UpsertMixin[models_pb2.BookingCancellation],
 ):
     _proto = models_pb2.BookingCancellation
     _indexes = (pymongo.IndexModel("booking_id", background=True),)
@@ -82,5 +98,42 @@ class BookingCancellationRepository(
             self._collection.find_one,
             {
                 "booking_id": booking_id,
+            },
+        )
+
+    async def update_ticket_id(self, identifier: str, ticket_id: str) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {repository.mongo_id_key: identifier},
+            {
+                "$set": {
+                    "ticket_id": ticket_id,
+                },
+            },
+        )
+
+    async def mark_as_pending(self, identifier: str) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {repository.mongo_id_key: identifier},
+            {
+                "$set": {
+                    "status": models_pb2.BookingCancellation.STATUS_PENDING,
+                },
+            },
+        )
+
+    async def update_status(
+        self,
+        identifier: str,
+        status: models_pb2.BookingCancellation.Status.ValueType,
+    ) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {repository.mongo_id_key: identifier},
+            {
+                "$set": {
+                    "status": status,
+                },
             },
         )

@@ -68,6 +68,25 @@ class ZendeskClient(client.HttpClient):
             },
         }
 
+    def create_rocket_cancel_request_payload(
+        self,
+        booking: cancellation_request_models.RocketBooking,
+        group_id: int,
+    ) -> dict[str, Any]:
+        return {
+            "ticket": {
+                "comment": {
+                    "html_body": parsers.parse_rocket_cancellation_request_models(
+                        booking=booking,
+                        convert_to_html=True,
+                    ),
+                },
+                "subject": "Booking Cancellation Request",
+                "tags": "[BookingCancellationRequest, {0}]".format(self._env),
+                "group_id": group_id,
+            },
+        }
+
     def create_fetch_booked_ticket_payload(
         self,
         ticket: ticket_request_models.Ticket,

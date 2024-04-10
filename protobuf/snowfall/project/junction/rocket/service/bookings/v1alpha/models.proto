@@ -110,11 +110,8 @@ message BookingCancellation {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_PENDING = 1;
-    STATUS_REJECTED = 2;
-    STATUS_NO_REFUND = 3;
-    STATUS_REFUND_DUE = 4;
-    STATUS_REFUND_ISSUED = 5;
-    STATUS_REFUND_FAILED = 6;
+    STATUS_NO_REFUND = 2;
+    STATUS_REFUND_DUE = 3;
   }
   Status status = 4;
   snowfall.stdlib.v1.Money refunded_us = 5;

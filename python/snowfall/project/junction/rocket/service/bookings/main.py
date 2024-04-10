@@ -8,6 +8,7 @@ from motor import motor_asyncio
 from snowfall.project.junction.rocket.service.bookings import (
     amqp,
     bookings,
+    cancellations,
     grpc,
     importer,
     repository,
@@ -16,9 +17,16 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2_grpc,
     meta_pb2_grpc,
 )
-from snowfall.stdlib.service import amqp_factory, application, grpc_factory
+from snowfall.stdlib.instrumentation.httpx import logging
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    httpx_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
+from snowfall.vendor.zendesk import client
 
 
 class _BookingSettings(application.Settings):
@@ -44,11 +52,7 @@ class _CancellationsConsumerSettings(application.Settings):
     zendesk_cancellation_group_id: int
     zendesk_base_url: pydantic.AnyUrl
     zendesk_api_key: str
-    refunds_address: str
     gateway_address: str
-    resellers_address: str
-    passenger_name_records_address: str
-    smtp_dsn: pydantic.AnyUrl
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -127,6 +131,50 @@ async def _import(app: application.Application[_BookingSettings]) -> None:
     await booking_importer.consume()
 
 
+async def _consume_cancellations(
+    app: application.Application[_CancellationsConsumerSettings],
+) -> None:
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+
+    http_client = await httpx_factory.make_client(app)
+    logging.register(http_client)
+
+    mongo = motor_asyncio.AsyncIOMotorClient(
+        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
+    )
+
+    await cancellations.BookingCancellationsConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_cancellations".format(app.name),
+            binds=[(types.Exchange("bookings"), "bookings.cancellations")],
+        ),
+        cancellation_handler=cancellations.CancellationHandler(
+            gateway_stub=bookings_pb2_grpc.BookingServiceStub(
+                await grpc_factory.make_insecure_channel(
+                    app,
+                    app.settings.gateway_address,
+                ),
+            ),
+            bookings=repository.BookingRepository(
+                collection=mongo.bookings.bookings,
+            ),
+            cancellations=repository.BookingCancellationRepository(
+                collection=mongo.bookings.cancellations,
+            ),
+            manual_handler=cancellations.ManualCancellationHandler(
+                zendesk_client=client.ZendeskClient(
+                    base_url=str(app.settings.zendesk_base_url),
+                    api_key=app.settings.zendesk_api_key,
+                    http_client=http_client,
+                    env=app.environment,
+                ),
+                group_id=app.settings.zendesk_cancellation_group_id,
+            ),
+        ),
+    ).consume()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="bookings")
 
@@ -140,5 +188,10 @@ if __name__ == "__main__":
             name="import",
             callback=_import,
             settings_class=_BookingSettings,
+        ),
+        application.Command(
+            name="consume-cancellations",
+            callback=_consume_cancellations,
+            settings_class=_CancellationsConsumerSettings,
         ),
     )

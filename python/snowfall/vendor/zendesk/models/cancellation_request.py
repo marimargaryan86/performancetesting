@@ -52,3 +52,21 @@ class Order:
 class Journey:
     reseller_id: str
     passenger_name_record: str
+
+
+@dataclasses.dataclass(frozen=True)
+class TripOptionDetails:
+    origin_name: str
+    destination_name: str
+    departure_date: str
+
+
+@dataclasses.dataclass(frozen=True)
+class RocketBooking:
+    booking_id: str
+    price: Price
+    provider_name: str
+    trip_reference: str
+    operator_booking_references: Sequence[OperatorBookingReference]
+    trip_option_details: Sequence[TripOptionDetails]
+    passengers: Sequence[Passengers]

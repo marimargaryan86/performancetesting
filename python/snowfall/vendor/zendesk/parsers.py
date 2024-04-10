@@ -48,6 +48,32 @@ def parse_cancellation_request_models(
     return parsed_details
 
 
+def parse_rocket_cancellation_request_models(
+    booking: cancellation_request_models.RocketBooking,
+    *,
+    convert_to_html: bool = True,
+) -> dict[str, Any] | str:
+    parsed_details = {
+        "Booking ID": booking.booking_id,
+        "Provider Name": booking.provider_name,
+        "Trip Reference": booking.trip_reference,
+        "Operator Booking References": _parse_operator_booking_references(
+            booking.operator_booking_references,
+        ),
+        "Total Price": "{0} {1}".format(
+            booking.price.amount,
+            booking.price.currency,
+        ),
+        "Passengers": _parse_passengers(booking.passengers),
+        "Trip Details": _parse_trip_option_details(booking.trip_option_details),
+    }
+
+    if convert_to_html:
+        return _dict_to_html_ul(parsed_details)
+
+    return parsed_details
+
+
 def parse_fetch_booked_ticket_body(
     ticket: ticket_request_models.Ticket,
 ) -> str:
@@ -102,6 +128,23 @@ def _parse_trip_options(
         }
         for trip_option in trip_options
     ]
+
+
+def _parse_trip_option_details(
+    trip_options: Sequence[cancellation_request_models.TripOptionDetails],
+) -> dict[str, list[dict[str, str]]]:
+    return {
+        "Segments": [
+            {
+                "Route": "{0} --> {1}".format(
+                    trip_option.origin_name,
+                    trip_option.destination_name,
+                ),
+                "Departure Date": trip_option.departure_date,
+            }
+            for trip_option in trip_options
+        ],
+    }
 
 
 def _parse_legs(

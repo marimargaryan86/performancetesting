@@ -31,7 +31,8 @@ class BookingCancellationTaskProducer:
     ) -> None:
         await self._producer.publish(
             amqp_pb2.HandleBookingCancellationTask(
-                booking_cancellation=booking_cancellation,
+                booking_cancellation_id=booking_cancellation.id,
+                booking_id=booking_cancellation.booking_id,
             ),
             "bookings.cancellations",
         )

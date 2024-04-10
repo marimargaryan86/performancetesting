@@ -168,7 +168,8 @@ async def test_booking_cancellation_published(
 
     cancellation_producer_obj.publish.assert_called_once_with(
         amqp_pb2.HandleBookingCancellationTask(
-            booking_cancellation=response.booking_cancellation,
+            booking_cancellation_id=response.booking_cancellation.id,
+            booking_id=response.booking_cancellation.booking_id,
         ),
         "bookings.cancellations",
     )
