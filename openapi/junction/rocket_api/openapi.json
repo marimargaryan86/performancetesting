@@ -688,6 +688,147 @@
         ]
       }
     },
+    "/hotel-rooms/searches": {
+      "post": {
+        "summary": "Create Hotel Room Search",
+        "tags": [
+          "hotel"
+        ],
+        "operationId": "post-hotel-rooms-searches",
+        "description": "Used to initiate a hotel room search",
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/HotelRoomsSearchRequest"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "x-internal": true,
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/hotel-rooms/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get Hotel Rooms Search status",
+        "tags": [
+          "hotel"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Rooms Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-hotel-rooms-searches-id",
+        "description": "Used to lookup the status of a hotel rooms search."
+      }
+    },
+    "/hotel-rooms/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List Hotel Rooms Search results",
+        "tags": [
+          "hotel"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Rooms Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "operationId": "get-hotel-rooms-searches-id-results",
+        "description": "Used to lookup data for a hotel rooms search.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
+        ]
+      }
+    },
     "/places": {
       "get": {
         "summary": "List Places",
@@ -1872,6 +2013,43 @@
                 "items": {
                   "$ref": "#/components/schemas/Passenger"
                 }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "x-examples": {}
+      },
+      "HotelRoomsSearchRequest": {
+        "title": "Hotel Rooms Search Request",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hotel-rooms-searches"
+            ],
+            "example": "hotel-rooms-searches"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "ref"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string",
+                "example": "1F0-iNERRbQ"
               }
             }
           }

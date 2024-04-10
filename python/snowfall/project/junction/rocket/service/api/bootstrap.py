@@ -123,5 +123,10 @@ async def create_dependencies(
     container[hotel_types.HotelSearchResultTransformer] = (  # type: ignore[type-abstract]
         hotel_transforms.HotelSearchResultTransformer
     )
+    container[hotel_repositories.HotelRoomsSearchRepository] = (
+        hotel_repositories.HotelRoomsSearchRepository(
+            collection=mongo.searches.hotel_rooms_results,
+        )
+    )
 
     return container

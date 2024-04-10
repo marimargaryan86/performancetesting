@@ -42,6 +42,7 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 )
 from snowfall.project.junction.rocket.service.api.hotel import types as hotel_types
 from snowfall.project.junction.rocket.service.api.hotel.repositories import (
+    HotelRoomsSearchRepository,
     HotelSearchRepository,
 )
 from snowfall.project.junction.rocket.service.api.places import (
@@ -142,6 +143,7 @@ def container(
     junction_one_client: JunctionOneClient,
     air_search_repo: AirSearchRepository,
     hotel_search_repo: HotelSearchRepository,
+    hotel_rooms_search_repo: HotelRoomsSearchRepository,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -164,6 +166,7 @@ def container(
     container[hotel_types.HotelSearchResultTransformer] = (  # type: ignore[type-abstract]
         hotel_transformers.HotelSearchResultTransformer
     )
+    container[HotelRoomsSearchRepository] = hotel_rooms_search_repo
 
     return container
 
@@ -341,3 +344,10 @@ async def hotel_search_repo(
     mock_collection: motor_asyncio.AsyncIOMotorCollection,
 ) -> HotelSearchRepository:
     return HotelSearchRepository(collection=mock_collection)
+
+
+@pytest.fixture()
+async def hotel_rooms_search_repo(
+    mock_collection: motor_asyncio.AsyncIOMotorCollection,
+) -> HotelRoomsSearchRepository:
+    return HotelRoomsSearchRepository(collection=mock_collection)

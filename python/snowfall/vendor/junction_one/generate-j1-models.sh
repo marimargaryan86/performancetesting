@@ -69,6 +69,8 @@ class BaseModel(PydanticBase):
 	print "	@model_validator(mode='\''before'\'')"
 	print "	@classmethod"
 	print "	def parse_time_string(cls, value: Any) -> Any:"
+	print "		if isinstance(value, dict):"
+	print "			return value"
 	print "		parts = map(int, value.split(\x27:\x27))"
 	print "		fields = (\x27hour\x27, \x27minute\x27, \x27second\x27, \x27nano\x27)"
 	print "		return {"

@@ -23,4 +23,19 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             endpoints.HotelSearchRetrieval,
             name="HotelSearchRetrieval",
         ),
+        integration.route(
+            "/hotel-rooms/searches",
+            endpoints.HotelRoomsSearch,
+            name="HotelRoomsSearch",
+        ),
+        integration.route(
+            "/hotel-rooms/searches/{id:str}",
+            endpoints.HotelRoomsSearchStatus,
+            name="HotelRoomsSearchStatus",
+        ),
+        integration.route(
+            "/hotel-rooms/searches/{id:str}/results",
+            endpoints.HotelRoomsSearchRetrieval,
+            name="HotelRoomsSearchRetrieval",
+        ),
     ]

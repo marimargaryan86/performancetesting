@@ -5,6 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from snowfall.project.junction.rocket.service.api.hotel.repositories import (
+    HotelRoomsSearchRepository,
     HotelSearchRepository,
 )
 from snowfall.vendor.junction_one.conftest import load_file_fixture
@@ -28,6 +29,16 @@ def example_request() -> Any:
     }
 
 
+@pytest.fixture()
+def example_rooms_request() -> Any:
+    return {
+        "data": {
+            "type": "hotel-rooms-searches",
+            "attributes": {"ref": "ref-code"},
+        },
+    }
+
+
 async def test_hotel_search_creation(
     client: httpx.AsyncClient,
     mocker: MockerFixture,
@@ -45,12 +56,15 @@ async def test_hotel_search_creation(
     response = await client.post("/hotel/searches", json=example_request)
 
     assert response.json() == {
-        "id": mocker.mock_module.ANY,
-        "attributes": {"status": "pending"},
+        "data": {
+            "id": mocker.mock_module.ANY,
+            "type": "hotel-search",
+            "attributes": {"status": "pending"},
+        },
     }
     assert response.status_code == 200
 
-    found_result = await hotel_search_repo.find_by_id(response.json()["id"])
+    found_result = await hotel_search_repo.find_by_id(response.json()["data"]["id"])
     assert found_result
     assert found_result.data[0].refs == fixture["hotels"][0]["refs"]
 
@@ -69,16 +83,25 @@ async def test_hotel_search_get_status(
     )
 
     response = await client.post("/hotel/searches", json=example_request)
-    search_id = response.json()["id"]
+    search_id = response.json()["data"]["id"]
 
     assert response.json() == {
-        "id": mocker.mock_module.ANY,
-        "attributes": {"status": "pending"},
+        "data": {
+            "id": mocker.mock_module.ANY,
+            "type": "hotel-search",
+            "attributes": {"status": "pending"},
+        },
     }
     assert response.status_code == 200
 
     response = await client.get("/hotel/searches/{0}".format(search_id))
-    assert response.json() == {"id": search_id, "attributes": {"status": "completed"}}
+    assert response.json() == {
+        "data": {
+            "id": search_id,
+            "type": "hotel-search",
+            "attributes": {"status": "completed"},
+        },
+    }
     assert response.status_code == 200
 
 
@@ -97,7 +120,98 @@ async def test_hotel_search_returns_correct_results(
     )
 
     response = await client.post("/hotel/searches", json=example_request)
-    search_id = response.json()["id"]
+    search_id = response.json()["data"]["id"]
 
     response = await client.get("/hotel/searches/{0}/results".format(search_id))
-    assert response.json()["data"][0]["refs"] == fixture["hotels"][0]["refs"]
+    attributes = response.json()["data"]["attributes"]
+    assert attributes["data"][0]["refs"] == fixture["hotels"][0]["refs"]
+
+
+async def test_hotel_rooms_search_creation(
+    client: httpx.AsyncClient,
+    mocker: MockerFixture,
+    hotel_rooms_search_repo: HotelRoomsSearchRepository,
+    example_rooms_request: Any,
+) -> None:
+    fixture = (await load_file_fixture("POST-v1-travel-hotel-hotelDetails.json"))[
+        "data"
+    ]
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.get_hotel_details",
+        return_value=j1.HotelRoomsResponse(**fixture),
+    )
+
+    response = await client.post("/hotel-rooms/searches", json=example_rooms_request)
+
+    assert response.json() == {
+        "data": {
+            "id": mocker.mock_module.ANY,
+            "type": "hotel-rooms-search",
+            "attributes": {"status": "pending"},
+        },
+    }
+    assert response.status_code == 200
+
+    found_result = await hotel_rooms_search_repo.find_by_id(
+        response.json()["data"]["id"],
+    )
+    assert found_result
+    assert found_result.data[0].ref == fixture["rooms"][0]["ref"]
+
+
+async def test_hotel_rooms_search_get_status(
+    client: httpx.AsyncClient,
+    mocker: MockerFixture,
+    example_rooms_request: Any,
+) -> None:
+    fixture = (await load_file_fixture("POST-v1-travel-hotel-hotelDetails.json"))[
+        "data"
+    ]
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.get_hotel_details",
+        return_value=j1.HotelRoomsResponse(**fixture),
+    )
+
+    response = await client.post("/hotel-rooms/searches", json=example_rooms_request)
+    search_id = response.json()["data"]["id"]
+
+    assert response.json() == {
+        "data": {
+            "id": mocker.mock_module.ANY,
+            "type": "hotel-rooms-search",
+            "attributes": {"status": "pending"},
+        },
+    }
+    assert response.status_code == 200
+
+    response = await client.get("/hotel-rooms/searches/{0}".format(search_id))
+    assert response.json() == {
+        "data": {
+            "id": search_id,
+            "type": "hotel-rooms-search",
+            "attributes": {"status": "completed"},
+        },
+    }
+    assert response.status_code == 200
+
+
+async def test_hotel_rooms_search_returns_correct_results(
+    client: httpx.AsyncClient,
+    mocker: MockerFixture,
+    hotel_rooms_search_repo: HotelRoomsSearchRepository,
+    example_rooms_request: Any,
+) -> None:
+    fixture = (await load_file_fixture("POST-v1-travel-hotel-hotelDetails.json"))[
+        "data"
+    ]
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.get_hotel_details",
+        return_value=j1.HotelRoomsResponse(**fixture),
+    )
+
+    response = await client.post("/hotel-rooms/searches", json=example_rooms_request)
+    search_id = response.json()["data"]["id"]
+
+    response = await client.get("/hotel-rooms/searches/{0}/results".format(search_id))
+    attributes = response.json()["data"]["attributes"]
+    assert attributes["data"][0]["ref"] == fixture["rooms"][0]["ref"]

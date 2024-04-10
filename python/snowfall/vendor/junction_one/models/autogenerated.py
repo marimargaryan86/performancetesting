@@ -1379,6 +1379,8 @@ class LocalTime(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def parse_time_string(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return value
         parts = map(int, value.split(":"))
         fields = ("hour", "minute", "second", "nano")
         return dict(zip(fields, parts, strict=False))
