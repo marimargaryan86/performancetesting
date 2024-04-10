@@ -436,8 +436,8 @@ class CriteriaGenerator:
                     else None
                 ),
                 outbound_id=(
-                    search.ferry.outbound_search_result_id
-                    if search.ferry.outbound_search_result_id
+                    search.ferry.outbound_offer_id
+                    if search.ferry.outbound_offer_id
                     else None
                 ),
             ),

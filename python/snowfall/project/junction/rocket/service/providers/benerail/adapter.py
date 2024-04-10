@@ -582,7 +582,7 @@ class BenerailOffersAdapter(_BenerailAdapter):
                         ),
                     ),
                     expires_at=expires_at_dt,
-                    key=search_result_id,
+                    key=offer_model.id,
                 )
                 offer_protos.append(offer_model)
             yield models_pb2.SearchResult(

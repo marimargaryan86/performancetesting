@@ -46,7 +46,7 @@ async def test_return_trip_search_integration(
     quotes = generator.generate(initial_search_criteria[0])
     initial_offers = [quote async for quote in quotes]
 
-    round_trip_search.ferry.outbound_search_result_id = initial_offers[0].offers[0].id
+    round_trip_search.ferry.outbound_offer_id = initial_offers[0].offers[0].id
     return_search_criteria = criteria_generator.criteria_task_generator(
         round_trip_search,
     )
@@ -139,9 +139,7 @@ async def test_round_trip_return_search(  # noqa: WPS218
     result_details = initial_offers[1].result_details[0]
     assert result_details.ferry.duration_in_minutes == 570
 
-    mock_round_trip_search.ferry.outbound_search_result_id = (
-        initial_offers[0].offers[0].id
-    )
+    mock_round_trip_search.ferry.outbound_offer_id = initial_offers[0].offers[0].id
     return_search_criteria = criteria_generator.criteria_task_generator(
         mock_round_trip_search,
     )

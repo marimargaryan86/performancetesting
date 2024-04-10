@@ -78,7 +78,7 @@ class FerrySearch(endpoints.HTTPEndpoint):
                         return_date=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["returnAt"]),
                         ),
-                        outbound_search_result_id=body.get("selectedOutboundOffer", ""),
+                        outbound_offer_id=body.get("selectedOutboundOffer", ""),
                         passengers=[
                             models_pb2.Passenger(
                                 date_of_birth=protobuf.date_to_protobuf(

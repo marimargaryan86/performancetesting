@@ -62,12 +62,12 @@ class RailSearchResource(models.Resource):
                 search.rail.departure_before,
             )
 
-        if search.rail.outbound_search_result_id:
+        if search.rail.outbound_offer_id:
             res.relationships = {
                 "selectedOutboundOffer": {
                     "data": (
                         models.ResourceIdentifier(
-                            id=search.rail.outbound_search_result_id,
+                            id=search.rail.outbound_offer_id,
                             type=OfferResource.api_type,
                         )
                     ),

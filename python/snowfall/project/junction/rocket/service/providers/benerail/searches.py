@@ -203,7 +203,7 @@ def _generate_search_criteria(
             origin=origin,
             destination=destination,
             passenger_dobs=passenger_dobs,
-            outward_offer_search_id=search.rail.outbound_search_result_id,
+            outward_offer_search_id=search.rail.outbound_offer_id,
             return_departure_after=return_departure_after,
             outbound_departure_datetime=timestamp,
             trip_sequence=trip_sequence,
@@ -227,7 +227,7 @@ def create_criteria_time_windows(
         search.rail.destination.coordinates,
     )
 
-    if search.rail.outbound_search_result_id:
+    if search.rail.outbound_offer_id:
         criteria_func = _generate_inbound_search_criteria
     else:
         criteria_func = _generate_outbound_search_criteria
