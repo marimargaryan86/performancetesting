@@ -19,8 +19,8 @@ class InputSearchData:
 
 
 BASIC_SEARCH = InputSearchData(
-    origin_iata="LON",
-    destination_iata="PAR",
+    origin_iata="LAX",
+    destination_iata="JFK",
     depart_after=(
         datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=10)
     ).strftime(
@@ -38,6 +38,33 @@ async def test_air_search_with_iata(
     search_result = await qa_client.air.search(
         origin=BASIC_SEARCH.origin_iata,
         destination=BASIC_SEARCH.destination_iata,
+        departure_after=BASIC_SEARCH.depart_after,
+        passengers_dates_of_birth=BASIC_SEARCH.passengers,
+    )
+
+    assert search_result.status == "pending"
+    assert search_result.id
+
+    search_result = await qa_client.air.wait_for_completed_search(
+        search_id=search_result.id,
+    )
+    assert search_result.status == "completed"
+
+    search_offers = await qa_client.air.get_offers(
+        search_id=search_result.id,
+    )
+    assert search_offers.offers
+    assert search_offers.id
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_air_search_with_no_offers(
+    qa_client: QaClient,
+) -> None:
+    search_result = await qa_client.air.search(
+        origin="LON",
+        destination="PAR",
         departure_after=BASIC_SEARCH.depart_after,
         passengers_dates_of_birth=BASIC_SEARCH.passengers,
     )
