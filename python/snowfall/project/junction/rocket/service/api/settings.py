@@ -12,6 +12,7 @@ DEFAULT_GRPC_TIMEOUT = 45
 class Settings(starlette.Settings):
     authentication_address: str
     searches_address: str
+    places_address: str
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     j_one_api_key: str
     reseller_j1_credentials_mapping: dict[str, Any]

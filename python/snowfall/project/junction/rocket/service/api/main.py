@@ -20,6 +20,9 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.middleware import (
     JunctionOneClientMiddleware,
 )
+from snowfall.project.junction.rocket.service.api.places import (
+    router as places_router,
+)
 from snowfall.project.junction.rocket.service.api.rail import (
     router as rail_router,
 )
@@ -43,6 +46,7 @@ async def _http(app: application.Application[Settings]) -> None:
         *car_rental_router.get_routes(integration),
         *ferry_router.get_routes(integration),
         *rail_router.get_routes(integration),
+        *places_router.get_routes(integration),
     ]
 
     asgi_app = starlette.create_starlette_app(

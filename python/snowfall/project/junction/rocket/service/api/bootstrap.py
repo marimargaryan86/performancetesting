@@ -26,6 +26,7 @@ from snowfall.project.junction.rocket.service.api.hotel import (
     types as hotel_types,
 )
 from snowfall.project.junction.rocket.service.api.settings import Settings
+from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
@@ -38,6 +39,7 @@ from snowfall.vendor.junction_one.client import JunctionOneClient
 class _Channels(NamedTuple):
     authentication: aio.Channel
     searches: aio.Channel
+    places: aio.Channel
 
 
 async def create_dependencies(
@@ -55,6 +57,7 @@ async def create_dependencies(
                 app,
                 app.settings.searches_address,
             ),
+            grpc_factory.make_insecure_channel(app, app.settings.places_address),
         ),
     )
 
@@ -91,6 +94,9 @@ async def create_dependencies(
     )
     container[grpc_pb2_grpc.SearchResultServiceStub] = (
         grpc_pb2_grpc.SearchResultServiceStub(channels.searches)
+    )
+    container[places_pb2_grpc.PlacesServiceStub] = places_pb2_grpc.PlacesServiceStub(
+        channels.places,
     )
     container[JunctionOneClient] = JunctionOneClient(
         api_base_url=app.settings.j_one_api_base_url,

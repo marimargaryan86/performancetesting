@@ -44,8 +44,15 @@ from snowfall.project.junction.rocket.service.api.hotel import types as hotel_ty
 from snowfall.project.junction.rocket.service.api.hotel.repositories import (
     HotelSearchRepository,
 )
+from snowfall.project.junction.rocket.service.api.places import (
+    router as places_router,
+)
 from snowfall.project.junction.rocket.service.api.rail import (
     router as rail_router,
+)
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    places_pb2,
+    places_pb2_grpc,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -113,9 +120,25 @@ def search_results(
 
 
 @pytest.fixture()
+def places_stub(mocker: pytest_mock.MockerFixture) -> places_pb2_grpc.PlacesServiceStub:
+    places = places_pb2_grpc.PlacesServiceStub(
+        grpc_testing.channel([], grpc_testing.strict_real_time()),
+    )
+
+    mocker.patch.object(
+        places,
+        "GetPlace",
+        side_effect=_get_place,
+    )
+
+    return places
+
+
+@pytest.fixture()
 def container(
     searches: grpc_pb2_grpc.SearchServiceStub,
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
+    places_stub: places_pb2_grpc.PlacesServiceStub,
     junction_one_client: JunctionOneClient,
     air_search_repo: AirSearchRepository,
     hotel_search_repo: HotelSearchRepository,
@@ -125,6 +148,7 @@ def container(
     container[datetime.timedelta] = datetime.timedelta(seconds=45)
     container[grpc_pb2_grpc.SearchServiceStub] = searches
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
+    container[places_pb2_grpc.PlacesServiceStub] = places_stub
     container[JunctionOneClient] = junction_one_client
     container[AirSearchRepository] = air_search_repo
     container[AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
@@ -152,6 +176,7 @@ def app(container: lagom.Container) -> applications.Starlette:
         *car_rental_router.get_routes(integration),
         *ferry_router.get_routes(integration),
         *hotel_router.get_routes(integration),
+        *places_router.get_routes(integration),
         *rail_router.get_routes(integration),
     ]
     asgi_app = application.create_starlette_app(
@@ -281,6 +306,20 @@ async def _get_search_results(
     return grpc_pb2.ListSearchResultsResponse(
         search_results=fixtures.get_search_results(),
     )
+
+
+async def _get_place(
+    request: places_pb2.GetPlaceRequest,
+    timeout: datetime.datetime,
+) -> places_pb2.GetPlaceResponse:
+    if request.id not in fixtures.PLACES:
+        raise grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+
+    return places_pb2.GetPlaceResponse(place=fixtures.get_place())
 
 
 @pytest.fixture()

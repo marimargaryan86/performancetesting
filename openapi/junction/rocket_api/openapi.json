@@ -1985,7 +1985,6 @@
                   },
                   "countryName": {
                     "type": "string",
-                    "format": "country",
                     "example": "Italy",
                     "readOnly": true
                   },
@@ -2014,13 +2013,10 @@
               },
               "relationships": {
                 "type": "object",
-                "required": [
-                  "city",
-                  "contains"
-                ],
                 "properties": {
                   "city": {
                     "type": "object",
+                    "nullable": true,
                     "required": [
                       "data"
                     ],
@@ -2082,21 +2078,12 @@
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
-          "name": {
-            "type": "string",
-            "example": "Rubano",
-            "readOnly": true
-          },
           "type": {
             "type": "string",
             "enum": [
-              "unspecified",
-              "city",
-              "railway-station",
-              "airport",
-              "ferry-port"
+              "places"
             ],
-            "example": "city"
+            "example": "places"
           }
         },
         "required": [

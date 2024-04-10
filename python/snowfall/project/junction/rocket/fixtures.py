@@ -1,6 +1,9 @@
 import datetime
 
 from snowfall.project.junction.go.v1 import models_pb2
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    models_pb2 as places_pb2,
+)
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     models_pb2 as searches_pb2,
 )
@@ -21,6 +24,7 @@ PROVIDERS = (
     "f87c4a6d-fa48-4abb-927c-25447827f511",
 )
 SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
+PLACES = ("3debfa7c-9884-5409-86c8-33f3e491382e",)
 SEARCH_RESULTS = (
     "5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",
     "c9fb49fc-7f2d-4403-a8b1-5a8c065ea8ce",
@@ -36,6 +40,9 @@ OFFERS = (
 EXPIRES_AT = protobuf.datetime_to_protobuf(
     datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1),
 )
+
+PLACE_LATITUDE = 52.5170365
+PLACE_LONGITUDE = 13.3888599
 
 
 def get_searches() -> list[searches_pb2.Search]:
@@ -134,4 +141,46 @@ def generate_point(identifier: str) -> models_pb2.Point:
         name="Point name",
         coordinates=latlng_pb2.LatLng(),
         time_zone="Europe/Stockholm",
+    )
+
+
+def get_place() -> places_pb2.Place:
+    return places_pb2.Place(
+        id=PLACES[0],
+        name="Berlin",
+        coordinates=latlng_pb2.LatLng(
+            latitude=PLACE_LATITUDE,
+            longitude=PLACE_LONGITUDE,
+        ),
+        time_zone="Europe/Berlin",
+        country_code="DE",
+        country_name="Germany",
+        type=places_pb2.TYPE_CITY,
+        search_capabilities=places_pb2.ProviderMappings(
+            rail=[
+                places_pb2.ProviderPlaceId(
+                    snowfall_provider_id="snowfall_provider_id_rail",
+                    provider_place_id="urn:bnds:tstatn_id:DEBRL",
+                ),
+            ],
+            air=[
+                places_pb2.ProviderPlaceId(
+                    snowfall_provider_id="snowfall_provider_id_air",
+                    provider_place_id="BER",
+                ),
+            ],
+            ferry=[],
+        ),
+        city=places_pb2.PlaceIdentifier(
+            id="011c01bd-4e4b-5bf0-a999-ba66175c7f56",
+            name="Takoma Park",
+            type=places_pb2.TYPE_CITY,
+        ),
+        contains=[
+            places_pb2.PlaceIdentifier(
+                id="00440ea9-a356-5d32-a714-eb61bcee1fdd",
+                name="Zeuthen",
+                type=places_pb2.TYPE_AIRPORT,
+            ),
+        ],
     )
