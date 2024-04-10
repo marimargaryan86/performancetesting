@@ -82,6 +82,8 @@ def generate_search(
                 search.ferry.CopyFrom(search_request.ferry)
             case "car_rental":
                 search.car_rental.CopyFrom(search_request.car_rental)
+    else:
+        search.car_rental.CopyFrom(generate_car_rental_criterion())
 
     return search
 
@@ -139,11 +141,28 @@ def generate_rail_one_way_search_criterion() -> searches_pb2.Rail:
     )
 
 
+def generate_car_rental_criterion() -> searches_pb2.CarRental:
+    return searches_pb2.CarRental(
+        origin=generate_point(string.uuid()),
+        destination=generate_point(string.uuid()),
+        pickup_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
+        return_at=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
+        driver_age=29,  # noqa: WPS432
+    )
+
+
 def generate_point(identifier: str) -> models_pb2.Point:
     return models_pb2.Point(
         ref=identifier,
         name="Point name",
-        coordinates=latlng_pb2.LatLng(),
+        coordinates=latlng_pb2.LatLng(
+            latitude=15,  # noqa: WPS432
+            longitude=15,  # noqa: WPS432
+        ),
         time_zone="Europe/Stockholm",
     )
 

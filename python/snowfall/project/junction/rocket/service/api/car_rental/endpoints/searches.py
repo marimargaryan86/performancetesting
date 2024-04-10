@@ -7,6 +7,9 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.v1 import models_pb2 as legacy_go_pb2
 from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api.car_rental.endpoints import (
+    searches_validation as validation,
+)
 from snowfall.project.junction.rocket.service.api.car_rental.models import (
     searches as search_models,
 )
@@ -38,6 +41,12 @@ class CarSearch(endpoints.HTTPEndpoint):
         searches: grpc_pb2_grpc.SearchServiceStub = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        validation_errors = validation.validate_create_search_request(body)
+        if validation_errors:
+            return models.JsonApiResponse(
+                models.Body(errors=validation_errors),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
         origin_coords = latlng_pb2.LatLng(
             latitude=body["pickupLocation"]["latitude"],

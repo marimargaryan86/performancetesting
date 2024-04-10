@@ -1,3 +1,7 @@
+import datetime
+from collections.abc import Mapping
+from typing import Any
+
 import httpx
 from starlette import status
 
@@ -5,17 +9,17 @@ from snowfall.project.junction.rocket import fixtures
 
 
 class TestCarRentalCreateSearch:
-    async def test_create_car_rental_search_is_successful(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        payload = {
+    @property
+    def search_payload(self) -> Mapping[str, Any]:
+        tomorrow = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+        after_tomorrow = tomorrow + datetime.timedelta(days=1)
+        return {
             "data": {
                 "type": "car-searches",
                 "attributes": {
                     "driverAge": 28,
-                    "pickupAt": "2024-04-05T08:00:00Z",
-                    "returnAt": "2024-04-07T08:00:00Z",
+                    "pickupAt": tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
+                    "returnAt": after_tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
                     "pickupLocation": {
                         "latitude": 50.89369066956447,
                         "longitude": 4.47136870945399,
@@ -28,13 +32,100 @@ class TestCarRentalCreateSearch:
             },
         }
 
+    async def assert_bad_request(
+        self,
+        client: httpx.AsyncClient,
+        payload: Mapping[str, Any],
+    ) -> None:
         response = await client.post(
             "/car-rental/searches",
             json=payload,
         )
 
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    async def test_create_car_rental_search_is_successful(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.post(
+            "/car-rental/searches",
+            json=self.search_payload,
+        )
+
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["data"]["id"]
+
+    async def test_create_car_rental_invalid_pickup_latitude(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["pickupLocation"]["latitude"] = -91
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_pickup_longitude(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["pickupLocation"]["longitude"] = -200
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_return_latitude(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["returnLocation"]["latitude"] = 91
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_return_longitude(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["returnLocation"]["longitude"] = 200
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_driver_age(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["driverAge"] = 14
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_pickup_date(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["pickupAt"] = "1998-04-05T08:00:00Z"
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_return_date(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["returnAt"] = "1998-04-05T08:00:00Z"
+        await self.assert_bad_request(client, payload)
+
+    async def test_create_car_rental_invalid_pickup_and_return_sequence(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        tomorrow = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+        after_tomorrow = tomorrow + datetime.timedelta(days=1)
+        payload["data"]["attributes"]["pickupAt"] = after_tomorrow.strftime(
+            "%Y-%m-%dT08:00:00.000Z",
+        )
+        payload["data"]["attributes"]["returnAt"] = tomorrow.strftime(
+            "%Y-%m-%dT08:00:00.000Z",
+        )
+        await self.assert_bad_request(client, payload)
 
 
 class TestCarRentalGetSearch:

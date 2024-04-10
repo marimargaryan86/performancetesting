@@ -1506,7 +1506,8 @@
                   "driverAge": {
                     "type": "number",
                     "format": "int32",
-                    "example": 32
+                    "example": 32,
+                    "minimum": 15
                   },
                   "pickupAt": {
                     "type": "string",
@@ -1714,12 +1715,16 @@
               "latitude": {
                 "type": "number",
                 "format": "float",
-                "example": 59.858611
+                "example": 59.858611,
+                "minimum": -90.0,
+                "maximum": 90.0
               },
               "longitude": {
                 "type": "number",
                 "format": "float",
-                "example": 59.858611
+                "example": 59.858611,
+                "minimum": -180.0,
+                "maximum": 180.0
               }
             },
             "required": [
