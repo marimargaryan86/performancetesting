@@ -264,12 +264,12 @@ class TestGrpc:
         )
         places_resp = await places_service.ListPlaces(
             request=places_pb2.ListPlacesRequest(
-                filters=places_pb2.Filters(type=models_pb2.TYPE_CITY),
+                filters=places_pb2.Filters(types=[models_pb2.TYPE_CITY]),
             ),
             context=grpc_context,
         )
         mock_repository.find_with_filters.assert_called_once_with(
-            filters=places_pb2.Filters(type=models_pb2.TYPE_CITY),
+            filters=places_pb2.Filters(types=[models_pb2.TYPE_CITY]),
             cursor="",
         )
         assert len(places_resp.places) == 2

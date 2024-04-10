@@ -142,8 +142,8 @@ class PlaceRepository(
         filter_: dict[str, Any] = {}
         if filters.name:
             filter_["name"] = {"$regex": filters.name, "$options": "i"}
-        if filters.type:
-            filter_["type"] = filters.type
+        if filters.types:
+            filter_["type"] = {"$in": list(filters.types)}
         if self._has_coordinates(filters.coordinates_and_radius):
             coordinates = filters.coordinates_and_radius.coordinates
             radius = min(

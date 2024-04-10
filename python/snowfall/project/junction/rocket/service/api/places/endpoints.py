@@ -82,9 +82,12 @@ class GetPlaces(endpoints.HTTPEndpoint):
         filter_name = request.scope["parsed_query_string"].get("filter[name][like]")
         if filter_name:
             filters_kwargs["name"] = filter_name
-        filter_type = request.scope["parsed_query_string"].get("filter[type][eq]")
-        if filter_type:
-            filters_kwargs["type"] = slug_to_enum_value(models_pb2.Type, filter_type[0])
+        filter_types = request.scope["parsed_query_string"].get("filter[type][eq]")
+        if filter_types:
+            enum_types = [
+                slug_to_enum_value(models_pb2.Type, type_) for type_ in filter_types
+            ]
+            filters_kwargs["types"] = enum_types
         query_coordinates = request.scope["parsed_query_string"].get(
             "query[coordinates]",
         )

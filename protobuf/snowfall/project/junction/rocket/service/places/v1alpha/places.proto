@@ -30,10 +30,10 @@ message GetPlaceByIataResponse {
   Place place = 1;
 }
 
-// We can filter a list request by name, type, a radius around a point, and for places only contained within another
+// We can filter a list request by name, types, a radius around a point, and for places only contained within another
 message Filters {
   string name = 1;
-  Type type = 2;
+  repeated Type types = 2;
   CoordinatesAndRadius coordinates_and_radius = 3;
   string place_to_search_within_id = 4;
 }
