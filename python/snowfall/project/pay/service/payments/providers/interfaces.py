@@ -53,6 +53,14 @@ class CreditCardProvider:
         """Capture credit card payment."""
 
     @abstractmethod
+    def process_credit_card_payment(
+        self,
+        payment_id: str,
+        payment_method_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        """Confirm credit card payment."""
+
+    @abstractmethod
     async def get_credit_card_holder(
         self,
         user_id: str,
@@ -81,6 +89,10 @@ class CreditCardProvider:
         external_reference_id: str,
     ) -> credit_card_models_pb2.Refund | None:
         """Get refund."""
+
+    @abstractmethod
+    def get_payment_method(self, payment_id: str) -> str:
+        """Get payment method's id."""
 
 
 class InvoiceProvider:

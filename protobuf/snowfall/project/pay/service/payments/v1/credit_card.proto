@@ -13,6 +13,7 @@ service CreditCardPaymentService {
   rpc UpdateCreditCardPayment(UpdateCreditCardPaymentRequest) returns (UpdateCreditCardPaymentResponse) {}
   rpc CancelCreditCardPayment(CancelCreditCardPaymentRequest) returns (CancelCreditCardPaymentResponse) {}
   rpc CaptureCreditCardPayment(CaptureCreditCardPaymentRequest) returns (CaptureCreditCardPaymentResponse) {}
+  rpc ProcessCreditCardPayment(ProcessCreditCardPaymentRequest) returns (ProcessCreditCardPaymentResponse) {}
   rpc GetCreditCardHolder(GetCreditCardHolderRequest) returns (GetCreditCardHolderResponse) {}
   rpc CreateCreditCardHolder(CreateCreditCardHolderRequest) returns (CreateCreditCardHolderResponse) {}
   rpc GetRefund(GetRefundRequest) returns (GetRefundResponse) {}
@@ -64,6 +65,15 @@ message CaptureCreditCardPaymentRequest {
 }
 
 message CaptureCreditCardPaymentResponse {
+  CreditCardPayment payment = 1;
+}
+
+message ProcessCreditCardPaymentRequest {
+  string payment_id = 1;
+  string reseller_id = 3;
+}
+
+message ProcessCreditCardPaymentResponse {
   CreditCardPayment payment = 1;
 }
 

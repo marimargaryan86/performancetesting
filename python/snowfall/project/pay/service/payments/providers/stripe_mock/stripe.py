@@ -82,6 +82,17 @@ class MockStripe(interfaces.CreditCardProvider):
             return self._credit_card_payments[payment_id]
         return None
 
+    def process_credit_card_payment(
+        self,
+        payment_id: str,
+        payment_method_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        if payment_id not in self._credit_card_payments:
+            return None
+
+        self._credit_card_payments[payment_id].status = "succeeded"
+        return self._credit_card_payments[payment_id]
+
     async def get_credit_card_holder(
         self,
         credit_card_holder_id: str,
@@ -132,3 +143,9 @@ class MockStripe(interfaces.CreditCardProvider):
         if refund:
             return refund
         return None
+
+    def get_payment_method(self, payment_id: str) -> str:
+        if payment_id not in self._credit_card_payments:
+            return ""
+
+        return string.uuid()

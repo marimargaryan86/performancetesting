@@ -16,6 +16,8 @@ message CreditCardPayment {
   string secret = 6;
   string status = 7;
   string setup_future_usage = 8;
+  // setting never for automated payment
+  string allow_redirect = 9;
 }
 
 message CreditCardHolder {

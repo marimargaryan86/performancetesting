@@ -85,6 +85,36 @@ class CreditCardPaymentService(
 
         return credit_card_pb2.UpdateCreditCardPaymentResponse(payment=updated_payment)
 
+    async def ProcessCreditCardPayment(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.ProcessCreditCardPaymentRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.ProcessCreditCardPaymentResponse:
+        payment_method = self._provider(request.reseller_id).get_payment_method(
+            request.payment_id,
+        )
+        if not payment_method:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not processed",
+            )
+
+        processed_payment = self._provider(
+            request.reseller_id,
+        ).process_credit_card_payment(
+            request.payment_id,
+            payment_method,
+        )
+        if not processed_payment:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not processed",
+            )
+
+        return credit_card_pb2.ProcessCreditCardPaymentResponse(
+            payment=processed_payment,
+        )
+
     async def GetCreditCardHolder(  # type: ignore[override] # noqa: N802
         self,
         request: credit_card_pb2.GetCreditCardHolderRequest,

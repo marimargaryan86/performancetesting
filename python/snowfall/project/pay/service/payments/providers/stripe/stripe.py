@@ -38,6 +38,12 @@ class Stripe(interfaces.CreditCardProvider):
             payment_intent.amount,
             money.Currency(payment_intent.currency.upper()),
         )
+        allow_redirect = ""
+        if payment_intent.automatic_payment_methods:
+            allow_redirect = payment_intent.automatic_payment_methods.get(
+                "allow_redirects",
+                "always",
+            )
 
         return credit_card_models_pb2.CreditCardPayment(
             id=payment_intent.id,
@@ -47,6 +53,7 @@ class Stripe(interfaces.CreditCardProvider):
             enable_automatic_payment_method=payment_intent.automatic_payment_methods[
                 "enabled"
             ],  # type: ignore[index]
+            allow_redirect=allow_redirect,
             secret=payment_intent.client_secret or "",
             status=payment_intent.status,
         )
@@ -59,6 +66,14 @@ class Stripe(interfaces.CreditCardProvider):
         if not self._is_valid_capture_method(payment.capture_method):
             raise ValueError
 
+        automatic_payment_methods: stripe.PaymentIntent.CreateParamsAutomaticPaymentMethods = {
+            "enabled": payment.enable_automatic_payment_method,
+        }
+        if self._is_valid_allow_redirect(payment.allow_redirect):
+            automatic_payment_methods["allow_redirects"] = payment.allow_redirect
+        elif payment.allow_redirect != "":
+            raise ValueError
+
         intent_money = money.from_protobuf(payment.amount)
         if payment.credit_card_holder_id:
             payment_intent = stripe.PaymentIntent.create(
@@ -66,9 +81,7 @@ class Stripe(interfaces.CreditCardProvider):
                 currency=intent_money.currency.code,
                 capture_method=payment.capture_method,
                 customer=payment.credit_card_holder_id,
-                automatic_payment_methods={
-                    "enabled": payment.enable_automatic_payment_method,
-                },
+                automatic_payment_methods=automatic_payment_methods,
             )
         else:
             payment_intent = stripe.PaymentIntent.create(
@@ -103,6 +116,13 @@ class Stripe(interfaces.CreditCardProvider):
         except stripe._error.InvalidRequestError:  # noqa: SLF001
             return None
 
+        allow_redirect = ""
+        if updated_payment_intent.automatic_payment_methods:
+            allow_redirect = updated_payment_intent.automatic_payment_methods.get(
+                "allow_redirects",
+                "always",
+            )
+
         return credit_card_models_pb2.CreditCardPayment(
             id=updated_payment_intent.id,
             amount=amount if amount is None else amount.protobuf(),
@@ -111,6 +131,7 @@ class Stripe(interfaces.CreditCardProvider):
             enable_automatic_payment_method=updated_payment_intent.automatic_payment_methods[
                 "enabled"
             ],  # type: ignore[index]
+            allow_redirect=allow_redirect,
             secret=updated_payment_intent.client_secret or "",
             status=updated_payment_intent.status,
         )
@@ -129,6 +150,13 @@ class Stripe(interfaces.CreditCardProvider):
             money.Currency(payment_intent.currency.upper()),
         )
 
+        allow_redirect = ""
+        if payment_intent.automatic_payment_methods:
+            allow_redirect = payment_intent.automatic_payment_methods.get(
+                "allow_redirects",
+                "always",
+            )
+
         return credit_card_models_pb2.CreditCardPayment(
             id=payment_intent.id,
             amount=intent_money.protobuf(),
@@ -137,6 +165,7 @@ class Stripe(interfaces.CreditCardProvider):
             enable_automatic_payment_method=payment_intent.automatic_payment_methods[
                 "enabled"
             ],  # type: ignore[index]
+            allow_redirect=allow_redirect,
             secret=payment_intent.client_secret or "",
             status=payment_intent.status,
         )
@@ -155,6 +184,13 @@ class Stripe(interfaces.CreditCardProvider):
             money.Currency(payment_intent.currency.upper()),
         )
 
+        allow_redirect = ""
+        if payment_intent.automatic_payment_methods:
+            allow_redirect = payment_intent.automatic_payment_methods.get(
+                "allow_redirects",
+                "always",
+            )
+
         return credit_card_models_pb2.CreditCardPayment(
             id=payment_intent.id,
             amount=intent_money.protobuf(),
@@ -163,6 +199,45 @@ class Stripe(interfaces.CreditCardProvider):
             enable_automatic_payment_method=payment_intent.automatic_payment_methods[
                 "enabled"
             ],  # type: ignore[index]
+            allow_redirect=allow_redirect,
+            secret=payment_intent.client_secret or "",
+            status=payment_intent.status,
+        )
+
+    def process_credit_card_payment(
+        self,
+        payment_id: str,
+        payment_method_id: str,
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
+        try:
+            payment_intent = stripe.PaymentIntent.confirm(
+                payment_id,
+                payment_method=payment_method_id,
+            )
+        except stripe.InvalidRequestError:
+            return None
+
+        intent_money = money.Money(
+            payment_intent.amount,
+            money.Currency(payment_intent.currency.upper()),
+        )
+
+        allow_redirect = ""
+        if payment_intent.automatic_payment_methods:
+            allow_redirect = payment_intent.automatic_payment_methods.get(
+                "allow_redirects",
+                "always",
+            )
+
+        return credit_card_models_pb2.CreditCardPayment(
+            id=payment_intent.id,
+            amount=intent_money.protobuf(),
+            capture_method=payment_intent.capture_method,
+            credit_card_holder_id=payment_intent.customer or "",  # type: ignore[arg-type]
+            enable_automatic_payment_method=payment_intent.automatic_payment_methods[
+                "enabled"
+            ],  # type: ignore[index]
+            allow_redirect=allow_redirect,
             secret=payment_intent.client_secret or "",
             status=payment_intent.status,
         )
@@ -259,8 +334,34 @@ class Stripe(interfaces.CreditCardProvider):
             ).protobuf(),
         )
 
+    def get_payment_method(self, payment_id: str) -> str:
+        try:
+            payment_intent = stripe.PaymentIntent.retrieve(payment_id)
+        except stripe.StripeError:
+            return ""
+
+        try:
+            payment_methods = stripe.PaymentMethod.list(
+                customer=payment_intent.customer,  # type: ignore[arg-type]
+                type="card",
+            )
+        except stripe.StripeError:
+            return ""
+        payment_card_methods = payment_methods["data"]
+
+        if len(payment_card_methods) > 1:
+            raise ValueError("Attached more than one payment methods")
+
+        return payment_card_methods[0].id  # type: ignore[index]
+
     def _is_valid_capture_method(
         self,
         value: str,
     ) -> TypeGuard[Literal["automatic", "automatic_async", "manual"]]:
         return value in {"automatic", "automatic_async", "manual"}
+
+    def _is_valid_allow_redirect(
+        self,
+        value: str,
+    ) -> TypeGuard[Literal["never", "always"]]:
+        return value in {"never", "always"}
