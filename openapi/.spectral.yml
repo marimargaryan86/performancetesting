@@ -86,6 +86,18 @@ overrides:
     rules:
       response-bodies: "off"
   - files:
+      - "junction/client_api/openapi.json"
+      - "junction/mobile_api/openapi.json"
+      - "junction/hub_api/openapi.json"
+      - "junction/data_api/openapi.json"
+      - "junction/pay_admin_api/openapi.json"
+      - "junction/pay_api/openapi.json"
+      - "junction/plus_api/openapi.json"
+      - "junction/plus_poc_api/openapi.json"
+    rules:
+      paths-ordered-alphabetically: "off"
+      schema-names-ordered-alphabetically: "off"
+  - files:
       - "junction/client_api/openapi.json#/paths/~1offers~1quotes/post/requestBody/content"
       - "junction/mobile_api/openapi.json#/paths/~1offers~1quotes"
     rules:

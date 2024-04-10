@@ -8,3 +8,10 @@ rules:
       function: pattern
       functionOptions:
         match: "^([A-Z]{1}[a-z]{1,}){1,}$"
+  schema-names-ordered-alphabetically:
+    severity: warn
+    description: "Schema names should be ordered alphabetically"
+    message: "{{error}}"
+    given: "$..components.schemas"
+    then:
+      function: alphabetical

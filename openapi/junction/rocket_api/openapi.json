@@ -3,7 +3,7 @@
   "info": {
     "title": "Junction Rocket API",
     "version": "1.0.0",
-    "description": "This API follows the [JSON:API][jsonapi] specification.\n\n[jsonapi]: https://jsonapi.org/",
+    "description": "This API follows the [JSON:API][jsonapi] specification.\n\nA recommended booking flow example:\n\n1. Create search request.\n2. Get search results\n3. Create quote\n4. Create a booking\n\nTODO: write some stuff here :)",
     "contact": {
       "name": "Snowfall",
       "url": "https://www.snowfalltravel.com",
@@ -14,27 +14,114 @@
       "url": "https://www.snowfalltravel.com"
     }
   },
-  "x-tagGroups": [],
+  "x-tagGroups": [
+    {
+      "name": "Air",
+      "tags": [
+        "air-searches",
+        "air-quotes",
+        "air-bookings"
+      ]
+    },
+    {
+      "name": "Car Rental",
+      "tags": [
+        "car-rental-searches",
+        "car-rental-quotes",
+        "car-rental-bookings"
+      ]
+    },
+    {
+      "name": "Ferry",
+      "tags": [
+        "ferry-searches",
+        "ferry-quotes",
+        "ferry-bookings"
+      ]
+    },
+    {
+      "name": "Hotel",
+      "tags": [
+        "hotel-searches",
+        "hotel-quotes",
+        "hotel-bookings"
+      ]
+    },
+    {
+      "name": "Rail",
+      "tags": [
+        "rail-searches",
+        "rail-quotes",
+        "rail-bookings"
+      ]
+    },
+    {
+      "name": "Places",
+      "tags": [
+        "places"
+      ]
+    }
+  ],
   "tags": [
     {
-      "name": "air",
-      "description": "Air",
-      "x-displayName": "Air"
+      "name": "air-bookings",
+      "description": "TODO: ...",
+      "x-displayName": "Bookings"
     },
     {
-      "name": "car-rental",
-      "description": "Car rental",
-      "x-displayName": "Car Rental"
+      "name": "air-quotes",
+      "description": "TODO: ...",
+      "x-displayName": "Quotes"
     },
     {
-      "name": "ferry",
-      "description": "Ferry",
-      "x-displayName": "Ferry"
+      "name": "air-searches",
+      "description": "TODO: To search for flights, you'll need to create an air search request. An air search request describes the passengers and where and when they want to travel.",
+      "x-displayName": "Searches"
     },
     {
-      "name": "hotel",
-      "description": "Hotel",
-      "x-displayName": "Hotel"
+      "name": "car-rental-bookings",
+      "description": "TODO: ...",
+      "x-displayName": "Bookings"
+    },
+    {
+      "name": "car-rental-quotes",
+      "description": "TODO: ...",
+      "x-displayName": "Quotes"
+    },
+    {
+      "name": "car-rental-searches",
+      "description": "TODO: To search for car rentals, you'll need to create an car rental search request. A car rental search request describes the passengers and where and when they want to travel.",
+      "x-displayName": "Searches"
+    },
+    {
+      "name": "ferry-bookings",
+      "description": "TODO: ...",
+      "x-displayName": "Bookings"
+    },
+    {
+      "name": "ferry-quotes",
+      "description": "TODO: ...",
+      "x-displayName": "Quotes"
+    },
+    {
+      "name": "ferry-searches",
+      "description": "TODO: To search for ferries, you'll need to create an ferry search request. A ferry search request describes the passengers and where and when they want to travel.",
+      "x-displayName": "Searches"
+    },
+    {
+      "name": "hotel-bookings",
+      "description": "TODO: ...",
+      "x-displayName": "Bookings"
+    },
+    {
+      "name": "hotel-quotes",
+      "description": "TODO: ...",
+      "x-displayName": "Quotes"
+    },
+    {
+      "name": "hotel-searches",
+      "description": "TODO: To search for hotels, you'll need to create a hotel search request. A hotel search request describes the passengers and where and when they want to stay.",
+      "x-displayName": "Searches"
     },
     {
       "name": "internal",
@@ -43,24 +130,52 @@
     },
     {
       "name": "places",
-      "description": "Places.",
+      "description": "TODO: ...",
       "x-displayName": "Places"
     },
     {
-      "name": "rail",
-      "description": "Rail",
-      "x-displayName": "Rail"
+      "name": "rail-bookings",
+      "description": "TODO: ...",
+      "x-displayName": "Bookings"
+    },
+    {
+      "name": "rail-quotes",
+      "description": "TODO: ...",
+      "x-displayName": "Quotes"
+    },
+    {
+      "name": "rail-searches",
+      "description": "TODO: To search for rail, you'll need to create a rail search request. A rail search request describes the passengers and where and when they want to travel.",
+      "x-displayName": "Searches"
     }
   ],
   "paths": {
     "/air/searches": {
       "post": {
-        "summary": "Create Air Search",
+        "summary": "Create air search",
         "tags": [
-          "air"
+          "air-searches"
         ],
         "operationId": "post-air-searches",
         "description": "Used to initiate an air search",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AirSearch"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Created",
@@ -109,31 +224,7 @@
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
           }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/AirSearch"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        },
-        "x-internal": true,
-        "security": [
-          {
-            "jwt": []
-          }
-        ]
+        }
       }
     },
     "/air/searches/{searchId}": {
@@ -143,10 +234,12 @@
         }
       ],
       "get": {
-        "summary": "Get Air Search status",
+        "summary": "Get air search",
         "tags": [
-          "air"
+          "air-searches"
         ],
+        "operationId": "get-air-searches-id",
+        "description": "Used to retrieve an Air Search by ID",
         "responses": {
           "200": {
             "description": "Success",
@@ -165,9 +258,7 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        },
-        "operationId": "get-air-searches-id",
-        "description": "Used to lookup data for a Search Identifier."
+        }
       }
     },
     "/air/searches/{searchId}/results": {
@@ -177,9 +268,19 @@
         }
       ],
       "get": {
-        "summary": "List Air Search results",
+        "summary": "List air search results",
         "tags": [
-          "air"
+          "air-searches"
+        ],
+        "operationId": "get-air-searches-id-results",
+        "description": "Used to retrieve Search Results for an Air Search ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
         ],
         "responses": {
           "200": {
@@ -199,27 +300,32 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        },
-        "operationId": "get-air-searches-id-results",
-        "description": "Used to lookup data for a Search Identifier.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ]
+        }
       }
     },
     "/car-rental/searches": {
       "post": {
-        "summary": "Create Car Rental Search",
+        "summary": "Create car rental search",
         "tags": [
-          "car-rental"
+          "car-rental-searches"
         ],
         "operationId": "post-car-rental-searches",
-        "description": "Used to initiate a car rental search",
+        "description": "Used to initiate a Car Rental Search",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CarRentalSearch"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Created",
@@ -257,21 +363,6 @@
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity"
           }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/CarRentalSearch"
-                  }
-                }
-              }
-            }
-          }
         }
       }
     },
@@ -282,10 +373,12 @@
         }
       ],
       "get": {
-        "summary": "Get Car Rental Search",
+        "summary": "Get car rental search",
         "tags": [
-          "car-rental"
+          "car-rental-searches"
         ],
+        "operationId": "get-car-rental-searches-id",
+        "description": "Used to retrieve a Car Rental Search by ID",
         "responses": {
           "200": {
             "description": "OK",
@@ -315,9 +408,7 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        },
-        "operationId": "get-car-rental-searches-id",
-        "description": "Used to lookup data for a Search Identifier."
+        }
       }
     },
     "/car-rental/searches/{searchId}/results": {
@@ -330,9 +421,19 @@
         }
       ],
       "get": {
-        "summary": "List Car Rental Search Results",
+        "summary": "List car rental search results",
         "tags": [
-          "car-rental"
+          "car-rental-searches"
+        ],
+        "operationId": "get-car-rental-searches-id-results",
+        "description": "Used to retrieve Search Results for a Car Rental Search ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
         ],
         "responses": {
           "200": {
@@ -374,26 +475,16 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        },
-        "operationId": "get-car-rental-searches-id-results",
-        "description": "Used to retrieve Search Results for Car Rentals.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ]
+        }
       }
     },
     "/ferry/searches": {
       "post": {
-        "summary": "Create Ferry Search",
+        "summary": "Create ferry search",
         "operationId": "post-ferry-searches",
-        "description": "Used to initiate a ferry search",
+        "description": "Used to initiate a Ferry Search",
         "tags": [
-          "ferry"
+          "ferry-searches"
         ],
         "requestBody": {
           "required": true,
@@ -448,11 +539,11 @@
         }
       ],
       "get": {
-        "summary": "Get Ferry Search",
+        "summary": "Get ferry search",
         "operationId": "get-ferry-searches-id",
-        "description": "Used to lookup data for a Search Identifier.",
+        "description": "Used to retrieve a Ferry Search by ID",
         "tags": [
-          "ferry"
+          "ferry-searches"
         ],
         "responses": {
           "200": {
@@ -493,11 +584,11 @@
         }
       ],
       "get": {
-        "summary": "List Ferry Search Results",
+        "summary": "List ferry search results",
         "operationId": "get-ferry-searches-id-results",
-        "description": "Used to retrieve Search Results for Ferries",
+        "description": "Used to retrieve Search Results for a Ferry Search ID",
         "tags": [
-          "ferry"
+          "ferry-searches"
         ],
         "parameters": [
           {
@@ -547,186 +638,69 @@
         }
       }
     },
-    "/hotel/searches": {
-      "post": {
-        "summary": "Create Hotel Search",
+    "/health": {
+      "get": {
+        "summary": "Health",
         "tags": [
-          "hotel"
+          "internal"
         ],
-        "operationId": "post-hotel-searches",
-        "description": "Used to initiate a hotel search",
         "responses": {
           "200": {
-            "description": "Created",
+            "description": "OK",
             "content": {
               "application/vnd.api+json": {
                 "schema": {
+                  "description": "",
                   "type": "object",
-                  "description": "Hotel Search Response"
+                  "x-examples": {
+                    "example-1": {
+                      "meta": {
+                        "status": "ok"
+                      }
+                    }
+                  },
+                  "properties": {
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "status"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "description": "Health status",
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "warn"
+                          ],
+                          "example": "pass"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "meta"
+                  ]
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
           }
         },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/vnd.api+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "$ref": "#/components/schemas/HotelSearchRequest"
-                  }
-                },
-                "required": [
-                  "data"
-                ]
-              }
-            }
-          }
-        },
+        "operationId": "get-health",
+        "description": "Check the application health.",
         "x-internal": true,
-        "security": [
-          {
-            "jwt": []
-          }
-        ]
-      }
-    },
-    "/hotel/searches/{searchId}": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/searchId"
-        }
-      ],
-      "get": {
-        "summary": "Get Hotel Search status",
-        "tags": [
-          "hotel"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Hotel Search Response"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-hotel-searches-id",
-        "description": "Used to lookup the status of a hotel search."
-      }
-    },
-    "/hotel/searches/{searchId}/results": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/searchId"
-        }
-      ],
-      "get": {
-        "summary": "List Hotel Search results",
-        "tags": [
-          "hotel"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Hotel Search Response"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "operationId": "get-hotel-searches-id-results",
-        "description": "Used to lookup data for a hotel search.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/page-cursor"
-          },
-          {
-            "$ref": "#/components/parameters/page-limit"
-          }
-        ]
+        "security": []
       }
     },
     "/hotel-rooms/searches": {
       "post": {
-        "summary": "Create Hotel Room Search",
+        "summary": "Create hotel room search",
         "tags": [
-          "hotel"
+          "hotel-searches"
         ],
         "operationId": "post-hotel-rooms-searches",
         "description": "Used to initiate a hotel room search",
-        "responses": {
-          "200": {
-            "description": "Created",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "type": "object",
-                  "description": "Hotel Search Response"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          }
-        },
         "requestBody": {
           "required": true,
           "content": {
@@ -745,12 +719,37 @@
             }
           }
         },
-        "x-internal": true,
-        "security": [
-          {
-            "jwt": []
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
           }
-        ]
+        }
       }
     },
     "/hotel-rooms/searches/{searchId}": {
@@ -760,9 +759,11 @@
         }
       ],
       "get": {
-        "summary": "Get Hotel Rooms Search status",
+        "summary": "Get hotel rooms search",
+        "operationId": "get-hotel-rooms-searches-id",
+        "description": "Used to lookup the status of a hotel rooms search",
         "tags": [
-          "hotel"
+          "hotel-searches"
         ],
         "responses": {
           "200": {
@@ -782,9 +783,7 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        },
-        "operationId": "get-hotel-rooms-searches-id",
-        "description": "Used to lookup the status of a hotel rooms search."
+        }
       }
     },
     "/hotel-rooms/searches/{searchId}/results": {
@@ -794,9 +793,19 @@
         }
       ],
       "get": {
-        "summary": "List Hotel Rooms Search results",
+        "summary": "List hotel rooms search results",
         "tags": [
-          "hotel"
+          "hotel-searches"
+        ],
+        "operationId": "get-hotel-rooms-searches-id-results",
+        "description": "Used to lookup data for a hotel rooms search result",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page-cursor"
+          },
+          {
+            "$ref": "#/components/parameters/page-limit"
+          }
         ],
         "responses": {
           "200": {
@@ -816,9 +825,115 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
+        }
+      }
+    },
+    "/hotel/searches": {
+      "post": {
+        "summary": "Create hotel search",
+        "tags": [
+          "hotel-searches"
+        ],
+        "operationId": "post-hotel-searches",
+        "description": "Used to initiate a Hotel Search",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/HotelSearchRequest"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
         },
-        "operationId": "get-hotel-rooms-searches-id-results",
-        "description": "Used to lookup data for a hotel rooms search.",
+        "responses": {
+          "200": {
+            "description": "Created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/hotel/searches/{searchId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "Get hotel search",
+        "tags": [
+          "hotel-searches"
+        ],
+        "operationId": "get-hotel-searches-id",
+        "description": "Used to retrieve a Hotel Search by ID",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/hotel/searches/{searchId}/results": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/searchId"
+        }
+      ],
+      "get": {
+        "summary": "List hotel search results",
+        "tags": [
+          "hotel-searches"
+        ],
+        "operationId": "get-hotel-searches-id-results",
+        "description": "Used to retrieve Search Results for a Hotel ID",
         "parameters": [
           {
             "$ref": "#/components/parameters/page-cursor"
@@ -826,7 +941,26 @@
           {
             "$ref": "#/components/parameters/page-limit"
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Hotel Search Response"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
       }
     },
     "/places": {
@@ -962,11 +1096,11 @@
     },
     "/rail/searches": {
       "post": {
-        "summary": "Create Rail Search",
+        "summary": "Create rail search",
         "operationId": "post-rail-searches",
-        "description": "Used to initiate a rail search",
+        "description": "Used to initiate a Rail Search",
         "tags": [
-          "rail"
+          "rail-searches"
         ],
         "requestBody": {
           "required": true,
@@ -1021,11 +1155,11 @@
         }
       ],
       "get": {
-        "summary": "Get Rail Search",
+        "summary": "Get rail search",
         "operationId": "get-rail-searches-id",
-        "description": "Used to lookup data for a Search Identifier.",
+        "description": "Used to retrieve a Rail Search by ID",
         "tags": [
-          "rail"
+          "rail-searches"
         ],
         "responses": {
           "200": {
@@ -1066,11 +1200,11 @@
         }
       ],
       "get": {
-        "summary": "List Rail Search Results",
+        "summary": "List rail search results",
         "operationId": "get-rail-searches-id-results",
-        "description": "Used to retrieve Search Results for Rail",
+        "description": "Used to retrieve Search Results for a Rail Search ID",
         "tags": [
-          "rail"
+          "rail-searches"
         ],
         "parameters": [
           {
@@ -1119,67 +1253,15 @@
           }
         }
       }
-    },
-    "/health": {
-      "get": {
-        "summary": "Health",
-        "tags": [
-          "internal"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/vnd.api+json": {
-                "schema": {
-                  "description": "",
-                  "type": "object",
-                  "x-examples": {
-                    "example-1": {
-                      "meta": {
-                        "status": "ok"
-                      }
-                    }
-                  },
-                  "properties": {
-                    "meta": {
-                      "type": "object",
-                      "required": [
-                        "status"
-                      ],
-                      "properties": {
-                        "status": {
-                          "type": "string",
-                          "description": "Health status",
-                          "enum": [
-                            "pass",
-                            "fail",
-                            "warn"
-                          ],
-                          "example": "pass"
-                        }
-                      }
-                    }
-                  },
-                  "required": [
-                    "meta"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-health",
-        "description": "Check the application health.",
-        "x-internal": true,
-        "security": []
-      }
     }
   },
   "components": {
     "schemas": {
       "AirSearch": {
         "title": "Air Search",
+        "x-tags": [
+          "air-searches"
+        ],
         "allOf": [
           {
             "type": "object",
@@ -1456,6 +1538,9 @@
         "description": "Result of searching for offers."
       },
       "CarRentalSearch": {
+        "x-tags": [
+          "car-rental-searches"
+        ],
         "allOf": [
           {
             "type": "object",
@@ -1735,8 +1820,66 @@
         ],
         "description": "A Coordinate represented via latitude and longitude"
       },
+      "Error": {
+        "title": "Error",
+        "type": "object",
+        "description": "JSON:API error",
+        "properties": {
+          "status": {
+            "type": "string",
+            "pattern": "^[45][0-9]{2}$",
+            "description": "The HTTP status code applicable to this problem, expressed as a string value.",
+            "example": "404"
+          },
+          "title": {
+            "type": "string",
+            "example": "Not Found",
+            "description": "A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization."
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title`, this field’s value can be localized.",
+            "example": "Nothing matches the given URI"
+          },
+          "code": {
+            "type": "string",
+            "example": "required",
+            "description": "An application-specific error code, expressed as a string value."
+          },
+          "source": {
+            "description": "An object containing references to the source of the error.",
+            "properties": {
+              "pointer": {
+                "type": "string",
+                "example": "/data/attributes/title",
+                "description": "A JSON Pointer to the associated entity in the request document."
+              },
+              "parameter": {
+                "type": "string",
+                "example": "page[cursor]",
+                "description": "A string indicating which URI query parameter caused the error."
+              },
+              "header": {
+                "type": "string",
+                "example": "X-Request-Id",
+                "description": "A string indicating the name of a single request header which caused the error."
+              }
+            },
+            "minProperties": 1,
+            "maxProperties": 1,
+            "type": "object"
+          }
+        },
+        "required": [
+          "status",
+          "detail"
+        ]
+      },
       "FerrySearch": {
         "title": "Ferry Search",
+        "x-tags": [
+          "ferry-searches"
+        ],
         "allOf": [
           {
             "type": "object",
@@ -1955,9 +2098,48 @@
           "relationships"
         ]
       },
+      "HotelRoomsSearchRequest": {
+        "title": "Hotel Rooms Search Request",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hotel-rooms-searches"
+            ],
+            "example": "hotel-rooms-searches"
+          },
+          "attributes": {
+            "type": "object",
+            "required": [
+              "ref"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string",
+                "example": "1F0-iNERRbQ"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
       "HotelSearchRequest": {
         "title": "Hotel Search Request",
         "type": "object",
+        "x-tags": [
+          "hotel-searches"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -2026,45 +2208,31 @@
           "id",
           "type",
           "attributes"
-        ],
-        "x-examples": {}
+        ]
       },
-      "HotelRoomsSearchRequest": {
-        "title": "Hotel Rooms Search Request",
+      "NextLink": {
+        "title": "Next Link",
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
-            "readOnly": true
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "hotel-rooms-searches"
-            ],
-            "example": "hotel-rooms-searches"
-          },
-          "attributes": {
+          "links": {
             "type": "object",
             "required": [
-              "ref"
+              "next"
             ],
             "properties": {
-              "ref": {
+              "next": {
                 "type": "string",
-                "example": "1F0-iNERRbQ"
+                "format": "uri",
+                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
+                "readOnly": true
               }
-            }
+            },
+            "readOnly": true
           }
         },
         "required": [
-          "id",
-          "type",
-          "attributes"
-        ],
-        "x-examples": {}
+          "links"
+        ]
       },
       "OfferIdentifier": {
         "title": "Offer Identifier",
@@ -2108,6 +2276,9 @@
       },
       "Place": {
         "title": "Place",
+        "x-tags": [
+          "places"
+        ],
         "allOf": [
           {
             "type": "object",
@@ -2240,18 +2411,6 @@
         ],
         "description": "A place is an indexed reference to a location that can serve as an origin or destination."
       },
-      "PlaceType": {
-        "title": "Place Type",
-        "type": "string",
-        "enum": [
-          "unspecified",
-          "city",
-          "railway-station",
-          "airport",
-          "ferry-port"
-        ],
-        "example": "airport"
-      },
       "PlaceIdentifier": {
         "title": "Place Identifier",
         "type": "object",
@@ -2274,6 +2433,18 @@
           "type"
         ],
         "description": "A unique identifier for each place."
+      },
+      "PlaceType": {
+        "title": "Place Type",
+        "type": "string",
+        "enum": [
+          "unspecified",
+          "city",
+          "railway-station",
+          "airport",
+          "ferry-port"
+        ],
+        "example": "airport"
       },
       "Price": {
         "title": "Price",
@@ -2319,6 +2490,9 @@
       },
       "RailSearch": {
         "title": "Rail Search",
+        "x-tags": [
+          "rail-searches"
+        ],
         "allOf": [
           {
             "type": "object",
@@ -2590,85 +2764,6 @@
           "ferry"
         ]
       },
-      "NextLink": {
-        "title": "Next Link",
-        "type": "object",
-        "properties": {
-          "links": {
-            "type": "object",
-            "required": [
-              "next"
-            ],
-            "properties": {
-              "next": {
-                "type": "string",
-                "format": "uri",
-                "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
-                "readOnly": true
-              }
-            },
-            "readOnly": true
-          }
-        },
-        "required": [
-          "links"
-        ]
-      },
-      "Error": {
-        "title": "Error",
-        "type": "object",
-        "description": "JSON:API error",
-        "properties": {
-          "status": {
-            "type": "string",
-            "pattern": "^[45][0-9]{2}$",
-            "description": "The HTTP status code applicable to this problem, expressed as a string value.",
-            "example": "404"
-          },
-          "title": {
-            "type": "string",
-            "example": "Not Found",
-            "description": "A short, human-readable summary of the problem that SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization."
-          },
-          "detail": {
-            "type": "string",
-            "description": "A human-readable explanation specific to this occurrence of the problem. Like `title`, this field’s value can be localized.",
-            "example": "Nothing matches the given URI"
-          },
-          "code": {
-            "type": "string",
-            "example": "required",
-            "description": "An application-specific error code, expressed as a string value."
-          },
-          "source": {
-            "description": "An object containing references to the source of the error.",
-            "properties": {
-              "pointer": {
-                "type": "string",
-                "example": "/data/attributes/title",
-                "description": "A JSON Pointer to the associated entity in the request document."
-              },
-              "parameter": {
-                "type": "string",
-                "example": "page[cursor]",
-                "description": "A string indicating which URI query parameter caused the error."
-              },
-              "header": {
-                "type": "string",
-                "example": "X-Request-Id",
-                "description": "A string indicating the name of a single request header which caused the error."
-              }
-            },
-            "minProperties": 1,
-            "maxProperties": 1,
-            "type": "object"
-          }
-        },
-        "required": [
-          "status",
-          "detail"
-        ]
-      },
       "SelfLink": {
         "title": "Self Link",
         "type": "object",
@@ -2846,52 +2941,6 @@
         "style": "form",
         "explode": false
       },
-      "searchId": {
-        "name": "searchId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-        },
-        "description": "Search identifier"
-      },
-      "placeId": {
-        "name": "placeId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
-        },
-        "description": "Place identifier"
-      },
-      "page-cursor": {
-        "name": "page[cursor]",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "default": "",
-          "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
-        },
-        "description": "Pagination cursor that defines your place in the list."
-      },
-      "page-limit": {
-        "name": "page[limit]",
-        "in": "query",
-        "required": false,
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20,
-          "example": 20
-        },
-        "description": "A limit on the number of objects to be returned, between 1 and 100."
-      },
       "filterIataEq": {
         "name": "filter[iata][eq]",
         "in": "query",
@@ -2913,6 +2962,17 @@
         "description": "Filters Place based on the value of iata code.",
         "style": "form",
         "explode": false
+      },
+      "filterNameLike": {
+        "name": "filter[name][like]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "minLength": 3,
+          "example": "foo"
+        },
+        "description": "Filters Place based on the value of place name."
       },
       "filterTypeEq": {
         "name": "filter[type][eq]",
@@ -2939,16 +2999,51 @@
         "style": "form",
         "explode": false
       },
-      "filterNameLike": {
-        "name": "filter[name][like]",
+      "page-cursor": {
+        "name": "page[cursor]",
         "in": "query",
         "required": false,
         "schema": {
           "type": "string",
-          "minLength": 3,
-          "example": "foo"
+          "default": "",
+          "example": "MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D"
         },
-        "description": "Filters Place based on the value of place name."
+        "description": "Pagination cursor that defines your place in the list."
+      },
+      "page-limit": {
+        "name": "page[limit]",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "example": 20
+        },
+        "description": "A limit on the number of objects to be returned, between 1 and 100."
+      },
+      "placeId": {
+        "name": "placeId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Place identifier"
+      },
+      "searchId": {
+        "name": "searchId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+        },
+        "description": "Search identifier"
       }
     },
     "securitySchemes": {

@@ -9,3 +9,10 @@ rules:
       function: pattern
       functionOptions:
         notMatch: "\\{.+?\\}.*\\{.+?\\}"
+  paths-ordered-alphabetically:
+    severity: warn
+    description: "Paths should be ordered alphabetically"
+    message: "{{error}}"
+    given: $..paths
+    then:
+      function: alphabetical
