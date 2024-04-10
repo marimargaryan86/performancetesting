@@ -15,7 +15,7 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2,
     bookings_pb2_grpc,
 )
-from snowfall.stdlib import money
+from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.transport.amqp import consumer, types
@@ -45,13 +45,18 @@ def _booking_to_zendesk_booking(
 
         result_detail = getattr(detail, result_detail_name)
 
+        if result_detail_name == "car_rental":
+            departure_date_proto = result_detail.pickup_at
+        else:
+            departure_date_proto = result_detail.departure_date
+
         if result_detail:
             trip_option_details.append(
                 cancellation_request.TripOptionDetails(
                     origin_name=result_detail.origin.name,
                     destination_name=result_detail.destination.name,
                     departure_date=protobuf.protobuf_to_datetime(
-                        result_detail.departure_date,
+                        departure_date_proto,
                     ).isoformat(),
                 ),
             )
@@ -143,7 +148,10 @@ class CancellationHandler:
         try:
             cancel_booking_response = await self._gateway_stub.CancelBooking(
                 request=bookings_pb2.CancelBookingRequest(
-                    booking_id=booking.id,
+                    booking_id=sequence.to_composite_id([
+                        booking.provider_id,
+                        booking.provider_booking.booking_reference,
+                    ]),
                 ),
             )
         except grpc.aio.AioRpcError:

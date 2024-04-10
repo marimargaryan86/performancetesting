@@ -28,7 +28,7 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
         request: bookings_pb2.GetBookingRequest,
         context: grpc.aio.ServicerContext,
     ) -> bookings_pb2.GetBookingResponse:
-        provider_id, _booking_id = providers.unmarshal_resource_id(request.id)
+        provider_id, booking_id = providers.unmarshal_resource_id(request.id)
         provider = await self._providers.find_by_id(provider_id)
 
         if not provider:
@@ -36,7 +36,11 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         try:
-            booking = await provider.connection.bookings.GetBooking(request.id)
+            booking_response = await provider.connection.bookings.GetBooking(
+                request=provider_bookings_pb2.GetBookingRequest(
+                    id=booking_id,
+                ),
+            )
         except grpc.aio.AioRpcError:
             self._logger.warning(
                 "Failed to retrieve booking from provider",
@@ -44,7 +48,12 @@ class Service(service.Service, bookings_pb2_grpc.BookingServiceServicer):
             )
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
-        return bookings_pb2.GetBookingResponse(booking=booking)
+        return bookings_pb2.GetBookingResponse(
+            booking=bookings_pb2.Booking(
+                id=provider.marshal_resource_id(booking_response.booking.id),
+                booking=booking_response.booking,
+            ),
+        )
 
     async def CancelBooking(  # type: ignore[override] # noqa: N802
         self,

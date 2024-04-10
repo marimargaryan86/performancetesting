@@ -62,7 +62,7 @@ class BookingHandler:
                 timeout=self._timeout,
             )
         except grpc.aio.AioRpcError:
-            self._logger.warning("Gateway service not available.")
+            self._logger.warning("Gateway or provider not available.")
             return booking
 
         return await self.update_local_with_provider(

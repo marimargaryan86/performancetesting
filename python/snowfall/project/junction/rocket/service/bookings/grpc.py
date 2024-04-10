@@ -148,12 +148,21 @@ class BookingService(
 
         await _validate_cancellation(request.reseller_id, context, booking)
 
-        booking_cancellation = await self._save_cancellation(
-            request.booking_cancellation,
+        cancellation_exists = (
+            await self._cancellations.repository.find_by_booking_id(
+                request.booking_cancellation.booking_id,
+            )
+            is not None
         )
 
-        await self._cancellations.task_producer.publish(
-            booking_cancellation=booking_cancellation,
+        if cancellation_exists:
+            return await context.abort(
+                StatusCode.ALREADY_EXISTS,
+                "Booking cancellation already exists",
+            )
+
+        booking_cancellation = await self._save_and_publish_cancellation(
+            request.booking_cancellation,
         )
 
         return bookings_pb2.CreateBookingCancellationResponse(
@@ -195,3 +204,14 @@ class BookingService(
         return await self._cancellations.repository.insert(
             booking_cancellation,
         )
+
+    async def _save_and_publish_cancellation(
+        self,
+        booking_cancellation: models_pb2.BookingCancellation,
+    ) -> models_pb2.BookingCancellation:
+        booking_cancellation = await self._save_cancellation(booking_cancellation)
+        await self._cancellations.task_producer.publish(
+            booking_cancellation=booking_cancellation,
+        )
+
+        return booking_cancellation
