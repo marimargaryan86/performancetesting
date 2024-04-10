@@ -11,14 +11,14 @@ from pydantic import (
     NaiveDatetime,
     RootModel,
     alias_generators,
-    model_validator,
 )
-from pydantic import BaseModel as PydanticBase
+
+from snowfall.stdlib.integration.pydantic import model
 
 AwareOrNaiveDatetime = AwareDatetime | NaiveDatetime
 
 
-class BaseModel(PydanticBase):
+class BaseModel(model.DefaultingBaseModel):
     model_config = ConfigDict(
         alias_generator=alias_generators.to_camel,
         populate_by_name=True,
@@ -27,39 +27,39 @@ class BaseModel(PydanticBase):
 
 
 class AddCvvRequest(BaseModel):
-    card_id: int | None = Field(None, alias="cardId")
+    card_id: int | None = None
     cvv: str | None = None
 
 
 class Address(BaseModel):
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     state: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     city: str | None = None
     address1: str | None = None
     address2: str | None = None
-    zip_code: str | None = Field(None, alias="zipCode")
-    street_number: str | None = Field(None, alias="streetNumber")
+    zip_code: str | None = None
+    street_number: str | None = None
 
 
 class AddressLocation(BaseModel):
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     state: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     city: str | None = None
     address1: str | None = None
     address2: str | None = None
-    zip_code: str | None = Field(None, alias="zipCode")
-    street_number: str | None = Field(None, alias="streetNumber")
+    zip_code: str | None = None
+    street_number: str | None = None
     id: int | None = None
-    is_billing: bool | None = Field(None, alias="isBilling")
-    owned_by_id: int | None = Field(None, alias="ownedById")
+    is_billing: bool | None = None
+    owned_by_id: int | None = None
 
 
 class Data(BaseModel):
-    string: AddressLocation | None = Field(None, alias="String")
+    string: AddressLocation | None = None
 
 
 class Agency(BaseModel):
@@ -69,25 +69,22 @@ class Agency(BaseModel):
     email: str | None = None
     website: str | None = None
     phone: str | None = None
-    phone_after_hours: str | None = Field(None, alias="phoneAfterHours")
-    phone_intl: str | None = Field(None, alias="phoneIntl")
-    reservation_providers: dict[str, str] | None = Field(
-        None,
-        alias="reservationProviders",
-    )
+    phone_after_hours: str | None = None
+    phone_intl: str | None = None
+    reservation_providers: dict[str, str] = Field(default_factory=dict)
     flags: int | None = None
-    zone_id: str | None = Field(None, alias="zoneId", examples=["America/Toronto"])
+    zone_id: str | None = None
 
 
 class AgencyContactInfo(BaseModel):
     email: str | None = None
     phone: str | None = None
-    phone_after_hours: str | None = Field(None, alias="phoneAfterHours")
-    phone_intl: str | None = Field(None, alias="phoneIntl")
-    price_after_hours: float | None = Field(None, alias="priceAfterHours")
-    price_currency: str | None = Field(None, alias="priceCurrency")
+    phone_after_hours: str | None = None
+    phone_intl: str | None = None
+    price_after_hours: float | None = None
+    price_currency: str | None = None
     availability: str | None = None
-    availability_after_hours: str | None = Field(None, alias="availabilityAfterHours")
+    availability_after_hours: str | None = None
     website: str | None = None
 
 
@@ -103,9 +100,9 @@ class AgencySettings(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    parent_agency_code: str | None = Field(None, alias="parentAgencyCode")
-    config: list[str] | None = None
+    agency_code: str | None = None
+    parent_agency_code: str | None = None
+    config: list[str] = Field(default_factory=list)
 
 
 class AgentInquiry(BaseModel):
@@ -114,7 +111,7 @@ class AgentInquiry(BaseModel):
     active: bool | None = None
     name: str | None = None
     email: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
     company: str | None = None
 
 
@@ -127,13 +124,13 @@ class AgentPhone(BaseModel):
 class AgentStatus(BaseModel):
     admin: bool | None = None
     agent: bool | None = None
-    agencies: list[Agency] | None = None
+    agencies: list[Agency] = Field(default_factory=list)
 
 
 class AircraftInfo(BaseModel):
-    aircraft_type: str | None = Field(None, alias="aircraftType")
-    weight_class: str | None = Field(None, alias="weightClass")
-    tail_number: str | None = Field(None, alias="tailNumber")
+    aircraft_type: str | None = None
+    weight_class: str | None = None
+    tail_number: str | None = None
 
 
 class AircraftType(Enum):
@@ -153,21 +150,21 @@ class Airline(BaseModel):
     id: int | None = None
     name: str | None = None
     alias: str | None = None
-    short_name: str | None = Field(None, alias="shortName")
+    short_name: str | None = None
     iata: str | None = None
     icao: str | None = None
     callsign: str | None = None
     country: str | None = None
     active: bool | None = None
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
-    loyalty_program_id: int | None = Field(None, alias="loyaltyProgramId")
-    ticketing_code: str | None = Field(None, alias="ticketingCode")
+    reward_program_id: int | None = None
+    loyalty_program_id: int | None = None
+    ticketing_code: str | None = None
 
 
 class AirlineLoyaltyProgram(BaseModel):
     id: int | None = None
-    loyalty_program_id: int | None = Field(None, alias="loyaltyProgramId")
-    airline_id: int | None = Field(None, alias="airlineId")
+    loyalty_program_id: int | None = None
+    airline_id: int | None = None
     main: bool | None = None
 
 
@@ -188,17 +185,17 @@ class Airport(BaseModel):
     name: str | None = None
     city: str | None = None
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     iata: str | None = None
     icao: str | None = None
     latitude: float | None = None
     longitude: float | None = None
     altitude: int | None = None
-    timezone_offset: float | None = Field(None, alias="timezoneOffset")
+    timezone_offset: float | None = None
     timezone: str | None = None
     dst: str | None = None
-    airline_count: int | None = Field(None, alias="airlineCount")
-    group_iata: str | None = Field(None, alias="groupIata")
+    airline_count: int | None = None
+    group_iata: str | None = None
     label: str | None = None
     code: str | None = None
 
@@ -206,11 +203,11 @@ class Airport(BaseModel):
 class AmadeusUserProfile(BaseModel):
     id: int | None = None
     nms: int | None = None
-    user_id: int | None = Field(None, alias="userId")
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    profile_id: str | None = Field(None, alias="profileId")
-    profile_hash: str | None = Field(None, alias="profileHash")
+    user_id: int | None = None
+    org_id: int | None = None
+    agency_code: str | None = None
+    profile_id: str | None = None
+    profile_hash: str | None = None
 
 
 class AmenityCategory(Enum):
@@ -235,7 +232,7 @@ class Amount(BaseModel):
 class AncillaryAssignment(BaseModel):
     boundary: str | None = None
     code: str | None = None
-    consumer_index: int | None = Field(None, alias="consumerIndex")
+    consumer_index: int | None = None
     quantity: int | None = None
     ref: str | None = None
 
@@ -267,7 +264,7 @@ class AppliedDiscount(BaseModel):
     code: str | None = None
     name: str | None = None
     description: str | None = None
-    conditions: list[str] | None = None
+    conditions: list[str] = Field(default_factory=list)
 
 
 class ApprovalAction(Enum):
@@ -293,7 +290,7 @@ class ApprovalUiFlags(Enum):
 
 class ArrivalFlight(BaseModel):
     airline: str | None = None
-    flight_number: str | None = Field(None, alias="flightNumber")
+    flight_number: str | None = None
 
 
 class Assessment(Enum):
@@ -306,14 +303,14 @@ class Assessment(Enum):
 class AssociatedAirline(BaseModel):
     id: int | None = None
     airline_id: int | None = None
-    associated_airline_id: int | None = Field(None, alias="associatedAirlineId")
+    associated_airline_id: int | None = None
 
 
 class BaggageAttributes(BaseModel):
     cxr: str | None = None
-    seq_no: int | None = Field(None, alias="seqNo")
-    service_type: str | None = Field(None, alias="serviceType")
-    sub_code: str | None = Field(None, alias="subCode")
+    seq_no: int | None = None
+    service_type: str | None = None
+    sub_code: str | None = None
 
 
 class BaseEntity(BaseModel):
@@ -326,9 +323,9 @@ class BaseTrainStation(BaseModel):
     code: str | None = None
     name: str | None = None
     city: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     state: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     country: str | None = None
     latitude: float | None = None
     longitude: float | None = None
@@ -363,16 +360,16 @@ class BookingAct(Enum):
 
 
 class Brand(BaseModel):
-    brand_codes: list[str] | None = Field(None, alias="brandCodes")
-    brand_name: str | None = Field(None, alias="brandName")
+    brand_codes: list[str] = Field(default_factory=list)
+    brand_name: str | None = None
     id: str | None = None
 
 
 class Branding(BaseModel):
-    hero_url: str | None = Field(None, alias="heroUrl")
-    logo_url: str | None = Field(None, alias="logoUrl")
-    primary_color: str | None = Field(None, alias="primaryColor")
-    secondary_color: str | None = Field(None, alias="secondaryColor")
+    hero_url: str | None = None
+    logo_url: str | None = None
+    primary_color: str | None = None
+    secondary_color: str | None = None
 
 
 class CabinClass(Enum):
@@ -408,28 +405,28 @@ class Campaign(BaseModel):
     nms: int | None = None
     active: bool | None = None
     code: str | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    show_company_input: bool | None = Field(None, alias="showCompanyInput")
-    accent_color: str | None = Field(None, alias="accentColor")
-    logo_url: str | None = Field(None, alias="logoUrl")
-    email_template: str | None = Field(None, alias="emailTemplate")
+    agency_code: str | None = None
+    show_company_input: bool | None = None
+    accent_color: str | None = None
+    logo_url: str | None = None
+    email_template: str | None = None
 
 
 class CampaignUser(BaseModel):
     id: int | None = None
     nms: int | None = None
-    campaign_id: int | None = Field(None, alias="campaignId")
-    user_id: int | None = Field(None, alias="userId")
+    campaign_id: int | None = None
+    user_id: int | None = None
 
 
 class Car(BaseModel):
     make: str | None = None
-    image_url: str | None = Field(None, alias="imageUrl")
+    image_url: str | None = None
     model: str | None = None
     name: str | None = None
-    class_code: str | None = Field(None, alias="classCode")
-    class_name: str | None = Field(None, alias="className")
-    car_type: str | None = Field(None, alias="carType")
+    class_code: str | None = None
+    class_name: str | None = None
+    car_type: str | None = None
     transmission: str | None = None
     mpg: str | None = None
     features: int | None = None
@@ -464,7 +461,7 @@ class CarExtra(BaseModel):
     name: str | None = None
     quantity: int | None = None
     price: float | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
+    total_price: float | None = None
 
 
 class CarFareType(Enum):
@@ -493,7 +490,7 @@ class CarInsurance(BaseModel):
     selected: bool | None = None
     note: str | None = None
     price: float | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
+    total_price: float | None = None
 
 
 class CarLocation(BaseModel):
@@ -508,17 +505,17 @@ class CarLocation(BaseModel):
     distance: float | None = None
     airport: bool | None = None
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     state: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     city: str | None = None
     address1: str | None = None
     address2: str | None = None
-    zip_code: str | None = Field(None, alias="zipCode")
+    zip_code: str | None = None
     flags: int | None = None
     ref: str | None = None
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    vendor_pref_level: int | None = Field(None, alias="vendorPrefLevel")
+    out_of_policy_id: int | None = None
+    vendor_pref_level: int | None = None
 
 
 class CarLocationFlags(Enum):
@@ -538,32 +535,32 @@ class CarLocationMerged(BaseModel):
     distance: float | None = None
     airport: bool | None = None
     flags: int | None = None
-    refs: list[str] | None = None
-    locations: list[CarLocation] | None = None
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    vendor_pref_level: int | None = Field(None, alias="vendorPrefLevel")
+    refs: list[str] = Field(default_factory=list)
+    locations: list[CarLocation] = Field(default_factory=list)
+    out_of_policy_id: int | None = None
+    vendor_pref_level: int | None = None
 
 
 class CarOffer(BaseModel):
     car: Car | None = None
-    fare_type: CarFareType | None = Field(None, alias="fareType")
+    fare_type: CarFareType | None = None
     vendor: str | None = None
     brand: str | None = None
-    pick_up: str | None = Field(None, alias="pickUp")
-    same_drop_off_location: bool | None = Field(None, alias="sameDropOffLocation")
-    drop_off: str | None = Field(None, alias="dropOff")
+    pick_up: str | None = None
+    same_drop_off_location: bool | None = None
+    drop_off: str | None = None
     flags: int | None = None
     currency: str | None = None
-    total_vehicle: float | None = Field(None, alias="totalVehicle")
-    total_price: float | None = Field(None, alias="totalPrice")
+    total_vehicle: float | None = None
+    total_price: float | None = None
     ref: str | None = None
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    out_of_policy_rule_ids: list[int] | None = Field(None, alias="outOfPolicyRuleIds")
-    vendor_pref_level: int | None = Field(None, alias="vendorPrefLevel")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    total_price_per_day: float | None = Field(None, alias="totalPricePerDay")
-    booking_blocked: bool | None = Field(None, alias="bookingBlocked")
-    approval_required: bool | None = Field(None, alias="approvalRequired")
+    out_of_policy_id: int | None = None
+    out_of_policy_rule_ids: list[int] = Field(default_factory=list)
+    vendor_pref_level: int | None = None
+    approval_required: bool | None = None
+    booking_blocked: bool | None = None
+    total_price_per_day: float | None = None
+    in_policy: bool | None = None
 
 
 class CarType(Enum):
@@ -595,8 +592,8 @@ class CarVendor(BaseModel):
     id: int | None = None
     code: str | None = None
     name: str | None = None
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
-    loyalty_program_id: int | None = Field(None, alias="loyaltyProgramId")
+    reward_program_id: int | None = None
+    loyalty_program_id: int | None = None
 
 
 class CardType(Enum):
@@ -626,7 +623,7 @@ class ConcurOrg(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     name: str | None = None
 
 
@@ -634,9 +631,9 @@ class ConcurOrgUser(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    org_user_id: int | None = Field(None, alias="orgUserId")
-    org_id: int | None = Field(None, alias="orgId")
-    employee_uid: str | None = Field(None, alias="employeeUid")
+    org_user_id: int | None = None
+    org_id: int | None = None
+    employee_uid: str | None = None
 
 
 class ConcurOrgUserMapper(BaseModel):
@@ -676,8 +673,8 @@ class Continent(Enum):
 
 
 class CorporateProfile(BaseModel):
-    org_id: int | None = Field(None, alias="orgId")
-    profile_id: str | None = Field(None, alias="profileId")
+    org_id: int | None = None
+    profile_id: str | None = None
     name: str | None = None
 
 
@@ -694,16 +691,16 @@ class Country(BaseModel):
     code: str | None = None
     code2: str | None = None
     code3: str | None = None
-    authority_code: str | None = Field(None, alias="authorityCode")
+    authority_code: str | None = None
     continent: str | None = None
-    currency_id: int | None = Field(None, alias="currencyId")
+    currency_id: int | None = None
 
 
 class CountryState(BaseModel):
     id: int | None = None
     name: str | None = None
     code: str | None = None
-    country_id: int | None = Field(None, alias="countryId")
+    country_id: int | None = None
 
 
 class CoverageEnum(Enum):
@@ -716,15 +713,15 @@ class CoverageEnum(Enum):
 class CrashReport(BaseModel):
     id: int | None = None
     os: str | None = None
-    os_version: str | None = Field(None, alias="osVersion")
-    version_code: str | None = Field(None, alias="versionCode")
-    version_name: str | None = Field(None, alias="versionName")
-    phone_model: str | None = Field(None, alias="phoneModel")
-    custom_data: str | None = Field(None, alias="customData")
-    stack_trace: str | None = Field(None, alias="stackTrace")
-    user_comment: str | None = Field(None, alias="userComment")
+    os_version: str | None = None
+    version_code: str | None = None
+    version_name: str | None = None
+    phone_model: str | None = None
+    custom_data: str | None = None
+    stack_trace: str | None = None
+    user_comment: str | None = None
     nms: int | None = None
-    created_on: int | None = Field(None, alias="createdOn")
+    created_on: int | None = None
 
 
 class CrashReportMapper(BaseModel):
@@ -734,8 +731,8 @@ class CrashReportMapper(BaseModel):
 class Credit(BaseModel):
     id: int | None = None
     active: bool | None = None
-    user_id: int | None = Field(None, alias="userId")
-    org_id: int | None = Field(None, alias="orgId")
+    user_id: int | None = None
+    org_id: int | None = None
     vendor: str | None = None
     reference: str | None = None
     currency: str | None = None
@@ -746,29 +743,29 @@ class Credit(BaseModel):
 
 class CreditCard(BaseModel):
     id: int | None = None
-    stripe_id: str | None = Field(None, alias="stripeId")
-    holder_name: str | None = Field(None, alias="holderName")
-    card_number: str | None = Field(None, alias="cardNumber")
+    stripe_id: str | None = None
+    holder_name: str | None = None
+    card_number: str | None = None
     type: CardType | None = None
-    exp: str | None = Field(None, examples=["2022-03"])
+    exp: str | None = None
     cvv: str | None = None
     address: Address | None = None
-    reservation_types: int | None = Field(None, alias="reservationTypes")
+    reservation_types: int | None = None
 
 
 class Currency(BaseModel):
     id: int | None = None
     name: str | None = None
-    numeric_code: str | None = Field(None, alias="numericCode")
+    numeric_code: str | None = None
     code: str | None = None
-    issuing_country: str | None = Field(None, alias="issuingCountry")
+    issuing_country: str | None = None
 
 
 class Cvv(BaseModel):
     id: int | None = None
-    card_id: int | None = Field(None, alias="cardId")
+    card_id: int | None = None
     cvv: str | None = None
-    tripboard_id: int | None = Field(None, alias="tripboardId")
+    tripboard_id: int | None = None
     expiration: AwareOrNaiveDatetime | None = None
 
 
@@ -793,11 +790,11 @@ class DeliveryOption(BaseModel):
 
 class DemoRequest(BaseModel):
     id: int | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    last_name: str | None = None
     email: str | None = None
-    decision_making_role: str | None = Field(None, alias="decisionMakingRole")
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    decision_making_role: str | None = None
+    phone_number: str | None = None
 
 
 class DemoRequestMapper(BaseModel):
@@ -807,7 +804,7 @@ class DemoRequestMapper(BaseModel):
 class DepartmentInfo(BaseModel):
     id: int | None = None
     name: str | None = None
-    member_count: int | None = Field(None, alias="memberCount")
+    member_count: int | None = None
 
 
 class DistanceUnit(Enum):
@@ -827,9 +824,9 @@ class Domain(BaseModel):
     active: bool | None = None
     code: str | None = None
     name: str | None = None
-    hosts: list[str] | None = None
-    sso_service_codes: list[str] | None = Field(None, alias="ssoServiceCodes")
-    org_ids: list[int] | None = Field(None, alias="orgIds")
+    hosts: list[str] = Field(default_factory=list)
+    sso_service_codes: list[str] = Field(default_factory=list)
+    org_ids: list[int] = Field(default_factory=list)
     branding: Branding | None = None
 
 
@@ -839,8 +836,8 @@ class EmailStatus(Enum):
 
 
 class EmergencyContact(BaseModel):
-    full_name: str | None = Field(None, alias="fullName")
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    full_name: str | None = None
+    phone_number: str | None = None
 
 
 class EmptyData(BaseModel):
@@ -924,21 +921,21 @@ class FareConditions(BaseModel):
     id: str | None = None
     code: str | None = None
     description: str | None = None
-    conditions_summary: str | None = Field(None, alias="conditionsSummary")
-    conditions: list[Condition] | None = None
+    conditions_summary: str | None = None
+    conditions: list[Condition] = Field(default_factory=list)
 
 
 class FareRule(BaseModel):
-    fare_basis_code: str | None = Field(None, alias="fareBasisCode")
-    segment_key: str | None = Field(None, alias="segmentKey")
-    descriptions: dict[str, list[str]] | None = None
+    fare_basis_code: str | None = None
+    segment_key: str | None = None
+    descriptions: dict[str, list[str]] = Field(default_factory=dict)
 
 
 class FareSegment(BaseModel):
-    segment_id: str | None = Field(None, alias="segmentId")
+    segment_id: str | None = None
     cabin: CabinClass | None = None
-    class_of_service: str | None = Field(None, alias="classOfService")
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    class_of_service: str | None = None
+    co2_emissions: float | None = None
     perks: int | None = None
 
 
@@ -988,11 +985,11 @@ class FieldType(Enum):
 class FieldValue(BaseModel):
     id: int | None = None
     nms: int | None = None
-    field_id: int | None = Field(None, alias="fieldId")
+    field_id: int | None = None
     code: str | None = None
     name: str | None = None
     active: bool | None = None
-    remark_required: bool | None = Field(None, alias="remarkRequired")
+    remark_required: bool | None = None
 
 
 class FieldValueType(Enum):
@@ -1008,9 +1005,9 @@ class FlatnessEnum(Enum):
 
 
 class FlightAttributeFee(BaseModel):
-    currency_code: str | None = Field(None, alias="currencyCode")
-    amount_min: str | None = Field(None, alias="amountMin")
-    amount_max: str | None = Field(None, alias="amountMax")
+    currency_code: str | None = None
+    amount_min: str | None = None
+    amount_max: str | None = None
 
 
 class FlightClass(Enum):
@@ -1040,72 +1037,63 @@ class FlightReservationSeatFlags(Enum):
 
 
 class FlightReservationSegment(BaseModel):
-    segment_key: str | None = Field(None, alias="segmentKey")
+    segment_key: str | None = None
     airline: str | None = None
-    operating_airline: str | None = Field(None, alias="operatingAirline")
+    operating_airline: str | None = None
     duration: int | None = None
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
-    arrival_time_offset: int | None = Field(None, alias="arrivalTimeOffset")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    departure_time_offset: int | None = Field(None, alias="departureTimeOffset")
-    flight_number: str | None = Field(None, alias="flightNumber")
-    flight_class: FlightClass | None = Field(None, alias="flightClass")
-    flight_class_premium: bool | None = Field(None, alias="flightClassPremium")
-    service_class: str | None = Field(None, alias="serviceClass")
-    fare_basis_code: str | None = Field(None, alias="fareBasisCode")
-    fare_brand: str | None = Field(None, alias="fareBrand")
+    arrival_station: str | None = None
+    departure_station: str | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
+    arrival_time_offset: int | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    departure_time_offset: int | None = None
+    flight_number: str | None = None
+    flight_class: FlightClass | None = None
+    flight_class_premium: bool | None = None
+    service_class: str | None = None
+    fare_basis_code: str | None = None
+    fare_brand: str | None = None
     aircraft: str | None = None
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    departure_offset_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="departureOffsetDateTime",
-    )
-    arrival_offset_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="arrivalOffsetDateTime",
-    )
+    fare_name: str | None = None
+    fare_type: FareType | None = None
+    co2_emissions: float | None = None
+    departure_offset_date_time: AwareOrNaiveDatetime | None = None
+    arrival_offset_date_time: AwareOrNaiveDatetime | None = None
 
 
 class FlightSearchFlight(BaseModel):
-    arrival_airport: str | None = Field(None, alias="arrivalAirport")
-    departure_airport: str | None = Field(None, alias="departureAirport")
-    depart_date: date | None = Field(None, alias="departDate")
+    arrival_airport: str | None = None
+    departure_airport: str | None = None
+    depart_date: date | None = None
 
 
 class FlightSeatMapRequest(BaseModel):
-    refs: list[str] | None = None
-    reward_programs: dict[str, dict[str, int]] | None = Field(
-        None,
-        alias="rewardPrograms",
-    )
+    refs: list[str] = Field(default_factory=list)
+    reward_programs: dict[str, dict[str, int]] = Field(default_factory=dict)
 
 
 class FlightSegmentRefData(BaseModel):
-    segment_key: str | None = Field(None, alias="segmentKey")
-    flight_number: str | None = Field(None, alias="flightNumber")
-    marketing_airline_code: str | None = Field(None, alias="marketingAirlineCode")
-    operating_airline_code: str | None = Field(None, alias="operatingAirlineCode")
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    segment_key: str | None = None
+    flight_number: str | None = None
+    marketing_airline_code: str | None = None
+    operating_airline_code: str | None = None
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     duration: int | None = None
-    class_of_service: str | None = Field(None, alias="classOfService")
-    fare_basis_code: str | None = Field(None, alias="fareBasisCode")
-    fare_brand: str | None = Field(None, alias="fareBrand")
-    flight_class: FlightClass | None = Field(None, alias="flightClass")
-    flight_class_premium: bool | None = Field(None, alias="flightClassPremium")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    fare_name: str | None = Field(None, alias="fareName")
-    aircraft_type: str | None = Field(None, alias="aircraftType")
-    is_stop_segment: bool | None = Field(None, alias="isStopSegment")
-    marriage_group: str | None = Field(None, alias="marriageGroup")
-    cabin_class: CabinClass | None = Field(None, alias="cabinClass")
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    class_of_service: str | None = None
+    fare_basis_code: str | None = None
+    fare_brand: str | None = None
+    flight_class: FlightClass | None = None
+    flight_class_premium: bool | None = None
+    fare_type: FareType | None = None
+    fare_name: str | None = None
+    aircraft_type: str | None = None
+    is_stop_segment: bool | None = None
+    marriage_group: str | None = None
+    cabin_class: CabinClass | None = None
+    co2_emissions: float | None = None
 
 
 class FoodQuality(Enum):
@@ -1135,7 +1123,7 @@ class FopFlags(Enum):
 
 class Fts(BaseModel):
     id: int | None = None
-    resource_type: str | None = Field(None, alias="resourceType")
+    resource_type: str | None = None
 
 
 class FtsOperatorType(Enum):
@@ -1159,45 +1147,45 @@ class GeoLocation(BaseModel):
 
 class GetCarRequest(BaseModel):
     ref: str | None = None
-    user_owner_id: int | None = Field(None, alias="userOwnerId")
+    user_owner_id: int | None = None
 
 
 class GetCarResponse(BaseModel):
     brand: str | None = None
     car: Car | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    pick_up: CarLocation | None = Field(None, alias="pickUp")
-    same_drop_off_location: bool | None = Field(None, alias="sameDropOffLocation")
-    drop_off: CarLocation | None = Field(None, alias="dropOff")
-    pick_up_date: AwareOrNaiveDatetime | None = Field(None, alias="pickUpDate")
-    drop_off_date: AwareOrNaiveDatetime | None = Field(None, alias="dropOffDate")
-    extras: list[CarExtra] | None = None
-    insurance: list[CarInsurance] | None = None
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    pick_up: CarLocation | None = None
+    same_drop_off_location: bool | None = None
+    drop_off: CarLocation | None = None
+    pick_up_date: AwareOrNaiveDatetime | None = None
+    drop_off_date: AwareOrNaiveDatetime | None = None
+    extras: list[CarExtra] = Field(default_factory=list)
+    insurance: list[CarInsurance] = Field(default_factory=list)
     days: int | None = None
     hours: int | None = None
-    total_extras: float | None = Field(None, alias="totalExtras")
-    total_insurance: float | None = Field(None, alias="totalInsurance")
-    total_taxes: float | None = Field(None, alias="totalTaxes")
-    total_fees: float | None = Field(None, alias="totalFees")
-    total_vehicle: float | None = Field(None, alias="totalVehicle")
+    total_extras: float | None = None
+    total_insurance: float | None = None
+    total_taxes: float | None = None
+    total_fees: float | None = None
+    total_vehicle: float | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
+    total_price: float | None = None
     flags: int | None = None
-    unlimited_distance: bool | None = Field(None, alias="unlimitedDistance")
-    free_distance_covered: float | None = Field(None, alias="freeDistanceCovered")
-    distance_overage: float | None = Field(None, alias="distanceOverage")
-    distance_unit: DistanceUnit | None = Field(None, alias="distanceUnit")
+    unlimited_distance: bool | None = None
+    free_distance_covered: float | None = None
+    distance_overage: float | None = None
+    distance_unit: DistanceUnit | None = None
     ref: str | None = None
-    invalid_reward_program: bool | None = Field(None, alias="invalidRewardProgram")
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
+    invalid_reward_program: bool | None = None
+    rate_code_descr: str | None = None
 
 
 class GlobalUserReward(BaseModel):
     id: int | None = None
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
+    reward_program_id: int | None = None
     idx: int | None = None
-    member_id: str | None = Field(None, alias="memberId")
+    member_id: str | None = None
 
 
 class HotelAmenities(Enum):
@@ -1213,12 +1201,12 @@ class HotelAmenities(Enum):
 
 
 class HotelCancellation(BaseModel):
-    non_refundable_rate: bool | None = Field(None, alias="nonRefundableRate")
+    non_refundable_rate: bool | None = None
     cancellable: bool | None = None
     deadline: AwareOrNaiveDatetime | None = None
-    cancellation_fee_percent: float | None = Field(None, alias="cancellationFeePercent")
-    prepayment_percent: float | None = Field(None, alias="prepaymentPercent")
-    fully_refundable: bool | None = Field(None, alias="fullyRefundable")
+    cancellation_fee_percent: float | None = None
+    prepayment_percent: float | None = None
+    fully_refundable: bool | None = None
     description: str | None = None
 
 
@@ -1226,30 +1214,30 @@ class HotelChain(BaseModel):
     id: int | None = None
     code: str | None = None
     name: str | None = None
-    marketer_code: str | None = Field(None, alias="marketerCode")
-    marketer_name: str | None = Field(None, alias="marketerName")
+    marketer_code: str | None = None
+    marketer_name: str | None = None
     active: bool | None = None
 
 
 class HotelChainReward(BaseModel):
     id: int | None = None
-    chain_name: str | None = Field(None, alias="chainName")
-    group_name: str | None = Field(None, alias="groupName")
-    chain_code: str | None = Field(None, alias="chainCode")
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
+    chain_name: str | None = None
+    group_name: str | None = None
+    chain_code: str | None = None
+    reward_program_id: int | None = None
 
 
 class HotelInfoRequest(BaseModel):
-    refs: list[str] | None = None
+    refs: list[str] = Field(default_factory=list)
 
 
 class HotelMedia(BaseModel):
-    thumbnail_height: int | None = Field(None, alias="thumbnailHeight")
-    thumbnail_width: int | None = Field(None, alias="thumbnailWidth")
-    thumbnail_url: str | None = Field(None, alias="thumbnailURL")
-    media_height: int | None = Field(None, alias="mediaHeight")
-    media_width: int | None = Field(None, alias="mediaWidth")
-    media_url: str | None = Field(None, alias="mediaURL")
+    thumbnail_height: int | None = None
+    thumbnail_width: int | None = None
+    thumbnail_url: str | None = None
+    media_height: int | None = None
+    media_width: int | None = None
+    media_url: str | None = None
 
 
 class HotelOfferFlags(Enum):
@@ -1284,8 +1272,8 @@ class HotelRoomFlags(Enum):
 
 
 class HotelRoomsRequest(BaseModel):
-    refs: list[str] | None = None
-    reservation_id: int | None = Field(None, alias="reservationId")
+    refs: list[str] = Field(default_factory=list)
+    reservation_id: int | None = None
 
 
 class ImportProfileAct(Enum):
@@ -1301,35 +1289,35 @@ class ImportProfileSource(Enum):
 
 class InitUserAccountRequest(BaseModel):
     email: str | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     dob: date | None = None
     gender: Gender | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
     flags: int | None = None
     token: str | None = None
     password: str | None = None
-    session_expires_in: int | None = Field(None, alias="sessionExpiresIn")
+    session_expires_in: int | None = None
 
 
 class IssueCreditCard(BaseModel):
     amount: int | None = None
-    expiry_date: date | None = Field(None, alias="expiryDate")
-    activation_date: date | None = Field(None, alias="activationDate")
+    expiry_date: date | None = None
+    activation_date: date | None = None
     currency: str | None = None
-    multi_use: bool | None = Field(None, alias="multiUse")
+    multi_use: bool | None = None
 
 
 class KnownTravelerNumber(BaseModel):
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     dob: AwareOrNaiveDatetime | None = None
-    doc_type: str | None = Field(None, alias="docType")
-    doc_number: str | None = Field(None, alias="docNumber")
+    doc_type: str | None = None
+    doc_number: str | None = None
 
 
 class KpiCountResponse(BaseModel):
@@ -1372,23 +1360,7 @@ class LegroomEnum(Enum):
 
 
 class ListFareRulesResponse(BaseModel):
-    fare_rules: list[FareRule] | None = Field(None, alias="fareRules")
-
-
-class LocalTime(BaseModel):
-    @model_validator(mode="before")
-    @classmethod
-    def parse_time_string(cls, value: Any) -> Any:
-        if isinstance(value, dict):
-            return value
-        parts = map(int, value.split(":"))
-        fields = ("hour", "minute", "second", "nano")
-        return dict(zip(fields, parts, strict=False))
-
-    hour: int | None = None
-    minute: int | None = None
-    second: int | None = None
-    nano: int | None = None
+    fare_rules: list[FareRule] = Field(default_factory=list)
 
 
 class Localization(BaseModel):
@@ -1397,9 +1369,9 @@ class Localization(BaseModel):
 
 
 class LocalizationList1(BaseModel):
-    localizations: list[Localization] | None = None
+    localizations: list[Localization] = Field(default_factory=list)
     empty: bool | None = None
-    elements: list[Localization] | None = None
+    elements: list[Localization] = Field(default_factory=list)
     first: Localization | None = None
     last: Localization | None = None
 
@@ -1409,14 +1381,14 @@ class LocalizationList(RootModel[list[Localization] | LocalizationList1]):
 
 
 class LocateCarRequest(BaseModel):
-    drop_off_date: AwareOrNaiveDatetime | None = Field(None, alias="dropOffDate")
-    pick_up_date: AwareOrNaiveDatetime | None = Field(None, alias="pickUpDate")
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    drop_off_date: AwareOrNaiveDatetime | None = None
+    pick_up_date: AwareOrNaiveDatetime | None = None
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
     keyword: str | None = None
     latitude: float | None = None
     longitude: float | None = None
-    refs: list[str] | None = None
+    refs: list[str] = Field(default_factory=list)
 
 
 class LookupTable(Enum):
@@ -1426,8 +1398,8 @@ class LookupTable(Enum):
 class MaskedUserRewardProgram(BaseModel):
     id: int | None = None
     number: str | None = None
-    user_id: int | None = Field(None, alias="userId")
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
+    user_id: int | None = None
+    reward_program_id: int | None = None
     idx: int | None = None
 
 
@@ -1454,15 +1426,15 @@ class MsgDatePair(BaseModel):
 
 class MsgLocation(BaseModel):
     text: str | None = None
-    place_id: str | None = Field(None, alias="placeId")
+    place_id: str | None = None
     geo: GeoLocation | None = None
     address: str | None = None
-    components: list[str] | None = None
+    components: list[str] = Field(default_factory=list)
 
 
 class MsgMention(BaseModel):
     text: str | None = None
-    user_id: int | None = Field(None, alias="userId")
+    user_id: int | None = None
 
 
 class NotificationType(Enum):
@@ -1509,26 +1481,26 @@ class OptSvcApplication(Enum):
 
 
 class OptionalServiceIdentifier(BaseModel):
-    group_code: str | None = Field(None, alias="groupCode")
-    sub_code: str | None = Field(None, alias="subCode")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    group_code: str | None = None
+    sub_code: str | None = None
+    sub_group_code: str | None = None
 
 
 class OrgAgency(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    org_id: int | None = Field(None, alias="orgId")
-    contact_info: AgencyContactInfo | None = Field(None, alias="contactInfo")
+    agency_code: str | None = None
+    org_id: int | None = None
+    contact_info: AgencyContactInfo | None = None
 
 
 class OrgAirlinePref(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    airline_code: str | None = Field(None, alias="airlineCode")
-    policy_id: int | None = Field(None, alias="policyId")
-    preference_level: int | None = Field(None, alias="preferenceLevel")
+    org_id: int | None = None
+    airline_code: str | None = None
+    policy_id: int | None = None
+    preference_level: int | None = None
 
 
 class OrgBudgetType(Enum):
@@ -1537,17 +1509,17 @@ class OrgBudgetType(Enum):
 
 class OrgCarVendorPref(BaseModel):
     id: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    vendor_code: str | None = Field(None, alias="vendorCode")
-    policy_id: int | None = Field(None, alias="policyId")
-    preference_level: int | None = Field(None, alias="preferenceLevel")
+    org_id: int | None = None
+    vendor_code: str | None = None
+    policy_id: int | None = None
+    preference_level: int | None = None
 
 
 class OrgDomain(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     name: str | None = None
 
 
@@ -1566,22 +1538,22 @@ class OrgEntryData(BaseModel):
     name: str | None = None
     flags: int | None = None
     description: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
-    agency_code: str | None = Field(None, alias="agencyCode")
+    agency_code: str | None = None
     timezone: str | None = None
-    billing_address: AddressLocation | None = Field(None, alias="billingAddress")
+    phone_number: str | None = None
+    billing_address: AddressLocation | None = None
     website: str | None = None
 
 
 class OrgEntryDataImpl(BaseModel):
-    agency_code: str | None = Field(None, alias="agencyCode")
+    agency_code: str | None = None
     name: str | None = None
     description: str | None = None
     flags: int | None = None
-    billing_address: AddressLocation | None = Field(None, alias="billingAddress")
+    billing_address: AddressLocation | None = None
     website: str | None = None
     timezone: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
 
 
 class OrgFlags(Enum):
@@ -1594,20 +1566,20 @@ class OrgFlags(Enum):
 class OrgHotelChainPref(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    chain_code: str | None = Field(None, alias="chainCode")
-    policy_id: int | None = Field(None, alias="policyId")
-    preference_level: int | None = Field(None, alias="preferenceLevel")
+    org_id: int | None = None
+    chain_code: str | None = None
+    policy_id: int | None = None
+    preference_level: int | None = None
 
 
 class OrgHotelChainRoomPref(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    chain_code: str | None = Field(None, alias="chainCode")
-    rate_code: str | None = Field(None, alias="rateCode")
-    policy_id: int | None = Field(None, alias="policyId")
-    preference_level: int | None = Field(None, alias="preferenceLevel")
+    org_id: int | None = None
+    chain_code: str | None = None
+    rate_code: str | None = None
+    policy_id: int | None = None
+    preference_level: int | None = None
 
 
 class OrgIntegrationType(Enum):
@@ -1616,8 +1588,8 @@ class OrgIntegrationType(Enum):
 
 class OrgLoyaltyProgram(BaseModel):
     id: int | None = None
-    loyalty_program_id: int | None = Field(None, alias="loyaltyProgramId")
-    org_id: int | None = Field(None, alias="orgId")
+    loyalty_program_id: int | None = None
+    org_id: int | None = None
     number: str | None = None
     idx: int | None = None
 
@@ -1634,8 +1606,8 @@ class OrgProjectMapper(BaseModel):
 
 class OrgRateCode(BaseModel):
     id: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    rate_code_id: int | None = Field(None, alias="rateCodeId")
+    org_id: int | None = None
+    rate_code_id: int | None = None
 
 
 class OrgRateCodeMapper(BaseModel):
@@ -1644,7 +1616,7 @@ class OrgRateCodeMapper(BaseModel):
 
 class OrgRateCodeText(BaseModel):
     id: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     text: str | None = None
 
 
@@ -1656,9 +1628,9 @@ class OrgSettings(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    config: list[str] | None = None
+    org_id: int | None = None
+    agency_code: str | None = None
+    config: list[str] = Field(default_factory=list)
 
 
 class OrgType(Enum):
@@ -1671,9 +1643,9 @@ class OrgType(Enum):
 class OrgUserField(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_user_id: int | None = Field(None, alias="orgUserId")
-    field_id: int | None = Field(None, alias="fieldId")
-    field_value_id: int | None = Field(None, alias="fieldValueId")
+    org_user_id: int | None = None
+    field_id: int | None = None
+    field_value_id: int | None = None
     value: str | None = None
     remark: str | None = None
 
@@ -1692,27 +1664,27 @@ class OrgUserStatus(Enum):
 
 class OrgUserUpdateEntryData(BaseModel):
     position: str | None = None
-    business_phone_number: str | None = Field(None, alias="businessPhoneNumber")
-    business_address: AddressLocation | None = Field(None, alias="businessAddress")
+    business_phone_number: str | None = None
+    business_address: AddressLocation | None = None
     role: OrgUserRole | None = None
 
 
 class OriginDestination(BaseModel):
     airline: str | None = None
-    departure_station: str | None = Field(None, alias="departureStation")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    departure_station: str | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_station: str | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     duration: int | None = None
-    segments: list[str] | None = None
-    stops: list[str] | None = None
-    airline_pref_level: int | None = Field(None, alias="airlinePrefLevel")
+    segments: list[str] = Field(default_factory=list)
+    stops: list[str] = Field(default_factory=list)
+    airline_pref_level: int | None = None
 
 
 class OriginDestinationRequest(BaseModel):
-    arrival_airport: str | None = Field(None, alias="arrivalAirport")
-    departure_airport: str | None = Field(None, alias="departureAirport")
-    departure_date: date | None = Field(None, alias="departureDate")
+    arrival_airport: str | None = None
+    departure_airport: str | None = None
+    departure_date: date | None = None
 
 
 class OtaRatePlanType(Enum):
@@ -1756,29 +1728,30 @@ class OutOfPolicy(BaseModel):
 class PassengerEntry(BaseModel):
     ref: str | None = None
     ptc: str | None = None
-    offer_item_id: str | None = Field(None, alias="offerItemId")
+    offer_item_id: str | None = None
 
 
 class PassportData(BaseModel):
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     dob: AwareOrNaiveDatetime | None = None
-    doc_type: str | None = Field(None, alias="docType")
-    doc_number: str | None = Field(None, alias="docNumber")
-    issue_country: str | None = Field(None, alias="issueCountry")
+    doc_type: str | None = None
+    doc_number: str | None = None
+    issue_country: str | None = None
     nationality: str | None = None
-    expiration_date: AwareOrNaiveDatetime | None = Field(None, alias="expirationDate")
+    expiration_date: AwareOrNaiveDatetime | None = None
 
 
 class PciCard(BaseModel):
     id: int | None = None
-    user_id: int | None = Field(None, alias="userId")
-    org_id: int | None = Field(None, alias="orgId")
+    user_id: int | None = None
+    org_id: int | None = None
     name: str | None = None
-    reservation_types: int | None = Field(None, alias="reservationTypes")
-    owner_id: int | None = Field(None, alias="ownerId")
+    reservation_types: int | None = None
+    complete: bool | None = None
+    owner_id: int | None = None
 
 
 class PciCardMapper(BaseModel):
@@ -1856,7 +1829,7 @@ class PolicyMapper(BaseModel):
 class PolicyOptionLeg(BaseModel):
     pair: str | None = None
     duration: int | None = None
-    flight_class: FlightClassPref | None = Field(None, alias="flightClass")
+    flight_class: FlightClassPref | None = None
 
 
 class PolicyResult(Enum):
@@ -1885,8 +1858,8 @@ class PolicyRuleMapper(BaseModel):
 
 
 class PolicyRuleResult(BaseModel):
-    policy_id: int | None = Field(None, alias="policyId")
-    rule_id: int | None = Field(None, alias="ruleId")
+    policy_id: int | None = None
+    rule_id: int | None = None
     result: PolicyResult | None = None
 
 
@@ -1924,8 +1897,8 @@ class PolicyRuleSpecs(Enum):
 
 
 class PolicyStatistics(BaseModel):
-    cheapest_price: float | None = Field(None, alias="cheapestPrice")
-    lowest_logical: float | None = Field(None, alias="lowestLogical")
+    cheapest_price: float | None = None
+    lowest_logical: float | None = None
 
 
 class PolicyType(Enum):
@@ -1950,43 +1923,40 @@ class PowerType(Enum):
 
 
 class PrepareTrainReservationResponse(BaseModel):
-    total_price: float | None = Field(None, alias="totalPrice")
-    raw_data: dict[str, Any] | None = Field(None, alias="rawData")
+    total_price: float | None = None
+    raw_data: dict[str, Any] = Field(default_factory=dict)
 
 
 class PriceSummary(BaseModel):
     currency: str | None = None
-    due_amount: float | None = Field(None, alias="dueAmount")
-    refund_amount: float | None = Field(None, alias="refundAmount")
-    credit_amount: float | None = Field(None, alias="creditAmount")
-    penalty_amount: float | None = Field(None, alias="penaltyAmount")
-    taxes_and_fees_amount: float | None = Field(None, alias="taxesAndFeesAmount")
-    total_amount: float | None = Field(None, alias="totalAmount")
-    fop_flags: int | None = Field(None, alias="fopFlags")
+    due_amount: float | None = None
+    refund_amount: float | None = None
+    credit_amount: float | None = None
+    penalty_amount: float | None = None
+    taxes_and_fees_amount: float | None = None
+    total_amount: float | None = None
+    fop_flags: int | None = None
 
 
 class PricedFare(BaseModel):
     currency: str | None = None
     price: float | None = None
     name: str | None = None
-    penalty_id: str | None = Field(None, alias="penaltyId")
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    out_of_policy_rule_ids: list[int] | None = Field(None, alias="outOfPolicyRuleIds")
+    penalty_id: str | None = None
+    out_of_policy_id: int | None = None
+    out_of_policy_rule_ids: list[int] = Field(default_factory=list)
     flags: int | None = None
     penalties: int | None = None
     perks: int | None = None
-    segments: list[FareSegment] | None = None
-    refs: list[str] | None = None
-    is_transborder: bool | None = Field(None, alias="isTransborder")
-    has_mixed_cabin: bool | None = Field(None, alias="hasMixedCabin")
-    is_current_fare: bool | None = Field(None, alias="isCurrentFare")
-    is_seat_selection_available: bool | None = Field(
-        None,
-        alias="isSeatSelectionAvailable",
-    )
-    has_limited_options: bool | None = Field(None, alias="hasLimitedOptions")
-    has_multi_tickets: bool | None = Field(None, alias="hasMultiTickets")
-    has_special_rate: bool | None = Field(None, alias="hasSpecialRate")
+    segments: list[FareSegment] = Field(default_factory=list)
+    refs: list[str] = Field(default_factory=list)
+    is_transborder: bool | None = None
+    has_mixed_cabin: bool | None = None
+    is_current_fare: bool | None = None
+    is_seat_selection_available: bool | None = None
+    has_limited_options: bool | None = None
+    has_multi_tickets: bool | None = None
+    has_special_rate: bool | None = None
 
 
 class PrimaryFlightStatus(Enum):
@@ -2018,31 +1988,31 @@ class Provider(BaseModel):
     id: int | None = None
     code: str | None = None
     name: str | None = None
-    provider_type: str | None = Field(None, alias="providerType")
+    provider_type: str | None = None
     active: bool | None = None
 
 
 class ProviderPnr(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    time_zone: str | None = Field(None, alias="timeZone")
-    local_created_on: AwareOrNaiveDatetime | None = Field(None, alias="localCreatedOn")
-    org_id: int | None = Field(None, alias="orgId")
-    trip_board_id: int | None = Field(None, alias="tripBoardId")
-    provider_code: str | None = Field(None, alias="providerCode")
+    agency_code: str | None = None
+    time_zone: str | None = None
+    local_created_on: AwareOrNaiveDatetime | None = None
+    org_id: int | None = None
+    trip_board_id: int | None = None
+    provider_code: str | None = None
     pnr: str | None = None
 
 
 class ProviderPnrReport(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    time_zone: str | None = Field(None, alias="timeZone")
-    local_created_on: AwareOrNaiveDatetime | None = Field(None, alias="localCreatedOn")
-    org_name: str | None = Field(None, alias="orgName")
-    trip_board_id: int | None = Field(None, alias="tripBoardId")
-    provider_code: str | None = Field(None, alias="providerCode")
+    agency_code: str | None = None
+    time_zone: str | None = None
+    local_created_on: AwareOrNaiveDatetime | None = None
+    org_name: str | None = None
+    trip_board_id: int | None = None
+    provider_code: str | None = None
     pnr: str | None = None
 
 
@@ -2053,9 +2023,9 @@ class Quality(Enum):
 
 
 class Localizations(BaseModel):
-    localizations: list[Localization] | None = None
+    localizations: list[Localization] = Field(default_factory=list)
     empty: bool | None = None
-    elements: list[Localization] | None = None
+    elements: list[Localization] = Field(default_factory=list)
     first: Localization | None = None
     last: Localization | None = None
 
@@ -2065,7 +2035,7 @@ class Railcard(BaseModel):
     code: str | None = None
     name: str | None = None
     vendor: str | None = None
-    provider_code: str | None = Field(None, alias="providerCode")
+    provider_code: str | None = None
     active: bool | None = None
     localizations: list[Localization] | Localizations | None = None
 
@@ -2075,10 +2045,10 @@ class RateCode(BaseModel):
     code: str | None = None
     description: str | None = None
     active: bool | None = None
-    is_default: bool | None = Field(None, alias="isDefault")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    org_default: bool | None = Field(None, alias="orgDefault")
-    provider_code: str | None = Field(None, alias="providerCode")
+    is_default: bool | None = None
+    agency_code: str | None = None
+    org_default: bool | None = None
+    provider_code: str | None = None
 
 
 class RateCodeInfo(BaseModel):
@@ -2097,85 +2067,82 @@ class ReasonType(Enum):
 
 class RefPolicyInfo(BaseModel):
     ref: str | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    policy_rule_results: list[PolicyRuleResult] | None = Field(
-        None,
-        alias="policyRuleResults",
-    )
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    policy_rule_results: list[PolicyRuleResult] = Field(default_factory=list)
 
 
 class ReportAirlinesByOrg(BaseModel):
-    airline_code: str | None = Field(None, alias="airlineCode")
-    airline_name: str | None = Field(None, alias="airlineName")
+    airline_code: str | None = None
+    airline_name: str | None = None
     segments: int | None = None
-    amount: list[Amount] | None = None
+    amount: list[Amount] = Field(default_factory=list)
 
 
 class ReportCityPairs(BaseModel):
-    departure_code: str | None = Field(None, alias="departureCode")
-    arrival_code: str | None = Field(None, alias="arrivalCode")
-    total_spend: list[Amount] | None = Field(None, alias="totalSpend")
-    current_spend: list[Amount] | None = Field(None, alias="currentSpend")
-    total_segments: int | None = Field(None, alias="totalSegments")
-    current_segments: int | None = Field(None, alias="currentSegments")
-    total_basic_segments: int | None = Field(None, alias="totalBasicSegments")
-    total_economy_segments: int | None = Field(None, alias="totalEconomySegments")
-    total_premium_segments: int | None = Field(None, alias="totalPremiumSegments")
-    current_basic_segments: int | None = Field(None, alias="currentBasicSegments")
-    current_economy_segments: int | None = Field(None, alias="currentEconomySegments")
-    current_premium_segments: int | None = Field(None, alias="currentPremiumSegments")
+    departure_code: str | None = None
+    arrival_code: str | None = None
+    total_spend: list[Amount] = Field(default_factory=list)
+    current_spend: list[Amount] = Field(default_factory=list)
+    total_segments: int | None = None
+    current_segments: int | None = None
+    total_basic_segments: int | None = None
+    total_economy_segments: int | None = None
+    total_premium_segments: int | None = None
+    current_basic_segments: int | None = None
+    current_economy_segments: int | None = None
+    current_premium_segments: int | None = None
     qsi: float | None = None
-    market_share: float | None = Field(None, alias="marketShare")
+    market_share: float | None = None
 
 
 class ReportFlightByCityPair(BaseModel):
-    departure_code: str | None = Field(None, alias="departureCode")
-    arrival_code: str | None = Field(None, alias="arrivalCode")
-    total_spend: float | None = Field(None, alias="totalSpend")
-    total_segments: int | None = Field(None, alias="totalSegments")
+    departure_code: str | None = None
+    arrival_code: str | None = None
+    total_spend: float | None = None
+    total_segments: int | None = None
 
 
 class ReportFlightByEmployee(BaseModel):
-    user_id: int | None = Field(None, alias="userId")
-    user_name: str | None = Field(None, alias="userName")
+    user_id: int | None = None
+    user_name: str | None = None
     amount: float | None = None
     segments: int | None = None
 
 
 class ReportFlightsHotelsInfo(BaseModel):
-    flights_total_spend: float | None = Field(None, alias="flightsTotalSpend")
-    flights_tickets: float | None = Field(None, alias="flightsTickets")
-    hotels_total_spend: float | None = Field(None, alias="hotelsTotalSpend")
-    hotels_average_rate: float | None = Field(None, alias="hotelsAverageRate")
-    hotels_average_days: float | None = Field(None, alias="hotelsAverageDays")
-    hotels_days: int | None = Field(None, alias="hotelsDays")
+    flights_total_spend: float | None = None
+    flights_tickets: float | None = None
+    hotels_total_spend: float | None = None
+    hotels_average_rate: float | None = None
+    hotels_average_days: float | None = None
+    hotels_days: int | None = None
     budget: float | None = None
 
 
 class ReportGraphInfo(BaseModel):
     day: date | None = None
-    amount_spend: float | None = Field(None, alias="amountSpend")
+    amount_spend: float | None = None
     budget: float | None = None
 
 
 class ReportOrganizationSpendInfo(BaseModel):
-    total_spend: float | None = Field(None, alias="totalSpend")
+    total_spend: float | None = None
 
 
 class ReportProspectiveCustomer(BaseModel):
-    org_id: int | None = Field(None, alias="orgId")
-    company_name: str | None = Field(None, alias="companyName")
-    current_spend: float | None = Field(None, alias="currentSpend")
-    current_segments: int | None = Field(None, alias="currentSegments")
-    total_spend: float | None = Field(None, alias="totalSpend")
-    total_segments: int | None = Field(None, alias="totalSegments")
-    total_basic_segments: int | None = Field(None, alias="totalBasicSegments")
-    total_economy_segments: int | None = Field(None, alias="totalEconomySegments")
-    total_premium_segments: int | None = Field(None, alias="totalPremiumSegments")
-    current_basic_segments: int | None = Field(None, alias="currentBasicSegments")
-    current_economy_segments: int | None = Field(None, alias="currentEconomySegments")
-    current_premium_segments: int | None = Field(None, alias="currentPremiumSegments")
+    org_id: int | None = None
+    company_name: str | None = None
+    current_spend: float | None = None
+    current_segments: int | None = None
+    total_spend: float | None = None
+    total_segments: int | None = None
+    total_basic_segments: int | None = None
+    total_economy_segments: int | None = None
+    total_premium_segments: int | None = None
+    current_basic_segments: int | None = None
+    current_economy_segments: int | None = None
+    current_premium_segments: int | None = None
 
 
 class ReqItinerarySegment(BaseModel):
@@ -2187,7 +2154,7 @@ class ReqItinerarySegment(BaseModel):
     fbc: str | None = None
     fltno: int | None = None
     rbd: str | None = None
-    rule_no: str | None = Field(None, alias="ruleNo")
+    rule_no: str | None = None
 
 
 class RequestId(BaseModel):
@@ -2195,21 +2162,21 @@ class RequestId(BaseModel):
 
 
 class ReservationConsumer(BaseModel):
-    user_id: int | None = Field(None, alias="userId")
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    user_id: int | None = None
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     dob: date | None = None
-    on_lap_index: int | None = Field(None, alias="onLapIndex")
+    on_lap_index: int | None = None
 
 
 class ReservationField(BaseModel):
     id: int | None = None
     nms: int | None = None
-    reservation_id: int | None = Field(None, alias="reservationId")
-    user_id: int | None = Field(None, alias="userId")
-    field_id: int | None = Field(None, alias="fieldId")
-    field_value_id: int | None = Field(None, alias="fieldValueId")
+    reservation_id: int | None = None
+    user_id: int | None = None
+    field_id: int | None = None
+    field_value_id: int | None = None
     value: str | None = None
     remark: str | None = None
 
@@ -2231,12 +2198,12 @@ class ReservationFlags(Enum):
 
 
 class ReservationMedia(BaseModel):
-    thumbnail_height: int | None = Field(None, alias="thumbnailHeight")
-    thumbnail_width: int | None = Field(None, alias="thumbnailWidth")
-    thumbnail_url: str | None = Field(None, alias="thumbnailUrl")
-    media_height: int | None = Field(None, alias="mediaHeight")
-    media_width: int | None = Field(None, alias="mediaWidth")
-    media_url: str | None = Field(None, alias="mediaUrl")
+    thumbnail_height: int | None = None
+    thumbnail_width: int | None = None
+    thumbnail_url: str | None = None
+    media_height: int | None = None
+    media_width: int | None = None
+    media_url: str | None = None
 
 
 class ReservationStatus(Enum):
@@ -2281,7 +2248,7 @@ class RespItineraryAmenityRef(BaseModel):
     aircraft: str | None = None
     beverage: str | None = None
     entertainment: str | None = None
-    fresh_food: str | None = Field(None, alias="freshFood")
+    fresh_food: str | None = None
     layout: str | None = None
     power: str | None = None
     seat: str | None = None
@@ -2289,28 +2256,25 @@ class RespItineraryAmenityRef(BaseModel):
 
 
 class RespItineraryErrors(BaseModel):
-    messages: list[str] | None = None
-    unmatched_fares: list[str] | None = Field(None, alias="unmatchedFares")
-    unmatched_segments: list[str] | None = Field(None, alias="unmatchedSegments")
+    messages: list[str] = Field(default_factory=list)
+    unmatched_fares: list[str] = Field(default_factory=list)
+    unmatched_segments: list[str] = Field(default_factory=list)
 
 
 class RespItinerarySegment(BaseModel):
     amenity: RespItineraryAmenityRef | None = None
-    boarding_priority: list[list[str]] | None = Field(None, alias="boardingPriority")
-    carry_on_bag: list[list[str]] | None = Field(None, alias="carryOnBag")
-    check_in_priority: list[list[str]] | None = Field(None, alias="checkInPriority")
-    checked_bag: list[list[str]] | None = Field(None, alias="checkedBag")
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    boarding_priority: list[list[str]] = Field(default_factory=list)
+    carry_on_bag: list[list[str]] = Field(default_factory=list)
+    check_in_priority: list[list[str]] = Field(default_factory=list)
+    checked_bag: list[list[str]] = Field(default_factory=list)
+    co2_emissions: float | None = None
     id: str | None = None
-    lounge_access: list[list[str]] | None = Field(None, alias="loungeAccess")
+    lounge_access: list[list[str]] = Field(default_factory=list)
     overnight: Exists | None = None
-    same_day_change: list[list[str]] | None = Field(None, alias="sameDayChange")
-    seat_selection: list[list[str]] | None = Field(None, alias="seatSelection")
-    upas: list[str] | None = None
-    upgrade_eligibility: list[list[str]] | None = Field(
-        None,
-        alias="upgradeEligibility",
-    )
+    same_day_change: list[list[str]] = Field(default_factory=list)
+    seat_selection: list[list[str]] = Field(default_factory=list)
+    upas: list[str] = Field(default_factory=list)
+    upgrade_eligibility: list[list[str]] = Field(default_factory=list)
 
 
 class ResponseStatus(Enum):
@@ -2319,11 +2283,11 @@ class ResponseStatus(Enum):
 
 
 class RestoreSession(BaseModel):
-    restored: list[str] | None = None
+    restored: list[str] = Field(default_factory=list)
 
 
 class ReviewFlightsRequest(BaseModel):
-    refs: list[str] | None = None
+    refs: list[str] = Field(default_factory=list)
 
 
 class RewardProgram(BaseModel):
@@ -2332,7 +2296,7 @@ class RewardProgram(BaseModel):
     name: str | None = None
     code: str | None = None
     type: ReservationType | None = None
-    ext_type: ReservationType | None = Field(None, alias="extType")
+    ext_type: ReservationType | None = None
 
 
 class RewardProgramInfo(BaseModel):
@@ -2344,7 +2308,7 @@ class RewardProgramListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[RewardProgram] | None = None
+    data: list[RewardProgram] = Field(default_factory=list)
 
 
 class RewardProgramResponse(BaseModel):
@@ -2380,16 +2344,16 @@ class RoomRateCode(BaseModel):
 
 class SabreCabinClass(BaseModel):
     id: int | None = None
-    service_class: str | None = Field(None, alias="serviceClass")
+    service_class: str | None = None
     airline: str | None = None
     description: str | None = None
-    cabin_class: CabinClass | None = Field(None, alias="cabinClass")
-    cabin_class_override: CabinClass | None = Field(None, alias="cabinClassOverride")
+    cabin_class: CabinClass | None = None
+    cabin_class_override: CabinClass | None = None
 
 
 class SabreCommand(BaseModel):
     token: str | None = None
-    conversation_id: str | None = Field(None, alias="conversationId")
+    conversation_id: str | None = None
     command: str | None = None
 
 
@@ -2400,60 +2364,54 @@ class SabreProfileType(Enum):
 
 class SabreRecordLocator(BaseModel):
     id: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
+    agency_code: str | None = None
     pnr: str | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    traveler_profile_ids: list[str] | None = Field(None, alias="travelerProfileIds")
-    dk_numbers: list[str] | None = Field(None, alias="dkNumbers")
-    corporate_profile_id: str | None = Field(None, alias="corporateProfileId")
-    agency_profile_id: str | None = Field(None, alias="agencyProfileId")
-    creation_timestamp: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="creationTimestamp",
-    )
-    last_updated_timestamp: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="lastUpdatedTimestamp",
-    )
-    total_price: float | None = Field(None, alias="totalPrice")
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    trip_id: int | None = None
+    traveler_profile_ids: list[str] = Field(default_factory=list)
+    dk_numbers: list[str] = Field(default_factory=list)
+    corporate_profile_id: str | None = None
+    agency_profile_id: str | None = None
+    creation_timestamp: AwareOrNaiveDatetime | None = None
+    last_updated_timestamp: AwareOrNaiveDatetime | None = None
+    total_price: float | None = None
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     hash: str | None = None
-    command_remarks: bool | None = Field(None, alias="commandRemarks")
-    update_requested: AwareOrNaiveDatetime | None = Field(None, alias="updateRequested")
+    command_remarks: bool | None = None
+    update_requested: AwareOrNaiveDatetime | None = None
 
 
 class SabreRecordLocatorTime(BaseModel):
     id: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    update_time: AwareOrNaiveDatetime | None = Field(None, alias="updateTime")
+    agency_code: str | None = None
+    update_time: AwareOrNaiveDatetime | None = None
 
 
 class SabreUserProfile(BaseModel):
     id: int | None = None
     nms: int | None = None
-    user_id: int | None = Field(None, alias="userId")
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    profile_id: str | None = Field(None, alias="profileId")
-    profile_hash: str | None = Field(None, alias="profileHash")
+    user_id: int | None = None
+    org_id: int | None = None
+    agency_code: str | None = None
+    profile_id: str | None = None
+    profile_hash: str | None = None
 
 
 class SameDayChange(BaseModel):
     application: OptSvcApplication | None = None
     assessment: Assessment | None = None
     code: str | None = None
-    commercial_name: str | None = Field(None, alias="commercialName")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    commercial_name: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
     fee: Fee | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    large_icon_url: str | None = None
+    small_icon_url: str | None = None
+    sub_group_code: str | None = None
 
 
 class ScheduleStatus(Enum):
@@ -2463,24 +2421,24 @@ class ScheduleStatus(Enum):
 
 
 class SearchCarRequest(BaseModel):
-    location_refs: list[str] | None = Field(None, alias="locationRefs")
-    drop_off_date: AwareOrNaiveDatetime | None = Field(None, alias="dropOffDate")
-    pick_up_date: AwareOrNaiveDatetime | None = Field(None, alias="pickUpDate")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    org_id: int | None = Field(None, alias="orgId")
-    reservation_id: int | None = Field(None, alias="reservationId")
-    trip_id: int | None = Field(None, alias="tripId")
+    location_refs: list[str] = Field(default_factory=list)
+    drop_off_date: AwareOrNaiveDatetime | None = None
+    pick_up_date: AwareOrNaiveDatetime | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    org_id: int | None = None
+    reservation_id: int | None = None
+    trip_id: int | None = None
 
 
 class SearchCarResponse(BaseModel):
-    cars: list[CarOffer] | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    pick_up_date: AwareOrNaiveDatetime | None = Field(None, alias="pickUpDate")
-    drop_off_date: AwareOrNaiveDatetime | None = Field(None, alias="dropOffDate")
-    locations: dict[str, CarLocation] | None = None
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-    out_of_policies: list[OutOfPolicy] | None = Field(None, alias="outOfPolicies")
+    cars: list[CarOffer] = Field(default_factory=list)
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    pick_up_date: AwareOrNaiveDatetime | None = None
+    drop_off_date: AwareOrNaiveDatetime | None = None
+    locations: dict[str, CarLocation] = Field(default_factory=dict)
+    rate_code_descr: str | None = None
+    out_of_policies: list[OutOfPolicy] = Field(default_factory=list)
 
 
 class SearchCarResponseResponse(BaseModel):
@@ -2499,12 +2457,12 @@ class SearchCategory(Enum):
 
 
 class SearchFlightsRequest(BaseModel):
-    ods: list[OriginDestinationRequest] | None = None
-    refs: list[str] | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    trip_id: int | None = Field(None, alias="tripId")
-    reservation_ids: list[int] | None = Field(None, alias="reservationIds")
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    ods: list[OriginDestinationRequest] = Field(default_factory=list)
+    refs: list[str] = Field(default_factory=list)
+    org_id: int | None = None
+    trip_id: int | None = None
+    reservation_ids: list[int] = Field(default_factory=list)
+    user_ids: list[int] = Field(default_factory=list)
     inf: int | None = None
 
 
@@ -2516,16 +2474,16 @@ class SearchFlightsRequestType(Enum):
 
 
 class SearchHotelsRequest(BaseModel):
-    checkin_date: date | None = Field(None, alias="checkinDate")
-    checkout_date: date | None = Field(None, alias="checkoutDate")
+    checkin_date: date | None = None
+    checkout_date: date | None = None
     latitude: float | None = None
     longitude: float | None = None
     radius: float | None = None
     currency: str | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    reservation_id: int | None = Field(None, alias="reservationId")
-    trip_id: int | None = Field(None, alias="tripId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    org_id: int | None = None
+    reservation_id: int | None = None
+    trip_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
 
 
 class SeatFlags(Enum):
@@ -2584,17 +2542,17 @@ class SeatSelection(BaseModel):
     application: OptSvcApplication | None = None
     assessment: Assessment | None = None
     code: str | None = None
-    commercial_name: str | None = Field(None, alias="commercialName")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    commercial_name: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
     fee: Fee | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    large_icon_url: str | None = None
+    small_icon_url: str | None = None
+    sub_group_code: str | None = None
 
 
 class SeatStatus(Enum):
@@ -2645,16 +2603,16 @@ class SecondaryFlightStatus(Enum):
 
 
 class Segment(BaseModel):
-    flight_number: str | None = Field(None, alias="flightNumber")
+    flight_number: str | None = None
     airline: str | None = None
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    depart_time: AwareOrNaiveDatetime | None = Field(None, alias="departTime")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    depart_time: AwareOrNaiveDatetime | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     duration: int | None = None
-    operating_airline: str | None = Field(None, alias="operatingAirline")
-    segment_key: str | None = Field(None, alias="segmentKey")
+    operating_airline: str | None = None
+    segment_key: str | None = None
 
 
 class SegmentPerks(Enum):
@@ -2693,8 +2651,8 @@ class SelectionTypeEnum(Enum):
 class ServiceFee(BaseModel):
     currency: str | None = None
     total: float | None = None
-    fop_label: str | None = Field(None, alias="fopLabel")
-    fop_record: str | None = Field(None, alias="fopRecord")
+    fop_label: str | None = None
+    fop_record: str | None = None
 
 
 class SettlementType(Enum):
@@ -2704,15 +2662,15 @@ class SettlementType(Enum):
 
 
 class ShopFlightsRequest(BaseModel):
-    ods: list[OriginDestinationRequest] | None = None
-    refs: list[str] | None = None
+    ods: list[OriginDestinationRequest] = Field(default_factory=list)
+    refs: list[str] = Field(default_factory=list)
 
 
 class SignUpCampaign(BaseModel):
     id: int | None = None
     email: str | None = None
     cid: str | None = None
-    created_at: AwareOrNaiveDatetime | None = Field(None, alias="createdAt")
+    created_at: AwareOrNaiveDatetime | None = None
 
 
 class SignUpCampaignMapper(BaseModel):
@@ -2723,20 +2681,20 @@ class SignUpUserRequest(BaseModel):
     email: str | None = None
     recaptcha: str | None = None
     cid: str | None = None
-    campaign_code: str | None = Field(None, alias="campaignCode")
+    campaign_code: str | None = None
 
 
 class Size(BaseModel):
     application: Application | None = None
     cm: str | None = None
-    in_: str | None = Field(None, alias="in")
+    in_: str | None = None
 
 
 class StatBudget(BaseModel):
-    start_date: date | None = Field(None, alias="startDate")
-    end_date: date | None = Field(None, alias="endDate")
+    start_date: date | None = None
+    end_date: date | None = None
     amount: float | None = None
-    accrual_term: int | None = Field(None, alias="accrualTerm")
+    accrual_term: int | None = None
 
 
 class StorageType(Enum):
@@ -2748,7 +2706,7 @@ class StringListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[str] | None = None
+    data: list[str] = Field(default_factory=list)
 
 
 class StringResponse(BaseModel):
@@ -2764,7 +2722,7 @@ class SupplierInquiry(BaseModel):
     active: bool | None = None
     name: str | None = None
     email: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
     company: str | None = None
 
 
@@ -2782,10 +2740,10 @@ class Task(BaseModel):
     active: bool | None = None
     running: bool | None = None
     name: str | None = None
-    executed_by: str | None = Field(None, alias="executedBy")
-    executed_on: int | None = Field(None, alias="executedOn")
-    executed_in: int | None = Field(None, alias="executedIn")
-    period_ms: int | None = Field(None, alias="periodMs")
+    executed_by: str | None = None
+    executed_on: int | None = None
+    executed_in: int | None = None
+    period_ms: int | None = None
 
 
 class TermsAndConditions(BaseModel):
@@ -2797,8 +2755,8 @@ class TfsAirline(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    synced_on: int | None = Field(None, alias="syncedOn")
-    tf_code: str | None = Field(None, alias="tfCode")
+    synced_on: int | None = None
+    tf_code: str | None = None
     iata: str | None = None
     name: str | None = None
 
@@ -2807,31 +2765,31 @@ class TfsAirport(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    synced_on: int | None = Field(None, alias="syncedOn")
+    synced_on: int | None = None
     iata: str | None = None
     name: str | None = None
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     city: str | None = None
-    city_code: str | None = Field(None, alias="cityCode")
+    city_code: str | None = None
 
 
 class TfsCity(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    synced_on: int | None = Field(None, alias="syncedOn")
+    synced_on: int | None = None
     iata: str | None = None
     name: str | None = None
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
 
 
 class TfsSupplierRoute(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    synced_on: int | None = Field(None, alias="syncedOn")
+    synced_on: int | None = None
     supplier: str | None = None
     origin: str | None = None
     destination: str | None = None
@@ -2915,9 +2873,9 @@ class TicketPerksSpecs(Enum):
 
 
 class Unit(BaseModel):
-    duration_estimated: bool | None = Field(None, alias="durationEstimated")
-    time_based: bool | None = Field(None, alias="timeBased")
-    date_based: bool | None = Field(None, alias="dateBased")
+    duration_estimated: bool | None = None
+    time_based: bool | None = None
+    date_based: bool | None = None
 
 
 class UtcOffset(BaseModel):
@@ -2926,22 +2884,22 @@ class UtcOffset(BaseModel):
     nano: int | None = None
     negative: bool | None = None
     positive: bool | None = None
-    units: list[Unit] | None = None
+    units: list[Unit] = Field(default_factory=list)
 
 
 class TimeZone(BaseModel):
     id: int | None = None
     name: str | None = None
     abbrev: str | None = None
-    utc_offset: UtcOffset | None = Field(None, alias="utcOffset")
-    is_dst: bool | None = Field(None, alias="isDst")
+    utc_offset: UtcOffset | None = None
+    is_dst: bool | None = None
 
 
 class TimeZoneListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[TimeZone] | None = None
+    data: list[TimeZone] = Field(default_factory=list)
 
 
 class TopicType(Enum):
@@ -2960,90 +2918,84 @@ class TrString(BaseModel):
 
 
 class TrStrings(BaseModel):
-    strings: list[TrString] | None = None
+    strings: list[TrString] = Field(default_factory=list)
 
 
 class TrainCarrier(BaseModel):
     id: int | None = None
     code: str | None = None
     name: str | None = None
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
-    loyalty_program_id: int | None = Field(None, alias="loyaltyProgramId")
-    codes: dict[str, str] | None = None
+    reward_program_id: int | None = None
+    loyalty_program_id: int | None = None
+    codes: dict[str, str] = Field(default_factory=dict)
 
 
 class TrainFareSegment(BaseModel):
-    segment_id: str | None = Field(None, alias="segmentId")
-    fare_name: str | None = Field(None, alias="fareName")
+    segment_id: str | None = None
+    fare_name: str | None = None
     quantity: int | None = None
     perks: int | None = None
-    applied_discount_id: str | None = Field(None, alias="appliedDiscountId")
-    fare_condition_id: str | None = Field(None, alias="fareConditionId")
-    comfort_class_id: str | None = Field(None, alias="comfortClassId")
-    fare_condition_ids: list[str] | None = Field(None, alias="fareConditionIds")
+    applied_discount_id: str | None = None
+    fare_condition_id: str | None = None
+    comfort_class_id: str | None = None
+    fare_condition_ids: list[str] = Field(default_factory=list)
 
 
 class TrainOriginDestination(BaseModel):
-    carrier_code: str | None = Field(None, alias="carrierCode")
+    carrier_code: str | None = None
     duration: int | None = None
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
-    departure_station: str | None = Field(None, alias="departureStation")
-    departure_station_name: str | None = Field(None, alias="departureStationName")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    arrival_station_name: str | None = Field(None, alias="arrivalStationName")
-    stops: list[str] | None = None
-    segments: list[str] | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
+    departure_station: str | None = None
+    departure_station_name: str | None = None
+    arrival_station: str | None = None
+    arrival_station_name: str | None = None
+    stops: list[str] = Field(default_factory=list)
+    segments: list[str] = Field(default_factory=list)
 
 
 class TrainOriginDestinationRequest(BaseModel):
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_date: date | None = Field(None, alias="departureDate")
-    departure_time: LocalTime | None = Field(None, alias="departureTime")
-    arrival_date: date | None = Field(None, alias="arrivalDate")
-    arrival_time: LocalTime | None = Field(None, alias="arrivalTime")
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    departure_date: date | None = None
+    departure_time: str | None = None
+    arrival_date: date | None = None
+    arrival_time: str | None = None
 
 
 class TrainPricedFare(BaseModel):
     currency: str | None = None
     price: float | None = None
-    discount_amount: float | None = Field(None, alias="discountAmount")
+    discount_amount: float | None = None
     name: str | None = None
     flags: int | None = None
     perks: int | None = None
-    segments: list[TrainFareSegment] | None = None
-    refs: list[str] | None = None
-    railcard_ids: list[int] | None = Field(None, alias="railcardIds")
-    route_restriction: str | None = Field(None, alias="routeRestriction")
-    fare_restriction: str | None = Field(None, alias="fareRestriction")
-    open_return_until: date | None = Field(None, alias="openReturnUntil")
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    allowed_departure_stations: list[str] | None = Field(
-        None,
-        alias="allowedDepartureStations",
-    )
-    allowed_arrival_stations: list[str] | None = Field(
-        None,
-        alias="allowedArrivalStations",
-    )
-    has_travelcard: bool | None = Field(None, alias="hasTravelcard")
-    is_transborder: bool | None = Field(None, alias="isTransborder")
-    has_mixed_cabin: bool | None = Field(None, alias="hasMixedCabin")
-    has_rate_code: bool | None = Field(None, alias="hasRateCode")
-    open_return: bool | None = Field(None, alias="openReturn")
-    is_current_fare: bool | None = Field(None, alias="isCurrentFare")
+    segments: list[TrainFareSegment] = Field(default_factory=list)
+    refs: list[str] = Field(default_factory=list)
+    railcard_ids: list[int] = Field(default_factory=list)
+    route_restriction: str | None = None
+    fare_restriction: str | None = None
+    open_return_until: date | None = None
+    out_of_policy_id: int | None = None
+    allowed_departure_stations: list[str] = Field(default_factory=list)
+    allowed_arrival_stations: list[str] = Field(default_factory=list)
+    is_transborder: bool | None = None
+    has_mixed_cabin: bool | None = None
+    has_rate_code: bool | None = None
+    open_return: bool | None = None
+    is_current_fare: bool | None = None
+    has_travelcard: bool | None = None
 
 
 class TrainReservationTicket(BaseModel):
-    ticket_number: str | None = Field(None, alias="ticketNumber")
-    ticket_url: str | None = Field(None, alias="ticketUrl")
+    ticket_number: str | None = None
+    ticket_url: str | None = None
 
 
 class TrainSeat(BaseModel):
     car: str | None = None
     seat: str | None = None
-    consumer_index: int | None = Field(None, alias="consumerIndex")
+    consumer_index: int | None = None
 
 
 class TrainSeatPreferenceFlags(Enum):
@@ -3081,22 +3033,22 @@ class TrainSeatReservabilityType(Enum):
 
 
 class TrainSegmentInfo(BaseModel):
-    train_number: str | None = Field(None, alias="trainNumber")
-    train_name: str | None = Field(None, alias="trainName")
+    train_number: str | None = None
+    train_name: str | None = None
     equipment: str | None = None
     logo: str | None = None
-    carrier_code: str | None = Field(None, alias="carrierCode")
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    carrier_code: str | None = None
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     duration: int | None = None
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    class_code: str | None = Field(None, alias="classCode")
-    available_quantity: int | None = Field(None, alias="availableQuantity")
+    fare_name: str | None = None
+    fare_type: FareType | None = None
+    class_code: str | None = None
+    available_quantity: int | None = None
     perks: int | None = None
-    fare_rules: str | None = Field(None, alias="fareRules")
+    fare_rules: str | None = None
 
 
 class TrainSegmentPerks(Enum):
@@ -3117,19 +3069,19 @@ class TrainStation(BaseModel):
     code: str | None = None
     name: str | None = None
     city: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     state: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     country: str | None = None
     latitude: float | None = None
     longitude: float | None = None
     flags: int | None = None
     label: str | None = None
-    vendor_codes: list[str] | None = Field(None, alias="vendorCodes")
+    vendor_codes: list[str] = Field(default_factory=list)
     active: bool | None = None
-    provider_code: str | None = Field(None, alias="providerCode")
+    provider_code: str | None = None
     searchable: bool | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
 
 
 class TrainStationFlags(Enum):
@@ -3145,9 +3097,9 @@ class TrainStationGroup(BaseModel):
     code: str | None = None
     name: str | None = None
     city: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     state: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     country: str | None = None
     latitude: float | None = None
     longitude: float | None = None
@@ -3159,7 +3111,7 @@ class TrainStationGroupListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[TrainStationGroup] | None = None
+    data: list[TrainStationGroup] = Field(default_factory=list)
 
 
 class TrainTicketFlags(Enum):
@@ -3187,8 +3139,8 @@ class TrainTransportMode(Enum):
 
 class TrainlineRewardProgram(BaseModel):
     id: int | None = None
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
-    internal_id: str | None = Field(None, alias="internalId")
+    reward_program_id: int | None = None
+    internal_id: str | None = None
 
 
 class TravelPolicyParameterType(Enum):
@@ -3202,40 +3154,40 @@ class TravelPolicyParameterType(Enum):
 
 
 class TravelerProfile(BaseModel):
-    user_id: int | None = Field(None, alias="userId")
-    profile_id: str | None = Field(None, alias="profileId")
+    user_id: int | None = None
+    profile_id: str | None = None
     name: str | None = None
 
 
 class TripBoardActionTrail(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    org_id: int | None = Field(None, alias="orgId")
-    user_id: int | None = Field(None, alias="userId")
+    agency_code: str | None = None
+    org_id: int | None = None
+    user_id: int | None = None
     action: str | None = None
-    resource_id: int | None = Field(None, alias="resourceId")
-    resource_type: ResourceType | None = Field(None, alias="resourceType")
-    request_headers: dict[str, str] | None = Field(None, alias="requestHeaders")
-    request_method: str | None = Field(None, alias="requestMethod")
-    request_uri: str | None = Field(None, alias="requestUri")
+    resource_id: int | None = None
+    resource_type: ResourceType | None = None
+    request_headers: dict[str, str] = Field(default_factory=dict)
+    request_method: str | None = None
+    request_uri: str | None = None
     time: int | None = None
 
 
 class TripBoardFee(BaseModel):
     id: int | None = None
     nms: int | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    trip_board_id: int | None = Field(None, alias="tripBoardId")
-    booker_id: int | None = Field(None, alias="bookerId")
+    trip_id: int | None = None
+    trip_board_id: int | None = None
+    booker_id: int | None = None
     currency: str | None = None
     total: float | None = None
-    fop_card_id: int | None = Field(None, alias="fopCardId")
-    fop_label: str | None = Field(None, alias="fopLabel")
-    fop_record: str | None = Field(None, alias="fopRecord")
+    fop_card_id: int | None = None
+    fop_label: str | None = None
+    fop_record: str | None = None
     locator: str | None = None
-    messages: list[str] | None = None
-    ui_flags: int | None = Field(None, alias="uiFlags")
+    messages: list[str] = Field(default_factory=list)
+    ui_flags: int | None = None
 
 
 class TripBoardFlags(Enum):
@@ -3248,15 +3200,15 @@ class TripBoardFlags(Enum):
 class TripBoardFop(BaseModel):
     id: int | None = None
     nms: int | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    trip_board_id: int | None = Field(None, alias="tripBoardId")
-    trip_board_ref_id: int | None = Field(None, alias="tripBoardRefId")
-    card_id: int | None = Field(None, alias="cardId")
-    credit_id: int | None = Field(None, alias="creditId")
+    trip_id: int | None = None
+    trip_board_id: int | None = None
+    trip_board_ref_id: int | None = None
+    card_id: int | None = None
+    credit_id: int | None = None
     label: str | None = None
     description: str | None = None
     amount: float | None = None
-    on_account: bool | None = Field(None, alias="onAccount")
+    on_account: bool | None = None
 
 
 class TripBoardProcessingFlags(Enum):
@@ -3286,24 +3238,24 @@ class TripSummaryLine(BaseModel):
     type: ReservationType | None = None
     date: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    user_ids: list[int] = Field(default_factory=list)
 
 
 class TspmOrgProfile(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    profile_id: str | None = Field(None, alias="profileId")
-    profile_hash: str | None = Field(None, alias="profileHash")
-    storage_type: StorageType | None = Field(None, alias="storageType")
+    org_id: int | None = None
+    agency_code: str | None = None
+    profile_id: str | None = None
+    profile_hash: str | None = None
+    storage_type: StorageType | None = None
 
 
 class TspmOrgProfileListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[TspmOrgProfile] | None = None
+    data: list[TspmOrgProfile] = Field(default_factory=list)
 
 
 class TspmOrgProfileResponse(BaseModel):
@@ -3316,11 +3268,11 @@ class TspmOrgProfileResponse(BaseModel):
 class TspmUserProfile(BaseModel):
     id: int | None = None
     nms: int | None = None
-    user_id: int | None = Field(None, alias="userId")
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    profile_id: str | None = Field(None, alias="profileId")
-    profile_hash: str | None = Field(None, alias="profileHash")
+    user_id: int | None = None
+    org_id: int | None = None
+    agency_code: str | None = None
+    profile_id: str | None = None
+    profile_hash: str | None = None
 
 
 class TypeEnum(Enum):
@@ -3334,21 +3286,21 @@ class TypeEnum(Enum):
 class UPAPhoto(BaseModel):
     caption: str | None = None
     id: str | None = None
-    thumb_url: str | None = Field(None, alias="thumbUrl")
-    medium_url: str | None = Field(None, alias="mediumUrl")
-    large_url: str | None = Field(None, alias="largeUrl")
+    thumb_url: str | None = None
+    medium_url: str | None = None
+    large_url: str | None = None
 
 
 class UTA(BaseModel):
     id: str | None = None
     headline: str | None = None
     description: str | None = None
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
-    categories: list[str] | None = None
-    fees: list[FlightAttributeFee] | None = None
+    small_icon_url: str | None = None
+    large_icon_url: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
+    categories: list[str] = Field(default_factory=list)
+    fees: list[FlightAttributeFee] = Field(default_factory=list)
     assessment: str | None = None
 
 
@@ -3370,10 +3322,10 @@ class UiFlags(Enum):
 
 class UpaCommon(BaseModel):
     caption: str | None = None
-    embed_url: str | None = Field(None, alias="embedUrl")
-    large_url: str | None = Field(None, alias="largeUrl")
-    medium_square_url: str | None = Field(None, alias="mediumSquareUrl")
-    thumb_url: str | None = Field(None, alias="thumbUrl")
+    embed_url: str | None = None
+    large_url: str | None = None
+    medium_square_url: str | None = None
+    thumb_url: str | None = None
     url: str | None = None
 
 
@@ -3381,25 +3333,25 @@ class UpgradeEligibility(BaseModel):
     application: OptSvcApplication | None = None
     assessment: Assessment | None = None
     code: str | None = None
-    commercial_name: str | None = Field(None, alias="commercialName")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    commercial_name: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
     fee: Fee | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    large_icon_url: str | None = None
+    small_icon_url: str | None = None
+    sub_group_code: str | None = None
 
 
 class UserAccountEmail(BaseModel):
     id: int | None = None
     nms: int | None = None
-    user_id: int | None = Field(None, alias="userId")
+    user_id: int | None = None
     email: str | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     status: EmailStatus | None = None
 
 
@@ -3407,7 +3359,7 @@ class UserAccountEmailListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[UserAccountEmail] | None = None
+    data: list[UserAccountEmail] = Field(default_factory=list)
 
 
 class UserAccountEmailResponse(BaseModel):
@@ -3428,12 +3380,12 @@ class UserAccountKycStatus(Enum):
 
 
 class UserAccountPreferences(BaseModel):
-    airport_code: str | None = Field(None, alias="airportCode")
+    airport_code: str | None = None
     currency: str | None = None
     locale: str | None = None
-    restrict_ip: bool | None = Field(None, alias="restrictIp")
+    restrict_ip: bool | None = None
     seat: SeatPreference | None = None
-    ssr: list[str] | None = None
+    ssr: list[str] = Field(default_factory=list)
 
 
 class UserAccountStatus(Enum):
@@ -3483,7 +3435,7 @@ class UserDocuments(BaseModel):
     passport: UserDocumentPassport | None = None
     tsa: str | None = None
     goes: str | None = None
-    redress_number: str | None = Field(None, alias="redressNumber")
+    redress_number: str | None = None
 
 
 class UserFlags(Enum):
@@ -3493,7 +3445,7 @@ class UserFlags(Enum):
 
 
 class UserOrgInfo(BaseModel):
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     name: str | None = None
     description: str | None = None
     status: OrgUserStatus | None = None
@@ -3501,8 +3453,8 @@ class UserOrgInfo(BaseModel):
 
 class UserRewardProgram(BaseModel):
     id: int | None = None
-    user_id: int | None = Field(None, alias="userId")
-    reward_program_id: int | None = Field(None, alias="rewardProgramId")
+    user_id: int | None = None
+    reward_program_id: int | None = None
     number: str | None = None
     idx: int | None = None
 
@@ -3511,7 +3463,7 @@ class UserRewardProgramListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[UserRewardProgram] | None = None
+    data: list[UserRewardProgram] = Field(default_factory=list)
 
 
 class UserRewardProgramResponse(BaseModel):
@@ -3529,7 +3481,7 @@ class UserRole(Enum):
 
 
 class UserSession(BaseModel):
-    user_id: int | None = Field(None, alias="userId")
+    user_id: int | None = None
     token: str | None = None
     expiry: AwareOrNaiveDatetime | None = None
     ip: str | None = None
@@ -3578,9 +3530,9 @@ class VisibilityType(Enum):
 class Wall(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    owner_id: int | None = Field(None, alias="ownerId")
-    owner_type: ResourceType | None = Field(None, alias="ownerType")
+    agency_code: str | None = None
+    owner_id: int | None = None
+    owner_type: ResourceType | None = None
     visibility: VisibilityType | None = None
 
 
@@ -3655,29 +3607,29 @@ class WindowSizeEnum(Enum):
 class ActionTrail(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    org_id: int | None = Field(None, alias="orgId")
-    user_id: int | None = Field(None, alias="userId")
+    agency_code: str | None = None
+    org_id: int | None = None
+    user_id: int | None = None
     action: str | None = None
-    resource_id: int | None = Field(None, alias="resourceId")
-    resource_type: ResourceType | None = Field(None, alias="resourceType")
-    request_headers: dict[str, str] | None = Field(None, alias="requestHeaders")
-    request_method: str | None = Field(None, alias="requestMethod")
-    request_uri: str | None = Field(None, alias="requestUri")
+    resource_id: int | None = None
+    resource_type: ResourceType | None = None
+    request_headers: dict[str, str] = Field(default_factory=dict)
+    request_method: str | None = None
+    request_uri: str | None = None
     time: int | None = None
 
 
 class AddCardRequest(BaseModel):
-    user_id: int | None = Field(None, alias="userId")
-    org_id: int | None = Field(None, alias="orgId")
+    user_id: int | None = None
+    org_id: int | None = None
     name: str | None = None
     number: str | None = None
     cvc: str | None = None
-    expiration: str | None = Field(None, examples=["2022-03"])
-    holder_name: str | None = Field(None, alias="holderName")
-    billing_address: Address | None = Field(None, alias="billingAddress")
-    is_default: bool | None = Field(None, alias="isDefault")
-    reservation_types: int | None = Field(None, alias="reservationTypes")
+    expiration: str | None = None
+    holder_name: str | None = None
+    billing_address: Address | None = None
+    is_default: bool | None = None
+    reservation_types: int | None = None
 
 
 class AddressLocationMap(BaseModel):
@@ -3698,7 +3650,7 @@ class AgencyListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Agency] | None = None
+    data: list[Agency] = Field(default_factory=list)
 
 
 class AgencyResponse(BaseModel):
@@ -3712,7 +3664,7 @@ class AgencySettingsListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[AgencySettings] | None = None
+    data: list[AgencySettings] = Field(default_factory=list)
 
 
 class AgencySettingsResponse(BaseModel):
@@ -3726,7 +3678,7 @@ class AgentPhoneListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[AgentPhone] | None = None
+    data: list[AgentPhone] = Field(default_factory=list)
 
 
 class AgentStatusResponse(BaseModel):
@@ -3738,21 +3690,21 @@ class AgentStatusResponse(BaseModel):
 
 class Aircraft(BaseModel):
     type: AircraftType | None = None
-    display_text: str | None = Field(None, alias="displayText")
+    display_text: str | None = None
 
 
 class AirlineListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Airline] | None = None
+    data: list[Airline] = Field(default_factory=list)
 
 
 class AirportListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Airport] | None = None
+    data: list[Airport] = Field(default_factory=list)
 
 
 class AirportResponse(BaseModel):
@@ -3765,11 +3717,11 @@ class AirportResponse(BaseModel):
 class AmadeusOrgProfile(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    profile_id: str | None = Field(None, alias="profileId")
-    profile_hash: str | None = Field(None, alias="profileHash")
-    storage_type: StorageType | None = Field(None, alias="storageType")
+    org_id: int | None = None
+    agency_code: str | None = None
+    profile_id: str | None = None
+    profile_hash: str | None = None
+    storage_type: StorageType | None = None
 
 
 class AncillaryOffer(BaseModel):
@@ -3782,18 +3734,18 @@ class AncillaryOffer(BaseModel):
     type: AncillaryType | None = None
     price: float | None = None
     taxes: float | None = None
-    local_price: float | None = Field(None, alias="localPrice")
-    local_taxes: float | None = Field(None, alias="localTaxes")
-    local_currency: str | None = Field(None, alias="localCurrency")
-    max_quantity: int | None = Field(None, alias="maxQuantity")
-    min_quantity: int | None = Field(None, alias="minQuantity")
-    available_quantity: int | None = Field(None, alias="availableQuantity")
-    passenger_refs: list[str] | None = Field(None, alias="passengerRefs")
+    local_price: float | None = None
+    local_taxes: float | None = None
+    local_currency: str | None = None
+    max_quantity: int | None = None
+    min_quantity: int | None = None
+    available_quantity: int | None = None
+    passenger_refs: list[str] = Field(default_factory=list)
 
 
 class AncillaryOffers(BaseModel):
     ref: str | None = None
-    ancillaries: list[AncillaryOffer] | None = None
+    ancillaries: list[AncillaryOffer] = Field(default_factory=list)
 
 
 class ApiKey(BaseModel):
@@ -3805,9 +3757,9 @@ class ApiKey(BaseModel):
 
 
 class ApprovalItem(BaseModel):
-    user_id: int | None = Field(None, alias="userId")
-    created_at: AwareOrNaiveDatetime | None = Field(None, alias="createdAt")
-    policy_ids: list[int] | None = Field(None, alias="policyIds")
+    user_id: int | None = None
+    created_at: AwareOrNaiveDatetime | None = None
+    policy_ids: list[int] = Field(default_factory=list)
     status: ApprovalStatus | None = None
     comment: str | None = None
 
@@ -3822,26 +3774,26 @@ class BaseTrainStationResponse(BaseModel):
 class Beverage(BaseModel):
     quality: FoodQuality | None = None
     type: BeverageType | None = None
-    alcoholic_free: bool | None = Field(None, alias="alcoholicFree")
-    nonalcoholic_free: bool | None = Field(None, alias="nonalcoholicFree")
-    display_text: str | None = Field(None, alias="displayText")
+    alcoholic_free: bool | None = None
+    nonalcoholic_free: bool | None = None
+    display_text: str | None = None
 
 
 class BoardingPriority(BaseModel):
     application: OptSvcApplication | None = None
     assessment: Assessment | None = None
     code: str | None = None
-    commercial_name: str | None = Field(None, alias="commercialName")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    commercial_name: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
     fee: Fee | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    large_icon_url: str | None = None
+    small_icon_url: str | None = None
+    sub_group_code: str | None = None
 
 
 class BooleanResponse(BaseModel):
@@ -3855,7 +3807,7 @@ class CampaignListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Campaign] | None = None
+    data: list[Campaign] = Field(default_factory=list)
 
 
 class CampaignResponse(BaseModel):
@@ -3873,26 +3825,26 @@ class CancellationInner(BaseModel):
 
 
 class CarReservationExt(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    co2_emissions: float | None = None
     car: Car | None = None
-    confirmation_number: str | None = Field(None, alias="confirmationNumber")
+    confirmation_number: str | None = None
     brand: str | None = None
-    pick_up: CarLocation | None = Field(None, alias="pickUp")
-    drop_off: CarLocation | None = Field(None, alias="dropOff")
-    same_drop_off_location: bool | None = Field(None, alias="sameDropOffLocation")
-    arrival_flight: ArrivalFlight | None = Field(None, alias="arrivalFlight")
-    extras: list[CarExtra] | None = None
-    insurances: list[CarInsurance] | None = None
-    consumers: list[ReservationConsumer] | None = None
-    total_taxes: float | None = Field(None, alias="totalTaxes")
-    total_extras: float | None = Field(None, alias="totalExtras")
-    total_insurance: float | None = Field(None, alias="totalInsurance")
-    total_fees: float | None = Field(None, alias="totalFees")
-    total_vehicle: float | None = Field(None, alias="totalVehicle")
-    unlimited_distance: bool | None = Field(None, alias="unlimitedDistance")
-    free_distance_covered: float | None = Field(None, alias="freeDistanceCovered")
-    distance_overage: float | None = Field(None, alias="distanceOverage")
-    distance_unit: DistanceUnit | None = Field(None, alias="distanceUnit")
+    pick_up: CarLocation | None = None
+    drop_off: CarLocation | None = None
+    same_drop_off_location: bool | None = None
+    arrival_flight: ArrivalFlight | None = None
+    extras: list[CarExtra] = Field(default_factory=list)
+    insurances: list[CarInsurance] = Field(default_factory=list)
+    consumers: list[ReservationConsumer] = Field(default_factory=list)
+    total_taxes: float | None = None
+    total_extras: float | None = None
+    total_insurance: float | None = None
+    total_fees: float | None = None
+    total_vehicle: float | None = None
+    unlimited_distance: bool | None = None
+    free_distance_covered: float | None = None
+    distance_overage: float | None = None
+    distance_unit: DistanceUnit | None = None
     days: int | None = None
     hours: int | None = None
 
@@ -3901,31 +3853,31 @@ class CarVendorListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[CarVendor] | None = None
+    data: list[CarVendor] = Field(default_factory=list)
 
 
 class CheckInPriority(BaseModel):
     application: OptSvcApplication | None = None
     assessment: Assessment | None = None
     code: str | None = None
-    commercial_name: str | None = Field(None, alias="commercialName")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    commercial_name: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
     fee: Fee | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    large_icon_url: str | None = None
+    small_icon_url: str | None = None
+    sub_group_code: str | None = None
 
 
 class ConcurOrgListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ConcurOrg] | None = None
+    data: list[ConcurOrg] = Field(default_factory=list)
 
 
 class ConcurOrgResponse(BaseModel):
@@ -3939,55 +3891,55 @@ class CountryListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Country] | None = None
+    data: list[Country] = Field(default_factory=list)
 
 
 class CountryStateListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[CountryState] | None = None
+    data: list[CountryState] = Field(default_factory=list)
 
 
 class CreateOrgRequest(BaseModel):
-    agency_code: str | None = Field(None, alias="agencyCode")
+    agency_code: str | None = None
     name: str | None = None
     description: str | None = None
     flags: int | None = None
-    billing_address: AddressLocation | None = Field(None, alias="billingAddress")
+    billing_address: AddressLocation | None = None
     website: str | None = None
     timezone: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
-    sabre_profile_id: str | None = Field(None, alias="sabreProfileId")
-    sabre_template_id: str | None = Field(None, alias="sabreTemplateId")
+    phone_number: str | None = None
+    sabre_profile_id: str | None = None
+    sabre_template_id: str | None = None
     type: OrgType | None = None
     visibility: VisibilityType | None = None
-    customer_number: str | None = Field(None, alias="customerNumber")
+    customer_number: str | None = None
     email: str | None = None
 
 
 class CreateOrgUserRequest(BaseModel):
     email: str | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     dob: date | None = None
     gender: Gender | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
     flags: int | None = None
-    org_data: OrgUserUpdateEntryData | None = Field(None, alias="orgData")
+    org_data: OrgUserUpdateEntryData | None = None
 
 
 class CreateUserAccountRequest(BaseModel):
     email: str | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     dob: date | None = None
     gender: Gender | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
     flags: int | None = None
 
 
@@ -3995,7 +3947,7 @@ class CreditListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Credit] | None = None
+    data: list[Credit] = Field(default_factory=list)
 
 
 class CreditResponse(BaseModel):
@@ -4009,11 +3961,11 @@ class CurrencyListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Currency] | None = None
+    data: list[Currency] = Field(default_factory=list)
 
 
 class DisplayTextSummary(BaseModel):
-    display_text: str | None = Field(None, alias="displayText")
+    display_text: str | None = None
     exists: Exists3 | None = None
 
 
@@ -4021,7 +3973,7 @@ class DomainListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Domain] | None = None
+    data: list[Domain] = Field(default_factory=list)
 
 
 class DomainResponse(BaseModel):
@@ -4046,45 +3998,36 @@ class EmptyResponse(BaseModel):
 
 class Entertainement(BaseModel):
     cost: AmenityCost | None = None
-    content_type: list[EntertainementContentType] | None = Field(
-        None,
-        alias="contentType",
-    )
-    display_text: str | None = Field(None, alias="displayText")
+    content_type: list[EntertainementContentType] = Field(default_factory=list)
+    display_text: str | None = None
 
 
 class EntertainmentOfferings(BaseModel):
-    content_type: ContentTypeEnum | None = Field(None, alias="contentType")
-    delivery_medium: DeliveryMediumEnum | None = Field(None, alias="deliveryMedium")
-    selection_type: SelectionTypeEnum | None = Field(None, alias="selectionType")
+    content_type: ContentTypeEnum | None = None
+    delivery_medium: DeliveryMediumEnum | None = None
+    selection_type: SelectionTypeEnum | None = None
 
 
 class EntertainmentOfferingsGroup(BaseModel):
-    offerings: list[EntertainmentOfferings] | None = None
+    offerings: list[EntertainmentOfferings] = Field(default_factory=list)
     operator: OperatorEnum | None = None
 
 
 class EnumsHolder(BaseModel):
-    platform_type: PlatformType | None = Field(None, alias="platformType")
-    field_flag: FieldFlags | None = Field(None, alias="fieldFlag")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    exception_flags: ExceptionFlags | None = Field(None, alias="exceptionFlags")
-    trip_board_processing_flags: TripBoardProcessingFlags | None = Field(
-        None,
-        alias="tripBoardProcessingFlags",
-    )
-    train_seat_preference_flags: TrainSeatPreferenceFlags | None = Field(
-        None,
-        alias="trainSeatPreferenceFlags",
-    )
-    approval_action: ApprovalAction | None = Field(None, alias="approvalAction")
+    platform_type: PlatformType | None = None
+    field_flag: FieldFlags | None = None
+    fare_type: FareType | None = None
+    exception_flags: ExceptionFlags | None = None
+    trip_board_processing_flags: TripBoardProcessingFlags | None = None
+    train_seat_preference_flags: TrainSeatPreferenceFlags | None = None
+    approval_action: ApprovalAction | None = None
 
 
 class ExchangeRateListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ExchangeRate] | None = None
+    data: list[ExchangeRate] = Field(default_factory=list)
 
 
 class ExpensifySettingsResponse(BaseModel):
@@ -4097,16 +4040,16 @@ class ExpensifySettingsResponse(BaseModel):
 class FieldModel(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
+    org_id: int | None = None
+    agency_code: str | None = None
     code: str | None = None
-    remark_code: str | None = Field(None, alias="remarkCode")
+    remark_code: str | None = None
     name: str | None = None
     type: FieldType | None = None
-    value_type: FieldValueType | None = Field(None, alias="valueType")
+    value_type: FieldValueType | None = None
     active: bool | None = None
     flags: int | None = None
-    reservation_type: ReservationType | None = Field(None, alias="reservationType")
+    reservation_type: ReservationType | None = None
 
 
 class FieldResponse(BaseModel):
@@ -4120,7 +4063,7 @@ class FieldValueListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[FieldValue] | None = None
+    data: list[FieldValue] = Field(default_factory=list)
 
 
 class FieldValueResponse(BaseModel):
@@ -4134,28 +4077,28 @@ class FlightAttribute(BaseModel):
     id: str | None = None
     headline: str | None = None
     description: str | None = None
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
-    categories: list[str] | None = None
-    fees: list[FlightAttributeFee] | None = None
+    small_icon_url: str | None = None
+    large_icon_url: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
+    categories: list[str] = Field(default_factory=list)
+    fees: list[FlightAttributeFee] = Field(default_factory=list)
 
 
 class FlightRefData(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    co2_emissions: float | None = None
     duration: int | None = None
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    flight_details: list[str] | None = Field(None, alias="flightDetails")
-    flight_key: str | None = Field(None, alias="flightKey")
-    offer_id: str | None = Field(None, alias="offerId")
+    fare_name: str | None = None
+    fare_type: FareType | None = None
+    flight_details: list[str] = Field(default_factory=list)
+    flight_key: str | None = None
+    offer_id: str | None = None
     owner: str | None = None
-    passengers: list[PassengerEntry] | None = None
-    segments: list[FlightSegmentRefData] | None = None
-    segment_perks: int | None = Field(None, alias="segmentPerks")
-    total_price: float | None = Field(None, alias="totalPrice")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
+    passengers: list[PassengerEntry] = Field(default_factory=list)
+    segments: list[FlightSegmentRefData] = Field(default_factory=list)
+    segment_perks: int | None = None
+    total_price: float | None = None
+    taxes_and_fees: float | None = None
 
 
 class FlightReservationAncillary(BaseModel):
@@ -4167,51 +4110,45 @@ class FlightReservationAncillary(BaseModel):
     type: AncillaryType | None = None
     price: float | None = None
     taxes: float | None = None
-    local_price: float | None = Field(None, alias="localPrice")
-    local_taxes: float | None = Field(None, alias="localTaxes")
-    local_currency: str | None = Field(None, alias="localCurrency")
+    local_price: float | None = None
+    local_taxes: float | None = None
+    local_currency: str | None = None
     quantity: int | None = None
     status: ReservationStatus | None = None
 
 
 class FlightReservationOd(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    co2_emissions: float | None = None
     duration: int | None = None
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
-    arrival_time_offset: int | None = Field(None, alias="arrivalTimeOffset")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    departure_time_offset: int | None = Field(None, alias="departureTimeOffset")
-    segments: list[FlightReservationSegment] | None = None
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    stops: list[str] | None = None
-    departure_offset_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="departureOffsetDateTime",
-    )
-    arrival_offset_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="arrivalOffsetDateTime",
-    )
+    arrival_station: str | None = None
+    departure_station: str | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
+    arrival_time_offset: int | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    departure_time_offset: int | None = None
+    segments: list[FlightReservationSegment] = Field(default_factory=list)
+    fare_name: str | None = None
+    fare_type: FareType | None = None
+    stops: list[str] = Field(default_factory=list)
+    departure_offset_date_time: AwareOrNaiveDatetime | None = None
+    arrival_offset_date_time: AwareOrNaiveDatetime | None = None
 
 
 class FlightReservationSeat(BaseModel):
-    consumer_index: int | None = Field(None, alias="consumerIndex")
+    consumer_index: int | None = None
     status: ReservationStatus | None = None
-    segment_key: str | None = Field(None, alias="segmentKey")
-    seat_key: str | None = Field(None, alias="seatKey")
-    seat_column: str | None = Field(None, alias="seatColumn")
-    seat_row: str | None = Field(None, alias="seatRow")
+    segment_key: str | None = None
+    seat_key: str | None = None
+    seat_column: str | None = None
+    seat_row: str | None = None
     price: float | None = None
     taxes: float | None = None
     preference: SeatPreference | None = None
-    seat_flags: int | None = Field(None, alias="seatFlags")
+    seat_flags: int | None = None
 
 
 class FlightReservationSsr(BaseModel):
-    consumer_index: int | None = Field(None, alias="consumerIndex")
+    consumer_index: int | None = None
     code: str | None = None
     comment: str | None = None
     status: ReservationStatus | None = None
@@ -4221,27 +4158,27 @@ class Food(BaseModel):
     quality: FoodQuality | None = None
     type: FoodType | None = None
     free: bool | None = None
-    display_text: str | None = Field(None, alias="displayText")
+    display_text: str | None = None
 
 
 class FreeBaggageData(BaseModel):
     attributes: BaggageAttributes | None = None
-    display_text: str | None = Field(None, alias="displayText")
-    optional_service_id: str | None = Field(None, alias="optionalServiceId")
+    display_text: str | None = None
+    optional_service_id: str | None = None
     pieces: str | None = None
     size: Size | None = None
-    total_weight: TotalMaxWeight | None = Field(None, alias="totalWeight")
+    total_weight: TotalMaxWeight | None = None
     weight: Weight | None = None
 
 
 class FreshFood(BaseModel):
     cost: Cost | None = None
-    display_text: str | None = Field(None, alias="displayText")
+    display_text: str | None = None
     exists: Exists | None = None
     id: str | None = None
     quality: Quality | None = None
     type: TypeEnum | None = None
-    updated_at: str | None = Field(None, alias="updatedAt")
+    updated_at: str | None = None
 
 
 class GetCarResponseResponse(BaseModel):
@@ -4253,131 +4190,131 @@ class GetCarResponseResponse(BaseModel):
 
 class Hotel(BaseModel):
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     state: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     city: str | None = None
     address1: str | None = None
     address2: str | None = None
-    zip_code: str | None = Field(None, alias="zipCode")
-    street_number: str | None = Field(None, alias="streetNumber")
-    hotel_code: str | None = Field(None, alias="hotelCode")
-    hotel_name: str | None = Field(None, alias="hotelName")
-    chain_code: str | None = Field(None, alias="chainCode")
-    chain_name: str | None = Field(None, alias="chainName")
-    code_context: str | None = Field(None, alias="codeContext")
-    brand_code: str | None = Field(None, alias="brandCode")
-    brand_name: str | None = Field(None, alias="brandName")
+    zip_code: str | None = None
+    street_number: str | None = None
+    hotel_code: str | None = None
+    hotel_name: str | None = None
+    chain_code: str | None = None
+    chain_name: str | None = None
+    code_context: str | None = None
+    brand_code: str | None = None
+    brand_name: str | None = None
     latitude: float | None = None
     longitude: float | None = None
     rating: float | None = None
-    city_code: str | None = Field(None, alias="cityCode")
-    main_city_code: str | None = Field(None, alias="mainCityCode")
+    city_code: str | None = None
+    main_city_code: str | None = None
     phone: str | None = None
     fax: str | None = None
     amenities: int | None = None
-    medias: list[HotelMedia] | None = None
+    medias: list[HotelMedia] = Field(default_factory=list)
 
 
 class HotelChainListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[HotelChain] | None = None
+    data: list[HotelChain] = Field(default_factory=list)
 
 
 class HotelOffer(BaseModel):
     hotel: Hotel | None = None
-    checkin_date: date | None = Field(None, alias="checkinDate")
-    checkout_date: date | None = Field(None, alias="checkoutDate")
+    checkin_date: date | None = None
+    checkout_date: date | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    taxes_and_fees_per_night: float | None = Field(None, alias="taxesAndFeesPerNight")
-    price_per_night: float | None = Field(None, alias="pricePerNight")
+    total_price: float | None = None
+    taxes_and_fees: float | None = None
+    taxes_and_fees_per_night: float | None = None
+    price_per_night: float | None = None
     flags: int | None = None
     distance: float | None = None
-    rate_codes: list[str] | None = Field(None, alias="rateCodes")
-    refs: list[str] | None = None
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    out_of_policy_rule_ids: list[int] | None = Field(None, alias="outOfPolicyRuleIds")
-    commission_percent: float | None = Field(None, alias="commissionPercent")
-    hotel_pref_level: int | None = Field(None, alias="hotelPrefLevel")
+    rate_codes: list[str] = Field(default_factory=list)
+    refs: list[str] = Field(default_factory=list)
+    out_of_policy_id: int | None = None
+    out_of_policy_rule_ids: list[int] = Field(default_factory=list)
+    commission_percent: float | None = None
+    hotel_pref_level: int | None = None
 
 
 class HotelReservationExt(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    consumers: list[ReservationConsumer] | None = None
-    hotel_refs: list[str] | None = Field(None, alias="hotelRefs")
+    co2_emissions: float | None = None
+    consumers: list[ReservationConsumer] = Field(default_factory=list)
+    hotel_refs: list[str] = Field(default_factory=list)
     cancellation: HotelCancellation | None = None
-    checkin_date: date | None = Field(None, alias="checkinDate")
-    checkout_date: date | None = Field(None, alias="checkoutDate")
-    checkin_time: LocalTime | None = Field(None, alias="checkinTime")
-    checkout_time: LocalTime | None = Field(None, alias="checkoutTime")
+    checkin_date: date | None = None
+    checkout_date: date | None = None
+    checkin_time: str | None = None
+    checkout_time: str | None = None
     fax: str | None = None
     phone: str | None = None
     latitude: float | None = None
     longitude: float | None = None
     guests: int | None = None
-    hotel_name: str | None = Field(None, alias="hotelName")
-    hotel_chain_name: str | None = Field(None, alias="hotelChainName")
-    hotel_group_name: str | None = Field(None, alias="hotelGroupName")
-    price_per_night: float | None = Field(None, alias="pricePerNight")
-    room_type: str | None = Field(None, alias="roomType")
+    hotel_name: str | None = None
+    hotel_chain_name: str | None = None
+    hotel_group_name: str | None = None
+    price_per_night: float | None = None
+    room_type: str | None = None
     rating: float | None = None
-    room_description: str | None = Field(None, alias="roomDescription")
-    atmosphere_description: str | None = Field(None, alias="atmosphereDescription")
+    room_description: str | None = None
+    atmosphere_description: str | None = None
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     state: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     city: str | None = None
     address1: str | None = None
     address2: str | None = None
-    zip_code: str | None = Field(None, alias="zipCode")
-    street_number: str | None = Field(None, alias="streetNumber")
-    media: list[ReservationMedia] | None = None
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    taxes_and_fees_per_night: float | None = Field(None, alias="taxesAndFeesPerNight")
-    city_code: str | None = Field(None, alias="cityCode")
-    main_city_code: str | None = Field(None, alias="mainCityCode")
+    zip_code: str | None = None
+    street_number: str | None = None
+    media: list[ReservationMedia] = Field(default_factory=list)
+    taxes_and_fees: float | None = None
+    taxes_and_fees_per_night: float | None = None
+    city_code: str | None = None
+    main_city_code: str | None = None
     perks: int | None = None
-    chain_code: str | None = Field(None, alias="chainCode")
-    brand_code: str | None = Field(None, alias="brandCode")
+    chain_code: str | None = None
+    brand_code: str | None = None
     amenities: int | None = None
-    external_segment_id: str | None = Field(None, alias="externalSegmentId")
-    confirmation_number: str | None = Field(None, alias="confirmationNumber")
-    room_flags: int | None = Field(None, alias="roomFlags")
+    external_segment_id: str | None = None
+    confirmation_number: str | None = None
+    room_flags: int | None = None
     important: str | None = None
 
 
 class HotelRoom(BaseModel):
-    room_type: str | None = Field(None, alias="roomType")
+    room_type: str | None = None
     description: str | None = None
-    bed_type: str | None = Field(None, alias="bedType")
+    bed_type: str | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    price_per_night: float | None = Field(None, alias="pricePerNight")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    taxes_and_fees_per_night: float | None = Field(None, alias="taxesAndFeesPerNight")
-    checkin_time: LocalTime | None = Field(None, alias="checkinTime")
-    checkout_time: LocalTime | None = Field(None, alias="checkoutTime")
+    total_price: float | None = None
+    price_per_night: float | None = None
+    taxes_and_fees: float | None = None
+    taxes_and_fees_per_night: float | None = None
+    checkin_time: str | None = None
+    checkout_time: str | None = None
     cancellation: HotelCancellation | None = None
-    rate_code: RoomRateCode | None = Field(None, alias="rateCode")
-    rate_plan_type: OtaRatePlanType | None = Field(None, alias="ratePlanType")
+    rate_code: RoomRateCode | None = None
+    rate_plan_type: OtaRatePlanType | None = None
     perks: int | None = None
     flags: int | None = None
     ref: str | None = None
-    room_id: str | None = Field(None, alias="roomId")
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    out_of_policy_rule_ids: list[int] | None = Field(None, alias="outOfPolicyRuleIds")
+    room_id: str | None = None
+    out_of_policy_id: int | None = None
+    out_of_policy_rule_ids: list[int] = Field(default_factory=list)
     commission: float | None = None
     important: str | None = None
-    hotel_pref_level: int | None = Field(None, alias="hotelPrefLevel")
+    hotel_pref_level: int | None = None
     hidden: bool | None = None
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    booking_blocked: bool | None = Field(None, alias="bookingBlocked")
-    approval_required: bool | None = Field(None, alias="approvalRequired")
+    approval_required: bool | None = None
+    booking_blocked: bool | None = None
+    in_policy: bool | None = None
 
 
 class HotelRoomResponse(BaseModel):
@@ -4392,8 +4329,8 @@ class HotelRoomResponseResponse(BaseModel):
 
 
 class HotelRoomsResponse(BaseModel):
-    rooms: list[HotelRoom] | None = None
-    out_of_policies: list[OutOfPolicy] | None = Field(None, alias="outOfPolicies")
+    rooms: list[HotelRoom] = Field(default_factory=list)
+    out_of_policies: list[OutOfPolicy] = Field(default_factory=list)
 
 
 class HotelRoomsResponseResponse(BaseModel):
@@ -4404,19 +4341,16 @@ class HotelRoomsResponseResponse(BaseModel):
 
 
 class ImportSabreOrgProfileResponse(BaseModel):
-    agency_code: str | None = Field(None, alias="agencyCode")
-    org_name: str | None = Field(None, alias="orgName")
-    sabre_profile_id: str | None = Field(None, alias="sabreProfileId")
-    sabre_template_id: str | None = Field(None, alias="sabreTemplateId")
-    suppress_user_emails: bool | None = Field(None, alias="suppressUserEmails")
-    link_traveler_profile: bool | None = Field(None, alias="linkTravelerProfile")
-    user_profile_source: ImportProfileSource | None = Field(
-        None,
-        alias="userProfileSource",
-    )
+    agency_code: str | None = None
+    org_name: str | None = None
+    sabre_profile_id: str | None = None
+    sabre_template_id: str | None = None
+    suppress_user_emails: bool | None = None
+    link_traveler_profile: bool | None = None
+    user_profile_source: ImportProfileSource | None = None
     act: ImportProfileAct | None = None
-    users: list[TravelerProfile] | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    users: list[TravelerProfile] = Field(default_factory=list)
+    org_id: int | None = None
 
 
 class ImportSabreOrgProfileResponseResponse(BaseModel):
@@ -4427,8 +4361,8 @@ class ImportSabreOrgProfileResponseResponse(BaseModel):
 
 
 class IsReservationExt(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    consumers: list[ReservationConsumer] | None = None
+    co2_emissions: float | None = None
+    consumers: list[ReservationConsumer] = Field(default_factory=list)
 
 
 class Items1(BaseModel):
@@ -4451,16 +4385,13 @@ class KpiCountResponseResponse(BaseModel):
 class Layout(BaseModel):
     type: LayoutType | None = None
     quality: LayoutQualityType | None = None
-    display_text: str | None = Field(None, alias="displayText")
-    row_layout: str | None = Field(None, alias="rowLayout")
-    direct_aisle_access: bool | None = Field(None, alias="directAisleAccess")
+    display_text: str | None = None
+    row_layout: str | None = None
+    direct_aisle_access: bool | None = None
 
 
 class ListAncillariesResponse(BaseModel):
-    ancillary_offers: list[AncillaryOffers] | None = Field(
-        None,
-        alias="ancillaryOffers",
-    )
+    ancillary_offers: list[AncillaryOffers] = Field(default_factory=list)
 
 
 class ListAncillariesResponseResponse(BaseModel):
@@ -4478,8 +4409,8 @@ class ListFareRulesResponseResponse(BaseModel):
 
 
 class ListFieldsResponse(BaseModel):
-    fields: list[FieldModel] | None = None
-    field_values: list[FieldValue] | None = Field(None, alias="fieldValues")
+    fields: list[FieldModel] = Field(default_factory=list)
+    field_values: list[FieldValue] = Field(default_factory=list)
 
 
 class ListFieldsResponseResponse(BaseModel):
@@ -4490,12 +4421,9 @@ class ListFieldsResponseResponse(BaseModel):
 
 
 class ListReservationFieldResponse(BaseModel):
-    reservation_fields: list[ReservationField] | None = Field(
-        None,
-        alias="reservationFields",
-    )
-    fields: list[FieldModel] | None = None
-    field_values: list[FieldValue] | None = Field(None, alias="fieldValues")
+    reservation_fields: list[ReservationField] = Field(default_factory=list)
+    fields: list[FieldModel] = Field(default_factory=list)
+    field_values: list[FieldValue] = Field(default_factory=list)
 
 
 class ListReservationFieldResponseResponse(BaseModel):
@@ -4506,8 +4434,8 @@ class ListReservationFieldResponseResponse(BaseModel):
 
 
 class LocateCarResponse(BaseModel):
-    locations: list[CarLocationMerged] | None = None
-    out_of_policies: list[OutOfPolicy] | None = Field(None, alias="outOfPolicies")
+    locations: list[CarLocationMerged] = Field(default_factory=list)
+    out_of_policies: list[OutOfPolicy] = Field(default_factory=list)
 
 
 class LocateCarResponseResponse(BaseModel):
@@ -4521,17 +4449,17 @@ class LoungeAccess(BaseModel):
     application: OptSvcApplication | None = None
     assessment: Assessment | None = None
     code: str | None = None
-    commercial_name: str | None = Field(None, alias="commercialName")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    commercial_name: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
     fee: Fee | None = None
-    group_code: str | None = Field(None, alias="groupCode")
+    group_code: str | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    sub_group_code: str | None = Field(None, alias="subGroupCode")
+    large_icon_url: str | None = None
+    small_icon_url: str | None = None
+    sub_group_code: str | None = None
 
 
 class LoyaltyProgram(BaseModel):
@@ -4540,8 +4468,8 @@ class LoyaltyProgram(BaseModel):
     code: str | None = None
     name: str | None = None
     type: ReservationType | None = None
-    website_url: str | None = Field(None, alias="websiteUrl")
-    logo_url: str | None = Field(None, alias="logoUrl")
+    website_url: str | None = None
+    logo_url: str | None = None
     prefix: str | None = None
 
 
@@ -4549,27 +4477,28 @@ class LoyaltyProgramListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[LoyaltyProgram] | None = None
+    data: list[LoyaltyProgram] = Field(default_factory=list)
 
 
 class MaskedCreditCard(BaseModel):
     id: int | None = None
     name: str | None = None
     address: Address | None = None
-    is_default: bool | None = Field(None, alias="isDefault")
+    is_default: bool | None = None
     brand: str | None = None
-    exp_date: str | None = Field(None, alias="expDate")
-    last_digits: str | None = Field(None, alias="lastDigits")
+    exp_date: str | None = None
+    last_digits: str | None = None
     type: UserCreditCardType | None = None
-    holder_name: str | None = Field(None, alias="holderName")
-    reservation_types: int | None = Field(None, alias="reservationTypes")
+    complete: bool | None = None
+    holder_name: str | None = None
+    reservation_types: int | None = None
 
 
 class MaskedCreditCardListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[MaskedCreditCard] | None = None
+    data: list[MaskedCreditCard] = Field(default_factory=list)
 
 
 class MaskedCreditCardResponse(BaseModel):
@@ -4583,14 +4512,14 @@ class Media(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    external_id: str | None = Field(None, alias="externalId")
+    external_id: str | None = None
     query: str | None = None
     height: int | None = None
     width: int | None = None
     source: MediaSource | None = None
     type: MediaType | None = None
-    attribution_name: str | None = Field(None, alias="attributionName")
-    attribution_url: str | None = Field(None, alias="attributionUrl")
+    attribution_name: str | None = None
+    attribution_url: str | None = None
     url: str | None = None
 
 
@@ -4599,59 +4528,59 @@ class MediaRepository(BaseModel):
     nms: int | None = None
     source: MediaSource | None = None
     query: str | None = None
-    last_queried_on: AwareOrNaiveDatetime | None = Field(None, alias="lastQueriedOn")
-    count_cached: int | None = Field(None, alias="countCached")
-    count_total: int | None = Field(None, alias="countTotal")
+    last_queried_on: AwareOrNaiveDatetime | None = None
+    count_cached: int | None = None
+    count_total: int | None = None
 
 
 class MiscReservationExt(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    consumers: list[ReservationConsumer] | None = None
+    co2_emissions: float | None = None
+    consumers: list[ReservationConsumer] = Field(default_factory=list)
     country: str | None = None
-    country_code: str | None = Field(None, alias="countryCode")
+    country_code: str | None = None
     state: str | None = None
-    state_code: str | None = Field(None, alias="stateCode")
+    state_code: str | None = None
     city: str | None = None
     address1: str | None = None
     address2: str | None = None
-    zip_code: str | None = Field(None, alias="zipCode")
+    zip_code: str | None = None
     latitude: float | None = None
     longitude: float | None = None
-    venue_name: str | None = Field(None, alias="venueName")
+    venue_name: str | None = None
     description: str | None = None
     phone: str | None = None
-    place_id: str | None = Field(None, alias="placeId")
+    place_id: str | None = None
 
 
 class Msg(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    post_id: int | None = Field(None, alias="postId")
-    parent_id: int | None = Field(None, alias="parentId")
-    user_id: int | None = Field(None, alias="userId")
+    post_id: int | None = None
+    parent_id: int | None = None
+    user_id: int | None = None
     text: str | None = None
-    likes: list[int] | None = None
-    processed_on: int | None = Field(None, alias="processedOn")
+    likes: list[int] = Field(default_factory=list)
+    processed_on: int | None = None
     ext: Ext | None = None
-    msgs: list[Msg] | None = None
+    msgs: list[Msg] = Field(default_factory=list)
     time: int | None = None
-    media: list[Media] | None = None
-    dates: list[MsgDatePair] | None = None
-    hashtags: list[str] | None = None
-    locations: list[MsgLocation] | None = None
-    mentions: list[MsgMention] | None = None
+    dates: list[MsgDatePair] = Field(default_factory=list)
+    media: list[Media] = Field(default_factory=list)
+    hashtags: list[str] = Field(default_factory=list)
+    locations: list[MsgLocation] = Field(default_factory=list)
+    mentions: list[MsgMention] = Field(default_factory=list)
 
 
 class NotificationCenter(BaseModel):
     id: int | None = None
     nms: int | None = None
-    owner_id: int | None = Field(None, alias="ownerId")
-    owner_type: ResourceType | None = Field(None, alias="ownerType")
+    owner_id: int | None = None
+    owner_type: ResourceType | None = None
     ext: Ext | None = None
+    unseen_agent_posts: int | None = None
     unseen: int | None = None
-    unseen_agent_posts: int | None = Field(None, alias="unseenAgentPosts")
-    unseen_user_posts: int | None = Field(None, alias="unseenUserPosts")
+    unseen_user_posts: int | None = None
 
 
 class NotificationCenterResponse(BaseModel):
@@ -4662,30 +4591,27 @@ class NotificationCenterResponse(BaseModel):
 
 
 class Offer(BaseModel):
-    od_id: str | None = Field(None, alias="odId")
-    fares: dict[str, list[PricedFare]] | None = None
+    od_id: str | None = None
+    fares: dict[str, list[PricedFare]] = Field(default_factory=dict)
 
 
 class Org(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
+    agency_code: str | None = None
     name: str | None = None
     description: str | None = None
     flags: int | None = None
-    billing_address_location_id: int | None = Field(
-        None,
-        alias="billingAddressLocationId",
-    )
-    billing_address: AddressLocation | None = Field(None, alias="billingAddress")
+    billing_address_location_id: int | None = None
+    billing_address: AddressLocation | None = None
     website: str | None = None
     timezone: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    phone_number: str | None = None
     active: bool | None = None
     type: OrgType | None = None
     visibility: VisibilityType | None = None
     branding: Branding | None = None
-    customer_number: str | None = Field(None, alias="customerNumber")
+    customer_number: str | None = None
 
 
 class OrgAgencyResponse(BaseModel):
@@ -4699,7 +4625,7 @@ class OrgAirlinePrefListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgAirlinePref] | None = None
+    data: list[OrgAirlinePref] = Field(default_factory=list)
 
 
 class OrgAirlinePrefResponse(BaseModel):
@@ -4711,8 +4637,8 @@ class OrgAirlinePrefResponse(BaseModel):
 
 class OrgBudgetEntry(BaseModel):
     name: str | None = None
-    start_date: date | None = Field(None, alias="startDate")
-    accrual_term: int | None = Field(None, alias="accrualTerm")
+    start_date: date | None = None
+    accrual_term: int | None = None
     amount: float | None = None
     type: OrgBudgetType | None = None
 
@@ -4721,7 +4647,7 @@ class OrgCarVendorPrefListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgCarVendorPref] | None = None
+    data: list[OrgCarVendorPref] = Field(default_factory=list)
 
 
 class OrgCarVendorPrefResponse(BaseModel):
@@ -4735,7 +4661,7 @@ class OrgDomainListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgDomain] | None = None
+    data: list[OrgDomain] = Field(default_factory=list)
 
 
 class OrgDomainResponse(BaseModel):
@@ -4749,7 +4675,7 @@ class OrgEmailListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgEmail] | None = None
+    data: list[OrgEmail] = Field(default_factory=list)
 
 
 class OrgEmailResponse(BaseModel):
@@ -4763,7 +4689,7 @@ class OrgHotelChainPrefListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgHotelChainPref] | None = None
+    data: list[OrgHotelChainPref] = Field(default_factory=list)
 
 
 class OrgHotelChainPrefResponse(BaseModel):
@@ -4777,26 +4703,26 @@ class OrgHotelChainRoomPrefListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgHotelChainRoomPref] | None = None
+    data: list[OrgHotelChainRoomPref] = Field(default_factory=list)
 
 
 class OrgIntegration(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     type: OrgIntegrationType | None = None
-    latest_sync_id: int | None = Field(None, alias="latestSyncId")
-    owned_by: str | None = Field(None, alias="ownedBy")
-    settings: dict[str, Any] | None = None
+    latest_sync_id: int | None = None
+    owned_by: str | None = None
+    settings: dict[str, Any] = Field(default_factory=dict)
 
 
 class OrgIntegrationExpensify(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     type: OrgIntegrationType | None = None
-    latest_sync_id: int | None = Field(None, alias="latestSyncId")
-    owned_by: str | None = Field(None, alias="ownedBy")
+    latest_sync_id: int | None = None
+    owned_by: str | None = None
     settings: ExpensifySettings | None = None
 
 
@@ -4804,14 +4730,14 @@ class OrgListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Org] | None = None
+    data: list[Org] = Field(default_factory=list)
 
 
 class OrgLoyaltyProgramListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgLoyaltyProgram] | None = None
+    data: list[OrgLoyaltyProgram] = Field(default_factory=list)
 
 
 class OrgLoyaltyProgramResponse(BaseModel):
@@ -4825,7 +4751,7 @@ class OrgProjectListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgProject] | None = None
+    data: list[OrgProject] = Field(default_factory=list)
 
 
 class OrgProjectResponse(BaseModel):
@@ -4839,7 +4765,7 @@ class OrgRateCodeListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgRateCode] | None = None
+    data: list[OrgRateCode] = Field(default_factory=list)
 
 
 class OrgRateCodeResponse(BaseModel):
@@ -4867,7 +4793,7 @@ class OrgSettingsListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgSettings] | None = None
+    data: list[OrgSettings] = Field(default_factory=list)
 
 
 class OrgSettingsResponse(BaseModel):
@@ -4880,34 +4806,34 @@ class OrgSettingsResponse(BaseModel):
 class OrgUser(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_id: int | None = Field(None, alias="userId")
+    org_id: int | None = None
+    user_id: int | None = None
     status: OrgUserStatus | None = None
     role: OrgUserRole | None = None
     position: str | None = None
-    business_phone_number: str | None = Field(None, alias="businessPhoneNumber")
-    business_address_id: int | None = Field(None, alias="businessAddressId")
-    travel_policy_ids: list[int] | None = Field(None, alias="travelPolicyIds")
-    guest_policy_ids: list[int] | None = Field(None, alias="guestPolicyIds")
-    guest_policy_count: int | None = Field(None, alias="guestPolicyCount")
-    approver_policy_ids: list[int] | None = Field(None, alias="approverPolicyIds")
+    business_phone_number: str | None = None
+    business_address_id: int | None = None
+    travel_policy_ids: list[int] = Field(default_factory=list)
+    guest_policy_ids: list[int] = Field(default_factory=list)
+    guest_policy_count: int | None = None
+    approver_policy_ids: list[int] = Field(default_factory=list)
 
 
 class OrgUserEntryData(BaseModel):
     position: str | None = None
-    business_phone_number: str | None = Field(None, alias="businessPhoneNumber")
-    business_address: AddressLocation | None = Field(None, alias="businessAddress")
+    business_phone_number: str | None = None
+    business_address: AddressLocation | None = None
     role: OrgUserRole | None = None
     email: str | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    last_name: str | None = None
 
 
 class OrgUserFieldListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgUserField] | None = None
+    data: list[OrgUserField] = Field(default_factory=list)
 
 
 class OrgUserFieldResponse(BaseModel):
@@ -4918,7 +4844,7 @@ class OrgUserFieldResponse(BaseModel):
 
 
 class OrgUserIdEntryDataList(BaseModel):
-    org_users: list[int] | None = Field(None, alias="orgUsers")
+    org_users: list[int] = Field(default_factory=list)
     update: OrgUserUpdateEntryData | None = None
 
 
@@ -4926,7 +4852,7 @@ class OrgUserListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[OrgUser] | None = None
+    data: list[OrgUser] = Field(default_factory=list)
 
 
 class OrgUserResponse(BaseModel):
@@ -4937,8 +4863,8 @@ class OrgUserResponse(BaseModel):
 
 
 class OrgUsersResponse(BaseModel):
-    errors: dict[str, str] | None = None
-    organization_users: list[OrgUser] | None = Field(None, alias="organizationUsers")
+    errors: dict[str, str] = Field(default_factory=dict)
+    organization_users: list[OrgUser] = Field(default_factory=list)
 
 
 class OrgUsersResponseResponse(BaseModel):
@@ -4949,14 +4875,11 @@ class OrgUsersResponseResponse(BaseModel):
 
 
 class OrganizationReportCityPairs(BaseModel):
-    org_id: int | None = Field(None, alias="orgId")
-    org_name: str | None = Field(None, alias="orgName")
-    org_logo_url: str | None = Field(None, alias="orgLogoUrl")
-    market_share: float | None = Field(None, alias="marketShare")
-    report_city_pairs: list[ReportCityPairs] | None = Field(
-        None,
-        alias="reportCityPairs",
-    )
+    org_id: int | None = None
+    org_name: str | None = None
+    org_logo_url: str | None = None
+    market_share: float | None = None
+    report_city_pairs: list[ReportCityPairs] = Field(default_factory=list)
 
 
 class OrganizationReportCityPairsResponse(BaseModel):
@@ -4968,13 +4891,13 @@ class OrganizationReportCityPairsResponse(BaseModel):
 
 class PaidBaggageData(BaseModel):
     attributes: BaggageAttributes | None = None
-    display_text: str | None = Field(None, alias="displayText")
-    excess_first: str | None = Field(None, alias="excessFirst")
-    excess_last: str | None = Field(None, alias="excessLast")
+    display_text: str | None = None
+    excess_first: str | None = None
+    excess_last: str | None = None
     fee: Fee | None = None
     free: str | None = None
-    optional_service_id: str | None = Field(None, alias="optionalServiceId")
-    os_sequence: str | None = Field(None, alias="osSequence")
+    optional_service_id: str | None = None
+    os_sequence: str | None = None
     size: Size | None = None
     weight: Weight | None = None
 
@@ -4987,12 +4910,12 @@ class ParentResource(BaseModel):
 class Penalty(BaseModel):
     type: PenaltyType | None = None
     enabled: bool | None = None
-    penalty_amount: float | None = Field(None, alias="penaltyAmount")
-    currency_code: str | None = Field(None, alias="currencyCode")
+    penalty_amount: float | None = None
+    currency_code: str | None = None
 
 
 class PenaltyData(BaseModel):
-    penalties: list[Penalty] | None = None
+    penalties: list[Penalty] = Field(default_factory=list)
 
 
 class PendingEmail(BaseModel):
@@ -5002,9 +4925,9 @@ class PendingEmail(BaseModel):
     email: str | None = None
     name: str | None = None
     subject: str | None = None
-    is_html: bool | None = Field(None, alias="isHtml")
+    is_html: bool | None = None
     message: str | None = None
-    bcc_emails: list[str] | None = Field(None, alias="bccEmails")
+    bcc_emails: list[str] = Field(default_factory=list)
     active: bool | None = None
 
 
@@ -5012,7 +4935,7 @@ class PendingEmailListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[PendingEmail] | None = None
+    data: list[PendingEmail] = Field(default_factory=list)
 
 
 class PendingEmailResponse(BaseModel):
@@ -5031,15 +4954,12 @@ class PolicyLookupTableResponse(BaseModel):
 
 class PolicyOptionFligthClassByDuration(BaseModel):
     max: FlightClassPref | None = None
-    by_legs: list[PolicyOptionLeg] | None = Field(None, alias="byLegs")
+    by_legs: list[PolicyOptionLeg] = Field(default_factory=list)
 
 
 class PolicyOptions(BaseModel):
-    flight_classes: list[FlightClassPref] | None = Field(None, alias="flightClasses")
-    flight_classes_by_duration: PolicyOptionFligthClassByDuration | None = Field(
-        None,
-        alias="flightClassesByDuration",
-    )
+    flight_classes: list[FlightClassPref] = Field(default_factory=list)
+    flight_classes_by_duration: PolicyOptionFligthClassByDuration | None = None
 
 
 class PolicyRuleException(BaseModel):
@@ -5047,8 +4967,8 @@ class PolicyRuleException(BaseModel):
     nms: int | None = None
     code: PolicyRuleSpecs | None = None
     active: bool | None = None
-    policy_rule_id: int | None = Field(None, alias="policyRuleId")
-    vars: dict[str, dict[str, Any]] | None = None
+    policy_rule_id: int | None = None
+    vars: dict[str, dict[str, Any]] = Field(default_factory=dict)
 
 
 class PolicyRuleExceptionResponse(BaseModel):
@@ -5061,9 +4981,9 @@ class PolicyRuleExceptionResponse(BaseModel):
 class PostPin(BaseModel):
     id: int | None = None
     nms: int | None = None
-    owner_id: int | None = Field(None, alias="ownerId")
-    owner_type: ResourceType | None = Field(None, alias="ownerType")
-    post_id: int | None = Field(None, alias="postId")
+    owner_id: int | None = None
+    owner_type: ResourceType | None = None
+    post_id: int | None = None
 
 
 class Power(BaseModel):
@@ -5075,21 +4995,21 @@ class ProviderPnrReportListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ProviderPnrReport] | None = None
+    data: list[ProviderPnrReport] = Field(default_factory=list)
 
 
 class RailcardListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Railcard] | None = None
+    data: list[Railcard] = Field(default_factory=list)
 
 
 class RateCodeListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[RateCode] | None = None
+    data: list[RateCode] = Field(default_factory=list)
 
 
 class RateCodeResponse(BaseModel):
@@ -5101,41 +5021,26 @@ class RateCodeResponse(BaseModel):
 
 class RealTimeFlightInfo(BaseModel):
     aircraft: str | None = None
-    primary_status: PrimaryFlightStatus | None = Field(None, alias="primaryStatus")
-    secondary_status: SecondaryFlightStatus | None = Field(
-        None,
-        alias="secondaryStatus",
-    )
-    departure_terminal: str | None = Field(None, alias="departureTerminal")
-    departure_gate: str | None = Field(None, alias="departureGate")
-    departure_local_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="departureLocalDateTime",
-    )
-    departure_utc_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="departureUtcDateTime",
-    )
-    departure_status: ScheduleStatus | None = Field(None, alias="departureStatus")
-    arrival_terminal: str | None = Field(None, alias="arrivalTerminal")
-    arrival_gate: str | None = Field(None, alias="arrivalGate")
-    arrival_local_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="arrivalLocalDateTime",
-    )
-    arrival_utc_date_time: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="arrivalUtcDateTime",
-    )
-    arrival_status: ScheduleStatus | None = Field(None, alias="arrivalStatus")
-    link_map: str | None = Field(None, alias="linkMap")
+    primary_status: PrimaryFlightStatus | None = None
+    secondary_status: SecondaryFlightStatus | None = None
+    departure_terminal: str | None = None
+    departure_gate: str | None = None
+    departure_local_date_time: AwareOrNaiveDatetime | None = None
+    departure_utc_date_time: AwareOrNaiveDatetime | None = None
+    departure_status: ScheduleStatus | None = None
+    arrival_terminal: str | None = None
+    arrival_gate: str | None = None
+    arrival_local_date_time: AwareOrNaiveDatetime | None = None
+    arrival_utc_date_time: AwareOrNaiveDatetime | None = None
+    arrival_status: ScheduleStatus | None = None
+    link_map: str | None = None
 
 
 class Reason(BaseModel):
     id: int | None = None
     active: bool | None = None
-    reason_type: ReasonType | None = Field(None, alias="reasonType")
-    reservation_type: ReservationType | None = Field(None, alias="reservationType")
+    reason_type: ReasonType | None = None
+    reservation_type: ReservationType | None = None
     reason: str | None = None
     position: int | None = None
 
@@ -5144,100 +5049,100 @@ class ReasonListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Reason] | None = None
+    data: list[Reason] = Field(default_factory=list)
 
 
 class ReportAirlinesByOrgListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ReportAirlinesByOrg] | None = None
+    data: list[ReportAirlinesByOrg] = Field(default_factory=list)
 
 
 class ReportCityPairsListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ReportCityPairs] | None = None
+    data: list[ReportCityPairs] = Field(default_factory=list)
 
 
 class ReportFlightByCityPairListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ReportFlightByCityPair] | None = None
+    data: list[ReportFlightByCityPair] = Field(default_factory=list)
 
 
 class ReportFlightByEmployeeListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ReportFlightByEmployee] | None = None
+    data: list[ReportFlightByEmployee] = Field(default_factory=list)
 
 
 class ReportFlightSegment(BaseModel):
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     flags: int | None = None
-    booker_id: int | None = Field(None, alias="bookerId")
-    org_id: int | None = Field(None, alias="orgId")
-    trip_id: int | None = Field(None, alias="tripId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
+    booker_id: int | None = None
+    org_id: int | None = None
+    trip_id: int | None = None
+    agency_code: str | None = None
+    provider_code: str | None = None
     label: str | None = None
     vendor: str | None = None
     rlk: str | None = None
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
-    in_policy: bool | None = Field(None, alias="inPolicy")
+    not_in_policy_reason: str | None = None
+    not_preferred_reason: str | None = None
+    in_policy: bool | None = None
     status: ReservationStatus | None = None
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
+    total_price: float | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    user_ids: list[int] = Field(default_factory=list)
     ext: Ext | None = None
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_station: str | None = Field(None, alias="departureStation")
-    fare_type: FareType | None = Field(None, alias="fareType")
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    arrival_station: str | None = None
+    departure_station: str | None = None
+    fare_type: FareType | None = None
     segments: int | None = None
 
 
 class ReportHotel(BaseModel):
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     flags: int | None = None
-    booker_id: int | None = Field(None, alias="bookerId")
-    org_id: int | None = Field(None, alias="orgId")
-    trip_id: int | None = Field(None, alias="tripId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
+    booker_id: int | None = None
+    org_id: int | None = None
+    trip_id: int | None = None
+    agency_code: str | None = None
+    provider_code: str | None = None
     label: str | None = None
     vendor: str | None = None
     rlk: str | None = None
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
-    in_policy: bool | None = Field(None, alias="inPolicy")
+    not_in_policy_reason: str | None = None
+    not_preferred_reason: str | None = None
+    in_policy: bool | None = None
     status: ReservationStatus | None = None
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
+    total_price: float | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    user_ids: list[int] = Field(default_factory=list)
     ext: Ext | None = None
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    hotel_name: str | None = Field(None, alias="hotelName")
-    hotel_code: str | None = Field(None, alias="hotelCode")
-    brand_code: str | None = Field(None, alias="brandCode")
-    chain_name: str | None = Field(None, alias="chainName")
-    chain_code: str | None = Field(None, alias="chainCode")
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    hotel_name: str | None = None
+    hotel_code: str | None = None
+    brand_code: str | None = None
+    chain_name: str | None = None
+    chain_code: str | None = None
     country: str | None = None
     city: str | None = None
     guests: int | None = None
@@ -5254,48 +5159,82 @@ class ReportProspectiveCustomerListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[ReportProspectiveCustomer] | None = None
+    data: list[ReportProspectiveCustomer] = Field(default_factory=list)
+
+
+class ReportTrain(BaseModel):
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
+    flags: int | None = None
+    booker_id: int | None = None
+    org_id: int | None = None
+    trip_id: int | None = None
+    agency_code: str | None = None
+    provider_code: str | None = None
+    label: str | None = None
+    vendor: str | None = None
+    rlk: str | None = None
+    not_in_policy_reason: str | None = None
+    not_preferred_reason: str | None = None
+    in_policy: bool | None = None
+    status: ReservationStatus | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
+    currency: str | None = None
+    total_price: float | None = None
+    ttl: AwareOrNaiveDatetime | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    ext: Ext | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    arrival_station: str | None = None
+    departure_station: str | None = None
+    fare_name: str | None = None
+    fare_type: FareType | None = None
+    segment_count: int | None = None
+    consumer_count: int | None = None
 
 
 class ReqItinerary(BaseModel):
-    acct_code: str | None = Field(None, alias="acctCode")
+    acct_code: str | None = None
     currency: str | None = None
-    office_id: str | None = Field(None, alias="officeId")
+    office_id: str | None = None
     pcc: str | None = None
     pos: str | None = None
-    psgrs: list[str] | None = None
-    segments: list[ReqItinerarySegment] | None = None
+    psgrs: list[str] = Field(default_factory=list)
+    segments: list[ReqItinerarySegment] = Field(default_factory=list)
     src: str | None = None
-    travel_agency_id: str | None = Field(None, alias="travelAgencyId")
+    travel_agency_id: str | None = None
 
 
 class Reservation(BaseModel):
     id: int | None = None
     ext: IsReservationExt | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    trip_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
+    provider_code: str | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     rlk: str | None = None
     vendor: str | None = None
     label: str | None = None
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    org_id: int | None = Field(None, alias="orgId")
-    org_project_id: int | None = Field(None, alias="orgProjectId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
+    total_price: float | None = None
+    org_id: int | None = None
+    org_project_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    in_policy: bool | None = None
+    not_in_policy_reason: str | None = None
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
+    not_preferred_reason: str | None = None
     flags: int | None = None
     type: ReservationType | None = None
 
@@ -5305,6 +5244,34 @@ class ReservationFieldResponse(BaseModel):
     code: int | None = None
     error: str | None = None
     data: ReservationField | None = None
+
+
+class ReservationReport(BaseModel):
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
+    flags: int | None = None
+    booker_id: int | None = None
+    org_id: int | None = None
+    trip_id: int | None = None
+    agency_code: str | None = None
+    provider_code: str | None = None
+    label: str | None = None
+    vendor: str | None = None
+    rlk: str | None = None
+    not_in_policy_reason: str | None = None
+    not_preferred_reason: str | None = None
+    in_policy: bool | None = None
+    status: ReservationStatus | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
+    currency: str | None = None
+    total_price: float | None = None
+    ttl: AwareOrNaiveDatetime | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    ext: Ext | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
 
 
 class ReservationResponse(BaseModel):
@@ -5322,28 +5289,28 @@ class ResourceNotificationResponseResponse(BaseModel):
 
 
 class RespItineraryFare(BaseModel):
-    advance_change: list[str] | None = Field(None, alias="advanceChange")
+    advance_change: list[str] = Field(default_factory=list)
     brand: str | None = None
-    cancellation: list[str] | None = None
-    segments: list[RespItinerarySegment] | None = None
+    cancellation: list[str] = Field(default_factory=list)
+    segments: list[RespItinerarySegment] = Field(default_factory=list)
 
 
 class RespItineraryLeg(BaseModel):
-    amenity_summary: str | None = Field(None, alias="amenitySummary")
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    fares: list[RespItineraryFare] | None = None
-    total_travel_time: str | None = Field(None, alias="totalTravelTime")
+    amenity_summary: str | None = None
+    co2_emissions: float | None = None
+    fares: list[RespItineraryFare] = Field(default_factory=list)
+    total_travel_time: str | None = None
 
 
 class SabreOrgProfile(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    profile_id: str | None = Field(None, alias="profileId")
-    template_id: str | None = Field(None, alias="templateId")
-    profile_hash: str | None = Field(None, alias="profileHash")
-    storage_type: StorageType | None = Field(None, alias="storageType")
+    org_id: int | None = None
+    agency_code: str | None = None
+    profile_id: str | None = None
+    template_id: str | None = None
+    profile_hash: str | None = None
+    storage_type: StorageType | None = None
 
 
 class SabreOrgProfileResponse(BaseModel):
@@ -5354,49 +5321,46 @@ class SabreOrgProfileResponse(BaseModel):
 
 
 class SearchFlightRefData(BaseModel):
-    agency_code: str | None = Field(None, alias="agencyCode")
-    created_on_utc: AwareOrNaiveDatetime | None = Field(None, alias="createdOnUtc")
-    org_id: int | None = Field(None, alias="orgId")
-    provider_code: str | None = Field(None, alias="providerCode")
-    fop_flags: int | None = Field(None, alias="fopFlags")
-    response_id: str | None = Field(None, alias="responseId")
-    flights: list[FlightRefData] | None = None
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    agency_code: str | None = None
+    created_on_utc: AwareOrNaiveDatetime | None = None
+    org_id: int | None = None
+    provider_code: str | None = None
+    fop_flags: int | None = None
+    response_id: str | None = None
+    flights: list[FlightRefData] = Field(default_factory=list)
+    user_ids: list[int] = Field(default_factory=list)
     inf: int | None = None
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    policy_rule_results: list[PolicyRuleResult] | None = Field(
-        None,
-        alias="policyRuleResults",
-    )
+    in_policy: bool | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    policy_rule_results: list[PolicyRuleResult] = Field(default_factory=list)
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    airline_pref_level: int | None = Field(None, alias="airlinePrefLevel")
-    account_code: str | None = Field(None, alias="accountCode")
-    request_type: SearchFlightsRequestType | None = Field(None, alias="requestType")
-    itinerary_ref: str | None = Field(None, alias="itineraryRef")
-    itinerary_ref_size: int | None = Field(None, alias="itineraryRefSize")
+    total_price: float | None = None
+    taxes_and_fees: float | None = None
+    airline_pref_level: int | None = None
+    account_code: str | None = None
+    request_type: SearchFlightsRequestType | None = None
+    itinerary_ref: str | None = None
+    itinerary_ref_size: int | None = None
     airline: str | None = None
     transborder: bool | None = None
-    seat_selection_available: bool | None = Field(None, alias="seatSelectionAvailable")
-    reshop_reservation_ids: list[int] | None = Field(None, alias="reshopReservationIds")
-    loyalty_program_number: str | None = Field(None, alias="loyaltyProgramNumber")
-    reservation_flags: int | None = Field(None, alias="reservationFlags")
-    transaction_identifier: str | None = Field(None, alias="transactionIdentifier")
-    inner_one_way: bool | None = Field(None, alias="innerOneWay")
+    seat_selection_available: bool | None = None
+    reshop_reservation_ids: list[int] = Field(default_factory=list)
+    loyalty_program_number: str | None = None
+    reservation_flags: int | None = None
+    transaction_identifier: str | None = None
+    inner_one_way: bool | None = None
 
 
 class SearchFlightsResponse(BaseModel):
-    airlines: dict[str, Airline] | None = None
-    airports: dict[str, Airport] | None = None
-    ods: dict[str, OriginDestination] | None = None
-    penalties: dict[str, PenaltyData] | None = None
-    segments: dict[str, Segment] | None = None
-    offers: list[Offer] | None = None
-    out_of_policies: list[OutOfPolicy] | None = Field(None, alias="outOfPolicies")
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-    od_count: int | None = Field(None, alias="odCount")
+    airlines: dict[str, Airline] = Field(default_factory=dict)
+    airports: dict[str, Airport] = Field(default_factory=dict)
+    ods: dict[str, OriginDestination] = Field(default_factory=dict)
+    penalties: dict[str, PenaltyData] = Field(default_factory=dict)
+    segments: dict[str, Segment] = Field(default_factory=dict)
+    offers: list[Offer] = Field(default_factory=list)
+    out_of_policies: list[OutOfPolicy] = Field(default_factory=list)
+    rate_code_descr: str | None = None
+    od_count: int | None = None
 
 
 class SearchFlightsResponseResponse(BaseModel):
@@ -5407,11 +5371,11 @@ class SearchFlightsResponseResponse(BaseModel):
 
 
 class SearchHotelsResponse(BaseModel):
-    hotels: list[HotelOffer] | None = None
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    out_of_policies: list[OutOfPolicy] | None = Field(None, alias="outOfPolicies")
+    hotels: list[HotelOffer] = Field(default_factory=list)
+    rate_code_descr: str | None = None
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    out_of_policies: list[OutOfPolicy] = Field(default_factory=list)
 
 
 class SearchHotelsResponseResponse(BaseModel):
@@ -5422,28 +5386,28 @@ class SearchHotelsResponseResponse(BaseModel):
 
 
 class SearchTrainRequest(BaseModel):
-    ods: list[TrainOriginDestinationRequest] | None = None
-    refs: list[str] | None = None
-    railcards: list[int] | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    trip_id: int | None = Field(None, alias="tripId")
-    reservation_ids: list[int] | None = Field(None, alias="reservationIds")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    open_return: bool | None = Field(None, alias="openReturn")
+    ods: list[TrainOriginDestinationRequest] = Field(default_factory=list)
+    refs: list[str] = Field(default_factory=list)
+    railcards: list[int] = Field(default_factory=list)
+    org_id: int | None = None
+    trip_id: int | None = None
+    reservation_ids: list[int] = Field(default_factory=list)
+    user_ids: list[int] = Field(default_factory=list)
+    open_return: bool | None = None
 
 
 class Seat(BaseModel):
-    wider_seat: bool | None = Field(None, alias="widerSeat")
+    wider_seat: bool | None = None
     pitch: str | None = None
-    leg_room: SeatLegRoom | None = Field(None, alias="legRoom")
+    leg_room: SeatLegRoom | None = None
     flatness: str | None = None
-    display_text: str | None = Field(None, alias="displayText")
+    display_text: str | None = None
 
 
 class SeatAssignment(BaseModel):
-    consumer_index: int | None = Field(None, alias="consumerIndex")
-    segment_key: str | None = Field(None, alias="segmentKey")
-    seat_key: str | None = Field(None, alias="seatKey")
+    consumer_index: int | None = None
+    segment_key: str | None = None
+    seat_key: str | None = None
     preference: SeatPreference | None = None
 
 
@@ -5452,41 +5416,41 @@ class SeatMapSeat(BaseModel):
     row: str | None = None
     flags: int | None = None
     status: SeatStatus | None = None
-    seat_key: str | None = Field(None, alias="seatKey")
+    seat_key: str | None = None
     occupied: bool | None = None
     chargeable: bool | None = None
-    no_seat: bool | None = Field(None, alias="noSeat")
+    no_seat: bool | None = None
     premium: bool | None = None
-    restricted_recline: bool | None = Field(None, alias="restrictedRecline")
-    no_infant: bool | None = Field(None, alias="noInfant")
-    leg_space: bool | None = Field(None, alias="legSpace")
+    restricted_recline: bool | None = None
+    no_infant: bool | None = None
+    leg_space: bool | None = None
     preferred: bool | None = None
-    exit_row: bool | None = Field(None, alias="exitRow")
-    to_be_left_vacant: bool | None = Field(None, alias="toBeLeftVacant")
+    exit_row: bool | None = None
+    to_be_left_vacant: bool | None = None
     price: float | None = None
     taxes: float | None = None
-    seat_type: str | None = Field(None, alias="seatType")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    booking_blocked: bool | None = Field(None, alias="bookingBlocked")
-    approval_required: bool | None = Field(None, alias="approvalRequired")
+    seat_type: str | None = None
+    approval_required: bool | None = None
+    booking_blocked: bool | None = None
+    in_policy: bool | None = None
 
 
 class SecureCreditCard(BaseModel):
     number: str | None = None
-    exp: str | None = Field(None, examples=["2022-03"])
+    exp: str | None = None
     cvc: str | None = None
     type: UserCreditCardType | None = None
-    holder_name: str | None = Field(None, alias="holderName")
+    holder_name: str | None = None
     address: Address | None = None
 
 
 class Settlement(BaseModel):
     id: int | None = None
     type: SettlementType | None = None
-    reservation_id: int | None = Field(None, alias="reservationId")
-    reservation_type: ReservationType | None = Field(None, alias="reservationType")
-    org_id: int | None = Field(None, alias="orgId")
-    user_id: int | None = Field(None, alias="userId")
+    reservation_id: int | None = None
+    reservation_type: ReservationType | None = None
+    org_id: int | None = None
+    user_id: int | None = None
     date: AwareOrNaiveDatetime | None = None
     label: str | None = None
     description: str | None = None
@@ -5498,7 +5462,7 @@ class Summary(BaseModel):
     aircraft: DisplayTextSummary | None = None
     beverage: DisplayTextSummary | None = None
     entertainment: DisplayTextSummary | None = None
-    fresh_food: DisplayTextSummary | None = Field(None, alias="freshFood")
+    fresh_food: DisplayTextSummary | None = None
     id: str | None = None
     layout: DisplayTextSummary | None = None
     power: DisplayTextSummary | None = None
@@ -5508,16 +5472,16 @@ class Summary(BaseModel):
 
 class Supplier(BaseModel):
     id: int | None = None
-    user_id: int | None = Field(None, alias="userId")
-    supplier_code: str | None = Field(None, alias="supplierCode")
-    supplier_type: SupplierType | None = Field(None, alias="supplierType")
+    user_id: int | None = None
+    supplier_code: str | None = None
+    supplier_type: SupplierType | None = None
 
 
 class SupplierListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Supplier] | None = None
+    data: list[Supplier] = Field(default_factory=list)
 
 
 class SupplierResponse(BaseModel):
@@ -5528,70 +5492,70 @@ class SupplierResponse(BaseModel):
 
 
 class TrainOffer(BaseModel):
-    od_id: str | None = Field(None, alias="odId")
-    fares: dict[str, list[TrainPricedFare]] | None = None
+    od_id: str | None = None
+    fares: dict[str, list[TrainPricedFare]] = Field(default_factory=dict)
 
 
 class TrainOriginDestinationInfo(BaseModel):
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     carrier: str | None = None
     duration: int | None = None
-    segments: list[TrainSegmentInfo] | None = None
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
+    segments: list[TrainSegmentInfo] = Field(default_factory=list)
+    fare_name: str | None = None
+    fare_type: FareType | None = None
 
 
 class TrainReservationSegment(BaseModel):
     ref: str | None = None
     duration: int | None = None
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    arrival_station_name: str | None = Field(None, alias="arrivalStationName")
-    departure_station: str | None = Field(None, alias="departureStation")
-    departure_station_name: str | None = Field(None, alias="departureStationName")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    train_number: str | None = Field(None, alias="trainNumber")
-    train_name: str | None = Field(None, alias="trainName")
-    class_code: str | None = Field(None, alias="classCode")
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_rules: str | None = Field(None, alias="fareRules")
+    arrival_station: str | None = None
+    arrival_station_name: str | None = None
+    departure_station: str | None = None
+    departure_station_name: str | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    train_number: str | None = None
+    train_name: str | None = None
+    class_code: str | None = None
+    fare_name: str | None = None
+    fare_rules: str | None = None
     logo: str | None = None
-    tickets: list[str] | None = None
-    seats: list[TrainSeat] | None = None
-    transport_mode: TrainTransportMode | None = Field(None, alias="transportMode")
-    applied_discount_id: str | None = Field(None, alias="appliedDiscountId")
-    fare_condition_id: str | None = Field(None, alias="fareConditionId")
-    comfort_class_id: str | None = Field(None, alias="comfortClassId")
-    carrier_name: str | None = Field(None, alias="carrierName")
-    fare_condition_ids: list[str] | None = Field(None, alias="fareConditionIds")
+    tickets: list[str] = Field(default_factory=list)
+    seats: list[TrainSeat] = Field(default_factory=list)
+    transport_mode: TrainTransportMode | None = None
+    applied_discount_id: str | None = None
+    fare_condition_id: str | None = None
+    comfort_class_id: str | None = None
+    carrier_name: str | None = None
+    fare_condition_ids: list[str] = Field(default_factory=list)
 
 
 class TrainSegment(BaseModel):
-    train_number: str | None = Field(None, alias="trainNumber")
-    train_name: str | None = Field(None, alias="trainName")
+    train_number: str | None = None
+    train_name: str | None = None
     equipment: str | None = None
     logo: str | None = None
-    carrier_name: str | None = Field(None, alias="carrierName")
+    carrier_name: str | None = None
     duration: int | None = None
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    transport_mode: TrainTransportMode | None = Field(None, alias="transportMode")
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    transport_mode: TrainTransportMode | None = None
 
 
 class TravelPolicyParameter(BaseModel):
     name: str | None = None
     description: str | None = None
     type: TravelPolicyParameterType | None = None
-    values: list[str] | None = None
+    values: list[str] = Field(default_factory=list)
     table: LookupTable | None = None
     required: bool | None = None
-    min_value: float | None = Field(None, alias="minValue")
-    max_value: float | None = Field(None, alias="maxValue")
+    min_value: float | None = None
+    max_value: float | None = None
 
 
 class Summary1(BaseModel):
@@ -5603,81 +5567,78 @@ class Summary1(BaseModel):
 class Trip(BaseModel):
     id: int | None = None
     nms: int | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    org_id: int | None = Field(None, alias="orgId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    arranger_ids: list[int] | None = Field(None, alias="arrangerIds")
-    booker_ids: list[int] | None = Field(None, alias="bookerIds")
-    granted_ids: list[int] | None = Field(None, alias="grantedIds")
-    invitee_ids: list[int] | None = Field(None, alias="inviteeIds")
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    agency_code: str | None = None
+    org_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    arranger_ids: list[int] = Field(default_factory=list)
+    booker_ids: list[int] = Field(default_factory=list)
+    granted_ids: list[int] = Field(default_factory=list)
+    invitee_ids: list[int] = Field(default_factory=list)
+    user_ids: list[int] = Field(default_factory=list)
     name: str | None = None
     description: str | None = None
     visibility: VisibilityType | None = None
-    start_date: date | None = Field(None, alias="startDate")
-    end_date: date | None = Field(None, alias="endDate")
-    agency_billed_on: AwareOrNaiveDatetime | None = Field(None, alias="agencyBilledOn")
+    start_date: date | None = None
+    end_date: date | None = None
+    agency_billed_on: AwareOrNaiveDatetime | None = None
     total: float | None = None
     summary: list[TripSummaryLine] | Summary1 | None = None
-    trip_board_flags: int | None = Field(None, alias="tripBoardFlags")
-    draft_boards: int | None = Field(None, alias="draftBoards")
-    pending_boards: int | None = Field(None, alias="pendingBoards")
-    processing_boards: int | None = Field(None, alias="processingBoards")
-    confirmed_boards: int | None = Field(None, alias="confirmedBoards")
-    send_itinerary_at: int | None = Field(None, alias="sendItineraryAt")
-    post_processed_on: int | None = Field(None, alias="postProcessedOn")
-    ui_flags: int | None = Field(None, alias="uiFlags")
-    agency_flags: int | None = Field(None, alias="agencyFlags")
+    trip_board_flags: int | None = None
+    draft_boards: int | None = None
+    pending_boards: int | None = None
+    processing_boards: int | None = None
+    confirmed_boards: int | None = None
+    send_itinerary_at: int | None = None
+    post_processed_on: int | None = None
+    ui_flags: int | None = None
+    agency_flags: int | None = None
 
 
 class TripBoardRef(BaseModel):
     id: int | None = None
     nms: int | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    trip_board_id: int | None = Field(None, alias="tripBoardId")
+    trip_id: int | None = None
+    trip_board_id: int | None = None
     active: bool | None = None
-    reservation_type: ReservationType | None = Field(None, alias="reservationType")
-    provider_code: str | None = Field(None, alias="providerCode")
+    reservation_type: ReservationType | None = None
+    provider_code: str | None = None
     ref: str | None = None
     vendor: str | None = None
-    user_reward_program_id: dict[str, int] | None = Field(
-        None,
-        alias="userRewardProgramId",
-    )
-    booker_id: int | None = Field(None, alias="bookerId")
-    amend_id: int | None = Field(None, alias="amendId")
-    amend_reservation_ids: list[int] | None = Field(None, alias="amendReservationIds")
-    reservation_ids: list[int] | None = Field(None, alias="reservationIds")
+    user_reward_program_id: dict[str, int] = Field(default_factory=dict)
+    booker_id: int | None = None
+    amend_id: int | None = None
+    amend_reservation_ids: list[int] = Field(default_factory=list)
+    reservation_ids: list[int] = Field(default_factory=list)
     status: ReservationStatus | None = None
-    user_ids: list[int] | None = Field(None, alias="userIds")
+    user_ids: list[int] = Field(default_factory=list)
     summary: list[TripSummaryLine] | Summary1 | None = None
-    start_date: date | None = Field(None, alias="startDate")
-    end_date: date | None = Field(None, alias="endDate")
-    priced_on: AwareOrNaiveDatetime | None = Field(None, alias="pricedOn")
+    start_date: date | None = None
+    end_date: date | None = None
+    priced_on: AwareOrNaiveDatetime | None = None
     currency: str | None = None
     due: float | None = None
-    earlier_due: float | None = Field(None, alias="earlierDue")
+    earlier_due: float | None = None
     refund: float | None = None
     credit: float | None = None
     penalty: float | None = None
     total: float | None = None
-    exception_on_id: int | None = Field(None, alias="exceptionOnId")
-    exception_flags: int | None = Field(None, alias="exceptionFlags")
-    fop_flags: int | None = Field(None, alias="fopFlags")
-    trip_board_flags: int | None = Field(None, alias="tripBoardFlags")
-    waypoint_flags: int | None = Field(None, alias="waypointFlags")
-    waypoint_attrs: dict[str, str] | None = Field(None, alias="waypointAttrs")
-    messages: list[str] | None = None
-    fops: list[TripBoardFop] | None = None
-    ui_flags: int | None = Field(None, alias="uiFlags")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
+    exception_on_id: int | None = None
+    exception_flags: int | None = None
+    fop_flags: int | None = None
+    trip_board_flags: int | None = None
+    waypoint_flags: int | None = None
+    waypoint_attrs: dict[str, str] = Field(default_factory=dict)
+    messages: list[str] = Field(default_factory=list)
+    fops: list[TripBoardFop] = Field(default_factory=list)
+    ui_flags: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
 
 
 class TripMedia(BaseModel):
     id: int | None = None
     nms: int | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    media_id: int | None = Field(None, alias="mediaId")
+    trip_id: int | None = None
+    media_id: int | None = None
     media: Media | None = None
     index: int | None = None
 
@@ -5686,84 +5647,83 @@ class UPA(BaseModel):
     id: str | None = None
     headline: str | None = None
     description: str | None = None
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
-    categories: list[str] | None = None
-    fees: list[FlightAttributeFee] | None = None
-    photos: list[UPAPhoto] | None = None
+    small_icon_url: str | None = None
+    large_icon_url: str | None = None
+    cta_text: str | None = None
+    cta_url: str | None = None
+    categories: list[str] = Field(default_factory=list)
+    fees: list[FlightAttributeFee] = Field(default_factory=list)
+    photos: list[UPAPhoto] = Field(default_factory=list)
 
 
 class Upa(BaseModel):
-    att_descr: str | None = Field(None, alias="attDescr")
-    categories: list[str] | None = None
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    att_descr: str | None = None
+    categories: list[str] = Field(default_factory=list)
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
-    fees: list[Fee] | None = None
+    fees: list[Fee] = Field(default_factory=list)
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    optional_service_identifiers: list[OptionalServiceIdentifier] | None = Field(
-        None,
-        alias="optionalServiceIdentifiers",
+    large_icon_url: str | None = None
+    optional_service_identifiers: list[OptionalServiceIdentifier] = Field(
+        default_factory=list,
     )
-    photos: list[UpaCommon] | None = None
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
-    tours: list[UpaCommon] | None = None
-    videos: list[UpaCommon] | None = None
+    photos: list[UpaCommon] = Field(default_factory=list)
+    small_icon_url: str | None = None
+    tours: list[UpaCommon] = Field(default_factory=list)
+    videos: list[UpaCommon] = Field(default_factory=list)
 
 
 class User(BaseModel):
     id: int | None = None
     nms: int | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     gender: Gender | None = None
     flags: int | None = None
     active: bool | None = None
     color: str | None = None
-    picture_url: str | None = Field(None, alias="pictureUrl")
+    picture_url: str | None = None
     status: UserAccountStatus | None = None
-    full_name: str | None = Field(None, alias="fullName")
-    short_name: str | None = Field(None, alias="shortName")
+    full_name: str | None = None
+    short_name: str | None = None
 
 
 class UserAccount(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    first_name: str | None = Field(None, alias="firstName")
-    middle_name: str | None = Field(None, alias="middleName")
-    last_name: str | None = Field(None, alias="lastName")
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
     suffix: str | None = None
     gender: Gender | None = None
     dob: date | None = None
-    primary_email: str | None = Field(None, alias="primaryEmail")
-    phone_number: str | None = Field(None, alias="phoneNumber")
+    primary_email: str | None = None
+    phone_number: str | None = None
     preferences: UserAccountPreferences | None = None
-    emergency_contact: EmergencyContact | None = Field(None, alias="emergencyContact")
+    emergency_contact: EmergencyContact | None = None
     documents: UserDocuments | None = None
     status: UserAccountStatus | None = None
     kyc: UserAccountKycStatus | None = None
     role: UserRole | None = None
-    agency_codes: list[str] | None = Field(None, alias="agencyCodes")
+    agency_codes: list[str] = Field(default_factory=list)
     color: str | None = None
-    picture_url: str | None = Field(None, alias="pictureUrl")
+    picture_url: str | None = None
     flags: int | None = None
-    agent_sines: list[str] | None = Field(None, alias="agentSines")
-    full_name: str | None = Field(None, alias="fullName")
-    short_name: str | None = Field(None, alias="shortName")
+    agent_sines: list[str] = Field(default_factory=list)
+    full_name: str | None = None
+    short_name: str | None = None
 
 
 class UserAccountListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[UserAccount] | None = None
+    data: list[UserAccount] = Field(default_factory=list)
 
 
 class UserAccountResponse(BaseModel):
@@ -5775,39 +5735,33 @@ class UserAccountResponse(BaseModel):
 
 class UserCreationValidationStatus(BaseModel):
     status: UserCreationValidationStatusEnum | None = None
-    user_account: UserAccount | None = Field(None, alias="userAccount")
-    user_account_email: UserAccountEmail | None = Field(None, alias="userAccountEmail")
+    user_account: UserAccount | None = None
+    user_account_email: UserAccountEmail | None = None
 
 
 class UserListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[User] | None = None
+    data: list[User] = Field(default_factory=list)
 
 
 class UserProfileInfo(BaseModel):
     org: Org | None = None
-    sabre_org_profile: SabreOrgProfile | None = Field(None, alias="sabreOrgProfile")
-    corporate_loyalty_programs: list[OrgLoyaltyProgram] | None = Field(
-        None,
-        alias="corporateLoyaltyPrograms",
-    )
-    loyalty_programs: dict[str, LoyaltyProgram] | None = Field(
-        None,
-        alias="loyaltyPrograms",
-    )
-    org_credit_cards: list[CreditCard] | None = Field(None, alias="orgCreditCards")
-    user_account: UserAccount | None = Field(None, alias="userAccount")
-    org_user: OrgUser | None = Field(None, alias="orgUser")
-    user_credit_cards: list[CreditCard] | None = Field(None, alias="userCreditCards")
-    sabre_user_profile: SabreUserProfile | None = Field(None, alias="sabreUserProfile")
-    home_address: AddressLocation | None = Field(None, alias="homeAddress")
-    business_address: AddressLocation | None = Field(None, alias="businessAddress")
-    rewards: dict[str, list[RewardProgramInfo]] | None = None
-    primary_email: str | None = Field(None, alias="primaryEmail")
-    org_email: str | None = Field(None, alias="orgEmail")
-    org_arranger_emails: list[str] | None = Field(None, alias="orgArrangerEmails")
+    sabre_org_profile: SabreOrgProfile | None = None
+    corporate_loyalty_programs: list[OrgLoyaltyProgram] = Field(default_factory=list)
+    loyalty_programs: dict[str, LoyaltyProgram] = Field(default_factory=dict)
+    org_credit_cards: list[CreditCard] = Field(default_factory=list)
+    user_account: UserAccount | None = None
+    org_user: OrgUser | None = None
+    user_credit_cards: list[CreditCard] = Field(default_factory=list)
+    sabre_user_profile: SabreUserProfile | None = None
+    home_address: AddressLocation | None = None
+    business_address: AddressLocation | None = None
+    rewards: dict[str, list[RewardProgramInfo]] = Field(default_factory=dict)
+    primary_email: str | None = None
+    org_email: str | None = None
+    org_arranger_emails: list[str] = Field(default_factory=list)
 
 
 class UserResponse(BaseModel):
@@ -5819,9 +5773,9 @@ class UserResponse(BaseModel):
 
 class UserTie(BaseModel):
     id: int | None = None
-    src_user_id: int | None = Field(None, alias="srcUserId")
-    dst_user_id: int | None = Field(None, alias="dstUserId")
-    tie_type: UserTieType | None = Field(None, alias="tieType")
+    src_user_id: int | None = None
+    dst_user_id: int | None = None
+    tie_type: UserTieType | None = None
 
 
 class UserTieResponse(BaseModel):
@@ -5837,33 +5791,33 @@ class Wifi(BaseModel):
 
 
 class AdvanceChange(BaseModel):
-    after_departure: AdvanceChangeInner | None = Field(None, alias="afterDeparture")
+    after_departure: AdvanceChangeInner | None = None
     anytime: AdvanceChangeInner | None = None
-    before_departure: AdvanceChangeInner | None = Field(None, alias="beforeDeparture")
+    before_departure: AdvanceChangeInner | None = None
     id: str | None = None
 
 
 class Approval(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    trip_id: int | None = Field(None, alias="tripId")
-    trip_name: str | None = Field(None, alias="tripName")
-    booker_id: int | None = Field(None, alias="bookerId")
-    trip_board_id: int | None = Field(None, alias="tripBoardId")
-    policy_ids: list[int] | None = Field(None, alias="policyIds")
-    booker_comment: str | None = Field(None, alias="bookerComment")
-    approvals: list[ApprovalItem] | None = None
+    org_id: int | None = None
+    trip_id: int | None = None
+    trip_name: str | None = None
+    booker_id: int | None = None
+    trip_board_id: int | None = None
+    policy_ids: list[int] = Field(default_factory=list)
+    booker_comment: str | None = None
+    approvals: list[ApprovalItem] = Field(default_factory=list)
     status: ApprovalStatus | None = None
-    canceled_by: int | None = Field(None, alias="canceledBy")
-    submitted_at: AwareOrNaiveDatetime | None = Field(None, alias="submittedAt")
-    cancelled_by: int | None = Field(None, alias="cancelledBy")
+    canceled_by: int | None = None
+    submitted_at: AwareOrNaiveDatetime | None = None
+    cancelled_by: int | None = None
 
 
 class ApprovalList(BaseModel):
-    approvals: list[Approval] | None = None
-    users: list[User] | None = None
-    approval: list[Approval] | None = None
+    approvals: list[Approval] = Field(default_factory=list)
+    users: list[User] = Field(default_factory=list)
+    approval: list[Approval] = Field(default_factory=list)
 
 
 class ApprovalListResponse(BaseModel):
@@ -5881,39 +5835,39 @@ class ApprovalResponse(BaseModel):
 
 
 class Cancellation(BaseModel):
-    after_departure: CancellationInner | None = Field(None, alias="afterDeparture")
+    after_departure: CancellationInner | None = None
     anytime: CancellationInner | None = None
-    before_departure: CancellationInner | None = Field(None, alias="beforeDeparture")
+    before_departure: CancellationInner | None = None
     id: str | None = None
 
 
 class CarReservation(BaseModel):
     id: int | None = None
     ext: CarReservationExt | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    trip_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
+    provider_code: str | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     rlk: str | None = None
     vendor: str | None = None
     label: str | None = None
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    org_id: int | None = Field(None, alias="orgId")
-    org_project_id: int | None = Field(None, alias="orgProjectId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
+    total_price: float | None = None
+    org_id: int | None = None
+    org_project_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    in_policy: bool | None = None
+    not_in_policy_reason: str | None = None
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
+    not_preferred_reason: str | None = None
     flags: int | None = None
     type: ReservationType | None = None
 
@@ -5927,78 +5881,75 @@ class CarReservationResponse(BaseModel):
 
 class CarryOnBaggage(BaseModel):
     assessment: Assessment | None = None
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
-    free_bags: FreeBaggageData | None = Field(None, alias="freeBags")
+    free_bags: FreeBaggageData | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    paid_bags: list[PaidBaggageData] | None = Field(None, alias="paidBags")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
+    large_icon_url: str | None = None
+    paid_bags: list[PaidBaggageData] = Field(default_factory=list)
+    small_icon_url: str | None = None
 
 
 class CheckedBaggage(BaseModel):
     assessment: Assessment | None = None
-    cta_text: str | None = Field(None, alias="ctaText")
-    cta_url: str | None = Field(None, alias="ctaUrl")
+    cta_text: str | None = None
+    cta_url: str | None = None
     description: str | None = None
-    free_bags: FreeBaggageData | None = Field(None, alias="freeBags")
+    free_bags: FreeBaggageData | None = None
     headline: str | None = None
     id: str | None = None
-    large_icon_url: str | None = Field(None, alias="largeIconUrl")
-    paid_bags: list[PaidBaggageData] | None = Field(None, alias="paidBags")
-    small_icon_url: str | None = Field(None, alias="smallIconUrl")
+    large_icon_url: str | None = None
+    paid_bags: list[PaidBaggageData] = Field(default_factory=list)
+    small_icon_url: str | None = None
 
 
 class Entertainment(BaseModel):
     cost: Cost | None = None
-    display_text: str | None = Field(None, alias="displayText")
+    display_text: str | None = None
     exists: Exists | None = None
     id: str | None = None
     offerings: EntertainmentOfferingsGroup | None = None
     quality: Quality | None = None
     type: TypeEnum | None = None
-    updated_at: str | None = Field(None, alias="updatedAt")
+    updated_at: str | None = None
 
 
 class FareOffer(BaseModel):
-    ref_data: SearchFlightRefData | None = Field(None, alias="refData")
-    segments: dict[str, Segment] | None = None
-    origin_destination: OriginDestination | None = Field(
-        None,
-        alias="originDestination",
-    )
-    penalties: list[Penalty] | None = None
-    fare_type: FareType | None = Field(None, alias="fareType")
-    fare_name: str | None = Field(None, alias="fareName")
-    rate_code: str | None = Field(None, alias="rateCode")
-    private_fare_type: str | None = Field(None, alias="privateFareType")
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    free_luggage_allowance: int | None = Field(None, alias="freeLuggageAllowance")
-    ticket_penalties: int | None = Field(None, alias="ticketPenalties")
-    ticket_perks: int | None = Field(None, alias="ticketPerks")
+    ref_data: SearchFlightRefData | None = None
+    segments: dict[str, Segment] = Field(default_factory=dict)
+    origin_destination: OriginDestination | None = None
+    penalties: list[Penalty] = Field(default_factory=list)
+    fare_type: FareType | None = None
+    fare_name: str | None = None
+    rate_code: str | None = None
+    private_fare_type: str | None = None
+    co2_emissions: float | None = None
+    free_luggage_allowance: int | None = None
+    ticket_penalties: int | None = None
+    ticket_perks: int | None = None
 
 
 class FlightReservationExt(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    consumers: list[ReservationConsumer] | None = None
-    air_price: float | None = Field(None, alias="airPrice")
-    seat_price: float | None = Field(None, alias="seatPrice")
-    seat_taxes: float | None = Field(None, alias="seatTaxes")
-    ancillary_price: float | None = Field(None, alias="ancillaryPrice")
-    ancillary_taxes: float | None = Field(None, alias="ancillaryTaxes")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
+    co2_emissions: float | None = None
+    consumers: list[ReservationConsumer] = Field(default_factory=list)
+    air_price: float | None = None
+    seat_price: float | None = None
+    seat_taxes: float | None = None
+    ancillary_price: float | None = None
+    ancillary_taxes: float | None = None
+    taxes_and_fees: float | None = None
     od: FlightReservationOd | None = None
-    ssr: list[FlightReservationSsr] | None = None
-    seats: list[FlightReservationSeat] | None = None
-    ancillaries: list[FlightReservationAncillary] | None = None
-    ticket_numbers: list[str] | None = Field(None, alias="ticketNumbers")
+    ssr: list[FlightReservationSsr] = Field(default_factory=list)
+    seats: list[FlightReservationSeat] = Field(default_factory=list)
+    ancillaries: list[FlightReservationAncillary] = Field(default_factory=list)
+    ticket_numbers: list[str] = Field(default_factory=list)
 
 
 class FtsResponse(BaseModel):
-    orgs: list[Org] | None = None
-    user_accounts: list[UserAccount] | None = Field(None, alias="userAccounts")
+    orgs: list[Org] = Field(default_factory=list)
+    user_accounts: list[UserAccount] = Field(default_factory=list)
 
 
 class FtsResponseResponse(BaseModel):
@@ -6009,8 +5960,8 @@ class FtsResponseResponse(BaseModel):
 
 
 class FtsUsersByOrgResponse(BaseModel):
-    users: list[User] | None = None
-    user_emails: dict[str, str] | None = Field(None, alias="userEmails")
+    users: list[User] = Field(default_factory=list)
+    user_emails: dict[str, str] = Field(default_factory=dict)
 
 
 class FtsUsersByOrgResponseResponse(BaseModel):
@@ -6021,17 +5972,14 @@ class FtsUsersByOrgResponseResponse(BaseModel):
 
 
 class GetTrainResponse(BaseModel):
-    org_id: int | None = Field(None, alias="orgId")
-    stations: dict[str, TrainStation] | None = None
-    carriers: dict[str, TrainCarrier] | None = None
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-    org_projects: list[OrgProject] | None = Field(None, alias="orgProjects")
-    total_price: float | None = Field(None, alias="totalPrice")
-    origin_destinations: list[TrainOriginDestinationInfo] | None = Field(
-        None,
-        alias="originDestinations",
-    )
+    org_id: int | None = None
+    stations: dict[str, TrainStation] = Field(default_factory=dict)
+    carriers: dict[str, TrainCarrier] = Field(default_factory=dict)
+    user_ids: list[int] = Field(default_factory=list)
+    rate_code_descr: str | None = None
+    org_projects: list[OrgProject] = Field(default_factory=list)
+    total_price: float | None = None
+    origin_destinations: list[TrainOriginDestinationInfo] = Field(default_factory=list)
 
 
 class GetTrainResponseResponse(BaseModel):
@@ -6043,7 +5991,7 @@ class GetTrainResponseResponse(BaseModel):
 
 class GetTripResponse(BaseModel):
     trip: Trip | None = None
-    users: dict[str, User] | None = None
+    users: dict[str, User] = Field(default_factory=dict)
 
 
 class GetTripResponseResponse(BaseModel):
@@ -6055,13 +6003,13 @@ class GetTripResponseResponse(BaseModel):
 
 class HotelInfoResponse(BaseModel):
     offer: HotelOffer | None = None
-    medias: list[HotelMedia] | None = None
-    checkin_time: LocalTime | None = Field(None, alias="checkinTime")
-    checkout_time: LocalTime | None = Field(None, alias="checkoutTime")
+    medias: list[HotelMedia] = Field(default_factory=list)
+    checkin_time: str | None = None
+    checkout_time: str | None = None
     description: str | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    rate_code_descr: str | None = None
 
 
 class HotelInfoResponseResponse(BaseModel):
@@ -6074,30 +6022,30 @@ class HotelInfoResponseResponse(BaseModel):
 class HotelReservation(BaseModel):
     id: int | None = None
     ext: HotelReservationExt | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    trip_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
+    provider_code: str | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     rlk: str | None = None
     vendor: str | None = None
     label: str | None = None
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    org_id: int | None = Field(None, alias="orgId")
-    org_project_id: int | None = Field(None, alias="orgProjectId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
+    total_price: float | None = None
+    org_id: int | None = None
+    org_project_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    in_policy: bool | None = None
+    not_in_policy_reason: str | None = None
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
+    not_preferred_reason: str | None = None
     flags: int | None = None
     type: ReservationType | None = None
 
@@ -6106,7 +6054,7 @@ class HotelReservationListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[HotelReservation] | None = None
+    data: list[HotelReservation] = Field(default_factory=list)
 
 
 class HotelReservationResponse(BaseModel):
@@ -6117,7 +6065,7 @@ class HotelReservationResponse(BaseModel):
 
 
 class ListCarReservationResponse(BaseModel):
-    car_reservations: list[CarReservation] | None = Field(None, alias="carReservations")
+    car_reservations: list[CarReservation] = Field(default_factory=list)
 
 
 class ListCarReservationResponseResponse(BaseModel):
@@ -6128,13 +6076,13 @@ class ListCarReservationResponseResponse(BaseModel):
 
 
 class ListOrgUserByOrgResponse(BaseModel):
-    users: list[User] | None = None
-    user_emails: dict[str, str] | None = Field(None, alias="userEmails")
-    org_users: dict[str, OrgUser] | None = Field(None, alias="orgUsers")
-    addresses: list[AddressLocation] | None = None
-    fields: list[FieldModel] | None = None
-    field_values: list[FieldValue] | None = Field(None, alias="fieldValues")
-    org_user_fields: list[OrgUserField] | None = Field(None, alias="orgUserFields")
+    users: list[User] = Field(default_factory=list)
+    user_emails: dict[str, str] = Field(default_factory=dict)
+    org_users: dict[str, OrgUser] = Field(default_factory=dict)
+    addresses: list[AddressLocation] = Field(default_factory=list)
+    fields: list[FieldModel] = Field(default_factory=list)
+    field_values: list[FieldValue] = Field(default_factory=list)
+    org_user_fields: list[OrgUserField] = Field(default_factory=list)
 
 
 class ListOrgUserByOrgResponseResponse(BaseModel):
@@ -6145,8 +6093,8 @@ class ListOrgUserByOrgResponseResponse(BaseModel):
 
 
 class ListOrgUserByPolicyResponse(BaseModel):
-    users: list[User] | None = None
-    org_users: dict[str, OrgUser] | None = Field(None, alias="orgUsers")
+    users: list[User] = Field(default_factory=list)
+    org_users: dict[str, OrgUser] = Field(default_factory=dict)
 
 
 class ListOrgUserByPolicyResponseResponse(BaseModel):
@@ -6157,9 +6105,9 @@ class ListOrgUserByPolicyResponseResponse(BaseModel):
 
 
 class ListOrgUserByUserResponse(BaseModel):
-    orgs: list[Org] | None = None
-    org_users: dict[str, OrgUser] | None = Field(None, alias="orgUsers")
-    addresses: list[AddressLocation] | None = None
+    orgs: list[Org] = Field(default_factory=list)
+    org_users: dict[str, OrgUser] = Field(default_factory=dict)
+    addresses: list[AddressLocation] = Field(default_factory=list)
 
 
 class ListOrgUserByUserResponseResponse(BaseModel):
@@ -6170,8 +6118,8 @@ class ListOrgUserByUserResponseResponse(BaseModel):
 
 
 class ListPolicyApprover(BaseModel):
-    users: list[User] | None = None
-    org_users: dict[str, OrgUser] | None = Field(None, alias="orgUsers")
+    users: list[User] = Field(default_factory=list)
+    org_users: dict[str, OrgUser] = Field(default_factory=dict)
 
 
 class ListPolicyApproverResponse(BaseModel):
@@ -6182,8 +6130,8 @@ class ListPolicyApproverResponse(BaseModel):
 
 
 class ListReservationResponse(BaseModel):
-    reservations: list[Reservation] | None = None
-    users: dict[str, User] | None = None
+    reservations: list[Reservation] = Field(default_factory=list)
+    users: dict[str, User] = Field(default_factory=dict)
 
 
 class ListReservationResponseResponse(BaseModel):
@@ -6194,8 +6142,8 @@ class ListReservationResponseResponse(BaseModel):
 
 
 class ListTripsResponse(BaseModel):
-    trips: list[Trip] | None = None
-    users: dict[str, User] | None = None
+    trips: list[Trip] = Field(default_factory=list)
+    users: dict[str, User] = Field(default_factory=dict)
 
 
 class ListTripsResponseResponse(BaseModel):
@@ -6206,11 +6154,8 @@ class ListTripsResponseResponse(BaseModel):
 
 
 class ListUserAccountsResponse(BaseModel):
-    user_accounts: list[UserAccount] | None = Field(None, alias="userAccounts")
-    user_account_emails: list[UserAccountEmail] | None = Field(
-        None,
-        alias="userAccountEmails",
-    )
+    user_accounts: list[UserAccount] = Field(default_factory=list)
+    user_account_emails: list[UserAccountEmail] = Field(default_factory=list)
 
 
 class ListUserAccountsResponseResponse(BaseModel):
@@ -6221,8 +6166,8 @@ class ListUserAccountsResponseResponse(BaseModel):
 
 
 class ListUserTieResponse(BaseModel):
-    ties: list[UserTie] | None = None
-    users: dict[str, User] | None = None
+    ties: list[UserTie] = Field(default_factory=list)
+    users: dict[str, User] = Field(default_factory=dict)
 
 
 class ListUserTieResponseResponse(BaseModel):
@@ -6235,30 +6180,30 @@ class ListUserTieResponseResponse(BaseModel):
 class MiscReservation(BaseModel):
     id: int | None = None
     ext: MiscReservationExt | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    trip_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
+    provider_code: str | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     rlk: str | None = None
     vendor: str | None = None
     label: str | None = None
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    org_id: int | None = Field(None, alias="orgId")
-    org_project_id: int | None = Field(None, alias="orgProjectId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
+    total_price: float | None = None
+    org_id: int | None = None
+    org_project_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    in_policy: bool | None = None
+    not_in_policy_reason: str | None = None
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
+    not_preferred_reason: str | None = None
     flags: int | None = None
     type: ReservationType | None = None
 
@@ -6266,21 +6211,21 @@ class MiscReservation(BaseModel):
 class Notification(BaseModel):
     id: int | None = None
     nms: int | None = None
-    owner_id: int | None = Field(None, alias="ownerId")
-    owner_type: ResourceType | None = Field(None, alias="ownerType")
-    target_id: int | None = Field(None, alias="targetId")
-    target_type: ResourceType | None = Field(None, alias="targetType")
+    owner_id: int | None = None
+    owner_type: ResourceType | None = None
+    target_id: int | None = None
+    target_type: ResourceType | None = None
     type: NotificationType | None = None
     read: bool | None = None
     seen: bool | None = None
     time: int | None = None
     ext: Ext | None = None
     count: int | None = None
-    parents: list[ParentResource] | None = None
+    parents: list[ParentResource] = Field(default_factory=list)
     status: OperationStatus | None = None
-    sample_user_ids: list[int] | None = Field(None, alias="sampleUserIds")
-    sample_msg_text: str | None = Field(None, alias="sampleMsgText")
-    trip_name: str | None = Field(None, alias="tripName")
+    sample_user_ids: list[int] = Field(default_factory=list)
+    sample_msg_text: str | None = None
+    trip_name: str | None = None
 
 
 class NotificationResponse(BaseModel):
@@ -6295,10 +6240,10 @@ class PolicyRule(BaseModel):
     nms: int | None = None
     code: PolicyRuleSpecs | None = None
     active: bool | None = None
-    policy_id: int | None = Field(None, alias="policyId")
+    policy_id: int | None = None
     action: PolicyRuleAction | None = None
-    vars: dict[str, dict[str, Any]] | None = None
-    exceptions: list[PolicyRuleException] | None = None
+    vars: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    exceptions: list[PolicyRuleException] = Field(default_factory=list)
 
 
 class PolicyRuleResponse(BaseModel):
@@ -6313,26 +6258,26 @@ class PolicyRuleSpec(BaseModel):
     description: str | None = None
     category: SearchCategory | None = None
     post: bool | None = None
-    params: list[TravelPolicyParameter] | None = None
+    params: list[TravelPolicyParameter] = Field(default_factory=list)
 
 
 class PolicyRuleSpecListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[PolicyRuleSpec] | None = None
+    data: list[PolicyRuleSpec] = Field(default_factory=list)
 
 
 class Post(BaseModel):
     id: int | None = None
     nms: int | None = None
     active: bool | None = None
-    wall_id: int | None = Field(None, alias="wallId")
-    archive_on: int | None = Field(None, alias="archiveOn")
-    followers: list[int] | None = None
+    wall_id: int | None = None
+    archive_on: int | None = None
+    followers: list[int] = Field(default_factory=list)
     msg: Msg | None = None
-    ui_flags: int | None = Field(None, alias="uiFlags")
-    users: dict[str, User] | None = None
+    ui_flags: int | None = None
+    users: dict[str, User] = Field(default_factory=dict)
 
 
 class PostResponse(BaseModel):
@@ -6343,10 +6288,10 @@ class PostResponse(BaseModel):
 
 
 class ReportByOrgResponse(BaseModel):
-    users: list[User] | None = None
-    org_users: list[OrgUser] | None = Field(None, alias="orgUsers")
-    user_emails: dict[str, str] | None = Field(None, alias="userEmails")
-    reports: list[dict[str, Any]] | None = None
+    users: list[User] = Field(default_factory=list)
+    org_users: list[OrgUser] = Field(default_factory=list)
+    user_emails: dict[str, str] = Field(default_factory=dict)
+    reports: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class ReportByOrgResponseResponse(BaseModel):
@@ -6357,27 +6302,20 @@ class ReportByOrgResponseResponse(BaseModel):
 
 
 class RespItineraryData(BaseModel):
-    legs: list[RespItineraryLeg] | None = None
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
+    legs: list[RespItineraryLeg] = Field(default_factory=list)
+    co2_emissions: float | None = None
 
 
 class ReviewTripBoardRefsResponse(BaseModel):
-    trip_board_ref_ids: list[int] | None = Field(None, alias="tripBoardRefIds")
-    users: dict[str, User] | None = None
-    user_to_reward_program_ids: dict[str, list[int]] | None = Field(
-        None,
-        alias="userToRewardProgramIds",
+    trip_board_ref_ids: list[int] = Field(default_factory=list)
+    users: dict[str, User] = Field(default_factory=dict)
+    user_to_reward_program_ids: dict[str, list[int]] = Field(default_factory=dict)
+    vendor_to_reward_programs: dict[str, dict[str, RewardProgram]] = Field(
+        default_factory=dict,
     )
-    vendor_to_reward_programs: dict[str, dict[str, RewardProgram]] | None = Field(
-        None,
-        alias="vendorToRewardPrograms",
-    )
-    org_projects: list[OrgProject] | None = Field(None, alias="orgProjects")
-    not_in_policy_reasons: list[Reason] | None = Field(None, alias="notInPolicyReasons")
-    not_preferred_reasons: list[Reason] | None = Field(
-        None,
-        alias="notPreferredReasons",
-    )
+    org_projects: list[OrgProject] = Field(default_factory=list)
+    not_in_policy_reasons: list[Reason] = Field(default_factory=list)
+    not_preferred_reasons: list[Reason] = Field(default_factory=list)
 
 
 class ReviewTripBoardRefsResponseResponse(BaseModel):
@@ -6388,34 +6326,22 @@ class ReviewTripBoardRefsResponseResponse(BaseModel):
 
 
 class SearchTrainResponse(BaseModel):
-    carriers: dict[str, TrainCarrier] | None = None
-    stations: dict[str, TrainStation] | None = None
-    ods: dict[str, TrainOriginDestination] | None = None
-    segments: dict[str, TrainSegment] | None = None
-    railcards: dict[str, Railcard] | None = None
-    applied_discounts: dict[str, AppliedDiscount] | None = Field(
-        None,
-        alias="appliedDiscounts",
-    )
-    fare_conditions: dict[str, FareConditions] | None = Field(
-        None,
-        alias="fareConditions",
-    )
-    comfort_classes: dict[str, ComfortClass] | None = Field(
-        None,
-        alias="comfortClasses",
-    )
-    offers: list[TrainOffer] | None = None
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-    next_page_ref: str | None = Field(None, alias="nextPageRef")
-    prev_page_ref: str | None = Field(None, alias="prevPageRef")
-    out_of_policies: list[OutOfPolicy] | None = Field(None, alias="outOfPolicies")
-    od_index: int | None = Field(None, alias="odIndex")
-    od_count: int | None = Field(None, alias="odCount")
-    page_replaces_previous_results: bool | None = Field(
-        None,
-        alias="pageReplacesPreviousResults",
-    )
+    carriers: dict[str, TrainCarrier] = Field(default_factory=dict)
+    stations: dict[str, TrainStation] = Field(default_factory=dict)
+    ods: dict[str, TrainOriginDestination] = Field(default_factory=dict)
+    segments: dict[str, TrainSegment] = Field(default_factory=dict)
+    railcards: dict[str, Railcard] = Field(default_factory=dict)
+    applied_discounts: dict[str, AppliedDiscount] = Field(default_factory=dict)
+    fare_conditions: dict[str, FareConditions] = Field(default_factory=dict)
+    comfort_classes: dict[str, ComfortClass] = Field(default_factory=dict)
+    offers: list[TrainOffer] = Field(default_factory=list)
+    rate_code_descr: str | None = None
+    next_page_ref: str | None = None
+    prev_page_ref: str | None = None
+    out_of_policies: list[OutOfPolicy] = Field(default_factory=list)
+    od_index: int | None = None
+    od_count: int | None = None
+    page_replaces_previous_results: bool | None = None
 
 
 class SearchTrainResponseResponse(BaseModel):
@@ -6427,8 +6353,8 @@ class SearchTrainResponseResponse(BaseModel):
 
 class SeatMapRow(BaseModel):
     row: int | None = None
-    exit_row: bool | None = Field(None, alias="exitRow")
-    seats: list[SeatMapSeat] | None = None
+    exit_row: bool | None = None
+    seats: list[SeatMapSeat] = Field(default_factory=list)
 
 
 class SegmentAmenityData(BaseModel):
@@ -6444,109 +6370,94 @@ class SegmentAmenityData(BaseModel):
 
 class SegmentInfo(BaseModel):
     airline: str | None = None
-    flight_number: str | None = Field(None, alias="flightNumber")
-    operating_airline: str | None = Field(None, alias="operatingAirline")
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    depart_time: AwareOrNaiveDatetime | None = Field(None, alias="departTime")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    flight_number: str | None = None
+    operating_airline: str | None = None
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    depart_time: AwareOrNaiveDatetime | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     duration: int | None = None
-    uta_list: list[UTA] | None = Field(None, alias="utaList")
-    upa_list: list[UPA] | None = Field(None, alias="upaList")
-    flight_class: FlightClass | None = Field(None, alias="flightClass")
-    flight_class_premium: bool | None = Field(None, alias="flightClassPremium")
+    uta_list: list[UTA] = Field(default_factory=list)
+    upa_list: list[UPA] = Field(default_factory=list)
+    flight_class: FlightClass | None = None
+    flight_class_premium: bool | None = None
     amenities: SegmentAmenityData | None = None
-    real_time_info: RealTimeFlightInfo | None = Field(None, alias="realTimeInfo")
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
+    real_time_info: RealTimeFlightInfo | None = None
+    fare_name: str | None = None
+    fare_type: FareType | None = None
 
 
 class TrainReservationOd(BaseModel):
     duration: int | None = None
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    arrival_station_name: str | None = Field(None, alias="arrivalStationName")
-    departure_station: str | None = Field(None, alias="departureStation")
-    departure_station_name: str | None = Field(None, alias="departureStationName")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    segments: list[TrainReservationSegment] | None = None
-    route_restriction: str | None = Field(None, alias="routeRestriction")
-    fare_restriction: str | None = Field(None, alias="fareRestriction")
-    railcard_ids: list[int] | None = Field(None, alias="railcardIds")
-    tickets: list[TrainReservationTicket] | None = None
-    seat_reservability: TrainSeatReservabilityType | None = Field(
-        None,
-        alias="seatReservability",
-    )
-    fare_name: str | None = Field(None, alias="fareName")
-    requested_departure_station: str | None = Field(
-        None,
-        alias="requestedDepartureStation",
-    )
-    requested_arrival_station: str | None = Field(None, alias="requestedArrivalStation")
-    allowed_departure_stations: list[str] | None = Field(
-        None,
-        alias="allowedDepartureStations",
-    )
-    allowed_arrival_stations: list[str] | None = Field(
-        None,
-        alias="allowedArrivalStations",
-    )
+    arrival_station: str | None = None
+    arrival_station_name: str | None = None
+    departure_station: str | None = None
+    departure_station_name: str | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    fare_type: FareType | None = None
+    segments: list[TrainReservationSegment] = Field(default_factory=list)
+    route_restriction: str | None = None
+    fare_restriction: str | None = None
+    railcard_ids: list[int] = Field(default_factory=list)
+    tickets: list[TrainReservationTicket] = Field(default_factory=list)
+    seat_reservability: TrainSeatReservabilityType | None = None
+    fare_name: str | None = None
+    requested_departure_station: str | None = None
+    requested_arrival_station: str | None = None
+    allowed_departure_stations: list[str] = Field(default_factory=list)
+    allowed_arrival_stations: list[str] = Field(default_factory=list)
 
 
 class TripBoard(BaseModel):
     id: int | None = None
     nms: int | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    org_id: int | None = Field(None, alias="orgId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
+    trip_id: int | None = None
+    org_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
     notes: str | None = None
     status: TripBoardStatus | None = None
-    status_changed_on: AwareOrNaiveDatetime | None = Field(
-        None,
-        alias="statusChangedOn",
-    )
-    start_date: date | None = Field(None, alias="startDate")
-    end_date: date | None = Field(None, alias="endDate")
+    status_changed_on: AwareOrNaiveDatetime | None = None
+    start_date: date | None = None
+    end_date: date | None = None
     summary: list[TripSummaryLine] | Summary1 | None = None
-    exception_flags: int | None = Field(None, alias="exceptionFlags")
-    processing_flags: int | None = Field(None, alias="processingFlags")
-    trip_board_flags: int | None = Field(None, alias="tripBoardFlags")
-    waypoint_flags: int | None = Field(None, alias="waypointFlags")
+    exception_flags: int | None = None
+    processing_flags: int | None = None
+    trip_board_flags: int | None = None
+    waypoint_flags: int | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    record_locators: list[str] | None = Field(None, alias="recordLocators")
-    owned_by: str | None = Field(None, alias="ownedBy")
-    sync_interval: int | None = Field(None, alias="syncInterval")
-    sync_on: AwareOrNaiveDatetime | None = Field(None, alias="syncOn")
-    fees: list[TripBoardFee] | None = None
-    refs: list[TripBoardRef] | None = None
-    ui_flags: int | None = Field(None, alias="uiFlags")
-    agency_flags: int | None = Field(None, alias="agencyFlags")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
+    record_locators: list[str] = Field(default_factory=list)
+    owned_by: str | None = None
+    sync_interval: int | None = None
+    sync_on: AwareOrNaiveDatetime | None = None
+    fees: list[TripBoardFee] = Field(default_factory=list)
+    refs: list[TripBoardRef] = Field(default_factory=list)
+    ui_flags: int | None = None
+    agency_flags: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
 
 
 class Amenity(BaseModel):
-    aircrafts: list[Aircraft] | None = None
-    beverages: list[Beverage] | None = None
-    entertainments: list[Entertainment] | None = None
-    fresh_foods: list[FreshFood] | None = Field(None, alias="freshFoods")
-    layouts: list[Layout] | None = None
-    powers: list[Power] | None = None
-    seats: list[Seat] | None = None
-    wifis: list[Wifi] | None = None
+    aircrafts: list[Aircraft] = Field(default_factory=list)
+    beverages: list[Beverage] = Field(default_factory=list)
+    entertainments: list[Entertainment] = Field(default_factory=list)
+    fresh_foods: list[FreshFood] = Field(default_factory=list)
+    layouts: list[Layout] = Field(default_factory=list)
+    powers: list[Power] = Field(default_factory=list)
+    seats: list[Seat] = Field(default_factory=list)
+    wifis: list[Wifi] = Field(default_factory=list)
 
 
 class FeedResponse(BaseModel):
-    up_from: int | None = Field(None, alias="upFrom")
-    down_to: int | None = Field(None, alias="downTo")
-    posts: list[Post] | None = None
-    walls: list[Wall] | None = None
-    users: list[User] | None = None
-    orgs: list[Org] | None = None
+    up_from: int | None = None
+    down_to: int | None = None
+    posts: list[Post] = Field(default_factory=list)
+    walls: list[Wall] = Field(default_factory=list)
+    users: list[User] = Field(default_factory=list)
+    orgs: list[Org] = Field(default_factory=list)
 
 
 class FeedResponseResponse(BaseModel):
@@ -6557,71 +6468,71 @@ class FeedResponseResponse(BaseModel):
 
 
 class FlightInfo(BaseModel):
-    departure_station: str | None = Field(None, alias="departureStation")
-    arrival_station: str | None = Field(None, alias="arrivalStation")
-    depart_time: AwareOrNaiveDatetime | None = Field(None, alias="departTime")
-    departure_time: AwareOrNaiveDatetime | None = Field(None, alias="departureTime")
-    arrival_time: AwareOrNaiveDatetime | None = Field(None, alias="arrivalTime")
+    departure_station: str | None = None
+    arrival_station: str | None = None
+    depart_time: AwareOrNaiveDatetime | None = None
+    departure_time: AwareOrNaiveDatetime | None = None
+    arrival_time: AwareOrNaiveDatetime | None = None
     duration: int | None = None
-    segments: list[SegmentInfo] | None = None
-    fare_name: str | None = Field(None, alias="fareName")
-    fare_type: FareType | None = Field(None, alias="fareType")
-    restricted_fare: bool | None = Field(None, alias="restrictedFare")
+    segments: list[SegmentInfo] = Field(default_factory=list)
+    fare_name: str | None = None
+    fare_type: FareType | None = None
+    restricted_fare: bool | None = None
 
 
 class FlightItem(BaseModel):
-    agency_code: str | None = Field(None, alias="agencyCode")
-    flights: list[FlightInfo] | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    reshop_reservation_ids: list[int] | None = Field(None, alias="reshopReservationIds")
-    airline_pref_level: int | None = Field(None, alias="airlinePrefLevel")
-    in_policy: bool | None = Field(None, alias="inPolicy")
+    agency_code: str | None = None
+    flights: list[FlightInfo] = Field(default_factory=list)
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    reshop_reservation_ids: list[int] = Field(default_factory=list)
+    airline_pref_level: int | None = None
+    in_policy: bool | None = None
     airline: str | None = None
-    rate_code: str | None = Field(None, alias="rateCode")
-    seat_selection_available: bool | None = Field(None, alias="seatSelectionAvailable")
+    rate_code: str | None = None
+    seat_selection_available: bool | None = None
     transborder: bool | None = None
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    total_price: float | None = Field(None, alias="totalPrice")
-    change_price: PriceSummary | None = Field(None, alias="changePrice")
-    airline_status: VendorStatusType | None = Field(None, alias="airlineStatus")
+    taxes_and_fees: float | None = None
+    total_price: float | None = None
+    change_price: PriceSummary | None = None
+    airline_status: VendorStatusType | None = None
 
 
 class FlightReservation(BaseModel):
     id: int | None = None
     ext: FlightReservationExt | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    trip_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
+    provider_code: str | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     rlk: str | None = None
     vendor: str | None = None
     label: str | None = None
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    org_id: int | None = Field(None, alias="orgId")
-    org_project_id: int | None = Field(None, alias="orgProjectId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
+    total_price: float | None = None
+    org_id: int | None = None
+    org_project_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    in_policy: bool | None = None
+    not_in_policy_reason: str | None = None
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
+    not_preferred_reason: str | None = None
     flags: int | None = None
     type: ReservationType | None = None
 
 
 class FlightReservationResponse(BaseModel):
     flight: FlightReservation | None = None
-    airlines: dict[str, Airline] | None = None
-    airports: dict[str, Airport] | None = None
+    airlines: dict[str, Airline] = Field(default_factory=dict)
+    airports: dict[str, Airport] = Field(default_factory=dict)
 
 
 class FlightReservationResponseResponse(BaseModel):
@@ -6632,9 +6543,9 @@ class FlightReservationResponseResponse(BaseModel):
 
 
 class ListFlightReservationsResponse(BaseModel):
-    reservations: list[FlightReservation] | None = None
-    airlines: dict[str, Airline] | None = None
-    airports: dict[str, Airport] | None = None
+    reservations: list[FlightReservation] = Field(default_factory=list)
+    airlines: dict[str, Airline] = Field(default_factory=dict)
+    airports: dict[str, Airport] = Field(default_factory=dict)
 
 
 class ListFlightReservationsResponseResponse(BaseModel):
@@ -6645,9 +6556,9 @@ class ListFlightReservationsResponseResponse(BaseModel):
 
 
 class ListNotificationsResponse(BaseModel):
-    down_to: int | None = Field(None, alias="downTo")
-    notifications: list[Notification] | None = None
-    users: list[User] | None = None
+    down_to: int | None = None
+    notifications: list[Notification] = Field(default_factory=list)
+    users: list[User] = Field(default_factory=list)
 
 
 class ListNotificationsResponseResponse(BaseModel):
@@ -6660,27 +6571,24 @@ class ListNotificationsResponseResponse(BaseModel):
 class Policy(BaseModel):
     id: int | None = None
     nms: int | None = None
-    org_id: int | None = Field(None, alias="orgId")
+    org_id: int | None = None
     label: str | None = None
     type: PolicyType | None = None
     active: bool | None = None
-    enforce_approval: bool | None = Field(None, alias="enforceApproval")
+    enforce_approval: bool | None = None
     action: PolicyAction | None = None
-    message_for_reservation: dict[str, str] | None = Field(
-        None,
-        alias="messageForReservation",
-    )
-    policy_rules: list[PolicyRule] | None = Field(None, alias="policyRules")
-    user_count: int | None = Field(None, alias="userCount")
-    guest_count: int | None = Field(None, alias="guestCount")
-    approver_count: int | None = Field(None, alias="approverCount")
+    message_for_reservation: dict[str, str] = Field(default_factory=dict)
+    policy_rules: list[PolicyRule] = Field(default_factory=list)
+    user_count: int | None = None
+    guest_count: int | None = None
+    approver_count: int | None = None
 
 
 class PolicyListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
     error: str | None = None
-    data: list[Policy] | None = None
+    data: list[Policy] = Field(default_factory=list)
 
 
 class PolicyResponse(BaseModel):
@@ -6691,56 +6599,43 @@ class PolicyResponse(BaseModel):
 
 
 class RespData(BaseModel):
-    advance_change: list[AdvanceChange] | None = Field(None, alias="advanceChange")
+    advance_change: list[AdvanceChange] = Field(default_factory=list)
     amenity: Amenity | None = None
-    amenity_summary: list[Summary] | None = Field(None, alias="amenitySummary")
-    boarding_priority: list[BoardingPriority] | None = Field(
-        None,
-        alias="boardingPriority",
-    )
-    brand: list[Brand] | None = None
-    cancellation: list[Cancellation] | None = None
-    carry_on_bag: list[CarryOnBaggage] | None = Field(None, alias="carryOnBag")
-    check_in_priority: list[CheckInPriority] | None = Field(
-        None,
-        alias="checkInPriority",
-    )
-    checked_bag: list[CheckedBaggage] | None = Field(None, alias="checkedBag")
-    lounge_access: list[LoungeAccess] | None = Field(None, alias="loungeAccess")
-    same_day_change: list[SameDayChange] | None = Field(None, alias="sameDayChange")
-    seat_selection: list[SeatSelection] | None = Field(None, alias="seatSelection")
-    upa: list[Upa] | None = None
-    upgrade_eligibility: list[UpgradeEligibility] | None = Field(
-        None,
-        alias="upgradeEligibility",
-    )
+    amenity_summary: list[Summary] = Field(default_factory=list)
+    boarding_priority: list[BoardingPriority] = Field(default_factory=list)
+    brand: list[Brand] = Field(default_factory=list)
+    cancellation: list[Cancellation] = Field(default_factory=list)
+    carry_on_bag: list[CarryOnBaggage] = Field(default_factory=list)
+    check_in_priority: list[CheckInPriority] = Field(default_factory=list)
+    checked_bag: list[CheckedBaggage] = Field(default_factory=list)
+    lounge_access: list[LoungeAccess] = Field(default_factory=list)
+    same_day_change: list[SameDayChange] = Field(default_factory=list)
+    seat_selection: list[SeatSelection] = Field(default_factory=list)
+    upa: list[Upa] = Field(default_factory=list)
+    upgrade_eligibility: list[UpgradeEligibility] = Field(default_factory=list)
 
 
 class RespItinerary(BaseModel):
     data: RespItineraryData | None = None
     errors: RespItineraryErrors | None = None
-    is_lcc: bool | None = Field(None, alias="isLcc")
+    is_lcc: bool | None = None
     rq: ReqItinerary | None = None
     valid: bool | None = None
 
 
 class ReviewFlightsResponse(BaseModel):
-    refs: list[str] | None = None
-    airlines: dict[str, Airline] | None = None
-    airports: dict[str, Airport] | None = None
-    items: dict[str, FlightItem] | None = None
-    reservations: dict[str, FlightReservation] | None = None
-    users: dict[str, User] | None = None
-    user_to_reward_program_ids: dict[str, list[int]] | None = Field(
-        None,
-        alias="userToRewardProgramIds",
+    refs: list[str] = Field(default_factory=list)
+    airlines: dict[str, Airline] = Field(default_factory=dict)
+    airports: dict[str, Airport] = Field(default_factory=dict)
+    items: dict[str, FlightItem] = Field(default_factory=dict)
+    reservations: dict[str, FlightReservation] = Field(default_factory=dict)
+    users: dict[str, User] = Field(default_factory=dict)
+    user_to_reward_program_ids: dict[str, list[int]] = Field(default_factory=dict)
+    vendor_to_reward_programs: dict[str, dict[str, RewardProgram]] = Field(
+        default_factory=dict,
     )
-    vendor_to_reward_programs: dict[str, dict[str, RewardProgram]] | None = Field(
-        None,
-        alias="vendorToRewardPrograms",
-    )
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    total_price: float | None = Field(None, alias="totalPrice")
+    taxes_and_fees: float | None = None
+    total_price: float | None = None
     currency: str | None = None
 
 
@@ -6752,74 +6647,57 @@ class ReviewFlightsResponseResponse(BaseModel):
 
 
 class SeatMapCabin(BaseModel):
-    first_row: int | None = Field(None, alias="firstRow")
-    last_row: int | None = Field(None, alias="lastRow")
+    first_row: int | None = None
+    last_row: int | None = None
     deck: SeatMapDeck | None = None
-    rows: list[SeatMapRow] | None = None
-    column_layout: str | None = Field(None, alias="columnLayout")
-    columns: list[SeatMapColumnInfo] | None = None
+    rows: list[SeatMapRow] = Field(default_factory=list)
+    column_layout: str | None = None
+    columns: list[SeatMapColumnInfo] = Field(default_factory=list)
 
 
 class SeatMapSegment(BaseModel):
-    reservation_id: int | None = Field(None, alias="reservationId")
-    transaction_identifier: str | None = Field(None, alias="transactionIdentifier")
-    segment_key: str | None = Field(None, alias="segmentKey")
-    cabins: list[SeatMapCabin] | None = None
-    seat_types: dict[str, SeatType] | None = Field(None, alias="seatTypes")
+    reservation_id: int | None = None
+    transaction_identifier: str | None = None
+    segment_key: str | None = None
+    cabins: list[SeatMapCabin] = Field(default_factory=list)
+    seat_types: dict[str, SeatType] = Field(default_factory=dict)
     currency: str | None = None
     status: SeatMapSegmentStatus | None = None
 
 
 class TrainReservationExt(BaseModel):
-    co2_emissions: float | None = Field(None, alias="co2Emissions")
-    consumers: list[ReservationConsumer] | None = None
+    co2_emissions: float | None = None
+    consumers: list[ReservationConsumer] = Field(default_factory=list)
     od: TrainReservationOd | None = None
-    carrier_code: str | None = Field(None, alias="carrierCode")
-    discount_amount: float | None = Field(None, alias="discountAmount")
-    railcards: list[Railcard] | None = None
-    supported_delivery_options: list[DeliveryOption] | None = Field(
-        None,
-        alias="supportedDeliveryOptions",
-    )
-    delivery_option: str | None = Field(None, alias="deliveryOption")
-    terms_and_conditions: str | None = Field(None, alias="termsAndConditions")
-    terms_and_conditions_label: str | None = Field(
-        None,
-        alias="termsAndConditionsLabel",
-    )
-    terms_and_conditions_list: list[TermsAndConditions] | None = Field(
-        None,
-        alias="termsAndConditionsList",
-    )
-    train_seat_preference_flags: int | None = Field(
-        None,
-        alias="trainSeatPreferenceFlags",
-    )
-    enabled_seat_preferences_flags: int | None = Field(
-        None,
-        alias="enabledSeatPreferencesFlags",
-    )
-    applied_discounts: list[AppliedDiscount] | None = Field(
-        None,
-        alias="appliedDiscounts",
-    )
-    fare_conditions: list[FareConditions] | None = Field(None, alias="fareConditions")
-    comfort_classes: list[ComfortClass] | None = Field(None, alias="comfortClasses")
-    ticket_collection_codes: str | None = Field(None, alias="ticketCollectionCodes")
-    transaction_id: str | None = Field(None, alias="transactionId")
-    open_return_until: date | None = Field(None, alias="openReturnUntil")
-    has_travelcard: bool | None = Field(None, alias="hasTravelcard")
-    external_id: str | None = Field(None, alias="externalId")
-    requested_railcard_ids: list[int] | None = Field(None, alias="requestedRailcardIds")
+    carrier_code: str | None = None
+    discount_amount: float | None = None
+    railcards: list[Railcard] = Field(default_factory=list)
+    supported_delivery_options: list[DeliveryOption] = Field(default_factory=list)
+    delivery_option: str | None = None
+    terms_and_conditions_acceptance: bool | None = None
+    terms_and_conditions: str | None = None
+    terms_and_conditions_label: str | None = None
+    terms_and_conditions_list: list[TermsAndConditions] = Field(default_factory=list)
+    train_seat_preference_flags: int | None = None
+    enabled_seat_preferences_flags: int | None = None
+    applied_discounts: list[AppliedDiscount] = Field(default_factory=list)
+    fare_conditions: list[FareConditions] = Field(default_factory=list)
+    comfort_classes: list[ComfortClass] = Field(default_factory=list)
+    ticket_collection_codes: str | None = None
+    transaction_id: str | None = None
+    open_return_until: date | None = None
+    has_travelcard: bool | None = None
+    external_id: str | None = None
+    requested_railcard_ids: list[int] = Field(default_factory=list)
 
 
 class ApprovalInfo(BaseModel):
-    sent_approval: Approval | None = Field(None, alias="sentApproval")
-    draft_approval: Approval | None = Field(None, alias="draftApproval")
-    org_users: list[OrgUser] | None = Field(None, alias="orgUsers")
-    users: list[User] | None = None
-    policies: list[Policy] | None = None
-    ui_flags: int | None = Field(None, alias="uiFlags")
+    sent_approval: Approval | None = None
+    draft_approval: Approval | None = None
+    org_users: list[OrgUser] = Field(default_factory=list)
+    users: list[User] = Field(default_factory=list)
+    policies: list[Policy] = Field(default_factory=list)
+    ui_flags: int | None = None
 
 
 class ApprovalInfoResponse(BaseModel):
@@ -6830,36 +6708,25 @@ class ApprovalInfoResponse(BaseModel):
 
 
 class FlightDetailInformation(BaseModel):
-    airline_pref_level: int | None = Field(None, alias="airlinePrefLevel")
-    flights: list[FlightInfo] | None = None
-    airlines: dict[str, Airline] | None = None
-    airports: dict[str, Airport] | None = None
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    total_price: float | None = Field(None, alias="totalPrice")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    rate_codes: list[str] | None = Field(None, alias="rateCodes")
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
+    airline_pref_level: int | None = None
+    flights: list[FlightInfo] = Field(default_factory=list)
+    airlines: dict[str, Airline] = Field(default_factory=dict)
+    airports: dict[str, Airport] = Field(default_factory=dict)
+    in_policy: bool | None = None
+    org_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    total_price: float | None = None
+    taxes_and_fees: float | None = None
+    rate_codes: list[str] = Field(default_factory=list)
+    rate_code_descr: str | None = None
     airline: str | None = None
-    org_projects: list[OrgProject] | None = Field(None, alias="orgProjects")
-    seat_selection_available: bool | None = Field(None, alias="seatSelectionAvailable")
-    airline_status: VendorStatusType | None = Field(None, alias="airlineStatus")
-
-
-class Data1(BaseModel):
-    string: FlightDetailInformation | None = Field(None, alias="String")
-
-
-class FlightDetailInformationMap(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: Data1 | None = None
+    org_projects: list[OrgProject] = Field(default_factory=list)
+    seat_selection_available: bool | None = None
+    airline_status: VendorStatusType | None = None
 
 
 class FlightSeatMapResponse(BaseModel):
-    segments: list[SeatMapSegment] | None = None
+    segments: list[SeatMapSegment] = Field(default_factory=list)
 
 
 class FlightSeatMapResponseResponse(BaseModel):
@@ -6870,10 +6737,10 @@ class FlightSeatMapResponseResponse(BaseModel):
 
 
 class OfferPolicyInfo(BaseModel):
-    orgs: list[Org] | None = None
-    users: list[User] | None = None
-    policies: list[Policy] | None = None
-    refs: list[RefPolicyInfo] | None = None
+    orgs: list[Org] = Field(default_factory=list)
+    users: list[User] = Field(default_factory=list)
+    policies: list[Policy] = Field(default_factory=list)
+    refs: list[RefPolicyInfo] = Field(default_factory=list)
 
 
 class OfferPolicyInfoResponse(BaseModel):
@@ -6884,10 +6751,10 @@ class OfferPolicyInfoResponse(BaseModel):
 
 
 class OrgUserPolicyData(BaseModel):
-    org_user: OrgUser | None = Field(None, alias="orgUser")
-    org_policies: list[Policy] | None = Field(None, alias="orgPolicies")
-    travel_policies: list[Policy] | None = Field(None, alias="travelPolicies")
-    guest_policies: list[Policy] | None = Field(None, alias="guestPolicies")
+    org_user: OrgUser | None = None
+    org_policies: list[Policy] = Field(default_factory=list)
+    travel_policies: list[Policy] = Field(default_factory=list)
+    guest_policies: list[Policy] = Field(default_factory=list)
 
 
 class OrgUserPolicyDataResponse(BaseModel):
@@ -6899,52 +6766,52 @@ class OrgUserPolicyDataResponse(BaseModel):
 
 class RespImpl(BaseModel):
     data: RespData | None = None
-    itineraries: list[RespItinerary] | None = None
-    wifis: dict[str, Wifi] | None = None
-    aircrafts: dict[str, Aircraft] | None = None
-    seats: dict[str, Seat] | None = None
-    foods: dict[str, FreshFood] | None = None
-    beverages: dict[str, Beverage] | None = None
-    powers: dict[str, Power] | None = None
-    entertainments: dict[str, Entertainment] | None = None
-    layouts: dict[str, Layout] | None = None
+    itineraries: list[RespItinerary] = Field(default_factory=list)
+    wifis: dict[str, Wifi] = Field(default_factory=dict)
+    aircrafts: dict[str, Aircraft] = Field(default_factory=dict)
+    seats: dict[str, Seat] = Field(default_factory=dict)
+    foods: dict[str, FreshFood] = Field(default_factory=dict)
+    beverages: dict[str, Beverage] = Field(default_factory=dict)
+    powers: dict[str, Power] = Field(default_factory=dict)
+    entertainments: dict[str, Entertainment] = Field(default_factory=dict)
+    layouts: dict[str, Layout] = Field(default_factory=dict)
 
 
 class TrainReservation(BaseModel):
     id: int | None = None
     ext: TrainReservationExt | None = None
-    trip_id: int | None = Field(None, alias="tripId")
-    booker_id: int | None = Field(None, alias="bookerId")
-    user_ids: list[int] | None = Field(None, alias="userIds")
-    agency_code: str | None = Field(None, alias="agencyCode")
-    provider_code: str | None = Field(None, alias="providerCode")
-    agency_pnr: str | None = Field(None, alias="agencyPnr")
-    vendor_pnr: str | None = Field(None, alias="vendorPnr")
+    trip_id: int | None = None
+    booker_id: int | None = None
+    user_ids: list[int] = Field(default_factory=list)
+    agency_code: str | None = None
+    provider_code: str | None = None
+    agency_pnr: str | None = None
+    vendor_pnr: str | None = None
     rlk: str | None = None
     vendor: str | None = None
     label: str | None = None
-    start_date: AwareOrNaiveDatetime | None = Field(None, alias="startDate")
-    end_date: AwareOrNaiveDatetime | None = Field(None, alias="endDate")
+    start_date: AwareOrNaiveDatetime | None = None
+    end_date: AwareOrNaiveDatetime | None = None
     currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    org_id: int | None = Field(None, alias="orgId")
-    org_project_id: int | None = Field(None, alias="orgProjectId")
-    approval_policy_ids: list[int] | None = Field(None, alias="approvalPolicyIds")
-    in_policy: bool | None = Field(None, alias="inPolicy")
-    not_in_policy_reason: str | None = Field(None, alias="notInPolicyReason")
-    created_on: AwareOrNaiveDatetime | None = Field(None, alias="createdOn")
-    updated_at: AwareOrNaiveDatetime | None = Field(None, alias="updatedAt")
+    total_price: float | None = None
+    org_id: int | None = None
+    org_project_id: int | None = None
+    approval_policy_ids: list[int] = Field(default_factory=list)
+    in_policy: bool | None = None
+    not_in_policy_reason: str | None = None
+    created_on: AwareOrNaiveDatetime | None = None
+    updated_at: AwareOrNaiveDatetime | None = None
     status: ReservationStatus | None = None
     ttl: AwareOrNaiveDatetime | None = None
-    not_preferred_reason: str | None = Field(None, alias="notPreferredReason")
+    not_preferred_reason: str | None = None
     flags: int | None = None
     type: ReservationType | None = None
 
 
 class TrainReservationResponse(BaseModel):
-    train_reservation: TrainReservation | None = Field(None, alias="trainReservation")
-    stations: dict[str, TrainStation] | None = None
-    carriers: dict[str, TrainCarrier] | None = None
+    train_reservation: TrainReservation | None = None
+    stations: dict[str, TrainStation] = Field(default_factory=dict)
+    carriers: dict[str, TrainCarrier] = Field(default_factory=dict)
 
 
 class TrainReservationResponseResponse(BaseModel):
@@ -6956,49 +6823,27 @@ class TrainReservationResponseResponse(BaseModel):
 
 class GetTripBoardsResponse(BaseModel):
     trip: Trip | None = None
-    boards: list[TripBoard] | None = None
-    medias: list[TripMedia] | None = None
+    boards: list[TripBoard] = Field(default_factory=list)
+    medias: list[TripMedia] = Field(default_factory=list)
     org: Org | None = None
-    users: dict[str, User] | None = None
-    car_reservations: dict[str, CarReservation] | None = Field(
-        None,
-        alias="carReservations",
+    users: dict[str, User] = Field(default_factory=dict)
+    car_reservations: dict[str, CarReservation] = Field(default_factory=dict)
+    flight_reservations: dict[str, FlightReservation] = Field(default_factory=dict)
+    hotel_reservations: dict[str, HotelReservation] = Field(default_factory=dict)
+    misc_reservations: dict[str, MiscReservation] = Field(default_factory=dict)
+    train_reservations: dict[str, TrainReservation] = Field(default_factory=dict)
+    reward_programs: dict[str, RewardProgram] = Field(default_factory=dict)
+    user_reward_programs: dict[str, MaskedUserRewardProgram] = Field(
+        default_factory=dict,
     )
-    flight_reservations: dict[str, FlightReservation] | None = Field(
-        None,
-        alias="flightReservations",
-    )
-    hotel_reservations: dict[str, HotelReservation] | None = Field(
-        None,
-        alias="hotelReservations",
-    )
-    misc_reservations: dict[str, MiscReservation] | None = Field(
-        None,
-        alias="miscReservations",
-    )
-    train_reservations: dict[str, TrainReservation] | None = Field(
-        None,
-        alias="trainReservations",
-    )
-    reward_programs: dict[str, RewardProgram] | None = Field(
-        None,
-        alias="rewardPrograms",
-    )
-    user_reward_programs: dict[str, MaskedUserRewardProgram] | None = Field(
-        None,
-        alias="userRewardPrograms",
-    )
-    airlines: dict[str, Airline] | None = None
-    airports: dict[str, Airport] | None = None
-    train_carriers: dict[str, TrainCarrier] | None = Field(None, alias="trainCarriers")
-    train_stations: dict[str, TrainStation] | None = Field(None, alias="trainStations")
-    fields: list[FieldModel] | None = None
-    field_values: list[FieldValue] | None = Field(None, alias="fieldValues")
-    reservation_fields: list[ReservationField] | None = Field(
-        None,
-        alias="reservationFields",
-    )
-    target_resource_id: int | None = Field(None, alias="targetResourceId")
+    airlines: dict[str, Airline] = Field(default_factory=dict)
+    airports: dict[str, Airport] = Field(default_factory=dict)
+    train_carriers: dict[str, TrainCarrier] = Field(default_factory=dict)
+    train_stations: dict[str, TrainStation] = Field(default_factory=dict)
+    fields: list[FieldModel] = Field(default_factory=list)
+    field_values: list[FieldValue] = Field(default_factory=list)
+    reservation_fields: list[ReservationField] = Field(default_factory=list)
+    target_resource_id: int | None = None
 
 
 class GetTripBoardsResponseResponse(BaseModel):
@@ -7009,12 +6854,9 @@ class GetTripBoardsResponseResponse(BaseModel):
 
 
 class ListTrainReservationResponse(BaseModel):
-    train_reservations: list[TrainReservation] | None = Field(
-        None,
-        alias="trainReservations",
-    )
-    carriers: dict[str, TrainCarrier] | None = None
-    stations: dict[str, TrainStation] | None = None
+    train_reservations: list[TrainReservation] = Field(default_factory=list)
+    carriers: dict[str, TrainCarrier] = Field(default_factory=dict)
+    stations: dict[str, TrainStation] = Field(default_factory=dict)
 
 
 class ListTrainReservationResponseResponse(BaseModel):
@@ -7027,27 +6869,15 @@ class ListTrainReservationResponseResponse(BaseModel):
 class RecordLocator(BaseModel):
     key: str | None = None
     pnr: str | None = None
-    agency_code: str | None = Field(None, alias="agencyCode")
-    arranger_ids: list[int] | None = Field(None, alias="arrangerIds")
-    trip_id: int | None = Field(None, alias="tripId")
-    car_reservations: list[CarReservation] | None = Field(None, alias="carReservations")
-    flight_reservations: list[FlightReservation] | None = Field(
-        None,
-        alias="flightReservations",
-    )
-    hotel_reservations: list[HotelReservation] | None = Field(
-        None,
-        alias="hotelReservations",
-    )
-    misc_reservations: list[MiscReservation] | None = Field(
-        None,
-        alias="miscReservations",
-    )
-    train_reservations: list[TrainReservation] | None = Field(
-        None,
-        alias="trainReservations",
-    )
-    fees: list[ServiceFee] | None = None
+    agency_code: str | None = None
+    arranger_ids: list[int] = Field(default_factory=list)
+    trip_id: int | None = None
+    car_reservations: list[CarReservation] = Field(default_factory=list)
+    flight_reservations: list[FlightReservation] = Field(default_factory=list)
+    hotel_reservations: list[HotelReservation] = Field(default_factory=list)
+    misc_reservations: list[MiscReservation] = Field(default_factory=list)
+    train_reservations: list[TrainReservation] = Field(default_factory=list)
+    fees: list[ServiceFee] = Field(default_factory=list)
 
 
 class RecordLocatorResponse(BaseModel):

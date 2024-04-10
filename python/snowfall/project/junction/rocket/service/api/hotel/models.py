@@ -35,8 +35,8 @@ class RoomsResult(BaseModel):
     price_per_night: float | None = None
     taxes_and_fees: float | None = None
     taxes_and_fees_per_night: float | None = None
-    checkin_time: j1.LocalTime | None = None
-    checkout_time: j1.LocalTime | None = None
+    checkin_time: str | None = None
+    checkout_time: str | None = None
     cancellation: j1.HotelCancellation | None = None
     rate_code: j1.RoomRateCode | None = None
     rate_plan_type: j1.OtaRatePlanType | None = None

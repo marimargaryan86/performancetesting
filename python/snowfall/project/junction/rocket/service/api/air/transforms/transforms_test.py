@@ -40,6 +40,8 @@ def test_transform_basic_request() -> None:
                 "departure_date": date(2024, 1, 1),
             },
         ],
+        "refs": [],
+        "reservation_ids": [],
         "user_ids": [-10, -11, -21],
     }
 

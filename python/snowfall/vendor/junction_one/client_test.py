@@ -217,10 +217,7 @@ async def test_get_seat_maps_with_ref(
     )
 
     response = await junction_one_client.seat_maps_with_refs(
-        auto_models.FlightSeatMapRequest(
-            refs=["12345"],
-            reward_programs=None,
-        ),
+        auto_models.FlightSeatMapRequest(refs=["12345"]),
     )
 
     assert response == auto_models.FlightSeatMapResponseResponse(**fixture["data"])
