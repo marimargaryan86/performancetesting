@@ -25,6 +25,10 @@ PROVIDERS = (
 )
 SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
 PLACES = ("3debfa7c-9884-5409-86c8-33f3e491382e",)
+PLACE_IATAS = ("BER",)
+NOT_FOUND_PLACE_IATA = "TTT"
+PLACE_NAMES = ("Takoma Park",)
+NOT_FOUND_PLACE_NAME = "not existing place"
 SEARCH_RESULTS = (
     "5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",
     "c9fb49fc-7f2d-4403-a8b1-5a8c065ea8ce",
@@ -166,14 +170,14 @@ def get_place() -> places_pb2.Place:
             air=[
                 places_pb2.ProviderPlaceId(
                     snowfall_provider_id="snowfall_provider_id_air",
-                    provider_place_id="BER",
+                    provider_place_id=PLACE_IATAS[0],
                 ),
             ],
             ferry=[],
         ),
         city=places_pb2.PlaceIdentifier(
             id="011c01bd-4e4b-5bf0-a999-ba66175c7f56",
-            name="Takoma Park",
+            name=PLACE_NAMES[0],
             type=places_pb2.TYPE_CITY,
         ),
         contains=[

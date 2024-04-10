@@ -11,4 +11,9 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             endpoints.GetPlace,
             name="GetPlace",
         ),
+        integration.route(
+            "/places",
+            endpoints.GetPlaces,
+            name="GetPlaces",
+        ),
     ]

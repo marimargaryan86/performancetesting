@@ -131,6 +131,16 @@ def places_stub(mocker: pytest_mock.MockerFixture) -> places_pb2_grpc.PlacesServ
         "GetPlace",
         side_effect=_get_place,
     )
+    mocker.patch.object(
+        places,
+        "GetPlaceByIata",
+        side_effect=_get_place_by_iata,
+    )
+    mocker.patch.object(
+        places,
+        "ListPlaces",
+        side_effect=_list_places,
+    )
 
     return places
 
@@ -323,6 +333,37 @@ async def _get_place(
         )
 
     return places_pb2.GetPlaceResponse(place=fixtures.get_place())
+
+
+async def _get_place_by_iata(
+    request: places_pb2.GetPlaceByIataRequest,
+    timeout: datetime.datetime,
+) -> places_pb2.GetPlaceByIataResponse:
+    if request.iata not in fixtures.PLACE_IATAS:
+        raise grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+
+    return places_pb2.GetPlaceByIataResponse(place=fixtures.get_place())
+
+
+async def _list_places(
+    request: places_pb2.ListPlacesRequest,
+    timeout: datetime.datetime,
+) -> places_pb2.ListPlacesResponse:
+    if request.filters.name not in fixtures.PLACE_NAMES:
+        raise grpc.aio.AioRpcError(
+            code=grpc.StatusCode.NOT_FOUND,
+            initial_metadata=grpc.aio.Metadata(),
+            trailing_metadata=grpc.aio.Metadata(),
+        )
+
+    return places_pb2.ListPlacesResponse(
+        places=[fixtures.get_place()],
+        next_page_token="",
+    )
 
 
 @pytest.fixture()
