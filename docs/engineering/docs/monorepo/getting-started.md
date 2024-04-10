@@ -94,3 +94,4 @@ Now that your environment is properly set up for development, we suggest you fol
 2. Understand the [high-level architecture of Junction](/docs/monorepo/architecture).
 3. Take a [deep dive into the codebase](/docs/monorepo/code-deep-dive) to learn how the monorepo is organized.
 4. Learn how to [run your first service](/docs/monorepo/running-a-service).
+5. [Contribute to the monorepo](/docs/monorepo/contributing).
