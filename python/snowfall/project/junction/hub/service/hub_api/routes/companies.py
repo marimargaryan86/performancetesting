@@ -131,6 +131,21 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                 body["billingType"],
             ),
             apply_markups=body["applyMarkups"],
+            invoice_generation_frequency=body["invoiceGenerationFrequency"],
+            vertical_fees=[
+                models_pb2.VerticalFee(
+                    vertical_type=protobuf.slug_to_enum_value(
+                        models_pb2.VerticalType,
+                        fee["verticalType"],
+                    ),
+                    billing_type=protobuf.slug_to_enum_value(
+                        models_pb2.BillingType,
+                        fee["billingType"],
+                    ),
+                    value=fee["value"],
+                )
+                for fee in body.get("verticalFees", [])
+            ],
         )
         for fee_amount in body.get("feeAmounts", []):
             request_company.fee_amounts.append(

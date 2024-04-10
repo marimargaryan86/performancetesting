@@ -649,6 +649,20 @@ class Company(models.Resource):
                 ),
                 "applyMarkups": company.apply_markups,
                 "invoiceGenerationFrequency": company.invoice_generation_frequency,
+                "verticalFees": [
+                    {
+                        "verticalType": protobuf.enum_value_to_slug(
+                            companies_models_pb2.VerticalType.DESCRIPTOR,
+                            fee.vertical_type,
+                        ),
+                        "billingType": protobuf.enum_value_to_slug(
+                            companies_models_pb2.BillingType.DESCRIPTOR,
+                            fee.billing_type,
+                        ),
+                        "value": round(fee.value, 3),
+                    }
+                    for fee in company.vertical_fees
+                ],
             },
             links={
                 _SELF_HREF: str(

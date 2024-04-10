@@ -6153,10 +6153,44 @@
                 "example": 7,
                 "minimum": 0,
                 "description": "The invoice generation period, in days"
+              },
+              "verticalFees": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/components/schemas/CompanyVerticalFee"
+                }
               }
             }
           }
         }
+      },
+      "CompanyVerticalFee": {
+        "title": "Company Vertical Fee",
+        "description": "Vertical fee amount represented by fixed amount or percentage. The fixed amount is in the same currency as the company's default currency.",
+        "type": "object",
+        "properties": {
+          "verticalType": {
+            "type": "string",
+            "example": "hotel",
+            "enum": ["air", "rail", "hotel", "bus", "ferry", "car"]
+          },
+          "billingType": {
+            "type": "string",
+            "example": "percentage",
+            "enum": ["percentage", "fixed"]
+          },
+          "value": {
+            "type": "number",
+            "format": "float",
+            "example": 5.6
+          }
+        },
+        "required": [
+          "verticalType",
+          "billingType",
+          "value"
+        ]
       },
       "CompanyCreatable": {
         "title": "Company (Creatable)",

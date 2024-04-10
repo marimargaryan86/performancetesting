@@ -48,9 +48,11 @@ class CompaniesService(
     ) -> grpc_pb2.CreateCompanyResponse:
         request.company.id = string.uuid()
 
-        request.company.invoice_generation_date = protobuf.date_to_protobuf(  # type: ignore[misc]
-            datetime.datetime.now(tz=datetime.UTC)
-            + datetime.timedelta(request.company.invoice_generation_frequency),
+        request.company.invoice_generation_date.CopyFrom(
+            protobuf.date_to_protobuf(
+                datetime.datetime.now(tz=datetime.UTC)
+                + datetime.timedelta(request.company.invoice_generation_frequency),
+            ),
         )
 
         try:
