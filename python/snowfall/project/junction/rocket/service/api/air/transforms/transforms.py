@@ -1,6 +1,7 @@
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from snowfall.project.junction.rocket.service.api import constants
 from snowfall.project.junction.rocket.service.api.air import models as rocket
 from snowfall.project.junction.rocket.service.api.air import types
 from snowfall.project.junction.rocket.service.api.air.transforms import models as safej1
@@ -39,101 +40,96 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
         )
 
 
+def _transform_result_detail(
+    segment: safej1.Segment,
+) -> rocket.ResultDetails:
+    return rocket.ResultDetails(
+        id=string.uuid(),
+        flight_number=segment.flight_number,
+        airline=segment.airline,
+        arrival_station=segment.arrival_station,
+        arrival_time=segment.arrival_time,
+        departure_station=segment.departure_station,
+        departure_time=segment.departure_time,
+        duration=segment.duration,
+        segment_key=segment.segment_key,
+        operating_airline=segment.operating_airline
+        if segment.operating_airline
+        else segment.airline,
+    )
+
+
 class AirSearchResultTransformer(types.AirSearchResultTransformer):
     def transform(
         self,
         j1_response: j1.SearchFlightsResponse,
-    ) -> rocket.AirSearchResult:
+    ) -> list[rocket.AirSearchResult]:
+        search_id = string.uuid()
         safe_j1_response = safej1.SearchFlightsResponse(**j1_response.model_dump())
+        offers = safe_j1_response.offers
+        search_results = []
+        for offer in offers:
+            search_result = self._transform_search_result(
+                offer,
+                safe_j1_response,
+                search_id,
+            )
+            search_results.append(search_result)
+
+        return search_results
+
+    def _transform_search_result(
+        self,
+        offer: safej1.Offer,
+        j1_response: safej1.SearchFlightsResponse,
+        search_id: str,
+    ) -> rocket.AirSearchResult:
+        offers = []
+        for fare_type, priced_fares in offer.fares.items():
+            for priced_fare in priced_fares:
+                new_offer = rocket.Offer(
+                    id=string.uuid(),
+                    price=rocket.Price(
+                        price=priced_fare.price,
+                        currency=priced_fare.currency,
+                    ),
+                    cabin_details=self._transform_cabins(priced_fare.segments)
+                    if priced_fare.segments
+                    else None,
+                    fare_type=rocket.FareTypeEnum(fare_type),
+                    name=priced_fare.name,
+                    ref_id=[ref for ref in priced_fare.refs if priced_fare.refs],
+                )
+                offers.append(new_offer)
+
+        result_details = []
+        full_trip = j1_response.ods[offer.od_id]
+        for segment in full_trip.segments:
+            full_segment = j1_response.segments[segment]
+            result_detail = _transform_result_detail(full_segment)
+            result_details.append(result_detail)
 
         return rocket.AirSearchResult(
             id=string.uuid(),
-            data=[
-                self._transform_offer(safe_j1_response, offer)
-                for offer in safe_j1_response.offers
-            ],
-        )
-
-    def _transform_offer(
-        self,
-        j1_response: safej1.SearchFlightsResponse,
-        offer: safej1.Offer,
-    ) -> rocket.AirSearchTrip:
-        offers = {
-            fare_type: [self._transform_fare(j1_response, fare) for fare in fare_list]
-            for fare_type, fare_list in offer.fares.items()
-        }
-
-        segments = j1_response.segments
-        return rocket.AirSearchTrip(
+            search_id=search_id,  # TODO(reuben.t): store the search in mongo
+            provider_id=str(constants.JUNCTION_ONE_PROVIDER_ID),
             offers=offers,
-            result_details=self._extract_segments_for_offers(
-                j1_response,
-                segments,
-                offers,
-            ),
+            result_details=result_details,
         )
 
-    def _transform_fare(
+    def _transform_cabins(
         self,
-        j1_response: safej1.SearchFlightsResponse,
-        fare: safej1.PricedFare,
-    ) -> rocket.Offer:
-        return rocket.Offer(
-            price=fare.price,
-            currency=fare.currency,
-            brand=fare.name,
-            segments={
-                segment.segment_id: self._transform_fare_segment(j1_response, segment)
-                for segment in fare.segments
-            },
-        )
+        fare_segments: Sequence[safej1.FareSegment],
+    ) -> list[rocket.CabinDetails]:
+        cabin_details = []
+        for fare_segment in fare_segments:
+            cabin = rocket.CabinDetails(
+                id=string.uuid(),
+                result_detail_id=fare_segment.segment_id
+                if fare_segment.segment_id
+                else None,
+                marketing_name=fare_segment.cabin if fare_segment.cabin else None,
+            )
+            cabin_details.append(cabin)
 
-    def _transform_fare_segment(
-        self,
-        j1_response: safej1.SearchFlightsResponse,
-        segment: safej1.FareSegment,
-    ) -> rocket.OfferSegment:
-        return rocket.OfferSegment(
-            cabin=segment.cabin,
-            class_of_service=segment.class_of_service,
-        )
-
-    def _extract_segments_for_offers(
-        self,
-        j1_response: safej1.SearchFlightsResponse,
-        segments: Mapping[str, safej1.Segment],
-        offers: Mapping[str, Sequence[rocket.Offer]],
-    ) -> dict[str, rocket.Segment]:
-        segment_ids = set().union(
-            *(
-                offer.segments.keys()
-                for offer_list in offers.values()
-                for offer in offer_list
-            ),
-        )
-
-        return {
-            key: self._transform_segment(j1_response, value)
-            for (key, value) in segments.items()
-            if key in segment_ids
-        }
-
-    def _transform_segment(
-        self,
-        j1_response: safej1.SearchFlightsResponse,
-        segment: safej1.Segment,
-    ) -> rocket.Segment:
-        return rocket.Segment(
-            flight_number=segment.flight_number,
-            airline=segment.airline,
-            arrival_station=segment.arrival_station,
-            arrival_time=segment.arrival_time,
-            departure_station=segment.departure_station,
-            departure_time=segment.departure_time,
-            duration=segment.duration,
-            segment_key=segment.segment_key,
-            operating_airline=segment.operating_airline
-            if segment.operating_airline
-            else segment.airline,
-        )
+        return cabin_details

@@ -35,6 +35,11 @@ class Segment(j1.Segment):
     operating_airline: str | None
 
 
+class OriginDestination(j1.OriginDestination):
+    segments: list[str]
+
+
 class SearchFlightsResponse(j1.SearchFlightsResponse):
+    ods: dict[str, OriginDestination]  # type: ignore[assignment]
     offers: list[Offer]  # type: ignore[assignment]
     segments: dict[str, Segment]  # type: ignore[assignment]

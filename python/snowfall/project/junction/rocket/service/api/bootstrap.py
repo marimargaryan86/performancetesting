@@ -103,8 +103,10 @@ async def create_dependencies(
         http_client=await app.stack.enter_async_context(httpx.AsyncClient()),
         auth=container[TemporaryTokenAuth],
     )
-    container[repositories.AirSearchRepository] = repositories.AirSearchRepository(
-        collection=mongo.searches.air_results,
+    container[repositories.AirSearchResultRepository] = (
+        repositories.AirSearchResultRepository(
+            collection=mongo.searches.search_results,
+        )
     )
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer

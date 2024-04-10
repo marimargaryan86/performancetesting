@@ -19,7 +19,7 @@ from snowfall.project.junction.rocket.service.api.air import (
     router as air_router,
 )
 from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AirSearchRepository,
+    AirSearchResultRepository,
 )
 from snowfall.project.junction.rocket.service.api.air.transforms import (
     transforms as air_transforms,
@@ -141,7 +141,7 @@ def container(
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
     places_stub: places_pb2_grpc.PlacesServiceStub,
     junction_one_client: JunctionOneClient,
-    air_search_repo: AirSearchRepository,
+    air_search_repo: AirSearchResultRepository,
     hotel_search_repo: HotelSearchRepository,
     hotel_rooms_search_repo: HotelRoomsSearchRepository,
 ) -> lagom.Container:
@@ -152,7 +152,7 @@ def container(
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
     container[places_pb2_grpc.PlacesServiceStub] = places_stub
     container[JunctionOneClient] = junction_one_client
-    container[AirSearchRepository] = air_search_repo
+    container[AirSearchResultRepository] = air_search_repo
     container[AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer
     )
@@ -335,8 +335,8 @@ async def mock_collection(
 @pytest.fixture()
 async def air_search_repo(
     mock_collection: motor_asyncio.AsyncIOMotorCollection,
-) -> AirSearchRepository:
-    return AirSearchRepository(collection=mock_collection)
+) -> AirSearchResultRepository:
+    return AirSearchResultRepository(collection=mock_collection)
 
 
 @pytest.fixture()

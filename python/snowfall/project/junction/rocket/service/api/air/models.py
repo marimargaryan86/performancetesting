@@ -50,7 +50,8 @@ class SearchCapabilities(BaseModel):
     ferry: bool
 
 
-class Segment(BaseModel):
+class ResultDetails(BaseModel):
+    id: str = Field(..., alias="_id")
     flight_number: str
     airline: str
     arrival_station: str
@@ -62,23 +63,29 @@ class Segment(BaseModel):
     operating_airline: str
 
 
-class OfferSegment(BaseModel):
-    cabin: str
-    class_of_service: str
+class Price(BaseModel):
+    price: float
+    currency: str
+
+
+class CabinDetails(BaseModel):
+    id: str
+    result_detail_id: str | None
+    marketing_name: str | None
 
 
 class Offer(BaseModel):
-    price: float
-    currency: str
-    brand: str
-    segments: dict[str, OfferSegment]
-
-
-class AirSearchTrip(BaseModel):
-    offers: dict[str, list[Offer]]  # TODO(jeremy): Use FareTypeEnum as str
-    result_details: dict[str, Segment]
+    id: str = Field(..., alias="_id")
+    price: Price
+    fare_type: FareTypeEnum
+    name: str
+    cabin_details: list[CabinDetails] | None
+    ref_id: list[str]
 
 
 class AirSearchResult(BaseModel):
     id: str = Field(..., alias="_id")
-    data: list[AirSearchTrip] = Field([])
+    search_id: str
+    provider_id: str
+    offers: list[Offer]
+    result_details: list[ResultDetails]
