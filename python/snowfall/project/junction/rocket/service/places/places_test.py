@@ -346,7 +346,7 @@ class TestPlaces:
     @mock.patch(
         "snowfall.project.junction.rocket.service.places.places.get_country_code_and_timezone",
     )
-    async def test_cities_to_places_yields_place_when_it_contains_places(
+    async def test_cities_to_places_yields_empty_when_it_contains_no_searchable_places(
         self,
         mock_get_country_code_and_timezone: mock.Mock,
     ) -> None:
@@ -361,6 +361,55 @@ class TestPlaces:
                 id="An ID",
                 type=models_pb2.TYPE_AIRPORT,
                 name="A Name",
+                search_capabilities=models_pb2.ProviderMappings(
+                    rail=None,
+                    air=None,
+                    ferry=None,
+                ),
+            )
+
+        mock_repository = mock.AsyncMock()
+        mock_repository.find_within_radius.return_value = place_yield()
+
+        places = [
+            place
+            async for place in cities_to_places(
+                cities=self.mock_iterator(rows),
+                places_repository=mock_repository,
+                geocoding=mock.Mock(),
+                country_codes_to_countries={"UK": "United Kingdom"},
+            )
+        ]
+        assert not places
+
+    @mock.patch(
+        "snowfall.project.junction.rocket.service.places.places.get_country_code_and_timezone",
+    )
+    async def test_cities_to_places_yields_place_when_it_contains_searchable_places(
+        self,
+        mock_get_country_code_and_timezone: mock.Mock,
+    ) -> None:
+        rows = [{"id": "an-id", "name": "A City", "latitude": 0, "longitude": 0}]
+        mock_get_country_code_and_timezone.return_value = (
+            "UK",
+            "Europe/London",
+        )
+
+        async def place_yield() -> AsyncIterable[models_pb2.Place]:  # noqa: WPS430
+            yield models_pb2.Place(
+                id="An ID",
+                type=models_pb2.TYPE_AIRPORT,
+                name="A Name",
+                search_capabilities=models_pb2.ProviderMappings(
+                    rail=[
+                        models_pb2.ProviderPlaceId(
+                            snowfall_provider_id="an-id",
+                            provider_place_id="an-id",
+                        ),
+                    ],
+                    air=None,
+                    ferry=None,
+                ),
             )
 
         mock_repository = mock.AsyncMock()

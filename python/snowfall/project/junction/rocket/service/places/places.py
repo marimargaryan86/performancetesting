@@ -353,17 +353,27 @@ async def osm_nodes_to_places(  # noqa: WPS231
             )
 
 
-async def get_places_within_radius(
+async def is_searchable(place: models_pb2.Place) -> bool:
+    return any([
+        place.search_capabilities.air,
+        place.search_capabilities.rail,
+        place.search_capabilities.ferry,
+    ])
+
+
+async def get_searchable_places_within_radius(
     coordinates: latlng_pb2.LatLng,
     places_repository: PlaceRepository,
 ) -> PlaceIdentifiers:
+    places = await places_repository.find_within_radius(
+        cursor="",
+        coordinates=coordinates,
+        radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY,
+    )
     return [
         models_pb2.PlaceIdentifier(id=place.id, name=place.name, type=place.type)
-        async for place in await places_repository.find_within_radius(
-            cursor="",
-            coordinates=coordinates,
-            radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY,
-        )
+        async for place in places
+        if await is_searchable(place)
     ]
 
 
@@ -404,7 +414,7 @@ async def cities_to_places(
             latitude=float(city["latitude"]),
             longitude=float(city["longitude"]),
         )
-        places_within = await get_places_within_radius(
+        places_within = await get_searchable_places_within_radius(
             coordinates=coordinates,
             places_repository=places_repository,
         )
