@@ -21,6 +21,7 @@ message QuotationAmounts {
   snowfall.stdlib.v1.Money fee_amount = 10;
   snowfall.stdlib.v1.Money tax = 11;
   snowfall.stdlib.v1.Money service_markup = 12;
+  snowfall.stdlib.v1.Money vertical_fee = 13;
 }
 
 message QuotationRates {

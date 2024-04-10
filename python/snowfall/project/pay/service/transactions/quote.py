@@ -22,6 +22,7 @@ class Quote:
         beneficiary_id: str,
         tax: int,
         fee_multiplier: int,
+        vertical_type: company_models.VerticalType.ValueType,
     ) -> None:
         self._amount = amount
         self._from_currency = from_currency
@@ -31,10 +32,15 @@ class Quote:
         self._tax = money.Money(tax, currency=self._from_currency)
         self._beneficiary_id = beneficiary_id
         self._fee_multiplier = fee_multiplier
+        self._vertical_type = vertical_type
         self._fee_amount = self._get_fee_amount(
             getattr(self._company, "fee_amounts", []),
         )
         self._quotation_amounts = self._calculate_margins()
+        self._vertical_amount = self._get_vertical_fee(
+            getattr(self._company, "vertical_fees", []),
+        )
+        self._calculate_totals()
 
     def to_proto(
         self,
@@ -57,6 +63,7 @@ class Quote:
                 total_amount=self._quotation_amounts["total_amount"].protobuf(),
                 fee_amount=self._fee_amount.protobuf(),
                 tax=self._tax.protobuf(),
+                vertical_fee=self._vertical_amount.protobuf(),
             ),
             rates=models_pb2.QuotationRates(
                 fx_quote=self._rate,
@@ -116,21 +123,6 @@ class Quote:
             rate,
         )
 
-        service_markup = money.total(
-            [
-                fx_margin,
-                processing_margin,
-                sales_margin,
-            ],
-        )
-
-        total_markups = money.total(
-            [
-                service_markup,
-                fee_amount,
-            ],
-        )
-
         return {
             "beneficiary": beneficiary,
             "base_converted": base_converted,
@@ -138,15 +130,7 @@ class Quote:
             "fx_margin": fx_margin,
             "processing_margin": processing_margin,
             "tax_converted": tax_converted,
-            "total_markups": total_markups,
-            "service_markup": service_markup,
-            "total_amount": money.total(
-                [
-                    base_converted,
-                    total_markups,
-                    tax_converted,
-                ],
-            ),
+            "fee_amount": fee_amount,
             "quotation": money.total(
                 [
                     base_converted,
@@ -157,6 +141,37 @@ class Quote:
             ),
         }
 
+    def _calculate_totals(self) -> None:
+        service_markup = money.total(
+            [
+                self._quotation_amounts["fx_margin"],
+                self._quotation_amounts["processing_margin"],
+                self._quotation_amounts["sales_margin"],
+            ],
+        )
+
+        total_markups = money.total(
+            [
+                service_markup,
+                self._quotation_amounts["fee_amount"],
+                self._vertical_amount,
+            ],
+        )
+
+        total_amount = money.total(
+            [
+                self._quotation_amounts["base_converted"],
+                total_markups,
+                self._quotation_amounts["tax_converted"],
+            ],
+        )
+
+        self._quotation_amounts.update({
+            "total_markups": total_markups,
+            "service_markup": service_markup,
+            "total_amount": total_amount,
+        })
+
     def _get_fee_amount(self, markups: Sequence[money_pb2.Money]) -> money.Money:
         for proto_markup in markups:
             markup = money.from_protobuf(proto_markup)
@@ -165,4 +180,35 @@ class Quote:
                     markup.amount * self._fee_multiplier,
                     markup.currency,
                 )
+        return money.Money(0, self._to_currency)
+
+    def _get_vertical_fee(
+        self,
+        vertical_fees: Sequence[company_models.VerticalFee],
+    ) -> money.Money:
+        for fee in vertical_fees:
+            if fee.vertical_type == self._vertical_type:
+                return self._calculate_vertical_fee(fee)
+
+        return money.Money(0, self._to_currency)
+
+    def _calculate_vertical_fee(
+        self,
+        fee_config: company_models.VerticalFee,
+    ) -> money.Money:
+        billing_type = fee_config.billing_type
+
+        if billing_type == company_models.BillingType.BILLING_TYPE_FIXED:
+            return money.from_string(
+                str(fee_config.value),
+                self._to_currency,
+            )
+        if billing_type == company_models.BillingType.BILLING_TYPE_PERCENTAGE:
+            amount = money.total([
+                self._quotation_amounts["base_converted"],
+                self._quotation_amounts["tax_converted"],
+            ])
+
+            return amount.convert(self._to_currency, Decimal(fee_config.value / 100))
+
         return money.Money(0, self._to_currency)

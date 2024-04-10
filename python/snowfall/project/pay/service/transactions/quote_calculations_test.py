@@ -17,6 +17,18 @@ def company() -> company_models.Company:
             money.Money(100, money.Currency("EUR")).protobuf(),  # noqa: WPS432
         ],
         apply_markups=True,
+        vertical_fees=[
+            company_models.VerticalFee(
+                vertical_type=company_models.VerticalType.VERTICAL_TYPE_RAIL,
+                value=1.0,
+                billing_type=company_models.BillingType.BILLING_TYPE_FIXED,
+            ),
+            company_models.VerticalFee(
+                vertical_type=company_models.VerticalType.VERTICAL_TYPE_AIR,
+                value=0.5,
+                billing_type=company_models.BillingType.BILLING_TYPE_PERCENTAGE,
+            ),
+        ],
     )
 
 
@@ -45,6 +57,7 @@ async def test_same_currencies(
         "beneficiary_id",
         0,
         2,
+        company_models.VerticalType.VERTICAL_TYPE_RAIL,
     ).to_proto()
 
     assert money.from_protobuf(quote.amounts.quotation).amount == expected_amount.amount
@@ -60,7 +73,7 @@ async def test_calculation(  # noqa: WPS218
         "fx_margin": money.Money(464, money.Currency("EUR")).amount,
         "processing_margin": money.Money(232, money.Currency("EUR")).amount,
         "service_markup": money.Money(1856, money.Currency("EUR")).amount,
-        "total_markups": money.Money(2088, money.Currency("EUR")).amount,
+        "total_markups": money.Money(2188, money.Currency("EUR")).amount,
     }
 
     quote = Quote(
@@ -72,6 +85,7 @@ async def test_calculation(  # noqa: WPS218
         "beneficiary_id",
         0,
         2,
+        company_models.VerticalType.VERTICAL_TYPE_RAIL,
     ).to_proto()
 
     assert (
@@ -122,6 +136,7 @@ async def test_calculation_without_margins(  # noqa: WPS218
         "beneficiary_id",
         0,
         2,
+        company_models.VerticalType.VERTICAL_TYPE_RAIL,
     ).to_proto()
 
     assert (
@@ -136,3 +151,23 @@ async def test_calculation_without_margins(  # noqa: WPS218
         money.from_protobuf(quote.amounts.total_markups).amount
         == expected_amounts["total_markups"]
     )
+
+
+async def test_percentage_vertical(
+    company: company_models.Company,
+) -> None:
+    total_markups = money.Money(2668, money.Currency("EUR")).amount
+
+    quote = Quote(
+        100000,
+        money.Currency("GBP"),
+        money.Currency("EUR"),
+        1.16,
+        company,
+        "beneficiary_id",
+        0,
+        2,
+        company_models.VerticalType.VERTICAL_TYPE_AIR,
+    ).to_proto()
+
+    assert money.from_protobuf(quote.amounts.total_markups).amount == total_markups

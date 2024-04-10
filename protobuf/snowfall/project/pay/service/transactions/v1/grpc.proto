@@ -106,6 +106,7 @@ message CreateQuotationRequest {
   string session_token = 6;
   int32 tax = 7;
   int32 fee_multiplier = 8;
+  snowfall.project.pay.service.companies.v1.VerticalType vertical_type = 9;
 }
 
 message CreateQuotationResponse {
