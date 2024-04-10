@@ -21,7 +21,7 @@
   import AutocompleteField from "$lib/components/ui/autocomplete-field.svelte";
 
   export let mode: "create" | "update";
-  export let user: HubSchemas.User | HubSchemas.UserCreate | undefined;
+  export let user: HubSchemas.User | HubSchemas.UserPut | undefined;
   export let resellers: PaginatedData<HubSchemas.Reseller> | undefined;
   export let breadCrumbs: BreadCrumb[];
   let deleteUserDialog: DeleteUserDialog;
@@ -106,9 +106,9 @@
     const lowerCaseQuery = query.toLowerCase();
 
     return resellers?.data.reduce((acc: HubSchemas.Reseller[], reseller) => {
-      const lowerCaseResellerName = reseller.name.toLowerCase();
+      const lowerCaseResellerName = reseller.name?.toLowerCase();
 
-      if (lowerCaseResellerName.includes(lowerCaseQuery)) {
+      if (lowerCaseResellerName?.includes(lowerCaseQuery)) {
         acc.push(reseller);
       }
 
@@ -121,7 +121,7 @@
       return "";
     }
 
-    return reseller.name;
+    return reseller.name ?? "Unknown";
   }
 
   function openDeleteUserDialog(): void {
@@ -133,7 +133,7 @@
   }
 
   async function createUser(): Promise<void> {
-    const { email, role } = currentUser as unknown as HubSchemas.UserCreate;
+    const { email, role } = currentUser as unknown as HubSchemas.UserPut;
     const reseller = selectedReseller;
     const resellerId = selectedReseller?.id || "";
 

@@ -1,18 +1,13 @@
+import type { GetOKResponse } from "~/integration/common/types";
+import type { Specification } from "./__generated__";
+
 export type Currency = {
   code: string;
   name: string;
   minorUnits: number;
 };
 
-export type CurrencySchema = {
-  id: string;
-  type: "currencies";
-  attributes: {
-    name: string;
-    minorUnits: number;
-  };
-  links: { self: string };
-};
+export type CurrencySchema = GetOKResponse<Specification, "/currencies/{currencyName}">["data"];
 
 export const currencyParser = {
   toModel: (data: CurrencySchema): Currency => ({

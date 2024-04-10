@@ -1,5 +1,7 @@
-import type { Company, CompanySchema } from "./company";
+import type { GetOKResponse, PostRequest } from "~/integration/common/types";
+import type { Company } from "./company";
 import type { IncludedMapping } from "./included";
+import type { Specification } from "./__generated__";
 
 export type Contact = {
   id: string;
@@ -13,21 +15,15 @@ export type Contact = {
 
 export type ContactCreate = Omit<Contact, "id" | "companyId" | "company">;
 
-export type ContactSchema = {
-  id: string;
-  type: "contacts";
-  attributes: {
-    firstName: string;
-    lastName: string;
-    emailAddress: string;
-    phoneNumber: string;
-  };
-  relationships: {
-    company: { data: Pick<CompanySchema, "id" | "type"> };
-  };
-};
+export type ContactSchema = GetOKResponse<
+  Specification,
+  "/companies/{companyId}/contacts"
+>["data"][number];
 
-export type ContactCreateSchema = Pick<ContactSchema, "type" | "attributes">;
+export type ContactCreateSchema = PostRequest<
+  Specification,
+  "/companies/{companyId}/contacts"
+>["data"];
 
 export const contactParser = {
   toModel: (data: ContactSchema, included?: IncludedMapping): Contact => {

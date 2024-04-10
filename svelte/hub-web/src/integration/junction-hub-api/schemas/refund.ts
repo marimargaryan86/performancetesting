@@ -1,7 +1,9 @@
-import type { Conversion, ConversionSchema } from "./conversion";
+import type { GetOKResponse, PatchRequest } from "~/integration/common/types";
+import type { Conversion } from "./conversion";
 import type { IncludedMapping } from "./included";
 import { moneyParser, type Money, type MoneySchema } from "./money";
-import type { Transaction, TransactionSchema } from "./transaction";
+import type { Transaction } from "./transaction";
+import type { Specification } from "./__generated__";
 
 export type RefundPosition = {
   id: string;
@@ -75,42 +77,15 @@ export type RefundPut =
     })
   | (Required<Pick<Refund, "externalReference">> & { type: "manual" });
 
-export type RefundSchema = {
-  id: string;
-  type: "refunds";
-  attributes: {
-    status: "unspecified" | "pending" | "succeeded" | "submitted" | "failed";
-    refundReceived: boolean;
-    note: string;
-    refundedUs: MoneySchema | null;
-    refundedUsInPayerCurrency?: MoneySchema | null;
-    refundedReseller: MoneySchema | null;
-    refundPosition?: MoneySchema | null;
-    invoiceReference: string;
-    externalReference?: string;
-  };
-  relationships: {
-    transaction: { data?: Pick<TransactionSchema, "id" | "type"> };
-    conversion?: { data?: Pick<ConversionSchema, "id" | "type"> | null };
-  };
-  links: { self: string };
-};
+export type RefundSchema = GetOKResponse<Specification, "/refunds/{refundId}">["data"];
 
-export type RefundPutSchema = Pick<RefundSchema, "type"> &
-  (
-    | {
-        attributes: Omit<RefundSchema["attributes"], "status" | "refundedUsInPayerCurrency">;
-        relationships: Pick<RefundSchema["relationships"], "transaction">;
-      }
-    | {
-        attributes: Pick<RefundSchema["attributes"], "externalReference">;
-      }
-  );
+export type RefundPutSchema = PatchRequest<Specification, "/refunds/{refundId}">["data"];
 
 export const refundParser = {
   toModel: (data: RefundSchema, included?: IncludedMapping): Refund => {
     const transactionId = data.relationships.transaction.data?.id ?? undefined;
-    const conversionId = data.relationships.conversion?.data?.id ?? undefined;
+    // TODO(2024-04-10): Figure out why this was removed from the API
+    // const conversionId = data.relationships.conversion?.data?.id ?? undefined;
 
     return {
       id: data.id,
@@ -132,8 +107,8 @@ export const refundParser = {
       externalReference: data.attributes.externalReference,
       transactionId,
       transaction: included?.transactions?.find(({ id }) => id === transactionId),
-      conversionId,
-      conversion: included?.conversions?.find(({ id }) => id === conversionId),
+      // conversionId,
+      // conversion: included?.conversions?.find(({ id }) => id === conversionId),
       refundPosition: data.attributes.refundPosition
         ? moneyParser.toModel(data.attributes.refundPosition)
         : undefined,

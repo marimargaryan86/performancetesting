@@ -1,6 +1,8 @@
+import type { GetOKResponse, PatchRequest } from "~/integration/common/types";
 import type { IncludedMapping } from "./included";
-import { moneyParser, type Money, type MoneySchema } from "./money";
-import type { Order, OrderSchema } from "./order";
+import { moneyParser, type Money } from "./money";
+import type { Order } from "./order";
+import type { Specification } from "./__generated__";
 
 export type Bill = {
   id: string;
@@ -15,33 +17,13 @@ export type Bill = {
   order?: Order;
 };
 
-export type BillSchema = {
-  id: string;
-  type: "bills";
-  attributes?: {
-    createdAt?: string;
-    updatedAt?: string;
-    isReconciled: boolean;
-    totalAmount?: MoneySchema;
-    reconciledAmount?: MoneySchema | null;
-  };
-  relationships: {
-    order?: { data: Pick<OrderSchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type BillSchema = GetOKResponse<Specification, "/bills">["data"][number];
 
-export type BillUpdateSchema = Pick<BillSchema, "type"> & {
-  attributes?: {
-    createdAt?: string;
-    updatedAt?: string;
-    isReconciled?: boolean;
-  };
-};
+export type BillUpdateSchema = PatchRequest<Specification, "/bills/{billId}">["data"];
 
 export const billParser = {
   toModel: (data: BillSchema, included?: IncludedMapping): Bill => {
-    const orderId = data.relationships.order?.data.id;
+    const orderId = data.relationships?.order?.data.id;
 
     return {
       id: data.id,

@@ -4,12 +4,12 @@ import type { RequestEvent } from "./$types";
 import rpcBase from "../../rpc-base";
 
 const { client, server } = rpcBase<UserService, RequestEvent>("/integration/hub/users")({
-  create: (params: { data: HubSchemas.UserCreate }) => [params],
+  create: (params: { data: HubSchemas.UserPut }) => [params],
   find: (params: { cursor?: string; limit?: number }) => [params],
   get: (params: { id: string }) => [params],
   getProfile: () => [],
   remove: (params: { id: string }) => [params],
-  update: (params: { id: string; data: HubSchemas.UserUpdate }) => [params],
+  update: (params: { id: string; data: HubSchemas.UserPut }) => [params],
 });
 
 export { server };

@@ -1,7 +1,9 @@
-import type { TripBooking, TripBookingSchema } from "./booking";
+import type { GetOKResponse } from "~/integration/common/types";
+import type { TripBooking } from "./booking";
 import type { IncludedMapping } from "./included";
-import type { Journey, JourneySchema } from "./journey";
+import type { Journey } from "./journey";
 import * as CommonSchemas from "~/integration/common/schemas";
+import type { Specification } from "./__generated__";
 
 export type TravelerDocument = {
   type?: CommonSchemas.TravelerDocumentType;
@@ -15,15 +17,7 @@ export type TravelerDocument = {
   };
 };
 
-export type TravelerDocumentSchema = {
-  documentType?: CommonSchemas.TravelerDocumentType;
-  documentNumber?: string;
-  documentIssueCountry?: string;
-  documentExpirationDate?: string;
-  documentIssueDate?: string;
-  nationality?: string;
-  residenceCountryCode?: string;
-};
+export type TravelerDocumentSchema = NonNullable<OrderPassengerSchema["travelerDocument"]>;
 
 export const travelerDocumentParser = {
   toModel: (data: TravelerDocumentSchema): TravelerDocument => ({
@@ -48,14 +42,7 @@ export type OrderPassenger = {
   travelerDocument?: TravelerDocument;
 };
 
-export type OrderPassengerSchema = {
-  firstName: string;
-  lastName: string;
-  title: CommonSchemas.PassengerTitle;
-  gender: CommonSchemas.Gender;
-  dateOfBirth: string;
-  travelerDocument?: TravelerDocumentSchema | null;
-};
+export type OrderPassengerSchema = OrderSchema["attributes"]["passengers"][number];
 
 export const orderPassengerParser = {
   toModel: (data: OrderPassengerSchema): OrderPassenger => ({
@@ -81,20 +68,7 @@ export type Order = {
   bookings: TripBooking[];
 };
 
-export type OrderSchema = {
-  id: string;
-  type: "orders";
-  attributes: {
-    createdAt: string;
-    passengers: OrderPassengerSchema[];
-    residenceAddress?: Required<Omit<CommonSchemas.EnhancedAddressDetailsSchema, "state">>;
-  };
-  relationships: {
-    journey: { data: Pick<JourneySchema, "id" | "type"> };
-    bookings: { data: Pick<TripBookingSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type OrderSchema = GetOKResponse<Specification, "/orders/{orderId}">["data"];
 
 export const orderParser = {
   toModel: (data: OrderSchema, included?: IncludedMapping): Order => {

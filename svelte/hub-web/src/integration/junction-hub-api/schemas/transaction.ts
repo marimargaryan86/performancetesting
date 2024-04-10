@@ -1,11 +1,13 @@
-import type { Bill, BillSchema } from "./bill";
-import type { Company, CompanySchema } from "./company";
-import type { Conversion, ConversionSchema } from "./conversion";
+import type { GetOKResponse } from "~/integration/common/types";
+import type { Bill } from "./bill";
+import type { Company } from "./company";
+import type { Conversion } from "./conversion";
 import type { IncludedMapping } from "./included";
-import { moneyParser, type Money, type MoneySchema } from "./money";
+import { moneyParser, type Money } from "./money";
+import type { Specification } from "./__generated__";
 
-export type PaymentType = "unspecified" | "card" | "bank-transfer";
-export type PaymentMethod = "unspecified" | "transactional" | "invoice";
+export type PaymentType = TransactionSchema["attributes"]["paymentType"];
+export type PaymentMethod = TransactionSchema["attributes"]["paymentMethod"];
 
 export type Transaction = {
   id: string;
@@ -58,44 +60,15 @@ export type Transaction = {
   beneficiary?: Company;
 };
 
-export type TransactionSchema = {
-  id: string;
-  type: "transactions";
-  attributes: {
-    externalReference: string;
-    invoiceReference?: string;
-    createdAt: string;
-    amounts: {
-      beneficiary: MoneySchema;
-      quotation: MoneySchema;
-      baseConverted: MoneySchema;
-      salesMargin: MoneySchema;
-      fxMargin: MoneySchema;
-      processingMargin: MoneySchema;
-      totalAmount: MoneySchema;
-    };
-    rates: {
-      fxQuote: number;
-      fxBuffer: number;
-      salesMarkup: number;
-      fxMarkup: number;
-      processingMarkup: number;
-    };
-    paymentType: PaymentType;
-    paymentMethod: PaymentMethod;
-  };
-  relationships?: {
-    conversion?: { data: Pick<ConversionSchema, "id" | "type"> | null };
-    bill?: { data: Pick<BillSchema, "id" | "type"> | null };
-    payer?: { data: Pick<CompanySchema, "id" | "type"> };
-    beneficiary?: { data: Pick<CompanySchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type TransactionSchema = GetOKResponse<
+  Specification,
+  "/transactions/{transactionId}"
+>["data"];
 
 export const transactionParser = {
   toModel: (data: TransactionSchema, included?: IncludedMapping): Transaction => {
-    const conversionId = data.relationships?.conversion?.data?.id;
+    // TODO(2024-04-10): Figure out why this was removed from the API
+    // const conversionId = data.relationships?.conversion?.data?.id;
     const billId = data.relationships?.bill?.data?.id;
     const payerId = data.relationships?.payer?.data.id;
     const beneficiaryId = data.relationships?.beneficiary?.data.id;
@@ -129,8 +102,8 @@ export const transactionParser = {
         type: data.attributes.paymentType,
         method: data.attributes.paymentMethod,
       },
-      conversionId,
-      conversion: included?.conversions?.find(({ id }) => id === conversionId),
+      // conversionId,
+      // conversion: included?.conversions?.find(({ id }) => id === conversionId),
       billId,
       bill: included?.bills?.find(({ id }) => id === billId),
       payerId,

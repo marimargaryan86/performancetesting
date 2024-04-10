@@ -1,12 +1,14 @@
-import type { Account, AccountSchema } from "./account";
+import type { Account } from "./account";
 import * as CommonSchemas from "~/integration/common/schemas";
 import type { IncludedMapping } from "./included";
-import { moneyParser, type Money, type MoneySchema } from "./money";
+import { moneyParser, type Money } from "./money";
+import type { GetOKResponse } from "~/integration/common/types";
+import type { Specification } from "./__generated__";
 
 export type Company = {
   id: string;
   name: string;
-  address: CommonSchemas.EnhancedAddressDetails;
+  address?: CommonSchemas.EnhancedAddressDetails;
   markups: {
     fx: number;
     processing: number;
@@ -21,44 +23,34 @@ export type Company = {
   account?: Account;
 };
 
-export type CompanySchema = {
-  id: string;
-  type: "companies";
-  attributes: {
-    name: string;
-    address: CommonSchemas.EnhancedAddressDetailsSchema;
-    fxMarkup: number;
-    processingMarkup: number;
-    salesMarkup: number;
-    feeAmounts: MoneySchema[];
-    feeMultiplier: number;
-    paymentType: "unspecified" | "card" | "bank-transfer";
-    paymentMethod: "unspecified" | "transactional" | "invoice";
-  };
-  relationships?: {
-    account?: { data: Pick<AccountSchema, "id" | "type"> };
-  };
-};
+export type CompanySchema = NonNullable<
+  GetOKResponse<Specification, "/companies/{companyId}">["data"]
+>;
 
 export const companyParser = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   toModel: (data: CompanySchema, included?: IncludedMapping): Company => {
-    const accountId = data.relationships?.account?.data.id;
+    // TODO(2024-04-10): Figure out why this was removed from the spec
+    // const accountId = data.relationships?.account?.data.id;
+
     return {
       id: data.id,
-      name: data.attributes.name,
-      address: CommonSchemas.enhancedAddressDetailsParser.toModel(data.attributes.address),
+      name: data.attributes.name ?? "",
+      address: data.attributes.address
+        ? CommonSchemas.enhancedAddressDetailsParser.toModel(data.attributes.address)
+        : undefined,
       markups: {
-        fx: data.attributes.fxMarkup,
-        processing: data.attributes.processingMarkup,
-        sales: data.attributes.salesMarkup,
-        reseller: data.attributes.feeAmounts.map(moneyParser.toModel),
+        fx: data.attributes.fxMarkup ?? 0,
+        processing: data.attributes.processingMarkup ?? 0,
+        sales: data.attributes.salesMarkup ?? 0,
+        reseller: data.attributes.feeAmounts?.map(moneyParser.toModel) ?? [],
       },
       payment: {
-        type: data.attributes.paymentType,
-        method: data.attributes.paymentMethod,
+        type: data.attributes.paymentType ?? "unspecified",
+        method: data.attributes.paymentMethod ?? "unspecified",
       },
-      accountId,
-      account: included?.accounts?.find(({ id }) => id === accountId),
+      // accountId,
+      // account: included?.accounts?.find(({ id }) => id === accountId),
     };
   },
 };

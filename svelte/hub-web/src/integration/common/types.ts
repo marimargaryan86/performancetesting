@@ -47,3 +47,8 @@ export type PostRequest<
   TSpecification extends Specification,
   TResource extends keyof TSpecification,
 > = GetRequest<TSpecification, TResource, "post">;
+
+export type PatchRequest<
+  TSpecification extends Specification,
+  TResource extends keyof TSpecification,
+> = GetRequest<TSpecification, TResource, "patch">;

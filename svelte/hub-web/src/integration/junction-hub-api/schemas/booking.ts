@@ -1,19 +1,20 @@
-import type { BookingCancellation, BookingCancellationSchema } from "./cancellation";
+import type { BookingCancellation } from "./cancellation";
 import type { IncludedMapping } from "./included";
-import type { Order, OrderSchema } from "./order";
+import type { Order } from "./order";
 import * as CommonSchemas from "~/integration/common/schemas";
-import type { Transaction, TransactionSchema } from "./transaction";
-import type { Refund, RefundSchema } from "./refund";
+import type { Transaction } from "./transaction";
+import type { Refund } from "./refund";
+import type { GetIncluded, GetOKResponse } from "~/integration/common/types";
+import type { Specification } from "./__generated__";
 
 export type OfferSegmentDetailRule = {
   title: string;
   body: string;
 };
 
-export type OfferSegmentDetailRuleSchema = {
-  title: string;
-  body: string;
-};
+export type OfferSegmentDetailRuleSchema = NonNullable<
+  TripBookingSchema["attributes"]["rules"]
+>[number];
 
 export const offerSegmentDetailRuleParser = {
   toModel: (data: OfferSegmentDetailRuleSchema): OfferSegmentDetailRule => ({ ...data }),
@@ -34,23 +35,10 @@ export type TripBookingDetails = {
   legType?: CommonSchemas.LegType;
 };
 
-export type TripBookingDetailsSchema = {
-  id: string;
-  type: "trip-booking-details";
-  attributes: {
-    cabinClassName: string;
-    vendor: string;
-    operator: string | null;
-    routeIdentifiers: CommonSchemas.RouteIdentifiersSchema;
-    legs: CommonSchemas.OfferSegmentLegSchema[];
-  };
-  relationships: {
-    booking: { data: Pick<TripBookingSchema, "id" | "type"> };
-    cabinClass: { data: Pick<CommonSchemas.CabinClassSchema, "id" | "type"> };
-    legType: { data: Pick<CommonSchemas.LegTypeSchema, "id" | "type"> };
-  };
-  links: { self: string };
-};
+export type TripBookingDetailsSchema = GetIncluded<
+  GetOKResponse<Specification, "/journeys">,
+  "trip-booking-details"
+>;
 
 export const tripBookingDetailsParser = {
   toModel: (data: TripBookingDetailsSchema, included?: IncludedMapping): TripBookingDetails => {
@@ -115,35 +103,18 @@ export type TripBooking = {
   refund?: Refund;
 };
 
-export type TripBookingSchema = {
-  id: string;
-  type: "trip-bookings";
-  attributes: {
-    totalPrice: CommonSchemas.PriceSchema;
-    priceBreakdown?: CommonSchemas.PriceBreakdownSchema[];
-    operatorBookingReferences: string[];
-    externalReference: string;
-    rules?: OfferSegmentDetailRuleSchema[];
-    ticketUrls?: string[];
-  };
-  relationships: {
-    order: { data: Pick<OrderSchema, "id" | "type"> };
-    status: { data: Pick<BookingStatusSchema, "id" | "type"> };
-    details: { data: Pick<TripBookingDetailsSchema, "id" | "type">[] };
-    bookingCancellation: { data: Pick<BookingCancellationSchema, "id" | "type"> | null };
-    transaction: { data: Pick<TransactionSchema, "id" | "type"> | null };
-    refund: { data: Pick<RefundSchema, "id" | "type"> | null };
-  };
-  links: { self: string };
-};
+export type TripBookingSchema = GetIncluded<
+  GetOKResponse<Specification, "/journeys">,
+  "trip-bookings"
+>;
 
 export const tripBookingParser = {
   toModel: (data: TripBookingSchema, included?: IncludedMapping): TripBooking => {
     const orderId = data.relationships.order.data.id;
     const detailsIds = data.relationships.details.data.map(({ id }) => id);
-    const cancellationId = data.relationships.bookingCancellation.data?.id ?? undefined;
-    const transactionId = data.relationships.transaction.data?.id ?? undefined;
-    const refundId = data.relationships.refund.data?.id ?? undefined;
+    const cancellationId = data.relationships.bookingCancellation?.data?.id ?? undefined;
+    const transactionId = data.relationships.transaction?.data?.id ?? undefined;
+    const refundId = data.relationships.refund?.data?.id ?? undefined;
 
     return {
       id: data.id,
@@ -158,7 +129,7 @@ export const tripBookingParser = {
       externalReference: data.attributes.externalReference,
       rules: data.attributes.rules?.map(offerSegmentDetailRuleParser.toModel) ?? [],
       ticketUrls: data.attributes.ticketUrls ?? [],
-      status: data.relationships.status.data.id,
+      status: data.relationships.status.data.id as BookingStatusSchema["id"],
       orderId,
       order: included?.orders?.find(({ id }) => id === orderId),
       detailsIds,

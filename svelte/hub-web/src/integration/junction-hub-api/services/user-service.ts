@@ -6,8 +6,7 @@ import {
   type UserProfile,
   type UserProfileSchema,
   userProfileParser,
-  type UserCreate,
-  type UserUpdate,
+  type UserPut,
 } from "../schemas/user";
 import JunctionHubApiService from "./junction-hub-api-service";
 import type * as OrySchemas from "~/integration/ory/schemas";
@@ -39,17 +38,11 @@ export default class UserService extends JunctionHubApiService {
     return userParser.toModel(resp.json.data);
   }
 
-  async create({
-    session,
-    data,
-  }: {
-    session: OrySchemas.Session;
-    data: UserCreate;
-  }): Promise<User> {
+  async create({ session, data }: { session: OrySchemas.Session; data: UserPut }): Promise<User> {
     const resp = await this.makeRequest<{ data: UserSchema }>("/users", {
       session,
       method: "POST",
-      data: { data: userParser.toCreateSchema(data) },
+      data: { data: userParser.toPutSchema(data) },
     });
 
     return userParser.toModel(resp.json.data);
@@ -61,13 +54,13 @@ export default class UserService extends JunctionHubApiService {
     data,
   }: {
     session: OrySchemas.Session;
-    data: UserUpdate;
+    data: UserPut;
     id: string;
   }): Promise<User> {
     const resp = await this.makeRequest<{ data: UserSchema }>(`/users/${id}`, {
       session,
       method: "PATCH",
-      data: { data: userParser.toUpdateSchema(data) },
+      data: { data: userParser.toPutSchema(data) },
     });
 
     return userParser.toModel(resp.json.data);

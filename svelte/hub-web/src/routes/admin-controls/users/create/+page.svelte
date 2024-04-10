@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import UserComponent from "$lib/components/pages/admin-controls/user/user.svelte";
-  import type { UserCreate } from "~/integration/junction-hub-api/schemas";
+  import type { UserPut } from "~/integration/junction-hub-api/schemas";
   import routeConfig from "$lib/route-config";
   import type { BreadCrumb } from "$lib/models/ui";
   import { getTranslator } from "$lib/i18n";
@@ -21,7 +21,7 @@
 
   export let data;
 
-  const newUser: UserCreate = {
+  const newUser: UserPut = {
     email: "",
     role: "reseller-user",
     resellerId: "",

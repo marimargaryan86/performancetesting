@@ -1,8 +1,10 @@
 import * as CommonSchemas from "~/integration/common/schemas";
 import type { IncludedMapping } from "./included";
-import type { Order, OrderSchema } from "./order";
+import type { Order } from "./order";
 import type { DateRange } from "$lib/models/date-time";
 import type { BookingStatus } from "./booking";
+import type { GetOKResponse } from "~/integration/common/types";
+import type { Specification } from "./__generated__";
 
 export type ContactDetails = {
   email: string;
@@ -10,11 +12,7 @@ export type ContactDetails = {
   phone: string;
 };
 
-export type ContactDetailsSchema = {
-  email: string;
-  address: Required<Omit<CommonSchemas.EnhancedAddressDetailsSchema, "state">>;
-  phoneNumber: string;
-};
+export type ContactDetailsSchema = JourneySchema["attributes"]["contactDetails"];
 
 export const contactDetailsParser = {
   toModel: (data: ContactDetailsSchema): ContactDetails => ({
@@ -35,19 +33,7 @@ export type Journey = {
   orders: Order[];
 };
 
-export type JourneySchema = {
-  id: string;
-  type: "journeys";
-  attributes: {
-    createdAt: string;
-    reference: string;
-    contactDetails: ContactDetailsSchema;
-  };
-  relationships: {
-    orders: { data: Pick<OrderSchema, "id" | "type">[] };
-  };
-  links: { self: string };
-};
+export type JourneySchema = GetOKResponse<Specification, "/journeys/{journeyId}">["data"];
 
 export type JourneyFilterOptions = {
   departureAtRange?: DateRange;

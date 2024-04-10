@@ -1,30 +1,22 @@
 import * as CommonSchemas from "~/integration/common/schemas";
+import type { GetOKResponse, PostRequest } from "~/integration/common/types";
 import type * as OrySchemas from "~/integration/ory/schemas";
+import type { Specification } from "./__generated__";
 
 export type Reseller = {
   id: string;
-  name: string;
+  name?: string;
   providers?: string[];
 
-  // TODO(2024-03-11/alvin.s): fix `unknown` typing.
-  company?: unknown;
-  currency?: unknown;
-  parentResellers?: unknown;
+  // TODO(2024-03-11/alvin.s): fix typing.
+  company?: NonNullable<ResellerSchema["relationships"]>["company"];
+  currency?: NonNullable<ResellerSchema["relationships"]>["currency"];
+  parentResellers?: NonNullable<ResellerSchema["relationships"]>["parentResellers"];
 };
 
-export type ResellerSchema = {
-  id: string;
-  type: "resellers";
-  attributes: {
-    name: string;
-    providers?: string[];
-  };
-  relationships: {
-    company?: unknown;
-    currency?: unknown;
-    parentResellers?: unknown;
-  };
-};
+export type ResellerSchema = NonNullable<
+  GetOKResponse<Specification, "/resellers/{resellerId}">["data"]
+>;
 
 export const resellerParser = {
   toModel: (data: ResellerSchema): Reseller => ({
@@ -58,52 +50,31 @@ export type User = {
   reseller?: Reseller;
 };
 
-export type UserCreate = Omit<User, "id">;
+export type UserPut = Omit<User, "id">;
 
-export type UserUpdate = UserCreate;
+export type UserSchema = GetOKResponse<Specification, "/users/{userId}">["data"];
 
-export type UserSchema = {
-  id: string;
-  type: "users";
-  attributes: {
-    email: string;
-    role: OrySchemas.UserRole;
-  };
-  relationships: {
-    reseller?: { data: Pick<ResellerSchema, "id" | "type"> } | null;
-  };
-};
-
-export type UserCreateSchema = Omit<UserSchema, "id">;
-
-export type UserUpdateSchema = UserCreateSchema;
+export type UserPutSchema = PostRequest<Specification, "/users">["data"];
 
 export const userParser = {
   toModel: (data: UserSchema): User => ({
     id: data.id,
     email: data.attributes.email,
     role: data.attributes.role,
-    // Check if reseller is neither null nor undefined before accessing id
-    resellerId:
-      data.relationships.reseller && data.relationships.reseller.data
-        ? data.relationships.reseller.data.id
-        : undefined,
+    resellerId: data.relationships.reseller?.data.id,
     // TODO: include?
     reseller: undefined,
   }),
-  toCreateSchema: (data: UserCreate): UserCreateSchema => ({
+  toPutSchema: (data: UserPut): UserPutSchema => ({
     type: "users",
     attributes: {
       email: data.email,
       role: data.role,
     },
     relationships: {
-      reseller: data.resellerId ? { data: { id: data.resellerId, type: "resellers" } } : undefined,
+      reseller: data.resellerId ? { data: { id: data.resellerId, type: "resellers" } } : null,
     },
   }),
-  get toUpdateSchema(): (data: UserUpdate) => UserUpdateSchema {
-    return this.toCreateSchema;
-  },
 };
 
 export type UserProfile = {
@@ -120,22 +91,7 @@ export type UserProfile = {
   }[];
 };
 
-export type UserProfileSchema = {
-  id: string;
-  type: "users-profiles";
-  attributes: {
-    company: {
-      name: string;
-      address: CommonSchemas.EnhancedAddressDetailsSchema;
-    };
-    contacts: {
-      firstName: string;
-      lastName: string;
-      emailAddress: string;
-      phoneNumber: string;
-    }[];
-  };
-};
+export type UserProfileSchema = GetOKResponse<Specification, "/users/me">["data"];
 
 export const userProfileParser = {
   toModel: (data: UserProfileSchema): UserProfile => ({
