@@ -126,7 +126,7 @@ job "junction-rocket-api-http" {
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 SEARCHES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_searches-${var.environment}"))}}
-PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-rocket-places-grpc${var.environment}"))}}
+PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-rocket-places-grpc-${var.environment}"))}}
 RESELLER_J1_CREDENTIALS_MAPPING={{keyOrDefault "${var.environment}/rocket-api/reseller-j1-credentials-mapping" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/rocket-api" }}
 J_ONE_API_KEY={{ .Data.data.j_one_api_key }}
