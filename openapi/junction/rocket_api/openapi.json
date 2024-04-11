@@ -130,7 +130,7 @@
     },
     {
       "name": "places",
-      "description": "TODO: ...",
+      "description": "To search within any Junction vertical, you need at least one place to travel to, usually also a place to travel from! Our Places endpoint allows you to find these locations and identify which verticals you can search with them.",
       "x-displayName": "Places"
     },
     {
