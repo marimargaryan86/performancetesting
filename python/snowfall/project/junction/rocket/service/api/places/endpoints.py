@@ -101,6 +101,11 @@ class GetPlaces(endpoints.HTTPEndpoint):
                 if len(query_coordinates) == 3
                 else DEFAULT_RADIUS,
             )
+        place_to_search_within = request.scope["parsed_query_string"].get(
+            "query[placeToSearchWithin]",
+        )
+        if place_to_search_within:
+            filters_kwargs["place_to_search_within_id"] = str(place_to_search_within)
         response = await places.ListPlaces(
             places_pb2.ListPlacesRequest(
                 page_size=DEFAULT_PAGE_LIMIT

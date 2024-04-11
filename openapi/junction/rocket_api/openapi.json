@@ -999,6 +999,17 @@
               ]
             },
             "description": "Specifies a point to search for nearby places, within a radius ( radius is in meters ). Defined as `longitude,latitude,radius`"
+          },
+          {
+            "name": "query[placeToSearchWithin]",
+            "in": "query",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+            },
+            "description": "Specifies a place to search within, any further filtering will be applied to places it contains"
           }
         ],
         "responses": {

@@ -110,6 +110,7 @@ class TestGetPlaces:
                 "filter[name][like]": fixtures.PLACE_NAMES[0],
                 "query[coordinates]": "1,1,1",
                 "filter[type][eq]": "city",
+                "query[placeToSearchWithin]": "799d5f9f-ab7d-4c97-a866-da6e57875854",
                 "page[limit]": 5,
             },
         )
