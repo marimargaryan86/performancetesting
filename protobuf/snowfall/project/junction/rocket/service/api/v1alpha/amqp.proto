@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.api.v1alpha;
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/api/v1alpha";
+
+message CreatePayQuoteTask {
+  string reseller_id = 1;
+  string offer_id = 2;
+}
