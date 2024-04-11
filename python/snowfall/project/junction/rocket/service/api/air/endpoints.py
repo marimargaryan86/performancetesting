@@ -51,7 +51,11 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         search_id: str = request.path_params["id"]
 
-        search_status = "completed" if await repo.exists(search_id) else "processing"
+        search_status = (
+            "completed"
+            if await repo.find_any_result_by_search_id(search_id)
+            else "processing"
+        )
         response_model = {
             "id": search_id,
             "attributes": {
@@ -69,7 +73,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
         request: requests.Request,
         repo: AirSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
-        result_set = await repo.find_by_search_id(request.path_params["id"])
+        result_set = await repo.find_results_by_search_id(request.path_params["id"])
 
         data = [
             models.Resource(

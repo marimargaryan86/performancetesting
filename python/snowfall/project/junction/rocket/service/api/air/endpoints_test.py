@@ -61,9 +61,28 @@ async def test_air_search_creation_and_storage(
     assert response.status_code == 200
 
     result_id = response.json()["id"]
-    found_result = await air_search_repo.find_by_search_id(result_id)
+    found_result = await air_search_repo.find_results_by_search_id(result_id)
     async for result in found_result:
         assert result.id
+
+
+async def test_air_search_get_status(
+    client: httpx.AsyncClient,
+    mocker: MockerFixture,
+    example_request: Any,
+    example_search_flight_response: SearchFlightsResponse,
+) -> None:
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.search_flights",
+        return_value=example_search_flight_response,
+    )
+    response = await client.post("/air/searches", json=example_request)
+    search_id = response.json()["id"]
+
+    response = await client.get("/air/searches/{0}".format(search_id))
+
+    assert response.json()["attributes"]["status"] == "completed"
+    assert response.status_code == 200
 
 
 async def test_air_search_retrieval(
