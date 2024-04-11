@@ -145,7 +145,7 @@ EOF
 	done
 fi
 
-if [ ${#deployed_services[@]} -ne 0 ]; then
+if [ "${DEPLOYMENT_ENVIRONMENT}" == "development" ] && [ ${#deployed_services[@]} -ne 0 ]; then
 	# editorconfig-checker-disable
 	cat <<EOF
 
