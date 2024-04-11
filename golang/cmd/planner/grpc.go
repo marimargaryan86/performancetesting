@@ -94,6 +94,18 @@ func (ps *PlannerServiceServer) resolveOriginsDestinations(wantedOrigins []*v1St
 	return origins, destinations, nil
 }
 
+func uniqueTimestamp(slice []*timestamppb.Timestamp) []*timestamppb.Timestamp {
+	keys := make(map[string]struct{})
+	list := make([]*timestamppb.Timestamp, 0, len(slice))
+	for _, entry := range slice {
+		if _, value := keys[entry.String()]; !value {
+			keys[entry.String()] = struct{}{}
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
 func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.FindRoutesRequest) (*planner.FindRoutesResponse, error) {
 	origins, destinations, err := ps.resolveOriginsDestinations(req.Origins, req.Destinations)
 
@@ -123,125 +135,125 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 		return &planner.FindRoutesResponse{}, status.Error(codes.Unknown, "raptor returned an error")
 	}
 
-	routes := make([]*planner.FindRoutesResponse_Route, 0, len(results))
-	seen := make(map[string]*planner.FindRoutesResponse_Route, len(results))
+	a := &analyzer{
+		analyzed:        make(map[string]struct{}),
+		departureAfter:  departureAfter,
+		departureBefore: departureBefore,
+		departureTimes:  make(map[string][]time.Time),
+		repository:      ps.Repository,
+		tripCutoff:      tripCutoff,
+	}
 
 	for _, r := range results {
-		route := &planner.FindRoutesResponse_Route{
-			Segments: make([]*planner.FindRoutesResponse_Segment, 0, len(r.Segments)),
+		for _, s := range r.Segments {
+			if len(s.Stops) == 0 {
+				continue
+			}
+
+			a.analyze(s)
 		}
+	}
+
+	routesCache := make(map[string]*planner.FindRoutesResponse_Route)
+	segmentsCache := make(map[string]*planner.FindRoutesResponse_Segment)
+
+	for _, r := range results {
+		routeKeyParts := make([]string, 0, len(r.Segments))
 
 		for _, s := range r.Segments {
 			if len(s.Stops) == 0 {
 				continue
 			}
 
-			origin := h3.CellToLatLng(s.Stops[0].Cell)
-			destination := h3.CellToLatLng(s.Stops[len(s.Stops)-1].Cell)
+			origin := a.repository.ScheduleStopBySequence(s.Stops[0].Sequence)
+			destination := a.repository.ScheduleStopBySequence(s.Stops[len(s.Stops)-1].Sequence)
+			segmentKey := makeSegmentKey(origin, destination, s.Type)
+			routeKeyParts = append(routeKeyParts, segmentKey)
+
+			if _, ok := segmentsCache[segmentKey]; ok {
+				continue
+			}
+
+			originCoordinates := s.Stops[0].Cell.LatLng()
+			destinationCoordinates := s.Stops[len(s.Stops)-1].Cell.LatLng()
 			segmentType, ok := scheduleTypeToSegmentType[s.Type]
 
 			if !ok {
 				return &planner.FindRoutesResponse{}, status.Errorf(codes.Unknown, "unknown segment type: %d", s.Type)
 			}
 
-			route.Segments = append(route.Segments, &planner.FindRoutesResponse_Segment{
-				Origin: &v1Stdlib.LatLng{
-					Latitude:  origin.Lat,
-					Longitude: origin.Lng,
-				},
-				Destination: &v1Stdlib.LatLng{
-					Latitude:  destination.Lat,
-					Longitude: destination.Lng,
-				},
-				SegmentType: segmentType,
-			})
-		}
+			departureTimes := make([]*timestamppb.Timestamp, 0, len(a.departureTimes[segmentKey]))
+			dailyDepartures := uint32(0)
 
-		routeString := route.String()
-		route.EstimatedTravelTime = durationpb.New(r.Segments[len(r.Segments)-1].Arrive.Sub(r.Segments[0].Depart))
-
-		if v, ok := seen[routeString]; ok {
-			if v.EstimatedTravelTime.AsDuration() > route.EstimatedTravelTime.AsDuration() {
-				v.EstimatedTravelTime = route.EstimatedTravelTime
-			}
-			continue
-		}
-
-		minNumDepartures := uint32(math.MaxUint32)
-		segmentIdx := 0
-
-		for _, s := range r.Segments {
-			if len(s.Stops) == 0 {
-				continue
-			}
-
-			origin := ps.Repository.ScheduleStopBySequence(s.Stops[0].Sequence)
-			destination := ps.Repository.ScheduleStopBySequence(s.Stops[len(s.Stops)-1].Sequence)
-			schedules := ps.Repository.RouteBySequence(s.RouteIndex).GetSchedules()
-			idx := sliceutil.Index(schedules, s.ScheduleIndex)
-			numDepartures := uint32(1)
-			departureTimes := []*timestamppb.Timestamp{
-				timestamppb.New(time.Unix(int64(ps.Repository.ScheduleStopBySequence(
-					ps.Repository.ScheduleBySequence(s.ScheduleIndex).ScheduleStops[origin.Order],
-				).DepartureAt), 0)),
-			}
-
-			for i := idx - 1; i >= 0; i-- {
-				deparatureAt := time.Unix(int64(ps.Repository.ScheduleStopBySequence(
-					ps.Repository.ScheduleBySequence(schedules[i]).ScheduleStops[origin.Order],
-				).DepartureAt), 0)
-
-				if deparatureAt.After(tripCutoff) {
-					continue
-				}
-
-				if deparatureAt.Before(departureAfter) {
-					break
-				}
-
-				departureTimes = append(departureTimes, timestamppb.New(deparatureAt))
-
-				if deparatureAt.Before(departureBefore) {
-					numDepartures++
-				}
-			}
-
-			for i := idx + 1; i < len(schedules); i++ {
-				deparatureAt := time.Unix(int64(ps.Repository.ScheduleStopBySequence(
-					ps.Repository.ScheduleBySequence(schedules[i]).ScheduleStops[origin.Order],
-				).DepartureAt), 0)
-
-				if deparatureAt.Before(departureAfter) {
-					continue
-				}
-
-				if deparatureAt.After(tripCutoff) {
-					break
-				}
-
-				departureTimes = append(departureTimes, timestamppb.New(deparatureAt))
-
-				if deparatureAt.Before(departureBefore) {
-					numDepartures++
-				}
-			}
-
-			if numDepartures < minNumDepartures {
-				minNumDepartures = numDepartures
+			for _, dt := range a.departureTimes[segmentKey] {
+				departureTimes = append(departureTimes, timestamppb.New(dt))
 			}
 
 			sort.Slice(departureTimes, func(i, j int) bool {
 				return departureTimes[i].Seconds < departureTimes[j].Seconds
 			})
 
-			route.Segments[segmentIdx].EstimatedDepartureTimes = departureTimes
-			route.Segments[segmentIdx].EstimatedTravelTime = durationpb.New(time.Duration(destination.ArrivalAt-origin.DepartureAt) * time.Second)
-			segmentIdx++
+			departureTimes = uniqueTimestamp(departureTimes)
+
+			for _, dt := range departureTimes {
+				if dt.AsTime().After(departureAfter) && dt.AsTime().Before(departureBefore) {
+					dailyDepartures++
+				}
+			}
+
+			segment := &planner.FindRoutesResponse_Segment{
+				Origin: &v1Stdlib.LatLng{
+					Latitude:  originCoordinates.Lat,
+					Longitude: originCoordinates.Lng,
+				},
+				Destination: &v1Stdlib.LatLng{
+					Latitude:  destinationCoordinates.Lat,
+					Longitude: destinationCoordinates.Lng,
+				},
+				SegmentType:              segmentType,
+				EstimatedTravelTime:      durationpb.New(s.Arrive.Sub(s.Depart)),
+				EstimatedDepartureTimes:  uniqueTimestamp(departureTimes),
+				EstimatedDailyDepartures: dailyDepartures,
+			}
+			segmentsCache[segmentKey] = segment
 		}
 
-		route.EstimatedDailyDepartures = minNumDepartures
-		seen[routeString] = route
-		routes = append(routes, route)
+		routeKey := strings.Join(routeKeyParts, "_")
+		estimatedTravelTime := durationpb.New(r.Segments[len(r.Segments)-1].Arrive.Sub(r.Segments[0].Depart))
+
+		if v, ok := routesCache[routeKey]; ok {
+			if v.EstimatedTravelTime.AsDuration() > estimatedTravelTime.AsDuration() {
+				v.EstimatedTravelTime = estimatedTravelTime
+			}
+
+			continue
+		}
+
+		segments := make([]*planner.FindRoutesResponse_Segment, 0, len(routeKeyParts))
+		dailyDepartures := uint32(math.MaxInt32)
+
+		for _, s := range routeKeyParts {
+			segment := segmentsCache[s]
+
+			if segment.EstimatedDailyDepartures < dailyDepartures {
+				dailyDepartures = segment.EstimatedDailyDepartures
+			}
+
+			segments = append(segments, segment)
+		}
+
+		route := &planner.FindRoutesResponse_Route{
+			Segments:                 segments,
+			EstimatedDailyDepartures: dailyDepartures,
+			EstimatedTravelTime:      estimatedTravelTime,
+		}
+		routesCache[routeKey] = route
+	}
+
+	routes := make([]*planner.FindRoutesResponse_Route, 0, len(routesCache))
+
+	for _, r := range routesCache {
+		routes = append(routes, r)
 	}
 
 	return &planner.FindRoutesResponse{Routes: routes}, nil

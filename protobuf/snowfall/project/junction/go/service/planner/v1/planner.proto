@@ -43,6 +43,7 @@ message FindRoutesResponse {
     snowfall.project.junction.v1.SegmentType segment_type = 3;
     google.protobuf.Duration estimated_travel_time = 4;
     repeated google.protobuf.Timestamp estimated_departure_times = 5;
+    uint32 estimated_daily_departures = 6;
   }
 
   message Route {
