@@ -3,6 +3,7 @@ from typing import Any
 import httpx
 import pytest
 from pytest_mock import MockerFixture
+from starlette import status
 
 from snowfall.project.junction.rocket.service.api.hotel.repositories import (
     HotelRoomsSearchRepository,
@@ -215,3 +216,49 @@ async def test_hotel_rooms_search_returns_correct_results(
     response = await client.get("/hotel-rooms/searches/{0}/results".format(search_id))
     attributes = response.json()["data"]["attributes"]
     assert attributes["data"][0]["ref"] == fixture["rooms"][0]["ref"]
+
+
+async def test_fails_if_the_passenger_has_a_future_birthday(
+    client: httpx.AsyncClient,
+    example_request: Any,
+) -> None:
+    passenger = example_request["data"]["attributes"]["passengers"][0]
+    passenger["dateOfBirth"] = "3000-01-01"
+    response = await client.post("/hotel/searches", json=example_request)
+    assert response.json() == {
+        "errors": [
+            {
+                "code": "invalid_birthday",
+                "detail": "birthday cannot be in the future",
+                "source": {"pointer": "/data/attributes/passengers/0/dateOfBirth"},
+                "status": "422",
+            },
+        ],
+    }
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+async def test_fails_if_the_dates_are_the_past(
+    client: httpx.AsyncClient,
+    example_request: Any,
+) -> None:
+    example_request["data"]["attributes"]["checkinAt"] = "2000-08-24T00:00:00Z"
+    example_request["data"]["attributes"]["checkoutAt"] = "2000-08-24T00:00:00Z"
+    response = await client.post("/hotel/searches", json=example_request)
+    assert response.json() == {
+        "errors": [
+            {
+                "code": "invalid_checkin_date",
+                "detail": "checkin date cannot be in the past",
+                "source": {"pointer": "/data/attributes/checkinAt"},
+                "status": "422",
+            },
+            {
+                "code": "invalid_checkout_date",
+                "detail": "checkout date cannot be in the past",
+                "source": {"pointer": "/data/attributes/checkoutAt"},
+                "status": "422",
+            },
+        ],
+    }
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

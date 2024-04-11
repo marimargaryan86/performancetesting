@@ -1,6 +1,7 @@
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.junction.rocket.service.api.errors import RequestValidationError
 from snowfall.project.junction.rocket.service.api.hotel import types
 from snowfall.project.junction.rocket.service.api.hotel.models import (
     HotelRoomsSearchResult,
@@ -28,7 +29,11 @@ class HotelSearch(endpoints.HTTPEndpoint):
         hotel_search_result_transformer: types.HotelSearchResultTransformer = lagom.injectable,
         repo: HotelSearchRepository = lagom.injectable,
     ) -> responses.Response:
-        query = hotel_search_request_transformer.transform(await request.json())
+        try:
+            query = hotel_search_request_transformer.transform(await request.json())
+        except RequestValidationError as exc:
+            return models.JsonApiResponse.from_errors(exc.errors)
+
         response = await junction_one_client.search_hotels(query)
         transformed = hotel_search_result_transformer.transform(response)
 
@@ -53,14 +58,14 @@ class HotelSearchStatus(endpoints.HTTPEndpoint):
         repo: HotelSearchRepository = lagom.injectable,
     ) -> responses.Response:
         search_id: str = request.path_params["id"]
-
-        search_status = "completed" if await repo.exists(search_id) else "processing"
+        if not await repo.exists(search_id):
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
         return await messages.create_response(
             body=models.Body(
                 data=models.Resource(
                     id=search_id,
                     type="hotel-search",
-                    attributes={"status": search_status},
+                    attributes={"status": "completed"},
                 ),
             ),
             request=request,
@@ -126,13 +131,14 @@ class HotelRoomsSearchStatus(endpoints.HTTPEndpoint):
         repo: HotelRoomsSearchRepository = lagom.injectable,
     ) -> responses.Response:
         search_id: str = request.path_params["id"]
-        search_status = "completed" if await repo.exists(search_id) else "processing"
+        if not await repo.exists(search_id):
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
         return await messages.create_response(
             body=models.Body(
                 data=models.Resource(
                     id=search_id,
                     type="hotel-rooms-search",
-                    attributes={"status": search_status},
+                    attributes={"status": "completed"},
                 ),
             ),
             request=request,

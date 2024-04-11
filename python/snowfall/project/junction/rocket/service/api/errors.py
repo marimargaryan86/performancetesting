@@ -1,5 +1,5 @@
 import functools
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import ParamSpec, TypeVar
 
 import grpc
@@ -81,3 +81,8 @@ def _handle_grpc_exception(err: grpc.aio.AioRpcError) -> None:
             _handle_bad_request(status, err)
         elif isinstance(status, error_details_pb2.PreconditionFailure):
             _handle_unprocessable_entity(err)
+
+
+class RequestValidationError(Exception):
+    def __init__(self, errors: Sequence[models.Error]) -> None:
+        self.errors = errors

@@ -1320,6 +1320,7 @@
                   },
                   "passengers": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                       "$ref": "#/components/schemas/Passenger"
                     }
@@ -2203,11 +2204,14 @@
               "radius": {
                 "type": "number",
                 "format": "float",
+                "minimum": 0,
+                "exclusiveMinimum": true,
                 "description": "In kilometres.",
                 "example": 20.5
               },
               "passengers": {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                   "$ref": "#/components/schemas/Passenger"
                 }
