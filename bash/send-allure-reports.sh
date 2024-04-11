@@ -4,7 +4,7 @@ shopt -s nullglob
 
 ALLURE_PROJECT_ID=${1}
 ALLURE_SERVER="https://allureapi.junction.dev/allure-docker-service"
-allure_dir="/allure-integration-report/"
+allure_dir=${2}
 
 LOGIN_STRING='{"username": "'"$ALLURE_USERNAME"'", "password": "'"$ALLURE_PASSWORD"'"}'
 # login
@@ -17,7 +17,7 @@ CRSF_ACCESS_TOKEN_VALUE=$(grep <cookiesFile -o 'csrf_access_token.*' | cut -f2)
 
 # prepare the allure data
 counter=1
-amount=$(find ${allure_dir}* -prune -print | wc -l)
+amount=$(find "${allure_dir}"* -prune -print | wc -l)
 for file in "${allure_dir}"*; do
 	etext=$(base64 "${file}")
 	all_data+="{\"file_name\": \"${file##*/}\", \"content_base64\": \"$etext\"}"

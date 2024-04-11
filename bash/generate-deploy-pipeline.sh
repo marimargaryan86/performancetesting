@@ -153,9 +153,21 @@ acceptance-tests:
   stage: verify
   allow_failure: true
   interruptible: false
+  variables:
+  	ALLURE_REPORT_PATH: "/tmp/allure-integration-report/"
+    ALLURE_PROJECT_ID: "monorepo-acceptance-tests"
+    SLACK_NOTIFICATION_CHANNEL: "monorepo-acceptance-tests-result"
+  before_script:
+    - SLACK_THREAD_NUMBER=$(./slack-start-notification.sh "$SLACK_NOTIFICATION_TOKEN" "$SLACK_NOTIFICATION_CHANNEL" "$ALLURE_PROJECT_ID")
+    - echo $SLACK_THREAD_NUMBER > slack.txt
   script:
     - docker login -u "\${PIPELINE_REGISTRY_USER}" -p "\${PIPELINE_REGISTRY_USER_PASSWORD}" "\${CI_REGISTRY}"
-    - docker run --rm --pull=always git.snowfall.se:4567/junction/junction/junction/api-automation:latest -m verify --alluredir=/tmp/allure /bin/main/snowfall/project/junction/api_automation/ --HOST="\${VAULT_ADDR_DEV}" --API-TOKEN="\${VAULT_USER_DEV}+\${VAULT_PASS_DEV}"
+    - docker run -v "$ALLURE_REPORT_PATH:/allure-integration-report" --rm --pull=always git.snowfall.se:4567/junction/junction/junction/api-automation:latest -m verify --alluredir=/allure-integration-report/ /bin/main/snowfall/project/junction/api_automation/ --HOST="\${VAULT_ADDR_DEV}" --API-TOKEN="\${VAULT_USER_DEV}+\${VAULT_PASS_DEV}"
+  after_script:
+    - ./send-allure-reports.sh "$ALLURE_REPORT_PATH" "$ALLURE_PROJECT_ID"
+    - SLACK_THREAD_NUMBER=$(cat slack.txt)
+    - JOB_LINK=$(./send-allure-reports.sh "$ALLURE_REPORT_PATH" "$ALLURE_PROJECT_ID")
+    - ./slack-end-notification.sh "$SLACK_THREAD_NUMBER" "$JOB_LINK"
   tags:
     - shell
   needs:

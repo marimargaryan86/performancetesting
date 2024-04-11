@@ -7,6 +7,7 @@ integration:api_automation-tests:
     TEST_E2E_HOSTNAME: "${HOSTNAME}"
     API_TOKEN: "${API_TOKEN}"
     ALLURE_PROJECT_ID: "${ALLURE_PROJECT_ID}"
+    ALLURE_DIR: "/allure-integration-report/"
     PROJECT_NAME: "${PROJECT_NAME}"
     PROJECT_DIR: "${PROJECT_DIR}"
     SLACK_NOTIFICATION_CHANNEL: "${SLACK_NOTIFICATION_CHANNEL}"
@@ -19,7 +20,7 @@ integration:api_automation-tests:
     - ./bash/run-integration-tests.sh $PROJECT_DIR $TEST_E2E_HOSTNAME $API_TOKEN $ALLURE_PROJECT_ID $TESTING_SUITE
   after_script:
     - SLACK_THREAD_NUMBER=$(cat slack.txt)
-    - JOB_LINK=$(./bash/send-allure-reports.sh $ALLURE_PROJECT_ID)
+    - JOB_LINK=$(./bash/send-allure-reports.sh $ALLURE_PROJECT_ID $ALLURE_DIR)
     - ./bash/slack-end-notification.sh $SLACK_THREAD_NUMBER $JOB_LINK
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $PROJECT_NAME == "api_automation"'

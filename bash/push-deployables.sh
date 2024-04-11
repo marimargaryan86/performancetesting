@@ -86,10 +86,16 @@ for e in "${ENVIRONMENTS[@]}"; do
 	cp "bash/deploy.sh" "repo/deploy.sh"
 	cp "bash/promote-environment.sh" "repo/promote-environment.sh"
 	cp "bash/generate-deploy-pipeline.sh" "repo/generate-deploy-pipeline.sh"
+	cp "bash/send-allure-reports.sh" "repo/send-allure-reports.sh"
+	cp "bash/slack-start-notification.sh" "repo/slack-start-notification.sh"
+	cp "bash/slack-end-notification.sh" "repo/slack-end-notification.sh"
 
 	chmod +x "repo/deploy.sh"
 	chmod +x "repo/generate-deploy-pipeline.sh"
 	chmod +x "repo/promote-environment.sh"
+	chmod +x "repo/send-allure-reports.sh"
+	chmod +x "repo/slack-start-notification.sh"
+	chmod +x "repo/slack-end-notification.sh"
 
 	cd repo
 	git add --all .
