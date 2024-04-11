@@ -25,7 +25,7 @@ class CreditCardProvider:
     def create_credit_card_payment(
         self,
         payment: credit_card_models_pb2.CreditCardPayment,
-    ) -> credit_card_models_pb2.CreditCardPayment:
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Create payment."""
 
     @abstractmethod

@@ -15,7 +15,13 @@ from snowfall.project.junction.go.service.orders.v1.orders_pb2_grpc import (
 from snowfall.project.junction.go.service.resellers.v1.resellers_pb2_grpc import (
     ResellerServiceStub,
 )
-from snowfall.project.pay.adapter import companies, currencies, invoice_payment, refunds
+from snowfall.project.pay.adapter import (
+    companies,
+    credit_card_payment,
+    currencies,
+    invoice_payment,
+    refunds,
+)
 from snowfall.project.pay.service.companies.v1 import (
     grpc_pb2_grpc as companies_grpc_pb2,
 )
@@ -23,6 +29,9 @@ from snowfall.project.pay.service.companies.v1.grpc_pb2_grpc import (
     CompaniesServiceStub,
 )
 from snowfall.project.pay.service.currencies.v1 import currencies_pb2_grpc
+from snowfall.project.pay.service.payments.v1.credit_card_pb2_grpc import (
+    CreditCardPaymentServiceStub,
+)
 from snowfall.project.pay.service.payments.v1.invoice_pb2_grpc import InvoiceServiceStub
 from snowfall.project.pay.service.refunds.v1.grpc_pb2_grpc import RefundsServiceStub
 from snowfall.project.pay.service.transactions import cache, smtp, transactions
@@ -55,9 +64,7 @@ class _GrpcSettings(application.Settings):
     redis_dsn: pydantic.RedisDsn
     currencies_address: str
     companies_address: str
-    cc_login: str
-    cc_api_key: str
-    cc_address: str
+    credit_card_address: str
 
 
 class _ReportsSettings(application.Settings):
@@ -118,6 +125,14 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 invoices=transactions.InvoiceRepository(
                     mongo.invoices.invoices,
+                ),
+                credit_card_client=credit_card_payment.GrpcClient(
+                    CreditCardPaymentServiceStub(
+                        await grpc_factory.make_insecure_channel(
+                            app,
+                            app.settings.credit_card_address,
+                        ),
+                    ),
                 ),
             ),
             QuotationsService(

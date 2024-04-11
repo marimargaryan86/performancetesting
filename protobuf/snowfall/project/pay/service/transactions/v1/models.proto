@@ -31,6 +31,7 @@ message QuotationRates {
   float sales_markup = 4;
   float processing_markup = 5;
   int32 fee_multiplier = 6;
+  snowfall.project.pay.service.companies.v1.VerticalFee vertical_fee_config = 7;
 }
 
 enum TransactionStatus {
@@ -54,6 +55,7 @@ message Transaction {
   string bill_id = 11;
   TransactionStatus status = 12;
   string invoice_id = 13;
+  TransactionStatus charge_status = 14;
 }
 
 enum QuotationStatus {

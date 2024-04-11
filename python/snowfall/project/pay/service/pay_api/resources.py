@@ -43,6 +43,11 @@ class QuoteResource(models.Resource):
                 "feeAmount": money.from_protobuf(
                     quotation.amounts.fee_amount,
                 ).amount,
+                "feeMultiplier": quotation.rates.fee_multiplier,
+                "verticalType": protobuf.enum_value_to_slug(
+                    models_pb2.VerticalType.DESCRIPTOR,
+                    quotation.rates.vertical_fee_config.vertical_type,
+                ),
             },
             relationships={
                 "fromCurrency": {

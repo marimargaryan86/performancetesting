@@ -3,7 +3,7 @@ import types
 import grpc
 
 from snowfall.project.junction.go.adapter import errors as adapter_errors
-from snowfall.project.pay.adapter import companies, currencies
+from snowfall.project.pay.adapter import companies, credit_card_payment, currencies
 from snowfall.project.pay.service.transactions.cache import UserSessionRepository
 from snowfall.project.pay.service.transactions.quote import Quote
 from snowfall.project.pay.service.transactions.transactions import (
@@ -37,6 +37,7 @@ class TransactionsService(
         bills: BillsRepository,
         companies_client: companies.Client,
         invoices: InvoiceRepository,
+        credit_card_client: credit_card_payment.Client,
     ):
         self._transactions = transactions
         self._invoices = invoices
@@ -44,6 +45,7 @@ class TransactionsService(
         self._companies = companies_client
         self._sort = {"created_at": "created_at"}
         self._default_page_size = 20
+        self._credit_card_client = credit_card_client
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["TransactionsService"].full_name
@@ -131,6 +133,25 @@ class TransactionsService(
         transaction_id = string.uuid()
 
         payer = await self._companies.get(request.quotation.payer_id)
+        charge_amount = money.total(
+            [
+                money.from_protobuf(request.quotation.amounts.base_converted),
+                money.from_protobuf(request.quotation.amounts.tax_converted),
+            ],
+        )
+        try:
+            execution_status = await self._execute_payment(
+                charge_amount,
+                payer.payment_reference,
+            )
+        except adapter_errors.NotFoundError:
+            execution_status = False
+
+        charge_status = (
+            models_pb2.TransactionStatus.TRANSACTION_STATUS_SUCCEEDED
+            if execution_status
+            else models_pb2.TransactionStatus.TRANSACTION_STATUS_FAILED
+        )
         transaction = models_pb2.Transaction(
             id=transaction_id,
             external_reference_id=request.external_reference,
@@ -143,6 +164,7 @@ class TransactionsService(
             payment_method=payer.payment_method,
             bill_id=bill.id,
             status=models_pb2.TransactionStatus.TRANSACTION_STATUS_PENDING,
+            charge_status=charge_status,
         )
 
         inserted_transaction = await self._transactions.insert(transaction)
@@ -198,6 +220,25 @@ class TransactionsService(
             bill.total_amount.MergeFrom(added_amount.protobuf())
 
         return bill
+
+    async def _execute_payment(
+        self,
+        amount: money.Money,
+        payment_reference: str,
+    ) -> bool:
+        payment_intent = await self._credit_card_client.create_credit_card_payment(
+            amount=amount,
+            credit_card_holder_id=payment_reference,
+            enable_automatic_payment_method=True,
+            capture_method="automatic",
+            allow_redirect="never",
+        )
+
+        processed_payment = await self._credit_card_client.process_credit_card_payment(
+            payment_intent.id,
+        )
+
+        return processed_payment.status == "succeeded"
 
 
 class QuotationsService(

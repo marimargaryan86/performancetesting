@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Sequence
+from typing import Literal
 
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.pay.service.companies.v1 import (
@@ -12,6 +13,17 @@ from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models,
 )
 from snowfall.stdlib import money, string
+from snowfall.stdlib.format import protobuf
+
+VERTICALS = Literal[
+    "air",
+    "rail",
+    "hotel",
+    "bus",
+    "ferry",
+    "car",
+    "unspecified",
+]
 
 
 class Client(abc.ABC):
@@ -26,6 +38,7 @@ class Client(abc.ABC):
         session_token: str,
         tax: int,
         fee_multiplier: int,
+        vertical_type: VERTICALS = "unspecified",
     ) -> transactions_models.Quotation:
         """Create a quotation resource."""
 
@@ -58,6 +71,7 @@ class DictClient(Client):
         session_token: str,
         tax: int,
         fee_multiplier: int,
+        vertical_type: VERTICALS = "unspecified",
     ) -> transactions_models.Quotation:
         mock_from_amount = money.Money(amount, money.Currency(from_currency))
         mock_to_amount = money.Money(amount, money.Currency(to_currency))
@@ -127,6 +141,7 @@ class GrpcClient(Client):
         session_token: str,
         tax: int,
         fee_multiplier: int,
+        vertical_type: VERTICALS = "unspecified",
     ) -> transactions_models.Quotation:
         response = await errors.handle_grpc_errors(
             self._quotations.CreateQuotation(
@@ -139,6 +154,10 @@ class GrpcClient(Client):
                     session_token=session_token,
                     tax=tax,
                     fee_multiplier=fee_multiplier,
+                    vertical_type=protobuf.slug_to_enum_value(
+                        companies_models.VerticalType,
+                        vertical_type,
+                    ),
                 ),
             ),
         )

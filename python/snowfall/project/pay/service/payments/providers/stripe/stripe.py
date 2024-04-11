@@ -58,10 +58,10 @@ class Stripe(interfaces.CreditCardProvider):
             status=payment_intent.status,
         )
 
-    def create_credit_card_payment(
+    def create_credit_card_payment(  # noqa: WPS231
         self,
         payment: credit_card_models_pb2.CreditCardPayment,
-    ) -> credit_card_models_pb2.CreditCardPayment:
+    ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Create payment intent in stripe."""
         if not self._is_valid_capture_method(payment.capture_method):
             raise ValueError
@@ -76,22 +76,28 @@ class Stripe(interfaces.CreditCardProvider):
 
         intent_money = money.from_protobuf(payment.amount)
         if payment.credit_card_holder_id:
-            payment_intent = stripe.PaymentIntent.create(
-                amount=intent_money.amount,
-                currency=intent_money.currency.code,
-                capture_method=payment.capture_method,
-                customer=payment.credit_card_holder_id,
-                automatic_payment_methods=automatic_payment_methods,
-            )
+            try:
+                payment_intent = stripe.PaymentIntent.create(
+                    amount=intent_money.amount,
+                    currency=intent_money.currency.code,
+                    capture_method=payment.capture_method,
+                    customer=payment.credit_card_holder_id,
+                    automatic_payment_methods=automatic_payment_methods,
+                )
+            except stripe._error.InvalidRequestError:  # noqa: SLF001
+                return None
         else:
-            payment_intent = stripe.PaymentIntent.create(
-                amount=intent_money.amount,
-                currency=intent_money.currency.code,
-                capture_method=payment.capture_method,
-                automatic_payment_methods={
-                    "enabled": payment.enable_automatic_payment_method,
-                },
-            )
+            try:
+                payment_intent = stripe.PaymentIntent.create(
+                    amount=intent_money.amount,
+                    currency=intent_money.currency.code,
+                    capture_method=payment.capture_method,
+                    automatic_payment_methods={
+                        "enabled": payment.enable_automatic_payment_method,
+                    },
+                )
+            except stripe._error.InvalidRequestError:  # noqa: SLF001
+                return None
 
         payment.id = payment_intent.id
         payment.secret = payment_intent.client_secret or ""

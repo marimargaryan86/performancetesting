@@ -37,6 +37,7 @@ class Quote:
             getattr(self._company, "fee_amounts", []),
         )
         self._quotation_amounts = self._calculate_margins()
+        self._vertical_fee_config: None | company_models.VerticalFee = None
         self._vertical_amount = self._get_vertical_fee(
             getattr(self._company, "vertical_fees", []),
         )
@@ -72,6 +73,7 @@ class Quote:
                 sales_markup=self._company.sales_markup,
                 processing_markup=self._company.processing_markup,
                 fee_multiplier=self._fee_multiplier,
+                vertical_fee_config=self._vertical_fee_config,
             ),
             expires_at=datetime_to_protobuf(self._calculate_expires_at()),
             payer_id=self._company.id,
@@ -188,6 +190,7 @@ class Quote:
     ) -> money.Money:
         for fee in vertical_fees:
             if fee.vertical_type == self._vertical_type:
+                self._vertical_fee_config = fee
                 return self._calculate_vertical_fee(fee)
 
         return money.Money(0, self._to_currency)

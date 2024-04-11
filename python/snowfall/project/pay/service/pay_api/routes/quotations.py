@@ -82,6 +82,7 @@ class Quotations(endpoints.HTTPEndpoint):
             session_token=session_token,
             tax=body.get("tax", 0),
             fee_multiplier=body["feeMultiplier"],
+            vertical_type=body["verticalType"],
         )
 
         return await messages.create_response(

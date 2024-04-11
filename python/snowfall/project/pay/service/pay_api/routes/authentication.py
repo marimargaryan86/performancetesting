@@ -118,7 +118,11 @@ class Authenticate(endpoints.HTTPEndpoint):
             },
         }
 
-        return responses.JSONResponse(payload, status_code=status.HTTP_200_OK)
+        return responses.JSONResponse(
+            payload,
+            status_code=status.HTTP_200_OK,
+            media_type="application/vnd.api+json",
+        )
 
 
 class ChangePassword(endpoints.HTTPEndpoint):

@@ -1,5 +1,6 @@
 import abc
 from collections.abc import Mapping
+from typing import Literal
 
 from google.protobuf.json_format import ParseDict
 
@@ -48,6 +49,7 @@ class Client(abc.ABC):
         reseller_id: str = "",
         capture_method: str = "manual",
         setup_future_usage: str = "on_session",
+        allow_redirect: Literal["always", "never"] = "always",
     ) -> credit_card_models_pb2.CreditCardPayment:
         """Create credit card payment."""
 
@@ -77,6 +79,14 @@ class Client(abc.ABC):
         reseller_id: str = "",
     ) -> credit_card_models_pb2.CreditCardPayment | None:
         """Capture the credit card payment."""
+
+    @abc.abstractmethod
+    async def process_credit_card_payment(
+        self,
+        payment_id: str,
+        reseller_id: str = "",
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        """Execute payment."""
 
     @abc.abstractmethod
     async def create_refund(
@@ -147,6 +157,7 @@ class DictClient(Client):
         reseller_id: str = "",
         capture_method: str = "manual",
         setup_future_usage: str = "on_session",
+        allow_redirect: Literal["always", "never"] = "always",
     ) -> credit_card_models_pb2.CreditCardPayment:
         credit_card_payment_id = string.uuid()
         credit_card_payment = credit_card_models_pb2.CreditCardPayment(
@@ -157,6 +168,7 @@ class DictClient(Client):
             enable_automatic_payment_method=enable_automatic_payment_method,
             secret="Payment_Secret",  # noqa: S106
             setup_future_usage=setup_future_usage,
+            allow_redirect=allow_redirect,
         )
         self._credit_card_payments[credit_card_payment_id] = credit_card_payment
         return credit_card_payment
@@ -209,6 +221,16 @@ class DictClient(Client):
             return self._credit_card_payments[payment_id]
 
         raise errors.NotFoundError()
+
+    async def process_credit_card_payment(
+        self,
+        payment_id: str,
+        reseller_id: str = "",
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        if payment_id not in self._credit_card_payments:
+            raise errors.NotFoundError()
+
+        return self._credit_card_payments[payment_id]
 
     async def create_refund(
         self,
@@ -318,6 +340,7 @@ class GrpcClient(Client):
         reseller_id: str = "",
         capture_method: str = "manual",
         setup_future_usage: str = "on_session",
+        allow_redirect: Literal["always", "never"] = "always",
     ) -> credit_card_models_pb2.CreditCardPayment:
         payment_request = credit_card_pb2.CreateCreditCardPaymentRequest(
             payment=credit_card_models_pb2.CreditCardPayment(
@@ -326,13 +349,16 @@ class GrpcClient(Client):
                 capture_method=capture_method,
                 enable_automatic_payment_method=enable_automatic_payment_method,
                 setup_future_usage=setup_future_usage,
+                allow_redirect=allow_redirect,
             ),
             reseller_id=reseller_id,
         )
 
-        payment_response = await self._client.CreateCreditCardPayment(
-            payment_request,
-            timeout=self._timeout,
+        payment_response = await errors.handle_grpc_errors(
+            self._client.CreateCreditCardPayment(
+                payment_request,
+                timeout=self._timeout,
+            ),
         )
 
         return payment_response.payment
@@ -399,6 +425,22 @@ class GrpcClient(Client):
             ),
         )
         return capture_response.payment
+
+    async def process_credit_card_payment(
+        self,
+        payment_id: str,
+        reseller_id: str = "",
+    ) -> credit_card_models_pb2.CreditCardPayment:
+        process_response = await errors.handle_grpc_errors(
+            self._client.ProcessCreditCardPayment(
+                credit_card_pb2.ProcessCreditCardPaymentRequest(
+                    payment_id=payment_id,
+                    reseller_id=reseller_id,
+                ),
+            ),
+        )
+
+        return process_response.payment
 
     async def create_refund(
         self,

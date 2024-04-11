@@ -58,6 +58,12 @@ class CreditCardPaymentService(
         payment = self._provider(request.reseller_id).create_credit_card_payment(
             request.payment,
         )
+        if not payment:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Payment not created",
+            )
+
         return credit_card_pb2.CreateCreditCardPaymentResponse(payment=payment)
 
     async def UpdateCreditCardPayment(  # type: ignore[override] # noqa: N802

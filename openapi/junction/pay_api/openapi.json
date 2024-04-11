@@ -499,6 +499,18 @@
                     "type": "integer",
                     "example": 3,
                     "minimum": 1
+                  },
+                  "verticalType": {
+                    "type": "string",
+                    "example": "hotel",
+                    "enum": [
+                      "air",
+                      "rail",
+                      "hotel",
+                      "bus",
+                      "ferry",
+                      "car"
+                    ]
                   }
                 },
                 "required": [
@@ -507,7 +519,8 @@
                   "totalMarkups",
                   "serviceMarkup",
                   "feeAmount",
-                  "feeMultiplier"
+                  "feeMultiplier",
+                  "verticalType"
                 ]
               },
               "relationships": {
