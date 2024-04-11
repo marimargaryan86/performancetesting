@@ -1,0 +1,240 @@
+{
+  "info": {
+    "_postman_id": "4d4cd9e1-6eb3-4e90-bc5a-12637a776f79",
+    "name": "Air",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33483058"
+  },
+  "item": [
+    {
+      "name": "searches",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.id;",
+              "pm.collectionVariables.set(\"air_search_id\", search_id);",
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.attributes.status).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Search ID is saved to collection variables and is not empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData).to.be.an('object');",
+              "    pm.expect(responseData.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"air-searches\",\n        \"attributes\": {\n            \"criteria\": {\n                \"origin\": \"LAX\",\n                \"destination\": \"JFK\",\n                \"departureAt\": \"2024-04-24T14:15:22Z\"\n            },\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/air/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "air",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Response has the required fields - id and status\", function () {",
+              "  const responseData = pm.response.json();",
+              "",
+              "  pm.expect(responseData).to.be.an('object');",
+              "  pm.expect(responseData.id).to.exist;",
+              "  pm.expect(responseData.attributes.status).to.exist;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id is a non-empty string\", function () {",
+              "  const responseData = pm.response.json();",
+              "  ",
+              "  pm.expect(responseData.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status is a non-empty string\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.attributes.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/air/searches/{{air_search_id}}",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "air",
+            "searches",
+            "{{air_search_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}/results",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{junction_api_url}}/air/searches/{{air_search_id}}/results",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "air",
+            "searches",
+            "{{air_search_id}}",
+            "results"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "search_id",
+      "value": ""
+    },
+    {
+      "key": "air_search_id",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,311 @@
+{
+  "info": {
+    "_postman_id": "2293da8a-7613-497d-af14-6eb9fda4e700",
+    "name": "Hotel",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33483058"
+  },
+  "item": [
+    {
+      "name": "searches",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data.id;",
+              "pm.collectionVariables.set(\"hotel_search_id\", search_id);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n            \"type\": \"hotel-searches\",\n            \"attributes\": {\n                \"checkinAt\": \"2024-08-24T00:00:00Z\",\n                \"checkoutAt\": \"2024-08-26T00:00:00Z\",\n                \"latitude\": 48.8533,\n                \"longitude\": 2.34861,\n                \"radius\": 20,\n                \"passengers\": [{\"dateOfBirth\": \"1980-02-03\"}]\n            }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/hotel/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "hotel",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/hotel/searches/{{hotel_search_id}}",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "hotel",
+            "searches",
+            "{{hotel_search_id}}"
+          ]
+        },
+        "description": "Used to initiate a search for offers based on the provided Offer Search context."
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}/results",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var hotel_ref = json_data.data.attributes.data[0].refs[0];",
+              "pm.collectionVariables.set(\"hotel_ref\", hotel_ref);",
+              "console.log(hotel_ref)"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/hotel/searches/{{hotel_search_id}}/results",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "hotel",
+            "searches",
+            "{{hotel_search_id}}",
+            "results"
+          ]
+        },
+        "description": "Used to initiate a search for offers based on the provided Offer Search context."
+      },
+      "response": []
+    },
+    {
+      "name": "hotel-rooms/searches",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var hotel_room_search_id = json_data.data.id;",
+              "pm.collectionVariables.set(\"hotel_room_search_id\", hotel_room_search_id);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n            \"type\": \"hotel-rooms-searches\",\n            \"attributes\": {\n                \"ref\": \"{{hotel_ref}}\"\n            }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/hotel-rooms/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "hotel-rooms",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "hotel-rooms/searches/{search-id}",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/hotel-rooms/searches/{{hotel_room_search_id}}",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "hotel-rooms",
+            "searches",
+            "{{hotel_room_search_id}}"
+          ]
+        },
+        "description": "Used to initiate a search for offers based on the provided Offer Search context."
+      },
+      "response": []
+    },
+    {
+      "name": "hotel-rooms/searches/{search-id}/results",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/hotel-rooms/searches/{{hotel_room_search_id}}/results",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "hotel-rooms",
+            "searches",
+            "{{hotel_room_search_id}}",
+            "results"
+          ]
+        },
+        "description": "Used to initiate a search for offers based on the provided Offer Search context."
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "hotel_search_id",
+      "value": ""
+    },
+    {
+      "key": "hotel_ref",
+      "value": ""
+    },
+    {
+      "key": "hotel_room_search_id",
+      "value": ""
+    }
+  ]
+}
