@@ -2,6 +2,7 @@ import pathlib
 import string as pystring
 import uuid
 
+from snowfall.project.junction.rocket.provider import bookings
 from snowfall.project.junction.rocket.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.rocket.service.bookings.v1alpha import (
     amqp_pb2,
@@ -50,8 +51,6 @@ class Booker:
                         amount=price_quote.amount,
                         currency=money.Currency(price_quote.currency),
                     ).protobuf(),
-                    details=task.booking.trip_option.details,
-                    rules=task.booking.trip_option.rules,
                 ),
                 provider_booking=models_pb2.ProviderBooking(
                     booking_reference=string.uuid(),
@@ -114,6 +113,46 @@ class Transformer:
             trip=bookings_pb2.Booking.Trip(
                 record_locator=booking.provider_booking.record_locator,
             ),
+            prices=[
+                bookings_pb2.Booking.Price(
+                    type=bookings_pb2.Booking.Price.TYPE_TOTAL,
+                    amount=booking.trip_option.price,
+                ),
+            ],
             created_at=booking.created_at,
             updated_at=booking.updated_at,
+        )
+
+
+class CancellationHandler:
+    def __init__(
+        self,
+        booking_storage: filesystem.Storage,
+        transformer: bookings.Transformer,
+    ) -> None:
+        self._storage = booking_storage
+        self._transformer = transformer
+
+    async def cancel(self, identifier: str) -> bookings_pb2.BookingCancellation:
+        booking_raw = await self._storage.get(pathlib.Path(identifier))
+
+        if not booking_raw:
+            raise FileNotFoundError()
+
+        booking = await self._transformer(booking_raw)
+        price = next(
+            price
+            for price in booking.prices
+            if price.type == bookings_pb2.Booking.Price.TYPE_TOTAL
+        )
+
+        price_amount = money.Money(
+            amount=price.amount.units // 2,
+            currency=money.Currency(price.amount.currency_code),
+        )
+
+        return bookings_pb2.BookingCancellation(
+            provider_booking_reference=identifier,
+            status=bookings_pb2.BookingCancellation.STATUS_REFUND_DUE,
+            refunded_us=price_amount.protobuf(),
         )

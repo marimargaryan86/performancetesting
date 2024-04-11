@@ -60,6 +60,9 @@ async def _meta_factory() -> meta.MetaImplementation:
         identifier=PROVIDER_ID,
         name=_PROVIDER_NAME,
         search_capabilities=meta_pb2.SearchCapabilities(car_rental=True),
+        booking_capabilities=meta_pb2.BookingCapabilities(
+            supports_cancellation=True,
+        ),
     )
 
 
@@ -153,10 +156,15 @@ async def _bookings_factory(
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
+    raw_to_booking = bookings.Transformer().raw_to_booking
 
     return provider_bookings.Implementation(
         storage=storage,
-        transformer=bookings.Transformer().raw_to_booking,
+        transformer=raw_to_booking,
+        cancellation_handler=bookings.CancellationHandler(
+            booking_storage=storage,
+            transformer=raw_to_booking,
+        ).cancel,
     )
 
 
