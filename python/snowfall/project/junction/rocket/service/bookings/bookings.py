@@ -67,7 +67,7 @@ class BookingHandler:
 
         return await self.update_local_with_provider(
             local_booking=booking,
-            provider_booking=response.booking,
+            provider_booking=response.booking.booking,
         )
 
     async def update_local_with_provider(
