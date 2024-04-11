@@ -33,6 +33,7 @@ class AirSearchCriteria(BaseModel):
 class AirSearchAttributes(BaseModel):
     criteria: AirSearchCriteria
     passengers: list[Passenger]
+    selected_outbound_offer: str | None = None
 
 
 class AirSearchRequestData(BaseModel):
