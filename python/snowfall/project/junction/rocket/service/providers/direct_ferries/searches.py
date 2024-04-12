@@ -160,6 +160,7 @@ class SearchResultGenerator:
             raise SearchError("Inbound offer keys not found")
 
         inbound_offers = await self._offers_cache.mfetch(redis_keys)
+
         if not inbound_offers:
             raise SearchError("Inbound offers not found")
 
@@ -270,6 +271,16 @@ class SearchResultGenerator:
                 ferry_operator=models_pb2.FerryOperator(
                     id=first_leg.operator.identifier,
                     name=first_leg.operator.name,
+                ),
+                departure_date=datetime_pb2.DateTime(
+                    year=int(first_leg.departure_date_time.year),
+                    month=int(first_leg.departure_date_time.month),
+                    day=int(first_leg.departure_date_time.day),
+                    hours=int(first_leg.departure_date_time.hour),
+                    minutes=int(first_leg.departure_date_time.minute),
+                    seconds=int(first_leg.departure_date_time.second),
+                    nanos=int(first_leg.departure_date_time.microsecond),
+                    time_zone=datetime_pb2.TimeZone(id=origin.time_zone),
                 ),
                 arrival_date=datetime_pb2.DateTime(
                     year=int(last_leg.arrival_date_time.year),

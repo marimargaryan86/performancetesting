@@ -15,3 +15,7 @@ class OfferDetails(RedisRecord):
 
 class OffersCache(RedisRepository[OfferDetails]):
     _record_type: type[OfferDetails] = OfferDetails
+
+
+class QuoteCache(RedisRepository[OfferDetails]):
+    _record_type: type[OfferDetails] = OfferDetails

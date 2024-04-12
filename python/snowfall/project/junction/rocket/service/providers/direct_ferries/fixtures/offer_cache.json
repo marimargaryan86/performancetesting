@@ -1,0 +1,239 @@
+{
+  "quote": {
+    "selected_currency": "EUR",
+    "partner_code": "F5152",
+    "is_different_outbound_return": true,
+    "return_alternative_routes": false,
+    "is_open_ticket": false,
+    "legs": [
+      {
+        "is_return_leg": false,
+        "route_id": 81,
+        "departure_date_time": "2024-05-15T14:15:00",
+        "passengers": [
+          {
+            "age_range": {
+              "from": 18,
+              "to": 64
+            },
+            "is_wheelchair_user": false,
+            "is_lead_passenger": true,
+            "first_name": null,
+            "sur_name": null,
+            "email": "",
+            "telephone": "",
+            "nationality": "",
+            "passport_number": "",
+            "passport_place_of_issue": null,
+            "date_of_birth": null,
+            "identifier": 0,
+            "title": "",
+            "passenger_type": "Adult",
+            "sequence_no": 1,
+            "place_of_birth": "",
+            "passport_start_date": "",
+            "passport_expiry_date": "",
+            "city_code": "",
+            "extra_info": {
+              "ticket_reference": "",
+              "visa_number": "",
+              "visa_expiry": ""
+            }
+          },
+          {
+            "age_range": {
+              "from": 7,
+              "to": 7
+            },
+            "is_wheelchair_user": false,
+            "is_lead_passenger": false,
+            "first_name": null,
+            "sur_name": null,
+            "email": "",
+            "telephone": "",
+            "nationality": "",
+            "passport_number": "",
+            "passport_place_of_issue": null,
+            "date_of_birth": null,
+            "identifier": 0,
+            "title": "",
+            "passenger_type": "Child",
+            "sequence_no": 2,
+            "place_of_birth": "",
+            "passport_start_date": "",
+            "passport_expiry_date": "",
+            "city_code": "",
+            "extra_info": {
+              "ticket_reference": "",
+              "visa_number": "",
+              "visa_expiry": ""
+            }
+          }
+        ],
+        "vehicles": [
+          {
+            "type_id": 2,
+            "make_model_id": 2056,
+            "make": "Standard",
+            "model": "Car",
+            "height": 179,
+            "length": 469,
+            "additional_height": null,
+            "additional_length": null,
+            "trailer": null,
+            "registration": null
+          }
+        ],
+        "ticket_reference": "",
+        "operator": {
+          "identifier": 13,
+          "name": "Stena Line",
+          "connection_type": null
+        },
+        "route_name": "Hook of Holland - Harwich",
+        "accommodation_message": null,
+        "departure_port_name": "Hook of Holland",
+        "departure_port_id": 33,
+        "departure_port_code": "NLMDK",
+        "arrival_port_name": "Harwich",
+        "arrival_port_id": 29,
+        "arrival_port_code": "GBHRW",
+        "arrival_date_time": "2024-05-15T19:45:00",
+        "duration_minutes": 390,
+        "is_accommodation_compulsory": false,
+        "latest_check_in_minutes": 60,
+        "ship": {
+          "name": "",
+          "onboard_facilities": []
+        },
+        "accommodations": [],
+        "meals": [],
+        "pdf_url": "",
+        "pets": []
+      },
+      {
+        "is_return_leg": true,
+        "route_id": 33,
+        "departure_date_time": "2024-05-17T09:00:00",
+        "passengers": [
+          {
+            "age_range": {
+              "from": 18,
+              "to": 64
+            },
+            "is_wheelchair_user": false,
+            "is_lead_passenger": true,
+            "first_name": null,
+            "sur_name": null,
+            "email": "",
+            "telephone": "",
+            "nationality": "",
+            "passport_number": "",
+            "passport_place_of_issue": null,
+            "date_of_birth": null,
+            "identifier": 0,
+            "title": "",
+            "passenger_type": "Adult",
+            "sequence_no": 1,
+            "place_of_birth": "",
+            "passport_start_date": "",
+            "passport_expiry_date": "",
+            "city_code": "",
+            "extra_info": {
+              "ticket_reference": "",
+              "visa_number": "",
+              "visa_expiry": ""
+            }
+          },
+          {
+            "age_range": {
+              "from": 7,
+              "to": 7
+            },
+            "is_wheelchair_user": false,
+            "is_lead_passenger": false,
+            "first_name": null,
+            "sur_name": null,
+            "email": "",
+            "telephone": "",
+            "nationality": "",
+            "passport_number": "",
+            "passport_place_of_issue": null,
+            "date_of_birth": null,
+            "identifier": 0,
+            "title": "",
+            "passenger_type": "Child",
+            "sequence_no": 2,
+            "place_of_birth": "",
+            "passport_start_date": "",
+            "passport_expiry_date": "",
+            "city_code": "",
+            "extra_info": {
+              "ticket_reference": "",
+              "visa_number": "",
+              "visa_expiry": ""
+            }
+          }
+        ],
+        "vehicles": [
+          {
+            "type_id": 2,
+            "make_model_id": 2056,
+            "make": "Standard",
+            "model": "Car",
+            "height": 179,
+            "length": 469,
+            "additional_height": null,
+            "additional_length": null,
+            "trailer": null,
+            "registration": null
+          }
+        ],
+        "ticket_reference": "",
+        "operator": {
+          "identifier": 13,
+          "name": "Stena Line",
+          "connection_type": null
+        },
+        "route_name": "Harwich - Hook of Holland",
+        "accommodation_message": null,
+        "departure_port_name": "Harwich",
+        "departure_port_id": 29,
+        "departure_port_code": "GBHRW",
+        "arrival_port_name": "Hook of Holland",
+        "arrival_port_id": 33,
+        "arrival_port_code": "NLMDK",
+        "arrival_date_time": "2024-05-17T17:15:00",
+        "duration_minutes": 435,
+        "is_accommodation_compulsory": false,
+        "latest_check_in_minutes": 60,
+        "ship": {
+          "name": "",
+          "onboard_facilities": []
+        },
+        "accommodations": [],
+        "meals": [],
+        "pdf_url": "",
+        "pets": []
+      }
+    ],
+    "quote_token": "bqS57j5MkBvKLQ8YX2TAqpP154slzID56bluyK8X7BtBBmPUn7ZWaNZ5rySx8EmurDKSx4grtkXV2MYcCQ+S9MDO90qaLkleS4i0w8DI4KX8hATRDEGBCPDwn4fW3V/DcfgLKrCMrNzSdnhEMMljzD6B35IKUDPy4tV1tWF0sDtdId3J8NoxIDZOirNR8lpClQm7gn3m36JxTqKBZt3Lvnxkr/2W/6IpxwoL4R5JSYOAgBkuUvMXjwps1pxdD7P5NpSLyHEfyL0vsvZqHqimJfpwk1d85lyWn5eA3d5Cddk=",
+    "created_date_time": "2024-04-02T02:47:53",
+    "is_success": true,
+    "price": {
+      "total_in_selected_currency": 104.0
+    },
+    "is_special_offer": false,
+    "has_ticket_types": true,
+    "has_accommodations": true,
+    "pet_instructions": "",
+    "ticket_conditions": "This ticket is non-refundable",
+    "quote_messages": "",
+    "accommodation_message": "If available, onboard accommodation/seating/extras may be selected on the following page.  ",
+    "required_passenger_information": [
+      "Nationality"
+    ]
+  },
+  "round_trip_offer_cache_keys": [],
+  "redis_key": null
+}

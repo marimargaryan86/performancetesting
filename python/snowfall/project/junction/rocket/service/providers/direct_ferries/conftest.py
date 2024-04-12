@@ -18,20 +18,79 @@ from snowfall.project.junction.rocket.service.providers.direct_ferries import (
     cache,
     config,
     port,
+    pricing,
     route,
     searches,
 )
-from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
+from snowfall.project.junction.rocket.service.searches.v1alpha import (
+    amqp_pb2,
+    models_pb2,
+)
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.transport.amqp import consumer
 from snowfall.stdlib.v1 import date_pb2
 from snowfall.stdlib.v1.latlng_pb2 import LatLng
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.clients import auth, base
+from snowfall.vendor.direct_ferries.models import (
+    passenger,
+)
 
 CLIENT_SECRET = "1jhj5gve52o7b8puafh0n218iq77u2vva8oosemi063a9g62e3qg"
 CLIENT_ID = "3r2ha5jopuaphv9fctntqtraso"
 API_URL = "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com"
+
+
+@pytest.fixture()
+def mock_quote_message() -> consumer.Consumer[amqp_pb2.QuoteTask]:
+    with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as mock_message:
+        message = mock_message.return_value
+        message.body = amqp_pb2.QuoteTask(
+            quote=models_pb2.Quote(
+                offer_id="offer_id",
+            ),
+            reseller_id="reseller_id",
+        )
+
+        return message
+
+
+@pytest.fixture()
+async def mock_offer_details() -> cache.OfferDetails:
+    offer_cache = await load_file_fixture("offer_cache.json")
+    return cache.OfferDetails(**offer_cache)
+
+
+@pytest.fixture()
+def consumer_obj(
+    mock_quote_message: consumer.Consumer[amqp_pb2.QuoteTask],
+) -> consumer.Consumer[amqp_pb2.QuoteTask]:
+    return mock_quote_message
+
+
+@pytest.fixture()
+def quote_result_producer() -> mock.AsyncMock:
+    mock_qutote_result_producer = mock.create_autospec(pricing.QuoteResultProducer)
+    return mock_qutote_result_producer.return_value
+
+
+@pytest.fixture()
+def quote_task_consumer(
+    df_client: client.DfHttpClient,
+    consumer_obj: consumer.Consumer[amqp_pb2.QuoteTask],
+    quote_result_producer: pricing.QuoteResultProducer,
+    redis_client: aioredis.Redis[bytes],
+    ttl: datetime.timedelta,
+) -> pricing.QuoteTaskConsumer:
+    return pricing.QuoteTaskConsumer(
+        df_client=df_client,
+        consumer_obj=consumer_obj,
+        quote_result_producer=quote_result_producer,
+        offers_cache=cache.OffersCache(client=redis.Client[bytes](redis_client)),
+        quote_cache=cache.QuoteCache(client=redis.Client[bytes](redis_client)),
+        ttl=ttl,
+    )
 
 
 @pytest.fixture()
@@ -109,6 +168,13 @@ async def generator(
 
 
 @pytest.fixture()
+async def ttl() -> datetime.timedelta:
+    return datetime.timedelta(
+        minutes=config._OFFER_TTL_DEFAULT_MINUTES,  # noqa: SLF001
+    )
+
+
+@pytest.fixture()
 def one_way_search(
     origin: Mapping[str, Any],
     destination: Mapping[str, Any],
@@ -150,6 +216,18 @@ async def mock_one_way_response() -> AsyncIterator[Any]:
         mock_response = httpx.Response(200, content=response_json)
         mock_request.return_value = mock_response
         yield mock_request
+
+
+@pytest.fixture()
+def mock_combined_passenger_requirements() -> passenger.RoutePassengerInfo:
+    return passenger.RoutePassengerInfo(
+        need_nationality=True,
+        need_place_of_birth=False,
+        need_date_of_birth=False,
+        need_passport=False,
+        need_passport_start_date=False,
+        need_passport_expiry_date=False,
+    )
 
 
 @pytest.fixture()
