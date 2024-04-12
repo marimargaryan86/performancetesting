@@ -2275,10 +2275,6 @@
         "title": "Passenger",
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "example": "John Smith"
-          },
           "dateOfBirth": {
             "type": "string",
             "format": "date",
