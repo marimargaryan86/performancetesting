@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import uuid
 from collections.abc import AsyncIterable, Mapping, Sequence
+from types import MappingProxyType
 from typing import Any
 
 from pymongo import GEOSPHERE, IndexModel
@@ -23,10 +24,15 @@ from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 from snowfall.stdlib.v1 import latlng_pb2
 
-_RADIUS_TO_MATCH_NODE_WITH_PROVIDER_PLACE = 5000
-_RADIUS_TO_MATCH_PLACE_WITH_CITY = 50000
+_RADIUS_TO_MATCH_PLACE_WITH_CITY_M = 50000
+_RADIUS_TO_MATCH_PLACE_FOR_VERTICAL_M = MappingProxyType({
+    models_pb2.TYPE_RAILWAY_STATION: 500,
+    models_pb2.TYPE_FERRY_PORT: 500,
+    models_pb2.TYPE_AIRPORT: 5000,
+})
 _IATA_PATH = "search_capabilities.air.provider_place_id"
 _NAMESPACE = uuid.UUID("f9ec30af-54df-4bd3-8dd9-6c4b51341d6d")
+
 
 _logger = stdout.get_logger()
 
@@ -91,7 +97,7 @@ class PlaceRepository(
                     },
                     "$maxDistance": min(
                         max(radius, 10),
-                        _RADIUS_TO_MATCH_PLACE_WITH_CITY,
+                        _RADIUS_TO_MATCH_PLACE_WITH_CITY_M,
                     ),
                 },
             },
@@ -120,7 +126,7 @@ class PlaceRepository(
                     },
                     "$maxDistance": min(
                         max(radius, 10),
-                        _RADIUS_TO_MATCH_PLACE_WITH_CITY,
+                        _RADIUS_TO_MATCH_PLACE_WITH_CITY_M,
                     ),
                 },
             },
@@ -148,7 +154,7 @@ class PlaceRepository(
             coordinates = filters.coordinates_and_radius.coordinates
             radius = min(
                 max(filters.coordinates_and_radius.radius, 100),
-                _RADIUS_TO_MATCH_PLACE_WITH_CITY,
+                _RADIUS_TO_MATCH_PLACE_WITH_CITY_M,
             )
             filter_["coordinates"] = {
                 "$nearSphere": {
@@ -262,7 +268,7 @@ def get_provider_places(
                     float(node["geometry"]["coordinates"][1]),
                     float(node["geometry"]["coordinates"][0]),
                 ),
-                radius=_RADIUS_TO_MATCH_NODE_WITH_PROVIDER_PLACE,
+                radius=_RADIUS_TO_MATCH_PLACE_FOR_VERTICAL_M[vertical_type],
                 provider_places=provider_places,
             )
             if provider_place_mapped_to_node:
@@ -368,7 +374,7 @@ async def get_searchable_places_within_radius(
     places = await places_repository.find_within_radius(
         cursor="",
         coordinates=coordinates,
-        radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY,
+        radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY_M,
     )
     return [
         models_pb2.PlaceIdentifier(id=place.id, name=place.name, type=place.type)
@@ -453,7 +459,7 @@ async def tag_all_non_cities_against_a_city(places_repository: PlaceRepository) 
     async for place in await places_repository.find_by_types(types=non_city_types):
         closest_cities = await places_repository.find_within_radius(
             coordinates=place.coordinates,
-            radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY,
+            radius=_RADIUS_TO_MATCH_PLACE_WITH_CITY_M,
             types=[models_pb2.TYPE_CITY],
         )
 
