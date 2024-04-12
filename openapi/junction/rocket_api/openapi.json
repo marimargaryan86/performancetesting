@@ -991,8 +991,8 @@
             "explode": false,
             "schema": {
               "type": "array",
-              "minLength": 2,
-              "maxLength": 3,
+              "minItems": 2,
+              "maxItems": 3,
               "example": [
                 -123.4567,
                 45.6789
@@ -1813,15 +1813,15 @@
                 "type": "number",
                 "format": "float",
                 "example": 59.858611,
-                "minimum": -90.0,
-                "maximum": 90.0
+                "minimum": -90,
+                "maximum": 90
               },
               "longitude": {
                 "type": "number",
                 "format": "float",
                 "example": 59.858611,
-                "minimum": -180.0,
-                "maximum": 180.0
+                "minimum": -180,
+                "maximum": 180
               }
             },
             "required": [
@@ -2403,7 +2403,7 @@
                         "items": {
                           "$ref": "#/components/schemas/PlaceIdentifier"
                         },
-                        "minLength": 0
+                        "minItems": 0
                       }
                     }
                   }
@@ -2958,7 +2958,7 @@
         "required": false,
         "schema": {
           "type": "array",
-          "maxLength": 1,
+          "maxItems": 1,
           "items": {
             "pattern": "^[A-Z]{3}$",
             "type": "string",
