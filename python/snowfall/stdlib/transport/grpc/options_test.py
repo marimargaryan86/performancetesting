@@ -45,3 +45,18 @@ def test_read_only_struct_is_cleared() -> None:
     assert proto.read_only_struct
     options.clear_message_with_option(proto, "read_only")
     assert not proto.read_only_struct
+
+
+def test_clear_message_with_map() -> None:
+    proto = testing_pb2.Foobar(map={"foo": "bar"})
+
+    options.clear_message_with_option(proto, "read_only")
+    assert proto.map["foo"] == "bar"
+
+
+def test_read_only_map_is_cleared() -> None:
+    proto = testing_pb2.Foobar(read_only_map={"foo": "bar"})
+
+    assert proto.read_only_map
+    options.clear_message_with_option(proto, "read_only")
+    assert not proto.read_only_map
