@@ -35,14 +35,24 @@ _PROVIDER_NAME = "Silverrail"
 
 class _Settings(service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
-    subscription_key: str
-    api_base_url: pydantic.AnyUrl
+    api_base_url: pydantic.HttpUrl
     cert_base64: str
+    key_base64: str
+    distributor_code: str
+    pos_code: str
+    channel_code: str
 
 
 def cert_tmp_path(cert_base64: str) -> str:
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         tmp_file.write(base64.b64decode(cert_base64))
+
+        return tmp_file.name
+
+
+def key_tmp_path(key_base64: str) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(base64.b64decode(key_base64))
 
         return tmp_file.name
 
@@ -66,14 +76,21 @@ async def _search_factory(
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
             http2=True,
-            cert=cert_tmp_path(app.settings.cert_base64),
+            cert=(
+                cert_tmp_path(app.settings.cert_base64),
+                key_tmp_path(app.settings.key_base64),
+            ),
         ),
     )
     logging.register(http_client)
     metrics.register(http_client)
     silverrail_client = client.SilverrailClient(
-        subscription_key=app.settings.subscription_key,
         base_url=str(app.settings.api_base_url),
+        settings=client.SilverrailSettings(
+            distributor_code=app.settings.distributor_code,
+            pos_code=app.settings.pos_code,
+            channel_code=app.settings.channel_code,
+        ),
         http_client=http_client,
     )
 
