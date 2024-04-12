@@ -158,7 +158,7 @@ acceptance-tests:
     ALLURE_PROJECT_ID: "monorepo-acceptance-tests"
     SLACK_NOTIFICATION_CHANNEL: "monorepo-acceptance-tests-result"
   before_script:
-    - SLACK_THREAD_NUMBER=$(./slack-start-notification.sh "$SLACK_NOTIFICATION_TOKEN" "$SLACK_NOTIFICATION_CHANNEL" "$ALLURE_PROJECT_ID")
+    - SLACK_THREAD_NUMBER=$(./slack-start-notification.sh "${SLACK_NOTIFICATION_TOKEN}" "$SLACK_NOTIFICATION_CHANNEL" "$ALLURE_PROJECT_ID")
     - echo $SLACK_THREAD_NUMBER > slack.txt
   script:
     - docker login -u "\${PIPELINE_REGISTRY_USER}" -p "\${PIPELINE_REGISTRY_USER_PASSWORD}" "\${CI_REGISTRY}"
