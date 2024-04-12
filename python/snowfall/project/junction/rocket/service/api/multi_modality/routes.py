@@ -1,7 +1,10 @@
 import asyncio
 import contextlib
 import dataclasses
+import datetime
+import types
 from collections.abc import Iterable, Mapping
+from typing import Self
 
 import grpc
 
@@ -20,7 +23,23 @@ from snowfall.project.junction.rocket.service.places.v1alpha import (
     places_pb2,
     places_pb2_grpc,
 )
+from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.v1 import latlng_pb2
+
+_MCT_FLIGHT_PREFIX_MINUTES = 75
+_MCT_FLIGHT_SUFFIX_MINUTES = 45
+_MCT_TRAIN_PREFIX_MINUTES = 30
+_MCT_TRAIN_SUFFIX_MINUTES = 15
+_MCT_MAPPING = types.MappingProxyType({
+    segment_type_pb2.SEGMENT_TYPE_FLIGHT: (
+        datetime.timedelta(minutes=_MCT_FLIGHT_PREFIX_MINUTES),
+        datetime.timedelta(minutes=_MCT_FLIGHT_SUFFIX_MINUTES),
+    ),
+    segment_type_pb2.SEGMENT_TYPE_TRAIN: (
+        datetime.timedelta(minutes=_MCT_TRAIN_PREFIX_MINUTES),
+        datetime.timedelta(minutes=_MCT_TRAIN_SUFFIX_MINUTES),
+    ),
+})
 
 
 class _PlaceNotFoundError(ValueError):
@@ -31,6 +50,25 @@ class _PlaceNotFoundError(ValueError):
 class Segment:
     origin: models_pb2.Place
     destination: models_pb2.Place
+    type: segment_type_pb2.SegmentType.ValueType
+    mct_prefix: datetime.timedelta
+    mct_suffix: datetime.timedelta
+
+    @classmethod
+    def create(
+        cls,
+        origin: models_pb2.Place,
+        destination: models_pb2.Place,
+        segment_type: segment_type_pb2.SegmentType.ValueType,
+    ) -> Self:
+        mct = _MCT_MAPPING[segment_type]
+        return cls(
+            origin=origin,
+            destination=destination,
+            type=segment_type,
+            mct_prefix=mct[0],
+            mct_suffix=mct[1],
+        )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -59,10 +97,8 @@ class Routes:
         try:
             route_response = await self._planner.FindRoutes(
                 planner_pb2.FindRoutesRequest(
-                    origins=await self._find_location_coordinates(origin.coordinates),
-                    destinations=await self._find_location_coordinates(
-                        destination.coordinates,
-                    ),
+                    origins=await self._find_location_coordinates(origin),
+                    destinations=await self._find_location_coordinates(destination),
                 ),
             )
         except grpc.aio.AioRpcError as err:
@@ -91,11 +127,11 @@ class Routes:
 
     async def _find_location_coordinates(
         self,
-        coordinates: latlng_pb2.LatLng,
+        place: models_pb2.Place,
     ) -> list[latlng_pb2.LatLng]:
         found_locations = await self._locations.ListNearbyLocations(
             locations_pb2.ListNearbyLocationsRequest(
-                coordinates=coordinates,
+                coordinates=place.coordinates,
                 precision=locations_pb2.SearchPrecision(
                     mode=locations_pb2.SearchPrecision.MODE_AREA,
                 ),
@@ -118,13 +154,14 @@ class Routes:
     ) -> Route:
         return Route(
             segments=[
-                Segment(
+                Segment.create(
                     origin=resolved_places[
                         segment.origin.SerializeToString(deterministic=True)
                     ],
                     destination=resolved_places[
                         segment.destination.SerializeToString(deterministic=True)
                     ],
+                    segment_type=segment.segment_type,
                 )
                 for segment in route.segments
             ],
@@ -159,9 +196,7 @@ class Routes:
         coordinate: latlng_pb2.LatLng,
     ) -> tuple[bytes, models_pb2.Place]:
         try:
-            return coordinate.SerializeToString(
-                deterministic=True,
-            ), await self._places.GetPlaceClosestToCoordinates(
+            response = await self._places.GetPlaceClosestToCoordinates(
                 places_pb2.GetPlaceClosestToCoordinatesRequest(
                     coordinates_and_radius=models_pb2.CoordinatesAndRadius(
                         coordinates=coordinate,
@@ -171,3 +206,5 @@ class Routes:
             )
         except grpc.aio.AioRpcError as err:
             raise _PlaceNotFoundError from err
+
+        return coordinate.SerializeToString(deterministic=True), response.place
