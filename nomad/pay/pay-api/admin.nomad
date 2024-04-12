@@ -42,10 +42,6 @@ variable "count" {
   type = number
 }
 
-variable "cc_address" {
-  type = string
-}
-
 job "pay-pay-api-admin" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -148,7 +144,7 @@ job "pay-pay-api-admin" {
       }
 
       vault {
-        policies = ["currencycloud-${var.environment}", "pay-api-${var.environment}"]
+        policies = ["pay-api-${var.environment}"]
       }
 
       template {
@@ -162,10 +158,6 @@ AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-$
 COMPANIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_companies-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_pay-payments-${var.environment}"))}}
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
-{{ with secret "kv/data/${var.environment}/currencycloud" }}
-CC_LOGIN={{ .Data.data.cc_login }}
-CC_API_KEY={{ .Data.data.cc_api_key }}
-{{ end }}
 {{ with secret "kv/data/${var.environment}/pay-api" }}
 JWT_PUBLIC_KEY={{ .Data.data.jwt_public_key }}
 {{ end }}
@@ -193,7 +185,6 @@ EOH
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://025704ebb5d24063b1153935db50ffd5@sentry.snowfall.se/42"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
-        CC_ADDRESS            = "${var.cc_address}"
       }
     }
   }

@@ -23,9 +23,6 @@ class _GrpcSettings(application.Settings):
     mongo_dsn: Sequence[AnyUrl]
     currencies_address: str
     payments_address: str
-    cc_login: str
-    cc_api_key: str
-    cc_address: str
     consul_api_base_url: AnyUrl
     consul_api_token: str
     consul_api_version: str = "v1"

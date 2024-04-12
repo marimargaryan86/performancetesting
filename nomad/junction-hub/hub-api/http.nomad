@@ -34,10 +34,6 @@ variable "count" {
   type = number
 }
 
-variable "cc_address" {
-  type = string
-}
-
 job "junction-hub-hub-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -155,7 +151,7 @@ job "junction-hub-hub-api-http" {
       driver = "docker"
 
       vault {
-        policies = ["currencycloud-${var.environment}", "hub-api-${var.environment}"]
+        policies = ["hub-api-${var.environment}"]
       }
 
       template {
@@ -175,10 +171,6 @@ NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${v
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/data/${var.environment}/hub-api" }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
-{{ end }}
-{{ with secret "kv/data/${var.environment}/currencycloud" }}
-CC_LOGIN={{ .Data.data.cc_login }}
-CC_API_KEY={{ .Data.data.cc_api_key }}
 {{ end }}
 EOH
       }
@@ -204,7 +196,6 @@ EOH
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
-        CC_ADDRESS            = "${var.cc_address}"
       }
     }
   }

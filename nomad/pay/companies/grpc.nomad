@@ -26,10 +26,6 @@ variable "count" {
   type = number
 }
 
-variable "cc_address" {
-  type = string
-}
-
 job "pay-companies-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -109,7 +105,7 @@ job "pay-companies-grpc" {
       driver = "docker"
 
       vault {
-        policies = ["currencycloud-${var.environment}", "companies-${var.environment}"]
+        policies = ["companies-${var.environment}"]
       }
 
       template {
@@ -121,10 +117,6 @@ MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mong
 CURRENCIES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_currencies-${var.environment}"))}}
 PAYMENTS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_payments-${var.environment}"))}}
 CONSUL_API_BASE_URL={{(printf "http://%s:8500" (env "NOMAD_IP_grpc"))}}
-{{ with secret "kv/data/${var.environment}/currencycloud" }}
-CC_LOGIN={{ .Data.data.cc_login }}
-CC_API_KEY={{ .Data.data.cc_api_key }}
-{{ end }}
 {{ with secret "kv/data/${var.environment}/companies" }}
 CONSUL_API_TOKEN={{ .Data.data.consul_api_token }}
 {{ end }}
@@ -152,7 +144,6 @@ EOH
         SENTRY_DSN      = "https://29671bbbf0174dc895a038d20b89d269@sentry.snowfall.se/157"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         CURRENCIES      = "AUD JPY SAR BHD KES SGD BGN KWD ZAR CAD SEK CNY CHF CZK NZD THB DKK NOK TRY EUR OMR UGX HKD GBP HUF PLN AED QAR USD RON ILS"
-        CC_ADDRESS      = "${var.cc_address}"
       }
     }
   }

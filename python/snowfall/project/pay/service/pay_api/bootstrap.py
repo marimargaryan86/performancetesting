@@ -16,9 +16,6 @@ from snowfall.stdlib.integration.starlette import application
 
 
 class _Settings(application.Settings):
-    cc_login: str
-    cc_api_key: str
-    cc_address: str
     authentication_address: str
     transactions_address: str
     companies_address: str

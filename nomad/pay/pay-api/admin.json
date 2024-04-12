@@ -5,8 +5,7 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "adminapi.pay.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
-      "traefik_headers_accessControlAllowHeaders": "*",
-      "cc_address": "https://devapi.currencycloud.com/v2"
+      "traefik_headers_accessControlAllowHeaders": "*"
     }
   },
   "production": {
@@ -15,8 +14,7 @@
       "traefik_entrypoints": "web",
       "traefik_host_URL": "adminapi.pay.junction.travel",
       "traefik_headers_accesscontrolalloworiginlist": "https://adminapi.pay.junction.travel",
-      "traefik_headers_accessControlAllowHeaders": "*",
-      "cc_address": "https://api.currencycloud.com/v2"
+      "traefik_headers_accessControlAllowHeaders": "*"
     }
   },
   "sandbox": {
@@ -25,8 +23,7 @@
       "traefik_entrypoints": "websecure",
       "traefik_host_URL": "adminapi.pay.sandbox.junction.dev",
       "traefik_headers_accesscontrolalloworiginlist": "*",
-      "traefik_headers_accessControlAllowHeaders": "*",
-      "cc_address": "https://devapi.currencycloud.com/v2"
+      "traefik_headers_accessControlAllowHeaders": "*"
     }
   }
 }

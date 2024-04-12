@@ -62,9 +62,6 @@ from snowfall.stdlib.service import application, grpc_factory
 
 
 class Settings(starlette.Settings):
-    cc_login: str
-    cc_api_key: str
-    cc_address: str
     authentication_address: str
     orders_address: str
     companies_address: str
