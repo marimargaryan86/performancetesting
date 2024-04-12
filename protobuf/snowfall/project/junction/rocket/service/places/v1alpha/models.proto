@@ -20,15 +20,10 @@ message CoordinatesAndRadius {
   int32 radius = 2;
 }
 
-message ProviderPlaceId {
-  string snowfall_provider_id = 1;
-  string provider_place_id = 2;
-}
-
 message ProviderMappings {
-  repeated ProviderPlaceId rail = 1;
-  repeated ProviderPlaceId air = 2;
-  repeated ProviderPlaceId ferry = 3;
+  map<string, string> rail = 1;
+  map<string, string> air = 2;
+  map<string, string> ferry = 3;
 }
 
 message PlaceIdentifier {

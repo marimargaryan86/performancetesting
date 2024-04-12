@@ -8,6 +8,9 @@ import pytest_mock
 from snowfall.project.junction.rocket.service.api.air import repositories
 from snowfall.project.junction.rocket.service.api.air.transforms import transforms
 from snowfall.project.junction.rocket.service.api.multi_modality import routes, search
+from snowfall.project.junction.rocket.service.api.places.models.places import (
+    IATA_PROVIDER_ID,
+)
 from snowfall.project.junction.rocket.service.places.v1alpha import models_pb2
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -138,12 +141,12 @@ def mono_route() -> routes.Route:
             routes.Segment.create(
                 origin=models_pb2.Place(
                     search_capabilities=models_pb2.ProviderMappings(
-                        air=[models_pb2.ProviderPlaceId(provider_place_id="FOO")],
+                        air={IATA_PROVIDER_ID: "FOO"},
                     ),
                 ),
                 destination=models_pb2.Place(
                     search_capabilities=models_pb2.ProviderMappings(
-                        air=[models_pb2.ProviderPlaceId(provider_place_id="BAR")],
+                        air={IATA_PROVIDER_ID: "BAR"},
                     ),
                 ),
                 segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,

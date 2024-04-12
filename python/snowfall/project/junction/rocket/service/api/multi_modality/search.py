@@ -11,6 +11,9 @@ from snowfall.project.junction.rocket.service.api.air import models, repositorie
 from snowfall.project.junction.rocket.service.api.air.transforms import transforms
 from snowfall.project.junction.rocket.service.api.common import passengers
 from snowfall.project.junction.rocket.service.api.multi_modality import routes
+from snowfall.project.junction.rocket.service.api.places.models.places import (
+    IATA_PROVIDER_ID,
+)
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -256,8 +259,8 @@ class AirSearcher:
         return j1_models.SearchFlightsRequest(
             ods=[
                 j1_models.OriginDestinationRequest(
-                    arrival_airport=destination_capabilities[0].provider_place_id,
-                    departure_airport=origin_capabilities[0].provider_place_id,
+                    arrival_airport=destination_capabilities[IATA_PROVIDER_ID],
+                    departure_airport=origin_capabilities[IATA_PROVIDER_ID],
                     departure_date=request.departure_after.date(),
                 ),
             ],

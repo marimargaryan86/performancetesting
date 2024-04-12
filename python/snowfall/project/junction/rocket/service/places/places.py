@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 import uuid
-from collections.abc import AsyncIterable, Mapping, Sequence
+from collections.abc import AsyncIterable, Mapping, MutableMapping, Sequence
 from types import MappingProxyType
 from typing import Any
 
@@ -10,7 +10,6 @@ from pymongo import GEOSPHERE, IndexModel
 from snowfall.project.junction.rocket.service.places import constants, handlers
 from snowfall.project.junction.rocket.service.places.typing import (
     PlaceIdentifiers,
-    ProviderMappings,
     ProviderTypedDict,
 )
 from snowfall.project.junction.rocket.service.places.v1alpha import (
@@ -242,21 +241,19 @@ def get_provider_places(
     vertical_type: models_pb2.Type.ValueType,
     provider_jsons: ProviderTypedDict,
     iata: str | None,
-) -> ProviderMappings:
-    provider_places_mapped: ProviderMappings = {
-        models_pb2.TYPE_RAILWAY_STATION: [],
-        models_pb2.TYPE_FERRY_PORT: [],
-        models_pb2.TYPE_AIRPORT: [],
+) -> models_pb2.ProviderMappings:
+    provider_places_mapped: MutableMapping[
+        models_pb2.Type.ValueType,
+        MutableMapping[str, str],
+    ] = {
+        models_pb2.TYPE_AIRPORT: {},
+        models_pb2.TYPE_RAILWAY_STATION: {},
+        models_pb2.TYPE_FERRY_PORT: {},
     }
 
     # We assume that if we have an IATA, this counts as an 'Air Provider' place
     if iata:
-        provider_places_mapped[models_pb2.TYPE_AIRPORT].append(
-            models_pb2.ProviderPlaceId(
-                snowfall_provider_id=constants.IATA_ID,
-                provider_place_id=iata,
-            ),
-        )
+        provider_places_mapped[models_pb2.TYPE_AIRPORT][constants.IATA_ID] = iata
 
     # Process other providers
     for provider_type, provider in provider_jsons.items():
@@ -272,20 +269,22 @@ def get_provider_places(
                 provider_places=provider_places,
             )
             if provider_place_mapped_to_node:
-                provider_places_mapped[provider_type].append(
-                    models_pb2.ProviderPlaceId(
-                        snowfall_provider_id=provider_id,
-                        provider_place_id=provider_place_mapped_to_node,
-                    ),
+                provider_places_mapped[provider_type][provider_id] = (
+                    provider_place_mapped_to_node
                 )
-    return provider_places_mapped
+
+    return models_pb2.ProviderMappings(
+        air=provider_places_mapped[models_pb2.TYPE_AIRPORT],
+        rail=provider_places_mapped[models_pb2.TYPE_RAILWAY_STATION],
+        ferry=provider_places_mapped[models_pb2.TYPE_FERRY_PORT],
+    )
 
 
-def has_no_provider_places(provider_places: ProviderMappings) -> bool:
+def has_no_provider_places(provider_places: models_pb2.ProviderMappings) -> bool:
     return (
-        not provider_places[models_pb2.TYPE_AIRPORT]
-        and not provider_places[models_pb2.TYPE_RAILWAY_STATION]
-        and not provider_places[models_pb2.TYPE_FERRY_PORT]
+        not provider_places.air
+        and not provider_places.rail
+        and not provider_places.ferry
     )
 
 
@@ -350,11 +349,7 @@ async def osm_nodes_to_places(  # noqa: WPS231
                 ),
                 city=None,
                 type=vertical_type,
-                search_capabilities=models_pb2.ProviderMappings(
-                    rail=provider_places[models_pb2.TYPE_RAILWAY_STATION],
-                    ferry=provider_places[models_pb2.TYPE_FERRY_PORT],
-                    air=provider_places[models_pb2.TYPE_AIRPORT],
-                ),
+                search_capabilities=provider_places,
                 contains=None,
             )
 
@@ -388,22 +383,16 @@ def resolve_city_search_capabilities(
 ) -> models_pb2.ProviderMappings:
     iata = city.get("iata")
     benerail_station_id = city.get("benerail_station_id")
-    rail = None
-    air = None
+    rail = {}
+    air = {}
     if benerail_station_id:
-        rail = models_pb2.ProviderPlaceId(
-            snowfall_provider_id=constants.BENERAIL_ID,
-            provider_place_id=benerail_station_id,
-        )
+        rail = {constants.BENERAIL_ID: benerail_station_id}
     if iata:
-        air = models_pb2.ProviderPlaceId(
-            snowfall_provider_id=constants.IATA_ID,
-            provider_place_id=iata,
-        )
+        air = {constants.IATA_ID: iata}
     return models_pb2.ProviderMappings(
-        rail=([rail] if rail else None),
-        air=([air] if air else None),
-        ferry=[],
+        rail=rail,
+        air=air,
+        ferry={},
     )
 
 

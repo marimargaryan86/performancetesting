@@ -18,9 +18,4 @@ ProviderTypedDict: TypeAlias = dict[
     ProviderJsonDict,
 ]
 
-ProviderMappings: TypeAlias = dict[
-    models_pb2.Type.ValueType,
-    list[models_pb2.ProviderPlaceId],
-]
-
 PlaceIdentifiers: TypeAlias = list[models_pb2.PlaceIdentifier]

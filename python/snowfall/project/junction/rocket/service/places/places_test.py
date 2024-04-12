@@ -107,11 +107,11 @@ class TestPlaces:
             vertical_type=models_pb2.Type.TYPE_FERRY_PORT,
             provider_jsons=provider_jsons,
             iata=None,
-        ) == {
-            models_pb2.TYPE_RAILWAY_STATION: [],
-            models_pb2.TYPE_FERRY_PORT: [],
-            models_pb2.TYPE_AIRPORT: [],
-        }
+        ) == models_pb2.ProviderMappings(
+            air={},
+            rail={},
+            ferry={},
+        )
 
     @mock.patch(
         "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
@@ -131,20 +131,14 @@ class TestPlaces:
             vertical_type=models_pb2.TYPE_RAILWAY_STATION,
             provider_jsons=provider_json,
             iata=None,
-        ) == {
-            models_pb2.TYPE_RAILWAY_STATION: [
-                models_pb2.ProviderPlaceId(
-                    snowfall_provider_id="an-id",
-                    provider_place_id="a-provider-id",
-                ),
-                models_pb2.ProviderPlaceId(
-                    snowfall_provider_id="an-id-1",
-                    provider_place_id="a-provider-id",
-                ),
-            ],
-            models_pb2.TYPE_FERRY_PORT: [],
-            models_pb2.TYPE_AIRPORT: [],
-        }
+        ) == models_pb2.ProviderMappings(
+            rail={
+                "an-id": "a-provider-id",
+                "an-id-1": "a-provider-id",
+            },
+            ferry={},
+            air={},
+        )
 
     @mock.patch(
         "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
@@ -164,25 +158,16 @@ class TestPlaces:
             vertical_type=models_pb2.TYPE_RAILWAY_STATION,
             provider_jsons=provider_json,
             iata="LHR",
-        ) == {
-            models_pb2.TYPE_RAILWAY_STATION: [
-                models_pb2.ProviderPlaceId(
-                    snowfall_provider_id="an-id",
-                    provider_place_id="a-provider-id",
-                ),
-                models_pb2.ProviderPlaceId(
-                    snowfall_provider_id="an-id-1",
-                    provider_place_id="a-provider-id",
-                ),
-            ],
-            models_pb2.TYPE_FERRY_PORT: [],
-            models_pb2.TYPE_AIRPORT: [
-                models_pb2.ProviderPlaceId(
-                    snowfall_provider_id=constants.IATA_ID,
-                    provider_place_id="LHR",
-                ),
-            ],
-        }
+        ) == models_pb2.ProviderMappings(
+            rail={
+                "an-id": "a-provider-id",
+                "an-id-1": "a-provider-id",
+            },
+            ferry={},
+            air={
+                constants.IATA_ID: "LHR",
+            },
+        )
 
     @mock.patch(
         "snowfall.project.junction.rocket.service.places.handlers.place_within_radius",
@@ -202,11 +187,11 @@ class TestPlaces:
             vertical_type=models_pb2.TYPE_RAILWAY_STATION,
             provider_jsons=provider_json,
             iata=None,
-        ) == {
-            models_pb2.TYPE_RAILWAY_STATION: [],
-            models_pb2.TYPE_FERRY_PORT: [],
-            models_pb2.TYPE_AIRPORT: [],
-        }
+        ) == models_pb2.ProviderMappings(
+            rail={},
+            ferry={},
+            air={},
+        )
 
     async def test_osm_nodes_to_places_yields_empty_if_invalid_name(self) -> None:
         places = [
@@ -239,11 +224,11 @@ class TestPlaces:
         self,
         mock_provider_places: mock.Mock,
     ) -> None:
-        mock_provider_places.return_value = {
-            models_pb2.TYPE_RAILWAY_STATION: [],
-            models_pb2.TYPE_FERRY_PORT: [],
-            models_pb2.TYPE_AIRPORT: [],
-        }
+        mock_provider_places.return_value = models_pb2.ProviderMappings(
+            rail={},
+            ferry={},
+            air={},
+        )
         places = [
             place
             async for place in osm_nodes_to_places(
@@ -271,16 +256,13 @@ class TestPlaces:
         mock_provider_places: mock.Mock,
         mock_get_country_code_and_timezone: mock.Mock,
     ) -> None:
-        mock_provider_places.return_value = {
-            models_pb2.TYPE_RAILWAY_STATION: [],
-            models_pb2.TYPE_FERRY_PORT: [],
-            models_pb2.TYPE_AIRPORT: [
-                models_pb2.ProviderPlaceId(
-                    snowfall_provider_id="an-id",
-                    provider_place_id="123",
-                ),
-            ],
-        }
+        mock_provider_places.return_value = models_pb2.ProviderMappings(
+            rail={},
+            ferry={},
+            air={
+                "an-id": "123",
+            },
+        )
         mock_get_country_code_and_timezone.return_value = (
             "UK",
             "Europe/London",
@@ -401,14 +383,11 @@ class TestPlaces:
                 type=models_pb2.TYPE_AIRPORT,
                 name="A Name",
                 search_capabilities=models_pb2.ProviderMappings(
-                    rail=[
-                        models_pb2.ProviderPlaceId(
-                            snowfall_provider_id="an-id",
-                            provider_place_id="an-id",
-                        ),
-                    ],
-                    air=None,
-                    ferry=None,
+                    rail={
+                        "an-id": "an-id",
+                    },
+                    air={},
+                    ferry={},
                 ),
             )
 
@@ -520,19 +499,13 @@ class TestPlaces:
                     "benerail_station_id": "benerail-id",
                 },
                 models_pb2.ProviderMappings(
-                    rail=[
-                        models_pb2.ProviderPlaceId(
-                            snowfall_provider_id=constants.BENERAIL_ID,
-                            provider_place_id="benerail-id",
-                        ),
-                    ],
-                    air=[
-                        models_pb2.ProviderPlaceId(
-                            snowfall_provider_id=constants.IATA_ID,
-                            provider_place_id="LHR",
-                        ),
-                    ],
-                    ferry=None,
+                    rail={
+                        constants.BENERAIL_ID: "benerail-id",
+                    },
+                    air={
+                        constants.IATA_ID: "LHR",
+                    },
+                    ferry={},
                 ),
             ),
             (
@@ -545,12 +518,7 @@ class TestPlaces:
                 },
                 models_pb2.ProviderMappings(
                     rail=None,
-                    air=[
-                        models_pb2.ProviderPlaceId(
-                            snowfall_provider_id=constants.IATA_ID,
-                            provider_place_id="LHR",
-                        ),
-                    ],
+                    air={constants.IATA_ID: "LHR"},
                     ferry=None,
                 ),
             ),
@@ -563,14 +531,11 @@ class TestPlaces:
                     "benerail_station_id": "benerail-id",
                 },
                 models_pb2.ProviderMappings(
-                    rail=[
-                        models_pb2.ProviderPlaceId(
-                            snowfall_provider_id=constants.BENERAIL_ID,
-                            provider_place_id="benerail-id",
-                        ),
-                    ],
-                    air=None,
-                    ferry=None,
+                    rail={
+                        constants.BENERAIL_ID: "benerail-id",
+                    },
+                    air={},
+                    ferry={},
                 ),
             ),
         ],

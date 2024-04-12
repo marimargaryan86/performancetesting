@@ -9,6 +9,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
 
 _SELF_HREF: typing.Literal["self"] = "self"
+IATA_PROVIDER_ID = "d29f7e2e-b6e2-4d59-b33d-289aebbed3c0"
 
 
 class PlacesResource(models.Resource):
@@ -23,7 +24,7 @@ class PlacesResource(models.Resource):
         iata = None
         air = place.search_capabilities.air
         if air:
-            iata = air[0].provider_place_id
+            iata = air[IATA_PROVIDER_ID]
 
         return cls(
             id=place.id,

@@ -180,19 +180,13 @@ def get_place() -> places_pb2.Place:
         country_name="Germany",
         type=places_pb2.TYPE_CITY,
         search_capabilities=places_pb2.ProviderMappings(
-            rail=[
-                places_pb2.ProviderPlaceId(
-                    snowfall_provider_id="snowfall_provider_id_rail",
-                    provider_place_id="urn:bnds:tstatn_id:DEBRL",
-                ),
-            ],
-            air=[
-                places_pb2.ProviderPlaceId(
-                    snowfall_provider_id="snowfall_provider_id_air",
-                    provider_place_id=PLACE_IATAS[0],
-                ),
-            ],
-            ferry=[],
+            rail={
+                "snowfall_provider_id_rail": "urn:bnds:tstatn_id:DEBRL",
+            },
+            air={
+                "d29f7e2e-b6e2-4d59-b33d-289aebbed3c0": PLACE_IATAS[0],
+            },
+            ferry={},
         ),
         city=places_pb2.PlaceIdentifier(
             id="011c01bd-4e4b-5bf0-a999-ba66175c7f56",
