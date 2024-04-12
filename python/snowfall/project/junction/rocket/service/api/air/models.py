@@ -30,15 +30,28 @@ class AirSearchCriteria(BaseModel):
     return_departure_at: datetime | None = None
 
 
+class SelectedOutboundOfferData(BaseModel):
+    id: str
+    type: Literal["offers"]
+
+
+class SelectedOutboundOffer(BaseModel):
+    data: SelectedOutboundOfferData
+
+
+class AirSearchRelationships(BaseModel):
+    selected_outbound_offer: SelectedOutboundOffer
+
+
 class AirSearchAttributes(BaseModel):
     criteria: AirSearchCriteria
     passengers: list[Passenger]
-    selected_outbound_offer: str | None = None
 
 
 class AirSearchRequestData(BaseModel):
     type: Literal["air-searches"]
     attributes: AirSearchAttributes
+    relationships: AirSearchRelationships | None = None
 
 
 class AirSearchRequest(BaseModel):

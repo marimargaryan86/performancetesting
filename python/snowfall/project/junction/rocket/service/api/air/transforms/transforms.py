@@ -19,8 +19,9 @@ class SearchCriteriaUnfulfilledError(Exception):
 class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
     def transform_outbound_query(
         self,
-        attributes: rocket.AirSearchAttributes,
+        air_search_request: rocket.AirSearchRequest,
     ) -> j1.SearchFlightsRequest:
+        attributes = air_search_request.data.attributes
         return j1.SearchFlightsRequest(
             ods=[
                 j1.OriginDestinationRequest(
@@ -34,10 +35,12 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
 
     def transform_inbound_query(
         self,
-        attributes: rocket.AirSearchAttributes,
+        air_search_request: rocket.AirSearchRequest,
     ) -> j1.SearchFlightsRequest:
+        # TODO(jeremy): This is the selected_outbound_offer = air_search_request.data.relationships.selected_outbound_offer.data.id
         # TODO(jeremy): 1. Get search result using search_id (from mongo): search_id = attributes.selected_outbound_offer
         # TODO(jeremy): 2. Get flight ref from offers: outbound_flight_ref = offers.ref_id[0]
+        attributes = air_search_request.data.attributes
         outbound_flight_ref = "1P0_ABCDEFG"  # TODO(jeremy): fix hc
         return_departure_at = attributes.criteria.return_departure_at
 
@@ -69,12 +72,17 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
         self,
         value: Mapping[str, Any],
     ) -> j1.SearchFlightsRequest:
-        attributes = rocket.AirSearchAttributes(**value)
+        air_search_request = rocket.AirSearchRequest(**value)
 
-        if attributes.selected_outbound_offer:
-            search_flight_request = self.transform_inbound_query(attributes)
+        is_inbound = (
+            air_search_request.data.relationships
+            and air_search_request.data.relationships.selected_outbound_offer
+        )
+
+        if is_inbound:
+            search_flight_request = self.transform_inbound_query(air_search_request)
         else:
-            search_flight_request = self.transform_outbound_query(attributes)
+            search_flight_request = self.transform_outbound_query(air_search_request)
 
         return search_flight_request
 

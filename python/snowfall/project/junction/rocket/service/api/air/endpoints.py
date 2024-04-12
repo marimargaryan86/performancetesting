@@ -14,7 +14,6 @@ from snowfall.project.junction.rocket.service.api.air.types import (
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
-    request_helpers,
 )
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
@@ -28,7 +27,7 @@ class AirSearch(endpoints.HTTPEndpoint):
         air_search_result_transformer: AirSearchResultTransformer = lagom.injectable,
         repo: AirSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
-        body = await request_helpers.flatten_request(request)
+        body = await request.json()
 
         query = air_search_request_transformer.transform(body)
         response = await junction_one_client.search_flights(query)
