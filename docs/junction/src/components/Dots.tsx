@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 import '../css/dots.css';
 
-export default function Home(props): JSX.Element {
-    const label = props.label;
+interface IProps {
+    label?: string;
+}
 
+export default function Home({ label }: IProps): JSX.Element {
     return (
-        <section className="dots">
-            <img src="img/dots.svg" alt="dots"/>
-            <span>
-                {label}
-            </span>
+        <section className='dots'>
+            <img src='img/dots.svg' alt='dots' />
+            {label && <span>{label}</span>}
         </section>
     );
 }

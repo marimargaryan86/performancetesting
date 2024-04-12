@@ -38,7 +38,7 @@
 .welcomeText {
   text-align: center;
   padding: 0 24px 55px;
-  background-color: #F5F7F6;
+  background-color: #f5f7f6;
   background-image: url("/img/welcome-background.svg");
   background-size: cover;
   background-repeat: no-repeat;
@@ -46,16 +46,18 @@
 }
 
 ul {
-    text-align: left;
+  text-align: left;
 }
 
 .heroContainer {
-  width: 705px;
+  max-width: 705px;
+  width: 100%;
+  padding: 0 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  color: #FFF;
+  color: #fff;
 }
 
 .benefitSection {
@@ -79,7 +81,7 @@ ul {
   font-family: Raleway, sans-serif;
   font-size: 24px;
   line-height: 32px;
-  color: #17372F;
+  color: #17372f;
 }
 
 .benefitText {
@@ -102,7 +104,7 @@ ul {
   font-size: 18px;
   font-weight: 400;
   line-height: 24px;
-  color: #5F716C;
+  color: #5f716c;
 }
 
 .headerSection {
@@ -117,7 +119,7 @@ ul {
   font-weight: 700;
   line-height: 52px;
   margin: 24px;
-  color: #17372F;
+  color: #17372f;
 }
 
 .headerSection p {
@@ -127,13 +129,13 @@ ul {
   font-weight: 400;
   line-height: 28px;
   margin: 0;
-  color: #17372F;
+  color: #17372f;
 }
 
 .mailLink {
   text-decoration: underline;
   font-weight: 600;
-  color: #17372F;
+  color: #17372f;
 }
 
 .mailLink:hover {
@@ -142,4 +144,83 @@ ul {
 
 .container {
   padding: 0 24px;
+}
+
+.apiCardsContainer {
+  padding-left: 24px;
+  padding-right: 24px;
+  background-color: #f5f7f6;
+  background-image: url("/img/welcome-background.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* flex: 1; */
+}
+
+.apiCardsFlex {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-top: 16px;
+  padding-bottom: 32px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.apiCard {
+  display: flex;
+  align-items: flex-start;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 24px;
+  max-width: 405px;
+  gap: 16px;
+}
+
+.apiCard img {
+  margin-right: 0;
+}
+
+.apiCard h4 {
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  color: #17372f;
+  font-size: 22px;
+  margin: 0;
+  line-height: 26px;
+}
+
+.apiCard p {
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  color: #5f716c;
+  font-size: 16px;
+  line-height: 26px;
+  margin: 0;
+}
+
+.apiCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.apiCardContent a {
+  color: #4bb69c;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
+.apiCardIcon {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background-color: #4bb69c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

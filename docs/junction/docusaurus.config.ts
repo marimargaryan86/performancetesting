@@ -1,10 +1,11 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'WELCOME TO THE DEVELOPER PORTAL',
-  tagline: 'Within this portal you will find documentation, specifications, and guides on how best to integrate against Junction APIs.',
+  tagline:
+    'Snowfall covers all verticals of the travel tech ecosystem. The following APIs will let you search, book and perform post-booking features according to the content you are looking for.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -39,7 +40,7 @@ const config: Config = {
     [
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
+      {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
@@ -48,8 +49,7 @@ const config: Config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-      }),
-
+      },
     ],
   ],
   themes: ['@docusaurus/theme-mermaid'],
@@ -58,7 +58,7 @@ const config: Config = {
   },
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
+    {
       navbar: {
         title: 'Junction',
         logo: {
@@ -71,20 +71,19 @@ const config: Config = {
             sidebarId: 'resellers',
             position: 'left',
             label: 'Resellers',
-          }
+          },
         ],
       },
       footer: {
         style: 'dark',
-        links: [
-        ],
+        links: [],
         copyright: `Copyright © ${new Date().getFullYear()} Snowfall Limited.`,
       },
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
-    }),
+    },
 };
 
 export default config;
