@@ -236,7 +236,6 @@ class JunctionOneClient:
         query: auto_models.SearchFlightsRequest,
         rate_limit_timeout: float | None = None,
     ) -> auto_models.SearchFlightsResponse:
-        query.org_id = query.org_id or self._get_org_id_from_auth()
         response = await self._make_request(
             "POST",
             "/v1/travel/flight/search",
@@ -284,6 +283,8 @@ class JunctionOneClient:
         *,
         encode_json: bool = False,
     ) -> models.Response:
+        if hasattr(payload, "org_id"):  # noqa: WPS421
+            payload.org_id = payload.org_id or self._get_org_id_from_auth()
         if self._rate_limit_client and rate_limit_timeout:
             try:
                 await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
