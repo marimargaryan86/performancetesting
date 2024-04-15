@@ -6,6 +6,7 @@ from pytest_mock import MockerFixture
 
 from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
 from snowfall.project.junction.rocket.service.api.air.repositories import (
+    AirSearchRequestRepository,
     AirSearchResultRepository,
 )
 from snowfall.vendor.junction_one.conftest import load_file_fixture
@@ -37,11 +38,11 @@ def example_request() -> Any:
     }
 
 
-# TODO(reuben.t): this test will be invalidated by search repo work
 async def test_air_search_creation_and_storage(
     client: httpx.AsyncClient,
     mocker: MockerFixture,
     air_search_repo: AirSearchResultRepository,
+    air_search_request_repo: AirSearchRequestRepository,
     example_request: Any,
     example_search_flight_response: SearchFlightsResponse,
 ) -> None:
@@ -60,8 +61,12 @@ async def test_air_search_creation_and_storage(
     }
     assert response.status_code == 200
 
-    result_id = response.json()["id"]
-    found_result = await air_search_repo.find_results_by_search_id(result_id)
+    search_id = response.json()["id"]
+
+    found_request = await air_search_request_repo.find_by_search_id(search_id)
+    assert found_request.search_id == search_id
+
+    found_result = await air_search_repo.find_results_by_search_id(search_id)
     async for result in found_result:
         assert result.id
 

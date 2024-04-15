@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 from enum import Enum
 from typing import Literal
 
@@ -103,3 +103,20 @@ class AirSearchResult(BaseModel):
     provider_id: str
     offers: list[Offer]
     result_details: list[ResultDetails]
+
+
+def now_factory() -> datetime:
+    return datetime.now(tz=UTC)
+
+
+def expires_factory() -> datetime:
+    return now_factory() + timedelta(hours=1)
+
+
+class AirSearchRequestStorage(BaseModel):
+    search_id: str
+    reseller_id: str
+    expires_at: datetime = Field(default_factory=expires_factory)
+    created_at: datetime = Field(default_factory=now_factory)
+    updated_at: datetime = Field(default_factory=now_factory)
+    air: AirSearchAttributes

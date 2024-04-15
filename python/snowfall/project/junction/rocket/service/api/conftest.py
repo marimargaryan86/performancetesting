@@ -19,6 +19,7 @@ from snowfall.project.junction.rocket.service.api.air import (
     router as air_router,
 )
 from snowfall.project.junction.rocket.service.api.air.repositories import (
+    AirSearchRequestRepository,
     AirSearchResultRepository,
 )
 from snowfall.project.junction.rocket.service.api.air.transforms import (
@@ -152,6 +153,7 @@ def container(
     places_stub: places_pb2_grpc.PlacesServiceStub,
     junction_one_client: JunctionOneClient,
     air_search_repo: AirSearchResultRepository,
+    air_search_request_repo: AirSearchRequestRepository,
     hotel_search_repo: HotelSearchRepository,
     hotel_rooms_search_repo: HotelRoomsSearchRepository,
 ) -> lagom.Container:
@@ -163,6 +165,7 @@ def container(
     container[places_pb2_grpc.PlacesServiceStub] = places_stub
     container[JunctionOneClient] = junction_one_client
     container[AirSearchResultRepository] = air_search_repo
+    container[AirSearchRequestRepository] = air_search_request_repo
     container[AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer
     )
@@ -367,28 +370,28 @@ async def _list_places(
 
 
 @pytest.fixture()
-async def mock_collection(
+async def air_search_request_repo(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> motor_asyncio.AsyncIOMotorCollection:
-    return mongo_client["db"]["collection"]
+) -> AirSearchRequestRepository:
+    return AirSearchRequestRepository(collection=mongo_client["db"]["air_request"])
 
 
 @pytest.fixture()
 async def air_search_repo(
-    mock_collection: motor_asyncio.AsyncIOMotorCollection,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> AirSearchResultRepository:
-    return AirSearchResultRepository(collection=mock_collection)
+    return AirSearchResultRepository(collection=mongo_client["db"]["air_search"])
 
 
 @pytest.fixture()
 async def hotel_search_repo(
-    mock_collection: motor_asyncio.AsyncIOMotorCollection,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> HotelSearchRepository:
-    return HotelSearchRepository(collection=mock_collection)
+    return HotelSearchRepository(collection=mongo_client["db"]["hotel_search"])
 
 
 @pytest.fixture()
 async def hotel_rooms_search_repo(
-    mock_collection: motor_asyncio.AsyncIOMotorCollection,
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> HotelRoomsSearchRepository:
-    return HotelRoomsSearchRepository(collection=mock_collection)
+    return HotelRoomsSearchRepository(collection=mongo_client["db"]["hotel_rooms"])

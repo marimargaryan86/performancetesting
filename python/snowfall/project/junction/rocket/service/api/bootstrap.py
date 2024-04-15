@@ -108,6 +108,9 @@ async def create_dependencies(
             collection=mongo.searches.search_results,
         )
     )
+    container[repositories.AirSearchRequestRepository] = (
+        repositories.AirSearchRequestRepository(collection=mongo.searches.searches)
+    )
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer
     )

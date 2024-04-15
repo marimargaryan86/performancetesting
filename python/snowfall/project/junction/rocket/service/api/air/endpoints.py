@@ -4,7 +4,11 @@ import json
 import lagom
 from starlette import endpoints, requests, responses, status
 
+from snowfall.project.junction.rocket.service.api.air.models import (
+    AirSearchRequestStorage,
+)
 from snowfall.project.junction.rocket.service.api.air.repositories import (
+    AirSearchRequestRepository,
     AirSearchResultRepository,
 )
 from snowfall.project.junction.rocket.service.api.air.types import (
@@ -25,17 +29,29 @@ class AirSearch(endpoints.HTTPEndpoint):
         junction_one_client: JunctionOneClient = lagom.injectable,
         air_search_request_transformer: AirSearchRequestTransformer = lagom.injectable,
         air_search_result_transformer: AirSearchResultTransformer = lagom.injectable,
-        repo: AirSearchResultRepository = lagom.injectable,
+        request_repo: AirSearchRequestRepository = lagom.injectable,
+        result_repo: AirSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
-        body = await request.json()
+        request_data = await request.json()
 
-        query = air_search_request_transformer.transform(body)
+        query = air_search_request_transformer.transform(request_data)
+
         response = await junction_one_client.search_flights(query)
         transformed = air_search_result_transformer.transform(response)
-        await asyncio.gather(*(repo.insert(doc) for doc in transformed))
+
+        search_id = transformed[0].search_id
+        await request_repo.insert(
+            AirSearchRequestStorage(
+                search_id=search_id,
+                reseller_id="air",
+                air=request_data["data"]["attributes"],
+            ),
+        )
+
+        await asyncio.gather(*(result_repo.insert(doc) for doc in transformed))
 
         response_model = {
-            "id": transformed[0].search_id,
+            "id": search_id,
             "attributes": {
                 "status": "pending",
             },

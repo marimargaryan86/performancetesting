@@ -1,5 +1,23 @@
-from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
+from snowfall.project.junction.rocket.service.api.air.models import (
+    AirSearchRequestStorage,
+    AirSearchResult,
+)
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
+
+
+class AirSearchRequestRepository(
+    repository.PydanticRepository[AirSearchRequestStorage],
+    mixins.InsertMixin[AirSearchRequestStorage],
+    mixins.ExistsMixin[AirSearchRequestStorage],
+    mixins.FindByIdMixin[AirSearchRequestStorage],
+):
+    _model = AirSearchRequestStorage
+
+    async def find_by_search_id(
+        self,
+        identifier: str,
+    ) -> AirSearchRequestStorage:
+        return await self._execute(self._collection.find_one, {"search_id": identifier})
 
 
 class AirSearchResultRepository(
