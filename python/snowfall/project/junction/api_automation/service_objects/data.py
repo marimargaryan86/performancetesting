@@ -113,3 +113,31 @@ class HotelOfferResult(BaseResult):
     @property
     def offers(self) -> str:
         return get_nested_attribute(self._data, "data.attributes.data")
+
+    @property
+    def first_hotel_reference(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.data.0.refs.0")
+
+
+class HotelRoomSearchResult(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def id(self) -> str:
+        return get_nested_attribute(self._data, "data.id")
+
+    @property
+    def status(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.status")
+
+
+class HotelRoomOfferResult(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def offers(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.data")

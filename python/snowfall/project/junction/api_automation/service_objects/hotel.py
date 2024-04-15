@@ -9,6 +9,8 @@ from snowfall.project.junction.api_automation.service_objects.client_wrapper imp
 )
 from snowfall.project.junction.api_automation.service_objects.data import (
     HotelOfferResult,
+    HotelRoomOfferResult,
+    HotelRoomSearchResult,
     HotelSearchResult,
 )
 from snowfall.project.junction.api_automation.service_objects.helper import (
@@ -83,3 +85,53 @@ class HotelClient:
             method=METHOD_GET,
             url="/hotel/searches/{0}".format(search_id),
         )
+
+    async def room_search(
+        self,
+        ref: str | None,
+    ) -> HotelRoomSearchResult:
+        criteria: dict[str, Any] = {}
+
+        if ref is not None:
+            criteria["ref"] = ref
+
+        body = {
+            "data": {
+                "type": "hotel-rooms-searches",
+                "attributes": criteria,
+            },
+        }
+
+        url = "/hotel-rooms/searches"
+        result = await self._client.request(
+            method=METHOD_POST,
+            url=url,
+            payload=body,
+        )
+
+        return HotelRoomSearchResult(result)
+
+    async def wait_for_completed_room_search(
+        self,
+        search_id: str,
+    ) -> HotelRoomSearchResult:
+        search_status = await poll_until_condition_met(
+            request_func=lambda: self.get_room_search_result(search_id),
+            attribute_path="data.attributes.status",
+            success_value="completed",
+            error_message="Timeout reached and status was not completed.",
+        )
+        return HotelRoomSearchResult(search_status)
+
+    async def get_room_search_result(self, search_id: str) -> Mapping[str, Any]:
+        return await self._client.request(
+            method=METHOD_GET,
+            url="/hotel-rooms/searches/{0}".format(search_id),
+        )
+
+    async def get_room_offers(self, search_id: str) -> HotelRoomOfferResult:
+        result = await self._client.request(
+            method=METHOD_GET,
+            url="/hotel-rooms/searches/{0}/results".format(search_id),
+        )
+        return HotelRoomOfferResult(result)

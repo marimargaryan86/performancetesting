@@ -20,6 +20,11 @@ class InputSearchData:
     passengers: Sequence[datetime.date]
 
 
+@dataclass(frozen=True)
+class RoomSearchData:
+    hotel_reference: str
+
+
 BASIC_SEARCH = InputSearchData(
     latitude=40.7127753,
     longitude=-74.0059728,
@@ -46,10 +51,12 @@ INVALID_SEARCH = InputSearchData(
     passengers=[datetime.date(2050, 2, 3)],
 )
 
+MOCK_ROOM_SEARCH = RoomSearchData(hotel_reference="1MCFNQB7eYY")
+
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
-async def test_hotel_search(
+async def test_hotel_search(  # noqa: WPS218,WPS217
     qa_client: QaClient,
 ) -> None:
     hotel_search = await qa_client.hotel.search(
@@ -71,6 +78,21 @@ async def test_hotel_search(
         search_id=hotel_search.id,
     )
     assert hotel_search_offers.offers
+
+    hotel_room_search = await qa_client.hotel.room_search(
+        ref=hotel_search_offers.first_hotel_reference,
+    )
+    assert hotel_room_search.id
+
+    hotel_room_search = await qa_client.hotel.wait_for_completed_room_search(
+        search_id=hotel_room_search.id,
+    )
+    assert hotel_room_search.status == "completed"
+
+    hotel_room_search_offers = await qa_client.hotel.get_room_offers(
+        search_id=hotel_room_search.id,
+    )
+    assert hotel_room_search_offers.offers
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -246,7 +268,10 @@ async def test_hotel_search_invalid(
     radius: int,
     passengers: Sequence[datetime.date],
 ) -> None:
-    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+    with pytest.raises(
+        HTTPStatusError,
+        match="Client error '400 Bad Request|422 Unprocessable Entity",
+    ):
         await qa_client.hotel.search(
             latitude=latitude,
             longitude=longitude,
@@ -281,3 +306,85 @@ async def test_hotel_get_offer_list_with_invalid_search_id(
         await qa_client.hotel.get_offers(
             search_id=invalid_search_id,
         )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_room_search_invalid(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.hotel.room_search(ref=None)
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_room_get_offers_result_with_invalid_search_id(
+    qa_client: QaClient,
+) -> None:
+    invalid_search_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+
+    with pytest.raises(HTTPStatusError, match="Client error '404 Not Found"):
+        await qa_client.hotel.get_room_search_result(
+            search_id=invalid_search_id,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_room_get_offer_list_with_invalid_search_id(
+    qa_client: QaClient,
+) -> None:
+    invalid_search_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+
+    with pytest.raises(HTTPStatusError, match="Client error '404 Not Found"):
+        await qa_client.hotel.get_room_offers(
+            search_id=invalid_search_id,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_mock_hotel_search(
+    qa_client: QaClient,
+) -> None:
+    hotel_search = await qa_client.hotel.search(
+        latitude=BASIC_SEARCH.latitude,
+        longitude=BASIC_SEARCH.longitude,
+        checkin_at=BASIC_SEARCH.checkin_at,
+        checkout_at=BASIC_SEARCH.checkout_at,
+        radius=BASIC_SEARCH.radius,
+        passengers=BASIC_SEARCH.passengers,
+    )
+    assert hotel_search.id
+
+    hotel_search = await qa_client.hotel.wait_for_completed_search(
+        search_id=hotel_search.id,
+    )
+    assert hotel_search.status == "completed"
+
+    hotel_search_offers = await qa_client.hotel.get_offers(
+        search_id=hotel_search.id,
+    )
+    assert hotel_search_offers.first_hotel_reference == MOCK_ROOM_SEARCH.hotel_reference
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_mock_room_search(
+    qa_client: QaClient,
+) -> None:
+    hotel_room_search = await qa_client.hotel.room_search(
+        ref=MOCK_ROOM_SEARCH.hotel_reference,
+    )
+    assert hotel_room_search.id
+
+    hotel_room_search = await qa_client.hotel.wait_for_completed_room_search(
+        search_id=hotel_room_search.id,
+    )
+    assert hotel_room_search.status == "completed"
+
+    hotel_room_search_offers = await qa_client.hotel.get_room_offers(
+        search_id=hotel_room_search.id,
+    )
+    assert hotel_room_search_offers.offers
