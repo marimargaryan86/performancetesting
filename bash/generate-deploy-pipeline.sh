@@ -203,7 +203,6 @@ EOF
 		cat <<EOF
   needs:
     - verify
-    - acceptance-tests
 EOF
 		# editorconfig-checker-enable
 	fi
