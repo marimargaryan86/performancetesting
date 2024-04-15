@@ -2614,6 +2614,9 @@
           },
           {
             "$ref": "#/components/parameters/page-limit"
+          },
+          {
+            "$ref": "#/components/parameters/filterByNameLike"
           }
         ],
         "responses": {
@@ -3097,6 +3100,17 @@
         },
         "style": "form",
         "explode": false
+      },
+      "filterByNameLike": {
+        "name": "filter[name][like]",
+        "in": "query",
+        "required": false,
+        "description": "Filter for resellers based on a partial match of the reseller's name. Use for names with 3 or more characters.",
+        "schema": {
+          "minLength": 3,
+          "type": "string",
+          "example": "Doe"
+        }
       },
       "transactionId": {
         "name": "transactionId",

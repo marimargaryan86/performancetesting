@@ -3,7 +3,7 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.adapter import resellers
 from snowfall.project.junction.go.service.resellers.v1 import models_pb2
-from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api import filters, resources
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -22,6 +22,7 @@ class Resellers(endpoints.HTTPEndpoint):
         response = await client.list_resellers(
             limit=pagination.limit,
             cursor=pagination.cursor,
+            filter_by=filters.get_reseller_filters(request),
         )
 
         return await messages.create_response(

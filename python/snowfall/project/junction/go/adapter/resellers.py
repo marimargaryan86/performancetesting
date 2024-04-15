@@ -8,8 +8,14 @@ from google.protobuf.field_mask_pb2 import FieldMask
 from snowfall.project.junction.go.adapter import errors
 from snowfall.project.junction.go.service.resellers.v1 import (
     models_pb2,
-    resellers_pb2,
     resellers_pb2_grpc,
+)
+from snowfall.project.junction.go.service.resellers.v1.resellers_pb2 import (
+    CreateResellerRequest,
+    GetResellerRequest,
+    ListResellersRequest,
+    ListResellersResponse,
+    UpdateResellerRequest,
 )
 from snowfall.stdlib import sequence, string
 
@@ -21,7 +27,8 @@ class Client(abc.ABC):
         identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
-    ) -> resellers_pb2.ListResellersResponse:
+        filter_by: Sequence[ListResellersRequest.ResellerFilter] | None = None,
+    ) -> ListResellersResponse:
         """Fetch all reseller resources."""
 
     @abc.abstractmethod
@@ -60,12 +67,17 @@ class DictClient(Client):
         identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
-    ) -> resellers_pb2.ListResellersResponse:
+        filter_by: Sequence[ListResellersRequest.ResellerFilter] | None = None,
+    ) -> ListResellersResponse:
         resellers = list(self._resellers.values())
         if identifiers:
             resellers = [
                 reseller for reseller in resellers if reseller.id in identifiers
             ]
+
+        if filter_by:
+            names = [name_filter.name for name_filter in filter_by]
+            resellers = [reseller for reseller in resellers if reseller.name in names]
 
         page = sequence.paginate(
             sequence=resellers,
@@ -73,7 +85,7 @@ class DictClient(Client):
             limit=limit,
         )
 
-        return resellers_pb2.ListResellersResponse(
+        return ListResellersResponse(
             resellers=page.sequence,
             next_page_token=page.cursor,
         )
@@ -150,10 +162,12 @@ class GrpcClient(Client):
         identifiers: Sequence[str] | None = None,
         limit: int | None = None,
         cursor: str | None = None,
-    ) -> resellers_pb2.ListResellersResponse:
-        request = resellers_pb2.ListResellersRequest(
+        filter_by: Sequence[ListResellersRequest.ResellerFilter] | None = None,
+    ) -> ListResellersResponse:
+        request = ListResellersRequest(
             ids=models_pb2.ListOfIds(ids=identifiers or []),
             page_token=cursor or "",
+            filter_by=filter_by,
         )
 
         if limit is not None:
@@ -171,7 +185,7 @@ class GrpcClient(Client):
     ) -> models_pb2.Reseller:
         response = await errors.handle_grpc_errors(
             self._resellers.GetReseller(
-                resellers_pb2.GetResellerRequest(
+                GetResellerRequest(
                     id=identifier,
                     fetch_child_resellers=fetch_child_resellers,
                 ),
@@ -187,7 +201,7 @@ class GrpcClient(Client):
     ) -> models_pb2.Reseller:
         response = await errors.handle_grpc_errors(
             self._resellers.CreateReseller(
-                resellers_pb2.CreateResellerRequest(
+                CreateResellerRequest(
                     reseller=reseller,
                 ),
                 timeout=self._timeout,
@@ -202,7 +216,7 @@ class GrpcClient(Client):
     ) -> models_pb2.Reseller:
         response = await errors.handle_grpc_errors(
             self._resellers.UpdateReseller(
-                resellers_pb2.UpdateResellerRequest(
+                UpdateResellerRequest(
                     reseller=reseller,
                     update_mask=FieldMask(
                         paths=[

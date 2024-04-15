@@ -4,6 +4,7 @@ from datetime import datetime
 from starlette import requests
 
 from snowfall.project.junction.go.service.orders.v1 import models_pb2, orders_pb2
+from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2
 from snowfall.stdlib.format import protobuf
 
 
@@ -17,6 +18,12 @@ def get_journey_filters(
     filter_params += _process_last_name_filter(request)
 
     return filter_params
+
+
+def get_reseller_filters(
+    request: requests.Request,
+) -> list[resellers_pb2.ListResellersRequest.ResellerFilter]:
+    return _process_name_filter(request)
 
 
 def _process_date_filters(
@@ -98,5 +105,21 @@ def _process_last_name_filter(
         orders_pb2.ListJourneysRequest.JourneyFilter(
             operator="like",
             last_name=last_name_filter.strip(),
+        ),
+    ]
+
+
+def _process_name_filter(
+    request: requests.Request,
+) -> list[resellers_pb2.ListResellersRequest.ResellerFilter]:
+    name_filter = request.query_params.get("filter[name][like]")
+
+    if name_filter is None:
+        return []
+
+    return [
+        resellers_pb2.ListResellersRequest.ResellerFilter(
+            operator="like",
+            name=name_filter.strip(),
         ),
     ]

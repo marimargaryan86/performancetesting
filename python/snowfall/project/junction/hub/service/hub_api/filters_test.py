@@ -4,12 +4,15 @@ from itertools import starmap
 import pytest
 from starlette import requests
 
-from snowfall.project.junction.hub.service.hub_api.filters import get_journey_filters
+from snowfall.project.junction.hub.service.hub_api.filters import (
+    get_journey_filters,
+    get_reseller_filters,
+)
 from snowfall.project.junction.hub.service.hub_api.routes.go_orders import Journeys
 
 
 @pytest.fixture()
-def query_params() -> Mapping[str, str]:
+def journey_query_params() -> Mapping[str, str]:
     return {
         "filter[createdAt][ge]": "2021-01-01",
         "filter[createdAt][le]": "2021-01-31",
@@ -22,22 +25,52 @@ def query_params() -> Mapping[str, str]:
 
 
 @pytest.fixture()
-def request_filters(query_params: Mapping[str, str]) -> requests.Request:
+def resellers_query_params() -> Mapping[str, str]:
+    return {
+        "filter[name][like]": "Res 1",
+    }
+
+
+@pytest.fixture()
+def journey_request_filters(
+    journey_query_params: Mapping[str, str],
+) -> requests.Request:
     query_string = "&".join(
-        starmap("{0}={1}".format, query_params.items()),
+        starmap("{0}={1}".format, journey_query_params.items()),
+    )
+
+    return requests.Request(scope={"query_string": query_string, "type": "http"})
+
+
+@pytest.fixture()
+def resellers_request_filters(
+    resellers_query_params: Mapping[str, str],
+) -> requests.Request:
+    query_string = "&".join(
+        starmap("{0}={1}".format, resellers_query_params.items()),
     )
 
     return requests.Request(scope={"query_string": query_string, "type": "http"})
 
 
 async def test_get_journey_filters(
-    request_filters: requests.Request,
+    journey_request_filters: requests.Request,
 ) -> None:
     status_mapping = Journeys._status_mapping  # noqa:SLF001
 
     filters = get_journey_filters(
-        request=request_filters,
+        request=journey_request_filters,
         status_mapping=status_mapping,
     )
 
     assert len(filters) == 7
+
+
+async def test_get_resellers_filters(
+    resellers_request_filters: requests.Request,
+) -> None:
+    filters = get_reseller_filters(
+        request=resellers_request_filters,
+    )
+
+    assert len(filters) == 1
