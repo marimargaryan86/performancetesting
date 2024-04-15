@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
     xz-utils \
+    yq \
 && curl -fsSL https://github.com/tmccombs/hcl2json/releases/download/v0.6.1/hcl2json_linux_amd64 -o /usr/local/bin/hcl2json \
 && chmod +x /usr/local/bin/hcl2json \
 && curl -fsSL https://go.dev/dl/go1.19.13.linux-amd64.tar.gz | tar xz -C /usr/local \
