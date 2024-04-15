@@ -125,7 +125,7 @@ class BookingService(
         )
 
         bookings_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         bookings_list = [booking async for booking in bookings_result]

@@ -1,5 +1,6 @@
 import datetime
 import gettext
+import operator
 from collections.abc import Iterable
 from typing import Any
 
@@ -50,7 +51,7 @@ def _order_details_sorted_by_date(
         for leg in detail.segment.legs
     ]
 
-    return sorted(detail_objects, key=lambda detail: detail["departure_at"])
+    return sorted(detail_objects, key=operator.itemgetter("departure_at"))
 
 
 def setup_translation_environment(user_language: str) -> jinja2.Environment:

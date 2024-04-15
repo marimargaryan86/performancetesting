@@ -136,7 +136,7 @@ class SubscriberService(
         self,
         request: notifications_pb2.GetSubscriberFromResellerRequest,
         context: aio.ServicerContext,
-    ) -> notifications_pb2.GetSubscriberResponse:
+    ) -> notifications_pb2.GetSubscriberFromResellerResponse:
         subscriber = await self._subscribers.find_by_reseller(
             request.reseller_id,
             request.mobile_phone,
@@ -145,7 +145,7 @@ class SubscriberService(
         if subscriber is None:
             return await context.abort(StatusCode.NOT_FOUND)
 
-        return notifications_pb2.GetSubscriberResponse(
+        return notifications_pb2.GetSubscriberFromResellerResponse(
             subscriber=subscriber,
         )
 

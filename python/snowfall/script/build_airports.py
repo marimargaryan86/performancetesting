@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import operator
 import re
 import string
 import sys
@@ -197,6 +198,6 @@ if __name__ == "__main__":
     asyncio.run(wikipedia_airports(airports))
     asyncio.run(duffel_update(airports))
 
-    sorted_airports = sorted(airports.values(), key=lambda ap: ap["iata_code"])
+    sorted_airports = sorted(airports.values(), key=operator.itemgetter("iata_code"))
     output = json.dumps(sorted_airports, ensure_ascii=False, indent=4, sort_keys=True)
     AIRPORTS_PATH.write_text("{0}\n".format(output))  # For linter...

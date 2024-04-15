@@ -196,7 +196,7 @@ class TripOfferSearchConsumer:
                     offer_models_pb2.OfferSegment(
                         id=offer_segment_id,
                         segment_id=segment.id,
-                        vendor=quote_obj.fleet.name if quote_obj.fleet.name else "",
+                        vendor=quote_obj.fleet.name or "",
                         type=models_pb2.Schedule.TYPE_TAXI,
                         legs=[
                             offer_models_pb2.OfferSegmentLeg(

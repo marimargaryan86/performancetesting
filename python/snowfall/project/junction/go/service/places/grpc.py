@@ -51,9 +51,7 @@ class LocationsService(service.Service, places_pb2_grpc.LocationsServiceServicer
             identifiers=list(request.ids.ids) if request.HasField("ids") else None,
         )
 
-        locations_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        locations_result.limit(request.page_size or self._default_page_size)
 
         locations = []
 
@@ -160,9 +158,7 @@ class PlacesService(
             identifiers=list(request.ids.ids) if request.HasField("ids") else None,
         )
 
-        places_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        places_result.limit(request.page_size or self._default_page_size)
 
         return places_pb2.ListPlacesResponse(
             places=[place async for place in places_result],

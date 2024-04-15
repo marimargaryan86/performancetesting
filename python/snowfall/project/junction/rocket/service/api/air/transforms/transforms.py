@@ -53,9 +53,7 @@ def _transform_result_detail(
         departure_time=segment.departure_time,
         duration=segment.duration,
         segment_key=segment.segment_key,
-        operating_airline=segment.operating_airline
-        if segment.operating_airline
-        else segment.airline,
+        operating_airline=segment.operating_airline or segment.airline,
     )
 
 
@@ -103,6 +101,10 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
                 offers.append(new_offer)
 
         result_details = []
+
+        if not offer.od_id:
+            raise ValueError
+
         full_trip = j1_response.ods[offer.od_id]
         for segment in full_trip.segments:
             full_segment = j1_response.segments[segment]
@@ -125,10 +127,8 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
         for fare_segment in fare_segments:
             cabin = rocket.CabinDetails(
                 id=string.uuid(),
-                result_detail_id=fare_segment.segment_id
-                if fare_segment.segment_id
-                else None,
-                marketing_name=fare_segment.cabin if fare_segment.cabin else None,
+                result_detail_id=fare_segment.segment_id or None,
+                marketing_name=fare_segment.cabin or None,
             )
             cabin_details.append(cabin)
 

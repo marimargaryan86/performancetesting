@@ -85,6 +85,6 @@ async def test_search(
 
     async for offer in search_results:
         assert isinstance(offer, offer_models_pb2.OfferGroup)
-        count = count + 1
+        count += 1
 
     assert count > 0

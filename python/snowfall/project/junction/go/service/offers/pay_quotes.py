@@ -244,7 +244,7 @@ class PayQuotes:
                 beneficiary_company=beneficiary_company,
                 from_currency=from_currency,
                 to_currency=to_currency,
-                tax=tax if tax else 0,
+                tax=tax or 0,
                 fee_multiplier=fee_multiplier,
             )
         except (errors.NotFoundError, errors.ServiceUnavailableError) as err:

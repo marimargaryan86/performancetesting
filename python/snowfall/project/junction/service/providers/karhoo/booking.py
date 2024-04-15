@@ -63,11 +63,7 @@ class BookingHandler:
                 ).protobuf(),
                 trip_result=models_pb2.TripBooking(
                     provider_booking_reference=str(booking_response.id),
-                    record_locator=(
-                        booking_response.follow_code
-                        if booking_response.follow_code
-                        else ""
-                    ),
+                    record_locator=booking_response.follow_code or "",
                     created_at=protobuf.datetime_to_protobuf(
                         (
                             datetime.datetime.strptime(

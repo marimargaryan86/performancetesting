@@ -357,7 +357,7 @@ class BookingHandler:
             provider_total_price=get_total_price(reservation).protobuf(),
             trip_result=models_pb2.TripBooking(
                 provider_booking_reference=provider_booking_reference,
-                record_locator=unique_id if unique_id else "",
+                record_locator=unique_id or "",
                 created_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(tz=datetime.UTC),
                 ),

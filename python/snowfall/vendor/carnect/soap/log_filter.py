@@ -38,7 +38,7 @@ class LogFilter:
     ) -> str | None:
         if log_data:
             if isinstance(log_data, bytes):
-                vi = log_data.decode(encoding=charset if charset else "utf-8")
+                vi = log_data.decode(encoding=charset or "utf-8")
             else:
                 vi = log_data
 

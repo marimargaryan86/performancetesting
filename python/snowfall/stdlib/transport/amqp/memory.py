@@ -34,7 +34,7 @@ class Producer(protocol.Producer):
         headers: Mapping[str, str] | None = None,
     ) -> None:
         if isinstance(expiration, datetime.timedelta):
-            expiration = datetime.datetime.now(tz=datetime.UTC) + expiration
+            expiration += datetime.datetime.now(tz=datetime.UTC)
 
         self._messages.put_nowait(
             _MessageContainer(

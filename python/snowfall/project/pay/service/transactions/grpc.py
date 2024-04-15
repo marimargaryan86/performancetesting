@@ -72,7 +72,7 @@ class TransactionsService(
             filter_by_created_dates=request.filter_by_created_dates,
         )
         transactions.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         return grpc_pb2.ListTransactionsResponse(
@@ -87,7 +87,7 @@ class TransactionsService(
     ) -> grpc_pb2.GetTransactionResponse:
         transaction = await self._transactions.find_by_selector(
             selection_value=request.id,
-            selector=request.selector if request.selector else "_id",
+            selector=request.selector or "_id",
         )
 
         if transaction is None:
@@ -102,7 +102,7 @@ class TransactionsService(
     ) -> grpc_pb2.GetTransactionsResponse:
         transactions = await self._transactions.find_by_ids(
             list(request.ids),
-            request.selector if request.selector else "_id",
+            request.selector or "_id",
         )
 
         return grpc_pb2.GetTransactionsResponse(
@@ -428,7 +428,7 @@ class BillsService(
             filter_by_order_ids=request.filter_by_order_ids,
         )
         bills.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         return grpc_pb2.ListBillsResponse(
@@ -443,7 +443,7 @@ class BillsService(
     ) -> grpc_pb2.GetBillResponse:
         bill = await self._bills.find_by_selector(
             selection_value=request.id,
-            selector=request.selector if request.selector else "_id",
+            selector=request.selector or "_id",
         )
 
         if bill is None:

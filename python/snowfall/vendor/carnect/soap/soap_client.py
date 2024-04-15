@@ -175,7 +175,7 @@ class AsyncSoapClient:
         transport: AsyncSoapTransport,
         location: str | None,
     ) -> AsyncSoapClient:
-        location = location if location else service.location
+        location = location or service.location
         parser = XmlParser(config=ParserConfig(fail_on_unknown_properties=False))
         client_config = Config.from_service(service, location=location)
         return AsyncSoapClient(

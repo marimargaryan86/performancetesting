@@ -127,8 +127,8 @@ class SmtpNotifier(Notifier):
         self._validate_sender_and_recipient(sender, recipient)
 
         email = message.EmailMessage()
-        email["From"] = sender if sender else self._sender
-        email["To"] = recipient if recipient else self._recipient
+        email["From"] = sender or self._sender
+        email["To"] = recipient or self._recipient
         email["Subject"] = notification.subject
         email.set_content(notification.body)
 
@@ -159,8 +159,8 @@ class SmtpNotifier(Notifier):
         self._validate_sender_and_recipient(sender, recipient)
 
         email = multipart.MIMEMultipart("alternative")
-        email["From"] = sender if sender else self._sender
-        email["To"] = recipient if recipient else self._recipient
+        email["From"] = sender or self._sender
+        email["To"] = recipient or self._recipient
         email["Subject"] = notification.subject
         email.attach(text.MIMEText(await notification.body, "html", "utf-8"))
 

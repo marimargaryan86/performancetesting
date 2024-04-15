@@ -1,4 +1,5 @@
 import datetime
+import operator
 import uuid
 from collections.abc import Mapping, Sequence
 from typing import ClassVar
@@ -244,7 +245,7 @@ def test_create_from_pydantic_model() -> None:
                 ),
             )
         ],
-        key=lambda click_param: click_param["name"],
+        key=operator.itemgetter("name"),
     )
 
     actual = sorted(
@@ -252,7 +253,7 @@ def test_create_from_pydantic_model() -> None:
             parameter.to_info_dict()
             for parameter in parameters.create_from_pydantic_model(_TestModel)
         ],
-        key=lambda click_param: click_param["name"],
+        key=operator.itemgetter("name"),
     )
 
     assert len(expected) == len(actual)

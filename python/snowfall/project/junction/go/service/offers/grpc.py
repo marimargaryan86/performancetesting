@@ -145,7 +145,7 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
         offer_aggregates = await self._offer_aggregates_result_set(request)
 
         offer_aggregates.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         aggregates = []

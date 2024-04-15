@@ -75,13 +75,11 @@ class CarSearch(endpoints.HTTPEndpoint):
                     car_rental=models_pb2.CarRental(
                         origin=legacy_go_pb2.Point(
                             coordinates=origin_coords,
-                            time_zone=origin_timezone if origin_timezone else "",
+                            time_zone=origin_timezone or "",
                         ),
                         destination=legacy_go_pb2.Point(
                             coordinates=destination_coords,
-                            time_zone=(
-                                destination_timezone if destination_timezone else ""
-                            ),
+                            time_zone=destination_timezone or "",
                         ),
                         pickup_at=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["pickupAt"]),

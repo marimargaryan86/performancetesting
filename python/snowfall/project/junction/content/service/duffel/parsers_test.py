@@ -1,3 +1,4 @@
+import operator
 from collections.abc import Iterable, Sequence
 
 import pytest
@@ -43,11 +44,14 @@ async def trip_results(
     ]
 
 
+_FIRST_ITEM = operator.itemgetter(0)
+
+
 @pytest.fixture()
 def trip_result(
     trip_results: Sequence[trips_pb2.Trip],
 ) -> trips_pb2.Trip:
-    return trip_results[0]
+    return _FIRST_ITEM(trip_results)
 
 
 class TestTripModel:

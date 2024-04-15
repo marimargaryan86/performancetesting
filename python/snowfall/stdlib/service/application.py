@@ -194,8 +194,7 @@ def _configure_sentry(
         dsn=global_settings.sentry_dsn,
         environment=global_settings.env_name,
         release=global_settings.sentry_release
-        if global_settings.sentry_release
-        else "{name}@{version}".format(
+        or "{name}@{version}".format(
             name=entrypoint.name,
             version=global_settings.version,
         ),

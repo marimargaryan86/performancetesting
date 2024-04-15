@@ -72,7 +72,7 @@ class CabinMappingRepository(
                 },
             },
         )
-        return mapping if mapping else None
+        return mapping or None
 
     async def _create(
         self,

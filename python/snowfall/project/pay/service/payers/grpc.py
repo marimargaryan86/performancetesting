@@ -48,7 +48,7 @@ class PayerService(service.Service, payers_pb2_grpc.PayersServiceServicer):
         payers_result = await self._payers.find(request.page_token)
 
         payers_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         return payers_pb2.ListPayersResponse(

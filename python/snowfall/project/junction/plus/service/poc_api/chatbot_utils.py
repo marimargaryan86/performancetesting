@@ -376,13 +376,19 @@ async def send_delay(
     delay: int,
     twilio_client: twilio.TwilioClient,
 ) -> None:
-    new_departure = datetime.datetime.fromisoformat(
-        delay_webhook["flight_details"]["departure_at"],
-    ) + datetime.timedelta(minutes=delay)
-    for old_delay in delay_webhook.get("delay_history", []):
-        new_departure = new_departure + datetime.timedelta(
-            minutes=old_delay["delay_minutes"],
+    new_departure = (
+        datetime.datetime.fromisoformat(
+            delay_webhook["flight_details"]["departure_at"],
         )
+        + datetime.timedelta(minutes=delay)
+        + datetime.timedelta(
+            minutes=sum(
+                old_delay["delay_minutes"]
+                for old_delay in delay_webhook.get("delay_history", [])
+            ),
+        )
+    )
+
     twilio_client.send_message(
         body=(
             "Delay for your travel of {0} minutes.".format(delay)

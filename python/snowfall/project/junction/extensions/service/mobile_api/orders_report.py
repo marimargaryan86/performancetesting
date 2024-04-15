@@ -103,7 +103,7 @@ async def _generate_report(
                 "passengers": order["passengers"],
                 "contactDetails": order["journey"]["contactDetails"],
                 "totalPrice": sum(
-                    [float(booking["totalPrice"]["amount"]) for booking in bookings],
+                    float(booking["totalPrice"]["amount"]) for booking in bookings
                 ),
                 "currency": bookings[0]["totalPrice"]["currency"],
                 "operatorBookingReferences": [

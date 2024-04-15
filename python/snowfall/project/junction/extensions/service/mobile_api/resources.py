@@ -80,24 +80,25 @@ class UserResource(models.Resource):
         data_type: str = "users",
     ) -> UserResource:
         user_dict = MessageToDict(user)
-        user_dict.pop("id")
+        attributes = MessageToDict(user)
+        attributes.pop("id")
         for user_field in user_dict:
             if user_field == "phone":
-                user_dict["phone"] = user_dict["phone"]["e164Number"]
+                attributes["phone"] = user_dict["phone"]["e164Number"]
             if user_field == "dateOfBirth":
-                user_dict[user_field] = protobuf.protobuf_to_date(user.date_of_birth)
+                attributes[user_field] = protobuf.protobuf_to_date(user.date_of_birth)
             if user_field == "createdAt":
-                user_dict[user_field] = protobuf.protobuf_to_datetime(
+                attributes[user_field] = protobuf.protobuf_to_datetime(
                     user.created_at,
                 )
             if user_field == "updatedAt":
-                user_dict[user_field] = protobuf.protobuf_to_datetime(
+                attributes[user_field] = protobuf.protobuf_to_datetime(
                     user.updated_at,
                 )
         return cls(
             id=user.id,
             type=data_type,
-            attributes=user_dict,
+            attributes=attributes,
         )
 
     @classmethod

@@ -570,11 +570,11 @@ class SimpleOfferSearches:
             simple_trip=models_pb2.SimpleTripOfferSearch(
                 origin=common_pb2.Point(
                     coordinates=origin_coords,
-                    time_zone=origin_timezone if origin_timezone else "",
+                    time_zone=origin_timezone or "",
                 ),
                 destination=common_pb2.Point(
                     coordinates=destination_coords,
-                    time_zone=destination_timezone if destination_timezone else "",
+                    time_zone=destination_timezone or "",
                 ),
                 departure_before=protobuf.datetime_to_protobuf(departure_before)
                 if departure_before

@@ -199,9 +199,7 @@ class OfferTransformer:
                 service_fee=offer.pricing_information.base.service_fee,
                 currency=offer.pricing_information.base.currency,
                 brand_name=(
-                    offer.pricing_information.base.brand_name
-                    if offer.pricing_information.base.brand_name
-                    else "LOWEST FARE AVAILABLE"
+                    offer.pricing_information.base.brand_name or "LOWEST FARE AVAILABLE"
                 ),
                 features=[
                     offers.BrandedPriceInformationFeature(

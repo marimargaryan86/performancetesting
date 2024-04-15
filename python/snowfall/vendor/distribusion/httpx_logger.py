@@ -15,7 +15,7 @@ class LogHandler:
         log_path: Path | None = None,
     ) -> None:
         self.base_url = base_url
-        self.log_path = log_path if log_path else Path("logs")
+        self.log_path = log_path or Path("logs")
 
     def get_file_path(self) -> Path:
         date = datetime.datetime.now(tz=datetime.UTC).date()

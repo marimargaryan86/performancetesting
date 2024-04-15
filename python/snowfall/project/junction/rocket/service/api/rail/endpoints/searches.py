@@ -70,13 +70,11 @@ class RailSearch(endpoints.HTTPEndpoint):
                     rail=models_pb2.Rail(
                         origin=legacy_go_pb2.Point(
                             coordinates=origin_coords,
-                            time_zone=origin_timezone if origin_timezone else "",
+                            time_zone=origin_timezone or "",
                         ),
                         destination=legacy_go_pb2.Point(
                             coordinates=destination_coords,
-                            time_zone=(
-                                destination_timezone if destination_timezone else ""
-                            ),
+                            time_zone=destination_timezone or "",
                         ),
                         departure_after=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["departureAfter"]),

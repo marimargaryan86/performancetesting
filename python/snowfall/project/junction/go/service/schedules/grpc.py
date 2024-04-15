@@ -50,9 +50,7 @@ class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceService
             cursor=request.page_token,
         )
 
-        schedules_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        schedules_result.limit(request.page_size or self._default_page_size)
 
         return schedules_pb2.ListSchedulesResponse(
             schedules=[schedule async for schedule in schedules_result],
@@ -81,9 +79,7 @@ class ScheduleService(service.Service, schedules_pb2_grpc.ScheduleServiceService
             cursor=request.page_token,
         )
 
-        legs_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        legs_result.limit(request.page_size or self._default_page_size)
 
         return schedules_pb2.ListLegsResponse(
             legs=[leg async for leg in legs_result],

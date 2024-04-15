@@ -62,10 +62,7 @@ class _IncludesResolver:
                 )
 
         if resolvables:
-            fetched_resources_map = fetched_resources_map | await self.resolve(
-                resolvables,
-                request,
-            )
+            fetched_resources_map |= await self.resolve(resolvables, request)
 
         return fetched_resources_map
 

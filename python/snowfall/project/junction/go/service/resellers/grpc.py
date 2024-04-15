@@ -119,9 +119,7 @@ class ResellerService(
             filter_by=request.filter_by,
         )
 
-        resellers_res.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        resellers_res.limit(request.page_size or self._default_page_size)
 
         resellers = [reseller async for reseller in resellers_res]
 

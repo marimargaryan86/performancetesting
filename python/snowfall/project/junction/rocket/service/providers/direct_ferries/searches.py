@@ -446,11 +446,7 @@ class CriteriaGenerator:
                     if search.ferry.HasField("return_date")
                     else None
                 ),
-                outbound_id=(
-                    search.ferry.outbound_offer_id
-                    if search.ferry.outbound_offer_id
-                    else None
-                ),
+                outbound_id=search.ferry.outbound_offer_id or None,
             ),
         ]
 

@@ -21,7 +21,7 @@ class Quotations(endpoints.HTTPEndpoint):
         session_token = body.get("externalReference")
 
         if session_token:
-            session_token = session_token + request.user.username
+            session_token += request.user.username
         from_currency = await currency_client.get(
             body["fromCurrency"],
             no_exist_ok=True,

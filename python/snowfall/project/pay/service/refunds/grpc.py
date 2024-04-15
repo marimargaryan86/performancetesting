@@ -129,7 +129,7 @@ class RefundsService(
         )
 
         refunds.limit(
-            request.page_size if request.page_size else self._default_page_size,
+            request.page_size or self._default_page_size,
         )
 
         return grpc_pb2.ListRefundsResponse(

@@ -10,6 +10,16 @@ from packaging import requirements, version
 from snowfall.stdlib.service import application
 
 
+class _OutdatedSettings(application.Settings):
+    requirements_path: pydantic.FilePath = pydantic.Field(
+        json_schema_extra={"argument": True},
+    )
+
+
+async def _outdated(app: application.Application[_OutdatedSettings]) -> None:
+    await _parse_requirements_file(app.settings.requirements_path)
+
+
 class _PinSettings(application.Settings):
     requirements_path: pydantic.FilePath = pydantic.Field(
         json_schema_extra={"argument": True},
@@ -174,6 +184,11 @@ if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="python-dependencies", cli_tool=True)
 
     entrypoint.enter_with_commands(
+        application.Command(
+            name="outdated",
+            callback=_outdated,
+            settings_class=_OutdatedSettings,
+        ),
         application.Command(
             name="pin",
             callback=_pin,

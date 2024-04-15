@@ -128,9 +128,7 @@ class OrderService(
             filter_by=request.filter_by,
         )
 
-        journeys_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        journeys_result.limit(request.page_size or self._default_page_size)
 
         return orders_pb2.ListJourneysResponse(
             journeys=[journey async for journey in journeys_result],
@@ -195,9 +193,7 @@ class OrderService(
                 reseller_id=request.reseller_id,
             )
 
-        orders_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        orders_result.limit(request.page_size or self._default_page_size)
 
         return orders_pb2.ListOrdersResponse(
             orders=[order async for order in orders_result],
@@ -246,9 +242,7 @@ class OrderService(
                 filter_by_departure_dates=request.departure_dates,
             )
 
-        bookings_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        bookings_result.limit(request.page_size or self._default_page_size)
 
         return orders_pb2.ListBookingsResponse(
             bookings=await self._booking_handler.get_latest(
@@ -290,9 +284,7 @@ class OrderService(
                 reseller_id=request.reseller_id,
             )
 
-        details_result.limit(
-            request.page_size if request.page_size else self._default_page_size,
-        )
+        details_result.limit(request.page_size or self._default_page_size)
 
         return orders_pb2.ListBookingDetailsResponse(
             details=[detail async for detail in details_result],

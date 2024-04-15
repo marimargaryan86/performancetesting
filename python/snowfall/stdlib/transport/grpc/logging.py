@@ -42,8 +42,6 @@ class LoggingServerInterceptor(interceptor.ServerInterceptor):
             self._logger.info(
                 "Request processed.",
                 name=name,
-                status=(
-                    context.code() if context.code() else StatusCode.OK
-                ).name.lower(),
+                status=(context.code() or StatusCode.OK).name.lower(),
                 response_size=request.ByteSize(),
             )

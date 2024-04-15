@@ -62,5 +62,5 @@ class TracingServerInterceptor(interceptor.ServerInterceptor):
                 yield span
             finally:
                 span.set_status(
-                    (context.code() if context.code() else StatusCode.OK).name.lower(),
+                    (context.code() or StatusCode.OK).name.lower(),
                 )

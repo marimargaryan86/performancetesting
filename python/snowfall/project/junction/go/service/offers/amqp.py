@@ -72,8 +72,7 @@ class PriceQuoteProducer:
             "",
         )
         original_option_ids = [
-            offer.initial_offer_id if offer.initial_offer_id else offer.id
-            async for offer in options
+            offer.initial_offer_id or offer.id async for offer in options
         ]
 
         await asyncio.gather(

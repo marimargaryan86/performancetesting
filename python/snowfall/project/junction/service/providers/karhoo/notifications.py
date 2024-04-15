@@ -46,12 +46,8 @@ Destination location : {destination}
             "created_at": datetime.datetime.now(
                 tz=datetime.UTC,
             ).isoformat(timespec="seconds"),
-            "follow_code": (
-                self._booking.follow_code if self._booking.follow_code else ""
-            ),
-            "pickup_date": (
-                self._booking.date_scheduled if self._booking.date_scheduled else ""
-            ),
+            "follow_code": self._booking.follow_code or "",
+            "pickup_date": self._booking.date_scheduled or "",
             "pickup_point_latitude": self._booking.origin.position.latitude,
             "pickup_point_longitude": self._booking.origin.position.longitude,
             "origin": self._booking.origin.display_address,

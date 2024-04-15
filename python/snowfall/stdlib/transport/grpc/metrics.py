@@ -160,7 +160,7 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor, _MetricsIntercepto
         finally:
             self._log_metrics(
                 rpc_name=continuation.__name__,
-                status_code=context.code() if context.code() else StatusCode.OK,
+                status_code=context.code() or StatusCode.OK,
                 request=request,
                 response=response,
                 start=start,

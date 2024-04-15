@@ -67,9 +67,7 @@ class Users:
                 page_size=pagination.limit,
                 page_token=pagination.cursor,
                 identifiers=(
-                    identity_ids
-                    if identity_ids
-                    else [request.starlette_request.user.identifier]
+                    identity_ids or [request.starlette_request.user.identifier]
                 ),
             )
         else:

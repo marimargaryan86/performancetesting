@@ -165,7 +165,7 @@ async def places_fixture() -> Sequence[dict[str, Any]]:
 def mongo_test_db(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> motor_asyncio.AsyncIOMotorDatabase:
-    return mongo_client["tests"]
+    return mongo_client.tests
 
 
 def _create_app(

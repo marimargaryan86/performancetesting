@@ -102,7 +102,7 @@ class DictClient(Client):
             default_currency=reseller.default_currency,
             provider_ids=reseller.provider_ids,
             parent_reseller_ids=reseller.parent_reseller_ids,
-            child_reseller_ids=child_reseller_ids if child_reseller_ids else None,
+            child_reseller_ids=child_reseller_ids or None,
         )
 
     async def create_reseller(

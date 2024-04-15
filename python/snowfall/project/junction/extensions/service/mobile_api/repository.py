@@ -312,7 +312,7 @@ class LoyaltyProgramsRepository(
             cur=cursor or "",
             filter_=query,
         )
-        programs.limit(limit if limit else _DEFAULT_PAGE_SIZE)
+        programs.limit(limit or _DEFAULT_PAGE_SIZE)
         return programs
 
 

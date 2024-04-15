@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import operator
 import re
 from collections.abc import (
     AsyncGenerator,
@@ -99,14 +100,17 @@ def api_token(
     return request.config.getoption("API_TOKEN") or local_config.get("API_TOKEN") or ""
 
 
+_FIRST_ITEM = operator.itemgetter(0)
+
+
 @pytest.fixture(scope="package", autouse=True)
 def departure_after(departures_after: Sequence[str]) -> str:
-    return departures_after[0]
+    return _FIRST_ITEM(departures_after)
 
 
 @pytest.fixture(scope="package", autouse=True)
 def departure_before(departures_before: Sequence[str]) -> str:
-    return departures_before[0]
+    return _FIRST_ITEM(departures_before)
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -417,7 +421,7 @@ async def qa_client(
     ory_url: str,
     local_api_url: str,
 ) -> QaClient:
-    url_part = local_api_url if local_api_url else config_variables["rocket_api_host"]
+    url_part = local_api_url or config_variables["rocket_api_host"]
 
     api_url = "{0}{1}".format(HTTPS_PREFIX, url_part)
     if basic_token and ory_url:
