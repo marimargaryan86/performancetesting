@@ -47,6 +47,10 @@ class QuoteCache(RedisRepository[PriceQuote]):
     _record_type: type[PriceQuote] = PriceQuote
 
 
+class QuoteNotFoundError(Exception):
+    """Raised when a quote is not found in the cache."""
+
+
 def generate_cache_key(search: criteria.Criteria) -> str:
     return string.to_uuid(
         "\x00".join(

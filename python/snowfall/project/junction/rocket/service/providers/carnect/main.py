@@ -7,9 +7,13 @@ import pydantic
 from aio_pika import abc
 from redis import asyncio as aioredis
 
+from snowfall.project.junction.rocket.provider import (
+    bookings as provider_bookings,
+)
 from snowfall.project.junction.rocket.provider import meta, searches, service
 from snowfall.project.junction.rocket.provider.v1alpha import meta_pb2
 from snowfall.project.junction.rocket.service.providers.carnect import (
+    bookings,
     cache,
     criteria,
     pricing,
@@ -20,6 +24,7 @@ from snowfall.project.junction.rocket.service.providers.carnect import (
 from snowfall.project.junction.rocket.service.providers.carnect.constants import (
     PROVIDER_ID,
 )
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import amqp_factory, httpx_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -28,7 +33,7 @@ from snowfall.vendor.carnect import config as carnect_settings
 
 _PROVIDER_NAME = "Carnect"
 
-_DEFAULT_TTL_IN_MINUTES = 45
+_DEFAULT_TTL_IN_MINUTES = 15
 _DEFAULT_API_TIMEOUT_IN_SECONDS = 30
 
 
@@ -55,6 +60,7 @@ async def _meta_factory() -> meta.MetaImplementation:
         identifier=PROVIDER_ID,
         name=_PROVIDER_NAME,
         search_capabilities=meta_pb2.SearchCapabilities(car_rental=True),
+        booking_capabilities=meta_pb2.BookingCapabilities(supports_cancellation=True),
     )
 
 
@@ -65,7 +71,7 @@ async def _search_factory(
     stack: contextlib.AsyncExitStack,
 ) -> searches.SearchImplementation[criteria.Criteria]:
     carnect_config = carnect_settings.Config(
-        timeout=app.settings.ttl.seconds,
+        timeout=app.settings.api_timeout.seconds,
         base_url=str(app.settings.api_base_url),
         export_soap_requests=True,
         username=app.settings.api_username,
@@ -101,7 +107,7 @@ async def _pricing(
     app: service.Application[_Settings],
 ) -> None:
     carnect_config = carnect_settings.Config(
-        timeout=app.settings.ttl.seconds,
+        timeout=app.settings.api_timeout.seconds,
         base_url=str(app.settings.api_base_url),
         export_soap_requests=True,
         username=app.settings.api_username,
@@ -148,17 +154,71 @@ async def _pricing(
     await quote_task_consumer.consume()
 
 
+async def _bookings(app: service.Application[_Settings]) -> None:
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+
+    await bookings.Consumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_bookings".format(app.name),
+            binds=[(types.Exchange("bookings"), "bookings.prices")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("bookings"),
+        ),
+        booker=bookings.Booker(
+            quote_cache=cache.QuoteCache(
+                client=redis_client,
+            ),
+            booking_storage=storage,
+            provider_id=PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
+        ),
+    ).consume()
+
+
+async def _bookings_factory(
+    app: service.Application[_Settings],
+) -> provider_bookings.Implementation:
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+    transformer = bookings.Transformer()
+
+    return provider_bookings.Implementation(
+        storage=storage,
+        transformer=transformer.raw_to_booking,
+        cancellation_handler=bookings.CancellationHandler().cancel,
+    )
+
+
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
         name="carnect",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,
+        bookings_factory=_bookings_factory,
     )
+
     entrypoint.enter_with_commands(
         service.Command(
             name="pricing",
             callback=_pricing,
+            settings_class=_Settings,
+        ),
+        service.Command(
+            name="bookings",
+            callback=_bookings,
             settings_class=_Settings,
         ),
     )

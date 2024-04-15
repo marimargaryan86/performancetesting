@@ -96,15 +96,14 @@ class QuoteTaskConsumer:
         offer = parse_offer(veh_avail)
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
-        price_quote = cache.PriceQuote(
-            quote_id=quote_id,
-        )
-        price_quote_id = await self._quote_cache.store(
-            record=price_quote,
+        await self._quote_cache.store(
+            record=cache.PriceQuote(
+                quote_id=quote_id,
+            ),
             expires_at=expires_at,
+            key=message.body.quote.id,
         )
         quote_obj = models_pb2.Quote(
-            id=str(price_quote_id),
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             price=offer.price,
             price_breakdown=offer.price_breakdown,
