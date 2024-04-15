@@ -1,6 +1,7 @@
 import datetime
 from collections.abc import Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import Any
 
 import pytest
@@ -35,6 +36,13 @@ BASIC_SEARCH = InputSearchData(
 NO_RESULTS_PICKUP_DATE = (  # No results for pickup after 2050
     datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=365 * 50)
 ).strftime("%Y-%m-%dT08:00:00.000Z")
+NO_RESULTS_RETURN_DATE = (  # No results for RETURN after 2050
+    datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=(365 * 50) + 10)
+).strftime("%Y-%m-%dT08:00:00.000Z")
+OCEAN_COORDINATES = MappingProxyType({
+    "latitude": -30.14512718,
+    "longitude": 61.25976562,
+})
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -256,7 +264,7 @@ async def test_car_rental_search_for_no_offers(
         pickup_location=BASIC_SEARCH.pickup_location,
         return_location=BASIC_SEARCH.return_location,
         pickup_at=NO_RESULTS_PICKUP_DATE,
-        return_at=BASIC_SEARCH.return_at,
+        return_at=NO_RESULTS_RETURN_DATE,
         driver_age=BASIC_SEARCH.driver_age,
     )
     assert car_rental_search.id
@@ -270,3 +278,29 @@ async def test_car_rental_search_for_no_offers(
         search_id=car_rental_search.id,
     )
     assert not car_rental_offers.data
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_mock_car_rental_search(
+    qa_client: QaClient,
+) -> None:
+    car_rental_search = await qa_client.car_rental.search(
+        pickup_location=OCEAN_COORDINATES,
+        return_location=OCEAN_COORDINATES,
+        pickup_at=BASIC_SEARCH.pickup_at,
+        return_at=BASIC_SEARCH.return_at,
+        driver_age=BASIC_SEARCH.driver_age,
+    )
+    assert car_rental_search.id
+
+    car_rental_search = await qa_client.car_rental.wait_for_completed_search(
+        search_id=car_rental_search.id,
+    )
+    assert car_rental_search.status == "completed"
+
+    car_rental_offers = await qa_client.car_rental.get_offers(
+        search_id=car_rental_search.id,
+    )
+    assert car_rental_offers.data
+    assert car_rental_offers.offers
