@@ -991,6 +991,10 @@
             "explode": false,
             "schema": {
               "type": "array",
+              "items": {
+                "type": "number",
+                "example": 123
+              },
               "minItems": 2,
               "maxItems": 3,
               "example": [
