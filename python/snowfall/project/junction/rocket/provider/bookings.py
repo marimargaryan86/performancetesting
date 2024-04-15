@@ -72,13 +72,6 @@ class BookingService(service.Service, bookings_pb2_grpc.BookingServiceServicer):
 
         return bookings_pb2.GetBookingResponse(booking=booking)
 
-    async def MakeBooking(  # type: ignore[override] # noqa: N802
-        self,
-        request: bookings_pb2.MakeBookingRequest,
-        context: grpc.aio.ServicerContext,
-    ) -> bookings_pb2.MakeBookingResponse:
-        return context.abort(grpc.StatusCode.UNIMPLEMENTED)
-
     async def CancelBooking(  # type: ignore[override] # noqa: N802
         self,
         request: bookings_pb2.CancelBookingRequest,

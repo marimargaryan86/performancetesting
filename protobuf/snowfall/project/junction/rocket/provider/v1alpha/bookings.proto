@@ -9,7 +9,6 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 
 service BookingService {
   rpc GetBooking(GetBookingRequest) returns (GetBookingResponse) {}
-  rpc MakeBooking(MakeBookingRequest) returns (MakeBookingResponse) {}
   rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {}
 }
 
@@ -20,11 +19,6 @@ message GetBookingRequest {
 message GetBookingResponse {
   Booking booking = 1;
 }
-
-message MakeBookingRequest {
-  string offer_id = 1;
-}
-message MakeBookingResponse {}
 
 message Booking {
   string id = 1;
