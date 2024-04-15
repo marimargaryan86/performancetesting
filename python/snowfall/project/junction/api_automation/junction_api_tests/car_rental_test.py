@@ -39,9 +39,11 @@ NO_RESULTS_PICKUP_DATE = (  # No results for pickup after 2050
 NO_RESULTS_RETURN_DATE = (  # No results for RETURN after 2050
     datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=(365 * 50) + 10)
 ).strftime("%Y-%m-%dT08:00:00.000Z")
-OCEAN_COORDINATES = MappingProxyType({
-    "latitude": -30.14512718,
-    "longitude": 61.25976562,
+COORDINATES = MappingProxyType({
+    "ocean": {
+        "latitude": -30.14512718,
+        "longitude": 61.25976562,
+    },
 })
 
 
@@ -286,8 +288,8 @@ async def test_mock_car_rental_search(
     qa_client: QaClient,
 ) -> None:
     car_rental_search = await qa_client.car_rental.search(
-        pickup_location=OCEAN_COORDINATES,
-        return_location=OCEAN_COORDINATES,
+        pickup_location=COORDINATES["ocean"],
+        return_location=COORDINATES["ocean"],
         pickup_at=BASIC_SEARCH.pickup_at,
         return_at=BASIC_SEARCH.return_at,
         driver_age=BASIC_SEARCH.driver_age,
