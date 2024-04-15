@@ -18,9 +18,9 @@ python_tests(name="tests")
 resource(
     name="cities",
     source=http_source(
-        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/cities_with_iatas_and_benerail_ids-f35e99d75f1f19293d76ba533dec8c482c5badf5357304289efb776c93c155be.csv",
-        len=8315343,
-        sha256="f35e99d75f1f19293d76ba533dec8c482c5badf5357304289efb776c93c155be",
+        url="https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/cities_with_iatas_and_benerail_ids-2887f0ba76d5daea30e6e808835a632fbbfe93842651a56c872de4e7d0de4658.csv",
+        len=8315344,
+        sha256="2887f0ba76d5daea30e6e808835a632fbbfe93842651a56c872de4e7d0de4658",
         filename="cities_with_iatas_and_benerail_ids.csv",
     ),
 )

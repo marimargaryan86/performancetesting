@@ -29,7 +29,7 @@ _RADIUS_TO_MATCH_PLACE_FOR_VERTICAL_M = MappingProxyType({
     models_pb2.TYPE_FERRY_PORT: 500,
     models_pb2.TYPE_AIRPORT: 5000,
 })
-_IATA_PATH = "search_capabilities.air.provider_place_id"
+_IATA_PATH = "{0}.{1}".format("search_capabilities.air", constants.IATA_ID)
 _NAMESPACE = uuid.UUID("f9ec30af-54df-4bd3-8dd9-6c4b51341d6d")
 
 
