@@ -1212,6 +1212,9 @@
       "parameters": [
         {
           "$ref": "#/components/parameters/searchId"
+        },
+        {
+          "$ref": "#/components/parameters/railSearchResultInclude"
         }
       ],
       "get": {
@@ -1246,6 +1249,9 @@
                           "items": {
                             "$ref": "#/components/schemas/RailSearchResult"
                           }
+                        },
+                        "included": {
+                          "$ref": "#/components/schemas/RailSearchResultIncluded"
                         }
                       },
                       "required": [
@@ -2235,12 +2241,14 @@
         "properties": {
           "links": {
             "type": "object",
+            "description": "A link that provides a url to fetch the next page of objects",
             "required": [
               "next"
             ],
             "properties": {
               "next": {
                 "type": "string",
+                "description": "The url to fetch the next page",
                 "format": "uri",
                 "example": "https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20",
                 "readOnly": true
@@ -2259,11 +2267,13 @@
         "properties": {
           "id": {
             "type": "string",
+            "description": "Unique identifier (UUID) for the Offer object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
+            "description": "The Junction resource type",
             "enum": [
               "offers"
             ],
@@ -2281,6 +2291,7 @@
         "properties": {
           "dateOfBirth": {
             "type": "string",
+            "description": "The date of birth of the passenger",
             "format": "date",
             "example": "2000-01-01"
           }
@@ -2463,16 +2474,18 @@
       },
       "Price": {
         "title": "Price",
-        "description": "Amount and currency.",
+        "description": "Amount and currency",
         "type": "object",
         "properties": {
           "currency": {
             "type": "string",
+            "description": "The currency code in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html) format",
             "format": "currency",
             "example": "EUR"
           },
           "amount": {
             "type": "string",
+            "description": "The amount of this price object",
             "example": "13.37"
           }
         },
@@ -2491,6 +2504,7 @@
           },
           "breakdownType": {
             "type": "string",
+            "description": "The type of the price breakdown component",
             "example": "tax",
             "enum": [
               "base-fare",
@@ -2501,6 +2515,210 @@
         "required": [
           "price",
           "breakdownType"
+        ]
+      },
+      "RailCabinDetails": {
+        "title": "Rail Cabin Details",
+        "type": "object",
+        "required": [
+          "cabinType",
+          "marketingName",
+          "resultDetail"
+        ],
+        "properties": {
+          "resultDetail": {
+            "type": "string",
+            "description": "The Result Detail ID related to this rail cabin detail",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "cabinType": {
+            "type": "string",
+            "description": "The Junction defined class of service for the cabin",
+            "enum": [
+              "unspecified",
+              "economy",
+              "premium",
+              "business",
+              "first"
+            ],
+            "example": "economy"
+          },
+          "marketingName": {
+            "type": "string",
+            "description": "The operator defined branding name for the cabin",
+            "example": "Comfort"
+          }
+        }
+      },
+      "RailOffer": {
+        "title": "Rail Offer",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier (UUID) for the Rail Offer object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "description": "The Junction resource type",
+            "enum": [
+              "rail-offers"
+            ],
+            "example": "rail-offers"
+          },
+          "attributes": {
+            "type": "object",
+            "description": "The properties that define a Rail Offer object",
+            "required": [
+              "price",
+              "priceBreakdown",
+              "cabinDetails"
+            ],
+            "properties": {
+              "price": {
+                "$ref": "#/components/schemas/Price"
+              },
+              "priceBreakdown": {
+                "type": "array",
+                "description": "A list of Price Breakdown objects that indicates the various fees and charges that make up the total price",
+                "items": {
+                  "$ref": "#/components/schemas/PriceBreakdown"
+                }
+              },
+              "cabinDetails": {
+                "type": "array",
+                "description": "The list of cabin information relating to each result detail of the rail offer",
+                "items": {
+                  "$ref": "#/components/schemas/RailCabinDetails"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "RailOfferIdentifier": {
+        "title": "Rail Offer Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier (UUID) for the Rail Offer object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "description": "The Junction resource type",
+            "enum": [
+              "rail-offers"
+            ],
+            "example": "rail-offers"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "RailResultDetail": {
+        "title": "Rail Result Detail",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier (UUID) for the Rail Result Detail object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "description": "The Junction resource type",
+            "enum": [
+              "rail-result-details"
+            ],
+            "example": "rail-result-details"
+          },
+          "attributes": {
+            "type": "object",
+            "description": "The properties that define a Rail Result Detail object",
+            "required": [
+              "origin",
+              "destination",
+              "departureAt",
+              "arrivalAt",
+              "outboundSegment",
+              "segmentSequence"
+            ],
+            "properties": {
+              "origin": {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              "destination": {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              "departureAt": {
+                "type": "string",
+                "description": "The departure date time for the rail result detail in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "arrivalAt": {
+                "type": "string",
+                "description": "The arrival date time for the rail result detail in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format",
+                "format": "date-time",
+                "example": "2019-08-24T14:15:22Z"
+              },
+              "outboundSegment": {
+                "type": "boolean",
+                "description": "A flag indicating whether this rail result detail represents the outbound or inbound segment of a trip",
+                "example": true
+              },
+              "segmentSequence": {
+                "type": "integer",
+                "description": "A sequence value indicating the stage of a full trip that this rail result detail represents",
+                "minimum": 1,
+                "example": 1
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ]
+      },
+      "RailResultDetailIdentifier": {
+        "title": "Rail Result Detail Identifier",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier (UUID) for the Rail Result Detail object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
+            "format": "uuid",
+            "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
+          },
+          "type": {
+            "type": "string",
+            "description": "The Junction resource type",
+            "enum": [
+              "rail-result-details"
+            ],
+            "example": "rail-result-details"
+          }
+        },
+        "required": [
+          "id",
+          "type"
         ]
       },
       "RailSearch": {
@@ -2514,12 +2732,14 @@
             "properties": {
               "id": {
                 "type": "string",
+                "description": "Unique identifier (UUID) for the Rail Search object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
                 "format": "uuid",
                 "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
               },
               "type": {
                 "type": "string",
+                "description": "The Junction resource type",
                 "enum": [
                   "rail-searches"
                 ],
@@ -2527,11 +2747,11 @@
               },
               "attributes": {
                 "type": "object",
+                "description": "The properties that define a Rail Search object",
                 "required": [
                   "expiresAt",
                   "status",
-                  "departureAfter",
-                  "returnAt",
+                  "departureAt",
                   "origin",
                   "destination",
                   "passengers"
@@ -2539,12 +2759,14 @@
                 "properties": {
                   "expiresAt": {
                     "type": "string",
+                    "description": "The time at which the object will expire in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format",
                     "format": "date-time",
                     "readOnly": true,
                     "example": "2019-08-24T14:15:22Z"
                   },
                   "status": {
                     "type": "string",
+                    "description": "The status of the Rail Search",
                     "readOnly": true,
                     "enum": [
                       "unspecified",
@@ -2555,18 +2777,21 @@
                     ],
                     "example": "completed"
                   },
-                  "departureAfter": {
+                  "departureAt": {
                     "type": "string",
+                    "description": "The requested departure date time for the rail search in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format",
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
                   },
                   "departureBefore": {
                     "type": "string",
+                    "description": "The requested departure before date time for the rail search in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format. This is optional but can be used to provide the ability to specify that the travelers would prefer to depart before a specific time",
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
                   },
                   "returnAt": {
                     "type": "string",
+                    "description": "The requested return date time for the rail search in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format. Only required if performing a round trip search",
                     "format": "date-time",
                     "example": "2019-08-24T14:15:22Z"
                   },
@@ -2578,6 +2803,7 @@
                   },
                   "passengers": {
                     "type": "array",
+                    "description": "The list of passengers that will travel on the requested rail search",
                     "items": {
                       "$ref": "#/components/schemas/Passenger"
                     }
@@ -2586,12 +2812,14 @@
               },
               "relationships": {
                 "type": "object",
+                "description": "The Junction resources related to this Rail Search object",
                 "required": [
                   "selectedOutboundOffer"
                 ],
                 "properties": {
                   "selectedOutboundOffer": {
                     "type": "object",
+                    "description": "The selected outbound Offer ID for use when performing the inbound search on a roundtrip. Not required for one-way scenarios",
                     "required": [
                       "data"
                     ],
@@ -2622,11 +2850,13 @@
         "properties": {
           "id": {
             "type": "string",
+            "description": "Unique identifier (UUID) for the Rail Search object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
+            "description": "The Junction resource type",
             "enum": [
               "rail-searches"
             ],
@@ -2640,30 +2870,36 @@
       },
       "RailSearchResult": {
         "title": "Rail Search Result",
-        "description": "Search result representing offer for specified origin and destination.",
         "type": "object",
+        "x-tags": [
+          "rail-searches"
+        ],
         "properties": {
           "id": {
             "type": "string",
+            "description": "Unique identifier (UUID) for the Rail Search Result object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5",
             "readOnly": true
           },
           "type": {
             "type": "string",
+            "description": "The Junction sesource type",
             "enum": [
-              "search-results"
+              "rail-search-results"
             ],
-            "example": "search-results"
+            "example": "rail-search-results"
           },
           "attributes": {
             "type": "object",
+            "description": "The properties that define a Rail Search Result object",
             "required": [
               "expiresAt"
             ],
             "properties": {
               "expiresAt": {
                 "type": "string",
+                "description": "The time at which the object will expire in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format",
                 "format": "date-time",
                 "example": "2019-08-24T14:15:22Z",
                 "readOnly": true
@@ -2672,6 +2908,7 @@
           },
           "relationships": {
             "type": "object",
+            "description": "The Junction resources related to this Rail Search Result object",
             "required": [
               "offers",
               "resultDetails",
@@ -2680,6 +2917,7 @@
             "properties": {
               "offers": {
                 "type": "object",
+                "description": "The list of Rail Offer IDs associated with this rail search result",
                 "required": [
                   "data"
                 ],
@@ -2687,31 +2925,29 @@
                   "data": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/OfferIdentifier"
+                      "$ref": "#/components/schemas/RailOfferIdentifier"
                     }
                   }
                 }
               },
               "resultDetails": {
                 "type": "object",
+                "description": "The list of Rail Result Detail IDs associated with this rail search result",
                 "required": [
                   "data"
                 ],
                 "properties": {
                   "data": {
-                    "oneOf": [
-                      {
-                        "type": "array",
-                        "items": {
-                          "$ref": "#/components/schemas/ResultDetailIdentifier"
-                        }
-                      }
-                    ]
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/RailResultDetailIdentifier"
+                    }
                   }
                 }
               },
               "search": {
                 "type": "object",
+                "description": "The Rail Search ID that this rail search result belongs to",
                 "required": [
                   "data"
                 ],
@@ -2731,17 +2967,40 @@
           "relationships"
         ]
       },
+      "RailSearchResultIncluded": {
+        "title": "Rail Search Result Included",
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/RailOffer"
+            },
+            {
+              "$ref": "#/components/schemas/RailResultDetail"
+            }
+          ],
+          "discriminator": {
+            "propertyName": "type",
+            "mapping": {
+              "rail-offers": "#/components/schemas/RailOffer",
+              "rail-result-details": "#/components/schemas/RailResultDetail"
+            }
+          }
+        }
+      },
       "ResultDetailIdentifier": {
         "title": "Result Detail Identifier",
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
+            "description": "Unique identifier (UUID) for the Result Detail object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format",
             "format": "uuid",
             "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
           },
           "type": {
             "type": "string",
+            "description": "The Junction resource type",
             "enum": [
               "result-details"
             ],
@@ -2785,12 +3044,14 @@
         "properties": {
           "links": {
             "type": "object",
+            "description": "A link that provides a url to access the full representation of a resource object",
             "required": [
               "self"
             ],
             "properties": {
               "self": {
                 "type": "string",
+                "description": "The url to retrieve the resource",
                 "format": "uri",
                 "example": "https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5",
                 "readOnly": true
@@ -3049,6 +3310,27 @@
         },
         "description": "Place identifier"
       },
+      "railSearchResultInclude": {
+        "name": "include",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "offers",
+              "resultDetails"
+            ]
+          },
+          "example": [
+            "offers"
+          ]
+        },
+        "description": "Customize which related resources to return",
+        "style": "form",
+        "explode": false
+      },
       "searchId": {
         "name": "searchId",
         "in": "path",
@@ -3058,7 +3340,7 @@
           "format": "uuid",
           "example": "04f83af9-90bb-4a0f-9881-03e1e690f7f5"
         },
-        "description": "Search identifier"
+        "description": "Unique identifier (UUID) for the Search object in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format"
       }
     },
     "securitySchemes": {

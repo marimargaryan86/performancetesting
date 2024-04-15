@@ -320,7 +320,7 @@ async def _get_search_results(
         )
 
     return grpc_pb2.ListSearchResultsResponse(
-        search_results=fixtures.get_search_results(),
+        search_results=fixtures.generate_search_results(request.search_id),
     )
 
 

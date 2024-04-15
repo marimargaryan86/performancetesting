@@ -135,7 +135,7 @@ class TestCarRentalGetSearch:
     ) -> None:
         response = await unauthorized_client.get(
             "/car-rental/searches/{searchId}".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.CAR_RENTAL_SEARCH_ID,
             ),
         )
 
@@ -159,7 +159,7 @@ class TestCarRentalGetSearch:
     ) -> None:
         response = await client.get(
             "/car-rental/searches/{searchId}".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.CAR_RENTAL_SEARCH_ID,
             ),
         )
 
@@ -173,7 +173,7 @@ class TestCarRentalListSearchResults:
     ) -> None:
         response = await client.get(
             "/car-rental/searches/{searchId}/results".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.CAR_RENTAL_SEARCH_ID,
             ),
             params={"include": "offers,resultDetails"},
         )

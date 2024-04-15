@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Sequence
 
 import lagom
 import timezonefinder
@@ -25,6 +26,7 @@ from snowfall.stdlib.integration.starlette import (
 from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
+_IncludesType = search_models.ResultDetailResource | search_models.OfferResource
 
 
 class RailSearch(endpoints.HTTPEndpoint):
@@ -63,6 +65,12 @@ class RailSearch(endpoints.HTTPEndpoint):
                 datetime.datetime.fromisoformat(departure_before),
             )
 
+        return_date = body.get("return_date", None)
+        if return_date:
+            return_date = protobuf.datetime_to_protobuf(
+                datetime.datetime.fromisoformat(return_date),
+            )
+
         response = await searches.EnqueueSearch(
             grpc_pb2.EnqueueSearchRequest(
                 search=models_pb2.Search(
@@ -77,12 +85,10 @@ class RailSearch(endpoints.HTTPEndpoint):
                             time_zone=destination_timezone or "",
                         ),
                         departure_after=protobuf.datetime_to_protobuf(
-                            datetime.datetime.fromisoformat(body["departureAfter"]),
+                            datetime.datetime.fromisoformat(body["departureAt"]),
                         ),
                         departure_before=departure_before,
-                        return_date=protobuf.datetime_to_protobuf(
-                            datetime.datetime.fromisoformat(body["returnAt"]),
-                        ),
+                        return_date=return_date,
                         outbound_offer_id=body.get("selectedOutboundOffer", ""),
                         passengers=[
                             models_pb2.Passenger(
@@ -172,6 +178,28 @@ class RailSearchResults(endpoints.HTTPEndpoint):
                     items_page.cursor,
                     pagination,
                 ),
+                included=self._resolve_included(items_page.sequence, request),
             ),
             request=request,
         )
+
+    def _resolve_included(
+        self,
+        search_results: Sequence[models_pb2.SearchResult],
+        request: requests.Request,
+    ) -> list[_IncludesType]:
+        included: list[_IncludesType] = []
+        requested_includes = request.scope["parsed_query_string"].get("include", [])
+        if "offers" in requested_includes:
+            included.extend([
+                search_models.OfferResource.from_proto(offer)
+                for search_result in search_results
+                for offer in search_result.offers
+            ])
+        if "resultDetails" in requested_includes:
+            included.extend([
+                search_models.ResultDetailResource.from_proto(result_detail)
+                for search_result in search_results
+                for result_detail in search_result.result_details
+            ])
+        return included

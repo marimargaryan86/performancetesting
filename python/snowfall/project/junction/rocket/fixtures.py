@@ -23,15 +23,26 @@ PROVIDERS = (
     "28a2ee10-d0a7-4a70-89f3-6d587f4dba33",
     "f87c4a6d-fa48-4abb-927c-25447827f511",
 )
-SEARCHES = ("cb2c2359-5520-42fc-9bf9-dc78d708cd5e",)
+CAR_RENTAL_SEARCH_ID = "c827332f-3460-4e79-8ff7-336787a2c88c"
+RAIL_SEARCH_ID = "cca489c9-fac4-4e33-bf53-7b06052f8116"
+FERRY_SEARCH_ID = "ceeb0307-be96-4066-9bdc-5f1b464bbb78"
+SEARCHES = (CAR_RENTAL_SEARCH_ID, RAIL_SEARCH_ID, FERRY_SEARCH_ID)
 PLACES = ("3debfa7c-9884-5409-86c8-33f3e491382e",)
 PLACE_IATAS = ("BER",)
 NOT_FOUND_PLACE_IATA = "TTT"
 PLACE_NAMES = ("Takoma Park",)
 NOT_FOUND_PLACE_NAME = "not existing place"
-SEARCH_RESULTS = (
-    "5927b3ce-fbd7-4f8b-b456-b1b7fd44cdad",
-    "c9fb49fc-7f2d-4403-a8b1-5a8c065ea8ce",
+CAR_RENTAL_SEARCH_RESULTS = (
+    "48d5d190-1e02-40a7-9483-fce0902d4c58",
+    "a97d713f-60cc-46fa-b207-dce1ff8606d2",
+)
+RAIL_SEARCH_RESULTS = (
+    "33795b04-e724-4a3a-8cab-d188f7ac8e1e",
+    "b1382de6-9e7c-421e-9b43-f3bc62a91961",
+)
+FERRY_SEARCH_RESULTS = (
+    "71337c8a-3c87-40b7-95e0-57f38baa6546",
+    "eb1019b2-e5cc-4a22-a481-67ad7706415a",
 )
 RESULT_DETAILS = (
     "2d178001-46ea-415f-8ec7-f22f2318b7c0",
@@ -44,17 +55,10 @@ OFFERS = (
 EXPIRES_AT = protobuf.datetime_to_protobuf(
     datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1),
 )
+FAKE_ID = 1234
 
 PLACE_LATITUDE = 52.5170365
 PLACE_LONGITUDE = 13.3888599
-
-
-def get_searches() -> list[searches_pb2.Search]:
-    return [generate_search(identifier) for identifier in SEARCHES]
-
-
-def get_search_results() -> list[searches_pb2.SearchResult]:
-    return [generate_search_result(identifier) for identifier in SEARCH_RESULTS]
 
 
 def generate_search(
@@ -70,8 +74,6 @@ def generate_search(
         reseller_id=RESELLER_ID,
         expires_at=EXPIRES_AT,
         status=status,
-        rail=generate_rail_one_way_search_criterion(),
-        search_result_ids=list(SEARCH_RESULTS),
     )
 
     if search_request:
@@ -82,13 +84,17 @@ def generate_search(
                 search.ferry.CopyFrom(search_request.ferry)
             case "car_rental":
                 search.car_rental.CopyFrom(search_request.car_rental)
-    else:
+    elif identifier == RAIL_SEARCH_ID:
+        search.rail.CopyFrom(generate_rail_one_way_search_criterion())
+    elif identifier == FERRY_SEARCH_ID:
+        search.ferry.CopyFrom(generate_ferry_one_way_search_criterion())
+    elif identifier == CAR_RENTAL_SEARCH_ID:
         search.car_rental.CopyFrom(generate_car_rental_criterion())
 
     return search
 
 
-def generate_offer(offer_id: str) -> searches_pb2.Offer:
+def generate_car_rental_offer(offer_id: str) -> searches_pb2.Offer:
     return searches_pb2.Offer(
         id=offer_id,
         price=money_pb2.Money(currency_code="EUR"),
@@ -97,7 +103,27 @@ def generate_offer(offer_id: str) -> searches_pb2.Offer:
     )
 
 
-def generate_result_detail(result_detail_id: str) -> searches_pb2.ResultDetail:
+def generate_rail_offer(offer_id: str) -> searches_pb2.Offer:
+    return searches_pb2.Offer(
+        id=offer_id,
+        price=money_pb2.Money(currency_code="EUR"),
+        price_breakdown=[],
+        rail=searches_pb2.RailOffer(cabin_class=[]),
+    )
+
+
+def generate_ferry_offer(offer_id: str) -> searches_pb2.Offer:
+    return searches_pb2.Offer(
+        id=offer_id,
+        price=money_pb2.Money(currency_code="EUR"),
+        price_breakdown=[],
+        ferry=searches_pb2.FerryOffer(),
+    )
+
+
+def generate_car_rental_result_detail(
+    result_detail_id: str,
+) -> searches_pb2.ResultDetail:
     return searches_pb2.ResultDetail(
         id=result_detail_id,
         car_rental=searches_pb2.CarRentalResultDetail(
@@ -113,15 +139,124 @@ def generate_result_detail(result_detail_id: str) -> searches_pb2.ResultDetail:
     )
 
 
-def generate_search_result(identifier: str) -> searches_pb2.SearchResult:
-    return searches_pb2.SearchResult(
-        id=identifier,
-        search_id=SEARCHES[0],
-        provider_id=PROVIDERS[0],
-        expires_at=EXPIRES_AT,
-        offers=[generate_offer(offer) for offer in OFFERS],
-        result_details=[
-            generate_result_detail(result_detail) for result_detail in RESULT_DETAILS
+def generate_ferry_result_detail(result_detail_id: str) -> searches_pb2.ResultDetail:
+    return searches_pb2.ResultDetail(
+        id=result_detail_id,
+        ferry=searches_pb2.FerryResultDetail(
+            origin=generate_point(string.uuid()),
+            destination=generate_point(string.uuid()),
+            departure_date=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+            arrival_date=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+            outbound_segment=True,
+            segment_sequence=1,
+            duration_in_minutes=60,
+            ferry_operator=searches_pb2.FerryOperator(
+                id=123,  # noqa: WPS432
+                name="ferry-op",
+            ),
+        ),
+    )
+
+
+def generate_rail_result_detail(result_detail_id: str) -> searches_pb2.ResultDetail:
+    return searches_pb2.ResultDetail(
+        id=result_detail_id,
+        rail=searches_pb2.RailResultDetail(
+            origin=generate_point(string.uuid()),
+            destination=generate_point(string.uuid()),
+            departure_date=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+            arrival_date=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(tz=datetime.UTC),
+            ),
+            outbound_segment=True,
+            segment_sequence=1,
+        ),
+    )
+
+
+def generate_search_results(search_id: str) -> list[searches_pb2.SearchResult]:
+    if search_id == CAR_RENTAL_SEARCH_ID:
+        return generate_car_rental_search_results(search_id)
+    if search_id == FERRY_SEARCH_ID:
+        return generate_ferry_search_results(search_id)
+
+    return generate_rail_search_results(search_id)
+
+
+def generate_car_rental_search_results(
+    search_id: str,
+) -> list[searches_pb2.SearchResult]:
+    return [
+        searches_pb2.SearchResult(
+            id=search_result,
+            search_id=search_id,
+            provider_id=PROVIDERS[0],
+            expires_at=EXPIRES_AT,
+            offers=[generate_car_rental_offer(offer) for offer in OFFERS],
+            result_details=[
+                generate_car_rental_result_detail(result_detail)
+                for result_detail in RESULT_DETAILS
+            ],
+        )
+        for search_result in CAR_RENTAL_SEARCH_RESULTS
+    ]
+
+
+def generate_ferry_search_results(
+    search_id: str,
+) -> list[searches_pb2.SearchResult]:
+    return [
+        searches_pb2.SearchResult(
+            id=search_result,
+            search_id=search_id,
+            provider_id=PROVIDERS[0],
+            expires_at=EXPIRES_AT,
+            offers=[generate_ferry_offer(offer) for offer in OFFERS],
+            result_details=[
+                generate_ferry_result_detail(result_detail)
+                for result_detail in RESULT_DETAILS
+            ],
+        )
+        for search_result in FERRY_SEARCH_RESULTS
+    ]
+
+
+def generate_rail_search_results(
+    search_id: str,
+) -> list[searches_pb2.SearchResult]:
+    return [
+        searches_pb2.SearchResult(
+            id=search_result,
+            search_id=search_id,
+            provider_id=PROVIDERS[0],
+            expires_at=EXPIRES_AT,
+            offers=[generate_rail_offer(offer) for offer in OFFERS],
+            result_details=[
+                generate_rail_result_detail(result_detail)
+                for result_detail in RESULT_DETAILS
+            ],
+        )
+        for search_result in RAIL_SEARCH_RESULTS
+    ]
+
+
+def generate_ferry_one_way_search_criterion() -> searches_pb2.Ferry:
+    return searches_pb2.Ferry(
+        origin=generate_point(string.uuid()),
+        destination=generate_point(string.uuid()),
+        departure_after=protobuf.datetime_to_protobuf(
+            datetime.datetime.now(tz=datetime.UTC),
+        ),
+        passengers=[
+            searches_pb2.Passenger(
+                date_of_birth=date_pb2.Date(year=1987, month=5, day=24),  # noqa: WPS432
+            ),
         ],
     )
 

@@ -45,7 +45,7 @@ class TestFerryGetSearch:
     ) -> None:
         response = await unauthorized_client.get(
             "/ferry/searches/{searchId}".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.FERRY_SEARCH_ID,
             ),
         )
 
@@ -69,7 +69,7 @@ class TestFerryGetSearch:
     ) -> None:
         response = await client.get(
             "/ferry/searches/{searchId}".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.FERRY_SEARCH_ID,
             ),
         )
 
@@ -83,7 +83,7 @@ class TestListSearchResults:
     ) -> None:
         response = await client.get(
             "/ferry/searches/{searchId}/results".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.FERRY_SEARCH_ID,
             ),
         )
 

@@ -13,7 +13,7 @@ class TestRailCreateSearch:
             "data": {
                 "type": "rail-searches",
                 "attributes": {
-                    "departureAfter": "2024-04-05T08:00:00Z",
+                    "departureAt": "2024-04-05T08:00:00Z",
                     "departureBefore": "2024-04-05T08:00:00Z",
                     "returnAt": "2024-04-07T08:00:00Z",
                     "origin": {
@@ -46,7 +46,7 @@ class TestRailGetSearch:
     ) -> None:
         response = await unauthorized_client.get(
             "/rail/searches/{searchId}".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.RAIL_SEARCH_ID,
             ),
         )
 
@@ -70,7 +70,7 @@ class TestRailGetSearch:
     ) -> None:
         response = await client.get(
             "/rail/searches/{searchId}".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.RAIL_SEARCH_ID,
             ),
         )
 
@@ -84,10 +84,29 @@ class TestRailListSearchResults:
     ) -> None:
         response = await client.get(
             "/rail/searches/{searchId}/results".format(
-                searchId=fixtures.SEARCHES[0],
+                searchId=fixtures.RAIL_SEARCH_ID,
             ),
         )
 
         assert response.status_code == status.HTTP_200_OK
         results = response.json()
         assert len(results["data"]) == 2
+
+    async def test_list_rail_search_results_with_includes_successful(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/rail/searches/{searchId}/results".format(
+                searchId=fixtures.RAIL_SEARCH_ID,
+            ),
+            params={"include": "offers,resultDetails"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()
+        assert len(results["data"]) == 2
+
+        included_types = [resource["type"] for resource in results["included"]]
+        assert "rail-offers" in included_types
+        assert "rail-result-details" in included_types
