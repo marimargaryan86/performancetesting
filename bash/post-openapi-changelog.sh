@@ -11,7 +11,7 @@ fi
 mkdir -p "/tmp/${CI_COMMIT_BEFORE_SHA}/openapi"
 git archive "${CI_COMMIT_BEFORE_SHA}:openapi" | tar -x -C "/tmp/${CI_COMMIT_BEFORE_SHA}/openapi"
 
-for f in openapi/**/openapi.json; do
+for f in openapi/**/openapi.*; do
 	if [ ! -f "/tmp/${CI_COMMIT_BEFORE_SHA}/${f}" ]; then
 		continue
 	fi

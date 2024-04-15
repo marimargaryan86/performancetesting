@@ -35,7 +35,7 @@ const config: Config = {
           },
           {
             id: 'junction-go-data-api',
-            spec: 'openapi/junction/data_api/openapi.json',
+            spec: 'openapi/junction/data_api/openapi.yaml',
           },
           {
             id: 'junction-go-client-api',

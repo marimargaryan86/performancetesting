@@ -89,7 +89,7 @@ overrides:
       - "junction/client_api/openapi.json"
       - "junction/mobile_api/openapi.json"
       - "junction/hub_api/openapi.json"
-      - "junction/data_api/openapi.json"
+      - "junction/data_api/openapi.yaml"
       - "junction/pay_admin_api/openapi.json"
       - "junction/pay_api/openapi.json"
       - "junction/plus_api/openapi.json"
@@ -103,7 +103,7 @@ overrides:
     rules:
       oas3-valid-schema-example: "off"
   - files:
-      - "junction/data_api/openapi.json#/paths/~1locations"
+      - "junction/data_api/openapi.yaml#/paths/~1locations"
     rules:
       ensure-pagination: info
   - files:

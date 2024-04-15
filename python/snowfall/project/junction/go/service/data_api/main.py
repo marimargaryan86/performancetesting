@@ -20,7 +20,7 @@ async def _http(
         ),
         openapi_path=filesystem.resource_path(
             "junction.data_api",
-            "openapi.json",
+            "openapi.yaml",
         ),
     )
 

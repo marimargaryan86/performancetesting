@@ -12,7 +12,7 @@ openapi:breaking:
     shopt -s nullglob
     mkdir -p "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/openapi"
     git archive "${CI_MERGE_REQUEST_DIFF_BASE_SHA}:openapi" | tar -x -C "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/openapi"
-    for f in openapi/**/openapi.json; do
+    for f in openapi/**/openapi.*; do
       if [ ! -f "/tmp/${CI_MERGE_REQUEST_DIFF_BASE_SHA}/${f}" ]; then
         continue
       fi
@@ -45,7 +45,7 @@ openapi:test:
     entrypoint: [""]
   interruptible: true
   script:
-    - for f in openapi/**/*.json; do spectral lint --ruleset "openapi/.spectral.yml" --fail-severity warn --display-only-failures "$f"; done
+    - for f in openapi/**/openapi.*; do spectral lint --ruleset "openapi/.spectral.yml" --fail-severity warn --display-only-failures "$f"; done
   needs: []
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

@@ -35,10 +35,10 @@
 
 [Specification][2] @backend-team-leads
 *.proto
-/openapi/**/*.json
+/openapi/**/openapi.*
 
 [Specification][2] @rocket-leads
-/openapi/junction/rocket_api/*.json
+/openapi/junction/rocket_api/openapi.*
 /protobuf/snowfall/project/junction/rocket/**/*.proto
 
 [Specification] @platform-engineers
