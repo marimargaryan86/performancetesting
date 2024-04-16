@@ -81,8 +81,8 @@ overrides:
       - "junction/pay_admin_api/openapi.json#/components/schemas/Authentication/properties/attributes"
       - "junction/pay_admin_api/openapi.json#/components/schemas/ChangePassword/properties/attributes"
       - "junction/plus_api/openapi.json#/components/schemas/TripResponseBody"
-      - "junction/rocket_api/openapi.json#/components/responses/Conflict/content"
-      - "junction/rocket_api/openapi.json#/components/responses/UnprocessableEntity/content"
+      - "junction/rocket_api/openapi.yaml#/components/responses/Conflict/content"
+      - "junction/rocket_api/openapi.yaml#/components/responses/UnprocessableEntity/content"
     rules:
       response-bodies: "off"
   - files:

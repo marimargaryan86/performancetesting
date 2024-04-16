@@ -1,0 +1,2616 @@
+---
+openapi: 3.0.0
+info:
+  title: Junction Rocket API
+  version: 1.0.0
+  description: |-
+    This API follows the [JSON:API][jsonapi] specification.
+
+    A recommended booking flow example:
+
+    1. Create search request.
+    2. Get search results
+    3. Create quote
+    4. Create a booking
+
+    TODO: write some stuff here :)
+  contact:
+    name: Snowfall
+    url: https://www.snowfalltravel.com
+    email: info@snowfalltravel.com
+  license:
+    name: Junction
+    url: https://www.snowfalltravel.com
+x-tagGroups:
+  - name: Air
+    tags:
+      - air-searches
+      - air-quotes
+      - air-bookings
+  - name: Car Rental
+    tags:
+      - car-rental-searches
+      - car-rental-quotes
+      - car-rental-bookings
+  - name: Ferry
+    tags:
+      - ferry-searches
+      - ferry-quotes
+      - ferry-bookings
+  - name: Hotel
+    tags:
+      - hotel-searches
+      - hotel-quotes
+      - hotel-bookings
+  - name: Rail
+    tags:
+      - rail-searches
+      - rail-quotes
+      - rail-bookings
+  - name: Places
+    tags:
+      - places
+tags:
+  - name: air-bookings
+    description: 'TODO: ...'
+    x-displayName: Bookings
+  - name: air-quotes
+    description: 'TODO: ...'
+    x-displayName: Quotes
+  - name: air-searches
+    description: >-
+      TODO: To search for flights, you'll need to create an air search request.
+      An air search request describes the passengers and where and when they
+      want to travel.
+    x-displayName: Searches
+  - name: car-rental-bookings
+    description: 'TODO: ...'
+    x-displayName: Bookings
+  - name: car-rental-quotes
+    description: 'TODO: ...'
+    x-displayName: Quotes
+  - name: car-rental-searches
+    description: >-
+      TODO: To search for car rentals, you'll need to create an car rental
+      search request. A car rental search request describes the passengers and
+      where and when they want to travel.
+    x-displayName: Searches
+  - name: ferry-bookings
+    description: 'TODO: ...'
+    x-displayName: Bookings
+  - name: ferry-quotes
+    description: 'TODO: ...'
+    x-displayName: Quotes
+  - name: ferry-searches
+    description: >-
+      TODO: To search for ferries, you'll need to create an ferry search
+      request. A ferry search request describes the passengers and where and
+      when they want to travel.
+    x-displayName: Searches
+  - name: hotel-bookings
+    description: 'TODO: ...'
+    x-displayName: Bookings
+  - name: hotel-quotes
+    description: 'TODO: ...'
+    x-displayName: Quotes
+  - name: hotel-searches
+    description: >-
+      TODO: To search for hotels, you'll need to create a hotel search request.
+      A hotel search request describes the passengers and where and when they
+      want to stay.
+    x-displayName: Searches
+  - name: internal
+    description: Endpoints not for public use.
+    x-displayName: Internal
+  - name: places
+    description: >-
+      To search within any Junction vertical, you need at least one place to
+      travel to, usually also a place to travel from! Our Places endpoint allows
+      you to find these locations and identify which verticals you can search
+      with them.
+    x-displayName: Places
+  - name: rail-bookings
+    description: 'TODO: ...'
+    x-displayName: Bookings
+  - name: rail-quotes
+    description: 'TODO: ...'
+    x-displayName: Quotes
+  - name: rail-searches
+    description: >-
+      TODO: To search for rail, you'll need to create a rail search request. A
+      rail search request describes the passengers and where and when they want
+      to travel.
+    x-displayName: Searches
+paths:
+  /air/searches:
+    post:
+      summary: Create air search
+      tags:
+        - air-searches
+      operationId: post-air-searches
+      description: Used to initiate an air search
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AirSearch'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AirSearch'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /air/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get air search
+      tags:
+        - air-searches
+      operationId: get-air-searches-id
+      description: Used to retrieve an Air Search by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Air Search Response
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/AirSearch'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /air/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+      - $ref: '#/components/parameters/searchResultInclude'
+    get:
+      summary: List air search results
+      tags:
+        - air-searches
+      operationId: get-air-searches-id-results
+      description: Used to retrieve Search Results for an Air Search ID
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        minItems: 0
+                        uniqueItems: true
+                        items:
+                          $ref: '#/components/schemas/AirSearchResult'
+                      included:
+                        $ref: '#/components/schemas/AirSearchResultIncluded'
+                    required:
+                      - data
+                  - $ref: '#/components/schemas/NextLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /car-rental/searches:
+    post:
+      summary: Create car rental search
+      tags:
+        - car-rental-searches
+      operationId: post-car-rental-searches
+      description: Used to initiate a Car Rental Search
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/CarRentalSearch'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CarRentalSearch'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /car-rental/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get car rental search
+      tags:
+        - car-rental-searches
+      operationId: get-car-rental-searches-id
+      description: Used to retrieve a Car Rental Search by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/CarRentalSearch'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /car-rental/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+      - $ref: '#/components/parameters/searchResultInclude'
+    get:
+      summary: List car rental search results
+      tags:
+        - car-rental-searches
+      operationId: get-car-rental-searches-id-results
+      description: Used to retrieve Search Results for a Car Rental Search ID
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        minItems: 0
+                        uniqueItems: true
+                        items:
+                          $ref: '#/components/schemas/CarRentalSearchResult'
+                      included:
+                        $ref: '#/components/schemas/CarRentalSearchResultIncluded'
+                    required:
+                      - data
+                  - $ref: '#/components/schemas/NextLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /ferry/searches:
+    post:
+      summary: Create ferry search
+      operationId: post-ferry-searches
+      description: Used to initiate a Ferry Search
+      tags:
+        - ferry-searches
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/FerrySearch'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FerrySearch'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /ferry/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get ferry search
+      operationId: get-ferry-searches-id
+      description: Used to retrieve a Ferry Search by ID
+      tags:
+        - ferry-searches
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/FerrySearch'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /ferry/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: List ferry search results
+      operationId: get-ferry-searches-id-results
+      description: Used to retrieve Search Results for a Ferry Search ID
+      tags:
+        - ferry-searches
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        minItems: 0
+                        uniqueItems: true
+                        items:
+                          $ref: '#/components/schemas/FerrySearchResult'
+                    required:
+                      - data
+                  - $ref: '#/components/schemas/NextLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /health:
+    get:
+      summary: Health
+      tags:
+        - internal
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    meta:
+                      status: ok
+                properties:
+                  meta:
+                    type: object
+                    required:
+                      - status
+                    properties:
+                      status:
+                        type: string
+                        description: Health status
+                        enum:
+                          - pass
+                          - fail
+                          - warn
+                        example: pass
+                required:
+                  - meta
+      operationId: get-health
+      description: Check the application health.
+      x-internal: true
+      security: []
+  /hotel-rooms/searches:
+    post:
+      summary: Create hotel room search
+      tags:
+        - hotel-searches
+      operationId: post-hotel-rooms-searches
+      description: Used to initiate a hotel room search
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HotelRoomsSearchRequest'
+              required:
+                - data
+      responses:
+        '200':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Hotel Search Response
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /hotel-rooms/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get hotel rooms search
+      operationId: get-hotel-rooms-searches-id
+      description: Used to lookup the status of a hotel rooms search
+      tags:
+        - hotel-searches
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Hotel Search Rooms Response
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /hotel-rooms/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: List hotel rooms search results
+      tags:
+        - hotel-searches
+      operationId: get-hotel-rooms-searches-id-results
+      description: Used to lookup data for a hotel rooms search result
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Hotel Rooms Search Response
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /hotel/searches:
+    post:
+      summary: Create hotel search
+      tags:
+        - hotel-searches
+      operationId: post-hotel-searches
+      description: Used to initiate a Hotel Search
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/HotelSearchRequest'
+              required:
+                - data
+      responses:
+        '200':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Hotel Search Response
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /hotel/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get hotel search
+      tags:
+        - hotel-searches
+      operationId: get-hotel-searches-id
+      description: Used to retrieve a Hotel Search by ID
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Hotel Search Response
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /hotel/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: List hotel search results
+      tags:
+        - hotel-searches
+      operationId: get-hotel-searches-id-results
+      description: Used to retrieve Search Results for a Hotel ID
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Hotel Search Response
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /places:
+    get:
+      summary: List Places
+      tags:
+        - places
+      parameters:
+        - $ref: '#/components/parameters/filterNameLike'
+        - $ref: '#/components/parameters/filterTypeEq'
+        - $ref: '#/components/parameters/filterIataEq'
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+        - name: query[coordinates]
+          in: query
+          explode: false
+          schema:
+            type: array
+            items:
+              type: number
+              example: 123
+            minItems: 2
+            maxItems: 3
+            example:
+              - -123.4567
+              - 45.6789
+          description: >-
+            Specifies a point to search for nearby places, within a radius (
+            radius is in meters ). Defined as `longitude,latitude,radius`
+        - name: query[placeToSearchWithin]
+          in: query
+          explode: false
+          schema:
+            type: string
+            format: uuid
+            example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          description: >-
+            Specifies a place to search within, any further filtering will be
+            applied to places it contains
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        minItems: 0
+                        uniqueItems: true
+                        items:
+                          $ref: '#/components/schemas/Place'
+                    required:
+                      - data
+                  - $ref: '#/components/schemas/NextLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      operationId: get-places
+      description: Used to retrieve places.
+  /places/{placeId}:
+    parameters:
+      - $ref: '#/components/parameters/placeId'
+    get:
+      summary: Get Place
+      tags:
+        - places
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Place'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      operationId: get-places-id
+      description: Used to lookup data for a Place Identifier.
+  /rail/searches:
+    post:
+      summary: Create rail search
+      operationId: post-rail-searches
+      description: Used to initiate a Rail Search
+      tags:
+        - rail-searches
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/RailSearch'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RailSearch'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /rail/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get rail search
+      operationId: get-rail-searches-id
+      description: Used to retrieve a Rail Search by ID
+      tags:
+        - rail-searches
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/RailSearch'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /rail/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+      - $ref: '#/components/parameters/railSearchResultInclude'
+    get:
+      summary: List rail search results
+      operationId: get-rail-searches-id-results
+      description: Used to retrieve Search Results for a Rail Search ID
+      tags:
+        - rail-searches
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        minItems: 0
+                        uniqueItems: true
+                        items:
+                          $ref: '#/components/schemas/RailSearchResult'
+                      included:
+                        $ref: '#/components/schemas/RailSearchResultIncluded'
+                    required:
+                      - data
+                  - $ref: '#/components/schemas/NextLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    AirSearch:
+      title: Air Search
+      x-tags:
+        - air-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - air-searches
+              example: air-searches
+            attributes:
+              type: object
+              required:
+                - origin
+                - destination
+                - departureAt
+                - passengers
+              properties:
+                expiresAt:
+                  type: string
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                status:
+                  type: string
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                origin:
+                  type: string
+                  example: LON
+                destination:
+                  type: string
+                  example: PAR
+                departureAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnDepartureAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-25T14:15:22Z'
+                passengers:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/Passenger'
+            relationships:
+              type: object
+              properties:
+                selectedOutboundOffer:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OfferIdentifier'
+          required:
+            - id
+            - type
+            - attributes
+        - $ref: '#/components/schemas/SelfLink'
+    AirSearchIdentifier:
+      title: Air Search Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          enum:
+            - air-searches
+          example: air-searches
+      required:
+        - id
+        - type
+      description: A unique identifier for air search.
+    AirSearchOffer:
+      title: Air Search Offer
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - offers
+              example: offers
+            attributes:
+              type: object
+              required:
+                - price
+                - fareType
+                - name
+                - cabinDetails
+              properties:
+                price:
+                  $ref: '#/components/schemas/Price'
+                fareType:
+                  type: string
+                  enum:
+                    - basic
+                    - standard
+                    - enhanced
+                    - premium
+                    - premium-plus
+                    - lux
+                  example: basic
+                name:
+                  type: string
+                  example: Economy Basic
+                cabinDetails:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CabinDetails'
+          required:
+            - id
+            - type
+            - attributes
+      description: Result of searching for offers.
+    AirSearchResult:
+      title: Air Search Result
+      type: object
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - search-results
+              example: search-results
+            attributes:
+              type: object
+              required:
+                - expiresAt
+              properties:
+                expiresAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                  readOnly: true
+            relationships:
+              type: object
+              required:
+                - offers
+                - resultDetails
+                - search
+              properties:
+                offers:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OfferIdentifier'
+                resultDetails:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      oneOf:
+                        - type: array
+                          items:
+                            $ref: '#/components/schemas/ResultDetailIdentifier'
+                search:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/AirSearchIdentifier'
+          required:
+            - id
+            - type
+            - attributes
+            - relationships
+      description: Search result representing offer for specified origin and destination.
+    AirSearchResultDetail:
+      title: Air Search Result Detail
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - result-details
+              example: result-details
+            attributes:
+              type: object
+              properties:
+                flightNumber:
+                  type: string
+                  example: '71'
+                airline:
+                  type: string
+                  example: EK
+                arrivalStation:
+                  type: string
+                  example: LON
+                departureStation:
+                  type: string
+                  example: PAR
+                departureAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                arrivalAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                durationOfSegmentMinutes:
+                  type: integer
+                  example: 460
+                  description: Length of time taken for flight segment.
+                segmentKey:
+                  type: string
+                  example: EK71
+                operatingAirline:
+                  type: string
+                  example: EK
+              required:
+                - flightNumber
+                - airline
+                - arrivalStation
+                - departureStation
+                - departureTime
+                - arrivalTime
+                - duration
+                - segmentKey
+                - operatingAirline
+          required:
+            - id
+            - type
+            - attributes
+      description: Result of searching for offers.
+    AirSearchResultIncluded:
+      title: OfferIncluded
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/AirSearchOffer'
+          - $ref: '#/components/schemas/AirSearchResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            offers: '#/components/schemas/AirSearchOffer'
+            result-details: '#/components/schemas/AirSearchResultDetail'
+    CabinDetails:
+      title: Cabin Details
+      description: Cabin Information for Air Search Offers.
+      type: object
+      properties:
+        uid:
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        marketingName:
+          type: string
+          example: Economy
+      required:
+        - id
+    CarRentalOffer:
+      title: Car Rental Offer
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - offers
+              example: offers
+            attributes:
+              type: object
+              required:
+                - price
+                - priceBreakdown
+                - conditionalPrices
+              properties:
+                price:
+                  $ref: '#/components/schemas/Price'
+                priceBreakdown:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PriceBreakdown'
+                conditionalPrices:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ConditionalPrice'
+          required:
+            - id
+            - type
+            - attributes
+      description: Result of searching for offers. Used for creating an Order.
+    CarRentalResultDetail:
+      title: Car Rental Result Detail
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - result-details
+              example: result-details
+            attributes:
+              type: object
+              properties:
+                pickupLocation:
+                  $ref: '#/components/schemas/Coordinates'
+                returnLocation:
+                  $ref: '#/components/schemas/Coordinates'
+                imageUrl:
+                  type: string
+                  format: uri
+                  example: >-
+                    https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg
+                  readOnly: true
+                  nullable: true
+                model:
+                  type: string
+                  example: Fiat 500
+                  readOnly: true
+                  nullable: true
+                seatsCount:
+                  type: integer
+                  example: 4
+                  readOnly: true
+                  nullable: true
+                doorsCount:
+                  type: integer
+                  example: 2
+                  readOnly: true
+                  nullable: true
+                transmission:
+                  type: string
+                  example: manual
+                  readOnly: true
+                  nullable: true
+                baggageQuantity:
+                  type: integer
+                  example: 3
+                  readOnly: true
+                  nullable: true
+                vehicleType:
+                  type: string
+                  example: Station Wagon
+                  readOnly: true
+                  nullable: true
+                vendor:
+                  type: string
+                  example: Sixt
+                  readOnly: true
+                  nullable: true
+                unlimitedMileage:
+                  type: boolean
+                  example: true
+                  readOnly: true
+                  nullable: true
+                airConditioning:
+                  type: boolean
+                  example: false
+                  readOnly: true
+                  nullable: true
+                pickupAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+          required:
+            - id
+            - type
+            - attributes
+      description: Result of searching for offers.
+    CarRentalSearch:
+      x-tags:
+        - car-rental-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - car-searches
+              example: car-searches
+            attributes:
+              type: object
+              required:
+                - driverAge
+                - expiresAt
+                - status
+                - pickupAt
+                - returnAt
+                - pickupLocation
+                - returnLocation
+              properties:
+                expiresAt:
+                  type: string
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                status:
+                  type: string
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                driverAge:
+                  type: number
+                  format: int32
+                  example: 32
+                  minimum: 15
+                pickupAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                pickupLocation:
+                  $ref: '#/components/schemas/Coordinates'
+                returnLocation:
+                  $ref: '#/components/schemas/Coordinates'
+          required:
+            - id
+            - type
+            - attributes
+        - $ref: '#/components/schemas/SelfLink'
+      title: Car Rental Search
+      x-examples: {}
+    CarRentalSearchIdentifier:
+      title: Car Rental Search Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          enum:
+            - car-searches
+          example: car-searches
+      required:
+        - id
+        - type
+      description: A unique identifier for car rental search.
+    CarRentalSearchResult:
+      title: Car Rental Search Result
+      type: object
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - search-results
+              example: search-results
+            attributes:
+              type: object
+              required:
+                - expiresAt
+              properties:
+                expiresAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                  readOnly: true
+            relationships:
+              type: object
+              required:
+                - offers
+                - resultDetails
+                - search
+              properties:
+                offers:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OfferIdentifier'
+                resultDetails:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      oneOf:
+                        - type: array
+                          items:
+                            $ref: '#/components/schemas/ResultDetailIdentifier'
+                search:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/CarRentalSearchIdentifier'
+          required:
+            - id
+            - type
+            - attributes
+            - relationships
+      description: Search result representing offer for specified origin and destination.
+    CarRentalSearchResultIncluded:
+      title: OfferIncluded
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/CarRentalOffer'
+          - $ref: '#/components/schemas/CarRentalResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            offers: '#/components/schemas/CarRentalOffer'
+            result-details: '#/components/schemas/CarRentalResultDetail'
+    ConditionalPrice:
+      title: Conditional Price
+      description: Additional fees that may or may not be included in total price
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        description:
+          type: string
+          example: one-way fee
+          nullable: true
+        includedInTotal:
+          type: boolean
+          example: false
+          nullable: true
+      required:
+        - price
+    Coordinates:
+      title: Coordinates
+      allOf:
+        - type: object
+          properties:
+            latitude:
+              type: number
+              format: float
+              example: 59.858611
+              minimum: -90
+              maximum: 90
+            longitude:
+              type: number
+              format: float
+              example: 59.858611
+              minimum: -180
+              maximum: 180
+          required:
+            - latitude
+            - longitude
+      description: A Coordinate represented via latitude and longitude
+    Error:
+      title: Error
+      type: object
+      description: JSON:API error
+      properties:
+        status:
+          type: string
+          pattern: ^[45][0-9]{2}$
+          description: >-
+            The HTTP status code applicable to this problem, expressed as a
+            string value.
+          example: '404'
+        title:
+          type: string
+          example: Not Found
+          description: >-
+            A short, human-readable summary of the problem that SHOULD NOT
+            change from occurrence to occurrence of the problem, except for
+            purposes of localization.
+        detail:
+          type: string
+          description: >-
+            A human-readable explanation specific to this occurrence of the
+            problem. Like `title`, this field’s value can be localized.
+          example: Nothing matches the given URI
+        code:
+          type: string
+          example: required
+          description: An application-specific error code, expressed as a string value.
+        source:
+          description: An object containing references to the source of the error.
+          properties:
+            pointer:
+              type: string
+              example: /data/attributes/title
+              description: A JSON Pointer to the associated entity in the request document.
+            parameter:
+              type: string
+              example: page[cursor]
+              description: A string indicating which URI query parameter caused the error.
+            header:
+              type: string
+              example: X-Request-Id
+              description: >-
+                A string indicating the name of a single request header which
+                caused the error.
+          minProperties: 1
+          maxProperties: 1
+          type: object
+      required:
+        - status
+        - detail
+    FerrySearch:
+      title: Ferry Search
+      x-tags:
+        - ferry-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - ferry-searches
+              example: ferry-searches
+            attributes:
+              type: object
+              required:
+                - expiresAt
+                - status
+                - departureAfter
+                - returnAt
+                - origin
+                - destination
+                - passengers
+              properties:
+                expiresAt:
+                  type: string
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                status:
+                  type: string
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                departureAfter:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnAt:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                origin:
+                  $ref: '#/components/schemas/Coordinates'
+                destination:
+                  $ref: '#/components/schemas/Coordinates'
+                passengers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Passenger'
+            relationships:
+              type: object
+              required:
+                - selectedOutboundOffer
+              properties:
+                selectedOutboundOffer:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OfferIdentifier'
+          required:
+            - id
+            - type
+            - attributes
+        - $ref: '#/components/schemas/SelfLink'
+    FerrySearchIdentifier:
+      title: Ferry Search Identifier
+      description: A unique identifier for ferry search.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          enum:
+            - ferry-searches
+          example: ferry-searches
+      required:
+        - id
+        - type
+    FerrySearchResult:
+      title: Ferry Search Result
+      description: Search result representing offer for specified origin and destination.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - search-results
+          example: search-results
+        attributes:
+          type: object
+          required:
+            - expiresAt
+          properties:
+            expiresAt:
+              type: string
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+              readOnly: true
+        relationships:
+          type: object
+          required:
+            - offers
+            - resultDetails
+            - search
+          properties:
+            offers:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/OfferIdentifier'
+            resultDetails:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  oneOf:
+                    - type: array
+                      items:
+                        $ref: '#/components/schemas/ResultDetailIdentifier'
+            search:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/FerrySearchIdentifier'
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+    HotelRoomsSearchRequest:
+      title: Hotel Rooms Search Request
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - hotel-rooms-searches
+          example: hotel-rooms-searches
+        attributes:
+          type: object
+          required:
+            - ref
+          properties:
+            ref:
+              type: string
+              example: 1F0-iNERRbQ
+      required:
+        - id
+        - type
+        - attributes
+    HotelSearchRequest:
+      title: Hotel Search Request
+      type: object
+      x-tags:
+        - hotel-searches
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - hotel-searches
+          example: hotel-searches
+        attributes:
+          type: object
+          required:
+            - checkinAt
+            - checkoutAt
+            - latitude
+            - longitude
+            - radius
+            - passengers
+          properties:
+            checkinAt:
+              type: string
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            checkoutAt:
+              type: string
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            latitude:
+              type: number
+              format: float
+              minimum: -90
+              maximum: 90
+              example: 59.858611
+            longitude:
+              type: number
+              format: float
+              minimum: -180
+              maximum: 180
+              example: 59.858611
+            radius:
+              type: number
+              format: float
+              minimum: 0
+              exclusiveMinimum: true
+              description: In kilometres.
+              example: 20.5
+            passengers:
+              type: array
+              minItems: 1
+              items:
+                $ref: '#/components/schemas/Passenger'
+      required:
+        - id
+        - type
+        - attributes
+    NextLink:
+      title: Next Link
+      type: object
+      properties:
+        links:
+          type: object
+          description: A link that provides a url to fetch the next page of objects
+          required:
+            - next
+          properties:
+            next:
+              type: string
+              description: The url to fetch the next page
+              format: uri
+              example: >-
+                https://example.com/resource/?page%5Bcursor%5D=MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D&page%5Blimit%5D=20
+              readOnly: true
+          readOnly: true
+      required:
+        - links
+    OfferIdentifier:
+      title: Offer Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - offers
+          example: offers
+      required:
+        - id
+        - type
+    Passenger:
+      title: Passenger
+      type: object
+      properties:
+        dateOfBirth:
+          type: string
+          description: The date of birth of the passenger
+          format: date
+          example: '2000-01-01'
+      required:
+        - dateOfBirth
+    Place:
+      title: Place
+      x-tags:
+        - places
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - places
+              example: places
+            attributes:
+              type: object
+              required:
+                - name
+                - placeType
+                - latitude
+                - longitude
+                - countryCode
+                - countryName
+                - timeZone
+                - searchCapabilities
+              properties:
+                name:
+                  type: string
+                  example: Venice Marco Polo Airport
+                  readOnly: true
+                placeType:
+                  $ref: '#/components/schemas/PlaceType'
+                latitude:
+                  type: number
+                  format: float
+                  example: 59.651164062
+                  minimum: -90
+                  maximum: 90
+                longitude:
+                  type: number
+                  format: float
+                  example: 17.917829662
+                  minimum: -180
+                  maximum: 180
+                countryCode:
+                  type: string
+                  format: country
+                  example: IT
+                  readOnly: true
+                countryName:
+                  type: string
+                  example: Italy
+                  readOnly: true
+                iataCode:
+                  type: string
+                  example: VCE
+                  pattern: ^[A-Z]{3}$
+                  nullable: true
+                  readOnly: true
+                timeZone:
+                  type: string
+                  example: Europe/Rome
+                  readOnly: true
+                searchCapabilities:
+                  $ref: '#/components/schemas/SearchCapabilities'
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: '2024-08-24T14:15:22Z'
+                  readOnly: true
+            relationships:
+              type: object
+              properties:
+                city:
+                  type: object
+                  nullable: true
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                contains:
+                  title: Contains
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PlaceIdentifier'
+                      minItems: 0
+          required:
+            - id
+            - type
+            - attributes
+        - $ref: '#/components/schemas/SelfLink'
+      description: >-
+        A place is an indexed reference to a location that can serve as an
+        origin or destination.
+    PlaceIdentifier:
+      title: Place Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          enum:
+            - places
+          example: places
+      required:
+        - id
+        - type
+      description: A unique identifier for each place.
+    PlaceType:
+      title: Place Type
+      type: string
+      enum:
+        - unspecified
+        - city
+        - railway-station
+        - airport
+        - ferry-port
+      example: airport
+    Price:
+      title: Price
+      description: Amount and currency
+      type: object
+      properties:
+        currency:
+          type: string
+          description: >-
+            The currency code in [ISO
+            4217](https://www.iso.org/iso-4217-currency-codes.html) format
+          format: currency
+          example: EUR
+        amount:
+          type: string
+          description: The amount of this price object
+          example: '13.37'
+      required:
+        - currency
+        - amount
+    PriceBreakdown:
+      title: Price Breakdown
+      description: Breakdown of price into its individual components (base fare, tax, etc)
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        breakdownType:
+          type: string
+          description: The type of the price breakdown component
+          example: tax
+          enum:
+            - base-fare
+            - tax
+      required:
+        - price
+        - breakdownType
+    RailCabinDetails:
+      title: Rail Cabin Details
+      type: object
+      required:
+        - cabinType
+        - marketingName
+        - resultDetail
+      properties:
+        resultDetail:
+          type: string
+          description: The Result Detail ID related to this rail cabin detail
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        cabinType:
+          type: string
+          description: The Junction defined class of service for the cabin
+          enum:
+            - unspecified
+            - economy
+            - premium
+            - business
+            - first
+          example: economy
+        marketingName:
+          type: string
+          description: The operator defined branding name for the cabin
+          example: Comfort
+    RailOffer:
+      title: Rail Offer
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Rail Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - rail-offers
+          example: rail-offers
+        attributes:
+          type: object
+          description: The properties that define a Rail Offer object
+          required:
+            - price
+            - priceBreakdown
+            - cabinDetails
+          properties:
+            price:
+              $ref: '#/components/schemas/Price'
+            priceBreakdown:
+              type: array
+              description: >-
+                A list of Price Breakdown objects that indicates the various
+                fees and charges that make up the total price
+              items:
+                $ref: '#/components/schemas/PriceBreakdown'
+            cabinDetails:
+              type: array
+              description: >-
+                The list of cabin information relating to each result detail of
+                the rail offer
+              items:
+                $ref: '#/components/schemas/RailCabinDetails'
+      required:
+        - id
+        - type
+        - attributes
+    RailOfferIdentifier:
+      title: Rail Offer Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Rail Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - rail-offers
+          example: rail-offers
+      required:
+        - id
+        - type
+    RailResultDetail:
+      title: Rail Result Detail
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Rail Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - rail-result-details
+          example: rail-result-details
+        attributes:
+          type: object
+          description: The properties that define a Rail Result Detail object
+          required:
+            - origin
+            - destination
+            - departureAt
+            - arrivalAt
+            - outboundSegment
+            - segmentSequence
+          properties:
+            origin:
+              $ref: '#/components/schemas/Coordinates'
+            destination:
+              $ref: '#/components/schemas/Coordinates'
+            departureAt:
+              type: string
+              description: >-
+                The departure date time for the rail result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            arrivalAt:
+              type: string
+              description: >-
+                The arrival date time for the rail result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            outboundSegment:
+              type: boolean
+              description: >-
+                A flag indicating whether this rail result detail represents the
+                outbound or inbound segment of a trip
+              example: true
+            segmentSequence:
+              type: integer
+              description: >-
+                A sequence value indicating the stage of a full trip that this
+                rail result detail represents
+              minimum: 1
+              example: 1
+      required:
+        - id
+        - type
+        - attributes
+    RailResultDetailIdentifier:
+      title: Rail Result Detail Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Rail Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - rail-result-details
+          example: rail-result-details
+      required:
+        - id
+        - type
+    RailSearch:
+      title: Rail Search
+      x-tags:
+        - rail-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Rail Search object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - rail-searches
+              example: rail-searches
+            attributes:
+              type: object
+              description: The properties that define a Rail Search object
+              required:
+                - expiresAt
+                - status
+                - departureAt
+                - origin
+                - destination
+                - passengers
+              properties:
+                expiresAt:
+                  type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                status:
+                  type: string
+                  description: The status of the Rail Search
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                departureAt:
+                  type: string
+                  description: >-
+                    The requested departure date time for the rail search in
+                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
+                    format
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                departureBefore:
+                  type: string
+                  description: >-
+                    The requested departure before date time for the rail search
+                    in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
+                    format. This is optional but can be used to provide the
+                    ability to specify that the travelers would prefer to depart
+                    before a specific time
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnAt:
+                  type: string
+                  description: >-
+                    The requested return date time for the rail search in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format.
+                    Only required if performing a round trip search
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                origin:
+                  $ref: '#/components/schemas/Coordinates'
+                destination:
+                  $ref: '#/components/schemas/Coordinates'
+                passengers:
+                  type: array
+                  description: >-
+                    The list of passengers that will travel on the requested
+                    rail search
+                  items:
+                    $ref: '#/components/schemas/Passenger'
+            relationships:
+              type: object
+              description: The Junction resources related to this Rail Search object
+              required:
+                - selectedOutboundOffer
+              properties:
+                selectedOutboundOffer:
+                  type: object
+                  description: >-
+                    The selected outbound Offer ID for use when performing the
+                    inbound search on a roundtrip. Not required for one-way
+                    scenarios
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OfferIdentifier'
+          required:
+            - id
+            - type
+            - attributes
+        - $ref: '#/components/schemas/SelfLink'
+    RailSearchIdentifier:
+      title: Rail Search Identifier
+      description: A unique identifier for rail search.
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Rail Search object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - rail-searches
+          example: rail-searches
+      required:
+        - id
+        - type
+    RailSearchResult:
+      title: Rail Search Result
+      type: object
+      x-tags:
+        - rail-searches
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Rail Search Result object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction sesource type
+          enum:
+            - rail-search-results
+          example: rail-search-results
+        attributes:
+          type: object
+          description: The properties that define a Rail Search Result object
+          required:
+            - expiresAt
+          properties:
+            expiresAt:
+              type: string
+              description: >-
+                The time at which the object will expire in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+              readOnly: true
+        relationships:
+          type: object
+          description: The Junction resources related to this Rail Search Result object
+          required:
+            - offers
+            - resultDetails
+            - search
+          properties:
+            offers:
+              type: object
+              description: >-
+                The list of Rail Offer IDs associated with this rail search
+                result
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RailOfferIdentifier'
+            resultDetails:
+              type: object
+              description: >-
+                The list of Rail Result Detail IDs associated with this rail
+                search result
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RailResultDetailIdentifier'
+            search:
+              type: object
+              description: The Rail Search ID that this rail search result belongs to
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/RailSearchIdentifier'
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+    RailSearchResultIncluded:
+      title: Rail Search Result Included
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/RailOffer'
+          - $ref: '#/components/schemas/RailResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            rail-offers: '#/components/schemas/RailOffer'
+            rail-result-details: '#/components/schemas/RailResultDetail'
+    ResultDetailIdentifier:
+      title: Result Detail Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - result-details
+          example: result-details
+      required:
+        - id
+        - type
+    SearchCapabilities:
+      type: object
+      title: SearchCapabilities
+      properties:
+        rail:
+          title: Rail
+          type: boolean
+          example: false
+        air:
+          title: Air
+          type: boolean
+          example: true
+        ferry:
+          title: Ferry
+          type: boolean
+          example: false
+      required:
+        - rail
+        - air
+        - ferry
+    SelfLink:
+      title: Self Link
+      type: object
+      properties:
+        links:
+          type: object
+          description: >-
+            A link that provides a url to access the full representation of a
+            resource object
+          required:
+            - self
+          properties:
+            self:
+              type: string
+              description: The url to retrieve the resource
+              format: uri
+              example: >-
+                https://example.com/resource/04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+          readOnly: true
+      required:
+        - links
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                uniqueItems: true
+                minItems: 1
+                items:
+                  $ref: '#/components/schemas/Error'
+            required:
+              - errors
+    Conflict:
+      description: Conflict
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                minItems: 1
+                uniqueItems: true
+                items:
+                  $ref: '#/components/schemas/Error'
+            required:
+              - errors
+    NotFound:
+      description: Not Found
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                minItems: 1
+                uniqueItems: true
+                items:
+                  $ref: '#/components/schemas/Error'
+            required:
+              - errors
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                minItems: 1
+                uniqueItems: true
+                items:
+                  $ref: '#/components/schemas/Error'
+            required:
+              - errors
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/vnd.api+json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
+  parameters:
+    searchResultInclude:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - offers
+            - resultDetails
+        example:
+          - offers
+      description: Customize which related resources to return.
+      style: form
+      explode: false
+    filterIataEq:
+      name: filter[iata][eq]
+      in: query
+      required: false
+      schema:
+        type: array
+        maxItems: 1
+        items:
+          pattern: ^[A-Z]{3}$
+          type: string
+          example: BER
+          maxLength: 3
+          minLength: 3
+        example:
+          - BER
+      description: Filters Place based on the value of iata code.
+      style: form
+      explode: false
+    filterNameLike:
+      name: filter[name][like]
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 3
+        example: foo
+      description: Filters Place based on the value of place name.
+    filterTypeEq:
+      name: filter[type][eq]
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - unspecified
+            - city
+            - railway-station
+            - airport
+            - ferry-port
+          example: city
+        example:
+          - city
+      description: Filters Place based on the value of place type.
+      style: form
+      explode: false
+    page-cursor:
+      name: page[cursor]
+      in: query
+      required: false
+      schema:
+        type: string
+        default: ''
+        example: >-
+          MTogIjAwNGNjOTQ5LWQ4NjYtNWM1MS05MmYxLTRjMTUxYTA4YzBjOSIgMjogIjM0ZmQwZmUzMDRhYjY3ZmIiIDM6ICIyZjhiZDU3MDljMjI3Mjg0Ig%3D%3D
+      description: Pagination cursor that defines your place in the list.
+    page-limit:
+      name: page[limit]
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 20
+      description: A limit on the number of objects to be returned, between 1 and 100.
+    placeId:
+      name: placeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: Place identifier
+    railSearchResultInclude:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - offers
+            - resultDetails
+        example:
+          - offers
+      description: Customize which related resources to return
+      style: form
+      explode: false
+    searchId:
+      name: searchId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: >-
+        Unique identifier (UUID) for the Search object in [RFC
+        4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+security:
+  - jwt: []

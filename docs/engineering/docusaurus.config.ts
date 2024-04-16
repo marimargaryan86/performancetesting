@@ -59,7 +59,7 @@ const config: Config = {
           },
           {
             id: 'junction-rocket-api',
-            spec: 'openapi/junction/rocket_api/openapi.json',
+            spec: 'openapi/junction/rocket_api/openapi.yaml',
           },
         ],
       },

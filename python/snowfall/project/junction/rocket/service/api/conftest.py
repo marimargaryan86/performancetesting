@@ -197,7 +197,7 @@ def app(container: lagom.Container) -> applications.Starlette:
     ]
     asgi_app = application.create_starlette_app(
         routes=route_list,
-        openapi_path=filesystem.resource_path("junction.rocket_api", "openapi.json"),
+        openapi_path=filesystem.resource_path("junction.rocket_api", "openapi.yaml"),
         custom_middlewares=[
             Middleware(
                 authentication.AuthenticationMiddleware,

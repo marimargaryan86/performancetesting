@@ -64,7 +64,7 @@ async def _http(app: application.Application[Settings]) -> None:
         ],
         openapi_path=filesystem.resource_path(
             "junction.rocket_api",
-            "openapi.json",
+            "openapi.yaml",
         ),
     )
     asgi_app.add_exception_handler(
