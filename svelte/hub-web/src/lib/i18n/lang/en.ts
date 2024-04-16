@@ -111,6 +111,9 @@ export default {
     earlier: "Earlier",
     later: "Later",
     ok: "Ok",
+    profile: "Profile",
+    role: "Role",
+    resellers: "Resellers",
   },
   actions: {
     logout: "Logout",
@@ -171,6 +174,10 @@ export default {
     confirmSelection: "Confirm selection",
     deactivate: "Deactivate",
     discard: "Discard",
+    enterUserDetails: "Enter the user’s account details",
+    enterUserRole: "Define the role of the user",
+    resellersSearch: "Resellers Search",
+    deleteUser: "Delete User",
   },
   sentences: {
     priceChange: "Price change",
@@ -265,6 +272,9 @@ export default {
     userCreatePending: "User has been created and is pending approval.",
     userError: "There was an error saving your changes. Please try again.",
     userDeleteSuccess: "User has been deleted successfully.",
+    searchResellers: "Search and add or remove resellers of the user",
+    typeToSearch: "Type 3+ characters to search",
+    deleteUserInfo: "Deleting this account will permanently remove the user from the system.",
   },
   tableHeaders: {
     id: "ID",

@@ -105,6 +105,9 @@ export default {
     earlier: "Antes",
     later: "Después",
     ok: "Ok",
+    profile: "Perfil",
+    role: "Rol",
+    resellers: "Distribuidores",
   },
   actions: {
     logout: "Cerrar sesión",
@@ -165,6 +168,10 @@ export default {
     confirmSelection: "Confirmar selección",
     deactivate: "Desactivar",
     discard: "Descartar",
+    enterUserDetails: "Introduzca los detalles de la cuenta del usuario",
+    enterUserRole: "Definir el rol del usuario",
+    resellersSearch: "Búsqueda de Distribuidores",
+    deleteUser: "Borrar Usuario",
   },
   sentences: {
     priceChange: "Cambio de precio",
@@ -286,6 +293,9 @@ export default {
     userCreatePending: "El usuario ha sido creado y está pendiente de aprobación.",
     userError: "Hubo un error al guardar tus cambios. Por favor, inténtalo de nuevo.",
     userDeleteSuccess: "El usuario ha sido borrado con éxito.",
+    searchResellers: "Buscar y añadir o borrar distribuidores del usuario",
+    typeToSearch: "Escriba 3+ caracteres para buscar",
+    deleteUserInfo: "Borrar esta cuenta removerá permanentemente al usuario del sistema.",
   },
   tableHeaders: {
     id: "IDENTIFICACIÓN",

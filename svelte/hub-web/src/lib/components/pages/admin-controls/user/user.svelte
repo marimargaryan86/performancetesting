@@ -181,14 +181,14 @@
       <form class="user-information">
         <div class="section">
           <div class="section-title">
-            <span typography="title-medium">Profile</span>
-            <span class="subtitle" typography="body-medium">Enter the user’s account details</span>
+            <span typography="title-medium">{$t("words.profile")}</span>
+            <span class="subtitle" typography="body-medium">{$t("actions.enterUserDetails")}</span>
           </div>
           <div class="fields-container">
             <TextField
-              label="Email address"
+              label={$t("words.email")}
               required
-              placeholder="Enter email address"
+              placeholder={$t("actions.enterEmail")}
               bind:value={currentUser.email}
             />
           </div>
@@ -196,8 +196,8 @@
 
         <div class="section">
           <div class="section-title">
-            <span typography="title-medium">Role</span>
-            <span class="subtitle" typography="body-medium">Define the role of the user</span>
+            <span typography="title-medium">{$t("words.role")}</span>
+            <span class="subtitle" typography="body-medium">{$t("actions.enterUserRole")}</span>
           </div>
           <div class="role-options-container">
             <RoleOption on:select={selectAdminRole} active={selectedRole === "reseller-admin"}>
@@ -235,16 +235,16 @@
 
         <div class="section">
           <div class="section-title">
-            <span typography="title-medium">Resellers Search</span>
+            <span typography="title-medium">{$t("actions.resellersSearch")}</span>
             <span class="subtitle" typography="body-medium">
-              Search and add or remove resellers of the user
+              {$t("sentences.searchResellers")}
             </span>
           </div>
           <div class="fields-container">
             <AutocompleteField
-              label="Resellers"
+              label={$t("words.resellers")}
               required
-              placeholder="Type 3+ characters to search"
+              placeholder={$t("sentences.typeToSearch")}
               bind:value={selectedReseller}
               autocomplete={findResellerStub}
               formatter={formatResellerOption}
@@ -255,9 +255,11 @@
         {#if mode === "update"}
           <div class="section">
             <div class="section-title">
-              <span class="delete-user-title" typography="title-medium">Delete User</span>
+              <span class="delete-user-title" typography="title-medium"
+                >{$t("actions.deleteUser")}</span
+              >
               <span class="subtitle" typography="body-medium">
-                Deleting this account will permanently remove the user from the system.
+                {$t("sentences.deleteUserInfo")}
               </span>
               <button class="delete-user-btn" variant="text" on:click={openDeleteUserDialog}>
                 <Icon variant="user-cross" color="var(--color-semantic-error-500)" size="16px" />
