@@ -49,3 +49,12 @@ class AirSearchResultRepository(
             )
             is not None
         )
+
+    async def find_results_by_offer_id(
+        self,
+        identifier: str,
+    ) -> resultset.ResultSet[AirSearchResult]:
+        return await self._execute(
+            query=self._collection.find,
+            filter_pre_cursor={"offers._id": identifier},
+        )
