@@ -4,7 +4,10 @@ import httpx
 import pytest
 from pytest_mock import MockerFixture
 
-from snowfall.project.junction.rocket.service.api.air.models import AirSearchResult
+from snowfall.project.junction.rocket.service.api.air.models import (
+    AirSearchRequestStorage,
+    AirSearchResult,
+)
 from snowfall.project.junction.rocket.service.api.air.repositories import (
     AirSearchRequestRepository,
     AirSearchResultRepository,
@@ -50,19 +53,18 @@ def example_response(
                 "destination": "LON",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
                 "status": "pending",
-                "expiresAt": "2024-04-11T12:30:45Z",
+                "expiresAt": mocker.mock_module.ANY,
             },
             "links": {"self": "https://example.com/air/searches"},
         },
     }
 
 
-# TODO(reuben.t): this test will be invalidated by search repo work
-async def test_air_search_creation_and_storage(
+async def test_air_search_creation_and_storage(  # noqa: WPS218
     client: httpx.AsyncClient,
     mocker: MockerFixture,
-    air_search_repo: AirSearchResultRepository,
     air_search_request_repo: AirSearchRequestRepository,
+    air_search_repo: AirSearchResultRepository,
     example_request: Any,
     example_response: Any,
     example_search_flight_response: SearchFlightsResponse,
@@ -78,37 +80,50 @@ async def test_air_search_creation_and_storage(
     assert response.json() == example_response
 
     result_id = response.json()["data"]["id"]
-    found_result = await air_search_repo.find_results_by_search_id(result_id)
-    async for result in found_result:
+    found_result = await air_search_request_repo.find_by_search_id(result_id)
+    assert found_result is not None
+    assert result_id == found_result.search_id
+
+    search_result = await air_search_repo.find_results_by_search_id(result_id)
+    async for result in search_result:
         assert result.id
 
 
 async def test_air_search_get_status(
     client: httpx.AsyncClient,
-    air_search_repo: AirSearchResultRepository,
+    mocker: MockerFixture,
+    example_request: Any,
+    example_search_flight_response: SearchFlightsResponse,
 ) -> None:
-    uuid = "eaaf5ab5-64f3-4190-a6a7-d4b40e6010b2"
-    search_id = "c7384289-a633-4bb3-83c6-3aafcb20a4ad"
-    result = AirSearchResult(
-        id=uuid,
-        search_id=search_id,
-        provider_id="",
-        offers=[],
-        result_details=[],
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.search_flights",
+        return_value=example_search_flight_response,
     )
-    await air_search_repo.insert(result)
-    response = await client.get("/air/searches/{0}".format(search_id))
 
+    response = await client.post("/air/searches", json=example_request)
+    assert response.status_code == 201
+    search_id = response.json()["data"]["id"]
+
+    response = await client.get("/air/searches/{0}".format(search_id))
     assert response.status_code == 200
     assert response.json()["data"]["attributes"]["status"] == "completed"
 
 
 async def test_air_search_retrieval(
     client: httpx.AsyncClient,
+    air_search_request_repo: AirSearchRequestRepository,
     air_search_repo: AirSearchResultRepository,
+    example_request: Any,
 ) -> None:
     uuid = "eaaf5ab5-64f3-4190-a6a7-d4b40e6010b2"
     search_id = "c7384289-a633-4bb3-83c6-3aafcb20a4ad"
+    search_object = AirSearchRequestStorage(
+        search_id=search_id,
+        reseller_id="RESELLER_ID",
+        air=example_request["data"]["attributes"],
+    )
+    await air_search_request_repo.insert(search_object)
+
     result = AirSearchResult(
         id=uuid,
         search_id=search_id,
