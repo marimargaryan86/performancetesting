@@ -127,7 +127,7 @@ pants:package:
     - !reference [.pants, services]
     - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker@sha256:87900bc1006d4ad96d545547b5c48fc077e26bc2fc75e99eae0f8387e01f19f8"
       alias: dockerdaemon
-  resource_group: "pants-package-${CI_COMMIT_BRANCH}"
+  resource_group: "pants-package-${CI_COMMIT_REF_SLUG}"
   artifacts:
     paths:
       - dist/
