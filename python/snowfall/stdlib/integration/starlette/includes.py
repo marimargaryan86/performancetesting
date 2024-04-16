@@ -88,8 +88,8 @@ class _IncludesResolver:
                     ),
                 )
             except KeyError:
-                self._logger.warning(
-                    "No resolver registered for type, skipping.",
+                self._logger.exception(
+                    "No resolver registered for type.",
                     type=api_type,
                 )
 
