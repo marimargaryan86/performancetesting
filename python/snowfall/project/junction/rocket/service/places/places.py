@@ -149,7 +149,7 @@ class PlaceRepository(
             filter_["name"] = {"$regex": filters.name, "$options": "i"}
         if filters.types:
             filter_["type"] = {"$in": list(filters.types)}
-        if self._has_coordinates(filters.coordinates_and_radius):
+        if filters.HasField("coordinates_and_radius"):
             coordinates = filters.coordinates_and_radius.coordinates
             radius = min(
                 max(filters.coordinates_and_radius.radius, 100),
@@ -190,15 +190,6 @@ class PlaceRepository(
             },
         )
         return update_result.modified_count != 0
-
-    def _has_coordinates(
-        self,
-        coordinates_and_radius: models_pb2.CoordinatesAndRadius,
-    ) -> bool:
-        return not (
-            coordinates_and_radius.coordinates.latitude == 0
-            and coordinates_and_radius.coordinates.longitude == 0
-        )
 
 
 def validate_name(node: Mapping[str, Any]) -> str | None:

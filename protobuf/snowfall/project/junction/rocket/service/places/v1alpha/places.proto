@@ -34,7 +34,7 @@ message GetPlaceByIataResponse {
 message Filters {
   string name = 1;
   repeated Type types = 2;
-  CoordinatesAndRadius coordinates_and_radius = 3;
+  optional CoordinatesAndRadius coordinates_and_radius = 3;
   string place_to_search_within_id = 4;
 }
 
