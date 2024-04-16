@@ -24,7 +24,7 @@ function createCookie<TValue>(
     path = "/",
     secure = !dev,
     httpOnly = true,
-    sameSite = "none",
+    sameSite = dev ? "lax" : "none",
     expires,
     domain,
     maxAge,
