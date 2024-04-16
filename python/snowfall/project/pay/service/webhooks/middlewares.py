@@ -6,8 +6,6 @@ import stripe
 from starlette import applications, exceptions, requests, responses, status
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from snowfall.stdlib.integration.starlette.middlewares import resolve_request
-
 
 class SignatureVerificationMiddleware(BaseHTTPMiddleware):
     def __init__(
@@ -27,8 +25,7 @@ class SignatureVerificationMiddleware(BaseHTTPMiddleware):
     ) -> responses.Response:
         if request.scope["path"].endswith("health"):
             return await call_next(request)
-        resolved_request = await resolve_request(request)
-        body = await resolved_request.body()
+        body = await request.body()
 
         payload = json.loads(body)
         is_authenticated = False
@@ -48,7 +45,7 @@ class SignatureVerificationMiddleware(BaseHTTPMiddleware):
 
         if not is_authenticated:
             raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-        return await call_next(resolved_request)
+        return await call_next(request)
 
     def verify_stripe(
         self,

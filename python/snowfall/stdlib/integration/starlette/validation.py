@@ -1,4 +1,3 @@
-import asyncio
 import http
 import pathlib
 from collections.abc import Iterable
@@ -8,9 +7,8 @@ import orjson
 from jsonschema import exceptions as jsonschema_exceptions
 from openapi_core import OpenAPI, configurations, exceptions, protocols
 from openapi_core.contrib.starlette import (
-    StarletteOpenAPIRequest,
-    StarletteOpenAPIResponse,
     handlers,
+    integrations,
 )
 from openapi_core.templating.security import exceptions as security_exceptions
 from openapi_core.unmarshalling.request import datatypes as request_datatypes
@@ -27,16 +25,6 @@ _status_codes: MappingProxyType[type[BaseException], int] = MappingProxyType({
     **handlers.StarletteOpenAPIErrorsHandler.OPENAPI_ERROR_STATUS,
     security_exceptions.SecurityNotFound: 401,
 })
-
-
-async def request_to_openapi(request: requests.Request) -> protocols.Request:
-    return StarletteOpenAPIRequest(request=request, body=await request.body())
-
-
-async def response_to_openapi(
-    response: responses.Response,
-) -> protocols.Response:
-    return StarletteOpenAPIResponse(response=response, data=response.body)
 
 
 def openapi_errors_to_errors(
@@ -104,18 +92,23 @@ class Validator:
                 extra_format_validators=formats.format_validators(),
             ),
         )
+        self._integration = integrations.StarletteIntegration(self._spec)
+
+    async def get_openapi_request(self, request: requests.Request) -> protocols.Request:
+        return await self._integration.get_openapi_request(request)
+
+    async def get_openapi_response(
+        self,
+        response: responses.Response,
+    ) -> protocols.Response:
+        return await self._integration.get_openapi_response(response)
 
     @tracing.trace
     async def validate_request(
         self,
         request: protocols.Request,
     ) -> request_datatypes.RequestUnmarshalResult:
-        loop = asyncio.get_running_loop()
-
-        def wrapper() -> request_datatypes.RequestUnmarshalResult:
-            return self._spec.unmarshal_request(request=request)
-
-        return await loop.run_in_executor(None, wrapper)
+        return self._spec.unmarshal_request(request=request)
 
     @tracing.trace
     async def validate_response(
@@ -123,9 +116,7 @@ class Validator:
         request: protocols.Request,
         response: protocols.Response,
     ) -> response_datatypes.ResponseUnmarshalResult:
-        loop = asyncio.get_running_loop()
-
-        def wrapper() -> response_datatypes.ResponseUnmarshalResult:
-            return self._spec.unmarshal_response(request=request, response=response)
-
-        return await loop.run_in_executor(None, wrapper)
+        return self._spec.unmarshal_response(
+            request=request,
+            response=response,
+        )

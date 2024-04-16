@@ -19,6 +19,7 @@
 //     "aiobotocore==2.12.3",
 //     "aiocsv==1.3.1",
 //     "aiofiles==23.2.1",
+//     "aioitertools==0.11.0",
 //     "aiosmtplib==3.0.1",
 //     "aiostream==0.5.2",
 //     "allure-pytest==2.13.5",
@@ -9335,19 +9336,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "79d5bfb01f64701b6cf442e89a37d9c4dc6dbb79a46f2f611739b2418d30ecfd",
-              "url": "https://files.pythonhosted.org/packages/0c/60/57af8a2f05ab05a0218030ff2f96cfbc232055f0d2a0b5320d59187c4e82/types_awscrt-0.20.5-py3-none-any.whl"
+              "hash": "b399c2b8778fc345d879915218e017276d39c69502df983b26e01080c802ecff",
+              "url": "https://files.pythonhosted.org/packages/ef/93/7d867cd7eb19b51df581c3d6121573f42b27c6faba671b9d93a7f546b594/types_awscrt-0.20.7-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "61811bbf4de95248939f9276a434be93d2b95f6ccfe8aa94e56999e9778cfcc2",
-              "url": "https://files.pythonhosted.org/packages/32/b2/accbd6ead195853bd5c3a51dfb06c5438eaa1c49924c33bc877cf7062b55/types_awscrt-0.20.5.tar.gz"
+              "hash": "3b3b654a7dcc126457638f235a70afccd746cd4641c8302877c9216711ed4ebc",
+              "url": "https://files.pythonhosted.org/packages/57/e2/fc313ae373273f2881a55d40b8469e7638922125324a740afc0b06a71b94/types_awscrt-0.20.7.tar.gz"
             }
           ],
           "project_name": "types-awscrt",
           "requires_dists": [],
           "requires_python": "<4.0,>=3.7",
-          "version": "0.20.5"
+          "version": "0.20.7"
         },
         {
           "artifacts": [
@@ -9508,19 +9509,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "44fcdf0097b924a9aab1ee4baa1179081a9559ca62a88c807e2b256893ce688f",
-              "url": "https://files.pythonhosted.org/packages/58/bb/53514ca17e5585360f8ea94bae9e75611c114ca8df701b10f5c713e38a9c/types_s3transfer-0.10.0-py3-none-any.whl"
+              "hash": "49a7c81fa609ac1532f8de3756e64b58afcecad8767933310228002ec7adff74",
+              "url": "https://files.pythonhosted.org/packages/ed/b4/c945ffb9681cf16903293b660ccec5363b6d3b5b00200e5796221673e230/types_s3transfer-0.10.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "35e4998c25df7f8985ad69dedc8e4860e8af3b43b7615e940d53c00d413bdc69",
-              "url": "https://files.pythonhosted.org/packages/5b/90/f00658473474581f334c43993f3cfd518955d4eb125cffa1279c94cf1605/types_s3transfer-0.10.0.tar.gz"
+              "hash": "02154cce46528287ad76ad1a0153840e0492239a0887e8833466eccf84b98da0",
+              "url": "https://files.pythonhosted.org/packages/6b/27/f0c0bc936cf9213e3acb485aff7cdf93b78d946036c5e0d6c878cdd65525/types_s3transfer-0.10.1.tar.gz"
             }
           ],
           "project_name": "types-s3transfer",
           "requires_dists": [],
-          "requires_python": "<4.0,>=3.7",
-          "version": "0.10.0"
+          "requires_python": "<4.0,>=3.8",
+          "version": "0.10.1"
         },
         {
           "artifacts": [
@@ -10326,6 +10327,7 @@
     "aiobotocore==2.12.3",
     "aiocsv==1.3.1",
     "aiofiles==23.2.1",
+    "aioitertools==0.11.0",
     "aiosmtplib==3.0.1",
     "aiostream==0.5.2",
     "allure-pytest==2.13.5",

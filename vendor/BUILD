@@ -67,7 +67,9 @@ python_requirements(
         },
         "fakeredis": {"dependencies": ["#lupa"]},
         "mongomock-motor": {"dependencies": ["#setuptools"]},
-        "openapi-core": {"dependencies": ["#setuptools", "#rfc3339-validator"]},
+        "openapi-core": {
+            "dependencies": ["#setuptools", "#rfc3339-validator", "#aioitertools"]
+        },
         "pandas": {"dependencies": ["#pyarrow"]},
         "protobuf": {"dependencies": ["#types-protobuf"]},
         "pyjwt": {"dependencies": ["#cryptography"]},

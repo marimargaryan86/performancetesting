@@ -6,7 +6,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from snowfall.project.junction.service.providers.duffel import (
     signature_validator,
 )
-from snowfall.stdlib.integration.starlette.middlewares import resolve_request
 
 
 class SignatureValidationMiddleware(BaseHTTPMiddleware):
@@ -26,6 +25,5 @@ class SignatureValidationMiddleware(BaseHTTPMiddleware):
         if request.scope["path"].endswith("/health"):
             return await call_next(request)
 
-        resolved_request = await resolve_request(request)
-        await self._validator.authenticate(resolved_request)
-        return await call_next(resolved_request)
+        await self._validator.authenticate(request)
+        return await call_next(request)

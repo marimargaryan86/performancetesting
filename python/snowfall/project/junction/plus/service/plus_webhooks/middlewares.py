@@ -7,7 +7,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from twilio.request_validator import RequestValidator
 
 from snowfall.stdlib.integration.starlette import handlers
-from snowfall.stdlib.integration.starlette.middlewares import resolve_request
 
 
 def calculate_hash(
@@ -69,7 +68,6 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         self,
         request: requests.Request,
     ) -> requests.Request:
-        resolved_request = await resolve_request(request)
         received_hash = request.headers.get("Cirium-Flex-Alert-Hash")
         received_key = request.headers.get("Cirium-Flex-Alert-Key")
         if received_key is None or received_hash is None:
@@ -81,13 +79,13 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         )
         if not is_valid_hmac:
             raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-        return resolved_request
+        return request
 
     async def whatsapp_dispatch(
         self,
         request: requests.Request,
     ) -> requests.Request:
-        resolved_request = await resolve_request(request)
+        await request.body()  # needed in order for Starlette to cache the body stream
         is_valid = self._twilio_validator.validate(  # type: ignore[no-untyped-call]
             str(request.url),
             await request.form(),
@@ -95,4 +93,4 @@ class HmacHeaderMiddleware(BaseHTTPMiddleware):
         )
         if not is_valid:
             raise exceptions.HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-        return resolved_request
+        return request
