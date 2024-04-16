@@ -24,6 +24,7 @@ from snowfall.project.junction.rocket.service.providers.carnect import (
 from snowfall.project.junction.rocket.service.providers.carnect.constants import (
     PROVIDER_ID,
 )
+from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import amqp_factory, httpx_factory, redis_factory
@@ -155,6 +156,9 @@ async def _pricing(
 
 
 async def _bookings(app: service.Application[_Settings]) -> None:
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
+    logging.register(http_client)
+
     redis_client = await redis_factory.make_client(
         app=app,
         dsn=app.settings.redis_dsn,
@@ -163,6 +167,20 @@ async def _bookings(app: service.Application[_Settings]) -> None:
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+
+    carnect_config = carnect_settings.Config(
+        timeout=app.settings.api_timeout.seconds,
+        base_url=str(app.settings.api_base_url),
+        export_soap_requests=True,
+        username=app.settings.api_username,
+        password=app.settings.api_password,
+        is_test=app.settings.is_test,
+    )
+
+    carnect_client = client.CarnectClient(
+        http_client=http_client,
+        config=carnect_config,
     )
 
     await bookings.Consumer(
@@ -180,6 +198,8 @@ async def _bookings(app: service.Application[_Settings]) -> None:
                 client=redis_client,
             ),
             booking_storage=storage,
+            carnect_client=carnect_client,
+            carnect_config=carnect_config,
             provider_id=PROVIDER_ID,
             provider_name=_PROVIDER_NAME,
         ),
