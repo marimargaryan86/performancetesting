@@ -1,4 +1,3 @@
-import enum
 import http
 from collections.abc import Awaitable, Callable, Container
 
@@ -6,13 +5,12 @@ import sentry_sdk
 from openapi_core import protocols
 from starlette import (
     applications,
-    background,
     requests,
     responses,
 )
 from starlette.middleware import base
 
-from snowfall.stdlib.integration.starlette import handlers, messages, validation
+from snowfall.stdlib.integration.starlette import handlers, validation
 from snowfall.stdlib.logging import stdout
 
 
@@ -49,12 +47,6 @@ class SecurityHeadersMiddleware(base.BaseHTTPMiddleware):
         return response
 
 
-class ValidationMode(enum.StrEnum):
-    disabled = "disabled"
-    eager = "eager"
-    lazy = "lazy"
-
-
 class ValidationMiddleware(base.BaseHTTPMiddleware):
     def __init__(
         self,
@@ -62,14 +54,14 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         validator: validation.Validator,
         *,
         excluded_status_codes: Container[int] | None = None,
-        validation_mode: ValidationMode = ValidationMode.disabled,
+        validate_responses: bool = True,
     ):
         super().__init__(app)
         self._logger = stdout.get_logger()
         self._response_logger = stdout.get_logger()
         self._validator = validator
         self._excluded_status_codes = excluded_status_codes or []
-        self._validation_mode = validation_mode
+        self._validate_responses = validate_responses
 
     async def dispatch(
         self,
@@ -102,25 +94,13 @@ class ValidationMiddleware(base.BaseHTTPMiddleware):
         if response.status_code in self._excluded_status_codes:
             return response
 
-        match self._validation_mode:
-            case ValidationMode.disabled:
-                return response
-            case ValidationMode.eager:
-                return await self._validate_response(
-                    openapi_request=openapi_request,
-                    response=response,
-                )
-            case ValidationMode.lazy:
-                messages.add_background_task(
-                    response,
-                    background.BackgroundTask(
-                        self._validate_response,
-                        openapi_request=openapi_request,
-                        response=response,
-                    ),
-                )
+        if self._validate_responses:
+            return await self._validate_response(
+                openapi_request=openapi_request,
+                response=response,
+            )
 
-                return response
+        return response
 
     async def _validate_response(
         self,

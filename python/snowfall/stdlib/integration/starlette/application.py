@@ -61,15 +61,6 @@ def create_starlette_app(
     if security_headers:
         stack.append(Middleware(middlewares.SecurityHeadersMiddleware))
 
-    validation_mode = middlewares.ValidationMode.disabled
-
-    # TODO(jyggen): pass environment from global application object
-    match os.environ.get("ENV_NAME", "local"):
-        case "local":
-            validation_mode = middlewares.ValidationMode.eager
-        case "development":
-            validation_mode = middlewares.ValidationMode.lazy
-
     if openapi_path:
         stack.append(
             Middleware(
@@ -79,7 +70,9 @@ def create_starlette_app(
                     http.HTTPStatus.METHOD_NOT_ALLOWED,
                     http.HTTPStatus.INTERNAL_SERVER_ERROR,
                 },
-                validation_mode=validation_mode,
+                # TODO(jyggen): pass environment from global application object
+                validate_responses=os.environ.get("ENV_NAME", "local")
+                in {"development", "local"},
             ),
         )
 

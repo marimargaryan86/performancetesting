@@ -78,6 +78,7 @@ class _IncludesResolver:
             identifiers_per_type[type_key].add(identifier)
 
         awaitables = []
+        missing_api_types = set()
 
         for api_type, identifiers in identifiers_per_type.items():
             try:
@@ -88,10 +89,13 @@ class _IncludesResolver:
                     ),
                 )
             except KeyError:
-                self._logger.exception(
-                    "No resolver registered for type.",
-                    type=api_type,
-                )
+                missing_api_types.add(api_type)
+
+        for missing_api_type in missing_api_types:
+            self._logger.error(
+                "No resolver registered for type.",
+                type=missing_api_type,
+            )
 
         return resources | {
             (resource.data_type, resource.identifier): resource
