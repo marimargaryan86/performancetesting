@@ -1,0 +1,242 @@
+{
+  "info": {
+    "_postman_id": "dc4339ea-0220-4583-852c-44a1006fd648",
+    "name": "Car Rental",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33483058"
+  },
+  "item": [
+    {
+      "name": "searches",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data.id;",
+              "pm.collectionVariables.set(\"car_rental_search_id\", search_id);",
+              "",
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.attributes.status).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Search ID is saved to collection variables and is not empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData).to.be.an('object');",
+              "    pm.expect(responseData.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"car-searches\",\n        \"attributes\": {\n            \"pickupLocation\": {\n                \"latitude\": 50.89369066956447, \n                \"longitude\": 4.47136870945399\n            },\n            \"returnLocation\": {\n                \"latitude\": 48.96691462802318, \n                \"longitude\": 2.52817297961273\n            },\n            \"pickupAt\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"driverAge\": 25\n        }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/car-rental/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "car-rental",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/car-rental/searches/{{car_rental_search_id}}",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "car-rental",
+            "searches",
+            "{{car_rental_search_id}}"
+          ]
+        },
+        "description": "Used to initiate a search for offers based on the provided Offer Search context."
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}/results",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "include",
+            "value": "offers,result-details",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{junction_api_url}}/car-rental/searches/{{car_rental_search_id}}/results?include=offers,resultDetails",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "car-rental",
+            "searches",
+            "{{car_rental_search_id}}",
+            "results"
+          ],
+          "query": [
+            {
+              "key": "include",
+              "value": "offers,resultDetails"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "var moment = require('moment');",
+          "var now_plus_one_day_utc = moment().add(1, 'days').utc(true).format()",
+          "var now_plus_one_week_utc = moment().add(7, 'days').utc(true).format()",
+          "pm.collectionVariables.set(\"now_plus_one_day_utc\", now_plus_one_day_utc);",
+          "pm.collectionVariables.set(\"now_plus_one_week_utc\", now_plus_one_week_utc);",
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "car_rental_pickupAt",
+      "value": ""
+    },
+    {
+      "key": "car_rental_dropoffAt",
+      "value": ""
+    },
+    {
+      "key": "car_rental_search_id",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_day_utc",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_week_utc",
+      "value": ""
+    }
+  ]
+}
