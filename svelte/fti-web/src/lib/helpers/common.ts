@@ -38,4 +38,8 @@ function getMonthNames(locale: string): string[] {
   }, []);
 }
 
-export { pluralise, setContainerScroll, setDropdown, getMonthNames };
+const renderStars = (stars: number): string[] => {
+  return Array.from({ length: stars }, () => "⭐");
+};
+
+export { pluralise, setContainerScroll, setDropdown, getMonthNames, renderStars };

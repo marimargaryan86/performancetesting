@@ -123,7 +123,12 @@ type IconTypes =
   | "flight"
   | "hotel"
   | "transfer"
-  | "luggage";
+  | "luggage"
+  | "copy-icon"
+  | "email-icon"
+  | "message-icon"
+  | "location-icon"
+  | "share-icon";
 
 type AmenityIcons = "wifi" | "pool" | "parking" | "restaurant" | "bar" | "gym" | "beach" | "spa";
 

@@ -1,5 +1,9 @@
 <script lang="ts">
+  import type { FeaturedPackage } from "$lib/models/common";
   import { onMount } from "svelte";
+  import SharePackageModal from "$lib/components/share-modal.svelte";
+  import { renderStars } from "$lib/helpers/common";
+  import Icon from "$lib/components/icon.svelte";
 
   onMount(async (): Promise<void> => {
     const response = await fetch("/images");
@@ -8,20 +12,20 @@
     selectedImage = hotelInfo.images[0];
   });
 
-  interface HotelInfo {
-    name: string;
-    stars: number;
-    location: string;
+  interface FeaturedPackageWithReview extends FeaturedPackage {
     reviewScore: number;
     reviewText: string;
     reviewCount: number;
     images: string[];
   }
 
-  let hotelInfo: HotelInfo = {
+  let hotelInfo: FeaturedPackageWithReview = {
     name: "White Goose Hotel",
-    stars: 4,
     location: "Indonesia, Bali",
+    length: "7 days",
+    stars: 4,
+    price: "1200",
+    description: "A luxurious stay at Bali",
     reviewScore: 4.8,
     reviewText: "Very good",
     reviewCount: 35,
@@ -42,7 +46,23 @@
 
   let selectedImage = hotelInfo.images[0];
 
+  let isPackageLiked = false;
+
   let currentBookingStep = 1;
+
+  let showModal = false;
+
+  const toggleLike = (): void => {
+    isPackageLiked = !isPackageLiked;
+  };
+
+  const openShareModal = (): void => {
+    showModal = true;
+  };
+
+  const closeShareModal = (): void => {
+    showModal = false;
+  };
 
   const bookingSteps = [
     { id: 1, name: "Flight & Room" },
@@ -54,9 +74,9 @@
   const setBookingStep = (bookingStepId: number): void => {
     currentBookingStep = bookingStepId;
   };
-
-  const renderStars = (stars: number): string[] => Array.from({ length: stars }, () => "⭐");
 </script>
+
+<SharePackageModal show={showModal} {hotelInfo} onClose={closeShareModal} />
 
 <div class="page">
   <div class="booking-steps-container">
@@ -80,29 +100,44 @@
       </ul>
     </nav>
   </div>
-  <div class="back-link">
-    <button>← Back to results</button>
-  </div>
-
-  <div class="hotel-info">
-    <div class="hotel-title">
-      <h1>{hotelInfo.name}</h1>
-      <div class="stars">
-        {#each renderStars(hotelInfo.stars) as star}
-          <span>{star}</span>
-        {/each}
+  <div class="hotel-header">
+    <div class="hotel-info">
+      <div class="back-link">
+        <button>← Back to results</button>
+      </div>
+      <div class="hotel-title">
+        <h1>{hotelInfo.name}</h1>
+        <div class="stars">
+          {#each renderStars(hotelInfo.stars) as star}
+            <span>{star}</span>
+          {/each}
+        </div>
+      </div>
+      <div class="location-review">
+        <span class="location">📍 {hotelInfo.location}</span>
+        <span class="review-score">{hotelInfo.reviewScore}</span>
+        <span class="review-text">{hotelInfo.reviewText} ({hotelInfo.reviewCount})</span>
       </div>
     </div>
-    <div class="location-review">
-      <span class="location">📍 {hotelInfo.location}</span>
-      <span class="review-score">{hotelInfo.reviewScore}</span>
-      <span class="review-text">{hotelInfo.reviewText} ({hotelInfo.reviewCount})</span>
+    <div class="button-container">
+      <button
+        class="action-button like-button"
+        on:click={toggleLike}
+        aria-label="Like"
+        class:liked={isPackageLiked}
+      >
+        <Icon variant={"heart-full"} size="36px" color={isPackageLiked ? "#ff616f" : "#B3AAAA"} />
+      </button>
+
+      <button class="action-button share-button" on:click={openShareModal} aria-label="Share">
+        <Icon variant="share-icon" size="30px" color="#000000" />
+      </button>
+      <button class="proceed-button">Proceed to book</button>
     </div>
   </div>
   <div class="image-gallery">
     <!-- svelte-ignore a11y-img-redundant-alt -->
     <img class="selected-image" src={selectedImage} alt="Selected Hotel Image" />
-
     <div class="thumbnails">
       {#each hotelInfo.images as image, index (image)}
         <button
@@ -283,5 +318,56 @@
 
   .thumbnail.selected img {
     opacity: 1;
+  }
+  /* Hotel Header */
+  .hotel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  /* Hotel Actions */
+  .button-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  /* Action Button */
+  .action-button {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .like-button {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 0;
+  }
+
+  .proceed-button {
+    background-color: var(--proceed-button-bg-color, #ff8c00);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .proceed-button:hover {
+    background-color: var(--proceed-button-hover-bg-color, #e67e22);
   }
 </style>
