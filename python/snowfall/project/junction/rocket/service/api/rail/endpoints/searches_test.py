@@ -1,3 +1,6 @@
+import typing
+import uuid
+
 import httpx
 from starlette import status
 
@@ -5,29 +8,39 @@ from snowfall.project.junction.rocket import fixtures
 
 
 class TestRailCreateSearch:
-    async def test_create_rail_search_is_successful(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        payload = {
+    @property
+    def payload(self) -> typing.Mapping[str, typing.Any]:
+        return {
             "data": {
                 "type": "rail-searches",
                 "attributes": {
                     "departureAt": "2024-04-05T08:00:00Z",
                     "departureBefore": "2024-04-05T08:00:00Z",
                     "returnAt": "2024-04-07T08:00:00Z",
+                    "passengers": [{"dateOfBirth": "2000-01-01"}],
+                },
+                "relationships": {
                     "origin": {
-                        "latitude": 50.89369066956447,
-                        "longitude": 4.47136870945399,
+                        "data": {
+                            "id": "3debfa7c-9884-5409-86c8-33f3e491382e",
+                            "type": "places",
+                        },
                     },
                     "destination": {
-                        "latitude": 48.96691462802318,
-                        "longitude": 2.52817297961273,
+                        "data": {
+                            "id": "3debfa7c-9884-5409-86c8-33f3e491382e",
+                            "type": "places",
+                        },
                     },
-                    "passengers": [{"dateOfBirth": "2000-01-01"}],
                 },
             },
         }
+
+    async def test_create_rail_search_is_successful(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.payload
 
         response = await client.post(
             "/rail/searches",
@@ -37,6 +50,50 @@ class TestRailCreateSearch:
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["data"]["id"]
+
+    async def test_create_rail_search_fails_when_origin_does_not_exist(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.payload
+        origin = payload["data"]["relationships"]["origin"]
+        origin["data"]["id"] = str(
+            uuid.uuid4(),
+        )
+
+        response = await client.post(
+            "/rail/searches",
+            json=payload,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert (
+            response.json()["errors"][0]["source"]["pointer"]
+            == "/data/relationships/origin"
+        )
+
+    async def test_create_rail_search_fails_when_destination_does_not_exist(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.payload
+        destination = payload["data"]["relationships"]["destination"]
+        destination["data"]["id"] = str(
+            uuid.uuid4(),
+        )
+
+        response = await client.post(
+            "/rail/searches",
+            json=payload,
+            headers={"Content-Type": "application/vnd.api+json"},
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert (
+            response.json()["errors"][0]["source"]["pointer"]
+            == "/data/relationships/destination"
+        )
 
 
 class TestRailGetSearch:

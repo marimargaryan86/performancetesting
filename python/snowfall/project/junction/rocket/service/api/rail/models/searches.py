@@ -6,6 +6,7 @@ import pydantic
 from starlette import requests
 
 from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
+from snowfall.project.junction.rocket.service.api.places.models import places
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -28,14 +29,6 @@ class RailSearchResource(models.Resource):
             id=search.id,
             type=RailSearchResource.api_type,
             attributes={
-                "origin": {
-                    "latitude": search.rail.origin.coordinates.latitude,
-                    "longitude": search.rail.origin.coordinates.longitude,
-                },
-                "destination": {
-                    "latitude": search.rail.destination.coordinates.latitude,
-                    "longitude": search.rail.destination.coordinates.longitude,
-                },
                 "departureAt": protobuf.protobuf_to_datetime(
                     search.rail.departure_after,
                 ),
@@ -69,16 +62,33 @@ class RailSearchResource(models.Resource):
                 search.rail.departure_before,
             )
 
+        res.relationships = {
+            "origin": {
+                "data": (
+                    models.ResourceIdentifier(
+                        id=search.rail.origin_id,
+                        type=places.PlacesResource.api_type,
+                    )
+                ),
+            },
+            "destination": {
+                "data": (
+                    models.ResourceIdentifier(
+                        id=search.rail.destination_id,
+                        type=places.PlacesResource.api_type,
+                    )
+                ),
+            },
+        }
+
         if search.rail.outbound_offer_id:
-            res.relationships = {
-                "selectedOutboundOffer": {
-                    "data": (
-                        models.ResourceIdentifier(
-                            id=search.rail.outbound_offer_id,
-                            type=OfferResource.api_type,
-                        )
-                    ),
-                },
+            res.relationships["selectedOutboundOffer"] = {
+                "data": (
+                    models.ResourceIdentifier(
+                        id=search.rail.outbound_offer_id,
+                        type=OfferResource.api_type,
+                    )
+                ),
             }
 
         return res

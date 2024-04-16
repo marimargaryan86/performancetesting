@@ -2148,8 +2148,6 @@ components:
                 - expiresAt
                 - status
                 - departureAt
-                - origin
-                - destination
                 - passengers
               properties:
                 expiresAt:
@@ -2197,10 +2195,6 @@ components:
                     Only required if performing a round trip search
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
-                origin:
-                  $ref: '#/components/schemas/Coordinates'
-                destination:
-                  $ref: '#/components/schemas/Coordinates'
                 passengers:
                   type: array
                   description: >-
@@ -2212,7 +2206,8 @@ components:
               type: object
               description: The Junction resources related to this Rail Search object
               required:
-                - selectedOutboundOffer
+                - origin
+                - destination
               properties:
                 selectedOutboundOffer:
                   type: object
@@ -2225,10 +2220,25 @@ components:
                   properties:
                     data:
                       $ref: '#/components/schemas/OfferIdentifier'
+                origin:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                destination:
+                  type: object
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
           required:
             - id
             - type
             - attributes
+            - relationships
         - $ref: '#/components/schemas/SelfLink'
     RailSearchIdentifier:
       title: Rail Search Identifier

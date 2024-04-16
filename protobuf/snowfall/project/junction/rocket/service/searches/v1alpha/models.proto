@@ -19,6 +19,8 @@ message Rail {
   google.protobuf.Timestamp return_date = 5;
   repeated Passenger passengers = 6;
   string outbound_offer_id = 7;
+  string origin_id = 8;
+  string destination_id = 9;
 }
 
 message Ferry {

@@ -1,14 +1,23 @@
 import datetime
 from collections.abc import Sequence
 
+import grpc
 import lagom
 import timezonefinder
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.v1 import models_pb2 as legacy_go_pb2
 from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api.common import validation
 from snowfall.project.junction.rocket.service.api.rail.models import (
     searches as search_models,
+)
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    models_pb2 as places_models_pb2,
+)
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    places_pb2,
+    places_pb2_grpc,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -23,7 +32,6 @@ from snowfall.stdlib.integration.starlette import (
     pagination_helpers,
     request_helpers,
 )
-from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
 _IncludesType = search_models.ResultDetailResource | search_models.OfferResource
@@ -36,28 +44,48 @@ class RailSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         grpc_timeout: datetime.timedelta = lagom.injectable,
         searches: grpc_pb2_grpc.SearchServiceStub = lagom.injectable,
+        places: places_pb2_grpc.PlacesServiceStub = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        timeout = grpc_timeout.total_seconds()
+        origin = await self._get_place(places, body["origin"], timeout)
+        destination = await self._get_place(places, body["destination"], timeout)
+        validation_errors = []
+        if origin is None:
+            validation_errors.append(
+                validation.generate_validation_error(
+                    "`origin` not found in the system, might be wrong identifier",
+                    "relationships/origin",
+                ),
+            )
+        elif not origin.search_capabilities.rail:
+            validation_errors.append(
+                validation.generate_validation_error(
+                    "Provided `origin` doesn't support rail search",
+                    "relationships/origin",
+                ),
+            )
 
-        origin_coords = latlng_pb2.LatLng(
-            latitude=body["origin"]["latitude"],
-            longitude=body["origin"]["longitude"],
-        )
+        if destination is None:
+            validation_errors.append(
+                validation.generate_validation_error(
+                    "`destination` not found in the system, might be wrong identifier",
+                    "relationships/destination",
+                ),
+            )
+        elif not destination.search_capabilities.rail:
+            validation_errors.append(
+                validation.generate_validation_error(
+                    "Provided `destination` doesn't support rail search",
+                    "relationships/destination",
+                ),
+            )
 
-        origin_timezone = _tz_finder.timezone_at(
-            lat=origin_coords.latitude,
-            lng=origin_coords.longitude,
-        )
-
-        destination_coords = latlng_pb2.LatLng(
-            latitude=body["destination"]["latitude"],
-            longitude=body["destination"]["longitude"],
-        )
-
-        destination_timezone = _tz_finder.timezone_at(
-            lat=destination_coords.latitude,
-            lng=destination_coords.longitude,
-        )
+        if validation_errors:
+            return models.JsonApiResponse(
+                models.Body(errors=validation_errors),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
         departure_before = body.get("departureBefore", None)
         if departure_before:
@@ -76,13 +104,15 @@ class RailSearch(endpoints.HTTPEndpoint):
                 search=models_pb2.Search(
                     reseller_id=request.user.username,
                     rail=models_pb2.Rail(
+                        origin_id=body["origin"],
+                        destination_id=body["destination"],
                         origin=legacy_go_pb2.Point(
-                            coordinates=origin_coords,
-                            time_zone=origin_timezone or "",
+                            coordinates=origin.coordinates,  # type: ignore[union-attr]
+                            time_zone=origin.time_zone,  # type: ignore[union-attr]
                         ),
                         destination=legacy_go_pb2.Point(
-                            coordinates=destination_coords,
-                            time_zone=destination_timezone or "",
+                            coordinates=destination.coordinates,  # type: ignore[union-attr]
+                            time_zone=destination.time_zone,  # type: ignore[union-attr]
                         ),
                         departure_after=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["departureAt"]),
@@ -139,6 +169,24 @@ class RailSearch(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+    async def _get_place(
+        self,
+        places: places_pb2_grpc.PlacesServiceStub,
+        place_id: str,
+        timeout: float,
+    ) -> places_models_pb2.Place | None:
+        try:
+            return (
+                await places.GetPlace(
+                    places_pb2.GetPlaceRequest(id=place_id),
+                    timeout=timeout,
+                )
+            ).place
+        except grpc.aio.AioRpcError as err:
+            if err.code() == grpc.StatusCode.NOT_FOUND:
+                return None
+            raise
 
 
 class RailSearchResults(endpoints.HTTPEndpoint):

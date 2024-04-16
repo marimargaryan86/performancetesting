@@ -263,6 +263,8 @@ def generate_ferry_one_way_search_criterion() -> searches_pb2.Ferry:
 
 def generate_rail_one_way_search_criterion() -> searches_pb2.Rail:
     return searches_pb2.Rail(
+        origin_id=PLACES[0],
+        destination_id=PLACES[0],
         origin=generate_point(string.uuid()),
         destination=generate_point(string.uuid()),
         departure_after=protobuf.datetime_to_protobuf(
