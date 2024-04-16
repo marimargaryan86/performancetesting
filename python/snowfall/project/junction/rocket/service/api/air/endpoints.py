@@ -1,11 +1,14 @@
 import asyncio
-import json
+from datetime import UTC, date, datetime
 
 import lagom
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequestStorage,
+    AirSearchResponseAttributes,
+    Passenger,
+    StatusTypeEnum,
 )
 from snowfall.project.junction.rocket.service.api.air.repositories import (
     AirSearchRequestRepository,
@@ -15,9 +18,11 @@ from snowfall.project.junction.rocket.service.api.air.types import (
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
+from snowfall.stdlib import sequence
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
+    pagination_helpers,
 )
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
@@ -47,18 +52,35 @@ class AirSearch(endpoints.HTTPEndpoint):
                 air=request_data["data"]["attributes"],
             ),
         )
+        # TODO(jeremy): fix response model here for unit tests
+        attributes_response = AirSearchResponseAttributes(
+            **request_data["data"]["attributes"],
+            status=StatusTypeEnum.pending,
+            expires_at="2024-04-11T12:30:45Z",  # TODO(jeremy): fix hc expiry time
+        ).model_dump(by_alias=True, exclude_none=True)
 
         await asyncio.gather(*(result_repo.insert(doc) for doc in transformed))
 
-        response_model = {
-            "id": search_id,
-            "attributes": {
-                "status": "pending",
+        response_model = models.Resource(
+            id=search_id,
+            type="air-searches",
+            attributes=attributes_response,
+            links={
+                "self": str(
+                    request.url_for(
+                        "AirSearch",
+                    ),
+                ),
             },
-        }
+        )
 
-        json_model = json.dumps(response_model)
-        return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
+        return await messages.create_response(
+            body=models.Body(
+                data=response_model,
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
+        )
 
 
 class AirSearchStatus(endpoints.HTTPEndpoint):
@@ -67,22 +89,46 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
         request: requests.Request,
         repo: AirSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
-        search_id: str = request.path_params["id"]
+        search_id: str = request.path_params["searchId"]
 
         search_status = (
-            "completed"
+            StatusTypeEnum.completed
             if await repo.find_any_result_by_search_id(search_id)
-            else "processing"
+            else StatusTypeEnum.processing
         )
-        response_model = {
-            "id": search_id,
-            "attributes": {
-                "status": search_status,
-            },
-        }
 
-        json_model = json.dumps(response_model)
-        return responses.Response(status_code=status.HTTP_200_OK, content=json_model)
+        # TODO(jeremy): fix hardcoded data of response attributes
+        # TODO(jeremy): blocked by MR(https://git.snowfall.se/junction/junction/-/merge_requests/5083) to get mongo search object
+        attributes_response = AirSearchResponseAttributes(
+            departure_at=datetime.now(tz=UTC),
+            origin="LON",
+            destination="PAR",
+            passengers=[Passenger(date_of_birth=date.fromisoformat("1980-01-01"))],
+            status=StatusTypeEnum(search_status),
+            expires_at="2024-04-11T12:30:45Z",
+        ).model_dump(by_alias=True, exclude_none=True)
+
+        response_model = models.Resource(
+            id=search_id,
+            type="air-searches",
+            attributes=attributes_response,
+            links={
+                "self": str(
+                    request.url_for(
+                        "AirSearchStatus",
+                        searchId=request.path_params["searchId"],
+                    ),
+                ),
+            },
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=response_model,
+            ),
+            request=request,
+            status_code=status.HTTP_200_OK,
+        )
 
 
 class AirSearchRetrieval(endpoints.HTTPEndpoint):
@@ -91,12 +137,18 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
         request: requests.Request,
         repo: AirSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
-        result_set = await repo.find_results_by_search_id(request.path_params["id"])
+        result_set = await repo.find_results_by_search_id(
+            request.path_params["searchId"],
+        )
 
+        # TODO(jeremy): fix includes resource
         data = [
             models.Resource(
                 id=result.id,
-                type="search-result",
+                type="search-results",
+                attributes={
+                    "expiresAt": "2024-04-11T12:30:45Z",  # TODO(jeremy): fix hc expiry time
+                },
                 relationships={
                     "offers": models.Relationship(
                         data=[
@@ -116,12 +168,35 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
                             for result_details in result.result_details
                         ],
                     ),
+                    "search": models.Relationship(
+                        data=models.ResourceIdentifier(
+                            id=request.path_params["searchId"],
+                            type="air-searches",
+                        ),
+                    ),
                 },
             )
             async for result in result_set
         ]
 
+        pagination = pagination_helpers.get_pagination(request)
+        items_page = sequence.paginate(
+            sequence=data,
+            cursor=pagination.cursor,
+            limit=pagination.limit,
+        )
+
         return await messages.create_response(
-            body=models.Body(data=data),
+            body=models.Body(
+                data=data,
+                links=pagination_helpers.get_next_url(
+                    request.url_for(
+                        "AirSearchRetrieval",
+                        searchId=request.path_params["searchId"],
+                    ),
+                    items_page.cursor,
+                    pagination,
+                ),
+            ),
             request=request,
         )

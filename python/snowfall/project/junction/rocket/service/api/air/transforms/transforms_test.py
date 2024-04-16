@@ -16,11 +16,9 @@ def test_transform_basic_request() -> None:
         "data": {
             "type": "air-searches",
             "attributes": {
-                "criteria": {
-                    "departureAt": date(2024, 1, 1),
-                    "origin": "JFK",
-                    "destination": "LAX",
-                },
+                "departureAt": date(2024, 1, 1),
+                "origin": "JFK",
+                "destination": "LAX",
                 "passengers": [
                     {"date_of_birth": date(1980, 1, 1)},
                     {"date_of_birth": date(2010, 1, 1)},

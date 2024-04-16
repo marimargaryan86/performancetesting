@@ -27,23 +27,44 @@ def example_request() -> Any:
         "data": {
             "type": "air-searches",
             "attributes": {
-                "criteria": {
-                    "origin": "PAR",
-                    "destination": "LON",
-                    "departureAt": "2024-03-24T00:00:00Z",
-                },
+                "origin": "PAR",
+                "destination": "LON",
+                "departureAt": "2024-03-24T00:00:00Z",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
             },
         },
     }
 
 
+@pytest.fixture()
+def example_response(
+    mocker: MockerFixture,
+) -> Any:
+    return {
+        "data": {
+            "id": mocker.mock_module.ANY,
+            "type": "air-searches",
+            "attributes": {
+                "departureAt": "2024-03-24T00:00:00Z",
+                "origin": "PAR",
+                "destination": "LON",
+                "passengers": [{"dateOfBirth": "1980-02-03"}],
+                "status": "pending",
+                "expiresAt": "2024-04-11T12:30:45Z",
+            },
+            "links": {"self": "https://example.com/air/searches"},
+        },
+    }
+
+
+# TODO(reuben.t): this test will be invalidated by search repo work
 async def test_air_search_creation_and_storage(
     client: httpx.AsyncClient,
     mocker: MockerFixture,
     air_search_repo: AirSearchResultRepository,
     air_search_request_repo: AirSearchRequestRepository,
     example_request: Any,
+    example_response: Any,
     example_search_flight_response: SearchFlightsResponse,
 ) -> None:
     mocker.patch(
@@ -53,41 +74,33 @@ async def test_air_search_creation_and_storage(
 
     response = await client.post("/air/searches", json=example_request)
 
-    assert response.json() == {
-        "id": mocker.mock_module.ANY,
-        "attributes": {
-            "status": "pending",
-        },
-    }
-    assert response.status_code == 200
+    assert response.status_code == 201
+    assert response.json() == example_response
 
-    search_id = response.json()["id"]
-
-    found_request = await air_search_request_repo.find_by_search_id(search_id)
-    assert found_request.search_id == search_id
-
-    found_result = await air_search_repo.find_results_by_search_id(search_id)
+    result_id = response.json()["data"]["id"]
+    found_result = await air_search_repo.find_results_by_search_id(result_id)
     async for result in found_result:
         assert result.id
 
 
 async def test_air_search_get_status(
     client: httpx.AsyncClient,
-    mocker: MockerFixture,
-    example_request: Any,
-    example_search_flight_response: SearchFlightsResponse,
+    air_search_repo: AirSearchResultRepository,
 ) -> None:
-    mocker.patch(
-        "snowfall.vendor.junction_one.client.JunctionOneClient.search_flights",
-        return_value=example_search_flight_response,
+    uuid = "eaaf5ab5-64f3-4190-a6a7-d4b40e6010b2"
+    search_id = "c7384289-a633-4bb3-83c6-3aafcb20a4ad"
+    result = AirSearchResult(
+        id=uuid,
+        search_id=search_id,
+        provider_id="",
+        offers=[],
+        result_details=[],
     )
-    response = await client.post("/air/searches", json=example_request)
-    search_id = response.json()["id"]
-
+    await air_search_repo.insert(result)
     response = await client.get("/air/searches/{0}".format(search_id))
 
-    assert response.json()["attributes"]["status"] == "completed"
     assert response.status_code == 200
+    assert response.json()["data"]["attributes"]["status"] == "completed"
 
 
 async def test_air_search_retrieval(
