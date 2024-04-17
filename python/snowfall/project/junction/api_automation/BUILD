@@ -7,4 +7,5 @@ python_image(
         "--asyncio-mode=auto",
     ],
     dependencies=["vendor#pytest-asyncio", "vendor#allure-pytest", ":src"],
+    is_service=False,
 )

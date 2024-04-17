@@ -2,7 +2,7 @@ from snowfall.project.junction.service.routes import factories
 from snowfall.stdlib.service import application
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="routes")
+    entrypoint = application.Entrypoint(name="junction-routes")
 
     entrypoint.enter_with_commands(
         application.Command(

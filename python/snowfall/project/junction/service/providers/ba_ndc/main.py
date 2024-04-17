@@ -42,7 +42,7 @@ async def _bookings_factory(
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="ba-ndc",
+        name="junction-providers-ba-ndc",
         settings_class=config.Settings,
         meta_factory=_meta_factory,
         offers_factory=offers.offers_factory,

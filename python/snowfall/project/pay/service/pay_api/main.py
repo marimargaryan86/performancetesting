@@ -250,7 +250,7 @@ async def _admin_http(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="pay-api")
+    entrypoint = application.Entrypoint(name="pay-pay-api")
 
     entrypoint.enter_with_commands(
         application.Command(

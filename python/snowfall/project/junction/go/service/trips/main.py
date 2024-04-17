@@ -217,7 +217,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name=_TRIPS)
+    entrypoint = application.Entrypoint(name="junction-go-trips")
 
     entrypoint.enter_with_commands(
         application.Command(

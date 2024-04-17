@@ -103,7 +103,7 @@ async def _http(app: application.Application[bootstrap.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="poc-api")
+    entrypoint = application.Entrypoint(name="junction-plus-poc-api")
 
     entrypoint.enter_with_commands(
         application.Command(

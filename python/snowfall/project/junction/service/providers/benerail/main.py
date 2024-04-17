@@ -191,7 +191,7 @@ async def _configure_queue(
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="benerail",
+        name="junction-providers-benerail",
         offers_factory=offers.offers_app,
         simple_offers_factory=simple_offers.simple_search_app,
         meta_factory=_meta_factory,

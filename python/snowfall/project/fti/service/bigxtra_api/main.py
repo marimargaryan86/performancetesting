@@ -49,7 +49,7 @@ async def _schema(app: application.Application[starlette.Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="bigxtra-api")
+    entrypoint = application.Entrypoint(name="fti-bigxtra-api")
 
     entrypoint.enter_with_commands(
         application.Command(

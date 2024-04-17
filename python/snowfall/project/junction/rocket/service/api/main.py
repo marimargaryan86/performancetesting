@@ -95,7 +95,7 @@ async def _http(app: application.Application[Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="api")
+    entrypoint = application.Entrypoint(name="junction-rocket-api")
 
     entrypoint.enter_with_commands(
         application.Command(

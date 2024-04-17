@@ -46,7 +46,7 @@ async def _main(app: application.Application[_Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="currencies")
+    entrypoint = application.Entrypoint(name="pay-currencies")
 
     entrypoint.enter_with_commands(
         application.Command(

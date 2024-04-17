@@ -31,7 +31,7 @@ async def _http(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="data-api")
+    entrypoint = application.Entrypoint(name="junction-go-data-api")
     entrypoint.enter_with_commands(
         application.Command(
             name="http",

@@ -223,7 +223,7 @@ async def _bookings_factory(
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="carnect",
+        name="junction-rocket-providers-carnect",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,

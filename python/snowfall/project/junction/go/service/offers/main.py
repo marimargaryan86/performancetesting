@@ -313,7 +313,7 @@ async def _gather_price_quotes(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="offers")
+    entrypoint = application.Entrypoint(name="junction-go-offers")
 
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),

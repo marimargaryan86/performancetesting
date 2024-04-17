@@ -140,7 +140,7 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="direct-ferries",
+        name="junction-rocket-providers-direct-ferries",
         settings_class=config.Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,

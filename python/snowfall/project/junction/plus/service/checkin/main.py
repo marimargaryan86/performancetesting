@@ -66,7 +66,7 @@ async def _cron_run(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="checkin")
+    entrypoint = application.Entrypoint(name="junction-plus-checkin")
 
     entrypoint.enter_with_commands(
         application.Command(

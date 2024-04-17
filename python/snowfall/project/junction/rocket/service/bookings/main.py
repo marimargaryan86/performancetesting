@@ -176,7 +176,7 @@ async def _consume_cancellations(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="bookings")
+    entrypoint = application.Entrypoint(name="junction-rocket-bookings")
 
     entrypoint.enter_with_commands(
         application.Command(

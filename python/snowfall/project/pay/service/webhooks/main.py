@@ -79,7 +79,7 @@ async def _http(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="webhooks")
+    entrypoint = application.Entrypoint(name="pay-webhooks")
 
     entrypoint.enter_with_commands(
         application.Command(

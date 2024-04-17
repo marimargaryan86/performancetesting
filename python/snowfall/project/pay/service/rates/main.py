@@ -87,7 +87,7 @@ async def _backup_rates_cron_run(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="rates")
+    entrypoint = application.Entrypoint(name="pay-rates")
 
     entrypoint.enter_with_commands(
         application.Command(

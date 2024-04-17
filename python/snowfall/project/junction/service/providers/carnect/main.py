@@ -79,7 +79,7 @@ if __name__ == "__main__":
         message.Message,
         amqp_pb2.Criteria,
     ] = service.Entrypoint(
-        name="carnect",
+        name="junction-providers-carnect",
         meta_factory=_meta_factory,
         simple_offers_factory=simple_offers.simple_search_app,
         bookings_factory=_bookings_factory,

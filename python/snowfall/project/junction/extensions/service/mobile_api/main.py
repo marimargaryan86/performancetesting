@@ -300,7 +300,7 @@ async def _orders_report(app: application.Application[orders_report.Settings]) -
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="mobile-api")
+    entrypoint = application.Entrypoint(name="junction-extensions-mobile-api")
 
     entrypoint.enter_with_commands(
         application.Command(

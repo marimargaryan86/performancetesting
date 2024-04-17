@@ -119,7 +119,7 @@ async def run_download(app: _DownloadApp) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="download")
+    entrypoint = application.Entrypoint(name="junction-go-data-pipeline")
     entrypoint.enter_with_commands(
         application.Command(
             name="download",

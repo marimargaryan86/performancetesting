@@ -138,7 +138,7 @@ async def _serve(app: application.Application[_ServeSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="gateway")
+    entrypoint = application.Entrypoint(name="junction-rocket-gateway")
 
     entrypoint.enter_with_commands(
         application.Command(

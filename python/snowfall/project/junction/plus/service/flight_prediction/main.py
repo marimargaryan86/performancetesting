@@ -134,7 +134,7 @@ async def _main(app: application.Application[_Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="flight-prediction")
+    entrypoint = application.Entrypoint(name="junction-plus-flight-prediction")
 
     entrypoint.enter_with_commands(
         application.Command(

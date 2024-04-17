@@ -70,7 +70,7 @@ async def _factory(
 
 if __name__ == "__main__":
     entrypoint = bootstrap.Entrypoint(
-        name="duffel",
+        name="junction-content-duffel",
         implementation_factory=_factory,
         settings_class=_Settings,
     )

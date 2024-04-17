@@ -175,7 +175,7 @@ async def _serve(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="demo-ui", cli_tool=True)
+    entrypoint = application.Entrypoint(name="junction-demo-ui", cli_tool=True)
 
     entrypoint.enter_with_commands(
         application.Command(

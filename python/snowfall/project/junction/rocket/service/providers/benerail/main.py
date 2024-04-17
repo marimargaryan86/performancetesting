@@ -119,7 +119,7 @@ async def _search_factory(
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="benerail",
+        name="junction-rocket-providers-benerail",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,

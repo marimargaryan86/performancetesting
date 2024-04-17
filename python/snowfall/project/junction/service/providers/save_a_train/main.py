@@ -508,7 +508,7 @@ async def _load_train_stations() -> list[train_stations.TrainStation]:
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="save-a-train",
+        name="junction-providers-save-a-train",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         offers_factory=_offers_factory,

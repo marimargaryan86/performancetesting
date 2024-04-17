@@ -88,7 +88,7 @@ async def _serve(app: application.Application[_ServeSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="resellers")
+    entrypoint = application.Entrypoint(name="junction-go-resellers")
 
     entrypoint.enter_with_commands(
         application.Command(

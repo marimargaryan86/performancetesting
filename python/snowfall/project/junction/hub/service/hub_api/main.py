@@ -254,7 +254,7 @@ async def _http(app: application.Application[Settings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="hub-api")
+    entrypoint = application.Entrypoint(name="junction-hub-hub-api")
 
     entrypoint.enter_with_commands(
         application.Command(

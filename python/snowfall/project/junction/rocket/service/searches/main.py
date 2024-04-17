@@ -179,7 +179,7 @@ async def _consume_quotes(app: application.Application[_ConsumeQuoteSettings]) -
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="searches")
+    entrypoint = application.Entrypoint(name="junction-rocket-searches")
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),
         application.Command(

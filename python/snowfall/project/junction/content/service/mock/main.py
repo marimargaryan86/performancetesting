@@ -55,7 +55,7 @@ async def _factory(
 
 if __name__ == "__main__":
     entrypoint = bootstrap.Entrypoint(
-        name="mock",
+        name="junction-content-mock",
         implementation_factory=_factory,
         settings_class=bootstrap.Settings,
     )

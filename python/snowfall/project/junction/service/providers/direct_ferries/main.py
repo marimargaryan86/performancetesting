@@ -276,7 +276,7 @@ async def _static(app: service.Application[config.StaticSettings]) -> None:
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="direct-ferries",
+        name="junction-providers-direct-ferries",
         settings_class=config.Settings,
         meta_factory=_meta_factory,
         offers_factory=_offers,

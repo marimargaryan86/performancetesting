@@ -341,7 +341,7 @@ async def _generate_cron_invoices(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="transactions")
+    entrypoint = application.Entrypoint(name="pay-transactions")
 
     entrypoint.enter_with_commands(
         application.Command(name="grpc", callback=_serve, settings_class=_GrpcSettings),

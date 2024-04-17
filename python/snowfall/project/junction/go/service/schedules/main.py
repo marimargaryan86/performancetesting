@@ -37,7 +37,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="schedules")
+    entrypoint = application.Entrypoint(name="junction-go-schedules")
 
     entrypoint.enter_with_commands(
         application.Command(

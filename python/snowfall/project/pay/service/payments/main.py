@@ -74,7 +74,7 @@ async def _serve_credit_card_payment(
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="payments")
+    entrypoint = application.Entrypoint(name="pay-payments")
 
     entrypoint.enter_with_commands(
         application.Command(

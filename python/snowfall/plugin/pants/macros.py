@@ -58,21 +58,6 @@ def nomad_template(
     if not name:
         name = build_file_dir().name  # type: ignore[name-defined]  # noqa: F821
 
-    cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" "{config}" "{entry_point}"'
-    config_path = "{path}/debug_info.json".format(
-        path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
-    )
-
-    if service_entry_point:
-        adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
-            name="{name}_debug_info".format(name=name),
-            runnable=service_entry_point,
-            args=["--debug-info"],
-            stdout=config_path,
-            output_files=[config_path],
-            workdir="/",
-        )
-
     for command_def in commands:
         parts = command_def.split("#")
 
@@ -92,6 +77,11 @@ def nomad_template(
         )
 
         if service_entry_point:
+            cmd = './bash/lint-configuration.sh {command} "{path}/{filename}.nomad" "{config}" "{entry_point}"'
+            config_path = "{path}/debug_info.json".format(
+                path=service_entry_point.split(":")[0],
+            )
+
             experimental_test_shell_command(  # type: ignore[name-defined]  # noqa: F821
                 name="{name}_{filename}_test".format(name=name, filename=filename),
                 command=cmd.format(
@@ -104,7 +94,9 @@ def nomad_template(
                 execution_dependencies=[
                     ":{name}_{filename}_config".format(name=name, filename=filename),
                     ":{name}_{filename}_nomad".format(name=name, filename=filename),
-                    ":{name}_debug_info".format(name=name),
+                    "{service_entry_point}_debug_info".format(
+                        service_entry_point=service_entry_point,
+                    ),
                     "bash/lint-configuration.sh",
                 ],
                 tools=["basename", "bash", "dirname", "jq", "perl"],
@@ -248,6 +240,8 @@ def go_image(  # type: ignore[no-untyped-def]
 
 
 def python_image(  # type: ignore[no-untyped-def]
+    *,
+    is_service: bool = True,
     **kwargs,  # noqa: ANN003
 ) -> None:
     try:
@@ -309,6 +303,33 @@ def python_image(  # type: ignore[no-untyped-def]
         frozenset(("python", "snowfall", "project", "service")),
     )
     service_name = _generate_service_name(repository)
+    config_path = "{path}/debug_info.json".format(
+        path=build_file_dir(),  # type: ignore[name-defined]  # noqa: F821
+    )
+
+    if is_service:
+        adhoc_tool(  # type: ignore[name-defined]  # noqa: F821
+            name="{name}_debug_info".format(name=name),
+            runnable=":{name}".format(name=name),
+            args=["--debug-info"],
+            stdout=config_path,
+            output_files=[config_path],
+            workdir="/",
+        )
+
+        experimental_test_shell_command(  # type: ignore[name-defined]  # noqa: F821
+            name="{name}_test".format(name=name),
+            command='./bash/lint-python-service.sh "{service_name}" "{config}"'.format(
+                service_name=service_name,
+                config=config_path,
+            ),
+            execution_dependencies=[
+                ":{name}_debug_info".format(name=name),
+                "bash/lint-python-service.sh",
+            ],
+            tools=["bash", "jq"],
+            workdir="/",
+        )
 
     docker_image(  # type: ignore[name-defined]  # noqa: F821
         name="{name}_docker".format(name=name),

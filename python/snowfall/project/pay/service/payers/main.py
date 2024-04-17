@@ -38,7 +38,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
 
 
 if __name__ == "__main__":
-    entrypoint = application.Entrypoint(name="payers")
+    entrypoint = application.Entrypoint(name="pay-payers")
 
     entrypoint.enter_with_commands(
         application.Command(

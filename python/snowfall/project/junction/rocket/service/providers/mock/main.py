@@ -170,7 +170,7 @@ async def _bookings_factory(
 
 if __name__ == "__main__":
     entrypoint = service.Entrypoint(
-        name="mock",
+        name="junction-rocket-providers-mock",
         settings_class=_Settings,
         meta_factory=_meta_factory,
         search_factory=_search_factory,
