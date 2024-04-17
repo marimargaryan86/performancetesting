@@ -41,12 +41,9 @@ class CarSearch(endpoints.HTTPEndpoint):
         searches: grpc_pb2_grpc.SearchServiceStub = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        validation_errors = validation.validate_create_search_request(body)
-        if validation_errors:
-            return models.JsonApiResponse(
-                models.Body(errors=validation_errors),
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
+        request_validator = validation.SearchRequestValidator(body)
+        if request_validator.validation_errors:
+            return request_validator.as_json_api_response()
 
         origin_coords = latlng_pb2.LatLng(
             latitude=body["pickupLocation"]["latitude"],

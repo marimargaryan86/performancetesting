@@ -1,5 +1,6 @@
-import typing
-import uuid
+import datetime
+from collections.abc import Mapping
+from typing import Any
 
 import httpx
 from starlette import status
@@ -9,26 +10,27 @@ from snowfall.project.junction.rocket import fixtures
 
 class TestRailCreateSearch:
     @property
-    def payload(self) -> typing.Mapping[str, typing.Any]:
+    def search_payload(self) -> Mapping[str, Any]:
+        tomorrow = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+        after_tomorrow = tomorrow + datetime.timedelta(days=1)
         return {
             "data": {
                 "type": "rail-searches",
                 "attributes": {
-                    "departureAfter": "2024-04-05T08:00:00Z",
-                    "departureBefore": "2024-04-05T08:00:00Z",
-                    "returnAt": "2024-04-07T08:00:00Z",
+                    "departureAfter": tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
+                    "returnAt": after_tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
                     "passengers": [{"dateOfBirth": "2000-01-01"}],
                 },
                 "relationships": {
                     "origin": {
                         "data": {
-                            "id": "3debfa7c-9884-5409-86c8-33f3e491382e",
+                            "id": fixtures.PLACES[0],
                             "type": "places",
                         },
                     },
                     "destination": {
                         "data": {
-                            "id": "3debfa7c-9884-5409-86c8-33f3e491382e",
+                            "id": fixtures.PLACES[0],
                             "type": "places",
                         },
                     },
@@ -40,11 +42,9 @@ class TestRailCreateSearch:
         self,
         client: httpx.AsyncClient,
     ) -> None:
-        payload = self.payload
-
         response = await client.post(
             "/rail/searches",
-            json=payload,
+            json=self.search_payload,
             headers={"Content-Type": "application/vnd.api+json"},
         )
 
@@ -55,45 +55,86 @@ class TestRailCreateSearch:
         self,
         client: httpx.AsyncClient,
     ) -> None:
-        payload = self.payload
+        payload = self.search_payload
         origin = payload["data"]["relationships"]["origin"]
-        origin["data"]["id"] = str(
-            uuid.uuid4(),
-        )
+        origin["data"]["id"] = fixtures.NOT_FOUND
 
-        response = await client.post(
-            "/rail/searches",
-            json=payload,
-            headers={"Content-Type": "application/vnd.api+json"},
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert (
-            response.json()["errors"][0]["source"]["pointer"]
-            == "/data/relationships/origin"
-        )
+        await self._assert_unprocessable_entity(client, payload)
 
     async def test_create_rail_search_fails_when_destination_does_not_exist(
         self,
         client: httpx.AsyncClient,
     ) -> None:
-        payload = self.payload
+        payload = self.search_payload
         destination = payload["data"]["relationships"]["destination"]
-        destination["data"]["id"] = str(
-            uuid.uuid4(),
+        destination["data"]["id"] = fixtures.NOT_FOUND
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_rail_search_departure_after_in_past_throws_bad_request(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["departureAfter"] = "1998-04-05T08:00:00Z"
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_rail_search_return_at_in_past_throws_bad_request(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["returnAt"] = "1998-04-05T08:00:00Z"
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_rail_search_return_at_before_departure_at_throws_bad_request(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        return_at = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(hours=1)
+        payload["data"]["attributes"]["returnAt"] = return_at.strftime(
+            "%Y-%m-%dT08:00:00.000Z",
         )
 
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_rail_search_departure_before_in_past_throws_bad_request(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["departureBefore"] = "1998-04-05T08:00:00Z"
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_rail_search_return_at_before_departure_before_throws_bad_request(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        departure_before = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(
+            days=2,
+        )
+        payload["data"]["attributes"]["departureBefore"] = departure_before.strftime(
+            "%Y-%m-%dT08:00:00.000Z",
+        )
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def _assert_unprocessable_entity(
+        self,
+        client: httpx.AsyncClient,
+        payload: Mapping[str, Any],
+    ) -> None:
         response = await client.post(
             "/rail/searches",
             json=payload,
-            headers={"Content-Type": "application/vnd.api+json"},
         )
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert (
-            response.json()["errors"][0]["source"]["pointer"]
-            == "/data/relationships/destination"
-        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 class TestRailGetSearch:

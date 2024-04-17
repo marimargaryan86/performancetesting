@@ -32,18 +32,6 @@ class TestCarRentalCreateSearch:
             },
         }
 
-    async def assert_bad_request(
-        self,
-        client: httpx.AsyncClient,
-        payload: Mapping[str, Any],
-    ) -> None:
-        response = await client.post(
-            "/car-rental/searches",
-            json=payload,
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-
     async def test_create_car_rental_search_is_successful(
         self,
         client: httpx.AsyncClient,
@@ -62,7 +50,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["pickupLocation"]["latitude"] = -91
-        await self.assert_bad_request(client, payload)
+        await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_pickup_longitude(
         self,
@@ -70,7 +58,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["pickupLocation"]["longitude"] = -200
-        await self.assert_bad_request(client, payload)
+        await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_return_latitude(
         self,
@@ -78,7 +66,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["returnLocation"]["latitude"] = 91
-        await self.assert_bad_request(client, payload)
+        await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_return_longitude(
         self,
@@ -86,7 +74,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["returnLocation"]["longitude"] = 200
-        await self.assert_bad_request(client, payload)
+        await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_driver_age(
         self,
@@ -94,7 +82,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["driverAge"] = 14
-        await self.assert_bad_request(client, payload)
+        await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_pickup_date(
         self,
@@ -102,7 +90,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["pickupAt"] = "1998-04-05T08:00:00Z"
-        await self.assert_bad_request(client, payload)
+        await self._assert_unprocessable_entity(client, payload)
 
     async def test_create_car_rental_invalid_return_date(
         self,
@@ -110,7 +98,7 @@ class TestCarRentalCreateSearch:
     ) -> None:
         payload = self.search_payload
         payload["data"]["attributes"]["returnAt"] = "1998-04-05T08:00:00Z"
-        await self.assert_bad_request(client, payload)
+        await self._assert_unprocessable_entity(client, payload)
 
     async def test_create_car_rental_invalid_pickup_and_return_sequence(
         self,
@@ -125,7 +113,31 @@ class TestCarRentalCreateSearch:
         payload["data"]["attributes"]["returnAt"] = tomorrow.strftime(
             "%Y-%m-%dT08:00:00.000Z",
         )
-        await self.assert_bad_request(client, payload)
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def _assert_unprocessable_entity(
+        self,
+        client: httpx.AsyncClient,
+        payload: Mapping[str, Any],
+    ) -> None:
+        response = await client.post(
+            "/car-rental/searches",
+            json=payload,
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    async def _assert_bad_request(
+        self,
+        client: httpx.AsyncClient,
+        payload: Mapping[str, Any],
+    ) -> None:
+        response = await client.post(
+            "/car-rental/searches",
+            json=payload,
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 class TestCarRentalGetSearch:

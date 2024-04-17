@@ -8,7 +8,7 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.v1 import models_pb2 as legacy_go_pb2
 from snowfall.project.junction.rocket.service.api import errors
-from snowfall.project.junction.rocket.service.api.common import validation
+from snowfall.project.junction.rocket.service.api.rail.endpoints import validation
 from snowfall.project.junction.rocket.service.api.rail.models import (
     searches as search_models,
 )
@@ -50,42 +50,10 @@ class RailSearch(endpoints.HTTPEndpoint):
         timeout = grpc_timeout.total_seconds()
         origin = await self._get_place(places, body["origin"], timeout)
         destination = await self._get_place(places, body["destination"], timeout)
-        validation_errors = []
-        if origin is None:
-            validation_errors.append(
-                validation.generate_validation_error(
-                    "`origin` not found in the system, might be wrong identifier",
-                    "relationships/origin",
-                ),
-            )
-        elif not origin.search_capabilities.rail:
-            validation_errors.append(
-                validation.generate_validation_error(
-                    "Provided `origin` doesn't support rail search",
-                    "relationships/origin",
-                ),
-            )
 
-        if destination is None:
-            validation_errors.append(
-                validation.generate_validation_error(
-                    "`destination` not found in the system, might be wrong identifier",
-                    "relationships/destination",
-                ),
-            )
-        elif not destination.search_capabilities.rail:
-            validation_errors.append(
-                validation.generate_validation_error(
-                    "Provided `destination` doesn't support rail search",
-                    "relationships/destination",
-                ),
-            )
-
-        if validation_errors:
-            return models.JsonApiResponse(
-                models.Body(errors=validation_errors),
-                status_code=status.HTTP_400_BAD_REQUEST,
-            )
+        request_validator = validation.SearchRequestValidator(body, origin, destination)
+        if request_validator.validation_errors:
+            return request_validator.as_json_api_response()
 
         departure_before = body.get("departureBefore", None)
         if departure_before:
