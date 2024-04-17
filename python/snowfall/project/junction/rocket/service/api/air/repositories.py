@@ -34,7 +34,7 @@ class AirSearchResultRepository(
     ) -> resultset.ResultSet[AirSearchResult]:
         return await self._execute(
             query=self._collection.find,
-            filter_pre_cursor={"search_id": search_id},
+            filter={"search_id": search_id},
         )
 
     async def find_any_result_by_search_id(
@@ -50,11 +50,11 @@ class AirSearchResultRepository(
             is not None
         )
 
-    async def find_results_by_offer_id(
+    async def find_result_by_offer_id(
         self,
         identifier: str,
-    ) -> resultset.ResultSet[AirSearchResult]:
+    ) -> AirSearchResult:
         return await self._execute(
-            query=self._collection.find,
-            filter_pre_cursor={"offers._id": identifier},
+            self._collection.find_one,
+            {"offers._id": identifier},
         )

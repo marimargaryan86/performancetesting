@@ -1,5 +1,4 @@
-from collections.abc import Mapping, Sequence
-from typing import Any
+from collections.abc import Sequence
 
 from snowfall.project.junction.rocket.service.api import constants
 from snowfall.project.junction.rocket.service.api.air import models as rocket
@@ -36,14 +35,11 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
     def transform_inbound_query(
         self,
         air_search_request: rocket.AirSearchRequest,
+        outbound_flight_ref_id: str,
     ) -> j1.SearchFlightsRequest:
-        # TODO(jeremy): This is the selected_outbound_offer = air_search_request.data.relationships.selected_outbound_offer.data.id
-        # TODO(jeremy): 1. Get search result using search_id (from mongo): search_id = attributes.selected_outbound_offer
-        # TODO(jeremy): 2. Get flight ref from offers: outbound_flight_ref = offers.ref_id[0]
         attributes = air_search_request.data.attributes
-        outbound_flight_ref = "1P0_ABCDEFG"  # TODO(jeremy): fix hc
-        return_departure_at = attributes.return_departure_at
 
+        return_departure_at = attributes.return_departure_at
         return_departure_after = (
             return_departure_at.date() if return_departure_at else None
         )
@@ -65,26 +61,8 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
                 ),
             ],
             user_ids=passengers_to_fake_user_ids(attributes.passengers),
-            refs=[outbound_flight_ref],
+            refs=[outbound_flight_ref_id],
         )
-
-    def transform(
-        self,
-        value: Mapping[str, Any],
-    ) -> j1.SearchFlightsRequest:
-        air_search_request = rocket.AirSearchRequest(**value)
-
-        is_inbound = (
-            air_search_request.data.relationships
-            and air_search_request.data.relationships.selected_outbound_offer
-        )
-
-        if is_inbound:
-            search_flight_request = self.transform_inbound_query(air_search_request)
-        else:
-            search_flight_request = self.transform_outbound_query(air_search_request)
-
-        return search_flight_request
 
 
 def _transform_result_detail(

@@ -7,6 +7,9 @@ from pytest_mock import MockerFixture
 from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequestStorage,
     AirSearchResult,
+    FareTypeEnum,
+    Offer,
+    Price,
 )
 from snowfall.project.junction.rocket.service.api.air.repositories import (
     AirSearchRequestRepository,
@@ -58,6 +61,101 @@ def example_response(
             "links": {"self": "https://example.com/air/searches"},
         },
     }
+
+
+UUID = "eaaf5ab5-64f3-4190-a6a7-d4b40e6010b2"
+SEARCH_ID = "c7384289-a633-4bb3-83c6-3aafcb20a4ad"
+OUTBOUND_SEARCH_OFFER_ID = "a7384289-a633-4bb3-83c6-3aafcb20a4zz"
+FLIGHT_REF_ID = "1P0_1234ABC"
+
+
+@pytest.fixture()
+def example_request_inbound() -> Any:
+    return {
+        "data": {
+            "type": "air-searches",
+            "attributes": {
+                "origin": "PAR",
+                "destination": "LON",
+                "departureAfter": "2024-03-24T00:00:00Z",
+                "returnDepartureAt": "2024-03-25T00:00:00Z",
+                "passengers": [{"dateOfBirth": "1980-02-03"}],
+            },
+            "relationships": {
+                "selected_outbound_offer": {
+                    "data": {
+                        "id": OUTBOUND_SEARCH_OFFER_ID,
+                        "type": "offers",
+                    },
+                },
+            },
+        },
+    }
+
+
+@pytest.fixture()
+def example_air_search_result_with_offers() -> Any:
+    return AirSearchResult(
+        id=UUID,
+        search_id=SEARCH_ID,
+        provider_id="",
+        offers=[
+            Offer(
+                id=OUTBOUND_SEARCH_OFFER_ID,
+                price=Price(price=1.0, currency=""),
+                fare_type=FareTypeEnum.basic,
+                cabin_details=None,
+                name="",
+                ref_ids=[
+                    FLIGHT_REF_ID,
+                ],
+            ),
+        ],
+        result_details=[],
+    )
+
+
+async def test_air_search_round_trip(  # noqa: WPS218
+    client: httpx.AsyncClient,
+    mocker: MockerFixture,
+    air_search_request_repo: AirSearchRequestRepository,
+    air_search_repo: AirSearchResultRepository,
+    example_request: Any,
+    example_request_inbound: Any,
+    example_air_search_result_with_offers: Any,
+    example_search_flight_response: SearchFlightsResponse,
+) -> None:
+    mocker.patch(
+        "snowfall.vendor.junction_one.client.JunctionOneClient.search_flights",
+        return_value=example_search_flight_response,
+    )
+
+    # Outbound insert
+    search_object = AirSearchRequestStorage(
+        search_id=SEARCH_ID,
+        reseller_id="RESELLER_ID",
+        air=example_request["data"]["attributes"],
+    )
+    await air_search_request_repo.insert(search_object)
+
+    insert_response = await air_search_repo.insert(
+        example_air_search_result_with_offers,
+    )
+    assert insert_response is not None
+
+    # Inbound response
+    response = await client.post("/air/searches", json=example_request_inbound)
+
+    assert response.status_code == 201
+
+    result_id = response.json()["data"]["id"]
+    found_result = await air_search_request_repo.find_by_search_id(result_id)
+    assert found_result is not None
+    assert result_id == found_result.search_id
+
+    search_result = await air_search_repo.find_results_by_search_id(result_id)
+    async for result in search_result:
+        assert result.id
 
 
 async def test_air_search_creation_and_storage(  # noqa: WPS218

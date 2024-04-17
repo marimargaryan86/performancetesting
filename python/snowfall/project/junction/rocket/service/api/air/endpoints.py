@@ -4,6 +4,7 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api.air.models import (
+    AirSearchRequest,
     AirSearchRequestStorage,
     AirSearchResponseAttributes,
     StatusTypeEnum,
@@ -25,8 +26,30 @@ from snowfall.stdlib.integration.starlette import (
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
 
+def is_inbound(
+    air_search_request: AirSearchRequest,
+) -> bool:
+    return (
+        air_search_request.data.relationships is not None
+        and air_search_request.data.relationships.selected_outbound_offer is not None
+    )
+
+
+async def get_selected_outbound_offer_ref_ids(
+    outbound_offer_id: str,
+    results_repo: AirSearchResultRepository,
+) -> str:
+    search_result = await results_repo.find_result_by_offer_id(
+        outbound_offer_id,
+    )
+    selected_offer = next(
+        offer for offer in search_result.offers if offer.id == outbound_offer_id
+    )
+    return selected_offer.ref_ids[0]
+
+
 class AirSearch(endpoints.HTTPEndpoint):
-    async def post(
+    async def post(  # noqa: WPS217
         self,
         request: requests.Request,
         junction_one_client: JunctionOneClient = lagom.injectable,
@@ -38,10 +61,27 @@ class AirSearch(endpoints.HTTPEndpoint):
         reseller_id = request.user.username
         request_data = await request.json()
 
-        query = air_search_request_transformer.transform(request_data)
+        search_request = AirSearchRequest(**request_data)
+        if is_inbound(search_request):
+            relationships = search_request.data.relationships
+            if relationships is None:
+                raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
 
-        response = await junction_one_client.search_flights(query)
-        transformed = air_search_result_transformer.transform(response)
+            outbound_flight_ref_id = await get_selected_outbound_offer_ref_ids(
+                outbound_offer_id=relationships.selected_outbound_offer.data.id,
+                results_repo=results_repo,
+            )
+
+            query = air_search_request_transformer.transform_inbound_query(
+                search_request,
+                outbound_flight_ref_id,
+            )
+        else:
+            query = air_search_request_transformer.transform_outbound_query(
+                search_request,
+            )
+        j1_search_response = await junction_one_client.search_flights(query)
+        transformed = air_search_result_transformer.transform(j1_search_response)
 
         search_id = transformed[0].search_id
         insert_response = await requests_repo.insert(

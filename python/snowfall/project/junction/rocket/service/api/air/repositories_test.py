@@ -73,24 +73,22 @@ async def test_find_results_by_search_id(
         assert result == example_air_search_result
 
 
-async def test_find_results_by_outbound_offer_id(
+async def test_find_result_by_outbound_offer_id(
     air_search_repo: AirSearchResultRepository,
     example_air_search_result_with_offers: AirSearchResult,
 ) -> None:
     await air_search_repo.insert(example_air_search_result_with_offers)
 
-    results_response = await air_search_repo.find_results_by_offer_id(
+    result = await air_search_repo.find_result_by_offer_id(
         OUTBOUND_SEARCH_OFFER_ID,
     )
-    assert results_response is not None
+    assert result is not None
+    assert result == example_air_search_result_with_offers
+    assert result.search_id == SEARCH_ID
 
-    async for result in results_response:
-        assert result == example_air_search_result_with_offers
-        assert result.search_id == SEARCH_ID
+    assert result.offers
 
-        assert result.offers
-
-        selected_offers = [
-            offer for offer in result.offers if offer.id == OUTBOUND_SEARCH_OFFER_ID
-        ]
-        assert selected_offers[0].ref_ids == [FLIGHT_REF_ID]
+    selected_offers = [
+        offer for offer in result.offers if offer.id == OUTBOUND_SEARCH_OFFER_ID
+    ]
+    assert selected_offers[0].ref_ids == [FLIGHT_REF_ID]
