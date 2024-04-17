@@ -47,6 +47,20 @@ just one goal.
     git commit -m "<type>[optional scope]: <description>"
     ```
 
+    This repository follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for its commits. The following types are accepted:
+
+    * `build` - changes to Pants, Dockerfiles etc.
+    * `chore` - mundane tasks like updating dependencies etc.
+    * `ci` - changes to the GitLab pipeline, Nomad deploys etc.
+    * `docs` - documentation related changes
+    * `feat` - new features
+    * `fix` - bug fixes
+    * `perf` - performance related changes and refactors
+    * `refactor` - general refactors
+    * `revert` - code and commit reverts
+    * `style` - code style changes
+    * `test` - test related changes
+
 5. Push your branch:
 
     ```shell
