@@ -14,7 +14,7 @@
           "script": {
             "exec": [
               "var json_data = pm.response.json();",
-              "var search_id = json_data.id;",
+              "var search_id = json_data.data.id;",
               "pm.collectionVariables.set(\"air_search_id\", search_id);",
               "",
               "pm.test(\"Response status code is 200\", function () {",
@@ -66,7 +66,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"air-searches\",\n        \"attributes\": {\n            \"criteria\": {\n                \"origin\": \"LAX\",\n                \"destination\": \"JFK\",\n                \"departureAt\": \"2024-04-24T14:15:22Z\"\n            },\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"air-searches\",\n        \"attributes\": {\n            \"origin\": \"LAX\",\n            \"destination\": \"JFK\",\n            \"departureAt\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -212,6 +212,9 @@
         "type": "text/javascript",
         "packages": {},
         "exec": [
+          "var moment = require('moment');",
+          "var now_plus_one_week_utc = moment().add(7, 'days').utc(true).format()",
+          "pm.collectionVariables.set(\"now_plus_one_week_utc\", now_plus_one_week_utc);",
           ""
         ]
       }
@@ -234,6 +237,10 @@
     },
     {
       "key": "air_search_id",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_week_utc",
       "value": ""
     }
   ]

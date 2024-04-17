@@ -39,7 +39,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n            \"type\": \"hotel-searches\",\n            \"attributes\": {\n                \"checkinAt\": \"2024-08-24T00:00:00Z\",\n                \"checkoutAt\": \"2024-08-26T00:00:00Z\",\n                \"latitude\": 48.8533,\n                \"longitude\": 2.34861,\n                \"radius\": 20,\n                \"passengers\": [{\"dateOfBirth\": \"1980-02-03\"}]\n            }\n    }\n}",
+          "raw": "{\n    \"data\": {\n            \"type\": \"hotel-searches\",\n            \"attributes\": {\n                \"checkinAt\": \"{{now_plus_one_day_utc}}\",\n                \"checkoutAt\": \"{{now_plus_one_week_utc}}\",\n                \"latitude\": 40.7127753,\n                \"longitude\": -74.0059728,\n                \"radius\": 20,\n                \"passengers\": [{\"dateOfBirth\": \"1980-02-03\"}]\n            }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -279,7 +279,11 @@
         "type": "text/javascript",
         "packages": {},
         "exec": [
-          ""
+          "var moment = require('moment');",
+          "var now_plus_one_day_utc = moment().add(1, 'days').utc(true).format()",
+          "var now_plus_one_week_utc = moment().add(7, 'days').utc(true).format()",
+          "pm.collectionVariables.set(\"now_plus_one_day_utc\", now_plus_one_day_utc);",
+          "pm.collectionVariables.set(\"now_plus_one_week_utc\", now_plus_one_week_utc);"
         ]
       }
     },
@@ -305,6 +309,14 @@
     },
     {
       "key": "hotel_room_search_id",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_day_utc",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_week_utc",
       "value": ""
     }
   ]
