@@ -169,7 +169,7 @@ async def test_air_get_offers_result_with_invalid_search_id(
 ) -> None:
     invalid_search_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 
-    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+    with pytest.raises(HTTPStatusError, match="Client error '404 Not Found' for url"):
         await qa_client.air.get_search_result(
             search_id=invalid_search_id,
         )
@@ -182,7 +182,7 @@ async def test_air_get_offer_list_with_invalid_search_id(
 ) -> None:
     invalid_search_id = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
 
-    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+    with pytest.raises(HTTPStatusError, match="Client error '404 Not Found' for url"):
         await qa_client.air.get_offers(
             search_id=invalid_search_id,
         )

@@ -27,29 +27,24 @@ class AirClient:
         departure_after: str | None,
         passengers_dates_of_birth: Sequence[date],
     ) -> AirSearchResult:
-        criteria = {}
+        attributes: dict[str, str | list[dict[str, str]]] = {}
 
         if origin is not None:
-            criteria["origin"] = origin
+            attributes["origin"] = origin
 
         if destination is not None:
-            criteria["destination"] = destination
+            attributes["destination"] = destination
 
         if departure_after is not None:
-            criteria["departureAt"] = departure_after
+            attributes["departureAt"] = departure_after
 
         passengers = [
             {"dateOfBirth": dob.strftime("%Y-%m-%d")}
             for dob in passengers_dates_of_birth
         ]
+        attributes["passengers"] = passengers
 
-        body_data = {
-            "type": "air-searches",
-            "attributes": {
-                "criteria": criteria,
-                "passengers": passengers,
-            },
-        }
+        body_data = {"type": "air-searches", "attributes": attributes}
 
         body = {
             "data": body_data,
@@ -67,7 +62,7 @@ class AirClient:
     async def wait_for_completed_search(self, search_id: str) -> AirSearchResult:
         search_status = await poll_until_condition_met(
             request_func=lambda: self.get_search_result(search_id),
-            attribute_path="attributes.status",
+            attribute_path="data.attributes.status",
             success_value="completed",
             error_message="Timeout reached and status was not completed.",
         )

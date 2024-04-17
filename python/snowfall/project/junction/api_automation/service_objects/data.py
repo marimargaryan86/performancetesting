@@ -47,11 +47,11 @@ class AirSearchResult:
 
     @property
     def id(self) -> str:
-        return get_nested_attribute(self._data, "id")
+        return get_nested_attribute(self._data, "data.id")
 
     @property
     def status(self) -> str:
-        return get_nested_attribute(self._data, "attributes.status")
+        return get_nested_attribute(self._data, "data.attributes.status")
 
 
 class AirOffersResult:
