@@ -61,9 +61,10 @@ message SearchResult { // old OfferGroup
   string id = 1;
   string search_id = 2;
   string provider_id = 3;
-  google.protobuf.Timestamp expires_at = 4;
-  repeated Offer offers = 5;
-  repeated ResultDetail result_details = 6;
+  string pay_company_id = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  repeated Offer offers = 6;
+  repeated ResultDetail result_details = 7;
 }
 
 message Offer { // Old OfferOption
@@ -214,8 +215,10 @@ message Penalty {
 message Quote {
   string id = 1;
   string offer_id = 2;
-  google.protobuf.Timestamp expires_at = 3;
-  snowfall.stdlib.v1.Money price = 4;
+  string pay_quote_id = 3;
+  string pay_company_id = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  snowfall.stdlib.v1.Money price = 6;
   enum Required {
     REQUIRED_UNSPECIFIED = 0;
     REQUIRED_DATE_OF_BIRTH = 1;
@@ -227,9 +230,9 @@ message Quote {
     REQUIRED_RESIDENCE_ADDRESS = 7;
     REQUIRED_ISSUE_DATE = 8;
   }
-  repeated Required required_documents = 5;
-  repeated Penalty penalties = 6;
-  repeated FareRule rules = 7;
-  repeated PriceBreakdown price_breakdown = 8;
-  repeated ConditionalPrice conditional_prices = 9;
+  repeated Required required_documents = 7;
+  repeated Penalty penalties = 8;
+  repeated FareRule rules = 9;
+  repeated PriceBreakdown price_breakdown = 10;
+  repeated ConditionalPrice conditional_prices = 11;
 }
