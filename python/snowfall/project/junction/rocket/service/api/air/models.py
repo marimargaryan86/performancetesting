@@ -34,7 +34,7 @@ class Passenger(BaseModel):
 
 
 class AirSearchAttributes(BaseModel):
-    departure_at: datetime
+    departure_after: datetime
     origin: str
     destination: str
     return_departure_at: datetime | None = None

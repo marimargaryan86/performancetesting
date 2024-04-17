@@ -840,7 +840,7 @@ components:
               required:
                 - origin
                 - destination
-                - departureAt
+                - departureAfter
                 - passengers
               properties:
                 expiresAt:
@@ -864,7 +864,7 @@ components:
                 destination:
                   type: string
                   example: PAR
-                departureAt:
+                departureAfter:
                   type: string
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
@@ -2147,7 +2147,7 @@ components:
               required:
                 - expiresAt
                 - status
-                - departureAt
+                - departureAfter
                 - passengers
               properties:
                 expiresAt:
@@ -2169,10 +2169,10 @@ components:
                     - completed
                     - failed
                   example: completed
-                departureAt:
+                departureAfter:
                   type: string
                   description: >-
-                    The requested departure date time for the rail search in
+                    The requested departure after date time for the rail search in
                     [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
                     format
                   format: date-time

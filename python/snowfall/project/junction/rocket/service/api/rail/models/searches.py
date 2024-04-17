@@ -29,7 +29,7 @@ class RailSearchResource(models.Resource):
             id=search.id,
             type=RailSearchResource.api_type,
             attributes={
-                "departureAt": protobuf.protobuf_to_datetime(
+                "departureAfter": protobuf.protobuf_to_datetime(
                     search.rail.departure_after,
                 ),
                 "status": protobuf.enum_value_to_slug(

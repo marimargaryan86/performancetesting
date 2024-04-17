@@ -27,7 +27,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
                 j1.OriginDestinationRequest(
                     arrival_airport=attributes.destination,
                     departure_airport=attributes.origin,
-                    departure_date=attributes.departure_at.date(),
+                    departure_date=attributes.departure_after.date(),
                 ),
             ],
             user_ids=passengers_to_fake_user_ids(attributes.passengers),
@@ -56,7 +56,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
                 j1.OriginDestinationRequest(
                     arrival_airport=attributes.destination,
                     departure_airport=attributes.origin,
-                    departure_date=attributes.departure_at.date(),
+                    departure_date=attributes.departure_after.date(),
                 ),
                 j1.OriginDestinationRequest(
                     arrival_airport=attributes.origin,
@@ -138,9 +138,11 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
                         price=priced_fare.price,
                         currency=priced_fare.currency,
                     ),
-                    cabin_details=self._transform_cabins(priced_fare.segments)
-                    if priced_fare.segments
-                    else None,
+                    cabin_details=(
+                        self._transform_cabins(priced_fare.segments)
+                        if priced_fare.segments
+                        else None
+                    ),
                     fare_type=rocket.FareTypeEnum(fare_type),
                     name=priced_fare.name,
                     ref_ids=[ref for ref in priced_fare.refs if priced_fare.refs],

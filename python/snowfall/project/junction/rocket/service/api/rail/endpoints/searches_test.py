@@ -14,7 +14,7 @@ class TestRailCreateSearch:
             "data": {
                 "type": "rail-searches",
                 "attributes": {
-                    "departureAt": "2024-04-05T08:00:00Z",
+                    "departureAfter": "2024-04-05T08:00:00Z",
                     "departureBefore": "2024-04-05T08:00:00Z",
                     "returnAt": "2024-04-07T08:00:00Z",
                     "passengers": [{"dateOfBirth": "2000-01-01"}],

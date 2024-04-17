@@ -32,7 +32,7 @@ def example_request() -> Any:
             "attributes": {
                 "origin": "PAR",
                 "destination": "LON",
-                "departureAt": "2024-03-24T00:00:00Z",
+                "departureAfter": "2024-03-24T00:00:00Z",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
             },
         },
@@ -48,7 +48,7 @@ def example_response(
             "id": mocker.mock_module.ANY,
             "type": "air-searches",
             "attributes": {
-                "departureAt": "2024-03-24T00:00:00Z",
+                "departureAfter": "2024-03-24T00:00:00Z",
                 "origin": "PAR",
                 "destination": "LON",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],

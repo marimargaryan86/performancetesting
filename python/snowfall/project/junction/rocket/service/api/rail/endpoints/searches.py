@@ -93,7 +93,7 @@ class RailSearch(endpoints.HTTPEndpoint):
                 datetime.datetime.fromisoformat(departure_before),
             )
 
-        return_date = body.get("return_date", None)
+        return_date = body.get("returnAt", None)
         if return_date:
             return_date = protobuf.datetime_to_protobuf(
                 datetime.datetime.fromisoformat(return_date),
@@ -115,7 +115,7 @@ class RailSearch(endpoints.HTTPEndpoint):
                             time_zone=destination.time_zone,  # type: ignore[union-attr]
                         ),
                         departure_after=protobuf.datetime_to_protobuf(
-                            datetime.datetime.fromisoformat(body["departureAt"]),
+                            datetime.datetime.fromisoformat(body["departureAfter"]),
                         ),
                         departure_before=departure_before,
                         return_date=return_date,
