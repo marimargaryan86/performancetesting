@@ -114,6 +114,8 @@ export default {
     profile: "Profile",
     role: "Role",
     resellers: "Resellers",
+    parentReseller: "Parent",
+    childReseller: "Child",
   },
   actions: {
     logout: "Logout",

@@ -8,16 +8,24 @@ export default class ResellerService extends JunctionHubApiService {
     session,
     cursor,
     limit = 20,
+    filter,
   }: {
     session: OrySchemas.Session;
     cursor?: string;
     limit?: number;
+    filter?: {
+      name?: string;
+    };
   }): Promise<PaginatedData<Reseller>> {
     const resp = await this.makeRequest<{ data: ResellerSchema[]; links: { next: string } }>(
       "/resellers",
       {
         session,
-        queryParams: { "page[cursor]": cursor, "page[limit]": limit },
+        queryParams: {
+          "page[cursor]": cursor,
+          "page[limit]": limit,
+          "filter[name][like]": filter?.name,
+        },
       },
     );
 

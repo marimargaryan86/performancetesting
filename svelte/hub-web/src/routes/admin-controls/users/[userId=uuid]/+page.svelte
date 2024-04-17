@@ -1,7 +1,3 @@
-<script lang="ts" context="module">
-  export const LIST_RESELLERS_LIMIT = 20;
-</script>
-
 <script lang="ts">
   import { page } from "$app/stores";
   import UserComponent from "$lib/components/pages/admin-controls/user/user.svelte";
@@ -21,7 +17,6 @@
     return userId === undefined ? "" : userId;
   }
 
-  $: resellers = data.resellers;
   $: i18nUsers = $t("pages.adminControls.pages.users", { returnObjects: true });
   $: usersRoute = routeConfig.routes.adminControls.routes.users;
   $: breadCrumbs = [
@@ -30,4 +25,4 @@
   ];
 </script>
 
-<UserComponent mode={"update"} user={data.user} {breadCrumbs} {resellers} />
+<UserComponent mode={"update"} user={data.user} {breadCrumbs} />

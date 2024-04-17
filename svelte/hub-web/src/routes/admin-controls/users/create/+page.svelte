@@ -19,15 +19,11 @@
     { label: i18nUsers.pages.create.title, url: usersRoute.routes.create.root },
   ];
 
-  export let data;
-
   const newUser: UserPut = {
     email: "",
     role: "reseller-user",
     resellerId: "",
   };
-
-  $: resellers = data.resellers;
 </script>
 
-<UserComponent mode={"create"} user={newUser} {breadCrumbs} {resellers} />
+<UserComponent mode={"create"} user={newUser} {breadCrumbs} />

@@ -11,7 +11,6 @@
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import { writable } from "svelte/store";
   import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
-  import type { PaginatedData } from "$lib/models/common";
   import type { BreadCrumb } from "$lib/models/ui";
   import DeleteUserDialog from "$lib/components/pages/admin-controls/user/delete-user-dialog.svelte";
   import DiscardUserChangesDialog from "$lib/components/pages/admin-controls/user/discard-user-changes-dialog.svelte";
@@ -22,7 +21,6 @@
 
   export let mode: "create" | "update";
   export let user: HubSchemas.User | HubSchemas.UserPut | undefined;
-  export let resellers: PaginatedData<HubSchemas.Reseller> | undefined;
   export let breadCrumbs: BreadCrumb[];
   let deleteUserDialog: DeleteUserDialog;
   let deleteUser: OrySchemas.User | undefined;
@@ -46,6 +44,8 @@
   $: i18nSuccessMessage = $t("sentences.userChangesSuccess");
   $: i18nPendingMessage = $t("sentences.userCreatePending");
   $: i18nErrorMessage = $t("sentences.userError");
+  $: i18nParentReseller = $t("words.parentReseller");
+  $: i18nChildReseller = $t("words.childReseller");
 
   function selectAdminRole(): void {
     selectedRole = "reseller-admin";
@@ -98,22 +98,22 @@
     }
   }
 
-  function findResellerStub(query: string): MaybePromise<HubSchemas.Reseller[]> {
-    if (!resellers || query.length < 3) {
-      return new Promise((r) => r(resellers?.data ?? []));
+  async function findReseller(name: string): Promise<HubSchemas.Reseller[]> {
+    const resp = await integrationInstancesClient.hub.resellers.find({
+      filter: { name },
+    });
+
+    return resp.data;
+  }
+
+  function findResellerQuery(query: string): MaybePromise<HubSchemas.Reseller[]> {
+    if (query.length < 3) {
+      return new Promise((r) => r([]));
     }
 
     const lowerCaseQuery = query.toLowerCase();
 
-    return resellers?.data.reduce((acc: HubSchemas.Reseller[], reseller) => {
-      const lowerCaseResellerName = reseller.name?.toLowerCase();
-
-      if (lowerCaseResellerName?.includes(lowerCaseQuery)) {
-        acc.push(reseller);
-      }
-
-      return acc;
-    }, []);
+    return findReseller(lowerCaseQuery);
   }
 
   function formatResellerOption(reseller?: HubSchemas.Reseller): string {
@@ -121,7 +121,13 @@
       return "";
     }
 
-    return reseller.name ?? "Unknown";
+    let value = reseller.name;
+
+    if (value && reseller?.parentResellers?.data.length === 0) {
+      return value.concat(` (${i18nParentReseller})`);
+    }
+
+    return value?.concat(` (${i18nChildReseller})`) ?? "--";
   }
 
   function openDeleteUserDialog(): void {
@@ -246,7 +252,7 @@
               required
               placeholder={$t("sentences.typeToSearch")}
               bind:value={selectedReseller}
-              autocomplete={findResellerStub}
+              autocomplete={findResellerQuery}
               formatter={formatResellerOption}
             />
           </div>
