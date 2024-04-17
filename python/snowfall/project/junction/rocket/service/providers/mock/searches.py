@@ -57,7 +57,7 @@ class Generator:
                 car_rental=models_pb2.CarRentalResultDetail(
                     origin=search.origin,
                     destination=search.destination,
-                    image_url="www.example.com/image",
+                    image_url="http://www.example.com/image.jpg",
                     model="ferrari",
                     seats_count=2,
                     doors_count=2,
