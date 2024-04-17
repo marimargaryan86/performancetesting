@@ -1,12 +1,10 @@
 import asyncio
 import datetime
-import random
 from typing import NamedTuple
 
 import httpx
 import lagom
 from grpc import aio
-from motor import motor_asyncio
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket.service.api.air import (
@@ -31,7 +29,7 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_g
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
-from snowfall.stdlib.service import application, grpc_factory
+from snowfall.stdlib.service import application, grpc_factory, mongo_factory
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
@@ -61,9 +59,7 @@ async def create_dependencies(
         ),
     )
 
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )
+    mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
 
     container[stdlib_auth.JWTAuthenticationBackend] = (
         stdlib_auth.JWTAuthenticationBackend(
@@ -105,11 +101,11 @@ async def create_dependencies(
     )
     container[repositories.AirSearchResultRepository] = (
         repositories.AirSearchResultRepository(
-            collection=mongo.searches.search_results,
+            collection=mongo_db.search_results,
         )
     )
     container[repositories.AirSearchRequestRepository] = (
-        repositories.AirSearchRequestRepository(collection=mongo.searches.searches)
+        repositories.AirSearchRequestRepository(collection=mongo_db.searches)
     )
     container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
         air_transforms.AirSearchRequestTransformer
@@ -119,7 +115,7 @@ async def create_dependencies(
     )
     container[hotel_repositories.HotelSearchRepository] = (
         hotel_repositories.HotelSearchRepository(
-            collection=mongo.searches.hotel_results,
+            collection=mongo_db.hotel_results,
         )
     )
     container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
@@ -130,7 +126,7 @@ async def create_dependencies(
     )
     container[hotel_repositories.HotelRoomsSearchRepository] = (
         hotel_repositories.HotelRoomsSearchRepository(
-            collection=mongo.searches.hotel_rooms_results,
+            collection=mongo_db.hotel_rooms_results,
         )
     )
 

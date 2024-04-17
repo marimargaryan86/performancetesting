@@ -1,5 +1,4 @@
 import datetime
-from collections.abc import Sequence
 from typing import Any
 
 import pydantic
@@ -17,6 +16,6 @@ class Settings(starlette.Settings):
     j_one_api_key: str
     reseller_j1_credentials_mapping: dict[str, Any]
     j_one_api_base_url: str
-    mongo_dsn: Sequence[pydantic.AnyUrl]
+    mongo_dsn: pydantic.MongoDsn
     grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=DEFAULT_GRPC_TIMEOUT)
     reseller_pay_companies: dict[str, str]
