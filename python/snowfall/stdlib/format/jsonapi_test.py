@@ -236,7 +236,7 @@ def test_serialization(
     model: jsonapi.ResourceModel,
     expected: jsonapi.Resource,
 ) -> None:
-    assert model.model_dump() == expected, "serialization failed"
+    assert model.model_dump(exclude_unset=True) == expected, "serialization failed"
 
 
 def test_serialization_with_no_type_defined_on_resource() -> None:
@@ -266,7 +266,9 @@ def test_validation(
     model_type: type[jsonapi.ResourceModel],
     data: jsonapi.Resource,
 ) -> None:
-    assert model_type.model_validate(data).model_dump() == data, "validation failed"
+    assert (
+        model_type.model_validate(data).model_dump(exclude_unset=True) == data
+    ), "validation failed"
 
 
 @pytest.mark.parametrize(
@@ -328,3 +330,121 @@ def test_validation(
 def test_validation_invalid_data(payload: Any) -> None:
     with pytest.raises(pydantic.ValidationError):
         _BazquxWithFoobar.model_validate(payload)
+
+
+def test_error_without_any_members() -> None:
+    with pytest.raises(
+        ValueError,
+        match="An error object MUST contain at least one member.",
+    ):
+        jsonapi.ErrorModel()
+
+
+_EXAMPLE_RESPONSE = """
+{
+  "links": {
+    "self": "http://example.com/articles",
+    "next": "http://example.com/articles?page%5Boffset%5D=2",
+    "last": "http://example.com/articles?page%5Boffset%5D=10"
+  },
+  "data": [{
+    "type": "articles",
+    "id": "1",
+    "attributes": {
+      "title": "JSON:API paints my bikeshed!"
+    },
+    "relationships": {
+      "author": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/author",
+          "related": "http://example.com/articles/1/author"
+        },
+        "data": { "type": "people", "id": "9" }
+      },
+      "comments": {
+        "links": {
+          "self": "http://example.com/articles/1/relationships/comments",
+          "related": "http://example.com/articles/1/comments"
+        },
+        "data": [
+          { "type": "comments", "id": "5" },
+          { "type": "comments", "id": "12" }
+        ]
+      }
+    },
+    "links": {
+      "self": "http://example.com/articles/1"
+    }
+  }],
+  "included": [{
+    "type": "people",
+    "id": "9",
+    "attributes": {
+      "firstName": "Dan",
+      "lastName": "Gebhardt",
+      "twitter": "dgeb"
+    },
+    "links": {
+      "self": "http://example.com/people/9"
+    }
+  }, {
+    "type": "comments",
+    "id": "5",
+    "attributes": {
+      "body": "First!"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "2" }
+      }
+    },
+    "links": {
+      "self": "http://example.com/comments/5"
+    }
+  }, {
+    "type": "comments",
+    "id": "12",
+    "attributes": {
+      "body": "I like XML better"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "9" }
+      }
+    },
+    "links": {
+      "self": "http://example.com/comments/12"
+    }
+  }]
+}
+"""
+
+
+class _PersonModel(jsonapi.ResourceModel):
+    _type: ClassVar[str] = "people"
+    first_name: str
+    last_name: str
+    twitter: str
+
+
+class _CommentModel(jsonapi.ResourceModel):
+    _type: ClassVar[str] = "comments"
+    body: str
+    author: jsonapi.RelationshipModel[_PersonModel]
+
+
+class _ArticleModel(jsonapi.ResourceModel):
+    _type: ClassVar[str] = "articles"
+    title: str
+    author: jsonapi.RelationshipModel[_PersonModel]
+    comments: list[jsonapi.RelationshipModel[_CommentModel]]
+
+
+class _ArticlesDocumentModel(
+    jsonapi.DocumentModel[_ArticleModel, _CommentModel | _PersonModel],
+):
+    """DocumentModel for _ArticleModel."""
+
+
+def test_validation_with_spec_example() -> None:
+    _ArticlesDocumentModel.model_validate_json(_EXAMPLE_RESPONSE)
