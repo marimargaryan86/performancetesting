@@ -2441,6 +2441,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Error'
+            required:
+              - errors
     Forbidden:
       description: Forbidden
       content:
@@ -2497,6 +2499,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Error'
+            required:
+              - errors
   parameters:
     searchResultInclude:
       name: include
