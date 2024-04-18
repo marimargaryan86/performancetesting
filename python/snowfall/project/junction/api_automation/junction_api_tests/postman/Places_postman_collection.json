@@ -1,0 +1,123 @@
+{
+  "info": {
+    "_postman_id": "202e0d71-bf9e-446c-8404-576b453ffe72",
+    "name": "Places",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27091123"
+  },
+  "item": [
+    {
+      "name": "places/by_place_id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{junction_api_url}}/places/:place_id",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "places",
+            ":place_id"
+          ],
+          "variable": [
+            {
+              "key": "place_id",
+              "value": "c6c12798-1668-5812-b611-7aa1709daee4"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "places/list_places",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "702c2a180291a25fb4690b19367b995e710d87e2",
+            "type": "text"
+          },
+          {
+            "key": "authorization",
+            "value": "NaphIgozxRAmpmzm7ZqWsYxZW2iK-G5-",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{junction_api_url}}/places?filter[iata][eq]=BER",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "places"
+          ],
+          "query": [
+            {
+              "key": "filter[name][like]",
+              "value": "ber",
+              "disabled": true
+            },
+            {
+              "key": "filter[type][eq]",
+              "value": "city",
+              "disabled": true
+            },
+            {
+              "key": "filter[iata][eq]",
+              "value": "BER"
+            },
+            {
+              "key": "query[coordinates]",
+              "value": "13.3888599,52.5170365,50000",
+              "disabled": true
+            },
+            {
+              "key": "page[cursor]",
+              "value": "null",
+              "disabled": true
+            },
+            {
+              "key": "page[limit]",
+              "value": "5",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
