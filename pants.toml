@@ -1,5 +1,5 @@
 [GLOBAL]
-pants_version = "2.21.0dev1"
+pants_version = "2.21.0dev6"
 level = "warn"
 pantsd_max_memory_usage = "8GiB"
 build_file_prelude_globs = ["python/snowfall/plugin/pants/macros.py"]
@@ -48,12 +48,12 @@ args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
 [buf]
 config = "protobuf/buf.yaml"
-version = "v1.30.0"
+version = "v1.30.1"
 known_versions = [
-  "v1.30.0|linux_arm64 |70efa6f5379dbe44297f0efac8fdd5e4ea90389330555a23e317f968b51a307c|17688808",
-  "v1.30.0|linux_x86_64|219f48fb1bb190e0f761e35cac0821dfd9c1b0dfda80d7aaf522347755d829ab|19246162",
-  "v1.30.0|macos_arm64 |2787ed233e2639c833ad2485bcca3c1c9563547ee9430d3e449820458722b590|18649632",
-  "v1.30.0|macos_x86_64|3d6a27b472906c4c35e5a5e8fa04305c27abfcbbe94a8eab9c17ed688fb596fa|19749518",
+  "v1.30.1|linux_arm64 |25d9b73c364e4b07961d0d162a7727b1179bdaf554a3dc9c74fad24920e0a058|17690731",
+  "v1.30.1|linux_x86_64|4d329fdd44146616325c0ad1ee7ebd34886d915131f5457bbb5e0f2a54ae7963|19247295",
+  "v1.30.1|macos_arm64 |0822f59120c22ac54593186c2321d1b8e907ae61a603b7416a8a41801939beeb|18653179",
+  "v1.30.1|macos_x86_64|ac84880ff5d55d3280c04c91be859c34ba27571024cba9f683bc3b3cb763f498|19753339",
 ]
 
 [cli.alias]
@@ -105,22 +105,22 @@ install_from_resolve = "python-default"
 interpreter_constraints = ["CPython==3.11.*"]
 
 [pex-cli]
-version = "v2.2.2"
+version = "v2.3.1"
 known_versions = [
-  "v2.2.2|linux_arm64 |a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
-  "v2.2.2|linux_x86_64|a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
-  "v2.2.2|macos_arm64 |a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
-  "v2.2.2|macos_x86_64|a27f9881610c5682b71104e17fea21a7bdb79b57c0c8129a6119390f216e0a02|4113902",
+  "v2.3.1|linux_arm64 |71690e672871b55323f5d6ef9a3fe9705f1668662652c4081080e7ab27d44de3|4124530",
+  "v2.3.1|linux_x86_64|71690e672871b55323f5d6ef9a3fe9705f1668662652c4081080e7ab27d44de3|4124530",
+  "v2.3.1|macos_arm64 |71690e672871b55323f5d6ef9a3fe9705f1668662652c4081080e7ab27d44de3|4124530",
+  "v2.3.1|macos_x86_64|71690e672871b55323f5d6ef9a3fe9705f1668662652c4081080e7ab27d44de3|4124530",
 ]
 
 [protoc]
-version = "25.3"
+version = "26.1"
 url_platform_mapping = { linux_arm64 = "linux-aarch_64", linux_x86_64 = "linux-x86_64", macos_arm64 = "osx-aarch_64", macos_x86_64 = "osx-x86_64" }
 known_versions = [
-  "25.3|linux_arm64 |9eae1f20f70cccc912d1c318c3929b86aebf5afd4b0f32c196ef682c222ed5ae|3071653",
-  "25.3|linux_x86_64|f853e691868d0557425ea290bf7ba6384eef2fa9b04c323afab49a770ba9da80|3105560",
-  "25.3|macos_arm64 |d0fcd6d3b3ef6f22f1c47cc30a80c06727e1eccdddcaf0f4a3be47c070ffd3fe|2209081",
-  "25.3|macos_x86_64|247e003b8e115405172eacc50bd19825209d85940728e766f0848eee7c80e2a1|2235056",
+  "26.1|linux_arm64 |64a3b3b5f7dac0c8f9cf1cb85b2b1a237eb628644f6bcb0fb8f23db6e0d66181|3141384",
+  "26.1|linux_x86_64|a7be2928c0454f132c599e25b79b7ad1b57663f2337d7f7e468a1d59b98ec1b0|3173150",
+  "26.1|macos_arm64 |26a29befa8891ecc48809958c909d284f2b9539a2eb47f22cadc631fe6abe8fd|2304045",
+  "26.1|macos_x86_64|febd8821c3a2a23f72f4641471e0ab6486f4fb07b68111490a27a31681465b3c|2279373",
 ]
 
 [pytest]
@@ -172,10 +172,10 @@ install_from_resolve = "python-default"
 [shellcheck]
 version = "v0.10.0"
 known_versions = [
-  "v0.10.0|linux_arm64 |7b598216ab4b60225ac0c2113d5cbcb84e56ffa3b5eb3c4ffdcb76ebaff77815|7174935",
-  "v0.10.0|linux_x86_64|736d51bfeb583fbdfcafc322aab9c8064a53ce30bf00f40468ccbd7492174adf|3673174",
-  "v0.10.0|macos_arm64 |dbe2e63ad23ddd83e41902d42f45006246d226f37be6e7e4abc5d6658fe27e39|11384552",
-  "v0.10.0|macos_x86_64|b71fffca2886c3cf873a3022a27860a2e54c45dcac08c1355bd9b9786e1c657e|6792933",
+  "v0.10.0|linux_arm64 |324a7e89de8fa2aed0d0c28f3dab59cf84c6d74264022c00c22af665ed1a09bb|4291764",
+  "v0.10.0|linux_x86_64|6c881ab0698e4e6ea235245f22832860544f17ba386442fe7e9d629f8cbedf87|2404716",
+  "v0.10.0|macos_arm64 |bbd2f14826328eee7679da7221f2bc3afb011f6a928b848c80c321f6046ddf81|7205756",
+  "v0.10.0|macos_x86_64|ef27684f23279d112d8ad84e0823642e43f838993bbb8c0963db9b58a90464c2|4371632",
 ]
 
 [shfmt]
