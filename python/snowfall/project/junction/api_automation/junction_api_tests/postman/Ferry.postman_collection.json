@@ -1,0 +1,253 @@
+{
+  "info": {
+    "_postman_id": "66bf67e0-0e65-4a55-a213-8861c5262636",
+    "name": "Ferry",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27748424"
+  },
+  "item": [
+    {
+      "name": "searches",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data.id;",
+              "pm.collectionVariables.set(\"ferry_search_id\", search_id);",
+              "",
+              "pm.test(\"Response status code is 201\", function () {",
+              "    pm.expect(pm.response.code).to.equal(201);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.data.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.data.attributes.status).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Search ID is saved to collection variables and is not empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData).to.be.an('object');",
+              "    pm.expect(responseData.data.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"ferry-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"origin\": {\n                \"latitude\": 51.94743,\n                \"longitude\": 1.2533101\n            },\n            \"destination\": {\n                \"latitude\": 51.9754793,\n                \"longitude\": 4.1255803\n            },\n            \"passengers\": [\n                {\n                \"dateOfBirth\": \"2000-01-01\"\n                }\n            ]\n        }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/ferry/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "ferry",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Response has the required fields - id and status\", function () {",
+              "  const responseData = pm.response.json();",
+              "",
+              "  pm.expect(responseData).to.be.an('object');",
+              "  pm.expect(responseData.data.id).to.exist;",
+              "  pm.expect(responseData.data.attributes.status).to.exist;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id is a non-empty string\", function () {",
+              "  const responseData = pm.response.json();",
+              "  ",
+              "  pm.expect(responseData.data.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status is a non-empty string\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.data.attributes.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/ferry/searches/{{ferry_search_id}}",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "ferry",
+            "searches",
+            "{{ferry_search_id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}/results",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{junction_api_url}}/ferry/searches/{{ferry_search_id}}/results",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "ferry",
+            "searches",
+            "{{ferry_search_id}}",
+            "results"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "var moment = require('moment');",
+          "var now_plus_one_day_utc = moment().add(1, 'days').utc(true).format()",
+          "var now_plus_one_week_utc = moment().add(7, 'days').utc(true).format()",
+          "pm.collectionVariables.set(\"now_plus_one_day_utc\", now_plus_one_day_utc);",
+          "pm.collectionVariables.set(\"now_plus_one_week_utc\", now_plus_one_week_utc);",
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "search_id",
+      "value": ""
+    },
+    {
+      "key": "ferry_search_id",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_week_utc",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_day_utc",
+      "value": ""
+    }
+  ]
+}
