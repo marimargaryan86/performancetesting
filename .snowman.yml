@@ -100,4 +100,6 @@ commits:
       - "python/snowfall/vendor/zendesk"
 metrics:
   base_size: 75
+stale_branches:
+  should_delete: true
 use_merge_train: true
