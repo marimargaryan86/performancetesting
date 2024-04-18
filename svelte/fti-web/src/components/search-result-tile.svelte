@@ -2,6 +2,7 @@
   import Icon from "$lib/components/icon.svelte";
   import StarRating from "$lib/components/star-rating.svelte";
   import type { SearchResultTile } from "$lib/models/common";
+  import { goto } from "$app/navigation";
   const item: SearchResultTile = {
     name: "The Kuta Beach Hotel - Managed by Accor",
     location: "Kuta, Bali",
@@ -98,7 +99,7 @@
       </div>
       <div class="pricing">
         <span>Total from: <b class="price-label">€{item.price}</b>/ pp</span>
-        <button>See Offer</button>
+        <button on:click={() => goto("/packages")}>See Offer</button>
       </div>
     </div>
   </div>

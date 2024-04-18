@@ -129,6 +129,7 @@ type IconTypes =
   | "message-icon"
   | "location-icon"
   | "share-icon"
+  | "left-back-arrow"
   | "back-icon"
   | "forward-icon";
 

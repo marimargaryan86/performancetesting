@@ -5,6 +5,7 @@
   import ImageGalleryModal from "$lib/components/image-gallery-modal.svelte";
   import { renderStars } from "$lib/helpers/common";
   import Icon from "$lib/components/icon.svelte";
+  import { goto } from "$app/navigation";
 
   onMount(async (): Promise<void> => {
     const response = await fetch("/images");
@@ -121,7 +122,10 @@
   <div class="hotel-header">
     <div class="hotel-info">
       <div class="back-link">
-        <button>← Back to results</button>
+        <button on:click={() => goto("/search")}>
+          <Icon variant="left-back-arrow" size="16px" color="#01A5C9" />
+          Back to results
+        </button>
       </div>
       <div class="hotel-title">
         <h1>{hotelInfo.name}</h1>
@@ -274,6 +278,8 @@
     background: none;
     border: none;
     font-size: 18px;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans";
   }
 
   .hotel-info {
