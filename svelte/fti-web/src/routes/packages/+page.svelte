@@ -2,6 +2,7 @@
   import type { FeaturedPackage } from "$lib/models/common";
   import { onMount } from "svelte";
   import SharePackageModal from "$lib/components/share-modal.svelte";
+  import ImageGalleryModal from "$lib/components/image-gallery-modal.svelte";
   import { renderStars } from "$lib/helpers/common";
   import Icon from "$lib/components/icon.svelte";
 
@@ -45,23 +46,25 @@
   };
 
   let selectedImage = hotelInfo.images[0];
+  let showImageGallery = false;
+  let selectedIndex = 0;
 
   let isPackageLiked = false;
 
   let currentBookingStep = 1;
 
-  let showModal = false;
+  let showShareModal = false;
 
   const toggleLike = (): void => {
     isPackageLiked = !isPackageLiked;
   };
 
   const openShareModal = (): void => {
-    showModal = true;
+    showShareModal = true;
   };
 
   const closeShareModal = (): void => {
-    showModal = false;
+    showShareModal = false;
   };
 
   const bookingSteps = [
@@ -74,9 +77,24 @@
   const setBookingStep = (bookingStepId: number): void => {
     currentBookingStep = bookingStepId;
   };
+
+  function openImageGallery(index: number): void {
+    selectedIndex = index;
+    showImageGallery = true;
+  }
+
+  function closeImageGallery() {
+    showImageGallery = false;
+  }
 </script>
 
-<SharePackageModal show={showModal} {hotelInfo} onClose={closeShareModal} />
+<SharePackageModal show={showShareModal} {hotelInfo} onClose={closeShareModal} />
+<ImageGalleryModal
+  images={hotelInfo.images}
+  isOpen={showImageGallery}
+  initialIndex={selectedIndex}
+  on:close={closeImageGallery}
+/>
 
 <div class="page">
   <div class="booking-steps-container">
@@ -114,7 +132,11 @@
         </div>
       </div>
       <div class="location-review">
-        <span class="location">📍 {hotelInfo.location}</span>
+        <span class="location">
+          <Icon variant="location-icon" size="20px" color="#1C1B1F" />
+
+          {hotelInfo.location}
+        </span>
         <span class="review-score">{hotelInfo.reviewScore}</span>
         <span class="review-text">{hotelInfo.reviewText} ({hotelInfo.reviewCount})</span>
       </div>
@@ -135,19 +157,39 @@
       <button class="proceed-button">Proceed to book</button>
     </div>
   </div>
-  <div class="image-gallery">
+  <div class="hotel-images-container">
     <!-- svelte-ignore a11y-img-redundant-alt -->
-    <img class="selected-image" src={selectedImage} alt="Selected Hotel Image" />
-    <div class="thumbnails">
+    <div class="hotel-images-container-left">
+      <button
+        class="image-button"
+        on:click={() => openImageGallery(0)}
+        aria-label="Open Image Gallery"
+      >
+        <img class="hotel-images-container-left" src={selectedImage} alt="Selected Hotel Image" />
+      </button>
+    </div>
+    <div class="hotel-images-container-right">
       {#each hotelInfo.images as image, index (image)}
-        <button
-          class="thumbnail"
-          class:selected={selectedImage === image}
-          on:click={() => (selectedImage = image)}
-          aria-label={`Select Hotel Image ${index + 1}`}
-        >
-          <img src={image} alt={`Hotel Image ${index + 1}`} />
-        </button>
+        {#if index !== 0 && index < 5}
+          <button
+            class="thumbnail"
+            class:selected={selectedImage === image}
+            on:click={() => {
+              openImageGallery(index);
+            }}
+            aria-label={`Select Hotel Image ${index + 1}`}
+          >
+            <img
+              class:thumbnail-opacity={index === 4}
+              src={image}
+              alt={`Hotel Image ${index + 1}`}
+            />
+            {#if index === 4}
+              <div class="image-overlay"></div>
+              <p class="gallery-overlay">View Gallery (+{hotelInfo.images.length - 5})</p>
+            {/if}
+          </button>
+        {/if}
       {/each}
     </div>
   </div>
@@ -257,6 +299,7 @@
     color: #818181;
     font-size: 18px;
     font-weight: 500;
+    font-family: "Plus Jakarta Sans";
   }
 
   .location {
@@ -282,44 +325,80 @@
     font-size: 20px;
   }
 
-  .image-gallery {
-    margin-top: 20px;
+  .hotel-images-container {
+    display: flex;
+    gap: 12px;
+    max-height: 350px;
   }
 
-  .selected-image {
+  .hotel-images-container .thumbnail {
+    position: relative;
+  }
+
+  .hotel-images-container .thumbnail .gallery-overlay {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    z-index: 1;
+    font-family: "Plus Jakarta Sans";
+    font-weight: 600;
+    font-size: 20px;
+  }
+
+  .hotel-images-container .thumbnail .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    margin-right: 7.5px;
+    margin-top: 7.5px;
+    margin-bottom: 7.5px;
+  }
+
+  .hotel-images-container-left {
     width: 100%;
-    max-height: 300px;
+    height: 100%;
     object-fit: cover;
     border-radius: 5px;
-    margin-bottom: 10px;
   }
-
-  .thumbnails {
-    display: flex;
-    overflow-x: auto;
+  .hotel-images-container-right {
+    width: 40%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap: 10px;
+    align-content: start;
   }
 
   .thumbnail {
-    background: none;
-    border: none;
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
     padding: 0;
+    border: none;
     cursor: pointer;
+    background: none;
   }
 
   .thumbnail img {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    margin-right: 5px;
     border-radius: 5px;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
   }
 
   .thumbnail.selected img {
     opacity: 1;
   }
-  /* Hotel Header */
+
   .hotel-header {
     display: flex;
     justify-content: space-between;
@@ -327,14 +406,12 @@
     margin-bottom: 30px;
   }
 
-  /* Hotel Actions */
   .button-container {
     display: flex;
     gap: 20px;
     align-items: center;
   }
 
-  /* Action Button */
   .action-button {
     background: none;
     border: none;
@@ -369,5 +446,14 @@
 
   .proceed-button:hover {
     background-color: var(--proceed-button-hover-bg-color, #e67e22);
+  }
+  .image-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: block;
+    cursor: pointer;
+    line-height: 0;
   }
 </style>

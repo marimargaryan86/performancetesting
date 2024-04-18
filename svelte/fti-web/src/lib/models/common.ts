@@ -128,7 +128,9 @@ type IconTypes =
   | "email-icon"
   | "message-icon"
   | "location-icon"
-  | "share-icon";
+  | "share-icon"
+  | "back-icon"
+  | "forward-icon";
 
 type AmenityIcons = "wifi" | "pool" | "parking" | "restaurant" | "bar" | "gym" | "beach" | "spa";
 
