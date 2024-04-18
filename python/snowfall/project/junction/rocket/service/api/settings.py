@@ -6,6 +6,7 @@ import pydantic
 from snowfall.stdlib.integration.starlette import application as starlette
 
 DEFAULT_GRPC_TIMEOUT = 45
+_DEFAULT_SUGGESTION_SEARCH_TTL_MINUTES = 30
 
 
 class Settings(starlette.Settings):
@@ -19,3 +20,6 @@ class Settings(starlette.Settings):
     mongo_dsn: pydantic.MongoDsn
     grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=DEFAULT_GRPC_TIMEOUT)
     reseller_pay_companies: dict[str, str]
+    suggestion_search_ttl: datetime.timedelta = datetime.timedelta(
+        minutes=_DEFAULT_SUGGESTION_SEARCH_TTL_MINUTES,
+    )

@@ -46,6 +46,12 @@ from snowfall.project.junction.rocket.service.api.hotel.repositories import (
     HotelRoomsSearchRepository,
     HotelSearchRepository,
 )
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    endpoints as multi_modal_endpoints,
+)
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    repository as multi_modal_repository,
+)
 from snowfall.project.junction.rocket.service.api.places import (
     router as places_router,
 )
@@ -185,7 +191,31 @@ def container(
 
 
 @pytest.fixture()
-def app(container: lagom.Container) -> applications.Starlette:
+async def suggestion_search_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> multi_modal_repository.SuggestionSearchRepository:
+    return multi_modal_repository.SuggestionSearchRepository(
+        collection=mongo_client["test"]["suggestions"],
+        ttl=datetime.timedelta(minutes=30),
+    )
+
+
+@pytest.fixture()
+def suggestions_searches(
+    places_stub: places_pb2_grpc.PlacesServiceStub,
+    suggestion_search_repository: multi_modal_repository.SuggestionSearchRepository,
+) -> multi_modal_endpoints.SuggestionSearches:
+    return multi_modal_endpoints.SuggestionSearches(
+        _places=places_stub,
+        _repository=suggestion_search_repository,
+    )
+
+
+@pytest.fixture()
+def app(
+    container: lagom.Container,
+    suggestions_searches: multi_modal_endpoints.SuggestionSearches,
+) -> applications.Starlette:
     integration = StarletteIntegration(container)
     route_list = [
         *air_router.get_routes(integration),
@@ -194,6 +224,9 @@ def app(container: lagom.Container) -> applications.Starlette:
         *hotel_router.get_routes(integration),
         *places_router.get_routes(integration),
         *rail_router.get_routes(integration),
+        *multi_modal_endpoints.get_routes(
+            suggestion_searches=suggestions_searches,
+        ),
     ]
     asgi_app = application.create_starlette_app(
         routes=route_list,
@@ -326,7 +359,7 @@ async def _get_search_results(
 
 async def _get_place(
     request: places_pb2.GetPlaceRequest,
-    timeout: datetime.datetime,
+    timeout: datetime.datetime | None = None,
 ) -> places_pb2.GetPlaceResponse:
     if request.id not in fixtures.PLACES:
         raise grpc.aio.AioRpcError(

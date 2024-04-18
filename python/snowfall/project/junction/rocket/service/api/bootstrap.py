@@ -23,6 +23,12 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.hotel import (
     types as hotel_types,
 )
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    endpoints as multi_modal_endpoints,
+)
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    repository as multi_modal_repository,
+)
 from snowfall.project.junction.rocket.service.api.settings import Settings
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
@@ -127,6 +133,18 @@ async def create_dependencies(
     container[hotel_repositories.HotelRoomsSearchRepository] = (
         hotel_repositories.HotelRoomsSearchRepository(
             collection=mongo_db.hotel_rooms_results,
+        )
+    )
+    container[multi_modal_repository.SuggestionSearchRepository] = (
+        multi_modal_repository.SuggestionSearchRepository(
+            collection=mongo_db.suggestion_searches,
+            ttl=app.settings.suggestion_search_ttl,
+        )
+    )
+    container[multi_modal_endpoints.SuggestionSearches] = (
+        multi_modal_endpoints.SuggestionSearches(
+            _repository=container[multi_modal_repository.SuggestionSearchRepository],
+            _places=container[places_pb2_grpc.PlacesServiceStub],
         )
     )
 

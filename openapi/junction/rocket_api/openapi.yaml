@@ -50,6 +50,9 @@ x-tagGroups:
   - name: Places
     tags:
       - places
+  - name: Journey
+    tags:
+      - journey-suggestion-searches
 tags:
   - name: air-bookings
     description: 'TODO: ...'
@@ -102,6 +105,9 @@ tags:
   - name: internal
     description: Endpoints not for public use.
     x-displayName: Internal
+  - name: journey-suggestion-searches
+    description: 'TODO: ...'
+    x-displayName: Journey Suggestion Searches
   - name: places
     description: >-
       To search within any Junction vertical, you need at least one place to
@@ -141,6 +147,13 @@ paths:
               required:
                 - data
       responses:
+        '200':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Air Search Response
         '201':
           description: Created
           content:
@@ -627,6 +640,67 @@ paths:
               schema:
                 type: object
                 description: Hotel Search Response
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /journeys/suggestions/searches:
+    post:
+      summary: Create multi-modal search
+      tags:
+        - journey-suggestion-searches
+      operationId: post-journeys-suggestions-searches
+      description: Used to initiate a search for suggestions
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/JourneySuggestionSearch'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JourneySuggestionSearch'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /journeys/suggestions/searches/{journeySuggestionSearchId}:
+    parameters:
+      - $ref: '#/components/parameters/journeySuggestionSearchId'
+    get:
+      summary: Get multi-modal search
+      tags:
+        - journey-suggestion-searches
+      operationId: get-journeys-suggestions-searches-id
+      description: Used to retrieve a search for suggestions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JourneySuggestionSearch'
+                required:
+                  - data
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1976,6 +2050,79 @@ components:
         - id
         - type
         - attributes
+    JourneySuggestionSearch:
+      title: Journey Suggestion Search
+      x-tags:
+        - journey-suggestion-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - journey-suggestion-searches
+              example: journey-suggestion-searches
+            attributes:
+              type: object
+              properties:
+                departureAfter:
+                  type: string
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                passengers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Passenger'
+                status:
+                  type: string
+                  readOnly: true
+                  enum:
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                expiresAt:
+                  type: string
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+              required:
+                - departureAfter
+                - passengers
+                - status
+                - expiresAt
+            relationships:
+              type: object
+              properties:
+                origin:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                  required:
+                    - data
+                destination:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                  required:
+                    - data
+              required:
+                - origin
+                - destination
+          required:
+            - id
+            - type
+            - attributes
+            - relationships
+        - $ref: '#/components/schemas/SelfLink'
     NextLink:
       title: Next Link
       type: object
@@ -2856,6 +3003,14 @@ components:
       description: >-
         Unique identifier (UUID) for the Search object in [RFC
         4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+    journeySuggestionSearchId:
+      name: journeySuggestionSearchId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: Journey Suggestion Search identifier
   securitySchemes:
     jwt:
       type: http

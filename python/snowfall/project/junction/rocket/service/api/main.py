@@ -25,6 +25,9 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.middleware import (
     JunctionOneClientMiddleware,
 )
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    endpoints as multi_modal_endpoints,
+)
 from snowfall.project.junction.rocket.service.api.places import (
     router as places_router,
 )
@@ -59,6 +62,9 @@ async def _http(app: application.Application[Settings]) -> None:
         *ferry_router.get_routes(integration),
         *rail_router.get_routes(integration),
         *places_router.get_routes(integration),
+        *multi_modal_endpoints.get_routes(
+            suggestion_searches=container[multi_modal_endpoints.SuggestionSearches],
+        ),
     ]
 
     asgi_app = starlette.create_starlette_app(
