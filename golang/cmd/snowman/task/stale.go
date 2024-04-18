@@ -8,9 +8,7 @@ import (
 	"time"
 )
 
-func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, snowman *gitlab.User) {
-	sixMonths := time.Now().Add(-(6 * 30 * 24 * time.Hour))
-
+func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, loader *common.Loader) {
 	projectsCh, g := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Project, *gitlab.Response, error) {
 		return client.Projects.ListProjects(&gitlab.ListProjectsOptions{
 			ListOptions:              options,
@@ -23,6 +21,18 @@ func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, snowm
 
 	for p := range projectsCh {
 		pLogger := logger.With("project", p.ID, "name", p.Name)
+		config, err := loader.Load(p.ID)
+
+		if err != nil {
+			pLogger.Error(err)
+			continue
+		}
+
+		if !config.StaleBranches.ShouldDelete {
+			continue
+		}
+
+		threshold := time.Now().Add(config.StaleBranches.ActivityThreshold)
 		mrBranches := make([]string, 0)
 		mergeRequestsCh, g2 := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
 			return client.MergeRequests.ListProjectMergeRequests(p.ID, &gitlab.ListProjectMergeRequestsOptions{
@@ -35,8 +45,9 @@ func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, snowm
 			mrBranches = append(mrBranches, mr.SourceBranch)
 		}
 
-		if err := g2.Wait(); err != nil {
+		if err = g2.Wait(); err != nil {
 			pLogger.Error(err)
+			continue
 		}
 
 		branchesCh, g3 := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.Branch, *gitlab.Response, error) {
@@ -50,14 +61,16 @@ func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, snowm
 				continue
 			}
 
-			if branch.Commit.CommittedDate.After(sixMonths) {
+			if branch.Commit.CommittedDate.After(threshold) {
 				continue
 			}
 
-			// todo(jyggen): delete branches? 💥
+			if _, err = client.Branches.DeleteBranch(p.ID, branch.Name); err != nil {
+				pLogger.Error(err)
+			}
 		}
 
-		if err := g3.Wait(); err != nil {
+		if err = g3.Wait(); err != nil {
 			pLogger.Error(err)
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 	"gopkg.in/yaml.v2"
 	"net/http"
+	"time"
 )
 
 type ScopesConfiguration map[string][]string
@@ -23,11 +24,17 @@ type ReviewersConfiguration struct {
 	Breaking  []int `yaml:"breaking"`
 }
 
+type StaleBranchesConfiguration struct {
+	ActivityThreshold time.Duration `yaml:"activity_threshold"`
+	ShouldDelete      bool          `yaml:"should_delete"`
+}
+
 type Configuration struct {
-	Commits       CommitsConfiguration   `yaml:"commits"`
-	Metrics       MetricsConfiguration   `yaml:"metrics"`
-	Reviewers     ReviewersConfiguration `yaml:"reviewers"`
-	UseMergeTrain bool                   `yaml:"use_merge_train"`
+	Commits       CommitsConfiguration       `yaml:"commits"`
+	Metrics       MetricsConfiguration       `yaml:"metrics"`
+	Reviewers     ReviewersConfiguration     `yaml:"reviewers"`
+	StaleBranches StaleBranchesConfiguration `yaml:"stale_branches"`
+	UseMergeTrain bool                       `yaml:"use_merge_train"`
 }
 
 func defaultConfiguration() Configuration {
@@ -51,6 +58,9 @@ func defaultConfiguration() Configuration {
 		Metrics: MetricsConfiguration{
 			BaseSize:   200,
 			GrowthRate: 2.0,
+		},
+		StaleBranches: StaleBranchesConfiguration{
+			ActivityThreshold: 3 * 30 * 24 * time.Hour,
 		},
 	}
 }

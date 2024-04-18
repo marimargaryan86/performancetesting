@@ -43,5 +43,8 @@ metrics:
 reviewers:
   blacklist: null
   breaking: null
+stale_branches:
+  should_delete: false
+  activity_threshold: 2160h0m0s
 use_merge_train: false
 ```

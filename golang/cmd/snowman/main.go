@@ -155,7 +155,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 
 	if _, err = c.AddFunc("0 0 * * *", func() {
-		task.ManageStaleBranches(client, sugar.Named("cron"), snowman)
+		task.ManageStaleBranches(client, sugar.Named("cron"), loader)
 	}); err != nil {
 		return err
 	}
