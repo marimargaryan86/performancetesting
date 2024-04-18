@@ -3,4 +3,4 @@ backend_packages = "+['pants.backend.experimental.codegen.protobuf.go','pants.ba
 pants_ignore = "-['/golang/']"
 
 [golang]
-minimum_expected_version = "1.19"
+minimum_expected_version = "1.22"

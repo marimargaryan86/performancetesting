@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     yq \
 && curl -fsSL https://github.com/tmccombs/hcl2json/releases/download/v0.6.1/hcl2json_linux_amd64 -o /usr/local/bin/hcl2json \
 && chmod +x /usr/local/bin/hcl2json \
-&& curl -fsSL https://go.dev/dl/go1.19.13.linux-amd64.tar.gz | tar xz -C /usr/local \
+&& curl -fsSL https://go.dev/dl/go1.22.2.linux-amd64.tar.gz | tar xz -C /usr/local \
 && curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version 0.10.7 \
 && curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.10.11/oasdiff_1.10.11_linux_amd64.deb > /tmp/oasdiff.deb \
 && curl -fsSL https://sentry.io/get-cli/ | SENTRY_CLI_VERSION=2.30.0 bash \

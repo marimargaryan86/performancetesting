@@ -70,6 +70,7 @@ func (mr *mergeRequest) merge() error {
 			_, err = mr.client.MergeRequests.RebaseMergeRequest(
 				mr.object.ProjectID,
 				mr.object.IID,
+				&gitlab.RebaseMergeRequestOptions{},
 			)
 
 			mr.hasChanged = true
