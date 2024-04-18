@@ -108,8 +108,8 @@ export default {
     profile: "Perfil",
     role: "Rol",
     resellers: "Revendedores",
-    parentReseller: "Matriz",
-    childReseller: "Filial",
+    parentReseller: "Nombre de Grupo de Agencias",
+    childReseller: "Nombre de Agencia",
   },
   actions: {
     logout: "Cerrar sesión",
