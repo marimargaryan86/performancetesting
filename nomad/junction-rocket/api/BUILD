@@ -1,1 +1,3 @@
-nomad_template(["http"], "python/snowfall/project/junction/rocket/service/api:main")
+nomad_template(
+    ["consume", "http"], "python/snowfall/project/junction/rocket/service/api:main"
+)

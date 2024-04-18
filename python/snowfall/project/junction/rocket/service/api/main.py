@@ -1,3 +1,8 @@
+import datetime
+from typing import cast
+
+import pydantic
+from google.protobuf import message
 from lagom.integrations.starlette import StarletteIntegration
 from starlette.middleware import Middleware, authentication
 
@@ -31,8 +36,15 @@ from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
 from snowfall.stdlib.persistence import cursor, filesystem
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
+from snowfall.stdlib.transport.amqp import protocol
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
+
+
+class _ConsumerSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    amqp_timeout: datetime.timedelta | None = None
 
 
 async def _http(app: application.Application[Settings]) -> None:
@@ -94,6 +106,21 @@ async def _http(app: application.Application[Settings]) -> None:
     )
 
 
+async def _consume(app: application.Application[_ConsumerSettings]) -> None:
+    connection = await amqp_factory.make_connection(
+        app=app,
+        dsn=app.settings.amqp_dsn,
+        timeout=app.settings.amqp_timeout,
+    )
+
+    consumer = amqp_consumer.QueueConsumer(
+        connection=connection,
+        queues=cast(list[protocol.Queue[message.Message]], []),
+    )
+
+    await consumer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="junction-rocket-api")
 
@@ -102,5 +129,10 @@ if __name__ == "__main__":
             name="http",
             callback=_http,
             settings_class=Settings,
+        ),
+        application.Command(
+            name="consume",
+            callback=_consume,
+            settings_class=_ConsumerSettings,
         ),
     )
