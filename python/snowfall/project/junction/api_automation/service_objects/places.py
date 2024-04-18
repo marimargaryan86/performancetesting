@@ -11,15 +11,11 @@ class PlacesClient:
     def __init__(self, client: ClientWrapper):
         self._client = client
 
-    async def get_place_by_name(self, name: str) -> PlaceData:
-        query_parameters = {
-            "query[name]": name,
-        }
-        url = "/places"
+    async def get_place_by_place_id(self, place_id: str) -> PlaceData:
+        url = "/places/{0}".format(place_id)
         result = await self._client.request(
             method=METHOD_GET,
             url=url,
-            query_parameters=query_parameters,
         )
 
         return PlaceData(result)

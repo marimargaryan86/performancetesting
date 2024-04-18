@@ -22,6 +22,40 @@ class PlaceData(BaseResult):
 
     @property
     def id(self) -> str:
+        return get_nested_attribute(self._data, "data.id")
+
+    @property
+    def name(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.name")
+
+    @property
+    def latitude(self) -> float:
+        return get_nested_attribute(self._data, "data.attributes.latitude")
+
+    @property
+    def longitude(self) -> float:
+        return get_nested_attribute(self._data, "data.attributes.longitude")
+
+    @property
+    def country_code(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.countryCode")
+
+    @property
+    def country_name(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.countryName")
+
+    @property
+    def iata_code(self) -> str:
+        return get_nested_attribute(self._data, "data.attributes.iataCode")
+
+
+class PlaceListData(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def id(self) -> str:
         return get_nested_attribute(self._data, "data.0.id")
 
     @property
