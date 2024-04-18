@@ -1366,6 +1366,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/md5": "npm:^2.3.5"
     "@types/mime-types": "npm:^2.1.4"
+    cookie: "npm:^0.6.0"
     devalue: "npm:^4.3.2"
     dotenv: "npm:^16.4.3"
     i18next: "npm:^23.8.2"
