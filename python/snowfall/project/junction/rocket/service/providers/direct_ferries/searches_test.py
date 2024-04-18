@@ -14,7 +14,7 @@ async def test_one_way_search_integration(
     one_way_search: models_pb2.Search,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    search_criteria = criteria_generator.criteria_task_generator(one_way_search)
+    search_criteria = await criteria_generator.criteria_task_generator(one_way_search)
     quotes = generator.generate(search_criteria[0])
     offers = [quote async for quote in quotes]
 
@@ -27,7 +27,9 @@ async def test_round_trip_initial_search_integration(
     round_trip_search: models_pb2.Search,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    search_criteria = criteria_generator.criteria_task_generator(round_trip_search)
+    search_criteria = await criteria_generator.criteria_task_generator(
+        round_trip_search,
+    )
     quotes = generator.generate(search_criteria[0])
     offers = [quote async for quote in quotes]
 
@@ -40,14 +42,14 @@ async def test_return_trip_search_integration(
     round_trip_search: models_pb2.Search,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    initial_search_criteria = criteria_generator.criteria_task_generator(
+    initial_search_criteria = await criteria_generator.criteria_task_generator(
         round_trip_search,
     )
     quotes = generator.generate(initial_search_criteria[0])
     initial_offers = [quote async for quote in quotes]
 
     round_trip_search.ferry.outbound_offer_id = initial_offers[0].offers[0].id
-    return_search_criteria = criteria_generator.criteria_task_generator(
+    return_search_criteria = await criteria_generator.criteria_task_generator(
         round_trip_search,
     )
     return_quotes = generator.generate(return_search_criteria[0])
@@ -62,7 +64,9 @@ async def test_one_way_search(  # noqa: WPS218
     mock_one_way_response: None,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    search_criteria = criteria_generator.criteria_task_generator(mock_one_way_search)
+    search_criteria = await criteria_generator.criteria_task_generator(
+        mock_one_way_search,
+    )
     quotes = generator.generate(search_criteria[0])
     offers = [quote async for quote in quotes]
     assert len(offers) == 2
@@ -90,7 +94,9 @@ async def test_round_trip_initial_search(  # noqa: WPS218
     mock_round_trip_response: None,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    search_criteria = criteria_generator.criteria_task_generator(mock_round_trip_search)
+    search_criteria = await criteria_generator.criteria_task_generator(
+        mock_round_trip_search,
+    )
     quotes = generator.generate(search_criteria[0])
     offers = [quote async for quote in quotes]
 
@@ -118,7 +124,9 @@ async def test_round_trip_return_search(  # noqa: WPS218
     mock_round_trip_response: None,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    search_criteria = criteria_generator.criteria_task_generator(mock_round_trip_search)
+    search_criteria = await criteria_generator.criteria_task_generator(
+        mock_round_trip_search,
+    )
     quotes = generator.generate(search_criteria[0])
     initial_offers = [quote async for quote in quotes]
 
@@ -140,7 +148,7 @@ async def test_round_trip_return_search(  # noqa: WPS218
     assert result_details.ferry.duration_in_minutes == 570
 
     mock_round_trip_search.ferry.outbound_offer_id = initial_offers[0].offers[0].id
-    return_search_criteria = criteria_generator.criteria_task_generator(
+    return_search_criteria = await criteria_generator.criteria_task_generator(
         mock_round_trip_search,
     )
     return_quotes = generator.generate(return_search_criteria[0])
@@ -170,7 +178,9 @@ async def test_criteria_generator(  # noqa: WPS218
     mock_round_trip_search: models_pb2.Search,
     criteria_generator: searches.CriteriaGenerator,
 ) -> None:
-    search_criteria = criteria_generator.criteria_task_generator(mock_round_trip_search)
+    search_criteria = await criteria_generator.criteria_task_generator(
+        mock_round_trip_search,
+    )
 
     assert search_criteria[0].origin.ref == "NLMDK"
     assert search_criteria[0].destination.ref == "GBHRW"

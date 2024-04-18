@@ -19,10 +19,12 @@ from snowfall.project.junction.rocket.provider import (
     service,
 )
 from snowfall.project.junction.rocket.provider.v1alpha import meta_pb2
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    places_pb2_grpc,
+)
 from snowfall.project.junction.rocket.service.providers.benerail import (
     adapter,
     cache,
-    id_mapping,
     train_stations,
 )
 from snowfall.project.junction.rocket.service.providers.benerail import (
@@ -31,9 +33,9 @@ from snowfall.project.junction.rocket.service.providers.benerail import (
 from snowfall.project.junction.rocket.service.providers.benerail.constant import (
     PROVIDER_ID,
 )
-from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.stdlib.service import grpc_factory
 from snowfall.vendor.benerail import client
 
 _PROVIDER_NAME = "Benerail"
@@ -46,6 +48,7 @@ class _Settings(service.ProviderSettings):
     subscription_key: str
     api_base_url: pydantic.AnyUrl
     cert_base64: str
+    places_address: str
 
 
 def cert_tmp_path(cert_base64: str) -> str:
@@ -73,6 +76,7 @@ async def _search_factory(
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
+    channel = await grpc_factory.make_insecure_channel(app, app.settings.places_address)
 
     http_client = await stack.enter_async_context(
         httpx.AsyncClient(
@@ -104,12 +108,8 @@ async def _search_factory(
 
     return searches.SearchImplementation(
         search_criteria_task_generator=provider_searches.CriteriaGenerator(
-            h3_mapping=h3.H3MappingRepository[train_stations.TrainStation](
-                mapping=stations,
-                resolution=8,
-            ),
-            _id_mapping=id_mapping.IdMappingRepository[train_stations.TrainStation](
-                mapping=stations,
+            places=places_pb2_grpc.PlacesServiceStub(
+                channel,
             ),
         ).criteria_task_generator,
         search_result_cache_key_generator=provider_searches.cache_key,

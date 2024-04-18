@@ -118,7 +118,7 @@ def search_result_generator(
     return wrapper
 
 
-def search_criteria_task_generator(
+async def search_criteria_task_generator(
     search: models_pb2.Search,
 ) -> list[CarRentalCriteria]:
     if search.HasField("car_rental"):

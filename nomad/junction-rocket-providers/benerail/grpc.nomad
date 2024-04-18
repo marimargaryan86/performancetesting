@@ -80,6 +80,11 @@ job "junction-rocket-providers-benerail-grpc" {
             config {
               local_request_timeout_ms = 50000 #Timeout is 50s
             }
+
+            upstreams {
+              local_bind_port  = 8010
+              destination_name = "junction-rocket-places-grpc-${var.environment}"
+            }
           }
         }
       }
@@ -118,6 +123,7 @@ job "junction-rocket-providers-benerail-grpc" {
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
+PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-rocket-places-grpc-${var.environment}"))}}
 {{ with secret "kv/data/${var.environment}/benerail" }}
 STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/benerail
 SUBSCRIPTION_KEY={{ .Data.data.subscription_key }}

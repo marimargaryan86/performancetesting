@@ -16,7 +16,7 @@ class Criteria:
     driver_age: int
 
 
-def search_criteria_generator(
+async def search_criteria_generator(
     search: models_pb2.Search,
 ) -> list[Criteria]:
     return [

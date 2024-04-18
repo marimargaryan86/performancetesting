@@ -42,7 +42,7 @@ class CriteriaGenerator:
     ):
         self._mapping = h3_mapping
 
-    def criteria_task_generator(
+    async def criteria_task_generator(
         self,
         search: models_pb2.Search,
     ) -> list[criteria.Criteria]:

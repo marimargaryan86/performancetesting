@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import datetime
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from typing import Generic, TypeVar
 
 from aio_pika import abc
@@ -32,7 +32,7 @@ from snowfall.stdlib.transport.grpc import service
 _SearchCriteria = TypeVar("_SearchCriteria", bound=object)
 SearchCriteriaTaskGenerator = Callable[
     [legacy_searches_pb2.Search],
-    list[_SearchCriteria],
+    Awaitable[list[_SearchCriteria]],
 ]
 SearchResultGenerator = Callable[
     [_SearchCriteria],
@@ -83,7 +83,7 @@ class Searcher(Generic[_SearchCriteria]):
         self,
         search: legacy_searches_pb2.Search,
     ) -> AsyncIterator[legacy_searches_pb2.SearchResult]:
-        search_criterion_tasks = self._search_criteria_task_generator(search)
+        search_criterion_tasks = await self._search_criteria_task_generator(search)
         generators = [
             self._process_search_task(search_criterion_task)
             for search_criterion_task in search_criterion_tasks

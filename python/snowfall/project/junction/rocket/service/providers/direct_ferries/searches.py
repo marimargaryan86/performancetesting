@@ -390,7 +390,7 @@ class CriteriaGenerator:
     def __init__(self) -> None:
         self._ports = port_functions.load_ports()
 
-    def criteria_task_generator(
+    async def criteria_task_generator(
         self,
         search: models_pb2.Search,
     ) -> list[Criteria]:

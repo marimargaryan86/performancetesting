@@ -5,23 +5,28 @@ import datetime
 import functools
 import secrets
 import zoneinfo
-from collections.abc import Collection, Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
+import grpc
 from geopy.distance import geodesic
 from google.protobuf import message
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    places_pb2,
+    places_pb2_grpc,
+)
 from snowfall.project.junction.rocket.service.providers.benerail import (
     constant,
-    id_mapping,
     train_stations,
 )
 from snowfall.project.junction.rocket.service.providers.benerail.helper_functions import (
     normalize_datetime,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
-from snowfall.stdlib import h3, string
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
+from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import latlng_pb2
 
 _TOKEN_LENGTH = 32
@@ -67,45 +72,66 @@ def _find_nearest_provider_place(
     return nearest_station.identifier, nearest_station.timezone
 
 
+class PlaceNotFoundError(Exception):
+    """Raised when place is not found."""
+
+
+class StationNotFoundError(Exception):
+    """Raised when there is no capability for the provider."""
+
+
 class CriteriaGenerator:
     def __init__(
         self,
-        h3_mapping: h3.H3MappingRepository[train_stations.TrainStation],
-        _id_mapping: id_mapping.IdMappingRepository[train_stations.TrainStation],
+        places: places_pb2_grpc.PlacesServiceStub,
     ):
-        self._mapping = h3_mapping
-        self._id_mapping = _id_mapping
+        self._places = places
+        self._logger = stdout.get_logger()
 
-    def criteria_task_generator(
+    async def get_station(self, place_id: str) -> train_stations.TrainStation:
+        try:
+            place = (
+                await self._places.GetPlace(
+                    places_pb2.GetPlaceRequest(id=place_id),
+                )
+            ).place
+        except grpc.aio.AioRpcError as err:
+            if err.code() == grpc.StatusCode.NOT_FOUND:
+                raise PlaceNotFoundError(place_id) from err
+            raise
+
+        station_id = place.search_capabilities.rail.get(str(constant.PROVIDER_ID))
+        if not station_id:
+            raise StationNotFoundError(place_id)
+
+        return train_stations.TrainStation(
+            name=place.name,
+            identifier=station_id,
+            latitude=place.coordinates.latitude,
+            longitude=place.coordinates.longitude,
+            timezone=zoneinfo.ZoneInfo(place.time_zone),
+        )
+
+    async def criteria_task_generator(
         self,
         search: models_pb2.Search,
     ) -> list[Criteria]:
-        origins = self._get_stations(
-            search.rail.origin.coordinates,
-        )
-        destinations = self._get_stations(
-            search.rail.destination.coordinates,
-        )
-        if not origins or not destinations:
+        try:
+            origin = await self.get_station(search.rail.origin_id)
+        except (PlaceNotFoundError, StationNotFoundError):
+            self._logger.exception("Unable to retrieve origin station id.")
             return []
+
+        try:
+            destination = await self.get_station(search.rail.destination_id)
+        except (PlaceNotFoundError, StationNotFoundError):
+            self._logger.exception("Unable to retrieve destination station id.")
+            return []
+
         return create_criteria_time_windows(
-            frozenset(origins),
-            frozenset(destinations),
+            origin,
+            destination,
             search,
-        )
-
-    def _get_stations(
-        self,
-        coordinates: latlng_pb2.LatLng,
-    ) -> set[train_stations.TrainStation]:
-        self._mapping.find_mapped_values(
-            coordinates=coordinates,
-            neighbour_search_radius=1,
-        )
-
-        return self._mapping.find_mapped_values(
-            coordinates=coordinates,
-            neighbour_search_radius=1,
         )
 
 
@@ -214,19 +240,10 @@ def _generate_search_criteria(
 
 
 def create_criteria_time_windows(
-    origins: Collection[train_stations.TrainStation],
-    destinations: Collection[train_stations.TrainStation],
+    origin: train_stations.TrainStation,
+    destination: train_stations.TrainStation,
     search: models_pb2.Search,
 ) -> list[Criteria]:
-    origin_id, origin_timezone = _find_nearest_provider_place(
-        origins,
-        search.rail.origin.coordinates,
-    )
-    destination_id, destination_timezone = _find_nearest_provider_place(
-        destinations,
-        search.rail.destination.coordinates,
-    )
-
     if search.rail.outbound_offer_id:
         criteria_func = _generate_inbound_search_criteria
     else:
@@ -234,10 +251,10 @@ def create_criteria_time_windows(
 
     return criteria_func(
         search,
-        origin_id,
-        destination_id,
-        origin_timezone,
-        destination_timezone,
+        origin.identifier,
+        destination.identifier,
+        origin.timezone,
+        destination.timezone,
     )
 
 
