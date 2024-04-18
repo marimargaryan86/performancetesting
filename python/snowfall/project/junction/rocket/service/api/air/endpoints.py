@@ -198,7 +198,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
         data = [
             models.Resource(
                 id=result.id,
-                type="search-results",
+                type="air-search-results",
                 attributes=AirSearchResponseAttributes(
                     **search_data,
                     status=StatusTypeEnum.completed,
@@ -209,7 +209,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
                         data=[
                             models.ResourceIdentifier(
                                 id=offer.id,
-                                type="offers",
+                                type="air-offers",
                             )
                             for offer in result.offers
                         ],
@@ -218,7 +218,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
                         data=[
                             models.ResourceIdentifier(
                                 id=result_details.id,
-                                type="result-details",
+                                type="air-result-details",
                             )
                             for result_details in result.result_details
                         ],

@@ -78,14 +78,14 @@ def example_request_inbound() -> Any:
                 "origin": "PAR",
                 "destination": "LON",
                 "departureAfter": "2024-03-24T00:00:00Z",
-                "returnDepartureAt": "2024-03-25T00:00:00Z",
+                "returnAt": "2024-03-25T00:00:00Z",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
             },
             "relationships": {
                 "selected_outbound_offer": {
                     "data": {
                         "id": OUTBOUND_SEARCH_OFFER_ID,
-                        "type": "offers",
+                        "type": "air-offers",
                     },
                 },
             },

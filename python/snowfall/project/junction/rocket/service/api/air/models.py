@@ -37,13 +37,13 @@ class AirSearchAttributes(BaseModel):
     departure_after: datetime
     origin: str
     destination: str
-    return_departure_at: datetime | None = None
+    return_at: datetime | None = None
     passengers: list[Passenger]
 
 
 class SelectedOutboundOfferData(BaseModel):
     id: str
-    type: Literal["offers"]
+    type: Literal["air-offers"]
 
 
 class SelectedOutboundOffer(BaseModel):
@@ -73,12 +73,12 @@ class SearchCapabilities(BaseModel):
 class ResultDetails(BaseModel):
     id: str = Field(..., alias="_id")
     flight_number: str
-    airline: str
+    marketing_airline: str
     arrival_station: str
     departure_station: str
     departure_at: AwareOrNaiveDatetime
     arrival_at: AwareOrNaiveDatetime
-    duration: int = Field(..., alias="durationOfSegmentMinutes")
+    duration: int
     segment_key: str
     operating_airline: str
 
@@ -90,7 +90,7 @@ class Price(BaseModel):
 
 class CabinDetails(BaseModel):
     id: str = Field(alias="uid")
-    result_detail_id: str | None = Field(..., alias="resultDetailUid")
+    result_detail_id: str | None = Field(..., alias="resultDetail")
     marketing_name: str | None
 
 

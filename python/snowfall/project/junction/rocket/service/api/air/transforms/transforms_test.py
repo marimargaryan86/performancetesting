@@ -51,7 +51,7 @@ def example_request_round_trip() -> Any:
             "type": "air-searches",
             "attributes": {
                 "departureAfter": date(2024, 1, 1),
-                "returnDepartureAt": date(2024, 1, 2),
+                "returnAt": date(2024, 1, 2),
                 "origin": "JFK",
                 "destination": "LAX",
                 "passengers": [
@@ -63,7 +63,7 @@ def example_request_round_trip() -> Any:
                 "selected_outbound_offer": {
                     "data": {
                         "id": OUTBOUND_SEARCH_OFFER_ID,
-                        "type": "offers",
+                        "type": "air-offers",
                     },
                 },
             },

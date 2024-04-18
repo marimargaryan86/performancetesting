@@ -39,7 +39,7 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
     ) -> j1.SearchFlightsRequest:
         attributes = air_search_request.data.attributes
 
-        return_departure_at = attributes.return_departure_at
+        return_departure_at = attributes.return_at
         return_departure_after = (
             return_departure_at.date() if return_departure_at else None
         )
@@ -71,7 +71,7 @@ def _transform_result_detail(
     return rocket.ResultDetails(
         id=string.uuid(),
         flight_number=segment.flight_number,
-        airline=segment.airline,
+        marketing_airline=segment.airline,
         arrival_station=segment.arrival_station,
         arrival_at=segment.arrival_time,
         departure_station=segment.departure_station,
