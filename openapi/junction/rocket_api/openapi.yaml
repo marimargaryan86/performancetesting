@@ -394,6 +394,7 @@ paths:
   /ferry/searches/{searchId}/results:
     parameters:
       - $ref: '#/components/parameters/searchId'
+      - $ref: '#/components/parameters/searchResultInclude'
     get:
       summary: List ferry search results
       operationId: get-ferry-searches-id-results
@@ -418,6 +419,8 @@ paths:
                         uniqueItems: true
                         items:
                           $ref: '#/components/schemas/FerrySearchResult'
+                      included:
+                        $ref: '#/components/schemas/FerrySearchResultIncluded'
                     required:
                       - data
                   - $ref: '#/components/schemas/NextLink'
@@ -782,7 +785,7 @@ paths:
   /rail/searches/{searchId}/results:
     parameters:
       - $ref: '#/components/parameters/searchId'
-      - $ref: '#/components/parameters/railSearchResultInclude'
+      - $ref: '#/components/parameters/searchResultInclude'
     get:
       summary: List rail search results
       operationId: get-rail-searches-id-results
@@ -1483,6 +1486,181 @@ components:
       required:
         - status
         - detail
+    FerryOffer:
+      title: Ferry Offer
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Ferry Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - ferry-offers
+          example: ferry-offers
+        attributes:
+          type: object
+          description: The properties that define a Ferry Offer object
+          required:
+            - price
+            - priceBreakdown
+          properties:
+            price:
+              $ref: '#/components/schemas/Price'
+            priceBreakdown:
+              type: array
+              description: >-
+                A list of Price Breakdown objects that indicates the various
+                fees and charges that make up the total price
+              items:
+                $ref: '#/components/schemas/PriceBreakdown'
+        relationships:
+          type: object
+          description: The Junction resources related to this Ferry Offer object
+          required:
+            - resultDetails
+          properties:
+            resultDetails:
+              type: object
+              description: The Ferry Result Detail ID associated to this ferry offer
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/FerryResultDetailIdentifier'
+    FerryOfferIdentifier:
+      title: Ferry Offer Identifier
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Ferry Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - ferry-offers
+          example: ferry-offers
+    FerryResultDetail:
+      title: Ferry Result Detail
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Ferry Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - ferry-result-details
+          example: ferry-result-details
+        attributes:
+          type: object
+          description: The properties that define a Ferry Result Detail object
+          required:
+            - origin
+            - destination
+            - departureAt
+            - arrivalAt
+            - outboundSegment
+            - segmentSequence
+            - duration
+            - ferryOperator
+          properties:
+            origin:
+              $ref: '#/components/schemas/Coordinates'
+            destination:
+              $ref: '#/components/schemas/Coordinates'
+            departureAt:
+              type: string
+              description: >-
+                The departure date time for the ferry result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            arrivalAt:
+              type: string
+              description: >-
+                The arrival date time for the ferry result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            outboundSegment:
+              type: boolean
+              description: >-
+                A flag indicating whether this ferry result detail represents
+                the outbound or inbound segment of a trip
+              example: true
+            segmentSequence:
+              type: integer
+              description: >-
+                A sequence value indicating the stage of a full trip that this
+                ferry result detail represents
+              minimum: 1
+              example: 1
+            duration:
+              type: integer
+              description: >-
+                The total duration of the route, in minutes, defined by this ferry
+                result detail
+              minimum: 0
+              example: 60
+            ferryOperator:
+              title: Ferry Operator
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: The name of the ferry operator
+                  example: Irish Ferries
+    FerryResultDetailIdentifier:
+      title: Ferry Result Detail Identitifer
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Ferry Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - ferry-result-details
+          example: ferry-result-details
     FerrySearch:
       title: Ferry Search
       x-tags:
@@ -1493,31 +1671,39 @@ components:
             id:
               type: string
               format: uuid
+              description: >-
+                Unique identifier (UUID) for the Ferry Search object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
               example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
               readOnly: true
             type:
               type: string
+              description: The Junction resource type
               enum:
                 - ferry-searches
               example: ferry-searches
             attributes:
               type: object
+              description: The properties that define an Ferry Search object
               required:
                 - expiresAt
                 - status
                 - departureAfter
-                - returnAt
                 - origin
                 - destination
                 - passengers
               properties:
                 expiresAt:
                   type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
                   format: date-time
                   readOnly: true
                   example: '2019-08-24T14:15:22Z'
                 status:
                   type: string
+                  description: The status of the Ferry Search
                   readOnly: true
                   enum:
                     - unspecified
@@ -1527,11 +1713,18 @@ components:
                     - failed
                   example: completed
                 departureAfter:
+                  description: >-
+                    The requested departure after date time for the ferry search in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
                   type: string
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
                 returnAt:
                   type: string
+                  description: >-
+                    The requested return date time for the ferry search in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format. Only
+                    required if performing a round trip search
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
                 origin:
@@ -1540,20 +1733,33 @@ components:
                   $ref: '#/components/schemas/Coordinates'
                 passengers:
                   type: array
+                  description: >-
+                    The list of passengers that will travel on the requested ferry search
+                  minItems: 1
                   items:
                     $ref: '#/components/schemas/Passenger'
+                vehicles:
+                  type: array
+                  description: >-
+                    The list of vehicle types that will travel on the requested ferry search
+                  items:
+                    $ref: '#/components/schemas/FerryVehicle'
             relationships:
               type: object
+              description: The Junction resources related to this Ferry Search object
               required:
                 - selectedOutboundOffer
               properties:
                 selectedOutboundOffer:
                   type: object
+                  description: >-
+                    The selected outbound Offer ID for use when performing the inbound search
+                    on a roundtrip. Not required for one-way scenarios
                   required:
                     - data
                   properties:
                     data:
-                      $ref: '#/components/schemas/OfferIdentifier'
+                      $ref: '#/components/schemas/FerryOfferIdentifier'
           required:
             - id
             - type
@@ -1561,48 +1767,68 @@ components:
         - $ref: '#/components/schemas/SelfLink'
     FerrySearchIdentifier:
       title: Ferry Search Identifier
-      description: A unique identifier for ferry search.
+      description: A unique identifier for ferry search
       type: object
+      required:
+        - id
+        - type
       properties:
         id:
           type: string
+          description: >-
+            Unique identifier (UUID) for the Ferry Search object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
           format: uuid
           example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
         type:
           type: string
+          description: The Junction resource type
           enum:
             - ferry-searches
           example: ferry-searches
+    FerrySearchResult:
+      title: Ferry Search Result
+      description: Search result representing offer for specified origin and destination
+      type: object
+      x-tags:
+        - ferry-searches
       required:
         - id
         - type
-    FerrySearchResult:
-      title: Ferry Search Result
-      description: Search result representing offer for specified origin and destination.
-      type: object
+        - attributes
+        - relationships
       properties:
         id:
           type: string
+          description: >-
+            Unique identifier (UUID) for the Ferry Search Result object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
           format: uuid
           example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
           readOnly: true
         type:
           type: string
+          description: The Junction resource type
           enum:
-            - search-results
-          example: search-results
+            - ferry-search-results
+          example: ferry-search-results
         attributes:
           type: object
+          description: The properties that define an Ferry Search Result object
           required:
             - expiresAt
           properties:
             expiresAt:
               type: string
+              description: >-
+                The time at which the object will expire in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
               format: date-time
               example: '2019-08-24T14:15:22Z'
               readOnly: true
         relationships:
           type: object
+          description: The Junction resources related to this Ferry Search Result object
           required:
             - offers
             - resultDetails
@@ -1610,15 +1836,17 @@ components:
           properties:
             offers:
               type: object
+              description: The list of Offer IDs associated with this ferry search result
               required:
                 - data
               properties:
                 data:
                   type: array
                   items:
-                    $ref: '#/components/schemas/OfferIdentifier'
+                    $ref: '#/components/schemas/FerryOfferIdentifier'
             resultDetails:
               type: object
+              description: The list of Result Detail IDs associated with this ferry search result
               required:
                 - data
               properties:
@@ -1626,19 +1854,40 @@ components:
                   oneOf:
                     - type: array
                       items:
-                        $ref: '#/components/schemas/ResultDetailIdentifier'
+                        $ref: '#/components/schemas/FerryResultDetailIdentifier'
             search:
               type: object
+              description: The Ferry Search ID that this ferry search result belongs to
               required:
                 - data
               properties:
                 data:
                   $ref: '#/components/schemas/FerrySearchIdentifier'
+    FerrySearchResultIncluded:
+      title: Ferry Search Result Included
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/FerryOffer'
+          - $ref: '#/components/schemas/FerryResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            ferry-offers: '#/components/schemas/FerryOffer'
+            ferry-result-details: '#/components/schemas/FerryResultDetail'
+    FerryVehicle:
+      title: Ferry Vehicle
+      type: object
       required:
-        - id
-        - type
-        - attributes
-        - relationships
+        - vehicleType
+      properties:
+        vehicleType:
+          type: string
+          description: The type of the vehicle
+          enum:
+            - car
+            - bicycle
+          example: car
     HotelRoomsSearchRequest:
       title: Hotel Rooms Search Request
       type: object
@@ -2202,6 +2451,7 @@ components:
                     rail search
                   items:
                     $ref: '#/components/schemas/Passenger'
+                  minItems: 1
             relationships:
               type: object
               description: The Junction resources related to this Rail Search object
@@ -2515,7 +2765,7 @@ components:
             - resultDetails
         example:
           - offers
-      description: Customize which related resources to return.
+      description: Customize which related resources to return along with this Search Result
       style: form
       explode: false
     filterIataEq:
@@ -2595,22 +2845,6 @@ components:
         format: uuid
         example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
       description: Place identifier
-    railSearchResultInclude:
-      name: include
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-            - offers
-            - resultDetails
-        example:
-          - offers
-      description: Customize which related resources to return
-      style: form
-      explode: false
     searchId:
       name: searchId
       in: path

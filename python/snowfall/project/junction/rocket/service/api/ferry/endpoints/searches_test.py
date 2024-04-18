@@ -90,3 +90,22 @@ class TestListSearchResults:
         assert response.status_code == status.HTTP_200_OK
         results = response.json()
         assert len(results["data"]) == 2
+
+    async def test_list_ferry_search_results_with_includes_successful(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/ferry/searches/{searchId}/results".format(
+                searchId=fixtures.FERRY_SEARCH_ID,
+            ),
+            params={"include": "offers,resultDetails"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        results = response.json()
+        assert len(results["data"]) == 2
+
+        included_types = [resource["type"] for resource in results["included"]]
+        assert "ferry-offers" in included_types
+        assert "ferry-result-details" in included_types

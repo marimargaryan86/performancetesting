@@ -117,7 +117,7 @@ def generate_ferry_offer(offer_id: str) -> searches_pb2.Offer:
         id=offer_id,
         price=money_pb2.Money(currency_code="EUR"),
         price_breakdown=[],
-        ferry=searches_pb2.FerryOffer(),
+        ferry=searches_pb2.FerryOffer(ferry_result_detail_id=RESULT_DETAILS[0]),
     )
 
 

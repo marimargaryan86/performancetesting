@@ -27,11 +27,10 @@ message Ferry {
   snowfall.project.junction.go.v1.Point origin = 1;
   snowfall.project.junction.go.v1.Point destination = 2;
   google.protobuf.Timestamp departure_after = 3;
-  google.protobuf.Timestamp departure_before = 4;
-  google.protobuf.Timestamp return_date = 5;
-  repeated Passenger passengers = 6;
-  repeated Vehicle vehicles = 7;
-  string outbound_offer_id = 8;
+  google.protobuf.Timestamp return_date = 4;
+  repeated Passenger passengers = 5;
+  repeated Vehicle vehicles = 6;
+  string outbound_offer_id = 7;
 }
 
 message CarRental {

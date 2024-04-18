@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Sequence
 
 import lagom
 import timezonefinder
@@ -25,6 +26,7 @@ from snowfall.stdlib.integration.starlette import (
 from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
+_IncludesType = search_models.ResultDetailResource | search_models.OfferResource
 
 
 class FerrySearch(endpoints.HTTPEndpoint):
@@ -57,6 +59,12 @@ class FerrySearch(endpoints.HTTPEndpoint):
             lng=destination_coords.longitude,
         )
 
+        return_date = body.get("returnAt", None)
+        if return_date:
+            return_date = protobuf.datetime_to_protobuf(
+                datetime.datetime.fromisoformat(return_date),
+            )
+
         response = await searches.EnqueueSearch(
             grpc_pb2.EnqueueSearchRequest(
                 search=models_pb2.Search(
@@ -73,9 +81,7 @@ class FerrySearch(endpoints.HTTPEndpoint):
                         departure_after=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["departureAfter"]),
                         ),
-                        return_date=protobuf.datetime_to_protobuf(
-                            datetime.datetime.fromisoformat(body["returnAt"]),
-                        ),
+                        return_date=return_date,
                         outbound_offer_id=body.get("selectedOutboundOffer", ""),
                         passengers=[
                             models_pb2.Passenger(
@@ -86,6 +92,15 @@ class FerrySearch(endpoints.HTTPEndpoint):
                                 ),
                             )
                             for passenger in body["passengers"]
+                        ],
+                        vehicles=[
+                            models_pb2.Vehicle(
+                                type_id=protobuf.slug_to_enum_value(
+                                    models_pb2.Vehicle.TypeId,
+                                    vehicle["vehicleType"],
+                                ),
+                            )
+                            for vehicle in body.get("vehicles", [])
                         ],
                     ),
                 ),
@@ -165,6 +180,28 @@ class FerrySearchResults(endpoints.HTTPEndpoint):
                     items_page.cursor,
                     pagination,
                 ),
+                included=self._resolve_included(items_page.sequence, request),
             ),
             request=request,
         )
+
+    def _resolve_included(
+        self,
+        search_results: Sequence[models_pb2.SearchResult],
+        request: requests.Request,
+    ) -> list[_IncludesType]:
+        included: list[_IncludesType] = []
+        requested_includes = request.scope["parsed_query_string"].get("include", [])
+        if "offers" in requested_includes:
+            included.extend([
+                search_models.OfferResource.from_proto(offer)
+                for search_result in search_results
+                for offer in search_result.offers
+            ])
+        if "resultDetails" in requested_includes:
+            included.extend([
+                search_models.ResultDetailResource.from_proto(result_detail)
+                for search_result in search_results
+                for result_detail in search_result.result_details
+            ])
+        return included
