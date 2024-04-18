@@ -1,25 +1,15 @@
 import dataclasses
-
-from snowfall.project.junction.go.v1 import models_pb2 as common_pb2
-from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
+import datetime
+from collections.abc import Sequence
 
 
 @dataclasses.dataclass(frozen=True)
 class Criteria:
     search_id: str
-    origin: common_pb2.Point
-    destination: common_pb2.Point
-    # TODO(regis.blanc): Implement the full criteria.
-
-
-def search_criteria_generator(
-    search: models_pb2.Search,
-) -> list[Criteria]:
-    # TODO(regis.blanc): Implement the full mapping.
-    return [
-        Criteria(
-            search_id=search.id,
-            origin=search.rail.origin,
-            destination=search.rail.destination,
-        ),
-    ]
+    origin: str
+    destination: str
+    # The departure must be at this time or after (inclusive).
+    outbound_departure_after: datetime.datetime
+    # The departure must be strictly before this time (exclusive).
+    outbound_departure_before: datetime.datetime
+    passenger_dobs: Sequence[datetime.date]

@@ -9,11 +9,16 @@ from snowfall.vendor.silverrail.models.shopping import (
     ContextType,
     PointToPointShoppingQuery,
     PointToPointShoppingRequest,
+    PointToPointShoppingResponse,
     ShoppingPointToPointShopInput,
     ShoppingPointToPointShopOutput,
 )
 
 SHOPPING_SERVICE_PATH = "/shopping-ws/services/Shopping/v2"
+
+
+class SilverrailUnexpectedFormatError(Exception):
+    """Raised when the message retunred by Silverrail had an unexpected format."""
 
 
 # The settings for the client (customer) of the API. This will limit
@@ -44,7 +49,7 @@ class SilverrailClient(client.HttpClient):
     async def shopping_point_to_point(
         self,
         query: PointToPointShoppingQuery,
-    ) -> ShoppingPointToPointShopOutput:
+    ) -> PointToPointShoppingResponse:
         req = ShoppingPointToPointShopInput(
             body=ShoppingPointToPointShopInput.Body(
                 point_to_point_shopping_request=PointToPointShoppingRequest(
@@ -58,7 +63,17 @@ class SilverrailClient(client.HttpClient):
         response = await self._make_soap_request(soap_request_body)
 
         parser = XmlParser()
-        return parser.from_string(response.text, ShoppingPointToPointShopOutput)
+        output: ShoppingPointToPointShopOutput = parser.from_string(
+            response.text,
+            ShoppingPointToPointShopOutput,
+        )
+
+        if output.body is None:
+            raise SilverrailUnexpectedFormatError()
+        if output.body.point_to_point_shopping_response is None:
+            raise SilverrailUnexpectedFormatError()
+
+        return output.body.point_to_point_shopping_response
 
     async def _make_soap_request(
         self,

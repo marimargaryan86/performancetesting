@@ -19,7 +19,7 @@ variables.
 The following ports are configured in local environments by default:
 
 | Port  | Service                | Description |
-| :---: | :--------------------- | :---------- |
+|:-----:|:-----------------------| :---------- |
 | 8000  | client-api             | HTTP Server |
 | 8001  | mobile-api             | HTTP Server |
 | 8003  | pay-api                | HTTP Server |
@@ -73,3 +73,4 @@ The following ports are configured in local environments by default:
 | 51056 | rocket/bookings        | gRPC Server |
 | 51057 | rocket/direct_ferries  | gRPC Server |
 | 51058 | rocket/benerail        | gRPC Server |
+| 51059 | rocket/silverrail      | gRPC Server |

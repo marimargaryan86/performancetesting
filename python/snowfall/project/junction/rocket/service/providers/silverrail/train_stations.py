@@ -6,7 +6,7 @@ from snowfall.stdlib import h3
 
 @dataclasses.dataclass(frozen=True)
 class TrainStation(h3.CoordinatesItem):
-    name: str | None
+    name: str
 
 
 class TrainStationRepository:
