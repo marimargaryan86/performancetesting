@@ -708,6 +708,8 @@ paths:
   /places:
     get:
       summary: List Places
+      operationId: get-places
+      description: Used to retrieve Places with optional filters.
       tags:
         - places
       parameters:
@@ -729,6 +731,7 @@ paths:
             example:
               - -123.4567
               - 45.6789
+              - 500
           description: >-
             Specifies a point to search for nearby places, within a radius (
             radius is in meters ). Defined as `longitude,latitude,radius`
@@ -740,8 +743,9 @@ paths:
             format: uuid
             example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
           description: >-
-            Specifies a place to search within, any further filtering will be
-            applied to places it contains
+            Unique identifier (UUID) for the Place to search within in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format.
+            Any further filtering is performed on Places it contains.
       responses:
         '200':
           description: OK
@@ -766,13 +770,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
-      operationId: get-places
-      description: Used to retrieve places.
   /places/{placeId}:
     parameters:
       - $ref: '#/components/parameters/placeId'
     get:
       summary: Get Place
+      operationId: get-places-id
+      description: Used to lookup data for a Place Identifier.
       tags:
         - places
       responses:
@@ -794,8 +798,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
-      operationId: get-places-id
-      description: Used to lookup data for a Place Identifier.
   /rail/searches:
     post:
       summary: Create rail search
@@ -2288,16 +2290,21 @@ components:
           properties:
             id:
               type: string
+              description: >-
+                Unique identifier (UUID) for the Place object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
               format: uuid
               example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
               readOnly: true
             type:
               type: string
+              description: The Junction resource type
               enum:
                 - places
               example: places
             attributes:
               type: object
+              description: The properties that define a Place object
               required:
                 - name
                 - placeType
@@ -2310,53 +2317,79 @@ components:
               properties:
                 name:
                   type: string
-                  example: Venice Marco Polo Airport
+                  description: >-
+                    The plaintext representation of the name of the Place.
                   readOnly: true
+                  example: Venice Marco Polo Airport
                 placeType:
                   $ref: '#/components/schemas/PlaceType'
                 latitude:
                   type: number
+                  description: >-
+                    The latitudinal component of the Places coordinates
                   format: float
-                  example: 59.651164062
                   minimum: -90
                   maximum: 90
+                  example: 59.651164062
                 longitude:
                   type: number
+                  description: >-
+                    The longitudinal component of the Places coordinates
                   format: float
-                  example: 17.917829662
                   minimum: -180
                   maximum: 180
+                  example: 17.917829662
                 countryCode:
                   type: string
+                  description: >-
+                    The two character country code of the Place in [ISO 3166-1]
+                    (https://www.iso.org/glossary-for-iso-3166.html) format
                   format: country
-                  example: IT
                   readOnly: true
+                  example: IT
                 countryName:
                   type: string
-                  example: Italy
+                  description: >-
+                    The plaintext representation of the name of the Country that
+                    the Place resides
                   readOnly: true
+                  example: Italy
                 iataCode:
                   type: string
-                  example: VCE
+                  description: >-
+                    The IATA Code for the Place as prescribed by [IATA]
+                    (https://www.iata.org/en/services/codes/) if the Place
+                    supports airline travel
                   pattern: ^[A-Z]{3}$
                   nullable: true
                   readOnly: true
+                  example: VCE
                 timeZone:
                   type: string
-                  example: Europe/Rome
+                  description: >-
+                    The plaintext representation of the timezone the Place
+                    resides in, in the form of <continent>/<country>
                   readOnly: true
+                  example: Europe/Rome
                 searchCapabilities:
                   $ref: '#/components/schemas/SearchCapabilities'
                 updatedAt:
                   type: string
+                  description: >-
+                    The time at which the Place was last modified in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
                   format: date-time
-                  example: '2024-08-24T14:15:22Z'
                   readOnly: true
+                  example: '2024-08-24T14:15:22Z'
             relationships:
               type: object
+              description: The Junction resources related to this Place object
               properties:
                 city:
                   type: object
+                  description: >-
+                    The Unique identifier (UUID) of the Place (of type City) that this Place
+                    resides, in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format
                   nullable: true
                   required:
                     - data
@@ -2364,8 +2397,10 @@ components:
                     data:
                       $ref: '#/components/schemas/PlaceIdentifier'
                 contains:
-                  title: Contains
                   type: object
+                  description: >-
+                    List of Unique identifiers (UUID)s of the Places this Place contains
+                    in [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format
                   required:
                     - data
                   properties:
@@ -2388,10 +2423,14 @@ components:
       properties:
         id:
           type: string
+          description: >-
+            Unique identifier (UUID) for the Place object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
           format: uuid
           example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
         type:
           type: string
+          description: The Junction resource typ
           enum:
             - places
           example: places
@@ -2401,6 +2440,8 @@ components:
       description: A unique identifier for each place.
     PlaceType:
       title: Place Type
+      description: >-
+        The type of Place in relation to its physical purpose
       type: string
       enum:
         - unspecified
@@ -2876,19 +2917,24 @@ components:
         - type
     SearchCapabilities:
       type: object
-      title: SearchCapabilities
+      title: Search Capabilities
+      description: >-
+        Represents which verticals the Place will be supported within a search for.
       properties:
         rail:
-          title: Rail
           type: boolean
+          description: >-
+            Indicates whether rail searches support this Place
           example: false
         air:
-          title: Air
           type: boolean
+          description: >-
+            Indicates whether air searches support this Place
           example: true
         ferry:
-          title: Ferry
           type: boolean
+          description: >-
+            Indicates whether ferry searches support this Place
           example: false
       required:
         - rail
@@ -3096,7 +3142,9 @@ components:
         type: string
         format: uuid
         example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-      description: Place identifier
+      description: >-
+        Unique identifier (UUID) for the Place object in [RFC
+        4122](https://datatracker.ietf.org/doc/html/rfc4122) format
     searchId:
       name: searchId
       in: path
