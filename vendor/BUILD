@@ -31,6 +31,7 @@ pex_binary(
 
 python_requirements(
     module_mapping={
+        "allure-python-commons": ["allure"],
         "antlr4-python3-runtime": ["antlr4"],
         "dnspython": ["dns"],
         "googleapis-common-protos": [
@@ -42,36 +43,23 @@ python_requirements(
             "google.rpc",
             "google.type",
         ],
-        "grpcio": ["grpc"],
-        "grpcio-health-checking": ["grpc_health"],
-        "grpcio-reflection": ["grpc_reflection"],
         "grpcio-status": ["grpc_status"],
         "grpcio-testing": ["grpc_testing"],
-        "protobuf": ["google.protobuf"],
-        "pyjwt": ["jwt"],
-        "pyshp": ["shapefile"],
-        "pytest-httpx": ["pytest_httpx"],
-        "python-dateutil": ["dateutil"],
-        "python-gitlab": ["gitlab"],
-        "python-hcl2": ["hcl2"],
-        "python-rapidjson": ["rapidjson"],
-        "setuptools": ["easy_install", "pkg_resources", "setuptools"],
-        "allure-python-commons": ["allure"],
         "matrix-nio": ["nio"],
+        "pyshp": ["shapefile"],
         "types-aiobotocore-sqs": ["types_aiobotocore_sqs"],
     },
     overrides={
-        "antlr4-python3-runtime": {"dependencies": ["#types-antlr4-python3-runtime"]},
         "aiobotocore": {
             "dependencies": ["#types-aiobotocore", "#types-aiobotocore-sqs"]
         },
+        "antlr4-python3-runtime": {"dependencies": ["#types-antlr4-python3-runtime"]},
         "fakeredis": {"dependencies": ["#lupa"]},
         "mongomock-motor": {"dependencies": ["#setuptools"]},
         "openapi-core": {
             "dependencies": ["#setuptools", "#rfc3339-validator", "#aioitertools"]
         },
         "pandas": {"dependencies": ["#pyarrow"]},
-        "protobuf": {"dependencies": ["#types-protobuf"]},
         "pyjwt": {"dependencies": ["#cryptography"]},
         "qrcode": {"dependencies": ["#Pillow"]},
         "starlette": {"dependencies": ["#python-multipart"]},
