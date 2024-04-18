@@ -1295,162 +1295,258 @@ components:
             air-result-details: '#/components/schemas/AirResultDetail'
     CarRentalOffer:
       title: Car Rental Offer
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              enum:
-                - offers
-              example: offers
-            attributes:
-              type: object
-              required:
-                - price
-                - priceBreakdown
-                - conditionalPrices
-              properties:
-                price:
-                  $ref: '#/components/schemas/Price'
-                priceBreakdown:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/PriceBreakdown'
-                conditionalPrices:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/ConditionalPrice'
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Car Rental Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - car-rental-offers
+          example: car-rental-offers
+        attributes:
+          type: object
+          description: The properties that define a Car Rental Offer object
           required:
-            - id
-            - type
-            - attributes
-      description: Result of searching for offers. Used for creating an Order.
+            - price
+            - priceBreakdown
+            - conditionalPrices
+          properties:
+            price:
+              $ref: '#/components/schemas/Price'
+            priceBreakdown:
+              type: array
+              description: >-
+                A list of Price Breakdown objects that indicates the various
+                fees and charges that make up the total price
+              items:
+                $ref: '#/components/schemas/PriceBreakdown'
+            conditionalPrices:
+              type: array
+              description: >-
+                A list of Conditional Price objects that indicates the various
+                fees that may or may not be included in total price
+              items:
+                $ref: '#/components/schemas/ConditionalPrice'
+    CarRentalOfferIdentifier:
+      title: Car Rental Offer Identifier
+      description: A unique identifier for car rental offer
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Car Rental Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - car-rental-offers
+          example: car-rental-offers
     CarRentalResultDetail:
       title: Car Rental Result Detail
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              enum:
-                - result-details
-              example: result-details
-            attributes:
-              type: object
-              properties:
-                pickupLocation:
-                  $ref: '#/components/schemas/Coordinates'
-                returnLocation:
-                  $ref: '#/components/schemas/Coordinates'
-                imageUrl:
-                  type: string
-                  format: uri
-                  example: >-
-                    https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg
-                  readOnly: true
-                  nullable: true
-                model:
-                  type: string
-                  example: Fiat 500
-                  readOnly: true
-                  nullable: true
-                seatsCount:
-                  type: integer
-                  example: 4
-                  readOnly: true
-                  nullable: true
-                doorsCount:
-                  type: integer
-                  example: 2
-                  readOnly: true
-                  nullable: true
-                transmission:
-                  type: string
-                  example: manual
-                  readOnly: true
-                  nullable: true
-                baggageQuantity:
-                  type: integer
-                  example: 3
-                  readOnly: true
-                  nullable: true
-                vehicleType:
-                  type: string
-                  example: Station Wagon
-                  readOnly: true
-                  nullable: true
-                vendor:
-                  type: string
-                  example: Sixt
-                  readOnly: true
-                  nullable: true
-                unlimitedMileage:
-                  type: boolean
-                  example: true
-                  readOnly: true
-                  nullable: true
-                airConditioning:
-                  type: boolean
-                  example: false
-                  readOnly: true
-                  nullable: true
-                pickupAt:
-                  type: string
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                returnAt:
-                  type: string
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Car Rental Result Detail object in
+            [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - car-rental-result-details
+          example: car-rental-result-details
+        attributes:
+          type: object
+          description: The properties that define a Car Rental Result Detail object
           required:
-            - id
-            - type
-            - attributes
-      description: Result of searching for offers.
+            - pickupAt
+            - returnAt
+            - origin
+            - destination
+          properties:
+            pickupAt:
+              type: string
+              description: >-
+                The pick up date time for the car rental result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            returnAt:
+              type: string
+              description: >-
+                The return date time for the car rental result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            origin:
+              $ref: '#/components/schemas/Coordinates'
+            destination:
+              $ref: '#/components/schemas/Coordinates'
+            imageUrl:
+              type: string
+              description: A URL to an image representation of the car
+              format: uri
+              example: >-
+                https://vehicles.carhire-solutions.com/371/small/1962750_CDAR.jpg
+              readOnly: true
+              nullable: true
+            model:
+              type: string
+              description: The supplier specific name of the fleet
+              example: Fiat 500
+              readOnly: true
+              nullable: true
+            seatsCount:
+              type: integer
+              description: >-
+                The number of seats in the vehicle, ie the maximum number of
+                passengers
+              example: 4
+              readOnly: true
+              nullable: true
+            doorsCount:
+              type: integer
+              description: The number of doors on the vehicle
+              example: 2
+              readOnly: true
+              nullable: true
+            transmission:
+              type: string
+              description: The transmission of the vehicle
+              example: manual
+              readOnly: true
+              nullable: true
+            baggageQuantity:
+              type: integer
+              description: >-
+                The estimated maximum number of pieces of luggage that will fit
+                in the vehicle
+              example: 3
+              readOnly: true
+              nullable: true
+            vehicleType:
+              type: string
+              description: The type of the vehicle
+              example: Station Wagon
+              readOnly: true
+              nullable: true
+            vendor:
+              type: string
+              description: The supplier of the vehicle
+              example: Sixt
+              readOnly: true
+              nullable: true
+            unlimitedMileage:
+              type: boolean
+              description: A flag indicating whether there is a mileage limitation or not
+              example: true
+              readOnly: true
+              nullable: true
+            airConditioning:
+              type: boolean
+              description: >-
+                A flag indicating whether the vehicle has air conditioning or
+                not
+              example: false
+              readOnly: true
+              nullable: true
+    CarRentalResultDetailIdentifier:
+      title: Car Rental Result Detail Identifier
+      description: A unique identifier for car rental result detail
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Car Rental Result Detail object in
+            [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - car-rental-result-details
+          example: car-rental-result-details
     CarRentalSearch:
+      title: Car Rental Search
       x-tags:
         - car-rental-searches
       allOf:
         - type: object
+          required:
+            - id
+            - type
+            - attributes
           properties:
             id:
               type: string
+              description: >-
+                Unique identifier (UUID) for the Car Rental Search object in
+                [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122)
+                format
               format: uuid
               example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
               readOnly: true
             type:
               type: string
+              description: The Junction resource type
               enum:
-                - car-searches
-              example: car-searches
+                - car-rental-searches
+              example: car-rental-searches
             attributes:
               type: object
+              description: The properties that define an Car Rental Search object
               required:
                 - driverAge
                 - expiresAt
                 - status
                 - pickupAt
                 - returnAt
-                - pickupLocation
-                - returnLocation
+                - origin
+                - destination
               properties:
                 expiresAt:
                   type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
                   format: date-time
                   readOnly: true
                   example: '2019-08-24T14:15:22Z'
                 status:
                   type: string
+                  description: The status of the Car Rental Search
                   readOnly: true
                   enum:
                     - unspecified
@@ -1461,112 +1557,137 @@ components:
                   example: completed
                 driverAge:
                   type: number
+                  description: The age of the person that will be driving the vehicle
                   format: int32
                   example: 32
                   minimum: 15
                 pickupAt:
                   type: string
+                  description: >-
+                    The requested pick up date time for the car rental search in
+                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
+                    format
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
                 returnAt:
                   type: string
+                  description: >-
+                    The requested return date time for the car rental search in
+                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
+                    format
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
-                pickupLocation:
+                origin:
                   $ref: '#/components/schemas/Coordinates'
-                returnLocation:
+                destination:
                   $ref: '#/components/schemas/Coordinates'
-          required:
-            - id
-            - type
-            - attributes
         - $ref: '#/components/schemas/SelfLink'
-      title: Car Rental Search
-      x-examples: {}
     CarRentalSearchIdentifier:
       title: Car Rental Search Identifier
+      description: A unique identifier for car rental search
       type: object
+      required:
+        - id
+        - type
       properties:
         id:
           type: string
+          description: >-
+            Unique identifier (UUID) for the Car Rental Search object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
           format: uuid
           example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
         type:
           type: string
+          description: The Junction resource type
           enum:
-            - car-searches
-          example: car-searches
-      required:
-        - id
-        - type
-      description: A unique identifier for car rental search.
+            - car-rental-searches
+          example: car-rental-searches
     CarRentalSearchResult:
       title: Car Rental Search Result
       type: object
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              enum:
-                - search-results
-              example: search-results
-            attributes:
-              type: object
-              required:
-                - expiresAt
-              properties:
-                expiresAt:
-                  type: string
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                  readOnly: true
-            relationships:
-              type: object
-              required:
-                - offers
-                - resultDetails
-                - search
-              properties:
-                offers:
-                  type: object
-                  required:
-                    - data
-                  properties:
-                    data:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/OfferIdentifier'
-                resultDetails:
-                  type: object
-                  required:
-                    - data
-                  properties:
-                    data:
-                      oneOf:
-                        - type: array
-                          items:
-                            $ref: '#/components/schemas/ResultDetailIdentifier'
-                search:
-                  type: object
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/CarRentalSearchIdentifier'
+      x-tags:
+        - car-rental-searches
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Car Rental Search Result object in
+            [RFC 4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - car-rental-search-results
+          example: car-rental-search-results
+        attributes:
+          type: object
+          description: The properties that define a Car Rental Search Result object
           required:
-            - id
-            - type
-            - attributes
-            - relationships
-      description: Search result representing offer for specified origin and destination.
+            - expiresAt
+          properties:
+            expiresAt:
+              type: string
+              description: >-
+                The time at which the object will expire in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+              readOnly: true
+        relationships:
+          type: object
+          description: >-
+            The Junction resources related to this Car Rental Search Result
+            object
+          required:
+            - offers
+            - resultDetails
+            - search
+          properties:
+            offers:
+              type: object
+              description: >-
+                The list of Offer IDs associated with this car rental search
+                result
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CarRentalOfferIdentifier'
+            resultDetails:
+              type: object
+              description: >-
+                The list of Result Detail IDs associated with this car rental
+                search result
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CarRentalResultDetailIdentifier'
+            search:
+              type: object
+              description: >-
+                The Car Rental Search ID that this car rental search result
+                belongs to
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/CarRentalSearchIdentifier'
     CarRentalSearchResultIncluded:
-      title: OfferIncluded
+      title: Car Rental Search Result Included
       type: array
       items:
         oneOf:
@@ -1575,25 +1696,29 @@ components:
         discriminator:
           propertyName: type
           mapping:
-            offers: '#/components/schemas/CarRentalOffer'
-            result-details: '#/components/schemas/CarRentalResultDetail'
+            car-rental-offers: '#/components/schemas/CarRentalOffer'
+            car-rental-result-details: '#/components/schemas/CarRentalResultDetail'
     ConditionalPrice:
       title: Conditional Price
       description: Additional fees that may or may not be included in total price
       type: object
+      required:
+        - price
       properties:
         price:
           $ref: '#/components/schemas/Price'
         description:
           type: string
+          description: A description of the fee
           example: one-way fee
           nullable: true
         includedInTotal:
           type: boolean
+          description: >-
+            A flag indicating whether this conditional fee is included in the
+            total price or not
           example: false
           nullable: true
-      required:
-        - price
     Coordinates:
       title: Coordinates
       allOf:
@@ -2250,26 +2375,6 @@ components:
           readOnly: true
       required:
         - links
-    OfferIdentifier:
-      title: Offer Identifier
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Offer object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - offers
-          example: offers
-      required:
-        - id
-        - type
     Passenger:
       title: Passenger
       type: object
@@ -2895,26 +3000,6 @@ components:
           mapping:
             rail-offers: '#/components/schemas/RailOffer'
             rail-result-details: '#/components/schemas/RailResultDetail'
-    ResultDetailIdentifier:
-      title: Result Detail Identifier
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Result Detail object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - result-details
-          example: result-details
-      required:
-        - id
-        - type
     SearchCapabilities:
       type: object
       title: Search Capabilities

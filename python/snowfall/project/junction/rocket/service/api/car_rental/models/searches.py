@@ -15,7 +15,7 @@ _SELF_HREF: typing.Literal["self"] = "self"
 
 
 class CarSearchResource(models.Resource):
-    api_type: typing.ClassVar[str] = "car-searches"
+    api_type: typing.ClassVar[str] = "car-rental-searches"
 
     @classmethod
     def from_proto(
@@ -27,11 +27,11 @@ class CarSearchResource(models.Resource):
             id=search.id,
             type=CarSearchResource.api_type,
             attributes={
-                "pickupLocation": {
+                "origin": {
                     "latitude": search.car_rental.origin.coordinates.latitude,
                     "longitude": search.car_rental.origin.coordinates.longitude,
                 },
-                "returnLocation": {
+                "destination": {
                     "latitude": search.car_rental.destination.coordinates.latitude,
                     "longitude": search.car_rental.destination.coordinates.longitude,
                 },
@@ -73,7 +73,7 @@ class ConditionalPrice(models.BaseModel):
 
 
 class OfferResource(models.Resource):
-    api_type: typing.ClassVar[str] = "offers"
+    api_type: typing.ClassVar[str] = "car-rental-offers"
 
     @classmethod
     def from_proto(cls, offer: models_pb2.Offer) -> OfferResource:
@@ -95,7 +95,7 @@ class OfferResource(models.Resource):
 
 
 class ResultDetailResource(models.Resource):
-    api_type: typing.ClassVar[str] = "result-details"
+    api_type: typing.ClassVar[str] = "car-rental-result-details"
 
     @classmethod
     def from_proto(cls, result_detail: models_pb2.ResultDetail) -> ResultDetailResource:
@@ -131,12 +131,20 @@ class ResultDetailResource(models.Resource):
                 "returnAt": protobuf.protobuf_to_datetime(
                     result_detail.car_rental.return_at,
                 ),
+                "origin": {
+                    "latitude": result_detail.car_rental.origin.coordinates.latitude,
+                    "longitude": result_detail.car_rental.origin.coordinates.longitude,
+                },
+                "destination": {
+                    "latitude": result_detail.car_rental.destination.coordinates.latitude,
+                    "longitude": result_detail.car_rental.destination.coordinates.longitude,
+                },
             },
         )
 
 
 class SearchResultResource(models.Resource):
-    api_type: typing.ClassVar[str] = "search-results"
+    api_type: typing.ClassVar[str] = "car-rental-search-results"
 
     @classmethod
     def from_proto(cls, search_result: models_pb2.SearchResult) -> SearchResultResource:

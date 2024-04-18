@@ -15,16 +15,16 @@ class TestCarRentalCreateSearch:
         after_tomorrow = tomorrow + datetime.timedelta(days=1)
         return {
             "data": {
-                "type": "car-searches",
+                "type": "car-rental-searches",
                 "attributes": {
                     "driverAge": 28,
                     "pickupAt": tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
                     "returnAt": after_tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
-                    "pickupLocation": {
+                    "origin": {
                         "latitude": 50.89369066956447,
                         "longitude": 4.47136870945399,
                     },
-                    "returnLocation": {
+                    "destination": {
                         "latitude": 48.96691462802318,
                         "longitude": 2.52817297961273,
                     },
@@ -49,7 +49,7 @@ class TestCarRentalCreateSearch:
         client: httpx.AsyncClient,
     ) -> None:
         payload = self.search_payload
-        payload["data"]["attributes"]["pickupLocation"]["latitude"] = -91
+        payload["data"]["attributes"]["origin"]["latitude"] = -91
         await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_pickup_longitude(
@@ -57,7 +57,7 @@ class TestCarRentalCreateSearch:
         client: httpx.AsyncClient,
     ) -> None:
         payload = self.search_payload
-        payload["data"]["attributes"]["pickupLocation"]["longitude"] = -200
+        payload["data"]["attributes"]["origin"]["longitude"] = -200
         await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_return_latitude(
@@ -65,7 +65,7 @@ class TestCarRentalCreateSearch:
         client: httpx.AsyncClient,
     ) -> None:
         payload = self.search_payload
-        payload["data"]["attributes"]["returnLocation"]["latitude"] = 91
+        payload["data"]["attributes"]["destination"]["latitude"] = 91
         await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_return_longitude(
@@ -73,7 +73,7 @@ class TestCarRentalCreateSearch:
         client: httpx.AsyncClient,
     ) -> None:
         payload = self.search_payload
-        payload["data"]["attributes"]["returnLocation"]["longitude"] = 200
+        payload["data"]["attributes"]["destination"]["longitude"] = 200
         await self._assert_bad_request(client, payload)
 
     async def test_create_car_rental_invalid_driver_age(
@@ -195,5 +195,5 @@ class TestCarRentalListSearchResults:
         assert len(results["data"]) == 2
 
         included_types = [resource["type"] for resource in results["included"]]
-        assert "offers" in included_types
-        assert "result-details" in included_types
+        assert "car-rental-offers" in included_types
+        assert "car-rental-result-details" in included_types

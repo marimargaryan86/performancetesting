@@ -46,8 +46,8 @@ class CarSearch(endpoints.HTTPEndpoint):
             return request_validator.as_json_api_response()
 
         origin_coords = latlng_pb2.LatLng(
-            latitude=body["pickupLocation"]["latitude"],
-            longitude=body["pickupLocation"]["longitude"],
+            latitude=body["origin"]["latitude"],
+            longitude=body["origin"]["longitude"],
         )
 
         origin_timezone = _tz_finder.timezone_at(
@@ -56,8 +56,8 @@ class CarSearch(endpoints.HTTPEndpoint):
         )
 
         destination_coords = latlng_pb2.LatLng(
-            latitude=body["returnLocation"]["latitude"],
-            longitude=body["returnLocation"]["longitude"],
+            latitude=body["destination"]["latitude"],
+            longitude=body["destination"]["longitude"],
         )
 
         destination_timezone = _tz_finder.timezone_at(
