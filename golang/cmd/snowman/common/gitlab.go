@@ -182,7 +182,7 @@ func Paginate[T any](reqFunc func(options gitlab.ListOptions) ([]T, *gitlab.Resp
 }
 
 func paginate[T any](ch chan T, request func(options gitlab.ListOptions) ([]T, *gitlab.Response, error)) error {
-	page := 0
+	page := 1
 
 	var items []T
 	var res *gitlab.Response

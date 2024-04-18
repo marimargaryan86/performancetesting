@@ -154,6 +154,12 @@ func serve(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if _, err = c.AddFunc("0 0 * * *", func() {
+		task.ManageStaleBranches(client, sugar.Named("cron"), snowman)
+	}); err != nil {
+		return err
+	}
+
 	wh := webhook{
 		Logger: sugar.Named("snowman"),
 		Plugins: []plugin{
