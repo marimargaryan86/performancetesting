@@ -530,9 +530,11 @@ class BenerailOffersAdapter(_BenerailAdapter):
 
                 continue
 
-            detail_ids = [
-                string.uuid() for _ in trip.trip_legs if isinstance(_, trips.TimedLeg)
-            ]
+            trip_details: dict[str, trips.TimedLeg] = {
+                string.uuid(): trip_leg
+                for trip_leg in trip.trip_legs
+                if isinstance(trip_leg, trips.TimedLeg)
+            }
 
             offer_protos = []
             search_result_id = string.uuid()
@@ -545,7 +547,7 @@ class BenerailOffersAdapter(_BenerailAdapter):
 
                 offer_model = await self._parse_offer(
                     offer_summary=offer_obj.summary,
-                    detail_ids=detail_ids,
+                    detail_ids=list(trip_details.keys()),
                 )
 
                 outward_passengers_info = [
@@ -590,7 +592,7 @@ class BenerailOffersAdapter(_BenerailAdapter):
                 expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
                 offers=offer_protos,
                 result_details=await self._parse_result_details(
-                    trip,
+                    trip_details,
                     search_task.outward_offer_search_id,
                 ),
                 provider_id=str(PROVIDER_ID),
@@ -611,57 +613,60 @@ class BenerailOffersAdapter(_BenerailAdapter):
 
     async def _parse_result_details(
         self,
-        trip: trips.Trip,
+        trip_details: Mapping[str, trips.TimedLeg],
         is_outbound_segment: str | None,
-    ) -> Sequence[models_pb2.ResultDetail]:
-        timed_legs = [leg for leg in trip.trip_legs if isinstance(leg, trips.TimedLeg)]
-        origin = self._train_stations.resolve_place_with_urn(
-            trip.origin.place_value,
-        )
+    ) -> list[models_pb2.ResultDetail]:
+        result_details = []
+        for idx, (result_detail_id, timed_leg) in enumerate(trip_details.items()):
+            origin = self._train_stations.resolve_place_with_urn(
+                timed_leg.origin.place_value,
+            )
 
-        destination = self._train_stations.resolve_place_with_urn(
-            trip.destination.place_value,
-        )
-        return [
-            models_pb2.ResultDetail(
-                id=string.uuid(),
-                rail=models_pb2.RailResultDetail(
-                    origin=legacy_models_pb2.Point(
-                        ref=origin.identifier,
-                        name=origin.name.title() if origin.name else "",
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=origin.latitude,
-                            longitude=origin.longitude,
+            destination = self._train_stations.resolve_place_with_urn(
+                timed_leg.destination.place_value,
+            )
+
+            result_details.append(
+                models_pb2.ResultDetail(
+                    id=result_detail_id,
+                    rail=models_pb2.RailResultDetail(
+                        origin=legacy_models_pb2.Point(
+                            ref=origin.identifier,
+                            name=origin.name.title() if origin.name else "",
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=origin.latitude,
+                                longitude=origin.longitude,
+                            ),
+                            time_zone=origin.timezone.key,
                         ),
-                        time_zone=origin.timezone.key,
-                    ),
-                    destination=legacy_models_pb2.Point(
-                        ref=destination.identifier,
-                        name=destination.name.title() if destination.name else "",
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=destination.latitude,
-                            longitude=destination.longitude,
+                        destination=legacy_models_pb2.Point(
+                            ref=destination.identifier,
+                            name=destination.name.title() if destination.name else "",
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=destination.latitude,
+                                longitude=destination.longitude,
+                            ),
+                            time_zone=destination.timezone.key,
                         ),
-                        time_zone=destination.timezone.key,
-                    ),
-                    outbound_segment=not bool(is_outbound_segment),
-                    segment_sequence=idx + 1,
-                    departure_date=protobuf.datetime_to_protobuf_datetime(
-                        datetime.datetime.strptime(
-                            timed_leg.departure_at,
-                            "%Y-%m-%dT%H:%M:%S%z",
+                        outbound_segment=not bool(is_outbound_segment),
+                        segment_sequence=idx + 1,
+                        departure_date=protobuf.datetime_to_protobuf_datetime(
+                            datetime.datetime.strptime(
+                                timed_leg.departure_at,
+                                "%Y-%m-%dT%H:%M:%S%z",
+                            ),
                         ),
-                    ),
-                    arrival_date=protobuf.datetime_to_protobuf_datetime(
-                        datetime.datetime.strptime(
-                            timed_leg.arrival_at,
-                            "%Y-%m-%dT%H:%M:%S%z",
+                        arrival_date=protobuf.datetime_to_protobuf_datetime(
+                            datetime.datetime.strptime(
+                                timed_leg.arrival_at,
+                                "%Y-%m-%dT%H:%M:%S%z",
+                            ),
                         ),
                     ),
                 ),
             )
-            for idx, timed_leg in enumerate(timed_legs)
-        ]
+
+        return result_details
 
     def _parse_currency(self, currency_string: str) -> money.Currency:
         return money.Currency(
