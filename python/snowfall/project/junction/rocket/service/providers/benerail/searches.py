@@ -129,9 +129,9 @@ class CriteriaGenerator:
             return []
 
         return create_criteria_time_windows(
-            origin,
-            destination,
-            search,
+            origin=origin,
+            destination=destination,
+            search=search,
         )
 
 
@@ -162,11 +162,11 @@ def _generate_inbound_search_criteria(
 
     trip_sequence = 2
     return _generate_search_criteria(
-        timestamps,
-        search,
-        origin,
-        destination,
-        trip_sequence,
+        timestamps=timestamps,
+        search=search,
+        origin=origin,
+        destination=destination,
+        trip_sequence=trip_sequence,
     )
 
 
@@ -202,20 +202,20 @@ def _generate_outbound_search_criteria(
     )
     trip_sequence = 1
     return _generate_search_criteria(
-        timestamps,
-        search,
-        origin,
-        destination,
-        trip_sequence,
-        return_departure_after,
+        timestamps=timestamps,
+        search=search,
+        origin=origin,
+        destination=destination,
+        trip_sequence=trip_sequence,
+        return_departure_after=return_departure_after,
     )
 
 
 def _generate_search_criteria(
     timestamps: Sequence[datetime.datetime],
     search: models_pb2.Search,
-    destination: str,
     origin: str,
+    destination: str,
     trip_sequence: int,
     return_departure_after: datetime.datetime | None = None,
 ) -> list[Criteria]:
@@ -250,11 +250,11 @@ def create_criteria_time_windows(
         criteria_func = _generate_outbound_search_criteria
 
     return criteria_func(
-        search,
-        origin.identifier,
-        destination.identifier,
-        origin.timezone,
-        destination.timezone,
+        search=search,
+        origin=origin.identifier,
+        destination=destination.identifier,
+        timezone_origin=origin.timezone,
+        timezone_destination=destination.timezone,
     )
 
 
