@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "dc4339ea-0220-4583-852c-44a1006fd648",
+    "_postman_id": "6ed51593-41fc-40d4-9aff-7b8e3b6fe4ad",
     "name": "Car Rental",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "33483058"
@@ -77,7 +77,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"car-searches\",\n        \"attributes\": {\n            \"pickupLocation\": {\n                \"latitude\": 50.89369066956447, \n                \"longitude\": 4.47136870945399\n            },\n            \"returnLocation\": {\n                \"latitude\": 48.96691462802318, \n                \"longitude\": 2.52817297961273\n            },\n            \"pickupAt\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"driverAge\": 25\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"car-rental-searches\",\n        \"attributes\": {\n            \"origin\": {\n                \"latitude\": 50.89369066956447, \n                \"longitude\": 4.47136870945399\n            },\n            \"destination\": {\n                \"latitude\": 48.96691462802318, \n                \"longitude\": 2.52817297961273\n            },\n            \"pickupAt\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"driverAge\": 25\n        }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
