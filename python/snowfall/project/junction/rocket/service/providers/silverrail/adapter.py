@@ -21,7 +21,7 @@ from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.time import date_to_age
 from snowfall.stdlib.v1 import latlng_pb2, money_pb2
-from snowfall.vendor.silverrail import client
+from snowfall.vendor.silverrail import client, errors
 from snowfall.vendor.silverrail.models.shopping import (
     DateTimeWindowType,
     FareCodeType,
@@ -119,15 +119,15 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
     ) -> list[models_pb2.SearchResult]:
         self._raise_if_not_success(response)
         if response.results is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         if response.results.legs is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         search_results = self._convert_leg_solutions(search_id, response.results.legs)
 
         if response.results.fare_information is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         offers = self._convert_fare_information(response.results.fare_information)
 
         for leg_solution_id, search_result in search_results.items():
@@ -137,9 +137,9 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
 
     def _raise_if_not_success(self, response: PointToPointShoppingResponse) -> None:
         if response.request_status is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         if response.request_status.success is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
     # Returns one SearchResult per LegSolution. The offers for each SearchResult will
     # have to be filled later based on the rest of the response from Silverrail.
@@ -157,14 +157,14 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
             # connections.
 
             if leg.leg_id is None or leg.leg_solutions is None:
-                raise client.SilverrailUnexpectedFormatError()
+                raise errors.SilverrailUnexpectedFormatError()
 
             for leg_solution in leg.leg_solutions.leg_solution:
                 if leg_solution.leg_solution_id is None:
-                    raise client.SilverrailUnexpectedFormatError()
+                    raise errors.SilverrailUnexpectedFormatError()
                 travel_segments = leg_solution.travel_segments
                 if travel_segments is None or travel_segments.travel_segment is None:
-                    raise client.SilverrailUnexpectedFormatError()
+                    raise errors.SilverrailUnexpectedFormatError()
 
                 result_details = self._convert_travel_segments(
                     travel_segments.travel_segment,
@@ -184,17 +184,17 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
         result_details: list[models_pb2.ResultDetail] = []
         for idx, segment in enumerate(travel_segments):
             if segment.origin_travel_point is None:
-                raise client.SilverrailUnexpectedFormatError()
+                raise errors.SilverrailUnexpectedFormatError()
             origin = self._train_stations.get_by_id(segment.origin_travel_point.value)
 
             if segment.destination_travel_point is None:
-                raise client.SilverrailUnexpectedFormatError()
+                raise errors.SilverrailUnexpectedFormatError()
             destination = self._train_stations.get_by_id(
                 segment.destination_travel_point.value,
             )
 
             if segment.departure_date_time is None or segment.arrival_date_time is None:
-                raise client.SilverrailUnexpectedFormatError()
+                raise errors.SilverrailUnexpectedFormatError()
 
             # TODO(regis.blanc): Use the right timezone, check with Silverrail what timezone the results are in?
             departure_date = protobuf.datetime_to_protobuf_datetime(
@@ -238,9 +238,9 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
         fare_information: PointToPointShoppingResponse.Results.FareInformation,
     ) -> dict[str, list[models_pb2.Offer]]:
         if fare_information.prices is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         if fare_information.prices.point_to_point_price is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         offers: dict[str, list[models_pb2.Offer]] = {}
 
@@ -266,7 +266,7 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
         total_price = ptp_price.total_price
         fares = ptp_price.ticketable_fares
         if price_id is None or total_price is None or fares is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         cabins = self._read_cabin_classes(fares)
         # TODO(regis.blanc): How to treat different cabin classes for different passengers?
@@ -274,7 +274,7 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
 
         leg_ref = ptp_price.leg_references
         if leg_ref is None or leg_ref.leg_solution_idref is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         # TODO(regis.blanc): Assume this is a single leg solution ref. Check with
         # Silverrail if it's correct.
         leg_solution_ref: str = leg_ref.leg_solution_idref[0]
@@ -296,9 +296,9 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
 
     def _convert_total_price(self, total_price: TotalPriceType) -> money_pb2.Money:
         if total_price.currency is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         if total_price.value is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         return money.from_string(
             str(total_price.value),
             Currency(total_price.currency),
@@ -314,12 +314,12 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
         for fare in ticketable_fares.ticketable_fare:
             refs = fare.passenger_references
             if refs is None or refs.passenger_reference is None:
-                raise client.SilverrailUnexpectedFormatError()
+                raise errors.SilverrailUnexpectedFormatError()
 
             for pass_ref in refs.passenger_reference:
                 pass_id = pass_ref.passenger_idref
                 if pass_id is None:
-                    raise client.SilverrailUnexpectedFormatError()
+                    raise errors.SilverrailUnexpectedFormatError()
                 cabin_class = self._convert_passenger_reference(pass_ref)
                 res[pass_id] = cabin_class
         return res
@@ -331,7 +331,7 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
         fare_codes = pass_ref.fare_codes
 
         if fare_codes is None or fare_codes.fare_code is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         # TODO(regis.blanc): process pass_ref.fare_codes.fare_code list.
         fare_code = fare_codes.fare_code[0]
@@ -339,7 +339,7 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
 
     def _convert_fare_code(self, fare_code: FareCodeType) -> go_models_pb2.CabinClass:
         if fare_code.service_class is None or fare_code.cabin_class is None:
-            raise client.SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         return go_models_pb2.CabinClass(
             type=self._convert_service_class(fare_code.service_class),

@@ -5,6 +5,8 @@ from xsdata.formats.dataclass.parsers import XmlParser
 from xsdata.formats.dataclass.serializers import XmlSerializer
 
 from snowfall.stdlib.transport.http import client
+from snowfall.vendor.silverrail import errors
+from snowfall.vendor.silverrail.models import stations
 from snowfall.vendor.silverrail.models.shopping import (
     ContextType,
     PointToPointShoppingQuery,
@@ -15,10 +17,7 @@ from snowfall.vendor.silverrail.models.shopping import (
 )
 
 SHOPPING_SERVICE_PATH = "/shopping-ws/services/Shopping/v2"
-
-
-class SilverrailUnexpectedFormatError(Exception):
-    """Raised when the message retunred by Silverrail had an unexpected format."""
+PUBLISHED_DATA_API_PATH = "/pub-ws"
 
 
 # The settings for the client (customer) of the API. This will limit
@@ -60,7 +59,10 @@ class SilverrailClient(client.HttpClient):
         )
         serializer = XmlSerializer()
         soap_request_body = serializer.render(req)
-        response = await self._make_soap_request(soap_request_body)
+        response = await self._make_soap_request(
+            soap_request_body,
+            SHOPPING_SERVICE_PATH,
+        )
 
         parser = XmlParser()
         output: ShoppingPointToPointShopOutput = parser.from_string(
@@ -69,15 +71,45 @@ class SilverrailClient(client.HttpClient):
         )
 
         if output.body is None:
-            raise SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
         if output.body.point_to_point_shopping_response is None:
-            raise SilverrailUnexpectedFormatError()
+            raise errors.SilverrailUnexpectedFormatError()
 
         return output.body.point_to_point_shopping_response
+
+    async def get_stations(self) -> list[stations.StationType]:
+        req = stations.PublishingAPIInput(
+            body=stations.PublishingAPIInput.Body(
+                request=stations.DataRequestType(
+                    type_value=stations.SrtDataType.STATION,
+                ),
+            ),
+        )
+        serializer = XmlSerializer()
+        soap_request_body = serializer.render(req)
+        response = await self._make_soap_request(
+            soap_request_body=soap_request_body,
+            path=PUBLISHED_DATA_API_PATH,
+        )
+
+        parser = XmlParser()
+        output: stations.PublishingAPIOutput = parser.from_string(
+            response.text,
+            stations.PublishingAPIOutput,
+        )
+
+        if output.body is None or output.body.data_response is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if output.body.data_response.request_status is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if not output.body.data_response.request_status.success:
+            raise errors.RequestFailedError()
+        return output.body.data_response.stations
 
     async def _make_soap_request(
         self,
         soap_request_body: str,
+        path: str,
         timeout: httpx.Timeout | int | None = None,
     ) -> httpx.Response:
         headers = {
@@ -87,7 +119,7 @@ class SilverrailClient(client.HttpClient):
         return await self._make_request(
             options=client.RequestOptions(
                 method="POST",
-                path=SHOPPING_SERVICE_PATH,
+                path=path,
                 headers=headers,
                 raw_content=soap_request_body,
             ),

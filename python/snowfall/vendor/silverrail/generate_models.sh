@@ -2,6 +2,7 @@
 PACKAGE="models"
 
 xsdata wsdls/shopping.wsdl --package $PACKAGE --structure-style filenames
+xsdata wsdls/stations.xsd --package $PACKAGE --structure-style filenames
 rm models/__init__.py
 
 grep -Rohli "^\(\s*@dataclass\)\s*$" models/ | xargs -r -L 1 sed -i -e "s/^\(\s*@dataclass\)\s*$/\1(frozen=True)/i"
