@@ -61,16 +61,12 @@ class PayQuotes:
                 offer,
             )
             num_segments = len(offer.segment_details)
-            payer_company = await self._get_company(company_id=payer_id)
-            beneficiary_company = await self._get_company(
-                company_id=search_result.provider_company_id,
-            )
             quote = await self._create_quote(
                 amount=amount,
                 fee_multiplier=num_segments * passenger_number,
                 session_token=session_token,
-                payer_company=payer_company,
-                beneficiary_company=beneficiary_company,
+                payer_id=payer_id,
+                beneficiary_id=search_result.provider_company_id,
                 from_currency=currency,
                 to_currency=to_currency,
                 tax=tax_amount,
@@ -122,23 +118,19 @@ class PayQuotes:
 
             raise SkippedConversionError()
 
-        payer_company = await self._get_company(company_id=payer_id)
         offer_search_id = await self._get_offer_search_id(
             search_result.price_quote.option_id,
         )
         passenger_number = await self._get_passenger_number(offer_search_id)
 
         num_segments = len(offer_option.segment_details)
-        beneficiary_company = await self._get_company(
-            company_id=search_result.provider_company_id,
-        )
 
         quote = await self._create_quote(
             amount=amount,
             fee_multiplier=passenger_number * num_segments,
             session_token=session_token,
-            payer_company=payer_company,
-            beneficiary_company=beneficiary_company,
+            payer_id=payer_id,
+            beneficiary_id=search_result.provider_company_id,
             from_currency=currency,
             to_currency=offer_option.price.currency_code,
             tax=tax_amount,
@@ -230,30 +222,32 @@ class PayQuotes:
         amount: int,
         fee_multiplier: int,
         session_token: str,
-        payer_company: companies_models_pb2.Company,
-        beneficiary_company: companies_models_pb2.Company,
+        payer_id: str,
+        beneficiary_id: str,
         from_currency: str,
         to_currency: str,
         tax: int | None = None,
     ) -> transactions_models_pb2.Quotation:
         try:
-            return await self._quotations_client.create(
-                amount=amount,
-                session_token=session_token,
-                payer=payer_company,
-                beneficiary_company=beneficiary_company,
-                from_currency=from_currency,
-                to_currency=to_currency,
-                tax=tax or 0,
-                fee_multiplier=fee_multiplier,
+            return await errors.handle_grpc_errors(
+                self._quotations_client.create(
+                    amount=amount,
+                    session_token=session_token,
+                    payer_id=payer_id,
+                    beneficiary_id=beneficiary_id,
+                    from_currency=from_currency,
+                    to_currency=to_currency,
+                    tax=tax or 0,
+                    fee_multiplier=fee_multiplier,
+                ),
             )
         except (errors.NotFoundError, errors.ServiceUnavailableError) as err:
             self._logger.exception(
                 "Failed to create quote in PAY",
                 amount=amount,
                 session_token=session_token,
-                payer_id=payer_company.id,
-                beneficiary_id=beneficiary_company.id,
+                payer_id=payer_id,
+                beneficiary_id=beneficiary_id,
                 from_currency=from_currency,
                 to_currency=to_currency,
             )

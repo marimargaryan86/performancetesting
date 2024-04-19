@@ -250,10 +250,12 @@ class QuotationsService(
         quotations: QuotationsRepository,
         user_sessions: UserSessionRepository,
         currencies_client: currencies.Client,
+        companies_client: companies.Client,
     ):
         self._quotations = quotations
         self._user_sessions = user_sessions
         self._currencies_client = currencies_client
+        self._companies_client = companies_client
 
     def get_name(self) -> str:
         return grpc_pb2.DESCRIPTOR.services_by_name["QuotationsService"].full_name
@@ -264,12 +266,32 @@ class QuotationsService(
             server,
         )
 
-    async def CreateQuotation(  # type: ignore[override]  # noqa: N802
+    async def CreateQuotation(  # type: ignore[override]  # noqa: N802, WPS217
         self,
         request: grpc_pb2.CreateQuotationRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateQuotationResponse:
-        # TODO(nikos.p): validation for companies and currency when we create the microservices
+        await self._validate_currencies(
+            request.from_currency,
+            request.to_currency,
+            context,
+        )
+
+        try:
+            payer = await self._companies_client.get(request.payer_id)
+        except adapter_errors.NotFoundError:
+            return await context.abort(
+                grpc.StatusCode.NOT_FOUND,
+                details="Company not found",
+                trailing_metadata=(
+                    ("field_name", "payer_id"),
+                    (
+                        "field_description",
+                        "Company not found {0}".format(request.payer_id),
+                    ),
+                ),
+            )
+
         try:
             rate = await self._get_rate(
                 request.from_currency,
@@ -288,8 +310,8 @@ class QuotationsService(
             money.Currency(request.from_currency),
             money.Currency(request.to_currency),
             rate,
-            request.payer,
-            request.beneficiary_company.id,
+            payer,
+            request.beneficiary_id,
             request.tax,
             request.fee_multiplier,
             request.vertical_type,
@@ -329,6 +351,9 @@ class QuotationsService(
         amount: int,
         session_token: str | None,
     ) -> float:
+        if from_currency == to_currency:
+            return 1.0
+
         if session_token:
             currency_pair = "{0}{1}".format(from_currency, to_currency)
             cache_key = "locks:{0}:{1}".format(session_token, currency_pair)
@@ -360,21 +385,16 @@ class QuotationsService(
         to_currency: str,
         amount: int,
     ) -> float:
-        rate = await self._user_sessions.get_rate(
+        rate = await self._get_live_rate(
+            from_currency,
+            to_currency,
+            amount,
+        )
+        await self._user_sessions.store(
             session_token,
             currency_pair,
+            rate,
         )
-        if not rate:
-            rate = await self._get_live_rate(
-                from_currency,
-                to_currency,
-                amount,
-            )
-            await self._user_sessions.store(
-                session_token,
-                currency_pair,
-                rate,
-            )
 
         return rate
 
@@ -384,16 +404,50 @@ class QuotationsService(
         to_currency: str,
         amount: int,
     ) -> float:
-        if from_currency == to_currency:
-            rate = 1.0
-        else:
-            response = await self._currencies_client.convert(
-                from_currency=money.Currency(from_currency),
-                to_currency=money.Currency(to_currency),
-                amount=amount,
+        response = await self._currencies_client.convert(
+            from_currency=money.Currency(from_currency),
+            to_currency=money.Currency(to_currency),
+            amount=amount,
+        )
+        return round(response.rate, 2)
+
+    async def _validate_currencies(
+        self,
+        from_currency: str,
+        to_currency: str,
+        context: grpc.aio.ServicerContext,
+    ) -> None:
+        check_from_currency = self._is_valid_currency(from_currency)
+        check_to_currency = self._is_valid_currency(to_currency)
+        if not check_from_currency:
+            return await context.abort(
+                grpc.StatusCode.NOT_FOUND,
+                details="Currency not found",
+                trailing_metadata=(
+                    ("field_name", "from_currency"),
+                    (
+                        "field_description",
+                        "Currency not found {0}".format(from_currency),
+                    ),
+                ),
             )
-            rate = round(response.rate, 2)
-        return rate
+        if not check_to_currency:
+            return await context.abort(
+                grpc.StatusCode.NOT_FOUND,
+                details="Currency not found",
+                trailing_metadata=(
+                    ("field_name", "to_currency"),
+                    ("field_description", "Currency not found {0}".format(to_currency)),
+                ),
+            )
+        return None
+
+    def _is_valid_currency(self, currency: str) -> bool:
+        try:
+            money.Currency(currency)
+        except ValueError:
+            return False
+        return True
 
 
 class BillsService(

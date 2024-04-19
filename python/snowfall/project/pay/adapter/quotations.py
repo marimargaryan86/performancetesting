@@ -33,8 +33,8 @@ class Client(abc.ABC):
         from_currency: str,
         to_currency: str,
         amount: int,
-        payer: companies_models.Company,
-        beneficiary_company: companies_models.Company,
+        payer_id: str,
+        beneficiary_id: str,
         session_token: str,
         tax: int,
         fee_multiplier: int,
@@ -66,8 +66,8 @@ class DictClient(Client):
         from_currency: str,
         to_currency: str,
         amount: int,
-        payer: companies_models.Company,
-        beneficiary_company: companies_models.Company,
+        payer_id: str,
+        beneficiary_id: str,
         session_token: str,
         tax: int,
         fee_multiplier: int,
@@ -100,8 +100,8 @@ class DictClient(Client):
                 processing_markup=1.0,
                 fee_multiplier=1,
             ),
-            payer_id=payer.id,
-            beneficiary_id=beneficiary_company.id,
+            payer_id=payer_id,
+            beneficiary_id=beneficiary_id,
         )
         self._quotations[quotation.id] = quotation
 
@@ -136,28 +136,26 @@ class GrpcClient(Client):
         from_currency: str,
         to_currency: str,
         amount: int,
-        payer: companies_models.Company,
-        beneficiary_company: companies_models.Company,
+        payer_id: str,
+        beneficiary_id: str,
         session_token: str,
         tax: int,
         fee_multiplier: int,
         vertical_type: VERTICALS = "unspecified",
     ) -> transactions_models.Quotation:
-        response = await errors.handle_grpc_errors(
-            self._quotations.CreateQuotation(
-                grpc_pb2.CreateQuotationRequest(
-                    from_currency=from_currency,
-                    to_currency=to_currency,
-                    amount=amount,
-                    payer=payer,
-                    beneficiary_company=beneficiary_company,
-                    session_token=session_token,
-                    tax=tax,
-                    fee_multiplier=fee_multiplier,
-                    vertical_type=protobuf.slug_to_enum_value(
-                        companies_models.VerticalType,
-                        vertical_type,
-                    ),
+        response = await self._quotations.CreateQuotation(
+            grpc_pb2.CreateQuotationRequest(
+                from_currency=from_currency,
+                to_currency=to_currency,
+                amount=amount,
+                payer_id=payer_id,
+                beneficiary_id=beneficiary_id,
+                session_token=session_token,
+                tax=tax,
+                fee_multiplier=fee_multiplier,
+                vertical_type=protobuf.slug_to_enum_value(
+                    companies_models.VerticalType,
+                    vertical_type,
                 ),
             ),
         )

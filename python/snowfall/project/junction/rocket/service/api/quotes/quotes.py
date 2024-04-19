@@ -33,7 +33,7 @@ class Quotes:
             await self._pay_transactions_service.CreateQuotation(
                 pay_grpc_pb2.CreateQuotationRequest(
                     # TODO(reuben.t): add more info to fill out quote request in params, e.g. amounts etc
-                    payer=payer,
-                    beneficiary_company=beneficiary,
+                    payer_id=reseller_id,
+                    beneficiary_id=provider_id,
                 ),
             )

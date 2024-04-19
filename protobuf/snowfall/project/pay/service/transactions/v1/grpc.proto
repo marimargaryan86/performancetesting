@@ -101,8 +101,8 @@ message CreateQuotationRequest {
   string from_currency = 1;
   string to_currency = 2;
   int32 amount = 3;
-  snowfall.project.pay.service.companies.v1.Company payer = 4;
-  snowfall.project.pay.service.companies.v1.Company beneficiary_company = 5;
+  string payer_id = 4;
+  string beneficiary_id = 5;
   string session_token = 6;
   int32 tax = 7;
   int32 fee_multiplier = 8;

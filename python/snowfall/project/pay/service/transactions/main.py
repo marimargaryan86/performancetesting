@@ -103,7 +103,10 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         dsn=app.settings.redis_dsn,
         decode_responses=True,
     )
-
+    companies_address = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.companies_address,
+    )
     grpc_server = server.create_server(
         app.settings.grpc_address,
         app.settings.grpc_port,
@@ -117,10 +120,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 ),
                 companies_client=companies.GrpcClient(
                     companies_grpc_pb2.CompaniesServiceStub(
-                        await grpc_factory.make_insecure_channel(
-                            app,
-                            app.settings.companies_address,
-                        ),
+                        companies_address,
                     ),
                 ),
                 invoices=transactions.InvoiceRepository(
@@ -149,6 +149,11 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                             app,
                             app.settings.currencies_address,
                         ),
+                    ),
+                ),
+                companies_client=companies.GrpcClient(
+                    companies_grpc_pb2.CompaniesServiceStub(
+                        companies_address,
                     ),
                 ),
             ),

@@ -26,14 +26,7 @@ class UserSessionRepository:
         session = self._redis.hash_(identifier)
         rate = await session.get(currency_pair)
 
-        if rate:
-            return float(rate)
-
-        rate = await session.get(currency_pair)
-        if rate:
-            return float(rate)
-
-        return None
+        return float(rate) if rate else None
 
     def lock(self, cache_key: str) -> lock.Lock:
         return self._redis.lock(cache_key)
