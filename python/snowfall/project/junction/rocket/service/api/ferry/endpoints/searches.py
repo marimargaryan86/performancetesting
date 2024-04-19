@@ -7,6 +7,7 @@ from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.go.v1 import models_pb2 as legacy_go_pb2
 from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api.ferry.endpoints import validation
 from snowfall.project.junction.rocket.service.api.ferry.models import (
     searches as search_models,
 )
@@ -38,6 +39,9 @@ class FerrySearch(endpoints.HTTPEndpoint):
         searches: grpc_pb2_grpc.SearchServiceStub = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
+        request_validator = validation.SearchRequestValidator(body)
+        if request_validator.validation_errors:
+            return request_validator.as_json_api_response()
 
         origin_coords = latlng_pb2.LatLng(
             latitude=body["origin"]["latitude"],

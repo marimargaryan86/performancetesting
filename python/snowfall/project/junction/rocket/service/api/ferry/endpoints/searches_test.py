@@ -1,3 +1,7 @@
+import datetime
+from collections.abc import Mapping
+from typing import Any
+
 import httpx
 from starlette import status
 
@@ -5,16 +9,16 @@ from snowfall.project.junction.rocket import fixtures
 
 
 class TestFerryCreateSearch:
-    async def test_create_ferry_search_is_successful(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        payload = {
+    @property
+    def search_payload(self) -> Mapping[str, Any]:
+        tomorrow = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+        after_tomorrow = tomorrow + datetime.timedelta(days=1)
+        return {
             "data": {
                 "type": "ferry-searches",
                 "attributes": {
-                    "departureAfter": "2024-04-05T08:00:00Z",
-                    "returnAt": "2024-04-07T08:00:00Z",
+                    "departureAfter": tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
+                    "returnAt": after_tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
                     "origin": {
                         "latitude": 50.89369066956447,
                         "longitude": 4.47136870945399,
@@ -28,14 +32,60 @@ class TestFerryCreateSearch:
             },
         }
 
+    async def test_create_ferry_search_is_successful(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
         response = await client.post(
             "/ferry/searches",
-            json=payload,
+            json=self.search_payload,
             headers={"Content-Type": "application/vnd.api+json"},
         )
 
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["data"]["id"]
+
+    async def test_create_ferry_search_departure_after_in_past_throws_unprocessable_entity(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["departureAfter"] = "1998-04-05T08:00:00Z"
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_ferry_search_return_at_in_past_throws_unprocessable_entity(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        payload["data"]["attributes"]["returnAt"] = "1998-04-05T08:00:00Z"
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def test_create_ferry_search_return_at_before_departure_at_throws_unprocessable_entity(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        payload = self.search_payload
+        return_at = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(hours=1)
+        payload["data"]["attributes"]["returnAt"] = return_at.strftime(
+            "%Y-%m-%dT08:00:00.000Z",
+        )
+
+        await self._assert_unprocessable_entity(client, payload)
+
+    async def _assert_unprocessable_entity(
+        self,
+        client: httpx.AsyncClient,
+        payload: Mapping[str, Any],
+    ) -> None:
+        response = await client.post(
+            "/ferry/searches",
+            json=payload,
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 class TestFerryGetSearch:
