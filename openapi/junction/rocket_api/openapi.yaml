@@ -644,13 +644,38 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /journeys/suggestions/{journeySuggestionId}:
+    parameters:
+      - $ref: '#/components/parameters/journeySuggestionId'
+    get:
+      summary: Get journey suggestion
+      tags:
+        - journey-suggestion-searches
+      operationId: get-journeys-suggestions-id
+      description: Used to retrieve a journey suggestion
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JourneySuggestion'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /journeys/suggestions/searches:
     post:
-      summary: Create multi-modal search
+      summary: Create journey suggestion search
       tags:
         - journey-suggestion-searches
       operationId: post-journeys-suggestions-searches
-      description: Used to initiate a search for suggestions
+      description: Used to initiate a search for journey suggestions
       requestBody:
         required: true
         content:
@@ -684,11 +709,11 @@ paths:
     parameters:
       - $ref: '#/components/parameters/journeySuggestionSearchId'
     get:
-      summary: Get multi-modal search
+      summary: Get journey suggestion search
       tags:
         - journey-suggestion-searches
       operationId: get-journeys-suggestions-searches-id
-      description: Used to retrieve a search for suggestions
+      description: Used to retrieve a search for journey suggestions
       responses:
         '200':
           description: Success
@@ -2282,6 +2307,55 @@ components:
         - id
         - type
         - attributes
+    JourneySuggestion:
+      title: Journey Suggestion
+      x-tags:
+        - journey-suggestion-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              enum:
+                - journey-suggestions
+              example: journey-suggestions
+            attributes:
+              type: object
+            relationships:
+              type: object
+              properties:
+                flightOffers:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AirOfferIdentifier'
+                  required:
+                    - data
+                trainOffers:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/RailOfferIdentifier'
+                  required:
+                    - data
+              required:
+                - flightOffers
+                - trainOffers
+          required:
+            - id
+            - type
+            - attributes
+            - relationships
+        - $ref: '#/components/schemas/SelfLink'
     JourneySuggestionSearch:
       title: Journey Suggestion Search
       x-tags:
@@ -3249,6 +3323,14 @@ components:
         type: string
         example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
       description: Journey Suggestion Search identifier
+    journeySuggestionId:
+      name: journeySuggestionId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: Journey Suggestion identifier
   securitySchemes:
     jwt:
       type: http
