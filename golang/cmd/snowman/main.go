@@ -165,7 +165,8 @@ func serve(cmd *cobra.Command, args []string) error {
 		Plugins: []plugin{
 			mr.OnEvent,
 		},
-		Secret: viper.GetString("gitlab_webhook_secret"),
+		Secret:  viper.GetString("gitlab_webhook_secret"),
+		Version: viper.GetString("version"),
 	}
 
 	go c.Start()

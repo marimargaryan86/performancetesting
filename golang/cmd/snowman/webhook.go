@@ -16,10 +16,13 @@ type webhook struct {
 	Logger  *zap.SugaredLogger
 	Plugins []plugin
 	Secret  string
+	Version string
 }
 
 func (hook webhook) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	event, err := hook.parse(request)
+
+	writer.Header().Add("X-Snowman-Version", hook.Version)
 
 	if err != nil {
 		hook.Logger.Warn(err)

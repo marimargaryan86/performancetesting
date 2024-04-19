@@ -57,6 +57,8 @@ func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, loade
 		})
 
 		for branch := range branchesCh {
+			bLogger := pLogger.With("branch", branch.Name)
+
 			if branch.Default || branch.Protected || sliceutil.In(mrBranches, branch.Name) {
 				continue
 			}
@@ -66,7 +68,9 @@ func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, loade
 			}
 
 			if _, err = client.Branches.DeleteBranch(p.ID, branch.Name); err != nil {
-				pLogger.Error(err)
+				bLogger.Error(err)
+			} else {
+				bLogger.Info("Branch deleted.")
 			}
 		}
 
