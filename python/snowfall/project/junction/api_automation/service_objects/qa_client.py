@@ -9,6 +9,9 @@ from snowfall.project.junction.api_automation.service_objects.car_rental import 
 from snowfall.project.junction.api_automation.service_objects.client_wrapper import (
     ClientWrapper,
 )
+from snowfall.project.junction.api_automation.service_objects.ferry import (
+    FerryClient,
+)
 from snowfall.project.junction.api_automation.service_objects.hotel import (
     HotelClient,
 )
@@ -37,4 +40,5 @@ class QaClient:
         self.air = AirClient(self._client_wrapper)
         self.car_rental = CarRentalClient(self._client_wrapper)
         self.hotel = HotelClient(self._client_wrapper)
+        self.ferry = FerryClient(self._client_wrapper)
         self.places = PlacesClient(self._client_wrapper)
