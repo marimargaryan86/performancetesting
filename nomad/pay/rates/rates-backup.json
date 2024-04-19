@@ -1,17 +1,17 @@
 {
   "development": {
     "variables": {
-      "cc_address": "https://devapi.currencycloud.com/v2"
+      "xe_address": "https://xecdapi.xe.com/v1"
     }
   },
   "production": {
     "variables": {
-      "cc_address": "https://api.currencycloud.com/v2"
+      "xe_address": "https://xecdapi.xe.com/v1"
     }
   },
   "sandbox": {
     "variables": {
-      "cc_address": "https://devapi.currencycloud.com/v2"
+      "xe_address": "https://xecdapi.xe.com/v1"
     }
   }
 }

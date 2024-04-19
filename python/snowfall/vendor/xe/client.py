@@ -3,6 +3,7 @@ from collections.abc import AsyncGenerator, Sequence
 
 import httpx
 
+from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.vendor.xe.models import rate
 
@@ -39,9 +40,11 @@ class XEClient:
         base_url: str,
         auth: XEAuth,
     ):
-        self._client = httpx.AsyncClient(
-            auth=auth,
-            base_url=base_url,
+        self._client = metrics.register(
+            httpx.AsyncClient(
+                auth=auth,
+                base_url=base_url,
+            ),
         )
 
     async def convert(
