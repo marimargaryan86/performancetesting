@@ -2521,8 +2521,8 @@ components:
                 countryCode:
                   type: string
                   description: >-
-                    The two character country code of the Place in [ISO 3166-1]
-                    (https://www.iso.org/glossary-for-iso-3166.html) format
+                    The two character country code of the Place in [ISO 3166-1](https://www.iso.org/glossary-for-iso-3166.html)
+                    format
                   format: country
                   readOnly: true
                   example: IT
@@ -2536,9 +2536,8 @@ components:
                 iataCode:
                   type: string
                   description: >-
-                    The IATA Code for the Place as prescribed by [IATA]
-                    (https://www.iata.org/en/services/codes/) if the Place
-                    supports airline travel
+                    The IATA Code for the Place as prescribed by [IATA](https://www.iata.org/en/services/codes/)
+                    if the Place supports airline travel
                   pattern: ^[A-Z]{3}$
                   nullable: true
                   readOnly: true
