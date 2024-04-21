@@ -7,14 +7,12 @@ import secrets
 import zoneinfo
 from collections.abc import Iterable, Sequence
 
-import grpc
 from geopy.distance import geodesic
 from google.protobuf import message
 
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.rocket.service.places.v1alpha import (
-    places_pb2,
-    places_pb2_grpc,
+    models_pb2 as places_models_pb2,
 )
 from snowfall.project.junction.rocket.service.providers.benerail import (
     constant,
@@ -72,37 +70,21 @@ def _find_nearest_provider_place(
     return nearest_station.identifier, nearest_station.timezone
 
 
-class PlaceNotFoundError(Exception):
-    """Raised when place is not found."""
-
-
 class StationNotFoundError(Exception):
     """Raised when there is no capability for the provider."""
 
 
 class CriteriaGenerator:
-    def __init__(
-        self,
-        places: places_pb2_grpc.PlacesServiceStub,
-    ):
-        self._places = places
+    def __init__(self) -> None:
         self._logger = stdout.get_logger()
 
-    async def get_station(self, place_id: str) -> train_stations.TrainStation:
-        try:
-            place = (
-                await self._places.GetPlace(
-                    places_pb2.GetPlaceRequest(id=place_id),
-                )
-            ).place
-        except grpc.aio.AioRpcError as err:
-            if err.code() == grpc.StatusCode.NOT_FOUND:
-                raise PlaceNotFoundError(place_id) from err
-            raise
-
+    async def get_station(
+        self,
+        place: places_models_pb2.Place,
+    ) -> train_stations.TrainStation:
         station_id = place.search_capabilities.rail.get(str(constant.PROVIDER_ID))
         if not station_id:
-            raise StationNotFoundError(place_id)
+            raise StationNotFoundError(place.id)
 
         return train_stations.TrainStation(
             name=place.name,
@@ -117,15 +99,19 @@ class CriteriaGenerator:
         search: models_pb2.Search,
     ) -> list[Criteria]:
         try:
-            origin = await self.get_station(search.rail.origin_id)
-        except (PlaceNotFoundError, StationNotFoundError):
-            self._logger.exception("Unable to retrieve origin station id.")
+            origin = await self.get_station(search.rail.origin)
+        except StationNotFoundError:
+            self._logger.exception(
+                "Unable to retrieve origin benerail station id for the provided Place",
+            )
             return []
 
         try:
-            destination = await self.get_station(search.rail.destination_id)
-        except (PlaceNotFoundError, StationNotFoundError):
-            self._logger.exception("Unable to retrieve destination station id.")
+            destination = await self.get_station(search.rail.destination)
+        except StationNotFoundError:
+            self._logger.exception(
+                "Unable to retrieve destination benerail station id for the provided Place",
+            )
             return []
 
         return create_criteria_time_windows(

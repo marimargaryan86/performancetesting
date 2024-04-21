@@ -42,6 +42,24 @@ class RailSearchResource(models.Resource):
                     for passenger in search.rail.passengers
                 ],
             },
+            relationships={
+                "origin": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=search.rail.origin.id,
+                            type=places.PlacesResource.api_type,
+                        )
+                    ),
+                },
+                "destination": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=search.rail.destination.id,
+                            type=places.PlacesResource.api_type,
+                        )
+                    ),
+                },
+            },
             links={
                 _SELF_HREF: str(
                     request.url_for(
@@ -62,27 +80,8 @@ class RailSearchResource(models.Resource):
                 search.rail.departure_before,
             )
 
-        res.relationships = {
-            "origin": {
-                "data": (
-                    models.ResourceIdentifier(
-                        id=search.rail.origin_id,
-                        type=places.PlacesResource.api_type,
-                    )
-                ),
-            },
-            "destination": {
-                "data": (
-                    models.ResourceIdentifier(
-                        id=search.rail.destination_id,
-                        type=places.PlacesResource.api_type,
-                    )
-                ),
-            },
-        }
-
         if search.rail.outbound_offer_id:
-            res.relationships["selectedOutboundOffer"] = {
+            res.relationships["selectedOutboundOffer"] = {  # type: ignore[index]
                 "data": (
                     models.ResourceIdentifier(
                         id=search.rail.outbound_offer_id,

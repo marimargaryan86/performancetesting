@@ -32,6 +32,7 @@ PLACE_IATAS = ("BER",)
 NOT_FOUND_PLACE_IATA = "TTT"
 PLACE_NAMES = ("Takoma Park",)
 NOT_FOUND_PLACE_NAME = "not existing place"
+BENERAIL_ID = "caefde65-c15c-4b60-b8d9-27638b50b08f"
 CAR_RENTAL_SEARCH_RESULTS = (
     "48d5d190-1e02-40a7-9483-fce0902d4c58",
     "a97d713f-60cc-46fa-b207-dce1ff8606d2",
@@ -263,10 +264,8 @@ def generate_ferry_one_way_search_criterion() -> searches_pb2.Ferry:
 
 def generate_rail_one_way_search_criterion() -> searches_pb2.Rail:
     return searches_pb2.Rail(
-        origin_id=PLACES[0],
-        destination_id=PLACES[0],
-        origin=generate_point(string.uuid()),
-        destination=generate_point(string.uuid()),
+        origin=get_place(),
+        destination=get_place(),
         departure_after=protobuf.datetime_to_protobuf(
             datetime.datetime.now(tz=datetime.UTC),
         ),
@@ -318,7 +317,7 @@ def get_place() -> places_pb2.Place:
         type=places_pb2.TYPE_CITY,
         search_capabilities=places_pb2.ProviderMappings(
             rail={
-                "snowfall_provider_id_rail": "urn:bnds:tstatn_id:DEBRL",
+                BENERAIL_ID: "urn:bnds:tstatn_id:DEBRL",
             },
             air={
                 "d29f7e2e-b6e2-4d59-b33d-289aebbed3c0": PLACE_IATAS[0],

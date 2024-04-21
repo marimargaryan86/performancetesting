@@ -2943,6 +2943,9 @@ components:
                       $ref: '#/components/schemas/RailOfferIdentifier'
                 origin:
                   type: object
+                  description: >-
+                    The Junction Place ID that represents the origin location for
+                    the rail search
                   required:
                     - data
                   properties:
@@ -2950,6 +2953,9 @@ components:
                       $ref: '#/components/schemas/PlaceIdentifier'
                 destination:
                   type: object
+                  description: >-
+                    The Junction Place ID that represents the destination location
+                    for the rail search
                   required:
                     - data
                   properties:

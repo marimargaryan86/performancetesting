@@ -6,7 +6,6 @@ import lagom
 import timezonefinder
 from starlette import endpoints, requests, responses, status
 
-from snowfall.project.junction.go.v1 import models_pb2 as legacy_go_pb2
 from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.rail.endpoints import validation
 from snowfall.project.junction.rocket.service.api.rail.models import (
@@ -72,16 +71,8 @@ class RailSearch(endpoints.HTTPEndpoint):
                 search=models_pb2.Search(
                     reseller_id=request.user.username,
                     rail=models_pb2.Rail(
-                        origin_id=body["origin"],
-                        destination_id=body["destination"],
-                        origin=legacy_go_pb2.Point(
-                            coordinates=origin.coordinates,  # type: ignore[union-attr]
-                            time_zone=origin.time_zone,  # type: ignore[union-attr]
-                        ),
-                        destination=legacy_go_pb2.Point(
-                            coordinates=destination.coordinates,  # type: ignore[union-attr]
-                            time_zone=destination.time_zone,  # type: ignore[union-attr]
-                        ),
+                        origin=origin,
+                        destination=destination,
                         departure_after=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["departureAfter"]),
                         ),

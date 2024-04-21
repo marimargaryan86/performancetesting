@@ -6,7 +6,6 @@ import zoneinfo
 from collections.abc import Awaitable, Callable, Iterable, Sequence
 from typing import Protocol, Self, TypeAlias, TypeGuard
 
-from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
 from snowfall.project.junction.rocket.service.api.air import models, repositories
 from snowfall.project.junction.rocket.service.api.air.transforms import transforms
 from snowfall.project.junction.rocket.service.api.common import passengers
@@ -363,14 +362,8 @@ class RailSearcher:
             search=searches_pb2.Search(
                 reseller_id=request.reseller_id,
                 rail=searches_pb2.Rail(
-                    origin=go_models_pb2.Point(
-                        coordinates=request.segment.origin.coordinates,
-                        time_zone=request.segment.origin.time_zone,
-                    ),
-                    destination=go_models_pb2.Point(
-                        coordinates=request.segment.destination.coordinates,
-                        time_zone=request.segment.destination.time_zone,
-                    ),
+                    origin=request.segment.origin,
+                    destination=request.segment.destination,
                     departure_after=protobuf.datetime_to_protobuf(
                         request.departure_after,
                     ),
