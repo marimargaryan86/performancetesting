@@ -7,6 +7,7 @@ import pytest
 from starlette import status
 
 from snowfall.project.junction.rocket import fixtures
+from snowfall.project.junction.rocket.service.api.multi_modality import repository
 
 
 @pytest.fixture()
@@ -73,6 +74,28 @@ def valid_payload(
 
 def assert_pointer(error: Mapping[str, Any], pointer: str) -> None:
     assert error["source"]["pointer"] == pointer
+
+
+class TestGetSuggestion:
+    async def test_unknown_search_id_is_not_found(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            url="/journeys/suggestions/{0}".format(fixtures.NOT_FOUND),
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_known_search_id_is_found(
+        self,
+        client: httpx.AsyncClient,
+        suggestion_repository: repository.SuggestionRepository,
+    ) -> None:
+        suggestion = await suggestion_repository.create()
+        response = await client.get(
+            url="/journeys/suggestions/{0}".format(suggestion.id),
+        )
+        assert response.status_code == status.HTTP_200_OK
 
 
 class TestCreateSuggestionSearch:

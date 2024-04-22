@@ -135,17 +135,20 @@ async def create_dependencies(
             collection=mongo_db.hotel_rooms_results,
         )
     )
-    container[multi_modal_repository.SuggestionSearchRepository] = (
-        multi_modal_repository.SuggestionSearchRepository(
-            collection=mongo_db.suggestion_searches,
-            ttl=app.settings.suggestion_search_ttl,
-        )
-    )
     container[multi_modal_endpoints.SuggestionSearches] = (
         multi_modal_endpoints.SuggestionSearches(
-            _repository=container[multi_modal_repository.SuggestionSearchRepository],
+            _repository=multi_modal_repository.SuggestionSearchRepository(
+                collection=mongo_db.suggestion_searches,
+                ttl=app.settings.suggestion_search_ttl,
+            ),
             _places=container[places_pb2_grpc.PlacesServiceStub],
         )
+    )
+    container[multi_modal_endpoints.Suggestions] = multi_modal_endpoints.Suggestions(
+        _repository=multi_modal_repository.SuggestionRepository(
+            collection=mongo_db.suggestions,
+            ttl=app.settings.suggestion_search_ttl,
+        ),
     )
 
     return container

@@ -63,6 +63,7 @@ async def _http(app: application.Application[Settings]) -> None:
         *rail_router.get_routes(integration),
         *places_router.get_routes(integration),
         *multi_modal_endpoints.get_routes(
+            suggestions=container[multi_modal_endpoints.Suggestions],
             suggestion_searches=container[multi_modal_endpoints.SuggestionSearches],
         ),
     ]

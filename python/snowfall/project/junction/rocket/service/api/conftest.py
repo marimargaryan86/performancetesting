@@ -195,6 +195,16 @@ async def suggestion_search_repository(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
 ) -> multi_modal_repository.SuggestionSearchRepository:
     return multi_modal_repository.SuggestionSearchRepository(
+        collection=mongo_client["test"]["suggestions_search"],
+        ttl=datetime.timedelta(minutes=30),
+    )
+
+
+@pytest.fixture()
+async def suggestion_repository(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> multi_modal_repository.SuggestionRepository:
+    return multi_modal_repository.SuggestionRepository(
         collection=mongo_client["test"]["suggestions"],
         ttl=datetime.timedelta(minutes=30),
     )
@@ -212,8 +222,18 @@ def suggestions_searches(
 
 
 @pytest.fixture()
+def suggestions(
+    suggestion_repository: multi_modal_repository.SuggestionRepository,
+) -> multi_modal_endpoints.Suggestions:
+    return multi_modal_endpoints.Suggestions(
+        _repository=suggestion_repository,
+    )
+
+
+@pytest.fixture()
 def app(
     container: lagom.Container,
+    suggestions: multi_modal_endpoints.Suggestions,
     suggestions_searches: multi_modal_endpoints.SuggestionSearches,
 ) -> applications.Starlette:
     integration = StarletteIntegration(container)
@@ -225,6 +245,7 @@ def app(
         *places_router.get_routes(integration),
         *rail_router.get_routes(integration),
         *multi_modal_endpoints.get_routes(
+            suggestions=suggestions,
             suggestion_searches=suggestions_searches,
         ),
     ]

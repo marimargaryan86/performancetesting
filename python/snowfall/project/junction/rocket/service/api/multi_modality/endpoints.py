@@ -22,6 +22,29 @@ from snowfall.stdlib.integration.starlette import models as std_models
 
 
 @dataclasses.dataclass(frozen=True)
+class Suggestions:
+    _repository: repository.SuggestionRepository
+
+    async def get(self, request: messages.Request) -> responses.Response:
+        suggestion = await self._repository.find_by_id(
+            request.path_params["journeySuggestionId"],
+        )
+
+        if not suggestion:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return await messages.create_response(
+            body=std_models.Body(
+                data=models.Suggestion.from_proto(
+                    suggestion,
+                    request.starlette_request,
+                ),
+            ),
+            request=request.starlette_request,
+        )
+
+
+@dataclasses.dataclass(frozen=True)
 class SuggestionSearches:
     _repository: repository.SuggestionSearchRepository
     _places: places_pb2_grpc.PlacesServiceStub
@@ -135,8 +158,16 @@ class SuggestionSearches:
         )
 
 
-def get_routes(suggestion_searches: SuggestionSearches) -> list[routing.Route]:
+def get_routes(
+    suggestions: Suggestions,
+    suggestion_searches: SuggestionSearches,
+) -> list[routing.Route]:
     return [
+        routes.to_route(
+            "/journeys/suggestions/{journeySuggestionId}",
+            suggestions.get,
+            name="GetJourneySuggestion",
+        ),
         routes.to_route(
             "/journeys/suggestions/searches",
             suggestion_searches.post,

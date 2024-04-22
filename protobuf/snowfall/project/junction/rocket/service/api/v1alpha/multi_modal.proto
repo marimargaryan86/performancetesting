@@ -8,6 +8,13 @@ import "snowfall/stdlib/v1/datetime.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/api/v1alpha";
 
+message Suggestion {
+  string id = 1;
+  google.protobuf.Timestamp expires_at = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
 message SuggestionSearch {
   string id = 1;
   message Criteria {

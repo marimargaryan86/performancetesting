@@ -33,6 +33,38 @@ class ValidationError(Exception):
         )
 
 
+class Suggestion(std_models.Resource):
+    api_type: ClassVar[str] = "journey-suggestions"
+
+    @classmethod
+    def from_proto(
+        cls,
+        proto: multi_modal_pb2.Suggestion,
+        request: requests.Request,
+    ) -> Self:
+        return cls(
+            id=proto.id,
+            type=cls.api_type,
+            attributes={},
+            relationships={
+                "flightOffers": {
+                    "data": [],
+                },
+                "trainOffers": {
+                    "data": [],
+                },
+            },
+            links=std_models.Links(
+                self=str(
+                    request.url_for(
+                        "GetJourneySuggestion",
+                        journeySuggestionId=proto.id,
+                    ),
+                ),
+            ),
+        )
+
+
 class SuggestionSearch(std_models.Resource):
     api_type: ClassVar[str] = "journey-suggestion-searches"
 
@@ -44,7 +76,7 @@ class SuggestionSearch(std_models.Resource):
     ) -> Self:
         return cls(
             id=proto.id,
-            type=SuggestionSearch.api_type,
+            type=cls.api_type,
             attributes={
                 "departureAfter": protobuf.protobuf_to_datetime(
                     proto.criteria.departure_after,
