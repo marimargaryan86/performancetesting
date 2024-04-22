@@ -17,7 +17,6 @@ class DfBaseSettings(service.Settings):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_API_TIMEOUT_DEFAULT_SECONDS,
     )
-    mongo_dsn: str
 
 
 class Settings(DfBaseSettings, service.ProviderSettings):
