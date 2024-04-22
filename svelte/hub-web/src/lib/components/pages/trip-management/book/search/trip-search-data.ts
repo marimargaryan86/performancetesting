@@ -64,10 +64,12 @@ function getBirthDates(): Record<keyof typeof PASSENGER_DEFINITIONS, Date> {
     children0: getBirthDate(PASSENGER_DEFINITIONS.children0.span.from),
     children4: getBirthDate(PASSENGER_DEFINITIONS.children0.span.from),
     children6: getBirthDate(PASSENGER_DEFINITIONS.children6.span.from),
+    children10: getBirthDate(PASSENGER_DEFINITIONS.children10.span.from),
     seniors60: getBirthDate(PASSENGER_DEFINITIONS.seniors60.span.from),
     seniors65: getBirthDate(PASSENGER_DEFINITIONS.seniors65.span.from),
     youths12: getBirthDate(PASSENGER_DEFINITIONS.youths12.span.from),
     youths15: getBirthDate(PASSENGER_DEFINITIONS.youths15.span.from),
+    youths18: getBirthDate(PASSENGER_DEFINITIONS.youths18.span.from),
   };
 }
 
@@ -84,12 +86,15 @@ export const passengerParser = {
       ...Array.from(Array(data.children0), () => new Date(birthDates.children0)),
       ...Array.from(Array(data.children4), () => new Date(birthDates.children4)),
       ...Array.from(Array(data.children6), () => new Date(birthDates.children6)),
+      ...Array.from(Array(data.children10), () => new Date(birthDates.children10)),
       ...Array.from(Array(data.seniors60), () => new Date(birthDates.seniors60)),
       ...Array.from(Array(data.seniors65), () => new Date(birthDates.seniors65)),
       ...Array.from(Array(data.youths12), () => new Date(birthDates.youths12)),
       ...Array.from(Array(data.youths15), () => new Date(birthDates.youths15)),
+      ...Array.from(Array(data.youths18), () => new Date(birthDates.youths18)),
     ];
   },
+  // eslint-disable-next-line max-lines-per-function
   fromSearchData: (data: Date[]): TripSearchData["passengers"] => {
     const ages = data.map((date) => getAge(date));
 
@@ -112,6 +117,11 @@ export const passengerParser = {
       children6: getPassengerCount(
         ages,
         PASSENGER_DEFINITIONS.children6.span.from,
+        PASSENGER_DEFINITIONS.children10.span.from,
+      ),
+      children10: getPassengerCount(
+        ages,
+        PASSENGER_DEFINITIONS.children10.span.from,
         PASSENGER_DEFINITIONS.youths12.span.from,
       ),
       seniors60: getPassengerCount(
@@ -132,6 +142,11 @@ export const passengerParser = {
       youths15: getPassengerCount(
         ages,
         PASSENGER_DEFINITIONS.youths15.span.from,
+        PASSENGER_DEFINITIONS.youths18.span.from,
+      ),
+      youths18: getPassengerCount(
+        ages,
+        PASSENGER_DEFINITIONS.youths18.span.from,
         PASSENGER_DEFINITIONS.adults.span.from,
       ),
     };
