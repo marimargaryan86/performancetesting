@@ -1,4 +1,5 @@
 import datetime
+from types import MappingProxyType
 
 import freezegun
 import pytest
@@ -26,6 +27,9 @@ from snowfall.vendor.junction_one import client as j1_client
 from snowfall.vendor.junction_one import conftest as j1_test
 
 _DOB = datetime.date(2000, 1, 1)
+_OFFER_DATE = datetime.datetime(2024, 1, 1, 0, 0, 0, 0, datetime.UTC)
+_OFFER_DATETIME1 = datetime.datetime(2024, 1, 1, 10, 0, 0, 0, datetime.UTC)
+_OFFER_DATETIME2 = datetime.datetime(2024, 1, 1, 18, 0, 0, 0, datetime.UTC)
 
 
 def _mock_offer(
@@ -43,20 +47,42 @@ def _mock_offer(
     )
 
 
-async def _mock_search(request: search.SegmentSearchRequest) -> list[search.Offer]:
-    prefix = "rail"
-    duration = datetime.timedelta(hours=1)
-
-    if request.segment.type == segment_type_pb2.SEGMENT_TYPE_FLIGHT:
-        prefix = "air"
-        duration = datetime.timedelta(hours=4)
-
-    return [
+_MOCK_OFFERS = MappingProxyType({
+    segment_type_pb2.SEGMENT_TYPE_FLIGHT: (
         _mock_offer(
-            key="{prefix}_{key}".format(prefix=prefix, key=key),
-            duration=duration,
-        )
-        for key in range(1, 3)
+            key="air_1",
+            duration=datetime.timedelta(hours=4),
+            departure_at=_OFFER_DATETIME1,
+        ),
+        _mock_offer(
+            key="air_2",
+            duration=datetime.timedelta(hours=4),
+            departure_at=_OFFER_DATETIME2,
+        ),
+    ),
+    segment_type_pb2.SEGMENT_TYPE_TRAIN: (
+        _mock_offer(
+            key="rail_1",
+            duration=datetime.timedelta(hours=1),
+            departure_at=_OFFER_DATETIME1,
+        ),
+        _mock_offer(
+            key="rail_2",
+            duration=datetime.timedelta(hours=1),
+            departure_at=_OFFER_DATETIME2,
+        ),
+    ),
+})
+
+
+# Returns the offers from the _MOCK_OFFERS above, respecting both they the type
+# and the departure_after fields. Returns any offer that is after the
+# departure_after field.
+async def _mock_search(request: search.SegmentSearchRequest) -> list[search.Offer]:
+    return [
+        offer
+        for offer in _MOCK_OFFERS[request.segment.type]
+        if offer.departure_at >= request.departure_after
     ]
 
 
@@ -316,13 +342,37 @@ class TestSearcher:
         search_result = await searcher.find_results(
             search.SearchRequest(
                 route=mono_route,
-                departure_after=datetime.datetime.now(datetime.UTC),
+                departure_after=_OFFER_DATE,
                 date_of_births=[_DOB],
                 reseller_id="foo",
             ),
         )
         assert search_result.segments
-        assert all(segment.offers for segment in search_result.segments)
+        assert len(search_result.segments) == 1
+        assert all(search_result.segments[0].offers)
+        assert len(search_result.segments[0].offers) == 2
+
+    async def test_mono_mode_result_with_tight_departure_is_complete(
+        self,
+        mono_route: routes.Route,
+    ) -> None:
+        searcher = search.Searcher(
+            search_implementations=[
+                (segment_type_pb2.SEGMENT_TYPE_FLIGHT, _mock_search),
+            ],
+        )
+        search_result = await searcher.find_results(
+            search.SearchRequest(
+                route=mono_route,
+                departure_after=_OFFER_DATETIME1,
+                date_of_births=[_DOB],
+                reseller_id="foo",
+            ),
+        )
+        assert search_result.segments
+        assert len(search_result.segments) == 1
+        assert all(search_result.segments[0].offers)
+        assert len(search_result.segments[0].offers) == 2
 
     async def test_multi_mode_result_is_complete(
         self,
@@ -337,7 +387,7 @@ class TestSearcher:
         search_result = await searcher.find_results(
             search.SearchRequest(
                 route=multi_route,
-                departure_after=datetime.datetime.now(datetime.UTC),
+                departure_after=_OFFER_DATE,
                 date_of_births=[_DOB],
                 reseller_id="foo",
             ),

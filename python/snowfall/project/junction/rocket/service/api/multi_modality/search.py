@@ -420,11 +420,14 @@ class Searcher:
         segments = []
         departure_after = request.departure_after
 
-        for segment in request.route.segments:
+        for idx, segment in enumerate(request.route.segments):
+            if idx > 0:
+                departure_after += segment.mct_prefix
+
             offers = await self._search_implementations[segment.type](
                 SegmentSearchRequest(
                     segment=segment,
-                    departure_after=departure_after + segment.mct_prefix,
+                    departure_after=departure_after,
                     date_of_births=request.date_of_births,
                     reseller_id=request.reseller_id,
                 ),
