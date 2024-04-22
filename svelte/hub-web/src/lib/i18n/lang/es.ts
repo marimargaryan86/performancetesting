@@ -116,6 +116,7 @@ export default {
     continue: "Continuar",
     cancel: "Cancelar",
     reportAnIssue: "Reportar un problema",
+    liveSupport: "Soporte al usuario",
     click: "Hacer clic",
     goToLogin: "Ir a iniciar sesión",
     search: "Buscar",
@@ -502,8 +503,8 @@ export default {
         customerService: {
           title: "Servicio al Cliente",
           content: `
-<p>Contáctenos con su solicitud de asistencia especializada</p>
-<p><a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">soporte@snowfalltravel.com</a></p>`,
+          <p>Contáctenos con su solicitud de asistencia especializada: <a href="mailto:support@snowfalltravel.com?subject=GG%20-%20">support@snowfalltravel.com</a></p>
+          <p>Llámanos a esta línea para más ayuda: <a href="tel:+34900751468">+34 900 751 468</a></p>`,
         },
         conditionsOfCarriage: {
           title: "Condiciones de Transporte",
