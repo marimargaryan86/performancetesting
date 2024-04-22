@@ -450,11 +450,13 @@ class BenerailAdapter:
         trip_filter_result: _ProcessTripFilterResult,
     ) -> str:
         return_trip_params = dialogue.DialogueIdTripOfferFiltersReturnTripParams(
-            inward_date_time=criterion.return_departure_after.isoformat(
-                timespec="seconds",
-            )
-            if criterion.return_departure_after
-            else None,
+            inward_date_time=(
+                criterion.return_departure_after.isoformat(
+                    timespec="seconds",
+                )
+                if criterion.return_departure_after
+                else None
+            ),
             outward_offer_id=criterion.outbound_offer_id or None,
         )
         body = self._create_dialogue_body(
@@ -547,9 +549,9 @@ class BenerailOffersAdapter(BenerailAdapter):
             outbound_departure_datetime=search_task.outbound_departure_datetime,
             passenger_dobs=search_task.passenger_dobs,
             session_token=search_task.session_token,
-            outbound_offer_id=outward_trip_info.outward_offer_id
-            if outward_trip_info
-            else None,
+            outbound_offer_id=(
+                outward_trip_info.outward_offer_id if outward_trip_info else None
+            ),
             return_departure_after=search_task.return_departure_after,
         )
 
@@ -710,7 +712,6 @@ class BenerailOffersAdapter(BenerailAdapter):
                 expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
                 offers=offer_protos,
                 result_details=await self._parse_result_details(
-                    trip,
                     search_task.outbound_offer_id,
                     details_list,
                 ),
@@ -719,22 +720,21 @@ class BenerailOffersAdapter(BenerailAdapter):
 
     async def _parse_result_details(
         self,
-        trip: trips.Trip,
         is_outbound_segment: str | None,
         details_list: Sequence[_TimedSegment],
     ) -> Sequence[models_pb2.ResultDetail]:
         result_details = []
-        for idx in range(len(details_list)):
+        for idx, detail in enumerate(details_list):
             origin = self._train_stations.resolve_place_with_urn(
-                trip.origin.place_value,
+                detail.segment.origin.place_value,
             )
             destination = self._train_stations.resolve_place_with_urn(
-                trip.destination.place_value,
+                detail.segment.destination.place_value,
             )
 
             result_details.append(
                 models_pb2.ResultDetail(
-                    id=details_list[idx].id,
+                    id=detail.id,
                     rail=models_pb2.RailResultDetail(
                         origin=legacy_models_pb2.Point(
                             ref=origin.identifier,
@@ -758,13 +758,13 @@ class BenerailOffersAdapter(BenerailAdapter):
                         segment_sequence=idx + 1,
                         departure_date=protobuf.datetime_to_protobuf_datetime(
                             datetime.datetime.strptime(
-                                details_list[idx].segment.departure_at,
+                                detail.segment.departure_at,
                                 "%Y-%m-%dT%H:%M:%S%z",
                             ),
                         ),
                         arrival_date=protobuf.datetime_to_protobuf_datetime(
                             datetime.datetime.strptime(
-                                details_list[idx].segment.arrival_at,
+                                detail.segment.arrival_at,
                                 "%Y-%m-%dT%H:%M:%S%z",
                             ),
                         ),
