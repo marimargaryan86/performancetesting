@@ -1,18 +1,10 @@
 <script lang="ts">
   import type { FeaturedPackage } from "$lib/models/common";
-  import { onMount } from "svelte";
   import SharePackageModal from "$lib/components/share-modal.svelte";
   import ImageGalleryModal from "$lib/components/image-gallery-modal.svelte";
   import { renderStars } from "$lib/helpers/common";
   import Icon from "$lib/components/icon.svelte";
   import { goto } from "$app/navigation";
-
-  onMount(async (): Promise<void> => {
-    const response = await fetch("/images");
-    const imagePaths = await response.json();
-    hotelInfo.images = imagePaths;
-    selectedImage = hotelInfo.images[0];
-  });
 
   interface FeaturedPackageWithReview extends FeaturedPackage {
     reviewScore: number;
