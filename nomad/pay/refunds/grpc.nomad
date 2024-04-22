@@ -26,7 +26,7 @@ variable "count" {
   type = number
 }
 
-variable "cc_address" {
+variable "xe_address" {
   type = string
 }
 
@@ -92,7 +92,7 @@ job "pay-refunds-grpc" {
       driver = "docker"
 
       vault {
-        policies = ["currencycloud-${var.environment}", "webhooks-${var.environment}"]
+        policies = ["xe-${var.environment}", "webhooks-${var.environment}"]
       }
 
       template {
@@ -101,9 +101,9 @@ MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_N
 TRANSACTIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_transactions-${var.environment}"))}}
 CREDIT_CARD_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_credit-card-payments-${var.environment}"))}}
 ORDERS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_orders-${var.environment}"))}}
-{{ with secret "kv/data/${var.environment}/currencycloud" }}
-CC_LOGIN={{ .Data.data.cc_login }}
-CC_API_KEY={{ .Data.data.cc_api_key }}
+{{ with secret "kv/data/${var.environment}/xe" }}
+XE_LOGIN={{ .Data.data.xe_login }}
+XE_API_KEY={{ .Data.data.xe_api_key }}
 {{ end }}
 EOH
         destination = "services.env"
@@ -129,7 +129,7 @@ EOH
         ENV_NAME     = "${var.environment}"
         GRPC_PORT    = "${NOMAD_PORT_grpc}"
         GRPC_ADDRESS = "0.0.0.0"
-        CC_ADDRESS   = "${var.cc_address}"
+        XE_ADDRESS   = "${var.xe_address}"
         SENTRY_DSN   = "https://02028ad4684847638dc2a2413ad6faa5@sentry.snowfall.se/164"
       }
     }

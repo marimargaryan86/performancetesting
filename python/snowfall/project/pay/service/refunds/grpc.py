@@ -22,12 +22,8 @@ from snowfall.project.pay.service.transactions.v1 import (
 from snowfall.stdlib import money, string
 from snowfall.stdlib.transport.grpc import rich_status, service
 from snowfall.stdlib.v1 import money_pb2
-from snowfall.vendor.currency_cloud.client import PaymentClient
-from snowfall.vendor.currency_cloud.models.rate import (
-    DetailedRateRequest,
-    DetailedRateResponse,
-    FixedSideEnum,
-)
+from snowfall.vendor.xe import client
+from snowfall.vendor.xe.models.rate import RateResponse
 
 
 class RefundsService(
@@ -39,13 +35,13 @@ class RefundsService(
         refunds: repositories.RefundsRepository,
         transactions_client: transactions_adapter.Client,
         bills_client: bills_adapter.Client,
-        payment_client: PaymentClient,
+        rate_client: client.XEClient,
         orders_client: orders_adapter.Client,
         credit_cards_client: credit_card_adapter.Client,
     ):
         self._refunds = refunds
         self._transactions_client = transactions_client
-        self._payment_client = payment_client
+        self._rate_client = rate_client
         self._bills_client = bills_client
         self._orders_client = orders_client
         self._credit_cards_client = credit_cards_client
@@ -181,13 +177,13 @@ class RefundsService(
             transaction.amounts.total_amount,
             context,
         )
-        detailed_rate = await self._get_detailed_rate(
+        rate = await self._get_rate(
             request.refunded_by_provider,
             request.refunded_to_reseller,
         )
 
         refund_position = await self._get_refund_position(
-            detailed_rate,
+            rate,
             request.refunded_to_reseller,
             transaction.amounts.sales_margin,
             transaction.amounts.fx_margin,
@@ -211,7 +207,7 @@ class RefundsService(
 
     async def _get_refund_position(
         self,
-        detailed_rate: DetailedRateResponse,
+        rate: RateResponse,
         refunded_to_reseller: money_pb2.Money,
         sales_margin: money_pb2.Money,
         fx_margin: money_pb2.Money,
@@ -221,8 +217,8 @@ class RefundsService(
             money.total(
                 [
                     money.from_string(
-                        detailed_rate.client_buy_amount,
-                        money.Currency(detailed_rate.client_buy_currency),
+                        str(rate.rate),
+                        money.Currency(rate.to_currency),
                     ),
                     money.from_protobuf(sales_margin),
                     money.from_protobuf(fx_margin),
@@ -234,14 +230,14 @@ class RefundsService(
 
         return money.Money(
             calculated_amount,
-            money.Currency(detailed_rate.client_buy_currency),
+            money.Currency(rate.to_currency),
         ).protobuf()
 
-    async def _get_detailed_rate(
+    async def _get_rate(
         self,
         refunded_by_provider: money_pb2.Money,
         refunded_to_reseller: money_pb2.Money,
-    ) -> DetailedRateResponse:
+    ) -> RateResponse:
         amount = money.from_protobuf(refunded_by_provider)
         if amount.amount < 0:
             amount = money.Money(
@@ -254,14 +250,13 @@ class RefundsService(
                 currency=amount.currency,
             )
 
-        return await self._payment_client.get_detailed_rates(
-            DetailedRateRequest(
-                sell_currency=refunded_by_provider.currency_code,
-                buy_currency=refunded_to_reseller.currency_code,
-                fixed_side=FixedSideEnum.sell,
-                amount=str(amount),
-            ),
-        )
+        return (
+            await self._rate_client.convert(
+                from_currency=refunded_by_provider.currency_code,
+                to_currencies=[refunded_to_reseller.currency_code],
+                amount=float(str(amount)),
+            )
+        )[0]
 
     async def _update_refund_status(
         self,
@@ -339,14 +334,14 @@ class RefundsService(
             context,
         )
 
-        detailed_rate = await self._get_detailed_rate(
+        rate = await self._get_rate(
             request.refund.refunded_us,
             request.refund.refunded_reseller,
         )
 
         refund.refund_position.CopyFrom(
             await self._get_refund_position(
-                detailed_rate,
+                rate,
                 request.refund.refunded_reseller,
                 transaction.amounts.sales_margin,
                 transaction.amounts.fx_margin,
@@ -370,8 +365,8 @@ class RefundsService(
         refund.refunded_reseller.CopyFrom(request.refund.refunded_reseller)
         refund.refunded_us_in_payer_currency.CopyFrom(
             money.from_string(
-                detailed_rate.client_buy_amount,
-                money.Currency(detailed_rate.client_buy_currency),
+                str(rate.rate),
+                money.Currency(rate.to_currency),
             ).protobuf(),
         )
 

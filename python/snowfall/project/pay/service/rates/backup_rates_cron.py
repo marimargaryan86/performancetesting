@@ -1,10 +1,15 @@
 import asyncio
 from collections.abc import Sequence
 
+from httpx import HTTPStatusError
+
 from snowfall.project.pay.service.rates.cache import RateRepository
 from snowfall.project.pay.service.rates.rates import BackUpRatesRepository
 from snowfall.project.pay.service.rates.v1alpha import models_pb2
+from snowfall.stdlib.logging import stdout
 from snowfall.vendor.xe.client import XEClient
+
+_logger = stdout.get_logger()
 
 
 class UpdateBackUpRatesJob:
@@ -37,10 +42,19 @@ class UpdateBackUpRatesJob:
             for index in range(len(self._available_currencies))
         ]
 
-        rates_gather = await asyncio.gather(*rates)
+        rates_gather = await asyncio.gather(*rates, return_exceptions=True)
 
         rate_results: list[models_pb2.BackUpRate] = []
         for rate_result in rates_gather:
+            if isinstance(rate_result, HTTPStatusError):
+                response = rate_result.response.json()
+                _logger.error(
+                    response["message"],
+                    status_code=rate_result.response.status_code,
+                )
+                continue
+            if isinstance(rate_result, BaseException):
+                raise rate_result
             rate_results.extend(
                 models_pb2.BackUpRate(
                     buy_currency=rate.to_currency,

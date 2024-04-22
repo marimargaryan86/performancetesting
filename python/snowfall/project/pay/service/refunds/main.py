@@ -2,7 +2,6 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -16,10 +15,9 @@ from snowfall.project.pay.service.refunds import grpc, repositories
 from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
-from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application, grpc_factory
 from snowfall.stdlib.transport.grpc import server
-from snowfall.vendor.currency_cloud.client import CurrencyCloudAuth, PaymentClient
+from snowfall.vendor.xe import client
 
 
 class _GrpcSettings(application.Settings):
@@ -28,9 +26,9 @@ class _GrpcSettings(application.Settings):
     mongo_dsn: Sequence[AnyUrl]
     transactions_address: str
     orders_address: str
-    cc_login: str
-    cc_api_key: str
-    cc_address: str
+    xe_login: str
+    xe_api_key: str
+    xe_address: str
     credit_card_address: str
 
 
@@ -69,14 +67,12 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                         transactions_channel,
                     ),
                 ),
-                payment_client=PaymentClient(
-                    base_url=app.settings.cc_address,
-                    auth=CurrencyCloudAuth(
-                        base_url=app.settings.cc_address,
-                        login_id=app.settings.cc_login,
-                        api_key=app.settings.cc_api_key,
+                rate_client=client.XEClient(
+                    base_url=app.settings.xe_address,
+                    auth=client.XEAuth(
+                        login_id=app.settings.xe_login,
+                        api_key=app.settings.xe_api_key,
                     ),
-                    client=metrics.register(httpx.AsyncClient()),
                 ),
                 orders_client=orders.GrpcClient(
                     orders_pb2_grpc.OrderServiceStub(orders_channel),

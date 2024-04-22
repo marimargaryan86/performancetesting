@@ -51,7 +51,7 @@ class XEClient:
         self,
         from_currency: str,
         to_currencies: Sequence[str],
-        amount: int = 1,
+        amount: float = 1.0,
     ) -> Sequence[rate.RateResponse]:
         response = await self._client.get(
             "/convert_from",
