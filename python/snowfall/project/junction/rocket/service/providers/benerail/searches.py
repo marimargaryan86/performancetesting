@@ -39,9 +39,8 @@ class Criteria(message.Message):
     trip_sequence: int
     session_token: str
     inbound_departure_datetime: datetime.datetime | None = None
-    outward_offer_search_id: str | None = None
     return_departure_after: datetime.datetime | None = None
-    outbound_id: str | None = None
+    outbound_offer_id: str | None = None
 
 
 def cache_key(search: Criteria) -> str:
@@ -138,9 +137,12 @@ def _generate_inbound_search_criteria(
     timezone_origin: zoneinfo.ZoneInfo,
 ) -> list[Criteria]:
     timestamps = find_time_windows(
-        None,  # Placeholder for future logic
+        departure_before=normalize_datetime(
+            protobuf.protobuf_to_datetime(search.rail.departure_before),
+            timezone_origin,
+        ),  # Placeholder for future logic
         departure_after=normalize_datetime(
-            protobuf.protobuf_to_datetime(search.rail.return_date),
+            protobuf.protobuf_to_datetime(search.rail.departure_after),
             timezone_origin,
         ),
         timezone=timezone_origin,
@@ -177,7 +179,7 @@ def _generate_outbound_search_criteria(
             protobuf.protobuf_to_datetime(search.rail.return_date),
             timezone_destination,
         )
-        if search.rail.HasField("departure_before")
+        if search.rail.HasField("return_date")
         else None
     )
 
@@ -215,7 +217,7 @@ def _generate_search_criteria(
             origin=origin,
             destination=destination,
             passenger_dobs=passenger_dobs,
-            outward_offer_search_id=search.rail.outbound_offer_id,
+            outbound_offer_id=search.rail.outbound_offer_id,
             return_departure_after=return_departure_after,
             outbound_departure_datetime=timestamp,
             trip_sequence=trip_sequence,

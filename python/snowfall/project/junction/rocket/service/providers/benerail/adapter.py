@@ -53,6 +53,14 @@ class OfferNotFoundError(Exception):
 
 
 @dataclasses.dataclass(frozen=True)
+class _GetOfferResponse:
+    offer_obj: offer.Offer
+    dialogue_info: helper_models.DialogueInfo
+    passengers_info: Sequence[helper_models.PassengerInfo]
+    departure_at: str
+
+
+@dataclasses.dataclass(frozen=True)
 class _CreatePassengersResponse:
     dialogue_etag: str
     passengers_info: list[helper_models.PassengerInfo]
@@ -65,14 +73,6 @@ class _CreateTripFilterResponse:
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripData:
-    dialogue_id: str
-    dialogue_etag: str
-    create_passengers_response: _CreatePassengersResponse
-    create_trip_filter_response: _CreateTripFilterResponse
-
-
-@dataclasses.dataclass(frozen=True)
 class _TripDataCriterion:
     origin: str
     destination: str
@@ -82,15 +82,15 @@ class _TripDataCriterion:
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithPassengers:
-    passengers_info: Sequence[helper_models.PassengerInfo]
-    trip_offer_responses: Sequence[t_o_response.GetTripOfferResponse]
-    dialogue_info: helper_models.DialogueInfo
-    trip_filter_id: str
+class _TripData:
+    dialogue_id: str
+    dialogue_etag: str
+    create_passengers_response: _CreatePassengersResponse
+    create_trip_filter_response: _CreateTripFilterResponse
 
 
 @dataclasses.dataclass(frozen=True)
-class _ProcessOfferResult:
+class _ProcessTripFilterResult:
     dialogue_id: str
     trip_filter_id: str
     etag: str
@@ -104,108 +104,125 @@ class _TripOfferResponsesWithPassengersCriterion:
     destination: str
     outbound_departure_datetime: datetime.datetime
     passenger_dobs: Sequence[datetime.date]
+    outbound_offer_id: str | None = None
     session_token: str | None = None
     return_departure_after: datetime.datetime | None = None
 
 
 @dataclasses.dataclass(frozen=True)
-class _TripOfferResponsesWithOutbound:
-    origin: str
-    destination: str
-    outbound_departure_datetime: datetime.datetime
-    passenger_dobs: Sequence[datetime.date]
-    outward_trip_dialogue_id: str
-    outward_passengers_info: Sequence[helper_models.PassengerInfo]
-    trip_filter_id: str
-    outward_offer_search_id: str
-    session_token: str | None = None
-    return_departure_after: datetime.datetime | None = None
+class _TripOfferResponsesWithPassengers:
+    passengers_info: Sequence[helper_models.PassengerInfo]
+    trip_offer_responses: Sequence[t_o_response.GetTripOfferResponse]
+    dialogue_info: helper_models.DialogueInfo
+    trip_offer_filter_id: str
 
 
-_TripOfferCriterion = (
-    _TripOfferResponsesWithPassengersCriterion | _TripOfferResponsesWithOutbound
-)
+@dataclasses.dataclass(frozen=True)
+class _TimedSegment:
+    id: str
+    segment: trips.TimedLeg
 
 
 class RCodeLabelNotFoundError(Exception):
     """Raised when rcode retrieval fails."""
 
 
-class _BenerailAdapter:
+def _compare_trip_offer_response(
+    trip_offer_responses: Sequence[t_o_response.GetTripOfferResponse],
+    trip_id: str,
+) -> t_o_response.GetTripOfferResponse:
+    for trip_offer in trip_offer_responses:
+        if trip_offer.response_result.trip.identifier == trip_id:
+            return trip_offer
+
+    raise OfferNotFoundError(
+        trip_offer_responses=trip_offer_responses,
+    )
+
+
+class BenerailAdapter:
     def __init__(self, benerail_client: client.BenerailClient) -> None:
         self._client = benerail_client
 
-    async def _process_outward_offer(
+    async def verify_offer(
         self,
-        criterion: _TripOfferResponsesWithOutbound,
-    ) -> _ProcessOfferResult:
-        dialogue_info = await self._client.dialogue.get_dialogue(
-            criterion.outward_trip_dialogue_id,
+        offer_details: cache.OfferDetails,
+        session_token: str | None = None,
+    ) -> _GetOfferResponse:
+        trip_offer_responses_with_passengers = (
+            await self._get_trip_offers_by_offer_filter_id(
+                offer_details.outward_passengers_info,
+                offer_details.trip_offer_filter_id,
+                offer_details.dialogue_id,
+                offer_details.dialogue_etag,
+            )
         )
 
-        etag = dialogue_info.etag
-        passenger_ids = self._extract_passenger_ids(
-            criterion.outward_passengers_info,
+        if not trip_offer_responses_with_passengers.trip_offer_responses:
+            raise OfferNotFoundError()
+        trip_offer_obj = _compare_trip_offer_response(
+            trip_offer_responses=(
+                trip_offer_responses_with_passengers.trip_offer_responses
+            ),
+            trip_id=offer_details.trip_id,
         )
 
-        return _ProcessOfferResult(
-            criterion.outward_trip_dialogue_id,
-            criterion.trip_filter_id,
-            etag,
-            passenger_ids,
-            criterion.outward_passengers_info,
+        offers, _ = await self._get_offers(
+            offer_ids=[
+                offer_ref.identifier
+                for offer_ref in trip_offer_obj.response_result.offers
+            ],
+            session_token=session_token,
         )
 
-    async def _process_no_outward_offer(
+        for offer_obj in offers:
+            offer_matches = helper_functions.offer_matches(
+                offer_obj=offer_obj,
+                comfort_class_value=offer_details.comfort_class_value,
+                flexibility_value=offer_details.flexibility_value,
+            )
+
+            if offer_matches:
+                return _GetOfferResponse(
+                    offer_obj=offer_obj,
+                    dialogue_info=trip_offer_responses_with_passengers.dialogue_info,
+                    passengers_info=(
+                        trip_offer_responses_with_passengers.passengers_info
+                    ),
+                    departure_at=str(trip_offer_obj.response_result.departure_at),
+                )
+
+        raise OfferNotFoundError(
+            trip_offer_responses=(
+                trip_offer_responses_with_passengers.trip_offer_responses
+            ),
+            offers=offers,
+        )
+
+    async def _get_offers(
         self,
-        criterion: _TripOfferResponsesWithPassengersCriterion,
-    ) -> _ProcessOfferResult:
-        trip_filter_creation = await self._dialogue_with_passengers_and_trip_filter(
-            _TripDataCriterion(
-                origin=criterion.origin,
-                destination=criterion.destination,
-                departure_datetime=criterion.outbound_departure_datetime,
-                passenger_dobs=criterion.passenger_dobs,
-                session_token=criterion.session_token,
+        offer_ids: Iterable[str],
+        session_token: str | None = None,
+    ) -> tuple[list[offer.Offer], set[str]]:
+        responses = await asyncio.gather(
+            *(
+                self._client.offers_client.get_offer_info(
+                    offer_id,
+                    session_token,
+                )
+                for offer_id in offer_ids
             ),
         )
-        dialogue_id = trip_filter_creation.dialogue_id
-        trip_filter_id = trip_filter_creation.create_trip_filter_response.trip_filter_id
-        etag = trip_filter_creation.dialogue_etag
-        passenger_ids = [
-            pax_info.identifier
-            for pax_info in trip_filter_creation.create_passengers_response.passengers_info
-        ]
-        passengers_info = (
-            trip_filter_creation.create_passengers_response.passengers_info
-        )
-        return _ProcessOfferResult(
-            dialogue_id,
-            trip_filter_id,
-            etag,
-            passenger_ids,
-            passengers_info,
-        )
+        offers = []
+        excluded_ids = set()
 
-    def _create_return_trip_params(
-        self,
-        criterion: _TripOfferCriterion,
-    ) -> dialogue.DialogueIdTripOfferFiltersReturnTripParams:
-        if isinstance(criterion, _TripOfferResponsesWithOutbound):
-            return dialogue.DialogueIdTripOfferFiltersReturnTripParams(
-                outward_offer_id=criterion.outward_offer_search_id,
-            )
-        if isinstance(criterion, _TripOfferResponsesWithPassengersCriterion):
-            return dialogue.DialogueIdTripOfferFiltersReturnTripParams(
-                inward_date_time=(
-                    criterion.return_departure_after.isoformat(
-                        timespec="seconds",
-                    )
-                    if criterion.return_departure_after
-                    else None
-                ),
-            )
-        raise AttributeError
+        for response in responses:
+            if response.response_result.price.currency == "?":
+                excluded_ids.add(response.response_result.identifier)
+            else:
+                offers.append(response.response_result)
+
+        return offers, excluded_ids
 
     def _create_dialogue_body(
         self,
@@ -218,105 +235,6 @@ class _BenerailAdapter:
             passengers=passenger_ids,
             return_trip_params=return_trip_params,
             market_segment=dialogue.MarketSegment(code=_BENERAIL_PUBLIC_FARES_CODE),
-        )
-
-    def _extract_passenger_ids(
-        self,
-        passengers: Sequence[helper_models.PassengerInfo],
-    ) -> Sequence[str]:
-        return [passenger.identifier for passenger in passengers]
-
-    async def _get_trip_offer_responses_with_passengers(
-        self,
-        criterion: _TripOfferCriterion,
-    ) -> _TripOfferResponsesWithPassengers:
-        if isinstance(criterion, _TripOfferResponsesWithOutbound):
-            offer_process_result = await self._process_outward_offer(criterion)
-        else:
-            offer_process_result = await self._process_no_outward_offer(criterion)
-
-        return_trip_params = self._create_return_trip_params(criterion)
-        body = self._create_dialogue_body(
-            offer_process_result.trip_filter_id,
-            offer_process_result.passenger_ids,
-            return_trip_params,
-        )
-        trip_offer_filter = (
-            await self._client.trip_offer_filter_client.create_trip_offer_filter(
-                dialogue_id=offer_process_result.dialogue_id,
-                etag=offer_process_result.etag,
-                body=body,
-                session_token=criterion.session_token,
-            )
-        )
-
-        trip_offers_iterator = self._get_trips_of_offer_collection(
-            collection_id=trip_offer_filter.response_result.identifier,
-        )
-
-        trip_offer_ids = [
-            trip_offer.identifier async for trip_offer in trip_offers_iterator
-        ]
-        dialogue_info = helper_models.DialogueInfo(
-            identifier=offer_process_result.dialogue_id,
-            etag=offer_process_result.etag,
-        )
-
-        if not trip_offer_ids:
-            return _TripOfferResponsesWithPassengers(
-                passengers_info=[],
-                trip_offer_responses=[],
-                dialogue_info=dialogue_info,
-                trip_filter_id=offer_process_result.trip_filter_id,
-            )
-
-        trip_offer_responses_iterator = self._get_trip_offers(
-            trip_offer_ids=trip_offer_ids,
-            session_token=criterion.session_token,
-        )
-        return _TripOfferResponsesWithPassengers(
-            trip_offer_responses=[
-                trip_offer_res
-                for trip_offer_res in await trip_offer_responses_iterator
-                if trip_offer_res.response_result.offers
-            ],
-            passengers_info=offer_process_result.passengers_info,
-            dialogue_info=dialogue_info,
-            trip_filter_id=offer_process_result.trip_filter_id,
-        )
-
-    async def _dialogue_with_passengers_and_trip_filter(
-        self,
-        criterion: _TripDataCriterion,
-    ) -> _TripData:
-        dialogue_res = await self._client.dialogue.create_dialogue(
-            session_token=criterion.session_token,
-        )
-        dialogue_id = dialogue_res.response_result.identifier
-        create_passenger_res = await self._create_passengers(
-            dialogue_info=helper_models.DialogueInfo(
-                identifier=dialogue_id,
-                etag=dialogue_res.etag,
-            ),
-            passenger_dobs=criterion.passenger_dobs,
-            session_token=criterion.session_token,
-        )
-        create_trip_filter_res = await self._create_trip_filter(
-            dialogue_info=helper_models.DialogueInfo(
-                identifier=dialogue_id,
-                etag=create_passenger_res.dialogue_etag,
-            ),
-            origin=criterion.origin,
-            destination=criterion.destination,
-            departure_datetime=criterion.departure_datetime,
-            session_token=criterion.session_token,
-        )
-
-        return _TripData(
-            dialogue_id=dialogue_id,
-            dialogue_etag=create_trip_filter_res.dialogue_etag,
-            create_passengers_response=create_passenger_res,
-            create_trip_filter_response=create_trip_filter_res,
         )
 
     async def _create_passengers(
@@ -383,6 +301,69 @@ class _BenerailAdapter:
             dialogue_etag=trip_filter_res.etag,
         )
 
+    async def _get_dialogue_with_passengers_and_trip_filter(
+        self,
+        criterion: _TripDataCriterion,
+    ) -> _TripData:
+        dialogue_res = await self._client.dialogue.create_dialogue(
+            session_token=criterion.session_token,
+        )
+        dialogue_id = dialogue_res.response_result.identifier
+        create_passenger_res = await self._create_passengers(
+            dialogue_info=helper_models.DialogueInfo(
+                identifier=dialogue_id,
+                etag=dialogue_res.etag,
+            ),
+            passenger_dobs=criterion.passenger_dobs,
+            session_token=criterion.session_token,
+        )
+        create_trip_filter_res = await self._create_trip_filter(
+            dialogue_info=helper_models.DialogueInfo(
+                identifier=dialogue_id,
+                etag=create_passenger_res.dialogue_etag,
+            ),
+            origin=criterion.origin,
+            destination=criterion.destination,
+            departure_datetime=criterion.departure_datetime,
+            session_token=criterion.session_token,
+        )
+
+        return _TripData(
+            dialogue_id=dialogue_id,
+            dialogue_etag=create_trip_filter_res.dialogue_etag,
+            create_passengers_response=create_passenger_res,
+            create_trip_filter_response=create_trip_filter_res,
+        )
+
+    async def _process_trip_filter(
+        self,
+        criterion: _TripOfferResponsesWithPassengersCriterion,
+    ) -> _ProcessTripFilterResult:
+        trip_filter = await self._get_dialogue_with_passengers_and_trip_filter(
+            _TripDataCriterion(
+                origin=criterion.origin,
+                destination=criterion.destination,
+                departure_datetime=criterion.outbound_departure_datetime,
+                passenger_dobs=criterion.passenger_dobs,
+                session_token=criterion.session_token,
+            ),
+        )
+        dialogue_id = trip_filter.dialogue_id
+        trip_filter_id = trip_filter.create_trip_filter_response.trip_filter_id
+        etag = trip_filter.dialogue_etag
+        passenger_ids = [
+            pax_info.identifier
+            for pax_info in trip_filter.create_passengers_response.passengers_info
+        ]
+        passengers_info = trip_filter.create_passengers_response.passengers_info
+        return _ProcessTripFilterResult(
+            dialogue_id,
+            trip_filter_id,
+            etag,
+            passenger_ids,
+            passengers_info,
+        )
+
     async def _get_trips_of_offer_collection(
         self,
         collection_id: str,
@@ -422,8 +403,95 @@ class _BenerailAdapter:
             ),
         )
 
+    async def _get_trip_offers_by_offer_filter_id(
+        self,
+        passenger_info: Sequence[helper_models.PassengerInfo],
+        trip_offer_filter_id: str,
+        dialogue_id: str,
+        dialogue_etag: str,
+    ) -> _TripOfferResponsesWithPassengers:
+        trip_offers_iterator = self._get_trips_of_offer_collection(
+            collection_id=trip_offer_filter_id,
+        )
 
-class BenerailOffersAdapter(_BenerailAdapter):
+        trip_offer_ids = [
+            trip_offer.identifier async for trip_offer in trip_offers_iterator
+        ]
+        dialogue_info = helper_models.DialogueInfo(
+            identifier=dialogue_id,
+            etag=dialogue_etag,
+        )
+
+        if not trip_offer_ids:
+            return _TripOfferResponsesWithPassengers(
+                passengers_info=[],
+                trip_offer_responses=[],
+                dialogue_info=dialogue_info,
+                trip_offer_filter_id=trip_offer_filter_id,
+            )
+
+        trip_offer_responses_iterator = self._get_trip_offers(
+            trip_offer_ids=trip_offer_ids,
+        )
+        return _TripOfferResponsesWithPassengers(
+            trip_offer_responses=[
+                trip_offer_res
+                for trip_offer_res in await trip_offer_responses_iterator
+                if trip_offer_res.response_result.offers
+            ],
+            passengers_info=passenger_info,
+            dialogue_info=dialogue_info,
+            trip_offer_filter_id=trip_offer_filter_id,
+        )
+
+    async def _handle_passenger_criterion(
+        self,
+        criterion: _TripOfferResponsesWithPassengersCriterion,
+        trip_filter_result: _ProcessTripFilterResult,
+    ) -> str:
+        return_trip_params = dialogue.DialogueIdTripOfferFiltersReturnTripParams(
+            inward_date_time=criterion.return_departure_after.isoformat(
+                timespec="seconds",
+            )
+            if criterion.return_departure_after
+            else None,
+            outward_offer_id=criterion.outbound_offer_id or None,
+        )
+        body = self._create_dialogue_body(
+            trip_filter_result.trip_filter_id,
+            trip_filter_result.passenger_ids,
+            return_trip_params,
+        )
+        trip_offer_filter = (
+            await self._client.trip_offer_filter_client.create_trip_offer_filter(
+                dialogue_id=trip_filter_result.dialogue_id,
+                etag=trip_filter_result.etag,
+                body=body,
+                session_token=criterion.session_token,
+            )
+        )
+        return trip_offer_filter.response_result.identifier
+
+    async def _get_trip_offer_responses_with_passengers(
+        self,
+        criterion: _TripOfferResponsesWithPassengersCriterion,
+    ) -> _TripOfferResponsesWithPassengers:
+        offer_process_result = await self._process_trip_filter(criterion)
+
+        trip_offer_filter_id = await self._handle_passenger_criterion(
+            criterion,
+            offer_process_result,
+        )
+
+        return await self._get_trip_offers_by_offer_filter_id(
+            offer_process_result.passengers_info,
+            trip_offer_filter_id,
+            offer_process_result.dialogue_id,
+            offer_process_result.etag,
+        )
+
+
+class BenerailOffersAdapter(BenerailAdapter):
     def __init__(
         self,
         benerail_client: client.BenerailClient,
@@ -457,11 +525,10 @@ class BenerailOffersAdapter(_BenerailAdapter):
         search_task: searches.Criteria,
     ) -> cache.OfferDetails | None:
         outward_offer_details = None
-        if search_task.outward_offer_search_id:
+        if search_task.outbound_offer_id:
             outward_offer_details = await self._offers_cache.fetch(
-                search_task.outward_offer_search_id,
+                search_task.outbound_offer_id,
             )
-
         if outward_offer_details:
             return outward_offer_details
         return None
@@ -469,261 +536,21 @@ class BenerailOffersAdapter(_BenerailAdapter):
     async def _parse_criterion(
         self,
         search_task: searches.Criteria,
-    ) -> _TripOfferResponsesWithPassengersCriterion | _TripOfferResponsesWithOutbound:
+    ) -> _TripOfferResponsesWithPassengersCriterion:
         outward_trip_info = await self._fetch_and_process_outward_offer_details(
             search_task,
         )
-        if outward_trip_info and search_task.outward_offer_search_id:
-            return _TripOfferResponsesWithOutbound(
-                origin=search_task.origin,
-                destination=search_task.destination,
-                outbound_departure_datetime=search_task.outbound_departure_datetime,
-                passenger_dobs=search_task.passenger_dobs,
-                outward_passengers_info=outward_trip_info.outward_passengers_info,
-                outward_offer_search_id=search_task.outward_offer_search_id,
-                session_token=search_task.session_token,
-                return_departure_after=search_task.return_departure_after,
-                trip_filter_id=outward_trip_info.trip_filter_id,
-                outward_trip_dialogue_id=outward_trip_info.dialogue_id,
-            )
+
         return _TripOfferResponsesWithPassengersCriterion(
             origin=search_task.origin,
             destination=search_task.destination,
             outbound_departure_datetime=search_task.outbound_departure_datetime,
             passenger_dobs=search_task.passenger_dobs,
             session_token=search_task.session_token,
+            outbound_offer_id=outward_trip_info.outward_offer_id
+            if outward_trip_info
+            else None,
             return_departure_after=search_task.return_departure_after,
-        )
-
-    async def _get_search_results(  # noqa: WPS217 , WPS231
-        self,
-        search_task: searches.Criteria,
-    ) -> AsyncIterator[models_pb2.SearchResult]:
-        outward_trip_info = await self._fetch_and_process_outward_offer_details(
-            search_task,
-        )
-
-        criterion = await self._parse_criterion(search_task)
-
-        trip_offer_responses_with_passengers = (
-            await self._get_trip_offer_responses_with_passengers(criterion=criterion)
-        )
-        trip_offer_responses = trip_offer_responses_with_passengers.trip_offer_responses
-        passengers_info = trip_offer_responses_with_passengers.passengers_info
-
-        if not all((trip_offer_responses, passengers_info)):
-            return
-
-        expires_at_dt = datetime.datetime.now(datetime.UTC) + self._ttl
-        trip_ids = [res.response_result.trip.identifier for res in trip_offer_responses]
-        trip_map = await self._get_trip_map(trip_ids, search_task.session_token)
-
-        for trip_offer_response in trip_offer_responses:
-            trip_id = trip_offer_response.response_result.trip.identifier
-            try:
-                trip = trip_map[trip_id]
-            except KeyError:
-                self._logger.warning(
-                    "Trip info not found, skipping trip offer",
-                    trip_offer_response=trip_offer_response,
-                )
-
-                continue
-
-            trip_details: dict[str, trips.TimedLeg] = {
-                string.uuid(): trip_leg
-                for trip_leg in trip.trip_legs
-                if isinstance(trip_leg, trips.TimedLeg)
-            }
-
-            offer_protos = []
-            search_result_id = string.uuid()
-            for offer_obj in trip_offer_response.response_result.offers:
-                cur = offer_obj.summary.price_with_optional_parts.currency.upper()
-                try:
-                    self._parse_currency(cur)
-                except ValueError:
-                    continue
-
-                offer_model = await self._parse_offer(
-                    offer_summary=offer_obj.summary,
-                    detail_ids=list(trip_details.keys()),
-                )
-
-                outward_passengers_info = [
-                    helper_models.PassengerInfo(
-                        identifier=pax.identifier,
-                        etag=pax.etag,
-                        date_of_birth=pax.date_of_birth,
-                    )
-                    for pax in passengers_info
-                ]
-
-                dialogue_id = (
-                    trip_offer_responses_with_passengers.dialogue_info.identifier
-                )
-                if outward_trip_info and outward_trip_info.dialogue_id:
-                    dialogue_id = outward_trip_info.dialogue_id
-
-                await self._offers_cache.store(
-                    cache.OfferDetails(
-                        passengers_dobs=[pax.date_of_birth for pax in passengers_info],
-                        outward_passengers_info=outward_passengers_info,
-                        dialogue_id=dialogue_id,
-                        origin_station=trip.origin.place_value,
-                        destination_station=trip.destination.place_value,
-                        trip_id=trip_id,
-                        outward_offer_id=offer_obj.identifier,
-                        outbound_departure_datetime=search_task.outbound_departure_datetime,
-                        trip_filter_id=trip_offer_responses_with_passengers.trip_filter_id,
-                        comfort_class_value=helper_functions.get_comfort_class_value(
-                            offer_obj.summary,
-                        ),
-                        flexibility_value=helper_functions.get_flexibility_value(
-                            offer_obj.summary,
-                        ),
-                    ),
-                    expires_at=expires_at_dt,
-                    key=offer_model.id,
-                )
-                offer_protos.append(offer_model)
-            yield models_pb2.SearchResult(
-                id=search_result_id,
-                expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
-                offers=offer_protos,
-                result_details=await self._parse_result_details(
-                    trip_details,
-                    search_task.outward_offer_search_id,
-                ),
-                provider_id=str(PROVIDER_ID),
-            )
-
-    async def _get_train_type(self, leg: trips.TimedLeg) -> str:
-        if leg.train_type and leg.train_type.train_type_value:
-            train_type = leg.train_type.train_type_value
-
-            try:
-                return await self._resolve_rcode_title(
-                    train_type,
-                )
-            except RCodeLabelNotFoundError:
-                return train_type.rsplit(":", 1)[-1]
-
-        return ""
-
-    async def _parse_result_details(
-        self,
-        trip_details: Mapping[str, trips.TimedLeg],
-        is_outbound_segment: str | None,
-    ) -> list[models_pb2.ResultDetail]:
-        result_details = []
-        for idx, (result_detail_id, timed_leg) in enumerate(trip_details.items()):
-            origin = self._train_stations.resolve_place_with_urn(
-                timed_leg.origin.place_value,
-            )
-
-            destination = self._train_stations.resolve_place_with_urn(
-                timed_leg.destination.place_value,
-            )
-
-            result_details.append(
-                models_pb2.ResultDetail(
-                    id=result_detail_id,
-                    rail=models_pb2.RailResultDetail(
-                        origin=legacy_models_pb2.Point(
-                            ref=origin.identifier,
-                            name=origin.name.title() if origin.name else "",
-                            coordinates=latlng_pb2.LatLng(
-                                latitude=origin.latitude,
-                                longitude=origin.longitude,
-                            ),
-                            time_zone=origin.timezone.key,
-                        ),
-                        destination=legacy_models_pb2.Point(
-                            ref=destination.identifier,
-                            name=destination.name.title() if destination.name else "",
-                            coordinates=latlng_pb2.LatLng(
-                                latitude=destination.latitude,
-                                longitude=destination.longitude,
-                            ),
-                            time_zone=destination.timezone.key,
-                        ),
-                        outbound_segment=not bool(is_outbound_segment),
-                        segment_sequence=idx + 1,
-                        departure_date=protobuf.datetime_to_protobuf_datetime(
-                            datetime.datetime.strptime(
-                                timed_leg.departure_at,
-                                "%Y-%m-%dT%H:%M:%S%z",
-                            ),
-                        ),
-                        arrival_date=protobuf.datetime_to_protobuf_datetime(
-                            datetime.datetime.strptime(
-                                timed_leg.arrival_at,
-                                "%Y-%m-%dT%H:%M:%S%z",
-                            ),
-                        ),
-                    ),
-                ),
-            )
-
-        return result_details
-
-    def _parse_currency(self, currency_string: str) -> money.Currency:
-        return money.Currency(
-            currency_string,
-        )
-
-    async def _parse_offer(
-        self,
-        offer_summary: summary.OfferSummary,
-        detail_ids: Sequence[str],
-    ) -> models_pb2.Offer:
-        comfort_class_value = helper_functions.get_comfort_class_value(
-            offer_summary,
-        )
-        if comfort_class_value:
-            try:
-                comfort_class_name = await self._resolve_rcode_title(
-                    comfort_class_value,
-                )
-            except RCodeLabelNotFoundError:
-                comfort_class_name = comfort_class_value
-        else:
-            comfort_class_name = ""
-
-        currency = self._parse_currency(
-            offer_summary.price_with_optional_parts.currency.upper(),
-        )
-
-        price_proto = money.from_string(
-            string_amount=str(offer_summary.price_with_optional_parts.amount),
-            currency=currency,
-        ).protobuf()
-
-        return models_pb2.Offer(
-            id=string.uuid(),
-            rail=models_pb2.RailOffer(
-                cabin_class=[
-                    models_pb2.CabinDetails(
-                        result_id=detail_id,
-                        cabin_class=legacy_models_pb2.CabinClass(
-                            type=await self._cabin_mapping.resolve_cabin_class(
-                                comfort_class_value,
-                                "benerail",
-                            ),
-                            marketing_name=comfort_class_name,
-                        ),
-                    )
-                    for detail_id in detail_ids
-                ],
-            ),
-            price=price_proto,
-            price_breakdown=[
-                models_pb2.PriceBreakdown(
-                    price=price_proto,
-                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
-                ),
-            ],
         )
 
     @asyncstdlib.lru_cache()
@@ -784,3 +611,225 @@ class BenerailOffersAdapter(_BenerailAdapter):
             )
 
         return trip_map
+
+    async def _get_search_results(  # noqa: WPS217 , WPS231
+        self,
+        search_task: searches.Criteria,
+    ) -> AsyncIterator[models_pb2.SearchResult]:
+        outward_trip_info = await self._fetch_and_process_outward_offer_details(
+            search_task,
+        )
+
+        criterion = await self._parse_criterion(search_task)
+
+        trip_offer_responses_with_passengers = (
+            await self._get_trip_offer_responses_with_passengers(criterion=criterion)
+        )
+        trip_offer_responses = trip_offer_responses_with_passengers.trip_offer_responses
+        passengers_info = trip_offer_responses_with_passengers.passengers_info
+
+        if not all((trip_offer_responses, passengers_info)):
+            return
+
+        expires_at_dt = datetime.datetime.now(datetime.UTC) + self._ttl
+        trip_ids = [res.response_result.trip.identifier for res in trip_offer_responses]
+        trip_map = await self._get_trip_map(trip_ids, search_task.session_token)
+
+        for trip_offer_response in trip_offer_responses:
+            trip_id = trip_offer_response.response_result.trip.identifier
+            try:
+                trip = trip_map[trip_id]
+            except KeyError:
+                self._logger.warning(
+                    "Trip info not found, skipping trip offer",
+                    trip_offer_response=trip_offer_response,
+                )
+
+                continue
+
+            details_list = [
+                _TimedSegment(id=string.uuid(), segment=segment)
+                for segment in trip.trip_legs
+                if isinstance(segment, trips.TimedLeg)
+            ]
+
+            offer_protos = []
+            search_result_id = string.uuid()
+            for offer_obj in trip_offer_response.response_result.offers:
+                cur = offer_obj.summary.price_with_optional_parts.currency.upper()
+                try:
+                    self._parse_currency(cur)
+                except ValueError:
+                    continue
+
+                offer_model = await self._parse_offer(
+                    offer_summary=offer_obj.summary,
+                    details_list=details_list,
+                )
+
+                outward_passengers_info = [
+                    helper_models.PassengerInfo(
+                        identifier=pax.identifier,
+                        etag=pax.etag,
+                        date_of_birth=pax.date_of_birth,
+                    )
+                    for pax in passengers_info
+                ]
+
+                dialogue_id = (
+                    trip_offer_responses_with_passengers.dialogue_info.identifier
+                )
+                if outward_trip_info and outward_trip_info.dialogue_id:
+                    dialogue_id = outward_trip_info.dialogue_id
+
+                await self._offers_cache.store(
+                    cache.OfferDetails(
+                        passengers_dobs=[pax.date_of_birth for pax in passengers_info],
+                        outward_passengers_info=outward_passengers_info,
+                        dialogue_id=dialogue_id,
+                        dialogue_etag=trip_offer_responses_with_passengers.dialogue_info.etag,
+                        origin_station=trip.origin.place_value,
+                        destination_station=trip.destination.place_value,
+                        trip_id=trip_id,
+                        outward_offer_id=offer_obj.identifier,
+                        outbound_departure_datetime=search_task.outbound_departure_datetime,
+                        trip_offer_filter_id=trip_offer_responses_with_passengers.trip_offer_filter_id,
+                        comfort_class_value=helper_functions.get_comfort_class_value(
+                            offer_obj.summary,
+                        ),
+                        flexibility_value=helper_functions.get_flexibility_value(
+                            offer_obj.summary,
+                        ),
+                    ),
+                    expires_at=expires_at_dt,
+                    key=offer_model.id,
+                )
+                offer_protos.append(offer_model)
+            yield models_pb2.SearchResult(
+                id=search_result_id,
+                expires_at=protobuf.datetime_to_protobuf(expires_at_dt),
+                offers=offer_protos,
+                result_details=await self._parse_result_details(
+                    trip,
+                    search_task.outbound_offer_id,
+                    details_list,
+                ),
+                provider_id=str(PROVIDER_ID),
+            )
+
+    async def _parse_result_details(
+        self,
+        trip: trips.Trip,
+        is_outbound_segment: str | None,
+        details_list: Sequence[_TimedSegment],
+    ) -> Sequence[models_pb2.ResultDetail]:
+        result_details = []
+        for idx in range(len(details_list)):
+            origin = self._train_stations.resolve_place_with_urn(
+                trip.origin.place_value,
+            )
+            destination = self._train_stations.resolve_place_with_urn(
+                trip.destination.place_value,
+            )
+
+            result_details.append(
+                models_pb2.ResultDetail(
+                    id=details_list[idx].id,
+                    rail=models_pb2.RailResultDetail(
+                        origin=legacy_models_pb2.Point(
+                            ref=origin.identifier,
+                            name=origin.name.title() if origin.name else "",
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=origin.latitude,
+                                longitude=origin.longitude,
+                            ),
+                            time_zone=origin.timezone.key,
+                        ),
+                        destination=legacy_models_pb2.Point(
+                            ref=destination.identifier,
+                            name=destination.name.title() if destination.name else "",
+                            coordinates=latlng_pb2.LatLng(
+                                latitude=destination.latitude,
+                                longitude=destination.longitude,
+                            ),
+                            time_zone=destination.timezone.key,
+                        ),
+                        outbound_segment=not bool(is_outbound_segment),
+                        segment_sequence=idx + 1,
+                        departure_date=protobuf.datetime_to_protobuf_datetime(
+                            datetime.datetime.strptime(
+                                details_list[idx].segment.departure_at,
+                                "%Y-%m-%dT%H:%M:%S%z",
+                            ),
+                        ),
+                        arrival_date=protobuf.datetime_to_protobuf_datetime(
+                            datetime.datetime.strptime(
+                                details_list[idx].segment.arrival_at,
+                                "%Y-%m-%dT%H:%M:%S%z",
+                            ),
+                        ),
+                    ),
+                ),
+            )
+
+        return result_details
+
+    def _parse_currency(self, currency_string: str) -> money.Currency:
+        return money.Currency(
+            currency_string,
+        )
+
+    async def _parse_offer(
+        self,
+        offer_summary: summary.OfferSummary,
+        details_list: Sequence[_TimedSegment],
+    ) -> models_pb2.Offer:
+        detail_ids = [detail.id for detail in details_list]
+
+        comfort_class_value = helper_functions.get_comfort_class_value(
+            offer_summary,
+        )
+        if comfort_class_value:
+            try:
+                comfort_class_name = await self._resolve_rcode_title(
+                    comfort_class_value,
+                )
+            except RCodeLabelNotFoundError:
+                comfort_class_name = comfort_class_value
+        else:
+            comfort_class_name = ""
+
+        currency = self._parse_currency(
+            offer_summary.price_with_optional_parts.currency.upper(),
+        )
+
+        price_proto = money.from_string(
+            string_amount=str(offer_summary.price_with_optional_parts.amount),
+            currency=currency,
+        ).protobuf()
+
+        return models_pb2.Offer(
+            id=string.uuid(),
+            rail=models_pb2.RailOffer(
+                cabin_class=[
+                    models_pb2.CabinDetails(
+                        result_id=detail_id,
+                        cabin_class=legacy_models_pb2.CabinClass(
+                            type=await self._cabin_mapping.resolve_cabin_class(
+                                comfort_class_value,
+                                "benerail",
+                            ),
+                            marketing_name=comfort_class_name,
+                        ),
+                    )
+                    for detail_id in detail_ids
+                ],
+            ),
+            price=price_proto,
+            price_breakdown=[
+                models_pb2.PriceBreakdown(
+                    price=price_proto,
+                    breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                ),
+            ],
+        )
