@@ -260,6 +260,15 @@
     <!-- Bottom Section of navbar-->
 
     <li>
+      <div class="item live-support" typography="body-medium">
+        <Icon variant="alert-disc" size="20px" color="var(--color-common-light-strong)" />
+        <div>
+          <span>Live Support</span>
+          <a href="tel:+34900751468" class="phone-number">+34 900 751 468</a>
+        </div>
+      </div>
+    </li>
+    <li>
       <button
         typography="body-medium"
         class="item logout"
@@ -392,5 +401,18 @@
 
   .main-menu:not(:hover) .toggle {
     opacity: 0;
+  }
+
+  .live-support {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background-color: #f2f2f2;
+  }
+
+  .live-support .phone-number {
+    display: block;
+    color: var(--color-common-light-strong);
+    text-decoration: none;
   }
 </style>
