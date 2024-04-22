@@ -119,7 +119,7 @@
   {#if $open}
     <div class="popover" use:melt={$content} transition:scale={{ duration: 200, start: 0.8 }}>
       {#if externalLabel}
-        <div typography="headline-medium" class="title">{externalLabel}</div>
+        <div typography="headline-small" class="title">{externalLabel}</div>
       {/if}
 
       <Calendar

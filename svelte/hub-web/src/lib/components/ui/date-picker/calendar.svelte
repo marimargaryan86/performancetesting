@@ -26,11 +26,11 @@
 <div use:melt={$calendar}>
   <header>
     <button use:melt={$prevButton} type="button" class="navigation">
-      <ChevronIcon direction="left" size="24px" />
+      <ChevronIcon direction="left" size="20px" />
     </button>
-    <div use:melt={$heading} typography="title-medium" weight="bold">{$headingValue}</div>
+    <div use:melt={$heading} typography="title-small">{$headingValue}</div>
     <button use:melt={$nextButton} type="button" class="navigation">
-      <ChevronIcon direction="right" size="24px" />
+      <ChevronIcon direction="right" size="20px" />
     </button>
   </header>
 
@@ -74,7 +74,7 @@
   header {
     display: flex;
     justify-content: space-between;
-    padding: 24px 0;
+    padding: 14px 0;
   }
 
   .navigation {
@@ -95,7 +95,7 @@
   }
 
   .weekdays th {
-    padding: 8px 0;
+    padding: 4px 0;
   }
 
   .day {
@@ -103,7 +103,7 @@
     align-items: center;
     justify-content: center;
     width: 48px;
-    height: 48px;
+    height: 46px;
     border-radius: 50%;
     cursor: pointer;
   }
