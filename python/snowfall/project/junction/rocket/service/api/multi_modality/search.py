@@ -276,10 +276,12 @@ class RailSearcher:
         searches: grpc_pb2_grpc.SearchServiceStub,
         search_results: grpc_pb2_grpc.SearchResultServiceStub,
         polling_interval: datetime.timedelta,
+        search_window: datetime.timedelta,
     ):
         self._searches = searches
         self._search_results = search_results
         self._polling_interval = polling_interval
+        self._search_window = search_window
         self._logger = stdout.get_logger()
         self._in_progress_statuses = {
             amqp_pb2.Trackable.STATUS_PENDING,
@@ -300,6 +302,32 @@ class RailSearcher:
                 self._search_result_to_offers(search_result)
                 for search_result in search_results
             ]),
+        )
+
+    def make_search_request(
+        self,
+        request: SegmentSearchRequest,
+    ) -> grpc_pb2.EnqueueSearchRequest:
+        return grpc_pb2.EnqueueSearchRequest(
+            search=searches_pb2.Search(
+                reseller_id=request.reseller_id,
+                rail=searches_pb2.Rail(
+                    origin=request.segment.origin,
+                    destination=request.segment.destination,
+                    departure_after=protobuf.datetime_to_protobuf(
+                        request.departure_after,
+                    ),
+                    departure_before=protobuf.datetime_to_protobuf(
+                        request.departure_after + self._search_window,
+                    ),
+                    passengers=[
+                        searches_pb2.Passenger(
+                            date_of_birth=protobuf.date_to_protobuf(date_of_birth),
+                        )
+                        for date_of_birth in request.date_of_births
+                    ],
+                ),
+            ),
         )
 
     def _search_result_to_offers(
@@ -334,7 +362,7 @@ class RailSearcher:
     ) -> list[searches_pb2.SearchResult]:
         self._logger.info("Enqueuing search")
         response = await self._searches.EnqueueSearch(
-            self._make_search_request(request),
+            self.make_search_request(request),
         )
 
         while response.search.status in self._in_progress_statuses:
@@ -353,29 +381,6 @@ class RailSearcher:
         )
 
         return result_response.search_results
-
-    def _make_search_request(
-        self,
-        request: SegmentSearchRequest,
-    ) -> grpc_pb2.EnqueueSearchRequest:
-        return grpc_pb2.EnqueueSearchRequest(
-            search=searches_pb2.Search(
-                reseller_id=request.reseller_id,
-                rail=searches_pb2.Rail(
-                    origin=request.segment.origin,
-                    destination=request.segment.destination,
-                    departure_after=protobuf.datetime_to_protobuf(
-                        request.departure_after,
-                    ),
-                    passengers=[
-                        searches_pb2.Passenger(
-                            date_of_birth=protobuf.date_to_protobuf(date_of_birth),
-                        )
-                        for date_of_birth in request.date_of_births
-                    ],
-                ),
-            ),
-        )
 
 
 @dataclasses.dataclass(frozen=True)

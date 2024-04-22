@@ -157,6 +157,7 @@ def rail_searcher(
         searches=searches,
         search_results=search_results,
         polling_interval=datetime.timedelta(),
+        search_window=datetime.timedelta(hours=7),
     )
 
 
@@ -303,6 +304,37 @@ class TestRailSearch:
 
         for offer in offers:
             assert offer.arrival_at > offer.departure_at
+
+    async def test_make_search_request_is_correct(  # noqa: WPS218
+        self,
+        rail_searcher: search.RailSearcher,
+        mono_route: routes.Route,
+    ) -> None:
+        now = datetime.datetime.now(datetime.UTC)
+        segment_search_request = search.SegmentSearchRequest(
+            segment=mono_route.segments[0],
+            departure_after=now,
+            date_of_births=[_DOB],
+            reseller_id="foo",
+        )
+        enqueue_search_request = rail_searcher.make_search_request(
+            segment_search_request,
+        )
+        assert enqueue_search_request is not None
+        assert enqueue_search_request.search is not None
+        assert enqueue_search_request.search.reseller_id == "foo"
+        assert enqueue_search_request.search.rail is not None
+        rail = enqueue_search_request.search.rail
+
+        assert rail.origin == mono_route.segments[0].origin
+        assert rail.destination == mono_route.segments[0].destination
+        assert rail.departure_after == protobuf.datetime_to_protobuf(now)
+        assert rail.departure_before == protobuf.datetime_to_protobuf(
+            now + datetime.timedelta(hours=7),
+        )
+        assert rail.passengers
+        assert len(rail.passengers) == 1
+        assert rail.passengers[0].date_of_birth == protobuf.date_to_protobuf(_DOB)
 
 
 class TestSearcher:
