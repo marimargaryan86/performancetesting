@@ -136,17 +136,12 @@ def _generate_inbound_search_criteria(
     timezone_destination: zoneinfo.ZoneInfo,
     timezone_origin: zoneinfo.ZoneInfo,
 ) -> list[Criteria]:
-    timestamps = find_time_windows(
-        departure_before=normalize_datetime(
-            protobuf.protobuf_to_datetime(search.rail.departure_before),
-            timezone_origin,
-        ),  # Placeholder for future logic
-        departure_after=normalize_datetime(
-            protobuf.protobuf_to_datetime(search.rail.departure_after),
-            timezone_origin,
-        ),
-        timezone=timezone_origin,
+    departure_after = normalize_datetime(
+        protobuf.protobuf_to_datetime(search.rail.departure_after),
+        timezone_origin,
     )
+
+    timestamps = [departure_after]
 
     trip_sequence = 2
     return _generate_search_criteria(
