@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from snowfall.project.junction.rocket.service.api import constants
 from snowfall.project.junction.rocket.service.api.air import models as rocket
@@ -67,9 +67,10 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
 
 def _transform_result_detail(
     segment: safej1.Segment,
+    result_detail_id: str,
 ) -> rocket.ResultDetails:
     return rocket.ResultDetails(
-        id=string.uuid(),
+        id=result_detail_id,
         flight_number=segment.flight_number,
         marketing_airline=segment.airline,
         arrival_station=segment.arrival_station,
@@ -107,6 +108,20 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
         j1_response: safej1.SearchFlightsResponse,
         search_id: str,
     ) -> rocket.AirSearchResult:
+        result_details = []
+        result_detail_id_from_segments = {}
+
+        if not offer.od_id:
+            raise ValueError
+
+        full_trip = j1_response.ods[offer.od_id]
+        for segment in full_trip.segments:
+            result_detail_id = string.uuid()
+            full_segment = j1_response.segments[segment]
+            result_detail = _transform_result_detail(full_segment, result_detail_id)
+            result_details.append(result_detail)
+            result_detail_id_from_segments[segment] = result_detail_id
+
         offers = []
         for fare_type, priced_fares in offer.fares.items():
             for priced_fare in priced_fares:
@@ -117,7 +132,10 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
                         currency=priced_fare.currency,
                     ),
                     cabin_details=(
-                        self._transform_cabins(priced_fare.segments)
+                        self._transform_cabins(
+                            priced_fare.segments,
+                            result_detail_id_from_segments,
+                        )
                         if priced_fare.segments
                         else None
                     ),
@@ -126,17 +144,6 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
                     ref_ids=[ref for ref in priced_fare.refs if priced_fare.refs],
                 )
                 offers.append(new_offer)
-
-        result_details = []
-
-        if not offer.od_id:
-            raise ValueError
-
-        full_trip = j1_response.ods[offer.od_id]
-        for segment in full_trip.segments:
-            full_segment = j1_response.segments[segment]
-            result_detail = _transform_result_detail(full_segment)
-            result_details.append(result_detail)
 
         return rocket.AirSearchResult(
             id=string.uuid(),
@@ -149,12 +156,14 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
     def _transform_cabins(
         self,
         fare_segments: Sequence[safej1.FareSegment],
+        result_detail_id_from_segments: Mapping[str, str],
     ) -> list[rocket.CabinDetails]:
         cabin_details = []
         for fare_segment in fare_segments:
+            result_detail_id = result_detail_id_from_segments[fare_segment.segment_id]
             cabin = rocket.CabinDetails(
                 id=string.uuid(),
-                result_detail_id=fare_segment.segment_id or None,
+                result_detail_id=result_detail_id,
                 marketing_name=fare_segment.cabin or None,
             )
             cabin_details.append(cabin)
