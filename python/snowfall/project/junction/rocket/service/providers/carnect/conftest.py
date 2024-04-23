@@ -1,5 +1,7 @@
 import datetime
+import uuid
 from collections.abc import AsyncIterator
+from typing import Any
 from unittest import mock
 
 import aiofiles
@@ -8,6 +10,16 @@ import pytest_asyncio
 from xsdata.formats.dataclass import parsers
 from xsdata.formats.dataclass.parsers import config as parsers_config
 
+from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
+from snowfall.project.junction.rocket.service.bookings.v1alpha import (
+    amqp_pb2 as booking_amqp_pb2,
+)
+from snowfall.project.junction.rocket.service.bookings.v1alpha import (
+    models_pb2 as booking_models_pb2,
+)
+from snowfall.project.junction.rocket.service.providers.carnect import (
+    bookings as carnect_bookings,
+)
 from snowfall.project.junction.rocket.service.providers.carnect import (
     cache,
     pricing,
@@ -19,7 +31,14 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import (
 )
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer, types
-from snowfall.stdlib.v1 import money_pb2
+from snowfall.stdlib.v1 import (
+    date_pb2,
+    datetime_pb2,
+    latlng_pb2,
+    money_pb2,
+    phone_number_pb2,
+    postal_address_pb2,
+)
 from snowfall.vendor.carnect.models import service as carnect_service
 
 
@@ -135,6 +154,141 @@ async def mock_message() -> AsyncIterator[types.Message[amqp_pb2.QuoteTask]]:
         yield message
 
 
+@pytest.fixture()
+async def storage() -> AsyncIterator[filesystem.Storage]:
+    async with filesystem.Storage.from_dsn("memory://") as storage_obj:
+        yield storage_obj
+
+
+@pytest_asyncio.fixture
+async def booking_task_mock() -> (
+    AsyncIterator[types.Message[booking_amqp_pb2.PlaceBookingTask]]
+):
+    with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as msg:
+        message = msg.return_value
+        message.ack = mock.AsyncMock(name="ack", return_value=None)
+        message.body = booking_amqp_pb2.PlaceBookingTask(
+            booking=booking_models_pb2.Booking(
+                reseller_id="9e693a64-c3fd-4c8c-8af7-0cd817939b38",
+                provider_id="fc4f9bbb-69d1-4cef-b8ac-ecd3661abba4",
+                provider_name="Carnect",
+                trip_option=booking_models_pb2.TripOption(
+                    price_quote_id="_c6INHqlc0ypOt1S8JP4Tw-6",
+                    price=money_pb2.Money(
+                        currency_code="EUR",
+                        units=328,
+                    ),
+                    details=[
+                        booking_models_pb2.TripOptionDetails(
+                            car_rental=models_pb2.CarRentalResultDetail(
+                                origin=go_models_pb2.Point(
+                                    name="Yerevan",
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=4.9041,
+                                        longitude=52.3676,
+                                    ),
+                                    time_zone="Europe/Amsterdam",
+                                ),
+                                destination=go_models_pb2.Point(
+                                    name="Tbilisi",
+                                    coordinates=latlng_pb2.LatLng(
+                                        latitude=4.9041,
+                                        longitude=52.3676,
+                                    ),
+                                    time_zone="Europe/Amsterdam",
+                                ),
+                                pickup_at=datetime_pb2.DateTime(
+                                    year=2024,
+                                    month=5,
+                                    day=5,
+                                    hours=14,
+                                    minutes=0,
+                                    seconds=0,
+                                    nanos=0,
+                                ),
+                                return_at=datetime_pb2.DateTime(
+                                    year=2024,
+                                    month=5,
+                                    day=6,
+                                    hours=14,
+                                    minutes=0,
+                                    seconds=0,
+                                    nanos=0,
+                                ),
+                            ),
+                        ),
+                    ],
+                    rules=[],
+                ),
+                passengers=[
+                    booking_models_pb2.Passenger(
+                        first_name="First",
+                        last_name="Last",
+                        title=booking_models_pb2.Passenger.Title.TITLE_MR,
+                        gender=booking_models_pb2.Passenger.Gender.GENDER_MALE,
+                        date_of_birth=date_pb2.Date(
+                            year=1996,
+                            month=11,
+                            day=12,
+                        ),
+                        doc_details=booking_models_pb2.DocumentDetails(
+                            issue_county="GB",
+                            document_type=booking_models_pb2.DocumentDetails.Type.TYPE_PASSPORT,
+                            document_number="AR123453",
+                            nationality="Armenian",
+                            residence_country_code="AM",
+                        ),
+                        place_of_birth="Yerevan",
+                        lead_passenger=True,
+                        contact_details=booking_models_pb2.ContactDetails(
+                            address=postal_address_pb2.PostalAddress(
+                                address_lines=["Street name 7"],
+                                postal_code="0052",
+                                locality="London",
+                            ),
+                            phone=phone_number_pb2.PhoneNumber(
+                                e164_number="37455111944",
+                            ),
+                            email="test@example.com",
+                        ),
+                    ),
+                ],
+            ),
+        )
+
+        yield message
+
+
+@pytest_asyncio.fixture()
+async def booking_consumer_mock(
+    storage: filesystem.Storage,
+) -> carnect_bookings.Consumer:
+    return carnect_bookings.Consumer(
+        consumer_obj=mock.AsyncMock(spec=consumer.Consumer),
+        producer_obj=mock.AsyncMock(spec=consumer.Consumer),
+        booker=carnect_bookings.Booker(
+            quote_cache=mock.AsyncMock(
+                name="QuoteCache",
+                fetch=mock.AsyncMock(
+                    name="fetch",
+                    return_value=cache.PriceQuote(quote_id="_c6INHqlc0ypOt1S8JP4Tw-6"),
+                ),
+            ),
+            booking_storage=storage,
+            carnect_client=mock.AsyncMock(
+                name="CarnectClient",
+                reservation=mock.AsyncMock(
+                    name="reservation",
+                    return_value=await get_reservation_response(),
+                ),
+            ),
+            carnect_config=mock.Mock(name="CarnectConfig"),
+            provider_id=uuid.UUID("fc4f9bbb-69d1-4cef-b8ac-ecd3661abba4"),
+            provider_name="Carnect",
+        ),
+    )
+
+
 async def _load_xml_fixture(
     file_name: str,
     package: str | None = None,
@@ -159,3 +313,14 @@ async def get_avail_rate_response() -> carnect_service.ServiceSoapGetVehAvailRat
     )
     response = await _load_xml_fixture("get_avail_rate.xml")
     return parser.from_bytes(response, carnect_service.ServiceSoapGetVehAvailRateOutput)
+
+
+async def get_reservation_response() -> tuple[Any, bytes]:
+    parser = parsers.XmlParser(
+        config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
+    )
+    response = await _load_xml_fixture("reservation.xml")
+    return parser.from_bytes(
+        response,
+        carnect_service.ServiceSoapGetVehReservationOutput,
+    ), response
