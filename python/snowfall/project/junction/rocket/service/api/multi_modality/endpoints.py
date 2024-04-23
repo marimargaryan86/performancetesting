@@ -19,6 +19,7 @@ from snowfall.stdlib.integration.starlette import (
     routes,
 )
 from snowfall.stdlib.integration.starlette import models as std_models
+from snowfall.stdlib.transport.amqp import protocol as amqp_producer
 
 
 @dataclasses.dataclass(frozen=True)
@@ -48,6 +49,7 @@ class Suggestions:
 class SuggestionSearches:
     _repository: repository.SuggestionSearchRepository
     _places: places_pb2_grpc.PlacesServiceStub
+    _producer: amqp_producer.Producer
 
     async def get(self, request: messages.Request) -> responses.Response:
         search = await self._repository.find_by_id(
@@ -74,6 +76,10 @@ class SuggestionSearches:
             return err.to_response()
 
         search = await self._repository.create_from_criteria(criteria)
+        await self._producer.publish(
+            multi_modal_pb2.SuggestionSearchTask(suggestion_search_id=search.id),
+            "tasks.suggestion_search",
+        )
 
         return await messages.create_response(
             body=std_models.Body(
@@ -155,6 +161,7 @@ class SuggestionSearches:
                 )
                 for passenger in body.passengers
             ],
+            reseller_id=request.starlette_request.user.username,
         )
 
 

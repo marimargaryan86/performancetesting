@@ -4,6 +4,7 @@ from typing import NamedTuple
 
 import lagom
 from grpc import aio
+from motor import motor_asyncio
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket.service.api.air import (
@@ -22,12 +23,6 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.hotel import (
     types as hotel_types,
 )
-from snowfall.project.junction.rocket.service.api.multi_modality import (
-    endpoints as multi_modal_endpoints,
-)
-from snowfall.project.junction.rocket.service.api.multi_modality import (
-    repository as multi_modal_repository,
-)
 from snowfall.project.junction.rocket.service.api.settings import Settings
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
@@ -38,7 +33,6 @@ from snowfall.stdlib.service import (
     application,
     grpc_factory,
     httpx_factory,
-    mongo_factory,
 )
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
 from snowfall.vendor.junction_one.client import JunctionOneClient
@@ -52,6 +46,7 @@ class _Channels(NamedTuple):
 
 async def create_dependencies(
     app: application.Application[Settings],
+    mongo_db: motor_asyncio.AsyncIOMotorDatabase,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -68,8 +63,6 @@ async def create_dependencies(
             grpc_factory.make_insecure_channel(app, app.settings.places_address),
         ),
     )
-
-    mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
 
     container[stdlib_auth.JWTAuthenticationBackend] = (
         stdlib_auth.JWTAuthenticationBackend(
@@ -138,21 +131,6 @@ async def create_dependencies(
         hotel_repositories.HotelRoomsSearchRepository(
             collection=mongo_db.hotel_rooms_results,
         )
-    )
-    container[multi_modal_endpoints.SuggestionSearches] = (
-        multi_modal_endpoints.SuggestionSearches(
-            _repository=multi_modal_repository.SuggestionSearchRepository(
-                collection=mongo_db.suggestion_searches,
-                ttl=app.settings.suggestion_search_ttl,
-            ),
-            _places=container[places_pb2_grpc.PlacesServiceStub],
-        )
-    )
-    container[multi_modal_endpoints.Suggestions] = multi_modal_endpoints.Suggestions(
-        _repository=multi_modal_repository.SuggestionRepository(
-            collection=mongo_db.suggestions,
-            ttl=app.settings.suggestion_search_ttl,
-        ),
     )
 
     return container

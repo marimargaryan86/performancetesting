@@ -123,6 +123,7 @@ job "junction-rocket-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
+AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 AUTHENTICATION_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_authentication-${var.environment}"))}}
 SEARCHES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_searches-${var.environment}"))}}

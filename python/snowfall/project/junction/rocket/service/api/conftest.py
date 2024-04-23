@@ -71,6 +71,7 @@ from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.transport.amqp import memory
 from snowfall.stdlib.v1 import amqp_pb2
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
@@ -218,6 +219,7 @@ def suggestions_searches(
     return multi_modal_endpoints.SuggestionSearches(
         _places=places_stub,
         _repository=suggestion_search_repository,
+        _producer=memory.Producer(),
     )
 
 
