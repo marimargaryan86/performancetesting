@@ -1,4 +1,3 @@
-# type: ignore  # noqa: PGH003
 from collections.abc import Sequence
 
 import pytest
@@ -6,40 +5,40 @@ import pytest
 from snowfall.project.junction.service.providers.benerail.stations import get_cities_ids
 from snowfall.vendor.benerail.models.enumeration import response, results
 
-cities_responses_examples: list[list[response.PlacesResponse]] = [
+cities_responses_examples: list[list[response.PlacesResponse | None]] = [
     [],
     [None],
     [response.PlacesResponse()],
     [response.PlacesResponse(response_result=None)],
     [
         response.PlacesResponse(
-            response_result=response.PlacesResult(
+            response_result=results.PlacesResult(
                 places=None,
             ),
         ),
     ],
     [
         response.PlacesResponse(
-            response_result=response.PlacesResult(
+            response_result=results.PlacesResult(
                 places=[],
             ),
         ),
     ],
     [
         response.PlacesResponse(
-            response_result=response.PlacesResult(
+            response_result=results.PlacesResult(
                 places=[
-                    results.PlacesResult(identifier="place_id_1", name="Place 1"),
-                    results.PlacesResult(identifier="place_id_2", name="Place 2"),
+                    results.PlaceResult(identifier="place_id_1", name="Place 1"),
+                    results.PlaceResult(identifier="place_id_2", name="Place 2"),
                 ],
             ),
         ),
     ],
     [
         response.PlacesResponse(
-            response_result=response.PlacesResult(
+            response_result=results.PlacesResult(
                 places=[
-                    results.PlacesResult(identifier="place_id_2", name=None),
+                    results.PlaceResult(identifier="place_id_2", name=None),
                 ],
             ),
         ),

@@ -4,6 +4,7 @@
       "no_file_level_flake8_noqa",
       "no_file_level_mypy",
       "no_file_level_ruff_noqa",
+      "no_file_level_type_ignore",
       "no_no_type_check_decorator",
       "no_pytest_mark_asyncio"
     ],
@@ -47,6 +48,11 @@
     {
       "name": "no_file_level_ruff_noqa",
       "pattern": "# ruff: noqa",
+      "inverted": true
+    },
+    {
+      "name": "no_file_level_type_ignore",
+      "pattern": "^# type: ignore",
       "inverted": true
     },
     {

@@ -49,15 +49,21 @@ async def dump_stations(
         )
 
 
-def get_cities_ids(cities_responses: Sequence[response.PlacesResponse]) -> set[str]:
+def get_cities_ids(
+    cities_responses: Sequence[response.PlacesResponse | None],
+) -> set[str]:
     city_ids: set[str] = set()
+
     for city_responses in cities_responses:
-        with contextlib.suppress(AttributeError):
-            city_ids.update(
-                place.identifier
-                for place in city_responses.response_result.places or []  # type: ignore[union-attr]
-                if place.identifier is not None
-            )
+        if not city_responses or not city_responses.response_result:
+            continue
+
+        city_ids.update(
+            place.identifier
+            for place in (city_responses.response_result.places or [])
+            if place.identifier is not None
+        )
+
     return city_ids
 
 
