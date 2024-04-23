@@ -205,6 +205,23 @@ async def _bookings(app: service.Application[_Settings]) -> None:
 async def _bookings_factory(
     app: service.Application[_Settings],
 ) -> provider_bookings.Implementation:
+    carnect_config = carnect_settings.Config(
+        timeout=app.settings.api_timeout.seconds,
+        base_url=str(app.settings.api_base_url),
+        export_soap_requests=True,
+        username=app.settings.api_username,
+        password=app.settings.api_password,
+        is_test=app.settings.is_test,
+    )
+
+    carnect_client = client.CarnectClient(
+        http_client=await httpx_factory.make_client(
+            app,
+            timeout=app.settings.api_timeout,
+        ),
+        config=carnect_config,
+    )
+
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
@@ -213,7 +230,10 @@ async def _bookings_factory(
     return provider_bookings.Implementation(
         storage=storage,
         transformer=transformer.raw_to_booking,
-        cancellation_handler=bookings.CancellationHandler().cancel,
+        cancellation_handler=bookings.CancellationHandler(
+            carnect_client=carnect_client,
+            carnect_config=carnect_config,
+        ).cancel,
     )
 
 

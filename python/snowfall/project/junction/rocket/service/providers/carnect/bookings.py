@@ -1,7 +1,10 @@
 import pathlib
+import types
 import uuid
 
 import httpx
+from xsdata.formats.dataclass import parsers
+from xsdata.formats.dataclass.parsers import config as parsers_config
 
 from snowfall.project.junction.rocket.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.rocket.service.bookings.v1alpha import (
@@ -12,16 +15,26 @@ from snowfall.project.junction.rocket.service.providers.carnect import (
     cache,
     errors,
 )
+from snowfall.project.junction.rocket.service.providers.carnect.searches import (
+    get_optional_value,
+)
 from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.transport.amqp import consumer, producer, types
+from snowfall.stdlib.transport.amqp import consumer, producer
+from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.carnect import client
 from snowfall.vendor.carnect import config as carnect_settings
-from snowfall.vendor.carnect.adapters import reservation_adapter
+from snowfall.vendor.carnect.adapters import (
+    cancel_reservation_adapter,
+    reservation_adapter,
+    veh_ret_res_adapter,
+)
 from snowfall.vendor.carnect.builders import (
+    cancel_reservation_builder,
     reservation_builder,
+    veh_ret_res_builder,
 )
 from snowfall.vendor.carnect.models import service
 
@@ -246,7 +259,7 @@ class Consumer:
 
     async def _process_message(
         self,
-        message: types.Message[amqp_pb2.PlaceBookingTask],
+        message: amqp_types.Message[amqp_pb2.PlaceBookingTask],
     ) -> None:
         try:
             booking_result = await self._booker.book(message.body)
@@ -262,20 +275,44 @@ class Consumer:
 
 
 class Transformer:
+    _status_map = types.MappingProxyType({
+        "Pending": bookings_pb2.Booking.STATUS_PENDING,
+        "Confirmed": bookings_pb2.Booking.STATUS_CONFIRMED,
+        "Failed": bookings_pb2.Booking.STATUS_ERROR,
+        None: bookings_pb2.Booking.STATUS_ERROR,
+    })
+
     def __init__(self) -> None:
         self._serializer = protobuf.AnySerializer[models_pb2.Booking]()
 
     async def raw_to_booking(self, raw: bytes) -> bookings_pb2.Booking:
         booking = self._serializer.deserialize(raw)
+        raw_data = booking.provider_booking.raw_data
+
+        response = self._parse_reservation_output_from_raw(raw_data)
+        res_adapter = reservation_adapter.ReservationAdapter(response)
+        reservation = res_adapter.reservation()
+        status = res_adapter.get_status()
+        booking_status = self._status_map.get(
+            status,
+            bookings_pb2.Booking.STATUS_CANCELLED,
+        )
+
+        try:
+            vendor_reference = reservation.veh_segment_core.vendor.value  # type: ignore[union-attr]
+        except AttributeError:
+            vendor_reference = ""
+
         return bookings_pb2.Booking(
             id=booking.provider_booking.booking_reference,
-            status=bookings_pb2.Booking.STATUS_CONFIRMED,
+            status=booking_status,
             provider=bookings_pb2.Booking.Provider(
                 id=booking.provider_id,
                 name=booking.provider_name,
             ),
             trip=bookings_pb2.Booking.Trip(
-                record_locator=booking.provider_booking.record_locator,
+                record_locator=res_adapter.get_unique_id() or "",
+                operator_booking_references=[vendor_reference],
             ),
             prices=[
                 bookings_pb2.Booking.Price(
@@ -287,7 +324,147 @@ class Transformer:
             updated_at=booking.updated_at,
         )
 
+    def _parse_reservation_output_from_raw(
+        self,
+        response: str,
+    ) -> service.ServiceSoapGetVehReservationOutput:
+        parser = parsers.XmlParser(
+            config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
+        )
+        return parser.from_string(response, service.ServiceSoapGetVehReservationOutput)
+
 
 class CancellationHandler:
+    def __init__(
+        self,
+        carnect_client: client.CarnectClient,
+        carnect_config: carnect_settings.Config,
+    ):
+        self._client = carnect_client
+        self._config = carnect_config
+        self._logger = stdout.get_logger()
+
     async def cancel(self, identifier: str) -> bookings_pb2.BookingCancellation:
-        return bookings_pb2.BookingCancellation()
+        provider_booking_reference = identifier
+        try:
+            rs_adapter = await self._cancel_booking(identifier)
+        except (httpx.HTTPError, errors.CarnectCancellationError, ValueError):
+            self._logger.exception(
+                "Booking cancellation failed",
+                identifier=identifier,
+            )
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=provider_booking_reference,
+                status=bookings_pb2.BookingCancellation.STATUS_CANCELLATION_FAILED,
+            )
+
+        try:
+            amount = await self._get_refunded_us(rs_adapter, identifier)
+        except (errors.FieldMissingError, errors.CarnectCancellationError):
+            self._logger.exception(
+                "Failed to get total amount",
+                identifier=identifier,
+            )
+            return bookings_pb2.BookingCancellation(
+                provider_booking_reference=provider_booking_reference,
+                status=bookings_pb2.BookingCancellation.STATUS_CANCELLATION_FAILED,
+            )
+
+        return bookings_pb2.BookingCancellation(
+            provider_booking_reference=provider_booking_reference,
+            status=bookings_pb2.BookingCancellation.STATUS_REFUND_DUE,
+            refunded_us=amount.protobuf(),
+        )
+
+    async def _get_refunded_us(
+        self,
+        rs_adapter: cancel_reservation_adapter.CancelReservationAdapter,
+        provider_booking_reference: str,
+    ) -> money.Money:
+        fees = get_optional_value(
+            rs_adapter.cancel_info(),
+            "veh_reservation.veh_segment_core.fees.fee",
+            [],
+        )
+        if not fees:
+            raise errors.FieldMissingError(
+                "Cancellation fee information is missing in cancellation response",
+            )
+
+        if fees[0].amount is None:
+            raise errors.FieldMissingError(
+                "Cancellation fee amount is missing in cancellation response",
+            )
+
+        if fees[0].currency_code is None:
+            raise errors.FieldMissingError(
+                "Cancellation fee currency_code is missing in cancellation response",
+            )
+
+        fee = money.from_string(
+            string_amount=str(fees[0].amount),
+            currency=money.Currency(fees[0].currency_code.upper()),
+        )
+
+        amount = money.Money(0, currency=fee.currency)
+        if fee.amount == 0:
+            amount = await self._get_total_amount(provider_booking_reference)
+
+        return amount
+
+    async def _get_total_amount(
+        self,
+        provider_booking_reference: str,
+    ) -> money.Money:
+        builder = veh_ret_res_builder.VehRetResRqBuilder(self._config)
+
+        id_context, surname = sequence.from_composite_id(provider_booking_reference)
+        builder.unique_id().id_context(id_context)
+        builder.person_name().surname(surname)
+
+        rs_adapter = veh_ret_res_adapter.VehRetResAdapter(
+            await self._client.retrieve_reservation(builder),
+        )
+        if not rs_adapter.is_success():
+            raise errors.CarnectCancellationError(rs_adapter.get_error())
+
+        rs_core = rs_adapter.rs_core()
+        amount = get_optional_value(
+            rs_core,
+            "veh_reservation.veh_segment_core.total_charge.estimated_total_amount",
+            None,
+        )
+        currency_code = get_optional_value(
+            rs_core,
+            "veh_reservation.veh_segment_core.total_charge.currency_code",
+            None,
+        )
+
+        if amount is None:
+            raise errors.FieldMissingError("missing value: total amount")
+        if currency_code is None:
+            raise errors.FieldMissingError("missing value: currency code")
+
+        return money.from_string(str(amount), money.Currency(currency_code.upper()))
+
+    async def _cancel_booking(
+        self,
+        provider_booking_reference: str,
+    ) -> cancel_reservation_adapter.CancelReservationAdapter:
+        id_context, surname = sequence.from_composite_id(provider_booking_reference)
+
+        cancel_rq_builder = cancel_reservation_builder.CancelReservationRqBuilder(
+            self._config,
+        )
+        cancel_info_type = cancel_rq_builder.get_cancel_info_type()
+        unique_id = cancel_info_type.add_unique_id()
+        unique_id.id_context(id_context)
+        cancel_info_type.get_person_name().surname(surname)
+
+        response = await self._client.cancel_reservation(cancel_rq_builder)
+        rs_adapter = cancel_reservation_adapter.CancelReservationAdapter(response)
+
+        if not rs_adapter.is_success():
+            raise errors.CarnectCancellationError(rs_adapter.get_error())
+
+        return rs_adapter
