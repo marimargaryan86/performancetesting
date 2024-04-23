@@ -28,6 +28,7 @@ include:
   - local: openapi/.gitlab-ci.yml
   - local: protobuf/.gitlab-ci.yml
   - local: svelte/.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.latest.gitlab-ci.yml
 
 make-uninterruptible:
   stage: setup
