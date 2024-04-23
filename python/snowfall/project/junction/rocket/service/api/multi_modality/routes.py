@@ -148,7 +148,14 @@ class Routes:
                     self._resolve_route(route, resolved_places).reduce(),
                 )
 
-        return resolved_routes
+        # We need to de-duplicate the routes after reducing the segments. We
+        # do it naively because the number of routes is expected to be small.
+        deduped_routes = []
+        for rte in resolved_routes:
+            if rte not in deduped_routes:
+                deduped_routes.append(rte)
+
+        return deduped_routes
 
     async def _find_location_coordinates(
         self,

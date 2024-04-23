@@ -228,6 +228,49 @@ async def test_route_with_missing_place_is_discarded(
     assert not found_routes
 
 
+async def test_route_with_adjacent_segments_is_reduced_and_deduped(
+    route_finder: routes.Routes,
+    planner: planner_pb2_grpc.PlannerServiceStub,
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    mocker.patch.object(
+        planner,
+        "FindRoutes",
+        return_value=_make_awaitable(
+            planner_pb2.FindRoutesResponse(
+                routes=[
+                    planner_pb2.FindRoutesResponse.Route(
+                        segments=[
+                            planner_pb2.FindRoutesResponse.Segment(
+                                segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+                            ),
+                            planner_pb2.FindRoutesResponse.Segment(
+                                segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+                            ),
+                        ],
+                    ),
+                    planner_pb2.FindRoutesResponse.Route(
+                        segments=[
+                            planner_pb2.FindRoutesResponse.Segment(
+                                segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+                            ),
+                            planner_pb2.FindRoutesResponse.Segment(
+                                segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ),
+    )
+    found_routes = await route_finder.find_routes(
+        origin=models_pb2.Place(),
+        destination=models_pb2.Place(),
+    )
+
+    assert len(found_routes) == 1
+
+
 async def test_valid_routes_are_not_discarded(
     route_finder: routes.Routes,
     planner: planner_pb2_grpc.PlannerServiceStub,
