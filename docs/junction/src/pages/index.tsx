@@ -106,27 +106,27 @@ function WelcomeText() {
 
 function ApiCards() {
     const cards = [
-        {
-            imgSrc: '/img/air.svg',
-            title: 'Air Content API',
-            description:
-                'Empower your travel with our Flights API, delivering seamless integration for seamless  flight experiences.',
-            link: '/docs/resellers/introduction',
-        },
-        {
-            imgSrc: '/img/hotel.svg',
-            title: 'Hotel Content API',
-            description:
-                'Transform the way your users search and book accommodations with our Hotels API.',
-            link: '/docs/resellers/introduction',
-        },
-        {
-            imgSrc: '/img/rail.svg',
-            title: 'Rail Content API',
-            description:
-                'Empower users with seamless rail travel via our Rail API for enhanced integration and journey planning.',
-            link: '/docs/resellers/introduction',
-        },
+        // {
+        //     imgSrc: '/img/air.svg',
+        //     title: 'Air Content API',
+        //     description:
+        //         'Empower your travel with our Flights API, delivering seamless integration for seamless  flight experiences.',
+        //     link: '/docs/resellers/introduction',
+        // },
+        // {
+        //     imgSrc: '/img/hotel.svg',
+        //     title: 'Hotel Content API',
+        //     description:
+        //         'Transform the way your users search and book accommodations with our Hotels API.',
+        //     link: '/docs/resellers/introduction',
+        // },
+        // {
+        //     imgSrc: '/img/rail.svg',
+        //     title: 'Rail Content API',
+        //     description:
+        //         'Empower users with seamless rail travel via our Rail API for enhanced integration and journey planning.',
+        //     link: '/docs/resellers/introduction',
+        // },
         {
             imgSrc: '/img/rail.svg',
             title: 'Multi-Modal Content API',
@@ -134,20 +134,20 @@ function ApiCards() {
                 'Offer your users the ultimate travel flexibility with our Multimodal Travel API.',
             link: '/docs/resellers/introduction',
         },
-        {
-            imgSrc: '/img/car.svg',
-            title: 'Car Rental Content API',
-            description:
-                'Enable your users to explore destinations at their own pace with our Car Rental API.',
-            link: '/docs/resellers/introduction',
-        },
-        {
-            imgSrc: '/img/ferry.svg',
-            title: 'Ferry Content API',
-            description:
-                'Expand your travel platform to include ferry services with our seamless Ferry API.',
-            link: '/docs/resellers/introduction',
-        },
+        // {
+        //     imgSrc: '/img/car.svg',
+        //     title: 'Car Rental Content API',
+        //     description:
+        //         'Enable your users to explore destinations at their own pace with our Car Rental API.',
+        //     link: '/docs/resellers/introduction',
+        // },
+        // {
+        //     imgSrc: '/img/ferry.svg',
+        //     title: 'Ferry Content API',
+        //     description:
+        //         'Expand your travel platform to include ferry services with our seamless Ferry API.',
+        //     link: '/docs/resellers/introduction',
+        // },
     ];
 
     return (

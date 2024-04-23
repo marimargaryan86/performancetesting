@@ -1,9 +1,9 @@
 ---
-title: Perform Simple Search
+title: Order simple trip
 sidebar_position: 1
 ---
 
-# Perform a Simple Search Guide
+# Order simple trip
 
 This guide will outline the steps needed to create your simple search with an example for a taxi trip.
 
@@ -536,7 +536,7 @@ The endpoint will return a `status: processing` until it has finished collecting
 <small><a href="/docs/resellers/openapi#tag/trips/operation/post-orders" target="_blank">(view)</a></small>
 endpoint is used to create the order.
 
-A request body is required which will contain the `OFFER_ID`, the `OFFER_OPTION_ID`, and the `OfferPriceQuoteId` saved from before.
+A request body is required which will contain the `OfferPriceQuoteId` saved from before.
 
 Example:
 
@@ -583,20 +583,6 @@ You will need to add a **Request Body** containing data:
             }
         },
         "relationships": {
-            "offer": {
-                "data": {
-                    "id": "<OfferId>",
-                    "type": "offers"
-                }
-            },
-            "options": {
-                "data": [
-                    {
-                        "id": "<OfferOptionId>",
-                        "type": "offer-options"
-                    }
-                ]
-            },
             "quote": {
                 "data": {
                     "id": "<OfferPriceQuoteId>",

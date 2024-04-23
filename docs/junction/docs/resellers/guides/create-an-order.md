@@ -1,9 +1,9 @@
 ---
-title: Create an Order
+title: Order composite (multimodal) journey
 sidebar_position: 1
 ---
 
-# Create an Order Guide
+# Order composite (multimodal) journey
 
 This guide will outline the steps needed to create your first multi-modal order.
 
@@ -29,7 +29,7 @@ If you haven't already, please read the [**Key Concepts**](/docs/resellers/key-c
 
 The Snowfall Reseller API connects any origin and destination, including cities, airports, train stations, bus stations, and ferry ports. To make this easier for our customers the API works best when using coordinates.
 
-`GET /places endpoint`
+`GET /places`
 <small><a href="/docs/resellers/openapi#tag/places" target="_blank">(view)</a></small>
 provides a collection of place names, their place type, their coordinates, and other attributes.
 
@@ -301,7 +301,7 @@ The `precision` (default: "area") attribute can be specified to search for eithe
 
 ---
 
-## 3. Trip Candidates - Retrieve offer results
+## 3. Trip Candidates - Retrieve search status
 
 `GET /trip-candidates/searches/{tripCandidateSearchid}`
 <small><a href="/docs/resellers/openapi#tag/trips/operation/get-trip-candidates-searches-id" target="_blank">(view)</a></small>
@@ -367,7 +367,7 @@ The `precision` (default: "area") attribute can be specified to search for eithe
 
 ---
 
-## 4. Trip Candidates - Retrieve details for an offer
+## 4. Trip Candidates - Retrieve offers
 
 `GET /trip-candidates/searches/{tripCandidateSearchid}/offers`
 <small><a href="/docs/resellers/openapi#tag/trips/operation/get-trip-candidates-searches-id-offers" target="_blank">(view)</a></small>
