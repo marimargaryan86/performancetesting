@@ -20,13 +20,11 @@ class TestCarRentalCreateSearch:
                     "driverAge": 28,
                     "pickupAt": tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
                     "returnAt": after_tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
-                    "origin": {
-                        "latitude": 50.89369066956447,
-                        "longitude": 4.47136870945399,
-                    },
+                },
+                "relationships": {
+                    "origin": {"data": {"id": fixtures.PLACES[0], "type": "places"}},
                     "destination": {
-                        "latitude": 48.96691462802318,
-                        "longitude": 2.52817297961273,
+                        "data": {"id": fixtures.PLACES[0], "type": "places"},
                     },
                 },
             },
@@ -44,37 +42,15 @@ class TestCarRentalCreateSearch:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["data"]["id"]
 
-    async def test_create_car_rental_invalid_pickup_latitude(
+    async def test_create_car_rental_search_should_fail_if_invalid_place_id_provided(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         payload = self.search_payload
-        payload["data"]["attributes"]["origin"]["latitude"] = -91
-        await self._assert_bad_request(client, payload)
+        relationships = payload["data"]["relationships"]
+        relationships["origin"]["data"]["id"] = fixtures.NOT_FOUND
 
-    async def test_create_car_rental_invalid_pickup_longitude(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        payload = self.search_payload
-        payload["data"]["attributes"]["origin"]["longitude"] = -200
-        await self._assert_bad_request(client, payload)
-
-    async def test_create_car_rental_invalid_return_latitude(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        payload = self.search_payload
-        payload["data"]["attributes"]["destination"]["latitude"] = 91
-        await self._assert_bad_request(client, payload)
-
-    async def test_create_car_rental_invalid_return_longitude(
-        self,
-        client: httpx.AsyncClient,
-    ) -> None:
-        payload = self.search_payload
-        payload["data"]["attributes"]["destination"]["longitude"] = 200
-        await self._assert_bad_request(client, payload)
+        await self._assert_unprocessable_entity(client, payload)
 
     async def test_create_car_rental_invalid_driver_age(
         self,

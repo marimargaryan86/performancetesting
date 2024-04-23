@@ -38,6 +38,8 @@ message CarRental {
   google.protobuf.Timestamp pickup_at = 3;
   google.protobuf.Timestamp return_at = 4;
   uint32 driver_age = 5;
+  string origin_id = 6;
+  string destination_id = 7;
 }
 
 message Search { // old SimpleTripOfferSearch

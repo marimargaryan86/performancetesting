@@ -1533,6 +1533,7 @@ components:
             - id
             - type
             - attributes
+            - relationships
           properties:
             id:
               type: string
@@ -1558,8 +1559,6 @@ components:
                 - status
                 - pickupAt
                 - returnAt
-                - origin
-                - destination
               properties:
                 expiresAt:
                   type: string
@@ -1602,10 +1601,32 @@ components:
                     format
                   format: date-time
                   example: '2019-08-24T14:15:22Z'
+            relationships:
+              type: object
+              properties:
                 origin:
-                  $ref: '#/components/schemas/Coordinates'
+                  type: object
+                  description: >-
+                    The Junction Place ID that represents the requested
+                    pick up location for the car rental search
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                  required:
+                    - data
                 destination:
-                  $ref: '#/components/schemas/Coordinates'
+                  type: object
+                  description: >-
+                    The Junction Place ID that represents the requested
+                    drop off location for the car rental search
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                  required:
+                    - data
+              required:
+                - origin
+                - destination
         - $ref: '#/components/schemas/SelfLink'
     CarRentalSearchIdentifier:
       title: Car Rental Search Identifier

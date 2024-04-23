@@ -6,6 +6,7 @@ import pydantic
 from starlette import requests
 
 from snowfall.project.junction.rocket.service.api.common import models as common_models
+from snowfall.project.junction.rocket.service.api.places.models import places
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models
@@ -27,14 +28,6 @@ class CarSearchResource(models.Resource):
             id=search.id,
             type=CarSearchResource.api_type,
             attributes={
-                "origin": {
-                    "latitude": search.car_rental.origin.coordinates.latitude,
-                    "longitude": search.car_rental.origin.coordinates.longitude,
-                },
-                "destination": {
-                    "latitude": search.car_rental.destination.coordinates.latitude,
-                    "longitude": search.car_rental.destination.coordinates.longitude,
-                },
                 "pickupAt": protobuf.protobuf_to_datetime(search.car_rental.pickup_at),
                 "returnAt": protobuf.protobuf_to_datetime(search.car_rental.return_at),
                 "status": protobuf.enum_value_to_slug(
@@ -43,6 +36,24 @@ class CarSearchResource(models.Resource):
                 ),
                 "driverAge": search.car_rental.driver_age,
                 "expiresAt": protobuf.protobuf_to_datetime(search.expires_at),
+            },
+            relationships={
+                "origin": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=search.car_rental.origin_id,
+                            type=places.PlacesResource.api_type,
+                        )
+                    ),
+                },
+                "destination": {
+                    "data": (
+                        models.ResourceIdentifier(
+                            id=search.car_rental.destination_id,
+                            type=places.PlacesResource.api_type,
+                        )
+                    ),
+                },
             },
             links={
                 _SELF_HREF: str(

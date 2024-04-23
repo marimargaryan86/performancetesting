@@ -279,6 +279,8 @@ def generate_rail_one_way_search_criterion() -> searches_pb2.Rail:
 
 def generate_car_rental_criterion() -> searches_pb2.CarRental:
     return searches_pb2.CarRental(
+        origin_id=PLACES[0],
+        destination_id=PLACES[0],
         origin=generate_point(string.uuid()),
         destination=generate_point(string.uuid()),
         pickup_at=protobuf.datetime_to_protobuf(

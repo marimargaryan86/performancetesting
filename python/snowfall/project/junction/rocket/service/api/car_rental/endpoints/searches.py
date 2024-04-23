@@ -1,6 +1,7 @@
 import datetime
 from collections.abc import Sequence
 
+import grpc
 import lagom
 import timezonefinder
 from starlette import endpoints, requests, responses, status
@@ -12,6 +13,13 @@ from snowfall.project.junction.rocket.service.api.car_rental.endpoints import (
 )
 from snowfall.project.junction.rocket.service.api.car_rental.models import (
     searches as search_models,
+)
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    models_pb2 as places_models_pb2,
+)
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    places_pb2,
+    places_pb2_grpc,
 )
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
@@ -39,44 +47,37 @@ class CarSearch(endpoints.HTTPEndpoint):
         request: requests.Request,
         grpc_timeout: datetime.timedelta = lagom.injectable,
         searches: grpc_pb2_grpc.SearchServiceStub = lagom.injectable,
+        places: places_pb2_grpc.PlacesServiceStub = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
-        request_validator = validation.SearchRequestValidator(body)
+        timeout = grpc_timeout.total_seconds()
+
+        origin_place = await self._get_place(places, body["origin"], timeout)
+        destination_place = await self._get_place(places, body["destination"], timeout)
+
+        request_validator = validation.SearchRequestValidator(
+            body,
+            origin_place,
+            destination_place,
+        )
+
         if request_validator.validation_errors:
             return request_validator.as_json_api_response()
-
-        origin_coords = latlng_pb2.LatLng(
-            latitude=body["origin"]["latitude"],
-            longitude=body["origin"]["longitude"],
-        )
-
-        origin_timezone = _tz_finder.timezone_at(
-            lat=origin_coords.latitude,
-            lng=origin_coords.longitude,
-        )
-
-        destination_coords = latlng_pb2.LatLng(
-            latitude=body["destination"]["latitude"],
-            longitude=body["destination"]["longitude"],
-        )
-
-        destination_timezone = _tz_finder.timezone_at(
-            lat=destination_coords.latitude,
-            lng=destination_coords.longitude,
-        )
 
         response = await searches.EnqueueSearch(
             grpc_pb2.EnqueueSearchRequest(
                 search=models_pb2.Search(
                     reseller_id=request.user.username,
                     car_rental=models_pb2.CarRental(
+                        origin_id=body["origin"],
+                        destination_id=body["destination"],
                         origin=legacy_go_pb2.Point(
-                            coordinates=origin_coords,
-                            time_zone=origin_timezone or "",
+                            coordinates=origin_place.coordinates,  # type: ignore[union-attr]
+                            time_zone=origin_place.time_zone,  # type: ignore[union-attr]
                         ),
                         destination=legacy_go_pb2.Point(
-                            coordinates=destination_coords,
-                            time_zone=destination_timezone or "",
+                            coordinates=destination_place.coordinates,  # type: ignore[union-attr]
+                            time_zone=destination_place.time_zone,  # type: ignore[union-attr]
                         ),
                         pickup_at=protobuf.datetime_to_protobuf(
                             datetime.datetime.fromisoformat(body["pickupAt"]),
@@ -124,6 +125,59 @@ class CarSearch(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+    async def _get_place(
+        self,
+        places: places_pb2_grpc.PlacesServiceStub,
+        place_id: str,
+        timeout: float,
+    ) -> places_models_pb2.Place | None:
+        try:
+            return (
+                await places.GetPlace(
+                    places_pb2.GetPlaceRequest(id=place_id),
+                    timeout=timeout,
+                )
+            ).place
+        except grpc.aio.AioRpcError as err:
+            if err.code() == grpc.StatusCode.NOT_FOUND:
+                return None
+            raise
+
+    async def _get_place_coordinates(
+        self,
+        places: places_pb2_grpc.PlacesServiceStub,
+        place_id: str,
+        timeout: float,
+    ) -> latlng_pb2.LatLng | None:
+        try:
+            place_response: places_pb2.GetPlaceResponse = await places.GetPlace(
+                places_pb2.GetPlaceRequest(
+                    id=place_id,
+                ),
+                timeout=timeout,
+            )
+        except grpc.aio.AioRpcError as err:
+            if err.code() == grpc.StatusCode.NOT_FOUND:
+                return None
+            raise
+        else:
+            return latlng_pb2.LatLng(
+                latitude=place_response.place.coordinates.latitude,
+                longitude=place_response.place.coordinates.longitude,
+            )
+
+    def _get_timezone(self, coordinates: latlng_pb2.LatLng | None) -> str:
+        if coordinates:
+            return (
+                _tz_finder.timezone_at(
+                    lat=coordinates.latitude,
+                    lng=coordinates.longitude,
+                )
+                or ""
+            )
+
+        return ""
 
 
 class CarSearchResults(endpoints.HTTPEndpoint):
