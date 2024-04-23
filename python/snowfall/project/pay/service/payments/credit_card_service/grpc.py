@@ -102,7 +102,7 @@ class CreditCardPaymentService(
         if not payment_method:
             await context.abort(
                 code=grpc.StatusCode.NOT_FOUND,
-                details="Payment not processed",
+                details="Payment method not found",
             )
 
         processed_payment = self._provider(

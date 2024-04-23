@@ -7,6 +7,9 @@ from snowfall.project.pay.service.payments.providers import interfaces
 from snowfall.project.pay.service.payments.providers.stripe import repositories
 from snowfall.project.pay.service.payments.v1 import credit_card_models_pb2
 from snowfall.stdlib import money
+from snowfall.stdlib.logging import stdout
+
+_logger = stdout.get_logger()
 
 
 class Stripe(interfaces.CreditCardProvider):
@@ -355,8 +358,16 @@ class Stripe(interfaces.CreditCardProvider):
             return ""
         payment_card_methods = payment_methods["data"]
 
+        if not payment_card_methods:
+            _logger.error("There is no attached payment method", payment_id=payment_id)
+            return ""
+
         if len(payment_card_methods) > 1:
-            raise ValueError("Attached more than one payment methods")
+            _logger.error(
+                "Attached more than one payment methods",
+                payment_id=payment_id,
+            )
+            return ""
 
         return payment_card_methods[0].id  # type: ignore[index]
 

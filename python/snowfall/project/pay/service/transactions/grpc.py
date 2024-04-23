@@ -226,6 +226,9 @@ class TransactionsService(
         amount: money.Money,
         payment_reference: str,
     ) -> bool:
+        if not payment_reference:
+            return False
+
         payment_intent = await self._credit_card_client.create_credit_card_payment(
             amount=amount,
             credit_card_holder_id=payment_reference,
