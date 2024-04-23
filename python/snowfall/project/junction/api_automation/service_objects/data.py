@@ -93,8 +93,8 @@ class AirOffersResult:
         self._data = data
 
     @property
-    def id(self) -> str:
-        return get_nested_attribute(self._data, "id")
+    def first_offer_id(self) -> str:
+        return get_nested_attribute(self._data, "data.0.id")
 
     @property
     def offers(self) -> str:

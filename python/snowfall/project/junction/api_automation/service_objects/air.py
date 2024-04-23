@@ -36,7 +36,7 @@ class AirClient:
             attributes["destination"] = destination
 
         if departure_after is not None:
-            attributes["departureAt"] = departure_after
+            attributes["departureAfter"] = departure_after
 
         passengers = [
             {"dateOfBirth": dob.strftime("%Y-%m-%d")}

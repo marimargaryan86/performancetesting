@@ -54,7 +54,7 @@ async def test_air_search_with_iata(
         search_id=search_result.id,
     )
     assert search_offers.offers
-    assert search_offers.id
+    assert search_offers.first_offer_id
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -80,8 +80,7 @@ async def test_air_search_with_no_offers(
     search_offers = await qa_client.air.get_offers(
         search_id=search_result.id,
     )
-    assert search_offers.offers
-    assert search_offers.id
+    assert not search_offers.offers
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")

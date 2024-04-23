@@ -30,9 +30,9 @@ class CarRentalClient:
         criteria: dict[str, Any] = {}
 
         if pickup_location is not None:
-            criteria["pickupLocation"] = pickup_location
+            criteria["origin"] = pickup_location
         if return_location is not None:
-            criteria["returnLocation"] = return_location
+            criteria["destination"] = return_location
         if pickup_at is not None:
             criteria["pickupAt"] = pickup_at
         if return_at is not None:
@@ -42,7 +42,7 @@ class CarRentalClient:
 
         body = {
             "data": {
-                "type": "car-searches",
+                "type": "car-rental-searches",
                 "attributes": criteria,
             },
         }

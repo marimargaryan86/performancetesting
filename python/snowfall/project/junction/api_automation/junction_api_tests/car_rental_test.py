@@ -178,28 +178,6 @@ async def test_car_rental_search_missing_or_none(
         (
             BASIC_SEARCH.pickup_location,
             BASIC_SEARCH.return_location,
-            (
-                datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=-1)
-            ).strftime(
-                "%Y-%m-%dT08:00:00.000Z",
-            ),
-            BASIC_SEARCH.return_at,
-            BASIC_SEARCH.driver_age,
-        ),
-        (
-            BASIC_SEARCH.pickup_location,
-            BASIC_SEARCH.return_location,
-            BASIC_SEARCH.pickup_at,
-            (
-                datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=-1)
-            ).strftime(
-                "%Y-%m-%dT08:00:00.000Z",
-            ),
-            BASIC_SEARCH.driver_age,
-        ),
-        (
-            BASIC_SEARCH.pickup_location,
-            BASIC_SEARCH.return_location,
             BASIC_SEARCH.pickup_at,
             BASIC_SEARCH.return_at,
             0,
@@ -208,8 +186,6 @@ async def test_car_rental_search_missing_or_none(
     ids=[
         "Search where Pickup Location is out of bounds, expecting HTTPStatusError, 400",
         "Search where Return Location is out of bounds, expecting HTTPStatusError, 400",
-        "Search where Pickup At is in Past, expecting HTTPStatusError, 400",
-        "Search where Return At is in Past, expecting HTTPStatusError, 400",
         "Search where Driver Age is 0, expecting HTTPStatusError, 400",
     ],
 )
@@ -222,6 +198,57 @@ async def test_car_rental_search_invalid(
     driver_age: int,
 ) -> None:
     with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.car_rental.search(
+            pickup_location=pickup_location,
+            return_location=return_location,
+            pickup_at=pickup_at,
+            return_at=return_at,
+            driver_age=driver_age,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+@pytest.mark.parametrize(
+    ("pickup_location", "return_location", "pickup_at", "return_at", "driver_age"),
+    [
+        (
+            BASIC_SEARCH.pickup_location,
+            BASIC_SEARCH.return_location,
+            (
+                datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=-1)
+            ).strftime(
+                "%Y-%m-%dT08:00:00.000Z",
+            ),
+            BASIC_SEARCH.return_at,
+            BASIC_SEARCH.driver_age,
+        ),
+        (
+            BASIC_SEARCH.pickup_location,
+            BASIC_SEARCH.return_location,
+            BASIC_SEARCH.pickup_at,
+            (
+                datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=-1)
+            ).strftime(
+                "%Y-%m-%dT08:00:00.000Z",
+            ),
+            BASIC_SEARCH.driver_age,
+        ),
+    ],
+    ids=[
+        "Search where Pickup At is in Past, expecting HTTPStatusError, 422",
+        "Search where Return At is in Past, expecting HTTPStatusError, 422",
+    ],
+)
+async def test_car_rental_search_unprocessable(
+    qa_client: QaClient,
+    pickup_location: Mapping[str, Any],
+    return_location: Mapping[str, Any],
+    pickup_at: str,
+    return_at: str,
+    driver_age: int,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '422 Unprocessable Entity"):
         await qa_client.car_rental.search(
             pickup_location=pickup_location,
             return_location=return_location,
