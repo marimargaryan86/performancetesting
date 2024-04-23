@@ -55,25 +55,25 @@ async def get_shopping_point_to_point_response() -> (
 async def train_station_repository() -> train_stations.TrainStationRepository:
     return train_stations.TrainStationRepository([
         train_stations.TrainStation(
-            name="first",
+            name="Paris Gare De Lyon",
             identifier="FRLYS",
             latitude=48.8448404,
             longitude=2.3744416,
-            timezone=zoneinfo.ZoneInfo("America/Winnipeg"),
+            timezone=zoneinfo.ZoneInfo("Europe/Paris"),
         ),
         train_stations.TrainStation(
-            name="second",
+            name="Lyon Part Dieu",
             identifier="FRXYD",
             latitude=45.7611339,
             longitude=4.8527867,
-            timezone=zoneinfo.ZoneInfo("America/Winnipeg"),
+            timezone=zoneinfo.ZoneInfo("CET"),
         ),
         train_stations.TrainStation(
-            name="segment station",
+            name="Paris Bercy",
             identifier="FRPBE",
             latitude=48.8385918,
             longitude=2.3784756,
-            timezone=zoneinfo.ZoneInfo("America/Winnipeg"),
+            timezone=zoneinfo.ZoneInfo("Europe/Paris"),
         ),
     ])
 
