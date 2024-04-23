@@ -91,7 +91,7 @@ class TestGetSuggestion:
         client: httpx.AsyncClient,
         suggestion_repository: repository.SuggestionRepository,
     ) -> None:
-        suggestion = await suggestion_repository.create()
+        suggestion = await suggestion_repository.create("foo")
         response = await client.get(
             url="/journeys/suggestions/{0}".format(suggestion.id),
         )
