@@ -1,7 +1,4 @@
-import httpx
-import lagom
 import pydantic
-from lagom.integrations import starlette as starlette_integration
 from starlette import routing, staticfiles, templating
 
 from snowfall.project.junction.go.service.dogfood_ui import routes
@@ -17,13 +14,12 @@ class _Settings(starlette.Settings):
 
 
 async def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
-    container = lagom.Container()
-    container[templating.Jinja2Templates] = templating.Jinja2Templates(
+    jinja2_templates = templating.Jinja2Templates(
         filesystem.package_path(
             "snowfall.project.junction.go.service.dogfood_ui.templates",
         ),
     )
-    container[httpx.AsyncClient] = await httpx_factory.make_client(
+    http_client = await httpx_factory.make_client(
         app=app,
         base_url=app.settings.base_url,
         headers={
@@ -33,11 +29,12 @@ async def _routes(app: application.Application[_Settings]) -> list[routing.BaseR
         },
     )
 
-    integration = starlette_integration.StarletteIntegration(container)
+    ui = routes.UI(template=jinja2_templates)
+    locations = routes.Locations(client=http_client)
 
     return [
-        integration.route("/", routes.UI),
-        integration.route("/locations", routes.Locations),
+        stdlib_routes.to_route("/", ui.get),
+        stdlib_routes.to_route("/locations", locations.get),
         routing.Mount(
             "/static",
             staticfiles.StaticFiles(
@@ -47,7 +44,7 @@ async def _routes(app: application.Application[_Settings]) -> list[routing.BaseR
                 ],
             ),
         ),
-        stdlib_routes.Proxy(container[httpx.AsyncClient]).to_route(),
+        stdlib_routes.Proxy(http_client).to_route(),
     ]
 
 

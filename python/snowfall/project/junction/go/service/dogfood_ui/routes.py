@@ -4,11 +4,11 @@ import hashlib
 from collections.abc import Mapping
 
 import httpx
-import lagom
-from starlette import endpoints, requests, responses, status, templating
+from starlette import responses, status, templating
 
 from snowfall.project.junction.go.service.dogfood_ui import locations
 from snowfall.stdlib import h3, string
+from snowfall.stdlib.integration.starlette import messages
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.v1 import latlng_pb2
 
@@ -62,13 +62,15 @@ def _is_city(place_response: httpx.Response) -> bool:
     return "city" in type_ids
 
 
-class Locations(endpoints.HTTPEndpoint):
+class Locations:
+    def __init__(self, client: httpx.AsyncClient) -> None:
+        self._client = client
+
     async def get(
         self,
-        request: requests.Request,
-        httpx_client: httpx.AsyncClient = lagom.injectable,
+        request: messages.Request,
     ) -> responses.Response:
-        place_response = await httpx_client.get(
+        place_response = await self._client.get(
             "/places/{0}".format(request.query_params.get("id")),
         )
 
@@ -98,16 +100,18 @@ class Locations(endpoints.HTTPEndpoint):
         return responses.JSONResponse(content=mapping_results)
 
 
-class UI(endpoints.HTTPEndpoint):
+class UI:
+    def __init__(self, template: templating.Jinja2Templates) -> None:
+        self._template = template
+
     async def get(
         self,
-        request: requests.Request,
-        template: templating.Jinja2Templates = lagom.injectable,
+        request: messages.Request,
     ) -> responses.Response:
-        return template.TemplateResponse(
+        return self._template.TemplateResponse(
             "layout.html",
             {
-                "request": request,
+                "request": request.starlette_request,
                 "session_token": string.random(_SESSION_TOKEN_LENGTH),
                 "hashes": _hash_static_resources(),
             },
