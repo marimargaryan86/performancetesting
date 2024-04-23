@@ -65,8 +65,6 @@ job "vendor-vector-vector-loki" {
             enabled = true
             address = "0.0.0.0:8686"
             playground = true
-          [sources.logs]
-            type = "docker_logs"
           [transforms.relabel_docker_logs]
             inputs = ["logs"]
             type   = "remap"
@@ -75,22 +73,8 @@ job "vendor-vector-vector-loki" {
             .log_level = .message.level
             .service_name = replace(.label."com.hashicorp.nomad.job_name",r'/periodic-(\\d+)',"") ?? ""
           """
-          [transforms.elastic_transform]
-            inputs = ["logs"]
-            type   = "remap"
-            source = """
-            .message,err = parse_json(.message)
-            .log_level = .message.level
-            .service_name = replace(.label."com.hashicorp.nomad.job_name",r'/periodic-(\\d+)',"") ?? ""
-            del(.label.\"com.hashicorp.nomad.job_name\")
-            .task = del(.label.\"com.hashicorp.nomad.task_name\")
-            .group = del(.label.\"com.hashicorp.nomad.task_group_name\")
-            .namespace = del(.label.\"com.hashicorp.nomad.namespace\")
-            .node = del(.label.\"com.hashicorp.nomad.node_name\")
-            .alloc_id = del(.label.\"com.hashicorp.nomad.alloc_id\")
-            .version = del(.label.\"com.snowfalltravel.version\")
-            .job = "${var.datacenter}"
-          """
+          [sources.logs]
+            type = "docker_logs"
           [sinks.loki]
             type = "loki"
             inputs = ["relabel_docker_logs"]
@@ -109,13 +93,6 @@ job "vendor-vector-vector-loki" {
             labels.service_name = "{{ service_name}}"
             #remove fields that have been converted to labels to avoid having the field twice
             remove_label_fields = true
-          [sinks.elk]
-            type = "elasticsearch"
-            inputs = ["elastic_transform"]
-            compression = "none"
-            bulk.index = "vector-${var.datacenter}-%Y-%m-%d"
-            endpoints = ["http://172.16.111.145:9200"]
-            healthcheck.enabled = true
 
         EOH
       }
