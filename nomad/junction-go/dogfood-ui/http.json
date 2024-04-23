@@ -7,7 +7,11 @@
     }
   },
   "production": {
-    "deploy": false
+    "variables": {
+      "base_url_URL": "https://api.junction.travel",
+      "traefik_entrypoints": "web",
+      "traefik_host_URL": "dogfood.junction.travel"
+    }
   },
   "sandbox": {
     "variables": {
