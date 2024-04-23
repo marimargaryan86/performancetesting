@@ -10,6 +10,14 @@ __dependents_rules__(
         "!*",
     ),
     (
+        ("//vendor#json-api-doc",),
+        "?*",
+    ),
+    (
+        ("//vendor#lagom",),
+        "?*",
+    ),
+    (
         ("//vendor#mongomock-motor",),
         "//python/snowfall/conftest.py",
         "!*",
