@@ -34,6 +34,10 @@ variable "provider_company_id" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-ba-ndc-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -134,6 +138,7 @@ EOH
         SENTRY_DSN          = "https://5e8ffcd08b434ebf955ecd889fe82947@sentry.snowfall.se/58"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
         STORAGE_DSN         = "memory://"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }

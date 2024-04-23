@@ -75,7 +75,6 @@ class _DumpStationsSettings(_SatConfig, service.Settings):
 class _Settings(_SatConfig, service.ProviderSettings):
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
     mongo_dsn: tuple[pydantic.AnyUrl]
-    allowed_window_td: datetime.timedelta = datetime.timedelta(minutes=0)
     storage_dsn: service.AnyDsn
     search_api_enabled: bool = True
     ticket_link_timeout: datetime.timedelta = datetime.timedelta(hours=6)

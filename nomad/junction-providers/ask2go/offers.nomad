@@ -38,6 +38,10 @@ variable "api_booking_base_url" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-ask2go-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -137,6 +141,7 @@ EOH
         API_BASE_URL              = "${var.api_base_url}"
         API_BOOKING_BASE_URL      = "${var.api_booking_base_url}"
         STORAGE_DSN               = "memory://"
+        ALLOWED_WINDOW_TD         = "${var.allowed_window_td}"
       }
     }
   }

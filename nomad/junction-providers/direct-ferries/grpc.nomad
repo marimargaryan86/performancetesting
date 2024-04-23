@@ -46,6 +46,10 @@ variable "affiliate_api_url" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-direct-ferries-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -155,6 +159,7 @@ EOH
         AFFILIATE_API_URL   = "${var.affiliate_api_url}"
         API_URL             = "${var.api_url}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }

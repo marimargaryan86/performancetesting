@@ -46,6 +46,10 @@ variable "memory_value" {
   type = number
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-duffel-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -167,6 +171,7 @@ EOH
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
         API_BASE_URL        = "${var.api_base_url}"
         DISABLED_AIRLINES   = "${var.disabled_airlines}"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }

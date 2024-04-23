@@ -7,7 +7,8 @@
             "api_base_url": "https://api.duffel.com",
             "disabled_airlines": "BA",
             "bucket": "junction-provider-data-development",
-            "memory_value": 512
+            "memory_value": 512,
+            "allowed_window_td": "PT15M"
         }
     },
     "production": {
@@ -18,7 +19,8 @@
             "api_base_url": "https://api.duffel.com",
             "disabled_airlines": "",
             "bucket": "junction-provider-data-production",
-            "memory_value": 512
+            "memory_value": 512,
+            "allowed_window_td": "PT15M"
         }
     },
     "sandbox": {
@@ -29,7 +31,8 @@
             "api_base_url": "https://api.duffel.com",
             "disabled_airlines": "BA",
             "bucket": "junction-provider-data-sandbox",
-            "memory_value": 450
+            "memory_value": 450,
+            "allowed_window_td": "PT15M"
         }
     }
 }

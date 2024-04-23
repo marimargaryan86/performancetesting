@@ -5,7 +5,8 @@
       "provider_company_id": "ed48aa95-c449-4100-8ba8-722e882e5dde",
       "api_base_url": "https://search.ask2go.com",
       "api_booking_base_url": "https://booking.ask2go.com",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "allowed_window_td": "PT15M"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "provider_company_id": "713a9b6e-2b67-450f-a212-b00a1efaa43d",
       "api_base_url": "https://search.production.ask2go.com/",
       "api_booking_base_url": "https://book.production.ask2go.com/",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "allowed_window_td": "PT15M"
     }
   },
   "sandbox": {
@@ -24,7 +26,8 @@
       "provider_company_id": "ed48aa95-c449-4100-8ba8-722e882e5dde",
       "api_base_url": "https://search.ask2go.com",
       "api_booking_base_url": "https://booking.ask2go.com",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "allowed_window_td": "PT15M"
     }
   }
 }

@@ -266,6 +266,7 @@ async def _offers(
                 offer_ttl=app.settings.ttl,
             ),
         ),
+        allowed_window_td=app.settings.allowed_window_td,
     )
 
 

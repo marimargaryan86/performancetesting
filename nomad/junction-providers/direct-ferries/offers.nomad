@@ -50,6 +50,10 @@ variable "provider_company_id" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-direct-ferries-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -144,6 +148,7 @@ EOH
         API_URL             = "${var.api_url}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
         API_TIMEOUT         = "${var.api_timeout}"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }

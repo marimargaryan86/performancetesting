@@ -82,4 +82,5 @@ async def offers_app(
         ).from_search_criteria_task,
         offer_group_cache_key_generator=cache.generate_cache_key,
         offer_group_generator=benerail_adapter.gather_search_results,
+        allowed_window_td=app.settings.allowed_window_td,
     )

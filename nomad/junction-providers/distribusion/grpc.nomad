@@ -42,6 +42,10 @@ variable "bucket" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-distribusion-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -159,6 +163,7 @@ EOH
         PROVIDER_COMPANY_ID     = "${var.provider_company_id}"
         API_BASE_URL            = "${var.api_base_url}"
         RETAILER_PARTNER_NUMBER = "${var.retailer_partner_number}"
+        ALLOWED_WINDOW_TD       = "${var.allowed_window_td}"
       }
     }
   }

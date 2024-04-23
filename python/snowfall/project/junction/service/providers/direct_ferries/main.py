@@ -112,6 +112,7 @@ async def _offers(
         search_criteria_generator=ferry_adapter.search_criteria_generator,
         offer_group_cache_key_generator=ferry_adapter.generate_cache_key,
         offer_group_generator=ferry_adapter.gather_search_results,
+        allowed_window_td=app.settings.allowed_window_td,
     )
 
 

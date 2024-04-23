@@ -38,6 +38,10 @@ variable "disabled_airlines" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-duffel-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -145,6 +149,7 @@ EOH
         SENTRY_DSN          = "https://c957bacb77d741509281e8b0a3b79e25@sentry.snowfall.se/57"
         DISABLED_AIRLINES   = "${var.disabled_airlines}"
         STORAGE_DSN         = "memory://"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }

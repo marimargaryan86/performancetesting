@@ -38,6 +38,10 @@ variable "bucket" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-benerail-offers" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -131,6 +135,7 @@ EOH
         PROMETHEUS_PORT     = "${NOMAD_PORT_prometheus}"
         PROVIDER_COMPANY_ID = "${var.provider_company_id}"
         API_BASE_URL        = "${var.api_base_url}"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }

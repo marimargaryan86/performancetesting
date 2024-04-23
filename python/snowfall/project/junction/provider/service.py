@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import ipaddress
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Generic, TypeVar
@@ -27,6 +28,8 @@ Application = application.Application
 Command = application.Command
 Settings = application.Settings
 
+_DEFAULT_ALLOWED_WINDOW_TD = datetime.timedelta(minutes=0)
+
 
 class ProviderSettings(application.Settings):
     amqp_dsn: pydantic.AmqpDsn
@@ -35,6 +38,7 @@ class ProviderSettings(application.Settings):
     provider_company_id: str
     redis_dsn: pydantic.RedisDsn
     reseller_providers: dict[str, list[str]]
+    allowed_window_td: datetime.timedelta = _DEFAULT_ALLOWED_WINDOW_TD
 
 
 class PriceQuoteSettings(application.Settings):

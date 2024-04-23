@@ -42,6 +42,10 @@ variable "bucket" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-ask2go-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -160,6 +164,7 @@ EOH
         WAIT_TIME_BETWEEN_POLLING = "2"
         API_BASE_URL              = "${var.api_base_url}"
         API_BOOKING_BASE_URL      = "${var.api_booking_base_url}"
+        ALLOWED_WINDOW_TD         = "${var.allowed_window_td}"
       }
     }
   }

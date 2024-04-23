@@ -4,7 +4,8 @@
       "count": 2,
       "provider_company_id": "ed48aa95-c449-4100-8ba8-722e882e5dde",
       "api_base_url": "https://search.ask2go.com",
-      "api_booking_base_url": "https://booking.ask2go.com"
+      "api_booking_base_url": "https://booking.ask2go.com",
+      "allowed_window_td": "PT15M"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
       "count": 2,
       "provider_company_id": "713a9b6e-2b67-450f-a212-b00a1efaa43d",
       "api_base_url": "https://search.production.ask2go.com/",
-      "api_booking_base_url": "https://book.production.ask2go.com/"
+      "api_booking_base_url": "https://book.production.ask2go.com/",
+      "allowed_window_td": "PT15M"
     }
   },
   "sandbox": {
@@ -21,7 +23,8 @@
       "count": 1,
       "provider_company_id": "ed48aa95-c449-4100-8ba8-722e882e5dde",
       "api_base_url": "https://search.ask2go.com",
-      "api_booking_base_url": "https://booking.ask2go.com"
+      "api_booking_base_url": "https://booking.ask2go.com",
+      "allowed_window_td": "PT15M"
     }
   }
 }

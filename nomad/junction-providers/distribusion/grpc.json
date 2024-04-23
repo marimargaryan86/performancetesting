@@ -6,7 +6,8 @@
             "provider_company_id": "3deca3bb-67ab-43f5-839c-3f82d4002f45",
             "api_base_url": "https://api.demo.distribusion.com",
             "retailer_partner_number": "431926",
-            "bucket": "junction-provider-data-development"
+            "bucket": "junction-provider-data-development",
+            "allowed_window_td": "PT15M"
         }
     },
     "production": {
@@ -16,7 +17,8 @@
             "provider_company_id": "cfe9ab32-d0c1-42c0-8657-314a09841d6a",
             "api_base_url": "https://api.distribusion.com",
             "retailer_partner_number": "431926",
-            "bucket": "junction-provider-data-production"
+            "bucket": "junction-provider-data-production",
+            "allowed_window_td": "PT15M"
         }
     },
     "sandbox": {
@@ -26,7 +28,8 @@
             "provider_company_id": "3deca3bb-67ab-43f5-839c-3f82d4002f45",
             "api_base_url": "https://api.demo.distribusion.com",
             "retailer_partner_number": "431926",
-            "bucket": "junction-provider-data-sandbox"
+            "bucket": "junction-provider-data-sandbox",
+            "allowed_window_td": "PT15M"
         }
     }
 }

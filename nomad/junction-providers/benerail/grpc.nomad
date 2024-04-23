@@ -38,6 +38,10 @@ variable "bucket" {
   type = string
 }
 
+variable "allowed_window_td" {
+  type = string
+}
+
 job "junction-providers-benerail-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -156,6 +160,7 @@ EOH
         API_BASE_URL        = "${var.api_base_url}"
         GRPC_ADDRESS        = "0.0.0.0"
         GRPC_PORT           = "${NOMAD_PORT_grpc}"
+        ALLOWED_WINDOW_TD   = "${var.allowed_window_td}"
       }
     }
   }
