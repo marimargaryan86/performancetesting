@@ -32,9 +32,8 @@ from snowfall.project.junction.service.providers.direct_ferries.gtfs import (
 )
 from snowfall.project.junction.service.providers.direct_ferries.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, redis_factory
+from snowfall.stdlib.service import amqp_factory, httpx_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.direct_ferries import client
 from snowfall.vendor.direct_ferries.clients import auth, base
@@ -88,13 +87,7 @@ async def _offers(
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=int(app.settings.api_timeout.total_seconds()),
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     ferry_adapter = adapter.DfAdapter(
         df_client=_create_client(
             http_client=http_client,
@@ -125,13 +118,7 @@ async def _offers(
 
 
 async def _orders(app: service.Application[config.OrdersSettings]) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=int(app.settings.api_timeout.total_seconds()),
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     amqp_conn = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_client = await redis_factory.make_client(
         app=app,
@@ -201,12 +188,7 @@ async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
     output_path = pathlib.Path(app.settings.output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=int(app.settings.api_timeout.total_seconds()),
-        ),
-    )
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     df_client = _create_client(
         http_client=http_client,
         setting=app.settings,
@@ -235,13 +217,7 @@ async def _create_gtfs(app: service.Application[config.GtfsSetting]) -> None:
 
 
 async def _static(app: service.Application[config.StaticSettings]) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=int(app.settings.api_timeout.total_seconds()),
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     df_client = _create_client(http_client, app.settings)
 
     if not app.settings.dump_routes and not app.settings.dump_ports:

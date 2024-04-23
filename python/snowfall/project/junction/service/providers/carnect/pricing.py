@@ -1,13 +1,16 @@
 import datetime
 
-import httpx
-
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.carnect import adapter, cache, config
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    httpx_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -39,11 +42,7 @@ async def price_quotes(
         is_test=app.settings.is_test,
     )
 
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout.seconds,
-        ),
-    )
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
 
     client = CarnectClient(http_client=http_client, config=carnect_config)
 

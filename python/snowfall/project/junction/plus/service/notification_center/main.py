@@ -4,7 +4,6 @@ import random
 import tempfile
 from collections.abc import Sequence
 
-import httpx
 import pydantic
 from redis import asyncio as aioredis
 
@@ -18,9 +17,13 @@ from snowfall.project.junction.plus.service.notification_center import importer,
 from snowfall.project.junction.plus.service.notifications.v1 import (
     grpc_pb2_grpc as notifications_pb2_grpc,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, application, grpc_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    httpx_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, types
 
 
@@ -42,11 +45,8 @@ class _ImportSettings(application.Settings):
 
 
 async def _import(app: application.Application[_ImportSettings]) -> None:
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    await httpx_factory.make_client(app)
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-
-    logging.register(http_client)
-    metrics.register(http_client)
     notifications_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.notifications_address,

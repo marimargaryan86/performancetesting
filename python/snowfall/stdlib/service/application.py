@@ -257,7 +257,7 @@ def _command(
             stack=contextlib.AsyncExitStack(),
             user_agent="{name}/{version} (+https://snowfalltravel.com/)".format(
                 name=entrypoint.name,
-                version=global_settings.version,
+                version=global_settings.version[:8],
             ),
             version=global_settings.version,
         )

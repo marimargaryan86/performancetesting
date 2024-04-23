@@ -13,7 +13,6 @@ from snowfall.project.junction.service.providers.carnect import (
     criteria,
 )
 from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
-from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import application, httpx_factory
 from snowfall.vendor.carnect import client
@@ -29,7 +28,6 @@ async def simple_search_app(
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
-    logging.register(http_client)
 
     carnect_config = carnect_settings.Config(
         timeout=app.settings.ttl.seconds,

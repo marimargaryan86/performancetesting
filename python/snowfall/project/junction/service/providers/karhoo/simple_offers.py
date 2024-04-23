@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 
-import httpx
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -14,9 +13,8 @@ from snowfall.project.junction.service.providers.karhoo import (
     criteria,
 )
 from snowfall.project.junction.service.providers.karhoo.v1 import amqp_pb2
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, httpx_factory
 from snowfall.vendor.karhoo import client
 
 _Impl = simple_offers.SimpleOfferSearchImplementation[amqp_pb2.Criteria]
@@ -28,13 +26,7 @@ async def simple_search_app(
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout.seconds,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     karhoo_client = client.KarhooClient(
         api_key=app.settings.api_key,
         base_url=str(app.settings.api_base_url),

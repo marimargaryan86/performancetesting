@@ -1,5 +1,4 @@
 import aiosmtplib
-import httpx
 import pydantic
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
@@ -10,12 +9,12 @@ from snowfall.project.junction.service.providers.ba_ndc import (
     notifications,
 )
 from snowfall.project.junction.service.providers.ba_ndc.booking import BookingHandler
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
     grpc_factory,
+    httpx_factory,
     redis_factory,
 )
 from snowfall.stdlib.transport.amqp import consumer, producer, types
@@ -39,13 +38,10 @@ class OrdersSettings(config.BaNdcConfig, application.Settings):
 async def orders(  # noqa: WPS217
     app: application.Application[OrdersSettings],
 ) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     redis_client = await redis_factory.make_client(
         app=app,
         dsn=app.settings.redis_dsn,

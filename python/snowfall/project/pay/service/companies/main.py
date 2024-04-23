@@ -2,7 +2,6 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import httpx
 from motor import motor_asyncio
 from pydantic import AnyUrl
 
@@ -12,7 +11,7 @@ from snowfall.project.pay.service.payments.v1 import (
     invoice_pb2_grpc,
 )
 from snowfall.stdlib import money
-from snowfall.stdlib.service import application, grpc_factory
+from snowfall.stdlib.service import application, grpc_factory, httpx_factory
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.consul.client import ConsulClient
 
@@ -34,7 +33,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    http_client = await httpx_factory.make_client(app)
 
     consul_client = ConsulClient(
         api_base_url=str(app.settings.consul_api_base_url),

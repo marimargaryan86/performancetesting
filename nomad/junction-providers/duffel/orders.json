@@ -3,7 +3,7 @@
     "variables": {
       "count": 1,
       "api_base_url": "https://api.duffel.com",
-      "http_timeout": 90,
+      "http_timeout": "PT90S",
       "bucket": "junction-provider-data-development",
       "email_recipient": "go-dev@snowfalltravel.com"
     }
@@ -13,7 +13,7 @@
     "variables": {
       "count": 2,
       "api_base_url": "https://api.duffel.com",
-      "http_timeout": 90,
+      "http_timeout": "PT90S",
       "bucket": "junction-provider-data-production",
       "email_recipient": "support@snowfalltravel.com"
     }
@@ -23,7 +23,7 @@
     "variables": {
       "count": 1,
       "api_base_url": "https://api.duffel.com",
-      "http_timeout": 90,
+      "http_timeout": "PT90S",
       "bucket": "junction-provider-data-sandbox",
       "email_recipient": "go-dev@snowfalltravel.com"
     }

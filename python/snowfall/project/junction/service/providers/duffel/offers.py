@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 
-import httpx
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -14,10 +13,9 @@ from snowfall.project.junction.service.providers.duffel.client_factory import (
 from snowfall.project.junction.service.providers.duffel.search import adapter
 from snowfall.project.junction.service.providers.duffel.v1 import amqp_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import grpc_factory
+from snowfall.stdlib.service import grpc_factory, httpx_factory
 from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
@@ -33,13 +31,10 @@ async def offers_factory(
     redis_connection: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
             await grpc_factory.make_insecure_channel(

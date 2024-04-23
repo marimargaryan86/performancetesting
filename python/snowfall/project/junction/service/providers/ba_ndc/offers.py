@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 
-import httpx
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -11,10 +10,9 @@ from snowfall.project.junction.service.providers.ba_ndc import cache, config, cr
 from snowfall.project.junction.service.providers.ba_ndc.search import adapter
 from snowfall.project.junction.service.providers.ba_ndc.v1alpha import amqp_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import grpc_factory
+from snowfall.stdlib.service import grpc_factory, httpx_factory
 from snowfall.vendor.ba_ndc import client
 from snowfall.vendor.ba_ndc.models import request_offer_search_schemas
 from snowfall.vendor.rate_limiter import gubernator_pb2_grpc
@@ -35,10 +33,9 @@ async def offers_factory(
     airport_repository = airports.AirportRepository(
         airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),
     )
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
@@ -58,8 +55,6 @@ async def offers_factory(
         ),
         app.settings.rate_limiter_service_configs["ba-ndc-daily"],
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     ba_ndc_client = client.BaNdcClient(
         api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,

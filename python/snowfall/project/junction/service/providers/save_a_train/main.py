@@ -10,7 +10,6 @@ import random
 from typing import cast
 
 import aiosmtplib
-import httpx
 import pydantic
 from aio_pika import abc
 from motor import motor_asyncio
@@ -38,10 +37,14 @@ from snowfall.project.junction.service.providers.save_a_train.constant import (
 from snowfall.project.junction.service.providers.save_a_train.v1 import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, grpc_factory, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    grpc_factory,
+    httpx_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.save_a_train import client
@@ -54,7 +57,7 @@ class _SatConfig(pydantic.BaseModel):
     api_base_url: pydantic.AnyUrl
     api_email: str
     api_password: str
-    api_timeout: int = 40
+    api_timeout: datetime.timedelta = datetime.timedelta(seconds=40)
     api_search_base_url: pydantic.AnyUrl
     api_search_timeout: int = 1
     api_search_requests_limit: int = 40
@@ -135,13 +138,7 @@ async def _offers_factory(
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     save_a_train_client = client.SATClient(
         email=app.settings.api_email,
         password=app.settings.api_password,
@@ -197,11 +194,7 @@ async def _bookings_factory(
     storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     client.SATClient(
         email=app.settings.api_email,
         password=app.settings.api_password,
@@ -230,13 +223,7 @@ async def _orders(  # noqa: WPS217
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_client = await redis_factory.make_client(
         app=app,
@@ -342,13 +329,7 @@ async def _notifications(  # noqa: WPS217
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
     redis_client = await redis_factory.make_client(
         app=app,
@@ -464,13 +445,7 @@ async def _configure_queue(
 
 
 async def _dump_stations(app: service.Application[_DumpStationsSettings]) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     save_a_train_client = client.SATClient(
         email=app.settings.api_email,
         password=app.settings.api_password,

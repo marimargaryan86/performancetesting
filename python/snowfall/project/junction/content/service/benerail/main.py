@@ -14,7 +14,6 @@ from snowfall.project.junction.provider import cabin_classes
 from snowfall.project.junction.provider.v2alpha import meta_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.service import httpx_factory
 from snowfall.vendor.benerail import client
 
@@ -32,7 +31,6 @@ async def _factory(
             certificate_file=pathlib.Path(app.settings.cert_path),
         ),
     )
-    logging.register(http_client)
     benerail_client = client.BenerailClient(
         subscription_key=app.settings.subscription_key,
         base_url=str(app.settings.api_base_url),

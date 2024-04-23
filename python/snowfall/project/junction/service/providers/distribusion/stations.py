@@ -6,15 +6,13 @@ import zoneinfo
 from collections.abc import Mapping, Sequence
 
 import aiofiles
-import httpx
 import pydantic
 
 from snowfall.project.junction.service.providers.distribusion.config import (
     DistribusionConfig,
 )
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import application
+from snowfall.stdlib.service import application, httpx_factory
 from snowfall.vendor.distribusion import client
 from snowfall.vendor.distribusion.models.stations import Station as VendorStation
 
@@ -44,13 +42,7 @@ class StationRepository:
 async def dump_stations(
     app: application.Application[DumpStationsSettings],
 ) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     distribusion_client = client.DistribusionClient(
         api_base_url=str(app.settings.api_base_url),
         api_key=app.settings.api_key,

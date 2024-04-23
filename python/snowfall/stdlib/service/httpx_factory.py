@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from typing import TypeVar
 
 import httpx
+import pydantic
 
 from snowfall.stdlib.instrumentation.httpx import metrics
 from snowfall.stdlib.service import application
@@ -36,16 +37,16 @@ class Certificate:
 async def make_client(
     app: application.Application[_Settings],
     *,
-    base_url: httpx.URL | None = None,
+    base_url: pydantic.AnyHttpUrl | None = None,
     follow_redirects: bool = False,
     headers: Mapping[str, str] | None = None,
     timeout: datetime.timedelta | None = None,
     cert: Certificate | None = None,
 ) -> httpx.AsyncClient:
     client = httpx.AsyncClient(
-        base_url=base_url or "",
+        base_url=httpx.URL(str(base_url)) if base_url else "",
         follow_redirects=follow_redirects,
-        headers=headers,
+        headers={"User-Agent": app.user_agent, **(headers or {})},
         timeout=(
             timeout.total_seconds()
             if timeout

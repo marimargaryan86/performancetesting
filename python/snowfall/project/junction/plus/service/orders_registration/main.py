@@ -1,4 +1,3 @@
-import httpx
 import pydantic
 
 from snowfall.project.junction.plus.adapter import (
@@ -12,8 +11,12 @@ from snowfall.project.junction.plus.service.orders_registration import (
     flight_stats,
     importer,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import amqp_factory, application, grpc_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    httpx_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 
 
@@ -27,11 +30,8 @@ class _ImportSettings(application.Settings):
 
 
 async def _import(app: application.Application[_ImportSettings]) -> None:
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    await httpx_factory.make_client(app)
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-
-    logging.register(http_client)
-    metrics.register(http_client)
     notifications_channel = await grpc_factory.make_insecure_channel(
         app,
         app.settings.notifications_address,

@@ -1,5 +1,4 @@
 import aiosmtplib
-import httpx
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.provider import notifications
@@ -9,10 +8,14 @@ from snowfall.project.junction.service.providers.karhoo import (
     config,
     constant,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    httpx_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
 from snowfall.stdlib.transport.amqp import types
@@ -24,13 +27,7 @@ _PROVIDER_NAME = "Karhoo"
 async def orders(
     app: application.Application[config.OrderSettings],
 ) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout.seconds,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     redis_client = await redis_factory.make_client(

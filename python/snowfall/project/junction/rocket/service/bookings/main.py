@@ -17,7 +17,6 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     bookings_pb2_grpc,
     meta_pb2_grpc,
 )
-from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
@@ -137,7 +136,6 @@ async def _consume_cancellations(
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     http_client = await httpx_factory.make_client(app)
-    logging.register(http_client)
 
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

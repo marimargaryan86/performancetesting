@@ -11,7 +11,6 @@ from snowfall.project.junction.service.providers.carnect import (
 )
 from snowfall.project.junction.service.providers.carnect.constants import PROVIDER_ID
 from snowfall.project.junction.service.providers.carnect.v1 import amqp_pb2
-from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import httpx_factory
 from snowfall.vendor.carnect import client
@@ -38,7 +37,6 @@ async def _bookings_factory(
     app: service.Application[config.Settings],
 ) -> bookings.Implementation:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
-    logging.register(http_client)
 
     carnect_config = carnect_settings.Config(
         timeout=app.settings.ttl.seconds,

@@ -2,7 +2,6 @@ import ipaddress
 import random
 from collections.abc import Sequence
 
-import httpx
 import pydantic
 from motor import motor_asyncio
 
@@ -19,7 +18,7 @@ from snowfall.project.junction.plus.service.notifications.notifications import (
     OrderRepository,
     SubscriberRepository,
 )
-from snowfall.stdlib.service import amqp_factory, application
+from snowfall.stdlib.service import amqp_factory, application, httpx_factory
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.consul.client import ConsulClient
@@ -41,7 +40,7 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
+    http_client = await httpx_factory.make_client(app)
     consul_client = ConsulClient(
         api_base_url=str(app.settings.consul_api_base_url),
         api_token=app.settings.consul_api_token,

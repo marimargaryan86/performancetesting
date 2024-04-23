@@ -8,7 +8,6 @@ from snowfall.project.junction.service.providers.carnect import (
     constants,
     notifications,
 )
-from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import (
@@ -30,7 +29,6 @@ async def orders(
     app: application.Application[config.OrderSettings],
 ) -> None:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
-    logging.register(http_client)
     amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
     redis_client = await redis_factory.make_client(

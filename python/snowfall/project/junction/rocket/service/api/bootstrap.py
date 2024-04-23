@@ -2,7 +2,6 @@ import asyncio
 import datetime
 from typing import NamedTuple
 
-import httpx
 import lagom
 from grpc import aio
 
@@ -35,7 +34,12 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_g
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
-from snowfall.stdlib.service import application, grpc_factory, mongo_factory
+from snowfall.stdlib.service import (
+    application,
+    grpc_factory,
+    httpx_factory,
+    mongo_factory,
+)
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
@@ -102,7 +106,7 @@ async def create_dependencies(
     )
     container[JunctionOneClient] = JunctionOneClient(
         api_base_url=app.settings.j_one_api_base_url,
-        http_client=await app.stack.enter_async_context(httpx.AsyncClient()),
+        http_client=await httpx_factory.make_client(app),
         auth=container[TemporaryTokenAuth],
     )
     container[repositories.AirSearchResultRepository] = (

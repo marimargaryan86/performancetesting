@@ -24,7 +24,6 @@ from snowfall.project.junction.rocket.service.providers.carnect import (
 from snowfall.project.junction.rocket.service.providers.carnect.constants import (
     PROVIDER_ID,
 )
-from snowfall.stdlib.instrumentation.httpx import logging
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import amqp_factory, httpx_factory, redis_factory
@@ -157,7 +156,6 @@ async def _pricing(
 
 async def _bookings(app: service.Application[_Settings]) -> None:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
-    logging.register(http_client)
 
     redis_client = await redis_factory.make_client(
         app=app,

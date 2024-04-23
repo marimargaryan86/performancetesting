@@ -1,15 +1,17 @@
 import datetime
 
-import httpx
-
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.go.service.offers.v1 import models_pb2 as offers_pb2
 from snowfall.project.junction.service.providers.karhoo import adapter, cache, config
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
-from snowfall.stdlib.service import amqp_factory, application, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    httpx_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -59,13 +61,7 @@ async def price_quotes(
         connection=amqp_connection,
         exchange=amqp_types.Exchange("prices"),
     )
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout.seconds,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     karhoo_client = client.KarhooClient(
         api_key=app.settings.api_key,
         base_url=str(app.settings.api_base_url),

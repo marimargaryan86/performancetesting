@@ -13,7 +13,7 @@ class DuffelConfig(pydantic.BaseModel):
     api_base_url: pydantic.AnyUrl
     api_key: str
     api_version: str = "v1"
-    http_timeout: int = 30
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=30)  # noqa: WPS432
     rate_limiter_grpc_host: str
     rate_limiter_service_configs: dict[str, RateLimitConfig]
     resellers_map: dict[str, dict[str, Any]] = pydantic.Field(default_factory=dict)

@@ -2,8 +2,6 @@ import datetime
 from collections.abc import Mapping
 from typing import Any
 
-import httpx
-
 from snowfall.project.junction.go.service.offers.v1 import amqp_pb2 as offers_amqp_pb2
 from snowfall.project.junction.service.providers.duffel import (
     cache,
@@ -17,12 +15,12 @@ from snowfall.project.junction.service.providers.duffel.config import PricingSet
 from snowfall.project.junction.service.providers.duffel.search.parser import (
     dict_to_private_fares,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
     grpc_factory,
+    httpx_factory,
     redis_factory,
 )
 from snowfall.stdlib.transport.amqp import consumer, producer
@@ -34,13 +32,10 @@ from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 async def price_quotes(
     app: application.Application[PricingSettings],
 ) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
             await grpc_factory.make_insecure_channel(

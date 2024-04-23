@@ -4,7 +4,6 @@ import random
 from collections.abc import Sequence
 
 import aiosmtplib
-import httpx
 import pydantic
 from motor import motor_asyncio
 
@@ -42,8 +41,12 @@ from snowfall.project.pay.service.refunds.v1 import (
 from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc as transactions_pb2_grpc,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
-from snowfall.stdlib.service import amqp_factory, application, grpc_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    application,
+    grpc_factory,
+    httpx_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.stdlib.transport.grpc import server
 from snowfall.vendor.zendesk.client import ZendeskClient
@@ -253,10 +256,7 @@ async def _consume_cancellations(
     app: application.Application[_CancellationsConsumerSettings],
 ) -> None:
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-
-    http_client = await app.stack.enter_async_context(httpx.AsyncClient())
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app)
 
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311

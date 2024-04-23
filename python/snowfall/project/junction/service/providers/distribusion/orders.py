@@ -1,5 +1,4 @@
 import aiosmtplib
-import httpx
 
 from snowfall.project.junction.go.service.orders.v1 import amqp_pb2
 from snowfall.project.junction.service.providers.distribusion import (
@@ -10,13 +9,13 @@ from snowfall.project.junction.service.providers.distribusion import (
 from snowfall.project.junction.service.providers.distribusion.booking import (
     BookingHandler,
 )
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import (
     amqp_factory,
     application,
     grpc_factory,
+    httpx_factory,
     redis_factory,
 )
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
@@ -31,13 +30,7 @@ _PROVIDER_NAME = "Distribusion"
 async def orders(  # noqa: WPS217
     app: application.Application[config.OrdersSettings],
 ) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.api_timeout,
-        ),
-    )
-    logging.register(http_client)
-    metrics.register(http_client)
+    http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
             await grpc_factory.make_insecure_channel(

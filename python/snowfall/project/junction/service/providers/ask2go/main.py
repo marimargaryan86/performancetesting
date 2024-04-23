@@ -8,7 +8,6 @@ import zoneinfo
 from collections.abc import Sequence
 
 import aiosmtplib
-import httpx
 import pydantic
 from aio_pika import abc
 from motor import motor_asyncio
@@ -50,10 +49,14 @@ from snowfall.project.junction.service.providers.ask2go.train_stations import (
 from snowfall.project.junction.service.providers.ask2go.v1 import amqp_pb2
 from snowfall.service.geodata.v1 import geocoding_pb2_grpc
 from snowfall.stdlib import h3
-from snowfall.stdlib.instrumentation.httpx import logging, metrics
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.persistence.redis import types as redis
-from snowfall.stdlib.service import amqp_factory, grpc_factory, redis_factory
+from snowfall.stdlib.service import (
+    amqp_factory,
+    grpc_factory,
+    httpx_factory,
+    redis_factory,
+)
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer, types
 from snowfall.vendor.ask2go import client
@@ -71,7 +74,7 @@ class _OrdersSettings(service.Settings):
     smtp_dsn: pydantic.AnyUrl
     smtp_sender: pydantic.EmailStr
     smtp_recipient: pydantic.EmailStr
-    http_timeout: float = 60.0
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=60)
     override_double_booking_check: bool = False
     storage_dsn: service.AnyDsn
 
@@ -80,7 +83,7 @@ class _Settings(service.ProviderSettings):
     api_base_url: pydantic.AnyUrl
     api_booking_base_url: pydantic.AnyUrl
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
-    http_timeout: float = 20.0
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=20)
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -97,7 +100,7 @@ class _PriceQuotesSettings(service.PriceQuoteSettings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
-    http_timeout: float = 20.0
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=20)
     poll_retries_limit: int = 10
     wait_time_between_polling: float = 1
     mongo_dsn: Sequence[pydantic.AnyUrl]
@@ -110,7 +113,7 @@ class _SeatMapsSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     redis_dsn: pydantic.RedisDsn
     amqp_dsn: pydantic.AmqpDsn
-    http_timeout: float = 60.0
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=60)
 
 
 class _OrderChangesSettings(service.Settings):
@@ -122,7 +125,7 @@ class _OrderChangesSettings(service.Settings):
     a2g_sqs_aws_secret_access_key: str
     aws_region: str
     wait_time_between_polling: int = 20
-    http_timeout: float = 60.0
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=60)
 
 
 _Impl = offers.OfferSearchImplementation[
@@ -136,7 +139,7 @@ class DumpStationsSettings(service.Settings):
     api_booking_base_url: pydantic.AnyUrl
     geodata_address: str
     output_dir: pydantic.DirectoryPath = pathlib.Path()
-    http_timeout: float = 60.0
+    http_timeout: datetime.timedelta = datetime.timedelta(seconds=60)
 
 
 _PROVIDER_NAME = "Ask2Go"
@@ -156,29 +159,26 @@ async def _meta_factory() -> meta.MetaImplementation:
 async def _dump_stations(
     app: service.Application[DumpStationsSettings],
 ) -> None:
-    settings = app.settings
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
+    )
+    ask2go_client = client.Ask2GoClient(
+        api_base_url=str(app.settings.api_base_url),
+        api_booking_base_url=str(app.settings.api_booking_base_url),
+        http_client=http_client,
+    )
 
-    async with httpx.AsyncClient(
-        timeout=settings.http_timeout,
-    ) as http_client:
-        logging.register(http_client)
-        metrics.register(http_client)
-        ask2go_client = client.Ask2GoClient(
-            api_base_url=str(app.settings.api_base_url),
-            api_booking_base_url=str(app.settings.api_booking_base_url),
-            http_client=http_client,
-        )
-
-        geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
-            await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
-        )
-        output_file_path = "/".join(
-            [
-                str(settings.output_dir),
-                "ask2go_stations.json",
-            ],
-        )
-        await stations.dump_stations(geocoder, ask2go_client, output_file_path)
+    geocoder = geocoding_pb2_grpc.GeocodingServiceStub(
+        await grpc_factory.make_insecure_channel(app, app.settings.geodata_address),
+    )
+    output_file_path = "/".join(
+        [
+            str(app.settings.output_dir),
+            "ask2go_stations.json",
+        ],
+    )
+    await stations.dump_stations(geocoder, ask2go_client, output_file_path)
 
 
 async def _offers(
@@ -187,13 +187,10 @@ async def _offers(
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> _Impl:
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
             await grpc_factory.make_insecure_channel(
@@ -286,13 +283,10 @@ async def _simple_offers(
     redis_conn: aioredis.Redis[bytes],
     stack: contextlib.AsyncExitStack,
 ) -> simple_offers.SimpleOfferSearchImplementation[search_models.CreateSearchCriteria]:
-    http_client = await stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
 
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
@@ -381,13 +375,10 @@ async def _simple_offers(
 
 
 async def _orders(app: service.Application[_OrdersSettings]) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     redis_client = await redis_factory.make_client(
         app=app,
         dsn=app.settings.redis_dsn,
@@ -440,13 +431,10 @@ async def _orders(app: service.Application[_OrdersSettings]) -> None:
 
 
 async def _order_changes(app: service.Application[_OrderChangesSettings]) -> None:
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
 
     ask2go_client = client.Ask2GoClient(
         api_base_url=str(app.settings.api_base_url),
@@ -470,13 +458,10 @@ async def _price_quotes(app: service.Application[_PriceQuotesSettings]) -> None:
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     rate_limit_client = RateLimitClient(
         gubernator_pb2_grpc.V1Stub(
             await grpc_factory.make_insecure_channel(
@@ -562,13 +547,10 @@ async def _seat_maps(app: service.Application[_SeatMapsSettings]) -> None:
         dsn=app.settings.redis_dsn,
         decode_responses=False,
     )
-    http_client = await app.stack.enter_async_context(
-        httpx.AsyncClient(
-            timeout=app.settings.http_timeout,
-        ),
+    http_client = await httpx_factory.make_client(
+        app,
+        timeout=app.settings.http_timeout,
     )
-    logging.register(http_client)
-    metrics.register(http_client)
     ask2go_client = client.Ask2GoClient(
         api_base_url=str(app.settings.api_base_url),
         api_booking_base_url=str(app.settings.api_booking_base_url),
