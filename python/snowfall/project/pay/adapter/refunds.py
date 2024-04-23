@@ -15,10 +15,8 @@ from snowfall.project.pay.service.transactions.v1 import (
 )
 from snowfall.stdlib import money, sequence, string
 from snowfall.stdlib.format import protobuf
-from snowfall.vendor.currency_cloud.client import PaymentClient
-from snowfall.vendor.currency_cloud.models.rate import (
-    DetailedRateRequest,
-    FixedSideEnum,
+from snowfall.vendor.xe.models.rate import (
+    RateResponse,
 )
 
 
@@ -84,13 +82,11 @@ class DictClient(Client):
         self,
         refunds: Sequence[models_pb2.Refund],
         transactions: Sequence[transaction_model.Transaction],
-        payment_client: PaymentClient,
     ):
         self._refunds = {refund.id: refund for refund in refunds}
         self._transactions = {
             transaction.id: transaction for transaction in transactions
         }
-        self._payment_client = payment_client
 
     async def create(
         self,
@@ -187,18 +183,15 @@ class DictClient(Client):
         transaction = self._transactions.get(refund.transaction_id)
         if not transaction:
             raise errors.NotFoundError("Transaction not found")
-        detailed_rate_response = await self._payment_client.get_detailed_rates(
-            DetailedRateRequest(
-                sell_currency=refunded_by_provider.currency.code,
-                buy_currency=refunded_to_reseller.currency.code,
-                fixed_side=FixedSideEnum.sell,
-                amount=str(refunded_by_provider.amount),
-            ),
+        detailed_rate_response = RateResponse(
+            from_currency=refunded_by_provider.currency.code,
+            to_currency=refunded_to_reseller.currency.code,
+            rate=float(str(refunded_by_provider.amount)),
         )
         total_amount = money.total(
             [
-                money.Money(
-                    int(detailed_rate_response.client_buy_amount),
+                money.from_string(
+                    str(detailed_rate_response.rate),
                     money.Currency(refunded_to_reseller.currency.code),
                 ),
                 money.from_protobuf(transaction.amounts.sales_margin),

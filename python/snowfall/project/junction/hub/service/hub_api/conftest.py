@@ -1,6 +1,4 @@
-import secrets
 from collections.abc import AsyncIterator, Awaitable, Callable, Mapping, Sequence
-from unittest import mock
 
 import httpx
 import pytest
@@ -147,7 +145,7 @@ def currencies_client(
 
 
 @pytest.fixture()
-def refunds_client(cc_payment_client: mock.Mock) -> refunds.DictClient:
+def refunds_client() -> refunds.DictClient:
     refund_data = [
         pay_fixtures.generate_refund(refund_id) for refund_id in pay_fixtures.REFUNDS
     ]
@@ -157,7 +155,6 @@ def refunds_client(cc_payment_client: mock.Mock) -> refunds.DictClient:
             pay_fixtures.generate_transaction(refund.transaction_id)
             for refund in refund_data
         ],
-        cc_payment_client,
     )
 
 
@@ -221,19 +218,6 @@ def get_bill(bill_id: str) -> Bill:
         is_reconciled=False,
         total_amount=money_usd,
     )
-
-
-@pytest.fixture()
-def cc_payment_client() -> mock.Mock:
-    payment_client = mock.Mock()
-
-    detailed_rate = mock.Mock()
-    detailed_rate.client_buy_amount = secrets.randbelow(9999) + 1  # noqa: WPS432
-    payment_client.get_detailed_rates = mock.AsyncMock(
-        return_value=detailed_rate,
-    )
-
-    return payment_client
 
 
 @pytest.fixture()

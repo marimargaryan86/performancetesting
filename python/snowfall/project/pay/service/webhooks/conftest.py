@@ -1,5 +1,4 @@
 from collections.abc import AsyncIterator, Mapping, Sequence
-from unittest import mock
 
 import httpx
 import pytest
@@ -54,12 +53,10 @@ def transaction_models() -> Sequence[Transaction]:
 def refunds_client(
     refund_models: Sequence[Refund],
     transaction_models: Sequence[Transaction],
-    cc_payment_client: mock.Mock,
 ) -> refunds.DictClient:
     return refunds.DictClient(
         refund_models,
         transaction_models,
-        cc_payment_client,
     )
 
 
