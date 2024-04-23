@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import contextlib
 import datetime
 import random
 import tempfile
@@ -74,59 +73,57 @@ async def _meta_factory() -> meta.MetaImplementation:
 
 
 async def _pricing(app: service.Application[_PricingSettings]) -> None:
-    async with contextlib.AsyncExitStack() as stack:
-        http_client = await stack.enter_async_context(
-            httpx.AsyncClient(
-                http2=True,
-                cert=cert_tmp_path(app.settings.cert_base64),
-            ),
-        )
-        benerail_client = client.BenerailClient(
-            subscription_key=app.settings.subscription_key,
-            base_url=str(app.settings.api_base_url),
-            http_client=http_client,
-        )
-        connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
-        redis_client = await redis_factory.make_client(
-            app=app,
-            dsn=app.settings.redis_dsn,
-            decode_responses=False,
-        )
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            http2=True,
+            cert=cert_tmp_path(app.settings.cert_base64),
+        ),
+    )
+    benerail_client = client.BenerailClient(
+        subscription_key=app.settings.subscription_key,
+        base_url=str(app.settings.api_base_url),
+        http_client=http_client,
+    )
+    connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
 
-        quote_task_consumer = pricing.QuoteTaskConsumer(
-            consumer_obj=consumer.Consumer(
-                connection=connection,
-                queue_name="{0}_pricing_consumer".format(app.name),
-                binds=[(types.Exchange("searches"), "searches.pricing")],
-            ),
-            quote_result_producer=pricing.QuoteResultProducer(
-                producer_obj=producer.Producer(connection, types.Exchange("searches")),
-                routing_key="searches.pricing_results",
-            ),
-            search_result_cache=cache.OffersCache(client=redis_client),
-            quote_cache=cache.QuoteCache(
-                client=redis_client,
-            ),
-            benerail_adapter=adapter.BenerailAdapter(benerail_client),
-            client=benerail_client,
-            ttl=app.settings.ttl,
-        )
+    quote_task_consumer = pricing.QuoteTaskConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=connection,
+            queue_name="{0}_pricing_consumer".format(app.name),
+            binds=[(types.Exchange("searches"), "searches.pricing")],
+        ),
+        quote_result_producer=pricing.QuoteResultProducer(
+            producer_obj=producer.Producer(connection, types.Exchange("searches")),
+            routing_key="searches.pricing_results",
+        ),
+        search_result_cache=cache.OffersCache(client=redis_client),
+        quote_cache=cache.QuoteCache(
+            client=redis_client,
+        ),
+        benerail_adapter=adapter.BenerailAdapter(benerail_client),
+        client=benerail_client,
+        ttl=app.settings.ttl,
+    )
 
-        await quote_task_consumer.consume()
+    await quote_task_consumer.consume()
 
 
 async def _search_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> searches.SearchImplementation[provider_searches.Criteria]:
     stations = await train_stations.load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    http_client = await stack.enter_async_context(
+    http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             http2=True,
             cert=cert_tmp_path(app.settings.cert_base64),

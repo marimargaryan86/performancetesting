@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import contextlib
 import datetime
 import tempfile
 
@@ -71,11 +70,10 @@ async def _search_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> searches.SearchImplementation[criteria.Criteria]:
     stations = await train_stations.load_train_stations()
 
-    http_client = await stack.enter_async_context(
+    http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             http2=True,
             cert=(

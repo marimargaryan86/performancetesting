@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import contextlib
-
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -24,7 +22,6 @@ async def simple_search_app(
     app: application.Application[config.Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     karhoo_client = client.KarhooClient(

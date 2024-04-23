@@ -132,7 +132,6 @@ async def _offers_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     stations = await _load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
@@ -150,7 +149,7 @@ async def _offers_factory(
         api_search_requests_limit=app.settings.api_search_requests_limit,
         client=http_client,
     )
-    booking_storage = await stack.enter_async_context(
+    booking_storage = await app.stack.enter_async_context(
         filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
     )
     # TODO(mislavv): do we need to call get_token on the save_a_train_client?

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import dataclasses
 import ipaddress
 from collections.abc import Awaitable, Callable
@@ -53,7 +52,6 @@ if TYPE_CHECKING:
             application.Application[_Settings],
             abc.AbstractConnection,
             aioredis.Redis[bytes],  # TODO(jyggen): accept Redis client instead.
-            contextlib.AsyncExitStack,
         ],
         Awaitable[
             offers.OfferSearchImplementation[_SearchCriteriaTask, _SearchCriteria]
@@ -64,7 +62,6 @@ if TYPE_CHECKING:
             application.Application[_Settings],
             abc.AbstractConnection,
             aioredis.Redis[bytes],  # TODO(reuben.t): accept Redis client instead.
-            contextlib.AsyncExitStack,
         ],
         Awaitable[simple_offers.SimpleOfferSearchImplementation[_SearchCriteria,]],
     ]
@@ -106,7 +103,6 @@ def _grpc_command(  # noqa: WPS217
                 app,
                 connection,
                 redis_conn,
-                app.stack,
             )
             services.append(
                 offers.OfferSearchService(
@@ -129,7 +125,6 @@ def _grpc_command(  # noqa: WPS217
                 app,
                 connection,
                 redis_conn,
-                app.stack,
             )
             services.append(
                 simple_offers.SimpleSearchService(
@@ -181,7 +176,7 @@ def _offers_command(
         trip_search_consumer = offers.create_trip_offer_search_consumer(
             amqp_connection=connection,
             redis_client=redis.Client[bytes](redis_conn, prefix=app.name),
-            implementation=await offers_factory(app, connection, redis_conn, app.stack),
+            implementation=await offers_factory(app, connection, redis_conn),
             app_name=app.name,
             pay_company_id=app.settings.provider_company_id,
             provider_name=meta_implementation.name,
@@ -214,7 +209,6 @@ def _simple_offers_command(
                 app,
                 connection,
                 redis_conn,
-                app.stack,
             ),
             app_name=app.name,
             pay_company_id=app.settings.provider_company_id,

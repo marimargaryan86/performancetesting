@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 
 import pydantic
@@ -70,7 +69,6 @@ async def _search_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> searches.SearchImplementation[provider_searches.CarRentalCriteria]:
     search_result_generator = provider_searches.search_result_generator(
         generator=provider_searches.Generator(

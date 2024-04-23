@@ -82,11 +82,11 @@ async def searcher(
     app.settings = mock.create_autospec(main._Settings)  # noqa: SLF001
     app.settings.realistic_results = False
     app.settings.ttl = datetime.timedelta(minutes=1)
+    app.stack = mock.create_autospec(contextlib.AsyncExitStack)
     implementation = await main._offers_factory(  # noqa: SLF001
         app=app,
         amqp_conn=mock.create_autospec(aio_pika.Connection),
         redis_conn=redis_client,
-        stack=mock.create_autospec(contextlib.AsyncExitStack),
     )
 
     return provider_offers.TripOfferSearcher.from_implementation(

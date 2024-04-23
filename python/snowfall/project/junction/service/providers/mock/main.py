@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 
 import pydantic
@@ -124,7 +123,6 @@ async def _offers_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> provider_offers.OfferSearchImplementation[offers.Criteria, offers.Criteria]:
     return provider_offers.OfferSearchImplementation(
         search_criteria_task_generator=offers.criteria_task_generator,
@@ -146,7 +144,6 @@ async def _simple_search_app(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> provider_simple_offers.SimpleOfferSearchImplementation[offers.Criteria]:
     offer_group_generator = offers.offer_group_generator(
         generator=offers.Generator(

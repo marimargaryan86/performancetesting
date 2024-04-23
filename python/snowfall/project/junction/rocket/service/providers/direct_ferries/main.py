@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 
 import httpx
@@ -72,7 +71,6 @@ async def _search_factory(
     app: service.Application[config.Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> searches.SearchImplementation[provider_searches.Criteria]:
     httpx_client = await httpx_factory.make_client(
         app,

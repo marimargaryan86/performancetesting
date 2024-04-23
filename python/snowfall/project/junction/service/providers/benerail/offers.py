@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import random
 
 import httpx
@@ -33,14 +32,13 @@ async def offers_app(
     app: application.Application[config.Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     stations = await train_stations.load_train_stations()
     mongo = motor_asyncio.AsyncIOMotorClient(
         str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
     )
 
-    http_client = await stack.enter_async_context(
+    http_client = await app.stack.enter_async_context(
         httpx.AsyncClient(
             http2=True,
             timeout=app.settings.api_timeout.seconds,

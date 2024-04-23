@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import contextlib
-
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -35,7 +33,6 @@ async def offers_factory(
     app: service.Application[config.Settings],
     amqp_connection: abc.AbstractConnection,
     redis_connection: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     rate_limit_client = RateLimitClient(

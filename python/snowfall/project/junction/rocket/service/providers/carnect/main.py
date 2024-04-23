@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 
 import pydantic
@@ -68,7 +67,6 @@ async def _search_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> searches.SearchImplementation[criteria.Criteria]:
     carnect_config = carnect_settings.Config(
         timeout=app.settings.api_timeout.seconds,

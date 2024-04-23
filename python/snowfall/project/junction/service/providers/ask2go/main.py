@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 import pathlib
 import random
@@ -185,7 +184,6 @@ async def _offers(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await httpx_factory.make_client(
         app,
@@ -281,7 +279,6 @@ async def _simple_offers(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> simple_offers.SimpleOfferSearchImplementation[search_models.CreateSearchCriteria]:
     http_client = await httpx_factory.make_client(
         app,

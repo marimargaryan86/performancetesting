@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import logging as core_logging
 import pathlib
 
@@ -85,7 +84,6 @@ async def _offers(
     app: service.Application[config.Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     http_client = await httpx_factory.make_client(app, timeout=app.settings.api_timeout)
     ferry_adapter = adapter.DfAdapter(

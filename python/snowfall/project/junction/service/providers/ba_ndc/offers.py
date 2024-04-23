@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import contextlib
-
 from aio_pika import abc
 from redis import asyncio as aioredis
 
@@ -28,7 +26,6 @@ async def offers_factory(
     app: service.Application[config.Settings],
     amqp_connection: abc.AbstractConnection,
     redis_connection: aioredis.Redis[bytes],
-    stack: contextlib.AsyncExitStack,
 ) -> _Impl:
     airport_repository = airports.AirportRepository(
         airports_data=filesystem.PkgLoader("snowfall.data").load("airports.json"),

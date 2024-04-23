@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import dataclasses
 import ipaddress
 from collections.abc import Awaitable, Callable
@@ -44,7 +43,6 @@ if TYPE_CHECKING:
             application.Application[_Settings],
             abc.AbstractConnection,
             aioredis.Redis[bytes],  # TODO(jyggen): accept Redis client instead.
-            contextlib.AsyncExitStack,
         ],
         Awaitable[searches.SearchImplementation[_SearchCriteria]],
     ]
@@ -83,7 +81,6 @@ def _grpc_command(  # noqa: WPS217
             app,
             connection,
             redis_conn,
-            app.stack,
         )
 
         services.append(
