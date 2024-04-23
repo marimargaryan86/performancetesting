@@ -6,7 +6,6 @@ python_sources(
             "gubernator_pb2_grpc.py",
             "gubernator_pb2_grpc.pyi",
         ): {
-            "skip_autoflake": True,
             "skip_ruff": True,
         }
     }

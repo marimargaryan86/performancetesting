@@ -20,7 +20,6 @@ backend_packages = [
   "pants.backend.experimental.visibility",
   "pants.backend.project_info",
   "pants.backend.python",
-  "pants.backend.python.lint.autoflake",
   "pants.backend.python.lint.docformatter",
   "pants.backend.python.lint.flake8",
   "pants.backend.python.typecheck.mypy",
@@ -39,12 +38,6 @@ interpreter_constraints = ["CPython==3.11.*"]
 
 [anonymous-telemetry]
 enabled = false
-
-[autoflake]
-requirements = ["autoflake"]
-install_from_resolve = "python-default"
-interpreter_constraints = ["CPython==3.11.*"]
-args = ["--remove-all-unused-imports", "--remove-unused-variables"]
 
 [buf]
 config = "protobuf/buf.yaml"
