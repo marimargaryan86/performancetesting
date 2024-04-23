@@ -199,7 +199,7 @@ func paginate[T any](ch chan T, request func(options gitlab.ListOptions) ([]T, *
 			ch <- item
 		}
 
-		if res.CurrentPage == res.TotalPages {
+		if res.CurrentPage >= res.TotalPages {
 			break
 		}
 
