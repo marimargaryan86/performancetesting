@@ -74,6 +74,18 @@ class PlaceListData(BaseResult):
     def country_code(self) -> str:
         return get_nested_attribute(self._data, "data.0.attributes.countryCode")
 
+    @property
+    def place_type(self) -> str:
+        return get_nested_attribute(self._data, "data.0.attributes.placeType")
+
+    @property
+    def iata_code(self) -> str:
+        return get_nested_attribute(self._data, "data.0.attributes.iataCode")
+
+    @property
+    def place_to_search_within(self) -> str:
+        return get_nested_attribute(self._data, "data.0.attributes.iataCode")
+
 
 class AirSearchResult:
     def __init__(self, data: Mapping[str, Any]):

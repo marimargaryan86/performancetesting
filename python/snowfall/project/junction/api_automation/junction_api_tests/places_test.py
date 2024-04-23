@@ -18,14 +18,32 @@ class ExpectedPlaceData:
     iata_code: str
 
 
+@dataclass(frozen=True)
+class PlaceListFilters:
+    name_like: str
+    type_eq: str
+    iata_eq: str
+    coordinates: str
+    place_to_search_within: str
+
+
+valid_place_filters = PlaceListFilters(
+    name_like="London",
+    type_eq="city",
+    iata_eq="BER",
+    coordinates="13.3888599,52.5170365,0",
+    place_to_search_within="c6c12798-1668-5812-b611-7aa1709daee4",
+)
+
+
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
 async def test_places_valid_place_id(qa_client: QaClient) -> None:  # noqa: WPS218
     place_id = "c6c12798-1668-5812-b611-7aa1709daee4"
     expected_data = ExpectedPlaceData(
         place_id="c6c12798-1668-5812-b611-7aa1709daee4",
-        latitude=float("52.5170365"),
-        longitude=float("13.3888599"),
+        latitude=52.5170365,
+        longitude=13.3888599,
         country_code="DE",
         country_name="Germany",
         iata_code="BER",
@@ -81,3 +99,84 @@ async def test_places_not_exist_place_id(
         await qa_client.places.get_place_by_place_id(
             place_id=not_exist_place_id,
         )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_name_like(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        name_like=valid_place_filters.name_like,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert (
+        valid_place_filters.name_like in place_data.name
+    ), "{0} is not contained in {1}".format(
+        valid_place_filters.name_like,
+        place_data.name,
+    )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_type_eq(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        type_eq=valid_place_filters.type_eq,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.place_type == valid_place_filters.type_eq
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_iata_eq(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        iata_eq=valid_place_filters.iata_eq,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.iata_code == valid_place_filters.iata_eq
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_coordinates(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        coordinates=valid_place_filters.coordinates,
+    )
+
+    longitude, latitude, _radius = map(
+        float,
+        valid_place_filters.coordinates.split(","),
+    )
+
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.latitude == latitude, "Expected latitude {0}, but got {1}".format(
+        latitude,
+        place_data.latitude,
+    )
+    assert (
+        place_data.longitude == longitude
+    ), "Expected longitude {0}, but got {1}".format(longitude, place_data.longitude)
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_search_within(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        place_to_search_within=valid_place_filters.place_to_search_within,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert (
+        place_data.country_code == "DE"
+    ), "Expected all places to have the country code 'DE', but found a country code of '{0}' in the data.".format(
+        place_data.country_code,
+    )
