@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import contextlib
 import dataclasses
@@ -75,6 +77,27 @@ class Segment:
 class Route:
     segments: list[Segment]
 
+    def reduce(self) -> Route:
+        if not self.segments:
+            return Route(segments=[])
+
+        new_segments = []
+        current_segment: Segment = self.segments[0]
+
+        for segment in self.segments[1:]:
+            if segment.type == current_segment.type:
+                current_segment = Segment.create(
+                    origin=current_segment.origin,
+                    destination=segment.destination,
+                    segment_type=current_segment.type,
+                )
+            else:
+                new_segments.append(current_segment)
+                current_segment = segment
+
+        new_segments.append(current_segment)
+        return Route(segments=new_segments)
+
 
 class Routes:
     def __init__(
@@ -121,7 +144,9 @@ class Routes:
 
         for route in route_response.routes:
             with contextlib.suppress(KeyError):
-                resolved_routes.append(self._resolve_route(route, resolved_places))
+                resolved_routes.append(
+                    self._resolve_route(route, resolved_places).reduce(),
+                )
 
         return resolved_routes
 

@@ -376,3 +376,78 @@ async def test_valid_routes_are_not_discarded(
     )
 
     assert len(found_routes) == 1
+
+
+@pytest.fixture()
+def train_segment1() -> routes.Segment:
+    return routes.Segment.create(
+        origin=models_pb2.Place(id="train_segment1_origin"),
+        destination=models_pb2.Place(id="train_segment1_destination"),
+        segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+    )
+
+
+@pytest.fixture()
+def train_segment2() -> routes.Segment:
+    return routes.Segment.create(
+        origin=models_pb2.Place(id="train_segment2_origin"),
+        destination=models_pb2.Place(id="train_segment2_destination"),
+        segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+    )
+
+
+@pytest.fixture()
+def air_segment1() -> routes.Segment:
+    return routes.Segment.create(
+        origin=models_pb2.Place(id="air_segment1_origin"),
+        destination=models_pb2.Place(id="air_segment1_destination"),
+        segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+    )
+
+
+def test_route_reduce_single_segment_return_itself(
+    train_segment1: routes.Segment,
+) -> None:
+    route = routes.Route(segments=[train_segment1])
+    reduced_route = route.reduce()
+
+    assert len(reduced_route.segments) == 1
+    assert reduced_route.segments[0] == train_segment1
+
+
+def test_route_reduce_two_train_segments_reduce_into_one(
+    train_segment1: routes.Segment,
+    train_segment2: routes.Segment,
+) -> None:
+    route = routes.Route(segments=[train_segment1, train_segment2])
+    reduced_route = route.reduce()
+
+    assert len(reduced_route.segments) == 1
+    assert reduced_route.segments[0].origin == train_segment1.origin
+    assert reduced_route.segments[0].destination == train_segment2.destination
+
+
+def test_route_reduce_two_different_segments_return_itself(
+    train_segment1: routes.Segment,
+    air_segment1: routes.Segment,
+) -> None:
+    route = routes.Route(segments=[train_segment1, air_segment1])
+    reduced_route = route.reduce()
+
+    assert len(reduced_route.segments) == 2
+    assert reduced_route.segments[0] == train_segment1
+    assert reduced_route.segments[1] == air_segment1
+
+
+def test_route_reduce_multiple_segments(
+    air_segment1: routes.Segment,
+    train_segment1: routes.Segment,
+    train_segment2: routes.Segment,
+) -> None:
+    route = routes.Route(segments=[air_segment1, train_segment1, train_segment2])
+    reduced_route = route.reduce()
+
+    assert len(reduced_route.segments) == 2
+    assert reduced_route.segments[0] == air_segment1
+    assert reduced_route.segments[1].origin == train_segment1.origin
+    assert reduced_route.segments[1].destination == train_segment2.destination
