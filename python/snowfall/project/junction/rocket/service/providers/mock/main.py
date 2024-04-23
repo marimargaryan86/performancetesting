@@ -58,7 +58,7 @@ async def _meta_factory() -> meta.MetaImplementation:
     return meta.MetaImplementation(
         identifier=PROVIDER_ID,
         name=_PROVIDER_NAME,
-        search_capabilities=meta_pb2.SearchCapabilities(car_rental=True),
+        search_capabilities=meta_pb2.SearchCapabilities(car_rental=True, rail=True),
         booking_capabilities=meta_pb2.BookingCapabilities(
             supports_cancellation=True,
         ),
@@ -69,7 +69,7 @@ async def _search_factory(
     app: service.Application[_Settings],
     amqp_conn: abc.AbstractConnection,
     redis_conn: aioredis.Redis[bytes],
-) -> searches.SearchImplementation[provider_searches.CarRentalCriteria]:
+) -> searches.SearchImplementation[provider_searches.Criteria]:
     search_result_generator = provider_searches.search_result_generator(
         generator=provider_searches.Generator(
             search_result_cache=cache.SearchResultCache(
