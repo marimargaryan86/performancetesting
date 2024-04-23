@@ -442,6 +442,7 @@ ignore = [
   "Q002",    # Single quote docstring found but double quotes preferred. Incompatible with Ruff's formatter.
   "Q003",    # Change outer quotes to avoid escaping inner quotes. Incompatible with Ruff's formatter.
   "RUF027",  # Possible f-string without an `f` prefix
+  "RUF029",  # Function is declared `async`, but doesn't `await` or use `async` features # TODO: fix
   "TD003",   # Missing issue link on the line following this TODO
   "TRY003",  # Avoid specifying long messages outside the exception class # TODO: fix
   "UP030",   # Use implicit references for positional format fields
