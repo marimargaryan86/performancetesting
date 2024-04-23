@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequestStorage,
     AirSearchResult,
@@ -18,6 +20,9 @@ class AirSearchRequestRepository(
         identifier: str,
     ) -> AirSearchRequestStorage | None:
         return await self._execute(self._collection.find_one, {"search_id": identifier})
+
+
+# TODO(jeremy): Add new repository for ResultDetails (https://git.snowfall.se/junction/junction/-/merge_requests/5178#note_252722)
 
 
 class AirSearchResultRepository(
@@ -57,4 +62,31 @@ class AirSearchResultRepository(
         return await self._execute(
             self._collection.find_one,
             {"offers._id": identifier},
+        )
+
+    async def find_results_by_offer_ids(
+        self,
+        identifiers: Sequence[str],
+    ) -> resultset.ResultSet[AirSearchResult]:
+        return await self._execute(
+            self._collection.find,
+            {"offers._id": {"$in": identifiers}},
+        )
+
+    async def find_result_by_result_detail_id(
+        self,
+        identifier: str,
+    ) -> AirSearchResult:
+        return await self._execute(
+            self._collection.find_one,
+            {"result_details._id": identifier},
+        )
+
+    async def find_results_by_result_detail_ids(
+        self,
+        identifiers: Sequence[str],
+    ) -> resultset.ResultSet[AirSearchResult]:
+        return await self._execute(
+            self._collection.find,
+            {"result_details._id": {"$in": identifiers}},
         )

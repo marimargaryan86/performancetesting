@@ -7,6 +7,7 @@ from grpc import aio
 from motor import motor_asyncio
 
 from snowfall.adapter import authentication as auth_adapter
+from snowfall.project.junction.rocket.service.api import includes
 from snowfall.project.junction.rocket.service.api.air import (
     repositories,
     types,
@@ -102,11 +103,10 @@ async def create_dependencies(
         http_client=await httpx_factory.make_client(app),
         auth=container[TemporaryTokenAuth],
     )
-    container[repositories.AirSearchResultRepository] = (
-        repositories.AirSearchResultRepository(
-            collection=mongo_db.search_results,
-        )
+    air_search_results_repository = repositories.AirSearchResultRepository(
+        collection=mongo_db.search_results,
     )
+    container[repositories.AirSearchResultRepository] = air_search_results_repository
     container[repositories.AirSearchRequestRepository] = (
         repositories.AirSearchRequestRepository(collection=mongo_db.searches)
     )
@@ -131,6 +131,10 @@ async def create_dependencies(
         hotel_repositories.HotelRoomsSearchRepository(
             collection=mongo_db.hotel_rooms_results,
         )
+    )
+
+    includes.register_resolvers(
+        air_results_repo=air_search_results_repository,
     )
 
     return container

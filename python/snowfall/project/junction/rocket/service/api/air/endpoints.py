@@ -7,6 +7,7 @@ from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequest,
     AirSearchRequestStorage,
     AirSearchResponseAttributes,
+    AirSearchResultResource,
     StatusTypeEnum,
 )
 from snowfall.project.junction.rocket.service.api.air.repositories import (
@@ -185,65 +186,30 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
         results_repo: AirSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
         search_id = request.path_params["searchId"]
-
         search = await requests_repo.find_by_search_id(search_id)
         if not search:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
-        expires_at = search.expires_at.isoformat()
-        search_data = search.air.model_dump(by_alias=True)
 
         result_set = await results_repo.find_results_by_search_id(search_id)
 
-        # TODO(jeremy): fix includes resource
-        data = [
-            models.Resource(
-                id=result.id,
-                type="air-search-results",
-                attributes=AirSearchResponseAttributes(
-                    **search_data,
-                    status=StatusTypeEnum.completed,
-                    expires_at=expires_at,
-                ).model_dump(by_alias=True, exclude_none=True),
-                relationships={
-                    "offers": models.Relationship(
-                        data=[
-                            models.ResourceIdentifier(
-                                id=offer.id,
-                                type="air-offers",
-                            )
-                            for offer in result.offers
-                        ],
-                    ),
-                    "resultDetails": models.Relationship(
-                        data=[
-                            models.ResourceIdentifier(
-                                id=result_details.id,
-                                type="air-result-details",
-                            )
-                            for result_details in result.result_details
-                        ],
-                    ),
-                    "search": models.Relationship(
-                        data=models.ResourceIdentifier(
-                            id=request.path_params["searchId"],
-                            type="air-searches",
-                        ),
-                    ),
-                },
+        response_data = [
+            AirSearchResultResource.from_model(
+                search_result=search_result,
+                search=search,
             )
-            async for result in result_set
+            async for search_result in result_set
         ]
 
         pagination = pagination_helpers.get_pagination(request)
         items_page = sequence.paginate(
-            sequence=data,
+            sequence=response_data,
             cursor=pagination.cursor,
             limit=pagination.limit,
         )
 
         return await messages.create_response(
             body=models.Body(
-                data=data,
+                data=response_data,
                 links=pagination_helpers.get_next_url(
                     request.url_for(
                         "AirSearchRetrieval",

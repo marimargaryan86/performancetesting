@@ -14,7 +14,7 @@ from starlette.middleware import Middleware, authentication
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api import errors, includes
 from snowfall.project.junction.rocket.service.api.air import (
     router as air_router,
 )
@@ -187,6 +187,10 @@ def container(
         hotel_transformers.HotelSearchResultTransformer
     )
     container[HotelRoomsSearchRepository] = hotel_rooms_search_repo
+
+    includes.register_resolvers(
+        air_results_repo=air_search_repo,
+    )
 
     return container
 

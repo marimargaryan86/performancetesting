@@ -1294,10 +1294,9 @@ components:
                     - data
                   properties:
                     data:
-                      oneOf:
-                        - type: array
-                          items:
-                            $ref: '#/components/schemas/AirResultDetailIdentifier'
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AirResultDetailIdentifier'
                 search:
                   type: object
                   description: The Air Search ID that this ferry search result belongs to

@@ -136,8 +136,6 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
                             priced_fare.segments,
                             result_detail_id_from_segments,
                         )
-                        if priced_fare.segments
-                        else None
                     ),
                     fare_type=rocket.FareTypeEnum(fare_type),
                     name=priced_fare.name,
