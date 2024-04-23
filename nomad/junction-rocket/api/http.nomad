@@ -114,6 +114,9 @@ job "junction-rocket-api-http" {
     task "http" {
       driver = "docker"
 
+      resources {
+        memory = 600
+      }
       vault {
         policies = ["rocket-api-${var.environment}"]
       }
