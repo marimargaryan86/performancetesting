@@ -164,11 +164,7 @@ def _generate_outbound_search_criteria(
         protobuf.protobuf_to_datetime(search.rail.departure_after),
         timezone_origin,
     )
-    departure_before = (
-        protobuf.protobuf_to_datetime(search.rail.departure_before)
-        if search.rail.HasField("departure_before")
-        else None
-    )
+
     return_departure_after = (
         normalize_datetime(
             protobuf.protobuf_to_datetime(search.rail.return_date),
@@ -178,11 +174,8 @@ def _generate_outbound_search_criteria(
         else None
     )
 
-    timestamps = find_time_windows(
-        departure_before,
-        departure_after,
-        timezone=timezone_origin,
-    )
+    timestamps = [departure_after]
+
     trip_sequence = 1
     return _generate_search_criteria(
         timestamps=timestamps,
