@@ -28,7 +28,7 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
         ],
     )
 
-    # 1. Search for flights
+    # Search for flights
     search_flights_response = await remote_junction_one_client.search_flights(
         search_req,
     )
@@ -38,13 +38,29 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     offer = search_flights_response.offers[0]
 
     assert offer.fares
-    flight_offer_ref = offer.fares["2"][0].refs
+    fare = offer.fares["2"][0]
+    flight_offer_ref = fare.refs
 
     assert flight_offer_ref
     assert search_req.ods
     destination_loc = search_req.ods[0].arrival_airport
 
-    # 2. Create a trip
+    # Get seatmap
+    seatmaps = await remote_junction_one_client.get_seatmap_for_flights(
+        auto_models.FlightSeatMapRequest(refs=flight_offer_ref),
+    )
+
+    first_segment_seatmap = seatmaps.segments[0]
+    assert first_segment_seatmap.seat_types
+
+    first_available_seat = next(
+        seat
+        for seat in first_segment_seatmap.seats()
+        if seat.status == auto_models.SeatStatus.available
+    )
+    assert first_available_seat.seat_key
+
+    # Create a trip
     trip_create_response = await remote_junction_one_client.create_trip_with_refs(
         models.TripCreateRefsRequest(
             name="Trip to {0}".format(destination_loc),
@@ -60,7 +76,7 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     flight_reservations = tripboard_ref.reservation_ids
     assert flight_reservations
 
-    # 3. Update reservation field
+    # Update reservation field
     reservation_id = flight_reservations[0]
     field_id = 872543  # Department field
     field_value_id = 872547  # Department value: Engineering

@@ -130,9 +130,119 @@ class AgentStatus(BaseModel):
     agencies: list[Agency] = Field(default_factory=list)
 
 
+class AgodaBenefit(Enum):
+    field_166 = "166"
+    field_169 = "169"
+    field_173 = "173"
+    field_298 = "298"
+    field_299 = "299"
+    field_300 = "300"
+    field_301 = "301"
+    field_302 = "302"
+    field_303 = "303"
+    field_323 = "323"
+    field_324 = "324"
+
+
+class AgodaBoardCode(Enum):
+    ro = "RO"
+    bb = "BB"
+    hb = "HB"
+    fb = "FB"
+    ai = "AI"
+
+
+class AgodaBookingDetailRequest(BaseModel):
+    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
+
+
+class AgodaBookingStatus(Enum):
+    booking_pending = "BookingPending"
+    confirmed = "Confirmed"
+    failed = "Failed"
+    cancelled = "Cancelled"
+
+
+class AgodaCancelRequest(BaseModel):
+    reference_id: str | None = Field(None, alias="referenceId")
+
+
+class AgodaCancellationInfo(BaseModel):
+    pass
+
+
+class AgodaCancellationPolicy(BaseModel):
+    pass
+
+
+class AgodaChannel(Enum):
+    field_1 = "1"
+    field_2 = "2"
+    field_6 = "6"
+    field_7 = "7"
+    field_9 = "9"
+    field_21 = "21"
+    field_23 = "23"
+    field_35 = "35"
+    field_3958 = "3958"
+
+
+class AgodaGuest(BaseModel):
+    first_name: str | None = Field(None, alias="firstName")
+    last_name: str | None = Field(None, alias="lastName")
+    email: str | None = None
+
+
+class AgodaGuestCount(BaseModel):
+    adults: int | None = None
+    children_ages: list[int] = Field(alias="childrenAges", default_factory=list)
+
+
+class AgodaHotel(BaseModel):
+    pass
+
+
+class AgodaHotelSearchRequest(BaseModel):
+    pass
+
+
+class AgodaHourlyAvailableSlot(BaseModel):
+    use_hour: int | None = Field(None, alias="useHour")
+    check_in_time: str | None = Field(None, alias="checkInTime")
+
+
 class AgodaPolicy(BaseModel):
     amount: float | None = None
     days_before_check_in: int | None = Field(None, alias="daysBeforeCheckIn")
+
+
+class AgodaPrice(BaseModel):
+    payout_price: float | None = Field(None, alias="payoutPrice")
+    currency: str | None = None
+    commission_percentage: float | None = Field(None, alias="commissionPercentage")
+
+
+class AgodaRate(BaseModel):
+    sub_supplier_id: str | None = Field(None, alias="subSupplierId")
+    board_code: AgodaBoardCode | None = Field(None, alias="boardCode")
+    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
+    channel: AgodaChannel | None = None
+    country_codes: list[str] = Field(alias="countryCodes", default_factory=list)
+    allotment: int | None = None
+    price: float | None = None
+    cancellation_policy: AgodaCancellationPolicy | None = Field(
+        None,
+        alias="cancellationPolicy",
+    )
+    confirm_by_mins: int | None = Field(None, alias="confirmByMins")
+    benefits: list[AgodaBenefit] = Field(default_factory=list)
+    commission_percentage: float | None = Field(None, alias="commissionPercentage")
+    hourly_available_slots: list[AgodaHourlyAvailableSlot] = Field(
+        alias="hourlyAvailableSlots",
+        default_factory=list,
+    )
+    metadata: str | None = None
+    instant_confirm: bool | None = Field(None, alias="instantConfirm")
 
 
 class AgodaResponseStatus(Enum):
@@ -150,6 +260,10 @@ class AgodaResponseStatus(Enum):
     unexpected_error = "UNEXPECTED_ERROR"
     unsupported_country_code = "UNSUPPORTED_COUNTRY_CODE"
     supplier_server_error = "SUPPLIER_SERVER_ERROR"
+
+
+class AgodaRoom(BaseModel):
+    pass
 
 
 class AircraftInfo(BaseModel):
@@ -275,10 +389,6 @@ class AncillaryType(Enum):
     per_user = "PerUser"
 
 
-class ApiKeyMapper(BaseModel):
-    pass
-
-
 class Application(Enum):
     up_to = "up to"
     over = "over"
@@ -358,34 +468,12 @@ class BaseTrainStation(BaseModel):
     label: str | None = None
 
 
-class Benefit(Enum):
-    field_166 = "166"
-    field_169 = "169"
-    field_173 = "173"
-    field_298 = "298"
-    field_299 = "299"
-    field_300 = "300"
-    field_301 = "301"
-    field_302 = "302"
-    field_303 = "303"
-    field_323 = "323"
-    field_324 = "324"
-
-
 class BeverageType(Enum):
     none = "None"
     alcoholic = "Alcoholic"
     nonalcoholic = "Nonalcoholic"
     alcoholic_and_nonalcoholic = "AlcoholicAndNonalcoholic"
     premium_alcoholic = "PremiumAlcoholic"
-
-
-class BoardCode(Enum):
-    ro = "RO"
-    bb = "BB"
-    hb = "HB"
-    fb = "FB"
-    ai = "AI"
 
 
 class BookingAct(Enum):
@@ -404,24 +492,6 @@ class BookingAct(Enum):
     post_commit = "POST_COMMIT"
     post_cancel = "POST_CANCEL"
     end = "END"
-
-
-class BookingDetailRequest(BaseModel):
-    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
-
-
-class BookingResponse(BaseModel):
-    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
-    version: str | None = None
-    remark: str | None = None
-    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
-
-
-class BookingStatus(Enum):
-    booking_pending = "BookingPending"
-    confirmed = "Confirmed"
-    failed = "Failed"
-    cancelled = "Cancelled"
 
 
 class Brand(BaseModel):
@@ -482,26 +552,6 @@ class CampaignUser(BaseModel):
     nms: int | None = None
     campaign_id: int | None = Field(None, alias="campaignId")
     user_id: int | None = Field(None, alias="userId")
-
-
-class CancelRequest(BaseModel):
-    reference_id: str | None = Field(None, alias="referenceId")
-
-
-class CancelResponse(BaseModel):
-    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
-    version: str | None = None
-    remark: str | None = None
-    reference_id: str | None = Field(None, alias="referenceId")
-    cancellation_fees: float | None = Field(None, alias="cancellationFees")
-
-
-class CancellationInfo(BaseModel):
-    pass
-
-
-class CancellationPolicy(BaseModel):
-    pass
 
 
 class Car(BaseModel):
@@ -645,10 +695,10 @@ class CarOffer(BaseModel):
         default_factory=list,
     )
     vendor_pref_level: int | None = Field(None, alias="vendorPrefLevel")
-    total_price_per_day: float | None = Field(None, alias="totalPricePerDay")
     in_policy: bool | None = Field(None, alias="inPolicy")
     approval_required: bool | None = Field(None, alias="approvalRequired")
     booking_blocked: bool | None = Field(None, alias="bookingBlocked")
+    total_price_per_day: float | None = Field(None, alias="totalPricePerDay")
 
 
 class CarType(Enum):
@@ -701,18 +751,6 @@ class ChanceEnum(Enum):
     full = "full"
 
 
-class Channel(Enum):
-    field_1 = "1"
-    field_2 = "2"
-    field_6 = "6"
-    field_7 = "7"
-    field_9 = "9"
-    field_21 = "21"
-    field_23 = "23"
-    field_35 = "35"
-    field_3958 = "3958"
-
-
 class ComfortClass(BaseModel):
     id: str | None = None
     code: str | None = None
@@ -734,10 +772,6 @@ class ConcurOrgUser(BaseModel):
     org_user_id: int | None = Field(None, alias="orgUserId")
     org_id: int | None = Field(None, alias="orgId")
     employee_uid: str | None = Field(None, alias="employeeUid")
-
-
-class ConcurOrgUserMapper(BaseModel):
-    pass
 
 
 class Condition(BaseModel):
@@ -824,10 +858,6 @@ class CrashReport(BaseModel):
     created_on: int | None = Field(None, alias="createdOn")
 
 
-class CrashReportMapper(BaseModel):
-    pass
-
-
 class Credit(BaseModel):
     id: int | None = None
     active: bool | None = None
@@ -869,10 +899,6 @@ class Cvv(BaseModel):
     expiration: AwareOrNaiveDatetime | None = None
 
 
-class CvvMapper(BaseModel):
-    pass
-
-
 class DeliveryMediumEnum(Enum):
     in_seat = "in-seat"
     n_a = "n/a"
@@ -895,10 +921,6 @@ class DemoRequest(BaseModel):
     email: str | None = None
     decision_making_role: str | None = Field(None, alias="decisionMakingRole")
     phone_number: str | None = Field(None, alias="phoneNumber")
-
-
-class DemoRequestMapper(BaseModel):
-    pass
 
 
 class DepartmentInfo(BaseModel):
@@ -1297,21 +1319,6 @@ class GlobalUserReward(BaseModel):
     member_id: str | None = Field(None, alias="memberId")
 
 
-class Guest(BaseModel):
-    first_name: str | None = Field(None, alias="firstName")
-    last_name: str | None = Field(None, alias="lastName")
-    email: str | None = None
-
-
-class GuestCount(BaseModel):
-    adults: int | None = None
-    children_ages: list[int] = Field(alias="childrenAges", default_factory=list)
-
-
-class Hotel(BaseModel):
-    pass
-
-
 class HotelAmenities(Enum):
     parking = "PARKING"
     restaurant = "RESTAURANT"
@@ -1364,28 +1371,6 @@ class HotelMedia(BaseModel):
     media_url: str | None = Field(None, alias="mediaURL")
 
 
-class HotelOffer(BaseModel):
-    hotel: Hotel | None = None
-    checkin_date: date | None = Field(None, alias="checkinDate")
-    checkout_date: date | None = Field(None, alias="checkoutDate")
-    currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
-    taxes_and_fees_per_night: float | None = Field(None, alias="taxesAndFeesPerNight")
-    price_per_night: float | None = Field(None, alias="pricePerNight")
-    flags: int | None = None
-    distance: float | None = None
-    rate_codes: list[str] = Field(alias="rateCodes", default_factory=list)
-    refs: list[str] = Field(default_factory=list)
-    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
-    out_of_policy_rule_ids: list[int] = Field(
-        alias="outOfPolicyRuleIds",
-        default_factory=list,
-    )
-    commission_percent: float | None = Field(None, alias="commissionPercent")
-    hotel_pref_level: int | None = Field(None, alias="hotelPrefLevel")
-
-
 class HotelOfferFlags(Enum):
     display_policy = "DISPLAY_POLICY"
     in_policy = "IN_POLICY"
@@ -1420,21 +1405,6 @@ class HotelRoomFlags(Enum):
 class HotelRoomsRequest(BaseModel):
     refs: list[str] = Field(default_factory=list)
     reservation_id: int | None = Field(None, alias="reservationId")
-
-
-class HotelSearchRequest(BaseModel):
-    pass
-
-
-class HotelSearchResponse(BaseModel):
-    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
-    version: str | None = None
-    remark: str | None = None
-
-
-class HourlyAvailableSlot(BaseModel):
-    use_hour: int | None = Field(None, alias="useHour")
-    check_in_time: str | None = Field(None, alias="checkInTime")
 
 
 class ImportProfileAct(Enum):
@@ -1485,10 +1455,6 @@ class KpiCountResponse(BaseModel):
     begin: AwareOrNaiveDatetime | None = None
     end: AwareOrNaiveDatetime | None = None
     count: int | None = None
-
-
-class KpiMapper(BaseModel):
-    pass
 
 
 class LayoutQualityType(Enum):
@@ -1577,6 +1543,13 @@ class MediaType(Enum):
 
 class MessageHandlingContext(BaseModel):
     pass
+
+
+class MissingFieldsFlags(Enum):
+    cvc = "CVC"
+    holder_name = "HOLDER_NAME"
+    address = "ADDRESS"
+    expiration = "EXPIRATION"
 
 
 class MsgDatePair(BaseModel):
@@ -1691,17 +1664,13 @@ class OrgEmail(BaseModel):
     active: bool | None = None
 
 
-class OrgEmailMapper(BaseModel):
-    pass
-
-
 class OrgEntryData(BaseModel):
     name: str | None = None
     flags: int | None = None
     description: str | None = None
-    phone_number: str | None = Field(None, alias="phoneNumber")
     agency_code: str | None = Field(None, alias="agencyCode")
     timezone: str | None = None
+    phone_number: str | None = Field(None, alias="phoneNumber")
     billing_address: AddressLocation | None = Field(None, alias="billingAddress")
     website: str | None = None
 
@@ -1761,28 +1730,16 @@ class OrgProject(BaseModel):
     hidden: bool | None = None
 
 
-class OrgProjectMapper(BaseModel):
-    pass
-
-
 class OrgRateCode(BaseModel):
     id: int | None = None
     org_id: int | None = Field(None, alias="orgId")
     rate_code_id: int | None = Field(None, alias="rateCodeId")
 
 
-class OrgRateCodeMapper(BaseModel):
-    pass
-
-
 class OrgRateCodeText(BaseModel):
     id: int | None = None
     org_id: int | None = Field(None, alias="orgId")
     text: str | None = None
-
-
-class OrgRateCodeTextMapper(BaseModel):
-    pass
 
 
 class OrgSettings(BaseModel):
@@ -1911,12 +1868,8 @@ class PciCard(BaseModel):
     org_id: int | None = Field(None, alias="orgId")
     name: str | None = None
     reservation_types: int | None = Field(None, alias="reservationTypes")
-    complete: bool | None = None
     owner_id: int | None = Field(None, alias="ownerId")
-
-
-class PciCardMapper(BaseModel):
-    pass
+    missing_fields_flags: int | None = Field(None, alias="missingFieldsFlags")
 
 
 class PenaltyType(Enum):
@@ -1924,10 +1877,6 @@ class PenaltyType(Enum):
     exchange_after = "exchangeAfter"
     refund_before = "refundBefore"
     refund_after = "refundAfter"
-
-
-class PendingEmailMapper(BaseModel):
-    pass
 
 
 class PendingEmailStatus(Enum):
@@ -1974,17 +1923,9 @@ class PolicyCity(BaseModel):
     country: str | None = None
 
 
-class PolicyCityMapper(BaseModel):
-    pass
-
-
 class PolicyLookupTable(BaseModel):
     name: str | None = None
     code: str | None = None
-
-
-class PolicyMapper(BaseModel):
-    pass
 
 
 class PolicyOptionLeg(BaseModel):
@@ -2008,14 +1949,6 @@ class PolicyRuleAction(Enum):
     approve = "APPROVE"
     block = "BLOCK"
     hide = "HIDE"
-
-
-class PolicyRuleExceptionMapper(BaseModel):
-    pass
-
-
-class PolicyRuleMapper(BaseModel):
-    pass
 
 
 class PolicyRuleResult(BaseModel):
@@ -2083,25 +2016,9 @@ class PowerType(Enum):
     usb_power_a = "UsbPowerA"
 
 
-class PrecheckResponse(BaseModel):
-    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
-    version: str | None = None
-    remark: str | None = None
-    check_in: date | None = Field(None, alias="checkIn")
-    check_out: date | None = Field(None, alias="checkOut")
-    currency: str | None = None
-    hotel: Hotel | None = None
-
-
 class PrepareTrainReservationResponse(BaseModel):
     total_price: float | None = Field(None, alias="totalPrice")
     raw_data: dict[str, Any] = Field(alias="rawData", default_factory=dict)
-
-
-class Price(BaseModel):
-    payout_price: float | None = Field(None, alias="payoutPrice")
-    currency: str | None = None
-    commission_percentage: float | None = Field(None, alias="commissionPercentage")
 
 
 class PriceSummary(BaseModel):
@@ -2130,16 +2047,16 @@ class PricedFare(BaseModel):
     perks: int | None = None
     segments: list[FareSegment] = Field(default_factory=list)
     refs: list[str] = Field(default_factory=list)
-    is_transborder: bool | None = Field(None, alias="isTransborder")
-    has_mixed_cabin: bool | None = Field(None, alias="hasMixedCabin")
-    is_current_fare: bool | None = Field(None, alias="isCurrentFare")
+    has_limited_options: bool | None = Field(None, alias="hasLimitedOptions")
+    has_multi_tickets: bool | None = Field(None, alias="hasMultiTickets")
+    has_special_rate: bool | None = Field(None, alias="hasSpecialRate")
     is_seat_selection_available: bool | None = Field(
         None,
         alias="isSeatSelectionAvailable",
     )
-    has_limited_options: bool | None = Field(None, alias="hasLimitedOptions")
-    has_multi_tickets: bool | None = Field(None, alias="hasMultiTickets")
-    has_special_rate: bool | None = Field(None, alias="hasSpecialRate")
+    is_transborder: bool | None = Field(None, alias="isTransborder")
+    has_mixed_cabin: bool | None = Field(None, alias="hasMixedCabin")
+    is_current_fare: bool | None = Field(None, alias="isCurrentFare")
 
 
 class PrimaryFlightStatus(Enum):
@@ -2223,29 +2140,6 @@ class Railcard(BaseModel):
     localizations: list[Localization] | Localizations | None = None
 
 
-class Rate(BaseModel):
-    sub_supplier_id: str | None = Field(None, alias="subSupplierId")
-    board_code: BoardCode | None = Field(None, alias="boardCode")
-    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
-    channel: Channel | None = None
-    country_codes: list[str] = Field(alias="countryCodes", default_factory=list)
-    allotment: int | None = None
-    price: float | None = None
-    cancellation_policy: CancellationPolicy | None = Field(
-        None,
-        alias="cancellationPolicy",
-    )
-    confirm_by_mins: int | None = Field(None, alias="confirmByMins")
-    benefits: list[Benefit] = Field(default_factory=list)
-    commission_percentage: float | None = Field(None, alias="commissionPercentage")
-    hourly_available_slots: list[HourlyAvailableSlot] = Field(
-        alias="hourlyAvailableSlots",
-        default_factory=list,
-    )
-    metadata: str | None = None
-    instant_confirm: bool | None = Field(None, alias="instantConfirm")
-
-
 class RateCode(BaseModel):
     id: int | None = None
     code: str | None = None
@@ -2258,12 +2152,8 @@ class RateCode(BaseModel):
 
 
 class RateCodeInfo(BaseModel):
-    description: str | None = None
     code: str | None = None
-
-
-class RateCodeMapper(BaseModel):
-    pass
+    description: str | None = None
 
 
 class ReasonType(Enum):
@@ -2548,10 +2438,6 @@ class Role(BaseModel):
     name: str | None = None
 
 
-class Room(BaseModel):
-    pass
-
-
 class RoomOccupancy(BaseModel):
     adults: int | None = None
     children_ages: list[int] = Field(alias="childrenAges", default_factory=list)
@@ -2730,24 +2616,6 @@ class SearchHotelsRequest(BaseModel):
     reservation_id: int | None = Field(None, alias="reservationId")
     trip_id: int | None = Field(None, alias="tripId")
     user_ids: list[int] = Field(alias="userIds", default_factory=list)
-
-
-class SearchHotelsResponse(BaseModel):
-    hotels: list[HotelOffer] = Field(default_factory=list)
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] = Field(alias="userIds", default_factory=list)
-    out_of_policies: list[OutOfPolicy] = Field(
-        alias="outOfPolicies",
-        default_factory=list,
-    )
-
-
-class SearchHotelsResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: SearchHotelsResponse | None = None
 
 
 class SeatFlags(Enum):
@@ -2937,10 +2805,6 @@ class SignUpCampaign(BaseModel):
     created_at: AwareOrNaiveDatetime | None = Field(None, alias="createdAt")
 
 
-class SignUpCampaignMapper(BaseModel):
-    pass
-
-
 class SignUpUserRequest(BaseModel):
     email: str | None = None
     recaptcha: str | None = None
@@ -2988,10 +2852,6 @@ class SupplierInquiry(BaseModel):
     email: str | None = None
     phone_number: str | None = Field(None, alias="phoneNumber")
     company: str | None = None
-
-
-class SupplierMapper(BaseModel):
-    pass
 
 
 class SupplierType(Enum):
@@ -3967,6 +3827,137 @@ class AgentStatusResponse(BaseModel):
     data: AgentStatus | None = None
 
 
+class AgodaBookingDetailResponse(BaseModel):
+    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
+    version: str | None = None
+    remark: str | None = None
+    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
+    supplier_booking_id: str | None = Field(None, alias="supplierBookingId")
+    booking_status: AgodaBookingStatus | None = Field(None, alias="bookingStatus")
+    hotel: str | None = None
+    check_in: date | None = Field(None, alias="checkIn")
+    check_out: date | None = Field(None, alias="checkOut")
+    room_code: str | None = Field(None, alias="roomCode")
+    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
+    board_code: AgodaBoardCode | None = Field(None, alias="boardCode")
+    channel: AgodaChannel | None = None
+    quantity: int | None = None
+    special_requests: str | None = Field(None, alias="specialRequests")
+    guest_count: AgodaGuestCount | None = Field(None, alias="guestCount")
+    price: AgodaPrice | None = None
+    benefits: list[AgodaBenefit] = Field(default_factory=list)
+    hourly_slot: AgodaHourlyAvailableSlot | None = Field(None, alias="hourlySlot")
+    hotel_confirmation_reference: str | None = Field(
+        None,
+        alias="hotelConfirmationReference",
+    )
+    instant_confirm: bool | None = Field(None, alias="instantConfirm")
+
+
+class AgodaBookingDetailResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: AgodaBookingDetailResponse | None = None
+
+
+class AgodaBookingRequest(BaseModel):
+    hotel: str | None = None
+    check_in: date | None = Field(None, alias="checkIn")
+    check_out: date | None = Field(None, alias="checkOut")
+    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
+    room_code: str | None = Field(None, alias="roomCode")
+    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
+    board_code: AgodaBoardCode | None = Field(None, alias="boardCode")
+    channel: AgodaChannel | None = None
+    currency: str | None = None
+    quantity: int | None = None
+    total_price: float | None = Field(None, alias="totalPrice")
+    guest: AgodaGuest | None = None
+    special_requests: str | None = Field(None, alias="specialRequests")
+    guest_count: AgodaGuestCount | None = Field(None, alias="guestCount")
+    benefits: list[AgodaBenefit] = Field(default_factory=list)
+    selected_hourly_slot: AgodaHourlyAvailableSlot | None = Field(
+        None,
+        alias="selectedHourlySlot",
+    )
+    metadata: str | None = None
+
+
+class AgodaBookingResponse(BaseModel):
+    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
+    version: str | None = None
+    remark: str | None = None
+    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
+
+
+class AgodaBookingResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: AgodaBookingResponse | None = None
+
+
+class AgodaCancelResponse(BaseModel):
+    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
+    version: str | None = None
+    remark: str | None = None
+    reference_id: str | None = Field(None, alias="referenceId")
+    cancellation_fees: float | None = Field(None, alias="cancellationFees")
+
+
+class AgodaCancelResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: AgodaCancelResponse | None = None
+
+
+class AgodaHotelSearchResponse(BaseModel):
+    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
+    version: str | None = None
+    remark: str | None = None
+
+
+class AgodaHotelSearchResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: AgodaHotelSearchResponse | None = None
+
+
+class AgodaPrecheckRequest(BaseModel):
+    hotel: str | None = None
+    check_in: date | None = Field(None, alias="checkIn")
+    check_out: date | None = Field(None, alias="checkOut")
+    occupancy: RoomOccupancy | None = None
+    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
+    currency: str | None = None
+    total_price: float | None = Field(None, alias="totalPrice")
+    selected_hourly_slot: AgodaHourlyAvailableSlot | None = Field(
+        None,
+        alias="selectedHourlySlot",
+    )
+    metadata: str | None = None
+
+
+class AgodaPrecheckResponse(BaseModel):
+    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
+    version: str | None = None
+    remark: str | None = None
+    check_in: date | None = Field(None, alias="checkIn")
+    check_out: date | None = Field(None, alias="checkOut")
+    currency: str | None = None
+    hotel: AgodaHotel | None = None
+
+
+class AgodaPrecheckResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: AgodaPrecheckResponse | None = None
+
+
 class AgodaResponse(BaseModel):
     response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
     version: str | None = None
@@ -4081,70 +4072,6 @@ class BoardingPriority(BaseModel):
     sub_group_code: str | None = Field(None, alias="subGroupCode")
 
 
-class BookingDetailResponse(BaseModel):
-    response_status: AgodaResponseStatus | None = Field(None, alias="responseStatus")
-    version: str | None = None
-    remark: str | None = None
-    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
-    supplier_booking_id: str | None = Field(None, alias="supplierBookingId")
-    booking_status: BookingStatus | None = Field(None, alias="bookingStatus")
-    hotel: str | None = None
-    check_in: date | None = Field(None, alias="checkIn")
-    check_out: date | None = Field(None, alias="checkOut")
-    room_code: str | None = Field(None, alias="roomCode")
-    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
-    board_code: BoardCode | None = Field(None, alias="boardCode")
-    channel: Channel | None = None
-    quantity: int | None = None
-    special_requests: str | None = Field(None, alias="specialRequests")
-    guest_count: GuestCount | None = Field(None, alias="guestCount")
-    price: Price | None = None
-    benefits: list[Benefit] = Field(default_factory=list)
-    hourly_slot: HourlyAvailableSlot | None = Field(None, alias="hourlySlot")
-    hotel_confirmation_reference: str | None = Field(
-        None,
-        alias="hotelConfirmationReference",
-    )
-    instant_confirm: bool | None = Field(None, alias="instantConfirm")
-
-
-class BookingDetailResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: BookingDetailResponse | None = None
-
-
-class BookingRequest(BaseModel):
-    hotel: str | None = None
-    check_in: date | None = Field(None, alias="checkIn")
-    check_out: date | None = Field(None, alias="checkOut")
-    booking_reference_id: str | None = Field(None, alias="bookingReferenceId")
-    room_code: str | None = Field(None, alias="roomCode")
-    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
-    board_code: BoardCode | None = Field(None, alias="boardCode")
-    channel: Channel | None = None
-    currency: str | None = None
-    quantity: int | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    guest: Guest | None = None
-    special_requests: str | None = Field(None, alias="specialRequests")
-    guest_count: GuestCount | None = Field(None, alias="guestCount")
-    benefits: list[Benefit] = Field(default_factory=list)
-    selected_hourly_slot: HourlyAvailableSlot | None = Field(
-        None,
-        alias="selectedHourlySlot",
-    )
-    metadata: str | None = None
-
-
-class BookingResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: BookingResponse | None = None
-
-
 class BooleanResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
@@ -4164,13 +4091,6 @@ class CampaignResponse(BaseModel):
     code: int | None = None
     error: str | None = None
     data: Campaign | None = None
-
-
-class CancelResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: CancelResponse | None = None
 
 
 class CancellationInner(BaseModel):
@@ -4559,6 +4479,34 @@ class GetCarResponseResponse(BaseModel):
     data: GetCarResponse | None = None
 
 
+class Hotel(BaseModel):
+    country: str | None = None
+    country_code: str | None = Field(None, alias="countryCode")
+    state: str | None = None
+    state_code: str | None = Field(None, alias="stateCode")
+    city: str | None = None
+    address1: str | None = None
+    address2: str | None = None
+    zip_code: str | None = Field(None, alias="zipCode")
+    street_number: str | None = Field(None, alias="streetNumber")
+    hotel_code: str | None = Field(None, alias="hotelCode")
+    hotel_name: str | None = Field(None, alias="hotelName")
+    chain_code: str | None = Field(None, alias="chainCode")
+    chain_name: str | None = Field(None, alias="chainName")
+    code_context: str | None = Field(None, alias="codeContext")
+    brand_code: str | None = Field(None, alias="brandCode")
+    brand_name: str | None = Field(None, alias="brandName")
+    latitude: float | None = None
+    longitude: float | None = None
+    rating: float | None = None
+    city_code: str | None = Field(None, alias="cityCode")
+    main_city_code: str | None = Field(None, alias="mainCityCode")
+    phone: str | None = None
+    fax: str | None = None
+    amenities: int | None = None
+    medias: list[HotelMedia] = Field(default_factory=list)
+
+
 class HotelChainListResponse(BaseModel):
     status: ResponseStatus | None = None
     code: int | None = None
@@ -4566,22 +4514,26 @@ class HotelChainListResponse(BaseModel):
     data: list[HotelChain] = Field(default_factory=list)
 
 
-class HotelInfoResponse(BaseModel):
-    offer: HotelOffer | None = None
-    medias: list[HotelMedia] = Field(default_factory=list)
-    checkin_time: str | None = Field(None, alias="checkinTime")
-    checkout_time: str | None = Field(None, alias="checkoutTime")
-    description: str | None = None
-    org_id: int | None = Field(None, alias="orgId")
-    user_ids: list[int] = Field(alias="userIds", default_factory=list)
-    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
-
-
-class HotelInfoResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: HotelInfoResponse | None = None
+class HotelOffer(BaseModel):
+    hotel: Hotel | None = None
+    checkin_date: date | None = Field(None, alias="checkinDate")
+    checkout_date: date | None = Field(None, alias="checkoutDate")
+    currency: str | None = None
+    total_price: float | None = Field(None, alias="totalPrice")
+    taxes_and_fees: float | None = Field(None, alias="taxesAndFees")
+    taxes_and_fees_per_night: float | None = Field(None, alias="taxesAndFeesPerNight")
+    price_per_night: float | None = Field(None, alias="pricePerNight")
+    flags: int | None = None
+    distance: float | None = None
+    rate_codes: list[str] = Field(alias="rateCodes", default_factory=list)
+    refs: list[str] = Field(default_factory=list)
+    out_of_policy_id: int | None = Field(None, alias="outOfPolicyId")
+    out_of_policy_rule_ids: list[int] = Field(
+        alias="outOfPolicyRuleIds",
+        default_factory=list,
+    )
+    commission_percent: float | None = Field(None, alias="commissionPercent")
+    hotel_pref_level: int | None = Field(None, alias="hotelPrefLevel")
 
 
 class HotelReservationExt(BaseModel):
@@ -4686,13 +4638,6 @@ class HotelRoomsResponseResponse(BaseModel):
     code: int | None = None
     error: str | None = None
     data: HotelRoomsResponse | None = None
-
-
-class HotelSearchResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: HotelSearchResponse | None = None
 
 
 class ImportSabreOrgProfileResponse(BaseModel):
@@ -4856,9 +4801,9 @@ class MaskedCreditCard(BaseModel):
     exp_date: str | None = Field(None, alias="expDate")
     last_digits: str | None = Field(None, alias="lastDigits")
     type: UserCreditCardType | None = None
-    complete: bool | None = None
     holder_name: str | None = Field(None, alias="holderName")
     reservation_types: int | None = Field(None, alias="reservationTypes")
+    missing_fields_flags: int | None = Field(None, alias="missingFieldsFlags")
 
 
 class MaskedCreditCardListResponse(BaseModel):
@@ -4945,8 +4890,8 @@ class NotificationCenter(BaseModel):
     owner_id: int | None = Field(None, alias="ownerId")
     owner_type: ResourceType | None = Field(None, alias="ownerType")
     ext: Ext | None = None
-    unseen: int | None = None
     unseen_agent_posts: int | None = Field(None, alias="unseenAgentPosts")
+    unseen: int | None = None
     unseen_user_posts: int | None = Field(None, alias="unseenUserPosts")
 
 
@@ -5374,28 +5319,6 @@ class PostPin(BaseModel):
 class Power(BaseModel):
     type: PowerType | None = None
     distribution: PowerDistribution | None = None
-
-
-class PrecheckRequest(BaseModel):
-    hotel: str | None = None
-    check_in: date | None = Field(None, alias="checkIn")
-    check_out: date | None = Field(None, alias="checkOut")
-    occupancy: RoomOccupancy | None = None
-    rate_plan_code: str | None = Field(None, alias="ratePlanCode")
-    currency: str | None = None
-    total_price: float | None = Field(None, alias="totalPrice")
-    selected_hourly_slot: HourlyAvailableSlot | None = Field(
-        None,
-        alias="selectedHourlySlot",
-    )
-    metadata: str | None = None
-
-
-class PrecheckResponseResponse(BaseModel):
-    status: ResponseStatus | None = None
-    code: int | None = None
-    error: str | None = None
-    data: PrecheckResponse | None = None
 
 
 class ProviderPnrReportListResponse(BaseModel):
@@ -5857,6 +5780,24 @@ class SearchFlightsResponseResponse(BaseModel):
     code: int | None = None
     error: str | None = None
     data: SearchFlightsResponse | None = None
+
+
+class SearchHotelsResponse(BaseModel):
+    hotels: list[HotelOffer] = Field(default_factory=list)
+    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
+    org_id: int | None = Field(None, alias="orgId")
+    user_ids: list[int] = Field(alias="userIds", default_factory=list)
+    out_of_policies: list[OutOfPolicy] = Field(
+        alias="outOfPolicies",
+        default_factory=list,
+    )
+
+
+class SearchHotelsResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: SearchHotelsResponse | None = None
 
 
 class SearchTrainRequest(BaseModel):
@@ -6513,6 +6454,24 @@ class GetTripResponseResponse(BaseModel):
     code: int | None = None
     error: str | None = None
     data: GetTripResponse | None = None
+
+
+class HotelInfoResponse(BaseModel):
+    offer: HotelOffer | None = None
+    medias: list[HotelMedia] = Field(default_factory=list)
+    checkin_time: str | None = Field(None, alias="checkinTime")
+    checkout_time: str | None = Field(None, alias="checkoutTime")
+    description: str | None = None
+    org_id: int | None = Field(None, alias="orgId")
+    user_ids: list[int] = Field(alias="userIds", default_factory=list)
+    rate_code_descr: str | None = Field(None, alias="rateCodeDescr")
+
+
+class HotelInfoResponseResponse(BaseModel):
+    status: ResponseStatus | None = None
+    code: int | None = None
+    error: str | None = None
+    data: HotelInfoResponse | None = None
 
 
 class HotelReservation(BaseModel):
