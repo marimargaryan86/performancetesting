@@ -3,6 +3,7 @@ import asyncio
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
+from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequest,
     AirSearchRequestStorage,
@@ -18,6 +19,9 @@ from snowfall.project.junction.rocket.service.api.air.types import (
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
+from snowfall.project.junction.rocket.service.places.v1alpha import (
+    places_pb2_grpc,
+)
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -30,10 +34,7 @@ from snowfall.vendor.junction_one.client import JunctionOneClient
 def is_inbound(
     air_search_request: AirSearchRequest,
 ) -> bool:
-    return (
-        air_search_request.data.relationships is not None
-        and air_search_request.data.relationships.selected_outbound_offer is not None
-    )
+    return air_search_request.data.relationships.selected_outbound_offer is not None
 
 
 async def get_selected_outbound_offer_ref_ids(
@@ -50,6 +51,7 @@ async def get_selected_outbound_offer_ref_ids(
 
 
 class AirSearch(endpoints.HTTPEndpoint):
+    @errors.handle_grpc_errors
     async def post(  # noqa: WPS217
         self,
         request: requests.Request,
@@ -58,6 +60,7 @@ class AirSearch(endpoints.HTTPEndpoint):
         air_search_result_transformer: AirSearchResultTransformer = lagom.injectable,
         requests_repo: AirSearchRequestRepository = lagom.injectable,
         results_repo: AirSearchResultRepository = lagom.injectable,
+        places: places_pb2_grpc.PlacesServiceStub = lagom.injectable,
     ) -> responses.Response:
         reseller_id = request.user.username
         request_data = await request.json()
@@ -68,19 +71,23 @@ class AirSearch(endpoints.HTTPEndpoint):
             relationships = search_request.data.relationships
             if relationships is None:
                 raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
+            if relationships.selected_outbound_offer is None:
+                raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
 
             outbound_flight_ref_id = await get_selected_outbound_offer_ref_ids(
                 outbound_offer_id=relationships.selected_outbound_offer.data.id,
                 results_repo=results_repo,
             )
 
-            query = air_search_request_transformer.transform_inbound_query(
+            query = await air_search_request_transformer.transform_inbound_query(
                 search_request,
                 outbound_flight_ref_id,
+                places,
             )
         else:
-            query = air_search_request_transformer.transform_outbound_query(
+            query = await air_search_request_transformer.transform_outbound_query(
                 search_request,
+                places,
             )
         j1_search_response = await junction_one_client.search_flights(query)
         transformed = air_search_result_transformer.transform(

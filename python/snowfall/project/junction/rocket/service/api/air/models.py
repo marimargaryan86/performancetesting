@@ -40,8 +40,6 @@ class Passenger(BaseModel):
 
 class AirSearchAttributes(BaseModel):
     departure_after: datetime
-    origin: str
-    destination: str
     return_at: datetime | None = None
     passengers: list[Passenger]
 
@@ -55,14 +53,25 @@ class SelectedOutboundOffer(BaseModel):
     data: SelectedOutboundOfferData
 
 
-class AirSearchRequestRelationships(BaseModel):
-    selected_outbound_offer: SelectedOutboundOffer
+class PlaceIdentifier(BaseModel):
+    id: str
+    type: str
+
+
+class PlaceContainer(BaseModel):
+    data: PlaceIdentifier
+
+
+class AirSearchRelationships(BaseModel):
+    selected_outbound_offer: SelectedOutboundOffer | None = None
+    origin: PlaceContainer
+    destination: PlaceContainer
 
 
 class AirSearchRequestData(BaseModel):
     type: Literal["air-searches"]
     attributes: AirSearchAttributes
-    relationships: AirSearchRequestRelationships | None = None
+    relationships: AirSearchRelationships
 
 
 class AirSearchRequest(BaseModel):

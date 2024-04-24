@@ -5,6 +5,7 @@ import httpx
 import pytest
 from pytest_mock import MockerFixture
 
+from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequestStorage,
     AirSearchResult,
@@ -42,10 +43,12 @@ def example_request() -> Any:
         "data": {
             "type": "air-searches",
             "attributes": {
-                "origin": "PAR",
-                "destination": "LON",
                 "departureAfter": "2024-03-24T00:00:00Z",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
+            },
+            "relationships": {
+                "origin": {"data": {"id": fixtures.PLACES[0], "type": "places"}},
+                "destination": {"data": {"id": fixtures.PLACES[1], "type": "places"}},
             },
         },
     }
@@ -61,8 +64,6 @@ def example_response(
             "type": "air-searches",
             "attributes": {
                 "departureAfter": "2024-03-24T00:00:00Z",
-                "origin": "PAR",
-                "destination": "LON",
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
                 "status": "pending",
                 "expiresAt": mocker.mock_module.ANY,
@@ -85,6 +86,8 @@ def example_request_inbound() -> Any:
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
             },
             "relationships": {
+                "origin": {"data": {"id": fixtures.PLACES[0], "type": "places"}},
+                "destination": {"data": {"id": fixtures.PLACES[1], "type": "places"}},
                 "selected_outbound_offer": {
                     "data": {
                         "id": OUTBOUND_SEARCH_OFFER_ID,

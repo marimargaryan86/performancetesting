@@ -147,13 +147,6 @@ paths:
               required:
                 - data
       responses:
-        '200':
-          description: Created
-          content:
-            application/vnd.api+json:
-              schema:
-                type: object
-                description: Air Search Response
         '201':
           description: Created
           content:
@@ -1139,8 +1132,6 @@ components:
               required:
                 - expiresAt
                 - status
-                - origin
-                - destination
                 - departureAfter
                 - passengers
               properties:
@@ -1163,12 +1154,6 @@ components:
                     - completed
                     - failed
                   example: completed
-                origin:
-                  type: string
-                  example: LON
-                destination:
-                  type: string
-                  example: PAR
                 departureAfter:
                   type: string
                   description: >-
@@ -1206,6 +1191,25 @@ components:
                   properties:
                     data:
                       $ref: '#/components/schemas/AirOfferIdentifier'
+                origin:
+                  type: object
+                  description: The Junction Place ID that represents the origin location for the air search
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                destination:
+                  type: object
+                  description: The Junction Place ID that represents the destination location for the air search
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+              required:
+                - origin
+                - destination
         - $ref: '#/components/schemas/SelfLink'
     AirSearchIdentifier:
       title: Air Search Identifier
