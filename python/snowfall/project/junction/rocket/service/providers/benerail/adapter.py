@@ -622,6 +622,9 @@ class BenerailOffersAdapter(BenerailAdapter):
             search_task,
         )
 
+        if search_task.outbound_offer_id and not outward_trip_info:
+            raise OfferNotFoundError(message="Selected outbound offer not found.")
+
         criterion = await self._parse_criterion(search_task)
 
         trip_offer_responses_with_passengers = (
