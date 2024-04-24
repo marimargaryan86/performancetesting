@@ -49,6 +49,7 @@ class SuggestionSearchProcessor:
         self._places = places
         self._routes = route_finder
         self._searcher = searcher
+        self._logger = stdout.get_logger()
 
     async def process(self, body: multi_modal_pb2.SuggestionSearchTask) -> None:
         suggestion_search = await self._get_search_to_process(body)
@@ -121,19 +122,25 @@ class SuggestionSearchProcessor:
         route: routes.Route,
     ) -> None:
         criteria = suggestion_search.criteria
-        search_results = await self._searcher.find_results(
-            search.SearchRequest(
-                route=route,
-                departure_after=protobuf.protobuf_to_datetime(
-                    criteria.departure_after,
+
+        try:
+            search_results = await self._searcher.find_results(
+                search.SearchRequest(
+                    route=route,
+                    departure_after=protobuf.protobuf_to_datetime(
+                        criteria.departure_after,
+                    ),
+                    date_of_births=[
+                        protobuf.protobuf_to_date(passenger.date_of_birth)
+                        for passenger in criteria.passengers
+                    ],
+                    reseller_id=criteria.reseller_id,
                 ),
-                date_of_births=[
-                    protobuf.protobuf_to_date(passenger.date_of_birth)
-                    for passenger in criteria.passengers
-                ],
-                reseller_id=criteria.reseller_id,
-            ),
-        )
+            )
+        except search.ModeNotSupportedForResellerError as err:
+            self._logger.warning(str(err))
+            return
+
         suggestion = search_results.optimize()
 
         await self._suggestions.create(

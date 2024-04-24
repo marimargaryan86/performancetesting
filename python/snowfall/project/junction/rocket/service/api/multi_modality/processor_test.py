@@ -17,13 +17,13 @@ from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.v1 import segment_type_pb2
 
-
-async def _mock_processor(body: multi_modal_pb2.SuggestionSearchTask) -> None:
-    if body.suggestion_search_id == "no_suggestion_search":
-        raise processor.SuggestionSearchNotFoundError
+_RESELLER_NOT_SUPPORTED = "not_supported"
 
 
 async def _mock_search(request: search.SegmentSearchRequest) -> list[search.Offer]:
+    if request.reseller_id == _RESELLER_NOT_SUPPORTED:
+        raise search.ModeNotSupportedForResellerError(mode=request.segment.type)
+
     departure_at = datetime.datetime.now(datetime.UTC)
 
     return [
@@ -53,14 +53,6 @@ async def suggestion_search_processor(
                 (segment_type_pb2.SEGMENT_TYPE_FLIGHT, _mock_search),
             ],
         ),
-    )
-
-
-@pytest.fixture()
-def suggestion_search_queue() -> processor.SuggestionSearchQueue:
-    return processor.SuggestionSearchQueue(
-        name_prefix="foo",
-        processor=_mock_processor,
     )
 
 
@@ -125,6 +117,30 @@ class TestProcessor:
         processed = await suggestion_search_repository.find_by_id(suggestion_search.id)
         assert processed
         assert processed.status == multi_modal_pb2.SuggestionSearch.STATUS_FAILED
+
+    async def test_unsupported_mode_search_status_is_completed(
+        self,
+        suggestion_search_processor: processor.SuggestionSearchProcessor,
+        suggestion_search_repository: repository.SuggestionSearchRepository,
+        planner: planner_pb2_grpc.PlannerServiceStub,
+        find_routes_response: planner_pb2.FindRoutesResponse,
+        search_criteria: multi_modal_pb2.SuggestionSearch.Criteria,
+    ) -> None:
+        planner.FindRoutes = mock.AsyncMock(return_value=find_routes_response)
+        search_criteria.reseller_id = _RESELLER_NOT_SUPPORTED
+        suggestion_search = await suggestion_search_repository.create_from_criteria(
+            search_criteria,
+        )
+
+        await suggestion_search_processor.process(
+            multi_modal_pb2.SuggestionSearchTask(
+                suggestion_search_id=suggestion_search.id,
+            ),
+        )
+
+        processed = await suggestion_search_repository.find_by_id(suggestion_search.id)
+        assert processed
+        assert processed.status == multi_modal_pb2.SuggestionSearch.STATUS_COMPLETED
 
     async def test_search_status_is_completed_after_processing(
         self,

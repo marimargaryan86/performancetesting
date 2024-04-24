@@ -2,6 +2,7 @@ import datetime
 from types import MappingProxyType
 
 import freezegun
+import httpx
 import pytest
 import pytest_httpx
 import pytest_mock
@@ -120,9 +121,35 @@ async def _get_search_results(
 
 
 @pytest.fixture()
+def temp_auth() -> auth.TemporaryTokenAuth:
+    return auth.TemporaryTokenAuth(
+        api_key="foo",
+        reseller_credentials_mapping={
+            "foo": auth.J1Credentials(
+                org_id="42",
+                j1_authorization="baz",
+            ),
+        },
+    )
+
+
+@pytest.fixture()
+def junction_one_client(
+    http_client: httpx.AsyncClient,
+    temp_auth: auth.TemporaryTokenAuth,
+) -> j1_client.JunctionOneClient:
+    return j1_client.JunctionOneClient(
+        api_base_url="https://localhost/",
+        http_client=http_client,
+        auth=temp_auth,
+    )
+
+
+@pytest.fixture()
 async def air_searcher(
     junction_one_client: j1_client.JunctionOneClient,
     air_search_repo: repositories.AirSearchResultRepository,
+    temp_auth: auth.TemporaryTokenAuth,
     httpx_mock: pytest_httpx.HTTPXMock,
 ) -> search.AirSearcher:
     httpx_mock.add_response(
@@ -136,15 +163,7 @@ async def air_searcher(
         client=junction_one_client,
         j1_transformer=transforms.AirSearchResultTransformer(),
         repository=air_search_repo,
-        temp_auth=auth.TemporaryTokenAuth(
-            api_key="foo",
-            reseller_credentials_mapping={
-                "foo": auth.J1Credentials(
-                    org_id="bar",
-                    j1_authorization="baz",
-                ),
-            },
-        ),
+        temp_auth=temp_auth,
     )
 
 
@@ -207,6 +226,23 @@ def multi_route() -> routes.Route:
 
 
 class TestAirSearch:
+    async def test_unsupported_reseller_raises_error(
+        self,
+        air_searcher: search.AirSearcher,
+        mono_route: routes.Route,
+        httpx_mock: pytest_httpx.HTTPXMock,
+    ) -> None:
+        httpx_mock.reset(assert_all_responses_were_requested=False)
+        with pytest.raises(search.ModeNotSupportedForResellerError):
+            await air_searcher.search(
+                search.SegmentSearchRequest(
+                    segment=mono_route.segments[0],
+                    departure_after=datetime.datetime.now(datetime.UTC),
+                    date_of_births=[_DOB],
+                    reseller_id="bar",
+                ),
+            )
+
     async def test_offers_are_found(
         self,
         air_searcher: search.AirSearcher,

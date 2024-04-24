@@ -45,6 +45,18 @@ class UnusableResponseError(Exception):
     """Raised when a Junction One response is not usable."""
 
 
+class ModeNotSupportedForResellerError(Exception):
+    def __init__(self, mode: segment_type_pb2.SegmentType.ValueType):
+        super().__init__(
+            "Mode '{0}' not supported for reseller.".format(
+                protobuf.enum_value_to_slug(
+                    segment_type_pb2.SegmentType.DESCRIPTOR,
+                    mode,
+                ),
+            ),
+        )
+
+
 @dataclasses.dataclass(frozen=True)
 class Offer:
     id: str
@@ -151,8 +163,12 @@ class AirSearcher:
         request: SegmentSearchRequest,
     ) -> j1_models.SearchFlightsResponse:
         self._logger.info("Searching")
+
         with self._temp_auth.temporary(reseller_id=request.reseller_id):
-            return await self._client.search_flights(self._make_request(request))
+            try:
+                return await self._client.search_flights(self._make_request(request))
+            except ValueError as err:
+                raise ModeNotSupportedForResellerError(request.segment.type) from err
 
     def _make_request(
         self,

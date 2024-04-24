@@ -146,26 +146,30 @@ def route_finder(
 
 
 @pytest.fixture()
+def search_criteria() -> multi_modal_pb2.SuggestionSearch.Criteria:
+    return multi_modal_pb2.SuggestionSearch.Criteria(
+        origin_id=fixtures.PLACES[0],
+        destination_id=fixtures.PLACES[0],
+        departure_after=protobuf.datetime_to_protobuf_datetime(
+            datetime.datetime.now(datetime.UTC),
+        ),
+        passengers=[
+            multi_modal_pb2.SuggestionSearch.Criteria.Passenger(
+                date_of_birth=protobuf.date_to_protobuf(
+                    datetime.datetime.now(datetime.UTC).date(),
+                ),
+            ),
+        ],
+        reseller_id="foo",
+    )
+
+
+@pytest.fixture()
 async def suggestion_search(
     suggestion_search_repository: repository.SuggestionSearchRepository,
+    search_criteria: multi_modal_pb2.SuggestionSearch.Criteria,
 ) -> multi_modal_pb2.SuggestionSearch:
-    return await suggestion_search_repository.create_from_criteria(
-        multi_modal_pb2.SuggestionSearch.Criteria(
-            origin_id=fixtures.PLACES[0],
-            destination_id=fixtures.PLACES[0],
-            departure_after=protobuf.datetime_to_protobuf_datetime(
-                datetime.datetime.now(datetime.UTC),
-            ),
-            passengers=[
-                multi_modal_pb2.SuggestionSearch.Criteria.Passenger(
-                    date_of_birth=protobuf.date_to_protobuf(
-                        datetime.datetime.now(datetime.UTC).date(),
-                    ),
-                ),
-            ],
-            reseller_id="foo",
-        ),
-    )
+    return await suggestion_search_repository.create_from_criteria(search_criteria)
 
 
 @pytest.fixture()
