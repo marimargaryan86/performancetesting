@@ -5,8 +5,7 @@
     translator: Translator,
   ): string {
     const age = getAge(passenger.birthDate, createdAt);
-
-    const def = Object.entries(PASSENGER_DEFINITIONS).find(([, val]) => {
+    const def = objectExt.entries(PASSENGER_DEFINITIONS).find(([, val]) => {
       if (val.span.from <= age) {
         return age <= (val.span.to ?? Number.MAX_SAFE_INTEGER);
       }
@@ -14,9 +13,7 @@
       return false;
     });
 
-    return def
-      ? getPassengerFullLabel(def[0] as keyof typeof PASSENGER_DEFINITIONS, translator)
-      : translator("words.unknown");
+    return def ? getPassengerFullLabel(def[0], translator) : translator("words.unknown");
   }
 </script>
 
@@ -26,6 +23,7 @@
   import { PASSENGER_DEFINITIONS, getPassengerFullLabel } from "$lib/models/passenger";
   import { getTranslator, type Translator } from "$lib/i18n";
   import Icon from "$lib/components/icons/icon.svelte";
+  import objectExt from "$lib/object-ext";
 
   export let passengers: MobileSchemas.OrderPassenger[];
   export let orderCreatedAt: Date = new Date();

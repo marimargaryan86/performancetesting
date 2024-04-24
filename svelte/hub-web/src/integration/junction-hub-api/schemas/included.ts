@@ -22,6 +22,7 @@ import * as CommonSchemas from "~/integration/common/schemas";
 import { orderParser, type Order, type OrderSchema } from "./order";
 import { transactionParser, type Transaction, type TransactionSchema } from "./transaction";
 import { refundParser, type Refund, type RefundSchema } from "./refund";
+import objectExt from "$lib/object-ext";
 
 type IncludedBind = {
   companies: { schema: CompanySchema; model: Company };
@@ -149,9 +150,7 @@ export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
   };
 
   included?.forEach((item) => {
-    const key = Object.entries(parserMapping).find(([, { type }]) => type === item.type)?.[0] as
-      | keyof IncludedBind
-      | undefined;
+    const key = objectExt.entries(parserMapping).find(([, { type }]) => type === item.type)?.[0];
 
     if (!key) {
       return;
@@ -162,18 +161,14 @@ export function parseIncluded(included?: IncludedSchemas): IncludedMapping {
     modelMapping[key].push({ id: item.id });
   });
 
-  (Object.entries(modelMapping) as unknown as [keyof IncludedMapping, { id: string }[]][]).forEach(
-    ([key, val]) => {
-      val.forEach((item) => {
-        const schema = (schemaMapping[key] as { id: string }[]).find(
-          (inner) => inner.id === item.id,
-        );
+  objectExt.entries(modelMapping).forEach(([key, val]) => {
+    val.forEach((item) => {
+      const schema = (schemaMapping[key] as { id: string }[]).find((inner) => inner.id === item.id);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Object.assign(item, parserMapping[key].parser.toModel(schema as any, modelMapping as any));
-      });
-    },
-  );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Object.assign(item, parserMapping[key].parser.toModel(schema as any, modelMapping as any));
+    });
+  });
 
   return orderIncluded(modelMapping as unknown as IncludedMapping);
 }

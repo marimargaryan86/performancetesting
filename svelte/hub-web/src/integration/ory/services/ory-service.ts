@@ -1,3 +1,4 @@
+import objectExt from "$lib/object-ext";
 import { URLExtended } from "$lib/utils/url";
 
 export default abstract class OryService {
@@ -25,7 +26,8 @@ export default abstract class OryService {
           ...options.headers,
           ...(options.cookies
             ? {
-                cookie: Object.entries(options.cookies)
+                cookie: objectExt
+                  .entries(options.cookies)
                   .map(([key, val]) => `${key}=${val}`)
                   .join("; "),
               }

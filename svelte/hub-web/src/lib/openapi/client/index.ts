@@ -1,13 +1,14 @@
 import { ensureDefined } from "../resolvers/helpers";
 import type * as Generated from "./types/generated";
 import type { Fetch, FetchHeadersInit, FetchParams, FetchRequestInit } from "./types";
+import objectExt from "$lib/object-ext";
 
 function getUrl(resource: string, baseUrl: string, params?: FetchParams): URL {
   let finalResource = resource;
 
   if (params?.path) {
     // Replace path parameters
-    Object.entries(params.path).forEach(([name, val]) => {
+    objectExt.entries(params.path).forEach(([name, val]) => {
       finalResource = finalResource.replaceAll(`{${name}}`, `${val}`);
     });
   }
@@ -16,7 +17,7 @@ function getUrl(resource: string, baseUrl: string, params?: FetchParams): URL {
 
   if (params?.query) {
     // Add query parameters
-    Object.entries(params.query).forEach(([name, val]) => {
+    objectExt.entries(params.query).forEach(([name, val]) => {
       if (val !== undefined) {
         url.searchParams.set(name, `${val}`);
       }
@@ -41,7 +42,8 @@ function getHeaders(headers?: FetchHeadersInit): HeadersInit {
     }
 
     if (cookie !== undefined) {
-      const parsedCookie = Object.entries(cookie)
+      const parsedCookie = objectExt
+        .entries(cookie)
         .map(([name, val]) => (val === undefined ? undefined : `${name}=${val}`))
         .filter(ensureDefined)
         .join("; ");
@@ -51,9 +53,7 @@ function getHeaders(headers?: FetchHeadersInit): HeadersInit {
       }
     }
 
-    Object.entries(rest).forEach(([name, val]) => {
-      finalHeaders[name] = `${val}`;
-    });
+    objectExt.entries(rest).forEach(([name, val]) => (finalHeaders[name] = `${val}`));
   }
 
   return finalHeaders;

@@ -1,6 +1,7 @@
 import type * as OrySchemas from "~/integration/ory/schemas";
 import { getContext, setContext } from "svelte";
 import type { Readable, Writable } from "svelte/store";
+import objectExt from "$lib/object-ext";
 
 /**
  * Base permissions, this list should be expanded upon as more permissions are created
@@ -38,10 +39,9 @@ export type Action = keyof typeof PERMISSIONS;
  * @returns A uniquely identifying number for the permission
  */
 export function getPermission(...actions: Action[]): number {
-  return Object.entries(PERMISSIONS).reduce(
-    (prev, [key, val]) => prev | (actions.includes(key as Action) ? val : 0),
-    0,
-  );
+  return objectExt
+    .entries(PERMISSIONS)
+    .reduce((prev, [key, val]) => prev | (actions.includes(key) ? val : 0), 0);
 }
 
 /**

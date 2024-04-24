@@ -1,4 +1,5 @@
 import type { Locale, Translator } from "$lib/i18n";
+import objectExt from "$lib/object-ext";
 import { ensureDefined } from "$lib/utils/array";
 import { z } from "zod";
 import type * as CommonSchemas from "~/integration/common/schemas";
@@ -98,10 +99,9 @@ export function getPassengersPresentation(
   passengers: PassengerPickerData,
   translator: Translator,
 ): string {
-  return Object.entries(PASSENGER_DEFINITIONS)
-    .map(([key]) => {
-      const type = key as keyof PassengerPickerData;
-
+  return objectExt
+    .entries(PASSENGER_DEFINITIONS)
+    .map(([type]) => {
       if (!passengers[type]) {
         return undefined;
       }
