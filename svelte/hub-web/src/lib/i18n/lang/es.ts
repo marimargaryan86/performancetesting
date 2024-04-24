@@ -208,12 +208,13 @@ export default {
       },
       {
         type: "text",
-        value: "y",
+        value: " y ",
       },
       {
         type: "fareRulesButton",
         value: "Reglas de Tarifas",
       },
+      { type: "text", value: "." },
     ],
     totalToCollect: "Total a cobrar",
     paymentDeclined: "Pago rechazado",
@@ -221,15 +222,15 @@ export default {
     paymentInfo: [
       {
         type: "text",
-        value: "Al reservar tu entrada aceptas las condiciones de Snowfall.",
+        value: "Al reservar tu entrada aceptas las condiciones de Snowfall. ",
       },
       {
         type: "toc",
-        value: "t",
+        value: "T&C",
       },
       {
         type: "text",
-        value: "el",
+        value: " el ",
       },
       {
         type: "coc",
@@ -237,12 +238,13 @@ export default {
       },
       {
         type: "text",
-        value: "y nuestro",
+        value: " y nuestro ",
       },
       {
         type: "privacy",
         value: "política de privacidad",
       },
+      { type: "text", value: "." },
     ],
     oopsSomethingWentWrong: "Huy! Algo salió mal :(",
     theOrderWasCreatedSuccessfully: "El pedido fue creado exitosamente.",

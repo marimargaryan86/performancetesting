@@ -14,7 +14,7 @@
   import { getPageTitle } from "$lib/utils/page-title";
   import { getLocale, getTranslator } from "$lib/i18n";
   import Price from "$lib/components/pages/trip-management/book/price.svelte";
-
+  import FareRulesDialog from "$lib/components/pages/trip-management/book/fare-rules-dialog.svelte";
   export let data;
 
   const locale = getLocale();
@@ -22,11 +22,13 @@
   const user = getUser();
 
   let breadCrumbs: BreadCrumb[];
+  let fareRulesDialog: FareRulesDialog | undefined;
 
   $: i18nOrders = $t("pages.tripManagement.pages.orders", { returnObjects: true });
   $: order = data.booking.order;
-  $: reservationNo = data.booking.externalReference.length
-    ? data.booking.externalReference
+  $: rules = data.booking.rules;
+  $: reservationNo = data.booking.operatorBookingReferences.length
+    ? data.booking.operatorBookingReferences.join(", ")
     : undefined;
   $: bookingTitle = `${$t("words.booking")} ${data.bookingNo}`;
   $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.booking.orderId);
@@ -79,6 +81,8 @@
           <Fees markups={data.markups} />
         {/if}
 
+        <FareRulesDialog bind:this={fareRulesDialog} {rules} />
+
         <div class="statuses">
           <div class="status" typography="body-small" weight="bold">
             {$t("words.bookingStatus")}
@@ -114,7 +118,7 @@
         <Passengers passengers={order.passengers} orderCreatedAt={order.createdAt} />
       {/if}
 
-      <Itinerary bookings={[data.booking]} />
+      <Itinerary on:showFareRules={fareRulesDialog?.open} bookings={[data.booking]} />
     </div>
 
     {#if canViewTransactions}

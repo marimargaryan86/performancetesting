@@ -4,13 +4,11 @@
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getTranslator } from "$lib/i18n";
 
-  export let priceQuote: MobileSchemas.TripOfferPriceQuote;
+  export let rules: MobileSchemas.TripOfferPriceQuote["rules"];
 
   const t = getTranslator();
 
   let backdrop: Backdrop | undefined = undefined;
-
-  $: rules = priceQuote.rules;
 
   export function open(): void {
     backdrop?.open();
@@ -54,7 +52,8 @@
     display: flex;
     flex-flow: column;
     gap: 32px;
-    max-width: minmax(400px, 50vw);
+    width: 100%;
+    max-width: 60vw;
     max-height: calc(100vh - 32px);
     padding: 48px;
     overflow: auto;

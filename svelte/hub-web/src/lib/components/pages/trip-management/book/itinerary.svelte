@@ -29,11 +29,21 @@
   import Icon from "$lib/components/icons/icon.svelte";
   import type * as HubSchemas from "~/integration/junction-hub-api/schemas";
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
+  import { createEventDispatcher } from "svelte";
+  interface EventTypes {
+    showFareRules: void;
+  }
+
+  const dispatch = createEventDispatcher<EventTypes>();
 
   export let bookings: TripBooking[];
 
   const locale = getLocale();
   const t = getTranslator();
+
+  function handleShowFareRulesClick(): void {
+    dispatch("showFareRules");
+  }
 </script>
 
 <div class="itinerary">
@@ -125,6 +135,15 @@
                 {cabinClasses.join(", ")}
               </strong>
             </div>
+            <button
+              variant="primary"
+              size="small"
+              on:click={handleShowFareRulesClick}
+              typography="body-xsmall"
+              class="rules"
+            >
+              View Fare Rules
+            </button>
           </div>
         </div>
       </div>
@@ -142,6 +161,10 @@
 
   h3 {
     margin-bottom: 8px;
+  }
+
+  .rules {
+    margin-left: 20px;
   }
 
   .booking {

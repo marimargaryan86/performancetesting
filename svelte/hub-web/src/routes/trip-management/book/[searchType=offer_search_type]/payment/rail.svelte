@@ -196,7 +196,7 @@
     on:cancel={cancel}
   />
 
-  <FareRulesDialog bind:this={fareRulesDialog} {priceQuote} />
+  <FareRulesDialog bind:this={fareRulesDialog} rules={priceQuote.rules} />
 {/if}
 
 <BookingLayout
