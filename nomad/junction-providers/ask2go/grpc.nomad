@@ -130,6 +130,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service (printf "mongodb-%s" (env "NOMAD_NAMESPACE"))}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 RESELLER_PROVIDERS={{keyOrDefault "${var.environment}/providers/reseller-providers" "{}" | toJSON }}
+RESELLER_AFFILIATE_MAPPING={{keyOrDefault "${var.environment}/providers/ask2go/reseller-affiliate-ids" "{}" | toJSON }}
 {{ with secret "kv/data/${var.environment}/ask2go" }}
 STORAGE_DSN=s3://{{ .Data.data.aws_access_key_id }}:{{ .Data.data.aws_secret_access_key | urlquery }}@/${var.bucket}/ask2go
 {{ end }}
