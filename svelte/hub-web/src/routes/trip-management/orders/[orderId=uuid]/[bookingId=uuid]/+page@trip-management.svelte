@@ -25,8 +25,8 @@
 
   $: i18nOrders = $t("pages.tripManagement.pages.orders", { returnObjects: true });
   $: order = data.booking.order;
-  $: reservationNo = data.booking.operatorBookingReferences.length
-    ? data.booking.operatorBookingReferences.join(", ")
+  $: reservationNo = data.booking.externalReference.length
+    ? data.booking.externalReference
     : undefined;
   $: bookingTitle = `${$t("words.booking")} ${data.bookingNo}`;
   $: orderLink = routeConfig.routes.tripManagement.routes.orders.routes.order(data.booking.orderId);
