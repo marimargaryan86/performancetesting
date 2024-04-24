@@ -1,0 +1,16 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "traefik_entrypoints": "websecure",
+      "traefik_host_URL": "debug.rocket.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false
+  },
+  "sandbox": {
+    "deploy": false
+  }
+}

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/css/bootstrap.min.css" integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" integrity="sha512-1xoFisiGdy9nvho8EgXuXvnpR5GAMSjFwp40gSRE3NwdUdIMIKuPa7bqoUhLD0O/5tPNhteAsE5XyyMi5reQVA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="static/debug.css?_={{ hashes['debug.css'] }}" integrity="sha512-{{ hashes['debug.css'] }}" />
+    <title>Debug UI</title>
+</head>
+<body>
+{% raw %}
+<script id="route-template" type="text/x-handlebars-template">
+  <div class="card text-center mb-2">
+      <div class="card-header">Route {{index}} (~{{ route.estimatedDailyDepartures }} daily departures)</div>
+      <div class="card-body">
+        <div id="{{ mapId }}" class="map col-sm"></div>
+          <table class="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Departures</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each route.segments}}
+                  <tr>
+                    <td><i class="{{ segment_type_icon segmentType }}"></i></td>
+                    {{#with (lookup ../origins @index) }}
+                    <td>{{ name }}</td>
+                    {{/with}}
+                    {{#with (lookup ../destinations @index) }}
+                    <td>{{ name }}</td>
+                    {{/with}}
+                    <td>~{{ estimatedDailyDepartures }}</td>
+                  </tr>
+                {{/each}}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</script>
+{% endraw %}
+<main class="container-fluid">
+    <h1 class="text-center">Debug UI</h1>
+    <div class="row">
+        <div class="col">
+            <datalist id="places"></datalist>
+            <form id="search-form">
+                <fieldset>
+                    <legend>Route Search</legend>
+                    <div class="mb-3 form-floating">
+                        <input class="form-control" list="places" id="origin" placeholder="Type to search...">
+                        <label for="origin" class="form-label">Origin</label>
+                    </div>
+                    <div class="mb-3 form-floating">
+                        <input class="form-control" list="places" id="destination" placeholder="Type to search...">
+                        <label for="destination" class="form-label">Destination</label>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="leg-types" type="checkbox" id="air" value="1" checked>
+                            <label class="form-check-label" for="air">Air</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="leg-types" type="checkbox" id="bus" value="4" checked>
+                            <label class="form-check-label" for="bus">Bus</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="leg-types" type="checkbox" id="car" value="6" checked>
+                            <label class="form-check-label" for="car">Car</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="leg-types" type="checkbox" id="ferry" value="3" checked>
+                            <label class="form-check-label" for="ferry">Ferry</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="leg-types" type="checkbox" id="rail" value="2" checked>
+                            <label class="form-check-label" for="rail">Rail</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" name="leg-types" type="checkbox" id="taxi" value="5" checked>
+                            <label class="form-check-label" for="taxi">Taxi</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary mb-3">Search</button>
+                        <button type="button" id="clear-places-cache" class="btn btn-danger mb-3">Clear Places Cache</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div id="result" class="col"></div>
+    </div>
+</main>
+<div id="loader"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/js/bootstrap.bundle.min.js" integrity="sha512-BOsvKbLb0dB1IVplOL9ptU1EYA+LuCKEluZWRUYG73hxqNBU85JBIBhPGwhQl7O633KtkjMv8lvxZcWP+N3V3w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-RXf+QSDCUQs5uwRKaDoXt55jygZZm2V++WUZduaU/Ui/9EGp3f/2KZVahFZBKGH0s774sd3HmrhUy+SgOFQLVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js" integrity="sha512-E1dSFxg+wsfJ4HKjutk/WaCzK7S2wv1POn1RRPGh8ZK+ag9l244Vqxji3r6wgz9YBf6+vhQEYJZpSjqWFPg9gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js" integrity="sha512-SeiQaaDh73yrb56sTW/RgVdi/mMqNeM2oBwubFHagc5BkixSpP1fvqF47mKzPGWYSSy4RwbBunrJBQ4Co8fRWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="static/debug.js?_={{ hashes['debug.js'] }}" integrity="sha512-{{ hashes['debug.js'] }}"></script>
+<script src="static/locations.js?_={{ hashes['locations.js'] }}" integrity="sha512-{{ hashes['locations.js'] }}"></script>
+<script src="static/map.js?_={{ hashes['map.js'] }}" integrity="sha512-{{ hashes['map.js'] }}"></script>
+<script src="static/places.js?_={{ hashes['places.js'] }}" integrity="sha512-{{ hashes['places.js'] }}"></script>
+<script src="static/routes.js?_={{ hashes['routes.js'] }}" integrity="sha512-{{ hashes['routes.js'] }}"></script>
+</body>
+</html>
