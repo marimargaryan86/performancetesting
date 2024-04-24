@@ -2376,6 +2376,27 @@ components:
             - attributes
             - relationships
         - $ref: '#/components/schemas/SelfLink'
+    JourneySuggestionIdentifier:
+      title: Journey Suggestion Identifier
+      description: A unique identifier for a journey suggestion
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Journey Suggestion object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - journey-suggestions
+          example: journey-suggestions
     JourneySuggestionSearch:
       title: Journey Suggestion Search
       x-tags:
@@ -2440,9 +2461,20 @@ components:
                       $ref: '#/components/schemas/PlaceIdentifier'
                   required:
                     - data
+                suggestions:
+                  type: object
+                  readOnly: true
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/JourneySuggestionIdentifier'
+                  required:
+                    - data
               required:
                 - origin
                 - destination
+                - suggestions
           required:
             - id
             - type

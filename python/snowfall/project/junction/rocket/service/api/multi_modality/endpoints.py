@@ -48,6 +48,7 @@ class Suggestions:
 @dataclasses.dataclass(frozen=True)
 class SuggestionSearches:
     _repository: repository.SuggestionSearchRepository
+    _suggestions: repository.SuggestionRepository
     _places: places_pb2_grpc.PlacesServiceStub
     _producer: amqp_producer.Producer
 
@@ -59,11 +60,16 @@ class SuggestionSearches:
         if not search:
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
+        suggestion_results = await self._suggestions.find_by_suggestion_search_id(
+            identifier=search.id,
+        )
+
         return await messages.create_response(
             body=std_models.Body(
                 data=models.SuggestionSearch.from_proto(
-                    search,
-                    request.starlette_request,
+                    proto=search,
+                    suggestions=[suggestion async for suggestion in suggestion_results],
+                    request=request.starlette_request,
                 ),
             ),
             request=request.starlette_request,
@@ -84,8 +90,9 @@ class SuggestionSearches:
         return await messages.create_response(
             body=std_models.Body(
                 data=models.SuggestionSearch.from_proto(
-                    search,
-                    request.starlette_request,
+                    proto=search,
+                    suggestions=[],
+                    request=request.starlette_request,
                 ),
             ),
             request=request.starlette_request,

@@ -7,6 +7,9 @@ from starlette import requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import models as api_models
 from snowfall.project.junction.rocket.service.api.places.models import places
+from snowfall.project.junction.rocket.service.api.rail.models import (
+    searches as rail_models,
+)
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.format import protobuf
@@ -64,7 +67,7 @@ class Suggestion(std_models.Resource):
                     data=[
                         std_models.ResourceIdentifier(
                             id=train_offer.id,
-                            type="rail-offers",
+                            type=rail_models.OfferResource.api_type,
                         )
                         for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
                     ],
@@ -88,6 +91,7 @@ class SuggestionSearch(std_models.Resource):
     def from_proto(
         cls,
         proto: multi_modal_pb2.SuggestionSearch,
+        suggestions: Sequence[multi_modal_pb2.Suggestion],
         request: requests.Request,
     ) -> Self:
         return cls(
@@ -119,6 +123,15 @@ class SuggestionSearch(std_models.Resource):
                         id=proto.criteria.destination_id,
                         type=places.PlacesResource.api_type,
                     ),
+                ),
+                "suggestions": std_models.Relationship(
+                    data=[
+                        std_models.ResourceIdentifier(
+                            id=suggestion.id,
+                            type=Suggestion.api_type,
+                        )
+                        for suggestion in suggestions
+                    ],
                 ),
             },
             links=std_models.Links(

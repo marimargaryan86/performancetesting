@@ -1,3 +1,4 @@
+import datetime
 import types
 
 import grpc
@@ -18,12 +19,18 @@ from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2_grpc,
 )
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api.multi_modality import routes
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    repository,
+    routes,
+    search,
+)
+from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.rocket.service.places.v1alpha import (
     models_pb2,
     places_pb2,
     places_pb2_grpc,
 )
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
 
 _LOCATIONS_MAPPING = types.MappingProxyType({
@@ -135,4 +142,38 @@ def route_finder(
         places=places,
         locations=locations,
         place_search_radius=0,
+    )
+
+
+@pytest.fixture()
+async def suggestion_search(
+    suggestion_search_repository: repository.SuggestionSearchRepository,
+) -> multi_modal_pb2.SuggestionSearch:
+    return await suggestion_search_repository.create_from_criteria(
+        multi_modal_pb2.SuggestionSearch.Criteria(
+            origin_id=fixtures.PLACES[0],
+            destination_id=fixtures.PLACES[0],
+            departure_after=protobuf.datetime_to_protobuf_datetime(
+                datetime.datetime.now(datetime.UTC),
+            ),
+            passengers=[
+                multi_modal_pb2.SuggestionSearch.Criteria.Passenger(
+                    date_of_birth=protobuf.date_to_protobuf(
+                        datetime.datetime.now(datetime.UTC).date(),
+                    ),
+                ),
+            ],
+            reseller_id="foo",
+        ),
+    )
+
+
+@pytest.fixture()
+async def suggestion(
+    suggestion_search: multi_modal_pb2.SuggestionSearch,
+    suggestion_repository: repository.SuggestionRepository,
+) -> multi_modal_pb2.Suggestion:
+    return await suggestion_repository.create(
+        suggestion_search.id,
+        search.Suggestion(offers=[]),
     )

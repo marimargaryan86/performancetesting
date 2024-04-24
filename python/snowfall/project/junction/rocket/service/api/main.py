@@ -109,6 +109,10 @@ async def _http(app: application.Application[settings.Settings]) -> None:
         dsn=app.settings.amqp_dsn,
         timeout=app.settings.amqp_timeout,
     )
+    suggestion_repository = multi_modal_repository.SuggestionRepository(
+        collection=mongo_db.suggestions,
+        ttl=app.settings.suggestion_search_ttl,
+    )
 
     routes = [
         *air_router.get_routes(integration),
@@ -119,16 +123,14 @@ async def _http(app: application.Application[settings.Settings]) -> None:
         *places_router.get_routes(integration),
         *multi_modal_endpoints.get_routes(
             suggestions=multi_modal_endpoints.Suggestions(
-                _repository=multi_modal_repository.SuggestionRepository(
-                    collection=mongo_db.suggestions,
-                    ttl=app.settings.suggestion_search_ttl,
-                ),
+                _repository=suggestion_repository,
             ),
             suggestion_searches=multi_modal_endpoints.SuggestionSearches(
                 _repository=multi_modal_repository.SuggestionSearchRepository(
                     collection=mongo_db.suggestion_searches,
                     ttl=app.settings.suggestion_search_ttl,
                 ),
+                _suggestions=suggestion_repository,
                 _places=container[places_pb2_grpc.PlacesServiceStub],
                 _producer=amqp_producer.Producer(
                     connection=amqp_connection,

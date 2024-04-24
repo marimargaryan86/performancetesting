@@ -219,11 +219,13 @@ async def suggestion_repository(
 def suggestions_searches(
     places_stub: places_pb2_grpc.PlacesServiceStub,
     suggestion_search_repository: multi_modal_repository.SuggestionSearchRepository,
+    suggestion_repository: multi_modal_repository.SuggestionRepository,
 ) -> multi_modal_endpoints.SuggestionSearches:
     return multi_modal_endpoints.SuggestionSearches(
         _places=places_stub,
         _repository=suggestion_search_repository,
         _producer=memory.Producer(),
+        _suggestions=suggestion_repository,
     )
 
 

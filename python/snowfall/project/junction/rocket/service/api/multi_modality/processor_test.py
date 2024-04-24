@@ -7,7 +7,6 @@ from snowfall.project.junction.go.service.planner.v1 import (
     planner_pb2,
     planner_pb2_grpc,
 )
-from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api.multi_modality import (
     processor,
     repository,
@@ -17,7 +16,6 @@ from snowfall.project.junction.rocket.service.api.multi_modality import (
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.v1 import segment_type_pb2
-from snowfall.stdlib.format import protobuf
 
 
 async def _mock_processor(body: multi_modal_pb2.SuggestionSearchTask) -> None:
@@ -78,29 +76,6 @@ def find_routes_response() -> planner_pb2.FindRoutesResponse:
                 ],
             ),
         ],
-    )
-
-
-@pytest.fixture()
-async def suggestion_search(
-    suggestion_search_repository: repository.SuggestionSearchRepository,
-) -> multi_modal_pb2.SuggestionSearch:
-    return await suggestion_search_repository.create_from_criteria(
-        multi_modal_pb2.SuggestionSearch.Criteria(
-            origin_id=fixtures.PLACES[0],
-            destination_id=fixtures.PLACES[0],
-            departure_after=protobuf.datetime_to_protobuf_datetime(
-                datetime.datetime.now(datetime.UTC),
-            ),
-            passengers=[
-                multi_modal_pb2.SuggestionSearch.Criteria.Passenger(
-                    date_of_birth=protobuf.date_to_protobuf(
-                        datetime.datetime.now(datetime.UTC).date(),
-                    ),
-                ),
-            ],
-            reseller_id="foo",
-        ),
     )
 
 

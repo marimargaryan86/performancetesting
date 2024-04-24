@@ -11,6 +11,7 @@ from snowfall.project.junction.rocket.service.api.multi_modality import (
     repository,
     search,
 )
+from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib import string
 
@@ -95,11 +96,8 @@ class TestGetSuggestion:
         self,
         client: httpx.AsyncClient,
         suggestion_repository: repository.SuggestionRepository,
+        suggestion: multi_modal_pb2.Suggestion,
     ) -> None:
-        suggestion = await suggestion_repository.create(
-            "foo",
-            search.Suggestion(offers=[]),
-        )
         response = await client.get(
             url="/journeys/suggestions/{0}".format(suggestion.id),
         )
@@ -257,3 +255,17 @@ class TestGetSuggestionSearch:
             url="/journeys/suggestions/searches/{0}".format(search_id),
         )
         assert get_response.status_code == status.HTTP_200_OK
+
+    async def test_search_has_suggestions(
+        self,
+        client: httpx.AsyncClient,
+        suggestion_search: multi_modal_pb2.SuggestionSearch,
+        suggestion: multi_modal_pb2.Suggestion,
+    ) -> None:
+        response = await client.get(
+            url="/journeys/suggestions/searches/{0}".format(suggestion_search.id),
+        )
+        relationships = response.json()["data"]["relationships"]
+        related_suggestions = relationships["suggestions"]["data"]
+        assert related_suggestions
+        assert related_suggestions[0]["id"] == suggestion.id
