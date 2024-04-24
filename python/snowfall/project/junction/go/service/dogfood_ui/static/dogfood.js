@@ -273,6 +273,7 @@ function haversine_distance(coords1, coords2) {
 function inject_trips(tripSearchId, response, origin, destination, searchOffers) {
   hide_loader();
 
+  const showDebug = document.getElementById("show-debug").checked;
   const showMaps = document.getElementById("show-maps").checked;
   const container = document.getElementById("result");
 
@@ -286,24 +287,27 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
   let mega = document.createElement("h2");
   mega.innerText = "Search Results: " + response.data.length + " trips found";
   new_children.push(mega);
-  let searchInfo = document.createElement("dl");
-  searchInfo.className = "row";
-  searchInfo.innerHTML +=
-    '<dt class="col-sm-2">Trip Search ID</dt><dd class="col-sm-10">' +
-    tripSearchId +
-    "</dd>";
-  searchInfo.innerHTML +=
-    '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
-    sessionToken +
-    "</dd>";
-  searchInfo.innerHTML += '<dt class="col-sm-2">Provider Mapping</dt>';
-  let provider_mapping = document.createElement("dd");
-  provider_mapping.className = "col-sm-10"
-  searchInfo.append(provider_mapping);
-  new_children.push(searchInfo);
 
-  inject_provider_mapping(origin, provider_mapping)
-  inject_provider_mapping(destination, provider_mapping)
+  if (showDebug) {
+    let searchInfo = document.createElement("dl");
+    searchInfo.className = "row";
+    searchInfo.innerHTML +=
+      '<dt class="col-sm-2">Trip Search ID</dt><dd class="col-sm-10">' +
+      tripSearchId +
+      "</dd>";
+    searchInfo.innerHTML +=
+      '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
+      sessionToken +
+      "</dd>";
+    searchInfo.innerHTML += '<dt class="col-sm-2">Provider Mapping</dt>';
+    let provider_mapping = document.createElement("dd");
+    provider_mapping.className = "col-sm-10"
+    searchInfo.append(provider_mapping);
+    new_children.push(searchInfo);
+
+    inject_provider_mapping(origin, provider_mapping)
+    inject_provider_mapping(destination, provider_mapping)
+  }
 
   included = {};
 
@@ -440,26 +444,36 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
 
     const infoList = document.createElement("dl");
     infoList.className = "row";
-    infoList.innerHTML =
-      '<dt class="col-sm-2">Trip ID</dt><dd class="col-sm-10">' +
-      trip.id +
-      "</dd>";
+
+    if (showDebug) {
+      infoList.innerHTML +=
+        '<dt class="col-sm-2">Trip ID</dt><dd class="col-sm-10">' +
+        trip.id +
+        "</dd>";
+    }
 
     if (searchOffers) {
-      infoList.innerHTML +=
-        '<dt class="col-sm-2">Offer Search ID</dt><dd class="col-sm-10" id="offer-search-' +
-        trip.id +
-        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-      infoList.innerHTML +=
-        '<dt class="col-sm-2">Trace ID</dt><dd class="col-sm-10" id="trace-' +
-        trip.id +
-        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-      infoList.innerHTML +=
-        '<dt class="col-sm-2">Provider(s)</dt><dd class="col-sm-10" id="provider-' +
-        trip.id +
-        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+      if (showDebug) {
+        infoList.innerHTML +=
+          '<dt class="col-sm-2">Offer Search ID</dt><dd class="col-sm-10" id="offer-search-' +
+          trip.id +
+          '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+        infoList.innerHTML +=
+          '<dt class="col-sm-2">Trace ID</dt><dd class="col-sm-10" id="trace-' +
+          trip.id +
+          '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+        infoList.innerHTML +=
+          '<dt class="col-sm-2">Provider(s)</dt><dd class="col-sm-10" id="provider-' +
+          trip.id +
+          '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+      }
+
       infoList.innerHTML +=
         '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
+        trip.id +
+        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+      infoList.innerHTML +=
+        '<dt class="col-sm-2">Prices</dt><dd class="col-sm-10" id="prices-' +
         trip.id +
         '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
       search_offers(trip.id);
@@ -652,12 +666,12 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
 
 async function load_places() {
   let url = "/places?page[limit]=100";
+  const transaction = db.transaction("places", "readwrite");
+  const objectStore = transaction.objectStore("places");
 
   while (true) {
     const response = await fetch(url).then((res) => res.json())
     for (const place of response.data) {
-      const transaction = db.transaction("places", "readwrite");
-      const objectStore = transaction.objectStore("places");
       const addRequest = objectStore.add(place);
     }
 
@@ -674,21 +688,47 @@ async function load_places() {
 function inject_offers(response, offerSearchId, tripId, searchStatus) {
   const status = document.getElementById("offers-" + tripId);
   const providers = document.getElementById("provider-" + tripId);
+  const prices = document.getElementById("prices-" + tripId);
   if (response.data.length > 0) {
     status.innerHTML =
-      '<i class="fas fa-check"></i> ' + response.data.length + " offers";
+      '<i class="fas fa-check"></i> ' + response.data.length + " offer(s)";
     let providerIds = [];
+    let pricesList = [];
+
+    included = {};
+
+    for (const resource of response.included) {
+      included[resource.type + resource.id] = resource;
+    }
+
+    for (const item of response.data) {
+      const offer = flatten(item, included);
+
+      for (const group of offer.relationships.groups.data) {
+        for (const option of group.relationships.options.data) {
+          pricesList.push("<li>" + option.attributes.brandName + ": " + option.attributes.price.amount + " " + option.attributes.price.currency + "</li>")
+        }
+      }
+    }
 
     for (const item of response.included) {
-      if (item.meta && item.meta.providerId) {
+      if (item.type == "offer-groups" && item.meta && item.meta.providerId) {
         providerIds.push(uuidToName[item.meta.providerId]);
       }
     }
 
-    providers.innerHTML = providerIds.join(', ');
+    prices.innerHTML = "<ul>" + pricesList.join('') + "</ul>";
+
+    if (providers) {
+      providers.innerHTML = providerIds.join(', ');
+    }
   } else {
+    if (providers) {
+      providers.innerHTML = ""
+    }
+    prices.innerHTML = ""
     status.innerHTML =
-      '<i class="fas fa-times-circle"></i> ' + response.data.length + " offers";
+      '<i class="fas fa-times-circle"></i> ' + response.data.length + " offer(s)";
   }
 }
 
@@ -697,7 +737,7 @@ function load_offers(id, tripId) {
     .then((res) => res.json())
     .then((response) => {
       if (response.data.attributes.status == "completed") {
-        fetch("/offers/searches/" + id + "/offers?include=groups")
+        fetch("/offers/searches/" + id + "/offers?include=groups,groups.options")
           .then((res) => res.json())
           .then((offersResponse) => {
             inject_offers(
@@ -776,12 +816,18 @@ function search_offers(tripId) {
     })
       .then((response) => {
         const trace = document.getElementById("trace-" + tripId);
-        trace.innerHTML = response.headers.get("x-request-id") || "<em>n/a</em>";
+
+        if (trace) {
+          trace.innerHTML = response.headers.get("x-request-id") || "<em>n/a</em>";
+        }
         return response.json()
       })
       .then((data) => {
+
         const search = document.getElementById("offer-search-" + tripId);
-        search.innerHTML = data.data.id;
+        if (search) {
+          search.innerHTML = data.data.id;
+        }
         load_offers(data.data.id, tripId);
       }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
   }, Math.floor(Math.random() * 10000));

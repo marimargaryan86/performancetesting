@@ -24,7 +24,6 @@ function inject_provider_mapping(place, domElement) {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data)
       for (const [key, value] of Object.entries(data)) {
         let dt = document.createElement("dt");
         dt.innerText = key;
