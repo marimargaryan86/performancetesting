@@ -462,21 +462,13 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
           '<dt class="col-sm-2">Trace ID</dt><dd class="col-sm-10" id="trace-' +
           trip.id +
           '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-        infoList.innerHTML +=
-          '<dt class="col-sm-2">Provider(s)</dt><dd class="col-sm-10" id="provider-' +
-          trip.id +
-          '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
       }
 
       infoList.innerHTML +=
         '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
         trip.id +
         '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-      infoList.innerHTML +=
-        '<dt class="col-sm-2">Prices</dt><dd class="col-sm-10" id="prices-' +
-        trip.id +
-        '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-      search_offers(trip.id);
+      search_offers(trip.id, showDebug);
     }
 
     let badges = document.createElement("p");
@@ -685,14 +677,11 @@ async function load_places() {
   inject_places();
 }
 
-function inject_offers(response, offerSearchId, tripId, searchStatus) {
+function inject_offers(response, offerSearchId, tripId, searchStatus, showDebug) {
   const status = document.getElementById("offers-" + tripId);
-  const providers = document.getElementById("provider-" + tripId);
-  const prices = document.getElementById("prices-" + tripId);
   if (response.data.length > 0) {
     status.innerHTML =
       '<i class="fas fa-check"></i> ' + response.data.length + " offer(s)";
-    let providerIds = [];
     let pricesList = [];
 
     included = {};
@@ -703,36 +692,36 @@ function inject_offers(response, offerSearchId, tripId, searchStatus) {
 
     for (const item of response.data) {
       const offer = flatten(item, included);
-
+      pricesList.push("<li>Offer " + offer.id + ":<ol>")
       for (const group of offer.relationships.groups.data) {
-        for (const option of group.relationships.options.data) {
-          pricesList.push("<li>" + option.attributes.brandName + ": " + option.attributes.price.amount + " " + option.attributes.price.currency + "</li>")
+        pricesList.push("<li>")
+
+        if (showDebug && group.meta && group.meta.providerId) {
+          pricesList.push("Options from " + uuidToName[group.meta.providerId] + ":")
+        } else if (group.meta && group.meta.providerId) {
+          pricesList.push("Options " + Array.from(uuidToName[group.meta.providerId])[0].toUpperCase() + ":")
+        } else {
+          pricesList.push("Options:")
         }
+
+        pricesList.push("<ul>")
+        for (const option of group.relationships.options.data) {
+          pricesList.push("<li>" + option.id + " (" + option.attributes.brandName + "): " + option.attributes.price.amount + " " + option.attributes.price.currency + "</li>")
+        }
+        pricesList.push("</ul></li>")
       }
+      pricesList.push("</ol></li>")
     }
 
-    for (const item of response.included) {
-      if (item.type == "offer-groups" && item.meta && item.meta.providerId) {
-        providerIds.push(uuidToName[item.meta.providerId]);
-      }
-    }
+    status.innerHTML = "<ul style='font-size: 0.8em'>" + pricesList.join('') + "</ul>";
 
-    prices.innerHTML = "<ul>" + pricesList.join('') + "</ul>";
-
-    if (providers) {
-      providers.innerHTML = providerIds.join(', ');
-    }
   } else {
-    if (providers) {
-      providers.innerHTML = ""
-    }
-    prices.innerHTML = ""
     status.innerHTML =
       '<i class="fas fa-times-circle"></i> ' + response.data.length + " offer(s)";
   }
 }
 
-function load_offers(id, tripId) {
+function load_offers(id, tripId, showDebug) {
   fetch("/offers/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
@@ -744,7 +733,8 @@ function load_offers(id, tripId) {
               offersResponse,
               id,
               tripId,
-              response.data.attributes.status
+              response.data.attributes.status,
+              showDebug
             );
           });
       } else if (response.data.attributes.status == "failed") {
@@ -752,7 +742,7 @@ function load_offers(id, tripId) {
         status.innerHTML = '<i class="fas fa-exclamation-circle"></i> System Failure';
       } else {
         setTimeout(() => {
-          load_offers(id, tripId);
+          load_offers(id, tripId, showDebug);
         }, "5000");
       }
     }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
@@ -783,7 +773,7 @@ function load_trips(id, origin, destination) {
     }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
 }
 
-function search_offers(tripId) {
+function search_offers(tripId, showDebug) {
   setTimeout(() => {
     fetch("/offers/searches", {
       method: "POST",
@@ -828,7 +818,7 @@ function search_offers(tripId) {
         if (search) {
           search.innerHTML = data.data.id;
         }
-        load_offers(data.data.id, tripId);
+        load_offers(data.data.id, tripId, showDebug);
       }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
   }, Math.floor(Math.random() * 10000));
 }
