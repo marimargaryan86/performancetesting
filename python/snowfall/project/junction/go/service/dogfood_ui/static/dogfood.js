@@ -650,26 +650,25 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
   }
 }
 
-function load_places(url = null) {
-  if (url == null) {
-    url = "/places?page[limit]=100";
+async function load_places() {
+  let url = "/places?page[limit]=100";
+
+  while (true) {
+    const response = await fetch(url).then((res) => res.json())
+    for (const place of response.data) {
+      const transaction = db.transaction("places", "readwrite");
+      const objectStore = transaction.objectStore("places");
+      const addRequest = objectStore.add(place);
+    }
+
+    if (response.data.length == 0) {
+      break
+    }
+
+    url = response.links.next
   }
 
-  fetch(url)
-    .then((res) => res.json())
-    .then((response) => {
-      for (const place of response.data) {
-        const transaction = db.transaction("places", "readwrite");
-        const objectStore = transaction.objectStore("places");
-        const addRequest = objectStore.add(place);
-      }
-
-      if (response.data.length > 0) {
-        load_places(response.links.next);
-      } else {
-        inject_places();
-      }
-    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
+  inject_places();
 }
 
 function inject_offers(response, offerSearchId, tripId, searchStatus) {
