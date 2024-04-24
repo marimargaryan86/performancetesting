@@ -4,6 +4,7 @@ import pymongo
 from google.protobuf import timestamp_pb2
 from motor import motor_asyncio
 
+from snowfall.project.junction.rocket.service.api.multi_modality import search
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
@@ -107,7 +108,11 @@ class SuggestionRepository(
 
         self._ttl = ttl
 
-    async def create(self, suggestion_search_id: str) -> multi_modal_pb2.Suggestion:
+    async def create(
+        self,
+        suggestion_search_id: str,
+        suggestion: search.Suggestion,
+    ) -> multi_modal_pb2.Suggestion:
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
             datetime.datetime.now(tz=datetime.UTC) + self._ttl,
@@ -116,6 +121,13 @@ class SuggestionRepository(
             id=string.uuid(),
             suggestion_search_id=suggestion_search_id,
             expires_at=expires_at,
+            offers=[
+                multi_modal_pb2.Suggestion.Offer(
+                    id=offer.id,
+                    segment_type=offer.type,
+                )
+                for offer in suggestion.offers
+            ],
         )
 
         return await self.insert(new_suggestion)

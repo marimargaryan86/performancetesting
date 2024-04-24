@@ -1,12 +1,14 @@
 from collections.abc import Sequence
 from typing import ClassVar, Self
 
+import more_itertools
 from pydantic import types
 from starlette import requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import models as api_models
 from snowfall.project.junction.rocket.service.api.places.models import places
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
+from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import models as std_models
 
@@ -42,17 +44,31 @@ class Suggestion(std_models.Resource):
         proto: multi_modal_pb2.Suggestion,
         request: requests.Request,
     ) -> Self:
+        offers = more_itertools.bucket(proto.offers, lambda offer: offer.segment_type)
+
         return cls(
             id=proto.id,
             type=cls.api_type,
             attributes={},
             relationships={
-                "flightOffers": {
-                    "data": [],
-                },
-                "trainOffers": {
-                    "data": [],
-                },
+                "flightOffers": std_models.Relationship(
+                    data=[
+                        std_models.ResourceIdentifier(
+                            id=flight_offer.id,
+                            type="air-offers",
+                        )
+                        for flight_offer in offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT]
+                    ],
+                ),
+                "trainOffers": std_models.Relationship(
+                    data=[
+                        std_models.ResourceIdentifier(
+                            id=train_offer.id,
+                            type="rail-offers",
+                        )
+                        for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
+                    ],
+                ),
             },
             links=std_models.Links(
                 self=str(
@@ -92,18 +108,18 @@ class SuggestionSearch(std_models.Resource):
                 "expiresAt": protobuf.protobuf_to_datetime(proto.expires_at),
             },
             relationships={
-                "origin": {
-                    "data": std_models.ResourceIdentifier(
+                "origin": std_models.Relationship(
+                    data=std_models.ResourceIdentifier(
                         id=proto.criteria.origin_id,
                         type=places.PlacesResource.api_type,
                     ),
-                },
-                "destination": {
-                    "data": std_models.ResourceIdentifier(
+                ),
+                "destination": std_models.Relationship(
+                    data=std_models.ResourceIdentifier(
                         id=proto.criteria.destination_id,
                         type=places.PlacesResource.api_type,
                     ),
-                },
+                ),
             },
             links=std_models.Links(
                 self=str(

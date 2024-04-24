@@ -50,6 +50,7 @@ class Offer:
     id: str
     departure_at: datetime.datetime
     arrival_at: datetime.datetime
+    type: segment_type_pb2.SegmentType.ValueType
 
 
 @dataclasses.dataclass(frozen=True)
@@ -204,6 +205,7 @@ class AirSearchResponse:
                 id=self._search_id,
                 departure_at=departure_at,
                 arrival_at=arrival_at,
+                type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
             ),
         ]
 
@@ -352,6 +354,7 @@ class RailSearcher:
                 arrival_at=protobuf.protobuf_to_datetime(
                     last_segment.rail.arrival_date,
                 ),
+                type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
             )
             for offer in search_result.offers
         ]

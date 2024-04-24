@@ -134,9 +134,12 @@ class SuggestionSearchProcessor:
                 reseller_id=criteria.reseller_id,
             ),
         )
-        search_results.optimize()
+        suggestion = search_results.optimize()
 
-        await self._suggestions.create(suggestion_search_id=suggestion_search.id)
+        await self._suggestions.create(
+            suggestion_search_id=suggestion_search.id,
+            suggestion=suggestion,
+        )
 
 
 class SuggestionSearchQueue(

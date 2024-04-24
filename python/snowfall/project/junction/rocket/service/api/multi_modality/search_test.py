@@ -35,6 +35,7 @@ _OFFER_DATETIME2 = datetime.datetime(2024, 1, 1, 18, 0, 0, 0, datetime.UTC)
 def _mock_offer(
     key: str,
     duration: datetime.timedelta,
+    segment_type: segment_type_pb2.SegmentType.ValueType,
     departure_at: datetime.datetime | None = None,
 ) -> search.Offer:
     if not departure_at:
@@ -44,6 +45,7 @@ def _mock_offer(
         id=key,
         departure_at=departure_at,
         arrival_at=departure_at + duration,
+        type=segment_type,
     )
 
 
@@ -53,11 +55,13 @@ _MOCK_OFFERS = MappingProxyType({
             key="air_1",
             duration=datetime.timedelta(hours=4),
             departure_at=_OFFER_DATETIME1,
+            segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
         ),
         _mock_offer(
             key="air_2",
             duration=datetime.timedelta(hours=4),
             departure_at=_OFFER_DATETIME2,
+            segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
         ),
     ),
     segment_type_pb2.SEGMENT_TYPE_TRAIN: (
@@ -65,11 +69,13 @@ _MOCK_OFFERS = MappingProxyType({
             key="rail_1",
             duration=datetime.timedelta(hours=1),
             departure_at=_OFFER_DATETIME1,
+            segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
         ),
         _mock_offer(
             key="rail_2",
             duration=datetime.timedelta(hours=1),
             departure_at=_OFFER_DATETIME2,
+            segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
         ),
     ),
 })
@@ -436,8 +442,16 @@ def mono_search_result(mono_route: routes.Route) -> search.SearchResult:
             search.Segment(
                 segment=mono_route.segments[0],
                 offers=[
-                    _mock_offer("air_1", datetime.timedelta(hours=4)),
-                    _mock_offer("air_2", datetime.timedelta(hours=4)),
+                    _mock_offer(
+                        "air_1",
+                        datetime.timedelta(hours=4),
+                        segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+                    ),
+                    _mock_offer(
+                        "air_2",
+                        datetime.timedelta(hours=4),
+                        segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+                    ),
                 ],
             ),
         ],
@@ -451,13 +465,37 @@ def multi_search_result(multi_route: routes.Route) -> search.SearchResult:
     train_offers = []
 
     with freezegun.freeze_time(time_to_freeze=now) as frozen_datetime:
-        air_offers.append(_mock_offer("air_1", datetime.timedelta(hours=4)))
+        air_offers.append(
+            _mock_offer(
+                "air_1",
+                datetime.timedelta(hours=4),
+                segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+            ),
+        )
         frozen_datetime.tick(datetime.timedelta(hours=6))
-        air_offers.append(_mock_offer("air_2", datetime.timedelta(hours=4)))
+        air_offers.append(
+            _mock_offer(
+                "air_2",
+                datetime.timedelta(hours=4),
+                segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+            ),
+        )
         frozen_datetime.move_to(now)
-        train_offers.append(_mock_offer("train_1", datetime.timedelta(hours=1)))
+        train_offers.append(
+            _mock_offer(
+                "train_1",
+                datetime.timedelta(hours=1),
+                segment_type_pb2.SEGMENT_TYPE_TRAIN,
+            ),
+        )
         frozen_datetime.tick(datetime.timedelta(hours=6))
-        train_offers.append(_mock_offer("train_2", datetime.timedelta(hours=1)))
+        train_offers.append(
+            _mock_offer(
+                "train_2",
+                datetime.timedelta(hours=1),
+                segment_type_pb2.SEGMENT_TYPE_TRAIN,
+            ),
+        )
 
     return search.SearchResult(
         route=multi_route,

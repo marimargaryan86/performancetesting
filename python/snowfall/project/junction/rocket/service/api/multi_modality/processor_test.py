@@ -33,6 +33,7 @@ async def _mock_search(request: search.SegmentSearchRequest) -> list[search.Offe
             id="foo",
             departure_at=departure_at,
             arrival_at=departure_at + datetime.timedelta(hours=1),
+            type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
         ),
     ]
 

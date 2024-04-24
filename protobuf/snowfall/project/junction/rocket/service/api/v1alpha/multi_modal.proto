@@ -3,6 +3,7 @@ syntax = "proto3";
 package snowfall.project.junction.rocket.service.api.v1alpha;
 
 import "google/protobuf/timestamp.proto";
+import "snowfall/project/junction/v1/segment_type.proto";
 import "snowfall/stdlib/v1/date.proto";
 import "snowfall/stdlib/v1/datetime.proto";
 
@@ -11,6 +12,11 @@ option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/
 message Suggestion {
   string id = 1;
   string suggestion_search_id = 5;
+  message Offer {
+    string id = 1;
+    snowfall.project.junction.v1.SegmentType segment_type = 2;
+  }
+  repeated Offer offers = 6;
   google.protobuf.Timestamp expires_at = 2;
   google.protobuf.Timestamp created_at = 3;
   google.protobuf.Timestamp updated_at = 4;

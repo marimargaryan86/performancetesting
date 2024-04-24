@@ -7,7 +7,12 @@ import pytest
 from starlette import status
 
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api.multi_modality import repository
+from snowfall.project.junction.rocket.service.api.multi_modality import (
+    repository,
+    search,
+)
+from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.stdlib import string
 
 
 @pytest.fixture()
@@ -77,7 +82,7 @@ def assert_pointer(error: Mapping[str, Any], pointer: str) -> None:
 
 
 class TestGetSuggestion:
-    async def test_unknown_search_id_is_not_found(
+    async def test_unknown_suggestion_id_is_not_found(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -86,16 +91,52 @@ class TestGetSuggestion:
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_known_search_id_is_found(
+    async def test_known_suggestion_id_is_found(
         self,
         client: httpx.AsyncClient,
         suggestion_repository: repository.SuggestionRepository,
     ) -> None:
-        suggestion = await suggestion_repository.create("foo")
+        suggestion = await suggestion_repository.create(
+            "foo",
+            search.Suggestion(offers=[]),
+        )
         response = await client.get(
             url="/journeys/suggestions/{0}".format(suggestion.id),
         )
         assert response.status_code == status.HTTP_200_OK
+
+    async def test_suggestion_has_offers(
+        self,
+        client: httpx.AsyncClient,
+        suggestion_repository: repository.SuggestionRepository,
+        now: datetime.datetime,
+    ) -> None:
+        flight_offer = search.Offer(
+            id=string.uuid(),
+            departure_at=now,
+            arrival_at=now,
+            type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+        )
+        train_offer = search.Offer(
+            id=string.uuid(),
+            departure_at=now,
+            arrival_at=now,
+            type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+        )
+        suggestion = await suggestion_repository.create(
+            "foo",
+            search.Suggestion(offers=[flight_offer, train_offer]),
+        )
+        response = await client.get(
+            url="/journeys/suggestions/{0}".format(suggestion.id),
+        )
+        relationships = response.json()["data"]["relationships"]
+        flight_offers = relationships["flightOffers"]["data"]
+        assert flight_offers
+        assert flight_offers[0]["id"] == flight_offer.id
+        train_offers = relationships["trainOffers"]["data"]
+        assert train_offers
+        assert train_offers[0]["id"] == train_offer.id
 
 
 class TestCreateSuggestionSearch:
