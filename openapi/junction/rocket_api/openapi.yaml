@@ -42,11 +42,11 @@ x-tagGroups:
       - hotel-searches
       - hotel-quotes
       - hotel-bookings
-  - name: Rail
+  - name: Trains
     tags:
-      - rail-searches
-      - rail-quotes
-      - rail-bookings
+      - train-searches
+      - train-quotes
+      - train-bookings
   - name: Places
     tags:
       - places
@@ -115,16 +115,16 @@ tags:
       you to find these locations and identify which verticals you can search
       with them.
     x-displayName: Places
-  - name: rail-bookings
+  - name: train-bookings
     description: 'TODO: ...'
     x-displayName: Bookings
-  - name: rail-quotes
+  - name: train-quotes
     description: 'TODO: ...'
     x-displayName: Quotes
-  - name: rail-searches
+  - name: train-searches
     description: >-
-      TODO: To search for rail, you'll need to create a rail search request. A
-      rail search request describes the passengers and where and when they want
+      TODO: To search for trains, you'll need to create a train search request. A
+      train search request describes the passengers and where and when they want
       to travel.
     x-displayName: Searches
 paths:
@@ -816,13 +816,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
-  /rail/searches:
+  /trains/searches:
     post:
-      summary: Create rail search
-      operationId: post-rail-searches
-      description: Used to initiate a Rail Search
+      summary: Create train search
+      operationId: post-trains-searches
+      description: Used to initiate a Train Search
       tags:
-        - rail-searches
+        - train-searches
       requestBody:
         required: true
         content:
@@ -831,7 +831,7 @@ paths:
               type: object
               properties:
                 data:
-                  $ref: '#/components/schemas/RailSearch'
+                  $ref: '#/components/schemas/TrainSearch'
       responses:
         '201':
           description: Created
@@ -841,7 +841,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/RailSearch'
+                    $ref: '#/components/schemas/TrainSearch'
                 required:
                   - data
         '400':
@@ -850,15 +850,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
-  /rail/searches/{searchId}:
+  /trains/searches/{searchId}:
     parameters:
       - $ref: '#/components/parameters/searchId'
     get:
-      summary: Get rail search
-      operationId: get-rail-searches-id
-      description: Used to retrieve a Rail Search by ID
+      summary: Get train search
+      operationId: get-trains-searches-id
+      description: Used to retrieve a Train Search by ID
       tags:
-        - rail-searches
+        - train-searches
       responses:
         '200':
           description: OK
@@ -869,23 +869,23 @@ paths:
                 properties:
                   data:
                     oneOf:
-                      - $ref: '#/components/schemas/RailSearch'
+                      - $ref: '#/components/schemas/TrainSearch'
                 required:
                   - data
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-  /rail/searches/{searchId}/results:
+  /trains/searches/{searchId}/results:
     parameters:
       - $ref: '#/components/parameters/searchId'
       - $ref: '#/components/parameters/searchResultInclude'
     get:
-      summary: List rail search results
-      operationId: get-rail-searches-id-results
-      description: Used to retrieve Search Results for a Rail Search ID
+      summary: List train search results
+      operationId: get-trains-searches-id-results
+      description: Used to retrieve Search Results for a Train Search ID
       tags:
-        - rail-searches
+        - train-searches
       parameters:
         - $ref: '#/components/parameters/page-cursor'
         - $ref: '#/components/parameters/page-limit'
@@ -903,9 +903,9 @@ paths:
                         minItems: 0
                         uniqueItems: true
                         items:
-                          $ref: '#/components/schemas/RailSearchResult'
+                          $ref: '#/components/schemas/TrainSearchResult'
                       included:
-                        $ref: '#/components/schemas/RailSearchResultIncluded'
+                        $ref: '#/components/schemas/TrainSearchResultIncluded'
                     required:
                       - data
                   - $ref: '#/components/schemas/NextLink'
@@ -2368,7 +2368,7 @@ components:
                     data:
                       type: array
                       items:
-                        $ref: '#/components/schemas/RailOfferIdentifier'
+                        $ref: '#/components/schemas/TrainOfferIdentifier'
                   required:
                     - data
               required:
@@ -2720,431 +2720,16 @@ components:
       required:
         - price
         - breakdownType
-    RailCabinDetails:
-      title: Rail Cabin Details
-      type: object
-      required:
-        - cabinType
-        - marketingName
-        - resultDetail
-      properties:
-        resultDetail:
-          type: string
-          description: The Result Detail ID related to this rail cabin detail
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        cabinType:
-          type: string
-          description: The Junction defined class of service for the cabin
-          enum:
-            - unspecified
-            - economy
-            - premium
-            - business
-            - first
-          example: economy
-        marketingName:
-          type: string
-          description: The operator defined branding name for the cabin
-          example: Comfort
-    RailOffer:
-      title: Rail Offer
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Rail Offer object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-          readOnly: true
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - rail-offers
-          example: rail-offers
-        attributes:
-          type: object
-          description: The properties that define a Rail Offer object
-          required:
-            - price
-            - priceBreakdown
-            - cabinDetails
-          properties:
-            price:
-              $ref: '#/components/schemas/Price'
-            priceBreakdown:
-              type: array
-              description: >-
-                A list of Price Breakdown objects that indicates the various
-                fees and charges that make up the total price
-              items:
-                $ref: '#/components/schemas/PriceBreakdown'
-            cabinDetails:
-              type: array
-              description: >-
-                The list of cabin information relating to each result detail of
-                the rail offer
-              items:
-                $ref: '#/components/schemas/RailCabinDetails'
-      required:
-        - id
-        - type
-        - attributes
-    RailOfferIdentifier:
-      title: Rail Offer Identifier
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Rail Offer object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - rail-offers
-          example: rail-offers
-      required:
-        - id
-        - type
-    RailResultDetail:
-      title: Rail Result Detail
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Rail Result Detail object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-          readOnly: true
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - rail-result-details
-          example: rail-result-details
-        attributes:
-          type: object
-          description: The properties that define a Rail Result Detail object
-          required:
-            - origin
-            - destination
-            - departureAt
-            - arrivalAt
-            - outboundSegment
-            - segmentSequence
-          properties:
-            origin:
-              $ref: '#/components/schemas/Coordinates'
-            destination:
-              $ref: '#/components/schemas/Coordinates'
-            departureAt:
-              type: string
-              description: >-
-                The departure date time for the rail result detail in [RFC
-                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-              format: date-time
-              example: '2019-08-24T14:15:22Z'
-            arrivalAt:
-              type: string
-              description: >-
-                The arrival date time for the rail result detail in [RFC
-                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-              format: date-time
-              example: '2019-08-24T14:15:22Z'
-            outboundSegment:
-              type: boolean
-              description: >-
-                A flag indicating whether this rail result detail represents the
-                outbound or inbound segment of a trip
-              example: true
-            segmentSequence:
-              type: integer
-              description: >-
-                A sequence value indicating the stage of a full trip that this
-                rail result detail represents
-              minimum: 1
-              example: 1
-      required:
-        - id
-        - type
-        - attributes
-    RailResultDetailIdentifier:
-      title: Rail Result Detail Identifier
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Rail Result Detail object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - rail-result-details
-          example: rail-result-details
-      required:
-        - id
-        - type
-    RailSearch:
-      title: Rail Search
-      x-tags:
-        - rail-searches
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              description: >-
-                Unique identifier (UUID) for the Rail Search object in [RFC
-                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              description: The Junction resource type
-              enum:
-                - rail-searches
-              example: rail-searches
-            attributes:
-              type: object
-              description: The properties that define a Rail Search object
-              required:
-                - expiresAt
-                - status
-                - departureAfter
-                - passengers
-              properties:
-                expiresAt:
-                  type: string
-                  description: >-
-                    The time at which the object will expire in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-                  format: date-time
-                  readOnly: true
-                  example: '2019-08-24T14:15:22Z'
-                status:
-                  type: string
-                  description: The status of the Rail Search
-                  readOnly: true
-                  enum:
-                    - unspecified
-                    - pending
-                    - processing
-                    - completed
-                    - failed
-                  example: completed
-                departureAfter:
-                  type: string
-                  description: >-
-                    The requested departure after date time for the rail search in
-                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
-                    format
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                departureBefore:
-                  type: string
-                  description: >-
-                    The requested departure before date time for the rail search
-                    in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
-                    format. This is optional but can be used to provide the
-                    ability to specify that the travelers would prefer to depart
-                    before a specific time
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                returnAt:
-                  type: string
-                  description: >-
-                    The requested return date time for the rail search in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format.
-                    Only required if performing a round trip search
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                passengers:
-                  type: array
-                  description: >-
-                    The list of passengers that will travel on the requested
-                    rail search
-                  items:
-                    $ref: '#/components/schemas/Passenger'
-                  minItems: 1
-            relationships:
-              type: object
-              description: The Junction resources related to this Rail Search object
-              required:
-                - origin
-                - destination
-              properties:
-                selectedOutboundOffer:
-                  type: object
-                  description: >-
-                    The selected outbound Offer ID for use when performing the
-                    inbound search on a roundtrip. Not required for one-way
-                    scenarios
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/RailOfferIdentifier'
-                origin:
-                  type: object
-                  description: >-
-                    The Junction Place ID that represents the origin location for
-                    the rail search
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/PlaceIdentifier'
-                destination:
-                  type: object
-                  description: >-
-                    The Junction Place ID that represents the destination location
-                    for the rail search
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/PlaceIdentifier'
-          required:
-            - id
-            - type
-            - attributes
-            - relationships
-        - $ref: '#/components/schemas/SelfLink'
-    RailSearchIdentifier:
-      title: Rail Search Identifier
-      description: A unique identifier for rail search.
-      type: object
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Rail Search object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - rail-searches
-          example: rail-searches
-      required:
-        - id
-        - type
-    RailSearchResult:
-      title: Rail Search Result
-      type: object
-      x-tags:
-        - rail-searches
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Rail Search Result object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-          readOnly: true
-        type:
-          type: string
-          description: The Junction sesource type
-          enum:
-            - rail-search-results
-          example: rail-search-results
-        attributes:
-          type: object
-          description: The properties that define a Rail Search Result object
-          required:
-            - expiresAt
-          properties:
-            expiresAt:
-              type: string
-              description: >-
-                The time at which the object will expire in [RFC
-                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-              format: date-time
-              example: '2019-08-24T14:15:22Z'
-              readOnly: true
-        relationships:
-          type: object
-          description: The Junction resources related to this Rail Search Result object
-          required:
-            - offers
-            - resultDetails
-            - search
-          properties:
-            offers:
-              type: object
-              description: >-
-                The list of Rail Offer IDs associated with this rail search
-                result
-              required:
-                - data
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/RailOfferIdentifier'
-            resultDetails:
-              type: object
-              description: >-
-                The list of Rail Result Detail IDs associated with this rail
-                search result
-              required:
-                - data
-              properties:
-                data:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/RailResultDetailIdentifier'
-            search:
-              type: object
-              description: The Rail Search ID that this rail search result belongs to
-              required:
-                - data
-              properties:
-                data:
-                  $ref: '#/components/schemas/RailSearchIdentifier'
-      required:
-        - id
-        - type
-        - attributes
-        - relationships
-    RailSearchResultIncluded:
-      title: Rail Search Result Included
-      type: array
-      items:
-        oneOf:
-          - $ref: '#/components/schemas/RailOffer'
-          - $ref: '#/components/schemas/RailResultDetail'
-        discriminator:
-          propertyName: type
-          mapping:
-            rail-offers: '#/components/schemas/RailOffer'
-            rail-result-details: '#/components/schemas/RailResultDetail'
     SearchCapabilities:
       type: object
       title: Search Capabilities
       description: >-
         Represents which verticals the Place will be supported within a search for.
       properties:
-        rail:
+        train:
           type: boolean
           description: >-
-            Indicates whether rail searches support this Place
+            Indicates whether train searches support this Place
           example: false
         air:
           type: boolean
@@ -3157,7 +2742,7 @@ components:
             Indicates whether ferry searches support this Place
           example: false
       required:
-        - rail
+        - train
         - air
         - ferry
     SelfLink:
@@ -3182,6 +2767,421 @@ components:
           readOnly: true
       required:
         - links
+    TrainCabinDetails:
+      title: Train Cabin Details
+      type: object
+      required:
+        - cabinType
+        - marketingName
+        - resultDetail
+      properties:
+        resultDetail:
+          type: string
+          description: The Result Detail ID related to this train cabin detail
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        cabinType:
+          type: string
+          description: The Junction defined class of service for the cabin
+          enum:
+            - unspecified
+            - economy
+            - premium
+            - business
+            - first
+          example: economy
+        marketingName:
+          type: string
+          description: The operator defined branding name for the cabin
+          example: Comfort
+    TrainOffer:
+      title: Train Offer
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - train-offers
+          example: train-offers
+        attributes:
+          type: object
+          description: The properties that define a Train Offer object
+          required:
+            - price
+            - priceBreakdown
+            - cabinDetails
+          properties:
+            price:
+              $ref: '#/components/schemas/Price'
+            priceBreakdown:
+              type: array
+              description: >-
+                A list of Price Breakdown objects that indicates the various
+                fees and charges that make up the total price
+              items:
+                $ref: '#/components/schemas/PriceBreakdown'
+            cabinDetails:
+              type: array
+              description: >-
+                The list of cabin information relating to each result detail of
+                the train offer
+              items:
+                $ref: '#/components/schemas/TrainCabinDetails'
+      required:
+        - id
+        - type
+        - attributes
+    TrainOfferIdentifier:
+      title: Train Offer Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - train-offers
+          example: train-offers
+      required:
+        - id
+        - type
+    TrainResultDetail:
+      title: Train Result Detail
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - train-result-details
+          example: train-result-details
+        attributes:
+          type: object
+          description: The properties that define a Train Result Detail object
+          required:
+            - origin
+            - destination
+            - departureAt
+            - arrivalAt
+            - outboundSegment
+            - segmentSequence
+          properties:
+            origin:
+              $ref: '#/components/schemas/Coordinates'
+            destination:
+              $ref: '#/components/schemas/Coordinates'
+            departureAt:
+              type: string
+              description: >-
+                The departure date time for the train result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            arrivalAt:
+              type: string
+              description: >-
+                The arrival date time for the train result detail in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+            outboundSegment:
+              type: boolean
+              description: >-
+                A flag indicating whether this train result detail represents the
+                outbound or inbound segment of a trip
+              example: true
+            segmentSequence:
+              type: integer
+              description: >-
+                A sequence value indicating the stage of a full trip that this
+                train result detail represents
+              minimum: 1
+              example: 1
+      required:
+        - id
+        - type
+        - attributes
+    TrainResultDetailIdentifier:
+      title: Train Result Detail Identifier
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - train-result-details
+          example: train-result-details
+      required:
+        - id
+        - type
+    TrainSearch:
+      title: Train Search
+      x-tags:
+        - train-searches
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Train Search object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - train-searches
+              example: train-searches
+            attributes:
+              type: object
+              description: The properties that define a Train Search object
+              required:
+                - expiresAt
+                - status
+                - departureAfter
+                - passengers
+              properties:
+                expiresAt:
+                  type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                status:
+                  type: string
+                  description: The status of the Train Search
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                departureAfter:
+                  type: string
+                  description: >-
+                    The requested departure after date time for the train search in
+                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
+                    format
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                departureBefore:
+                  type: string
+                  description: >-
+                    The requested departure before date time for the train search
+                    in [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339)
+                    format. This is optional but can be used to provide the
+                    ability to specify that the travelers would prefer to depart
+                    before a specific time
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnAt:
+                  type: string
+                  description: >-
+                    The requested return date time for the train search in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format.
+                    Only required if performing a round trip search
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                passengers:
+                  type: array
+                  description: >-
+                    The list of passengers that will travel on the requested
+                    train search
+                  items:
+                    $ref: '#/components/schemas/Passenger'
+                  minItems: 1
+            relationships:
+              type: object
+              description: The Junction resources related to this Train Search object
+              required:
+                - origin
+                - destination
+              properties:
+                selectedOutboundOffer:
+                  type: object
+                  description: >-
+                    The selected outbound Offer ID for use when performing the
+                    inbound search on a roundtrip. Not required for one-way
+                    scenarios
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/TrainOfferIdentifier'
+                origin:
+                  type: object
+                  description: >-
+                    The Junction Place ID that represents the origin location for
+                    the train search
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                destination:
+                  type: object
+                  description: >-
+                    The Junction Place ID that represents the destination location
+                    for the train search
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+          required:
+            - id
+            - type
+            - attributes
+            - relationships
+        - $ref: '#/components/schemas/SelfLink'
+    TrainSearchIdentifier:
+      title: Train Search Identifier
+      description: A unique identifier for train search.
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Search object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - train-searches
+          example: train-searches
+      required:
+        - id
+        - type
+    TrainSearchResult:
+      title: Train Search Result
+      type: object
+      x-tags:
+        - train-searches
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Search Result object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction sesource type
+          enum:
+            - train-search-results
+          example: train-search-results
+        attributes:
+          type: object
+          description: The properties that define a Train Search Result object
+          required:
+            - expiresAt
+          properties:
+            expiresAt:
+              type: string
+              description: >-
+                The time at which the object will expire in [RFC
+                3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+              format: date-time
+              example: '2019-08-24T14:15:22Z'
+              readOnly: true
+        relationships:
+          type: object
+          description: The Junction resources related to this Train Search Result object
+          required:
+            - offers
+            - resultDetails
+            - search
+          properties:
+            offers:
+              type: object
+              description: >-
+                The list of Train Offer IDs associated with this train search
+                result
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TrainOfferIdentifier'
+            resultDetails:
+              type: object
+              description: >-
+                The list of Train Result Detail IDs associated with this train
+                search result
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/TrainResultDetailIdentifier'
+            search:
+              type: object
+              description: The Train Search ID that this train search result belongs to
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/TrainSearchIdentifier'
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+    TrainSearchResultIncluded:
+      title: Train Search Result Included
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/TrainOffer'
+          - $ref: '#/components/schemas/TrainResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            train-offers: '#/components/schemas/TrainOffer'
+            train-result-details: '#/components/schemas/TrainResultDetail'
   responses:
     BadRequest:
       description: Bad Request

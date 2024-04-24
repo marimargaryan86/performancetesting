@@ -8,14 +8,14 @@ from starlette import status
 from snowfall.project.junction.rocket import fixtures
 
 
-class TestRailCreateSearch:
+class TestTrainCreateSearch:
     @property
     def search_payload(self) -> Mapping[str, Any]:
         tomorrow = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
         after_tomorrow = tomorrow + datetime.timedelta(days=1)
         return {
             "data": {
-                "type": "rail-searches",
+                "type": "train-searches",
                 "attributes": {
                     "departureAfter": tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
                     "returnAt": after_tomorrow.strftime("%Y-%m-%dT08:00:00.000Z"),
@@ -38,12 +38,12 @@ class TestRailCreateSearch:
             },
         }
 
-    async def test_create_rail_search_is_successful(
+    async def test_create_trains_search_is_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.post(
-            "/rail/searches",
+            "/trains/searches",
             json=self.search_payload,
             headers={"Content-Type": "application/vnd.api+json"},
         )
@@ -51,7 +51,7 @@ class TestRailCreateSearch:
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["data"]["id"]
 
-    async def test_create_rail_search_fails_when_origin_does_not_exist(
+    async def test_create_trains_search_fails_when_origin_does_not_exist(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -61,7 +61,7 @@ class TestRailCreateSearch:
 
         await self._assert_unprocessable_entity(client, payload)
 
-    async def test_create_rail_search_fails_when_destination_does_not_exist(
+    async def test_create_trains_search_fails_when_destination_does_not_exist(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -71,7 +71,7 @@ class TestRailCreateSearch:
 
         await self._assert_unprocessable_entity(client, payload)
 
-    async def test_create_rail_search_departure_after_in_past_throws_bad_request(
+    async def test_create_trains_search_departure_after_in_past_throws_bad_request(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -80,7 +80,7 @@ class TestRailCreateSearch:
 
         await self._assert_unprocessable_entity(client, payload)
 
-    async def test_create_rail_search_return_at_in_past_throws_bad_request(
+    async def test_create_trains_search_return_at_in_past_throws_bad_request(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -89,7 +89,7 @@ class TestRailCreateSearch:
 
         await self._assert_unprocessable_entity(client, payload)
 
-    async def test_create_rail_search_return_at_before_departure_at_throws_bad_request(
+    async def test_create_trains_search_return_at_before_departure_at_throws_bad_request(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -101,7 +101,7 @@ class TestRailCreateSearch:
 
         await self._assert_unprocessable_entity(client, payload)
 
-    async def test_create_rail_search_departure_before_in_past_throws_bad_request(
+    async def test_create_trains_search_departure_before_in_past_throws_bad_request(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -110,7 +110,7 @@ class TestRailCreateSearch:
 
         await self._assert_unprocessable_entity(client, payload)
 
-    async def test_create_rail_search_return_at_before_departure_before_throws_bad_request(
+    async def test_create_trains_search_return_at_before_departure_before_throws_bad_request(
         self,
         client: httpx.AsyncClient,
     ) -> None:
@@ -130,44 +130,44 @@ class TestRailCreateSearch:
         payload: Mapping[str, Any],
     ) -> None:
         response = await client.post(
-            "/rail/searches",
+            "/trains/searches",
             json=payload,
         )
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-class TestRailGetSearch:
-    async def test_get_rail_search_should_fail_when_unauthorized(
+class TestTrainGetSearch:
+    async def test_get_trains_search_should_fail_when_unauthorized(
         self,
         unauthorized_client: httpx.AsyncClient,
     ) -> None:
         response = await unauthorized_client.get(
-            "/rail/searches/{searchId}".format(
+            "/trains/searches/{searchId}".format(
                 searchId=fixtures.RAIL_SEARCH_ID,
             ),
         )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    async def test_get_rail_search_should_fail_when_not_existing_search_id_provided(
+    async def test_get_trains_search_should_fail_when_not_existing_search_id_provided(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/rail/searches/{searchId}".format(
+            "/trains/searches/{searchId}".format(
                 searchId=fixtures.NOT_FOUND,
             ),
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    async def test_get_rail_search_is_successful(
+    async def test_get_trains_search_is_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/rail/searches/{searchId}".format(
+            "/trains/searches/{searchId}".format(
                 searchId=fixtures.RAIL_SEARCH_ID,
             ),
         )
@@ -175,13 +175,13 @@ class TestRailGetSearch:
         assert response.status_code == status.HTTP_200_OK
 
 
-class TestRailListSearchResults:
-    async def test_list_rail_search_results_successful(
+class TestTrainListSearchResults:
+    async def test_list_trains_search_results_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/rail/searches/{searchId}/results".format(
+            "/trains/searches/{searchId}/results".format(
                 searchId=fixtures.RAIL_SEARCH_ID,
             ),
         )
@@ -190,12 +190,12 @@ class TestRailListSearchResults:
         results = response.json()
         assert len(results["data"]) == 2
 
-    async def test_list_rail_search_results_with_includes_successful(
+    async def test_list_trains_search_results_with_includes_successful(
         self,
         client: httpx.AsyncClient,
     ) -> None:
         response = await client.get(
-            "/rail/searches/{searchId}/results".format(
+            "/trains/searches/{searchId}/results".format(
                 searchId=fixtures.RAIL_SEARCH_ID,
             ),
             params={"include": "offers,resultDetails"},
@@ -206,5 +206,5 @@ class TestRailListSearchResults:
         assert len(results["data"]) == 2
 
         included_types = [resource["type"] for resource in results["included"]]
-        assert "rail-offers" in included_types
-        assert "rail-result-details" in included_types
+        assert "train-offers" in included_types
+        assert "train-result-details" in included_types

@@ -66,6 +66,6 @@ class SearchRequestValidator(validation.RequestValidator):
 
         elif not place.search_capabilities.rail:
             self.capture_error(
-                "Provided `{0}` doesn't support rail search".format(field_name),
+                "Provided `{0}` doesn't support train search".format(field_name),
                 "relationships/{0}".format(field_name),
             )

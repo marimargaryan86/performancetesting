@@ -7,8 +7,8 @@ from starlette import requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import models as api_models
 from snowfall.project.junction.rocket.service.api.places.models import places
-from snowfall.project.junction.rocket.service.api.rail.models import (
-    searches as rail_models,
+from snowfall.project.junction.rocket.service.api.trains.models import (
+    searches as train_models,
 )
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.v1 import segment_type_pb2
@@ -67,7 +67,7 @@ class Suggestion(std_models.Resource):
                     data=[
                         std_models.ResourceIdentifier(
                             id=train_offer.id,
-                            type=rail_models.OfferResource.api_type,
+                            type=train_models.OfferResource.api_type,
                         )
                         for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
                     ],

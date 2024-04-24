@@ -49,7 +49,7 @@ class TestGetPlace:
         assert response_data["id"] == fixtures.PLACES[0]
         assert search_capabilities["air"] is True
         assert search_capabilities["ferry"] is False
-        assert search_capabilities["rail"] is True
+        assert search_capabilities["train"] is True
         assert "city" in response_data["relationships"]
         assert "contains" in response_data["relationships"]
 
@@ -122,6 +122,6 @@ class TestGetPlaces:
     def _validate_place(self, place: Mapping[str, Any]) -> None:
         search_capabilities = place["attributes"]["searchCapabilities"]
         assert place["id"] == fixtures.PLACES[0]
-        assert search_capabilities == {"air": True, "ferry": False, "rail": True}
+        assert search_capabilities == {"air": True, "ferry": False, "train": True}
         assert "city" in place["relationships"]
         assert "contains" in place["relationships"]

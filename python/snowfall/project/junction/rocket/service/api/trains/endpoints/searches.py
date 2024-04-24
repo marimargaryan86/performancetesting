@@ -3,12 +3,11 @@ from collections.abc import Sequence
 
 import grpc
 import lagom
-import timezonefinder
 from starlette import endpoints, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import errors
-from snowfall.project.junction.rocket.service.api.rail.endpoints import validation
-from snowfall.project.junction.rocket.service.api.rail.models import (
+from snowfall.project.junction.rocket.service.api.trains.endpoints import validation
+from snowfall.project.junction.rocket.service.api.trains.models import (
     searches as search_models,
 )
 from snowfall.project.junction.rocket.service.places.v1alpha import (
@@ -32,11 +31,10 @@ from snowfall.stdlib.integration.starlette import (
     request_helpers,
 )
 
-_tz_finder = timezonefinder.TimezoneFinder()
 _IncludesType = search_models.ResultDetailResource | search_models.OfferResource
 
 
-class RailSearch(endpoints.HTTPEndpoint):
+class TrainSearch(endpoints.HTTPEndpoint):
     @errors.handle_grpc_errors
     async def post(
         self,
@@ -97,7 +95,7 @@ class RailSearch(endpoints.HTTPEndpoint):
 
         return await messages.create_response(
             body=models.Body(
-                data=search_models.RailSearchResource.from_proto(
+                data=search_models.TrainSearchResource.from_proto(
                     response.search,
                     request,
                 ),
@@ -121,7 +119,7 @@ class RailSearch(endpoints.HTTPEndpoint):
 
         return await messages.create_response(
             body=models.Body(
-                data=search_models.RailSearchResource.from_proto(
+                data=search_models.TrainSearchResource.from_proto(
                     response.search,
                     request,
                 ),
@@ -148,7 +146,7 @@ class RailSearch(endpoints.HTTPEndpoint):
             raise
 
 
-class RailSearchResults(endpoints.HTTPEndpoint):
+class TrainSearchResults(endpoints.HTTPEndpoint):
     @errors.handle_grpc_errors
     async def get(
         self,
@@ -179,7 +177,7 @@ class RailSearchResults(endpoints.HTTPEndpoint):
                 ],
                 links=pagination_helpers.get_next_url(
                     request.url_for(
-                        "ListRailSearchResults",
+                        "ListTrainsSearchResults",
                         searchId=search_id,
                     ),
                     items_page.cursor,

@@ -16,18 +16,18 @@ from snowfall.stdlib.v1 import amqp_pb2
 _SELF_HREF: typing.Literal["self"] = "self"
 
 
-class RailSearchResource(models.Resource):
-    api_type: typing.ClassVar[str] = "rail-searches"
+class TrainSearchResource(models.Resource):
+    api_type: typing.ClassVar[str] = "train-searches"
 
     @classmethod
     def from_proto(
         cls,
         search: models_pb2.Search,
         request: requests.Request,
-    ) -> RailSearchResource:
+    ) -> TrainSearchResource:
         res = cls(
             id=search.id,
-            type=RailSearchResource.api_type,
+            type=TrainSearchResource.api_type,
             attributes={
                 "departureAfter": protobuf.protobuf_to_datetime(
                     search.rail.departure_after,
@@ -63,7 +63,7 @@ class RailSearchResource(models.Resource):
             links={
                 _SELF_HREF: str(
                     request.url_for(
-                        "ViewRailSearch",
+                        "ViewTrainsSearch",
                         searchId=search.id,
                     ),
                 ),
@@ -114,7 +114,7 @@ class CabinDetails(models.BaseModel):
 
 
 class OfferResource(models.Resource):
-    api_type: typing.ClassVar[str] = "rail-offers"
+    api_type: typing.ClassVar[str] = "train-offers"
 
     @classmethod
     def from_proto(cls, offer: models_pb2.Offer) -> OfferResource:
@@ -136,7 +136,7 @@ class OfferResource(models.Resource):
 
 
 class ResultDetailResource(models.Resource):
-    api_type: typing.ClassVar[str] = "rail-result-details"
+    api_type: typing.ClassVar[str] = "train-result-details"
 
     @classmethod
     def from_proto(cls, result_detail: models_pb2.ResultDetail) -> ResultDetailResource:
@@ -165,7 +165,7 @@ class ResultDetailResource(models.Resource):
 
 
 class SearchResultResource(models.Resource):
-    api_type: typing.ClassVar[str] = "rail-search-results"
+    api_type: typing.ClassVar[str] = "train-search-results"
 
     @classmethod
     def from_proto(cls, search_result: models_pb2.SearchResult) -> SearchResultResource:
@@ -197,7 +197,7 @@ class SearchResultResource(models.Resource):
                 "search": {
                     "data": models.ResourceIdentifier(
                         id=search_result.search_id,
-                        type=RailSearchResource.api_type,
+                        type=TrainSearchResource.api_type,
                     ),
                 },
             },
