@@ -1,4 +1,5 @@
 import asyncio
+import zoneinfo
 from collections.abc import Mapping, Sequence
 
 from starlette import exceptions, status
@@ -122,15 +123,17 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
 def _transform_result_detail(
     segment: safej1.Segment,
     result_detail_id: str,
+    origin_timezone: zoneinfo.ZoneInfo,
+    destination_timezone: zoneinfo.ZoneInfo,
 ) -> rocket.ResultDetails:
     return rocket.ResultDetails(
         id=result_detail_id,
         flight_number=segment.flight_number,
         marketing_airline=segment.airline,
         arrival_station=segment.arrival_station,
-        arrival_at=segment.arrival_time,
+        arrival_at=segment.arrival_time.replace(tzinfo=destination_timezone),
         departure_station=segment.departure_station,
-        departure_at=segment.departure_time,
+        departure_at=segment.departure_time.replace(tzinfo=origin_timezone),
         duration=segment.duration,
         segment_key=segment.segment_key,
         operating_airline=segment.operating_airline or segment.airline,
@@ -165,14 +168,22 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
         result_details = []
         result_detail_id_from_segments = {}
 
-        if not offer.od_id:
-            raise ValueError
-
+        airport_timezones = {
+            key: zoneinfo.ZoneInfo(airport.timezone)
+            for key, airport in j1_response.airports.items()
+        }
         full_trip = j1_response.ods[offer.od_id]
         for segment in full_trip.segments:
             result_detail_id = string.uuid()
             full_segment = j1_response.segments[segment]
-            result_detail = _transform_result_detail(full_segment, result_detail_id)
+            origin_timezone = airport_timezones[full_segment.departure_station]
+            destination_timezone = airport_timezones[full_segment.arrival_station]
+            result_detail = _transform_result_detail(
+                full_segment,
+                result_detail_id,
+                origin_timezone,
+                destination_timezone,
+            )
             result_details.append(result_detail)
             result_detail_id_from_segments[segment] = result_detail_id
 
