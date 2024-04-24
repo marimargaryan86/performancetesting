@@ -2,9 +2,8 @@ import asyncio
 import dataclasses
 import datetime
 import itertools
-import zoneinfo
 from collections.abc import Awaitable, Callable, Iterable, Sequence
-from typing import Protocol, Self, TypeAlias, TypeGuard
+from typing import TypeAlias
 
 from snowfall.project.junction.rocket.service.api.air import models, repositories
 from snowfall.project.junction.rocket.service.api.air.transforms import transforms
@@ -114,103 +113,6 @@ SearchImplementations: TypeAlias = Iterable[
 ]
 
 
-class _SafeJ1Airport(Protocol):
-    timezone: str
-
-
-class _SafeJ1Offer(Protocol):
-    od_id: str
-
-
-class _SafeJ1OriginDestination(Protocol):
-    departure_station: str
-    arrival_station: str
-    departure_time: datetime.datetime
-    arrival_time: datetime.datetime
-
-    @classmethod
-    def is_safe(cls, response: j1_models.OriginDestination) -> TypeGuard[Self]:
-        return (
-            response.departure_station is not None
-            and response.arrival_station is not None
-            and response.departure_time is not None
-            and response.arrival_time is not None
-        )
-
-
-class _SafeJ1Response(Protocol):
-    airports: dict[str, _SafeJ1Airport]
-    ods: dict[str, _SafeJ1OriginDestination]
-    offers: list[_SafeJ1Offer]
-
-    @classmethod
-    def is_safe(cls, response: j1_models.SearchFlightsResponse) -> TypeGuard[Self]:
-        return (
-            all(offer.od_id is not None for offer in response.offers)
-            and all(
-                airport.timezone is not None for airport in response.airports.values()
-            )
-            and all(
-                _SafeJ1OriginDestination.is_safe(ond) for ond in response.ods.values()
-            )
-        )
-
-
-@dataclasses.dataclass(frozen=True)
-class AirSearchResponse:
-    _search_id: str
-    _airports: dict[str, zoneinfo.ZoneInfo]
-    _ods: dict[str, _SafeJ1OriginDestination]
-    _offers: list[_SafeJ1Offer]
-
-    @classmethod
-    def from_response(
-        cls,
-        search_id: str,
-        response: j1_models.SearchFlightsResponse,
-    ) -> Self:
-        if not _SafeJ1Response.is_safe(response):
-            raise UnusableResponseError("Response is missing offers.")
-
-        airports = {
-            key: zoneinfo.ZoneInfo(airport.timezone)
-            for key, airport in response.airports.items()
-        }
-
-        return cls(
-            _search_id=search_id,
-            _airports=airports,
-            _ods=response.ods,
-            _offers=response.offers,
-        )
-
-    def to_offers(self) -> list[Offer]:
-        return list(
-            itertools.chain.from_iterable([
-                self._transform_j1_offer(offer) for offer in self._offers
-            ]),
-        )
-
-    def _transform_j1_offer(
-        self,
-        offer: _SafeJ1Offer,
-    ) -> list[Offer]:
-        ond = self._ods[offer.od_id]
-        origin_timezone = self._airports[ond.departure_station]
-        destination_timezone = self._airports[ond.arrival_station]
-        departure_at = ond.departure_time.replace(tzinfo=origin_timezone)
-        arrival_at = ond.arrival_time.replace(tzinfo=destination_timezone)
-
-        return [
-            Offer(
-                id=self._search_id,
-                departure_at=departure_at,
-                arrival_at=arrival_at,
-                type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
-            ),
-        ]
-
-
 class AirSearcher:
     def __init__(
         self,
@@ -238,12 +140,11 @@ class AirSearcher:
         search_results = self._j1_transformer.transform(response, search_id)
         await asyncio.gather(*(self._repository.insert(doc) for doc in search_results))
 
-        search_model = AirSearchResponse.from_response(
-            search_id=search_results[0].id,
-            response=response,
+        return list(
+            itertools.chain.from_iterable([
+                self._transform_result(result) for result in search_results
+            ]),
         )
-
-        return search_model.to_offers()
 
     async def _find_results(
         self,
@@ -272,6 +173,23 @@ class AirSearcher:
                 for date_of_birth in request.date_of_births
             ]),
         )
+
+    def _transform_result(
+        self,
+        result: models.AirSearchResult,
+    ) -> list[Offer]:
+        departure_at = result.result_details[0].departure_at
+        arrival_at = result.result_details[-1].arrival_at
+
+        return [
+            Offer(
+                id=offer.id,
+                departure_at=departure_at,
+                arrival_at=arrival_at,
+                type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+            )
+            for offer in result.offers
+        ]
 
 
 class RailSearcher:
