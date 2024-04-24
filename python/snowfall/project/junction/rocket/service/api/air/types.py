@@ -12,8 +12,9 @@ class AirSearchResultTransformer(ABC):
     def transform(
         self,
         value: j1.SearchFlightsResponse,
+        search_id: str,
     ) -> list[AirSearchResult]:
-        "Transform."
+        "Transform results from j1 into a list of Rocket AirSearchResults."
 
 
 class AirSearchRequestTransformer(ABC):

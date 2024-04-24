@@ -21,6 +21,7 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import (
     models_pb2 as searches_pb2,
 )
 from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.v1 import amqp_pb2
@@ -233,7 +234,8 @@ class AirSearcher:
         ):
             response = await self._find_results(request)
 
-        search_results = self._j1_transformer.transform(response)
+        search_id = string.uuid()
+        search_results = self._j1_transformer.transform(response, search_id)
         await asyncio.gather(*(self._repository.insert(doc) for doc in search_results))
 
         search_model = AirSearchResponse.from_response(

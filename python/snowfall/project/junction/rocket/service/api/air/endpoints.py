@@ -18,7 +18,7 @@ from snowfall.project.junction.rocket.service.api.air.types import (
     AirSearchRequestTransformer,
     AirSearchResultTransformer,
 )
-from snowfall.stdlib import sequence
+from snowfall.stdlib import sequence, string
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
@@ -61,6 +61,7 @@ class AirSearch(endpoints.HTTPEndpoint):
     ) -> responses.Response:
         reseller_id = request.user.username
         request_data = await request.json()
+        search_id = string.uuid()
 
         search_request = AirSearchRequest(**request_data)
         if is_inbound(search_request):
@@ -82,9 +83,11 @@ class AirSearch(endpoints.HTTPEndpoint):
                 search_request,
             )
         j1_search_response = await junction_one_client.search_flights(query)
-        transformed = air_search_result_transformer.transform(j1_search_response)
+        transformed = air_search_result_transformer.transform(
+            j1_search_response,
+            search_id,
+        )
 
-        search_id = transformed[0].search_id
         insert_response = await requests_repo.insert(
             AirSearchRequestStorage(
                 search_id=search_id,

@@ -87,8 +87,8 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
     def transform(
         self,
         j1_response: j1.SearchFlightsResponse,
+        search_id: str,
     ) -> list[rocket.AirSearchResult]:
-        search_id = string.uuid()
         safe_j1_response = safej1.SearchFlightsResponse(**j1_response.model_dump())
         offers = safe_j1_response.offers
         search_results = []
