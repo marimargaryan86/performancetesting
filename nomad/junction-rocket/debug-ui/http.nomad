@@ -134,7 +134,7 @@ EOH
 
       config {
         image = var.docker_image
-        ports = ["http"]
+        ports = ["http", "prometheus"]
         args = [
           "http",
         ]

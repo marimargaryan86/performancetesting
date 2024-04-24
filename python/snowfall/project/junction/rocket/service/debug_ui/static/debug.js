@@ -46,7 +46,7 @@ function clear_places() {
 
 function set_loader_message(status_message) {
   const container = document.getElementById("loader-message");
-  container.innerText = status_message
+  container.innerHTML = status_message
 }
 
 function show_loader(status_message = "") {
