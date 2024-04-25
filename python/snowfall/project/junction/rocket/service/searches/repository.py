@@ -195,7 +195,7 @@ class QuoteRepository(
 
     async def create(
         self,
-        offer_id: str,
+        offer_ids: Sequence[str],
     ) -> models_pb2.Quote:
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
@@ -204,8 +204,8 @@ class QuoteRepository(
 
         quote = models_pb2.Quote(
             id=string.uuid(),
-            offer_id=offer_id,
             expires_at=expires_at,
+            offer_ids=offer_ids,
         )
 
         return await self.insert(quote)

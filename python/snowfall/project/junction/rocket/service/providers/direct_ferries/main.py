@@ -89,6 +89,7 @@ async def _search_factory(
             ),
         ),
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     return searches.SearchImplementation(
@@ -131,6 +132,7 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
             client=redis_client,
         ),
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     await quote_task_consumer.consume()

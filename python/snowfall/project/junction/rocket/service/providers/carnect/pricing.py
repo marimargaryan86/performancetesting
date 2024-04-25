@@ -46,6 +46,7 @@ class QuoteTaskConsumer:
         carnect_client: client.CarnectClient,
         carnect_config: config.Config,
         ttl: datetime.timedelta,
+        pay_company_id: str,
     ):
         self._consumer = consumer_obj
         self._quote_result_producer = quote_result_producer
@@ -55,6 +56,7 @@ class QuoteTaskConsumer:
         self._config = carnect_config
         self._ttl = ttl
         self._logger = stdout.get_logger()
+        self._pay_company_id = pay_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -63,7 +65,8 @@ class QuoteTaskConsumer:
         self,
         message: types.Message[amqp_pb2.QuoteTask],
     ) -> None:
-        offer_cache = await self._search_result_cache.fetch(message.body.quote.offer_id)
+        offer_id = message.body.quote.offer_ids[0]
+        offer_cache = await self._search_result_cache.fetch(offer_id)
 
         if not offer_cache:
             return
@@ -104,11 +107,18 @@ class QuoteTaskConsumer:
             key=message.body.quote.id,
         )
         quote_obj = models_pb2.Quote(
+            pay_company_id=self._pay_company_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            price=offer.price,
-            price_breakdown=offer.price_breakdown,
-            conditional_prices=offer.car_rental.conditional_prices,
-            rules=get_fare_rules(veh_avail),
+            total_price=offer.price,
+            quoted_offers=[
+                models_pb2.QuotedOffer(
+                    offer_id=offer_id,
+                    price=offer.price,
+                    price_breakdown=offer.price_breakdown,
+                    conditional_prices=offer.car_rental.conditional_prices,
+                    rules=get_fare_rules(veh_avail),
+                ),
+            ],
         )
 
         quote_obj.MergeFrom(message.body.quote)

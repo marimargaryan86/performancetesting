@@ -4,7 +4,8 @@
     "variables": {
       "count": 2,
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
-      "bucket": "junction-rocket-provider-data-development"
+      "bucket": "junction-rocket-provider-data-development",
+      "pay_company_id": "f3f20e54-abbb-454f-893e-3d8b81551277"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
     "variables": {
       "count": 2,
       "api_base_url": "https://benerail-prd-apim.azure-api.net",
-      "bucket": "junction-rocket-provider-data-production"
+      "bucket": "junction-rocket-provider-data-production",
+      "pay_company_id": ""
     }
   },
   "sandbox": {
@@ -20,7 +22,8 @@
     "variables": {
       "count": 1,
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
-      "bucket": "junction-rocket-provider-data-sandbox"
+      "bucket": "junction-rocket-provider-data-sandbox",
+      "pay_company_id": ""
     }
   }
 }

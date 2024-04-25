@@ -40,6 +40,7 @@ from snowfall.vendor.direct_ferries.models import (
 CLIENT_SECRET = "1jhj5gve52o7b8puafh0n218iq77u2vva8oosemi063a9g62e3qg"
 CLIENT_ID = "3r2ha5jopuaphv9fctntqtraso"
 API_URL = "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com"
+PAY_COMPANY_ID = "b69bf06b-be74-4eb8-90e2-b6df492e4783"
 
 
 @pytest.fixture()
@@ -48,7 +49,7 @@ def mock_quote_message() -> consumer.Consumer[amqp_pb2.QuoteTask]:
         message = mock_message.return_value
         message.body = amqp_pb2.QuoteTask(
             quote=models_pb2.Quote(
-                offer_id="offer_id",
+                offer_ids=["offer_id"],
             ),
             reseller_id="reseller_id",
         )
@@ -90,6 +91,7 @@ def quote_task_consumer(
         offers_cache=cache.OffersCache(client=redis.Client[bytes](redis_client)),
         quote_cache=cache.QuoteCache(client=redis.Client[bytes](redis_client)),
         ttl=ttl,
+        pay_company_id=PAY_COMPANY_ID,
     )
 
 
@@ -164,6 +166,7 @@ async def generator(
         ttl=datetime.timedelta(
             minutes=config._OFFER_TTL_DEFAULT_MINUTES,  # noqa: SLF001
         ),
+        pay_company_id=PAY_COMPANY_ID,
     )
 
 

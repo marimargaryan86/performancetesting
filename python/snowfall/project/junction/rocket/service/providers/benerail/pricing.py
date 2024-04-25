@@ -10,6 +10,7 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import (
     models_pb2,
 )
 from snowfall.stdlib import money, string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.benerail import client as benerail_client
 
@@ -33,6 +34,7 @@ class QuoteTaskConsumer:
         benerail_adapter: adapter.BenerailAdapter,
         ttl: datetime.timedelta,
         client: benerail_client.BenerailClient,
+        pay_company_id: str,
     ):
         self._consumer = consumer_obj
         self._quote_result_producer = quote_result_producer
@@ -41,6 +43,7 @@ class QuoteTaskConsumer:
         self._ttl = ttl
         self._adapter = benerail_adapter
         self._client = client
+        self._pay_company_id = pay_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -49,49 +52,64 @@ class QuoteTaskConsumer:
         self,
         message: types.Message[amqp_pb2.QuoteTask],
     ) -> None:
-        offer_details = await self._search_result_cache.fetch(
-            message.body.quote.offer_id,
-        )
+        quoted_offers: list[models_pb2.QuotedOffer] = []
+        for offer_id in message.body.quote.offer_ids:
+            offer_details = await self._search_result_cache.fetch(
+                offer_id,
+            )
 
-        if not offer_details:
-            return
-        session_token = string.uuid()
+            if not offer_details:
+                return
 
+            session_token = string.uuid()
+            get_offer_res = await self._adapter.verify_offer(
+                offer_details=offer_details,
+                session_token=session_token,
+            )
+
+            base_price_proto = money.from_string(
+                str(get_offer_res.offer_obj.price.amount),
+                money.Currency(get_offer_res.offer_obj.price.currency),
+            ).protobuf()
+
+            quoted_offers.append(
+                models_pb2.QuotedOffer(
+                    offer_id=offer_id,
+                    price=base_price_proto,
+                    required_documents=[
+                        models_pb2.QuotedOffer.Required.REQUIRED_PASSPORT_NUMBER,
+                    ],
+                    rules=await fare_rules.get_fare_rules(
+                        benerail_client=self._client,
+                        offer_obj=get_offer_res.offer_obj,
+                    ),
+                    price_breakdown=[
+                        models_pb2.PriceBreakdown(
+                            price=base_price_proto,
+                            breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE,
+                        ),
+                    ],
+                ),
+            )
+
+        total_price = money.total([
+            money.from_protobuf(offer.price) for offer in quoted_offers
+        ])
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
-        get_offer_res = await self._adapter.verify_offer(
-            offer_details=offer_details,
-            session_token=session_token,
-        )
-
         await self._quote_cache.store(
             cache.QuoteDetails(
-                amount=get_offer_res.offer_obj.price.amount,
-                currency=get_offer_res.offer_obj.price.currency,
+                amount=total_price.amount,
+                currency=total_price.currency.code,
             ),
             expires_at=expires_at,
             key=message.body.quote.id,
         )
 
-        base_price_proto = money.from_string(
-            str(get_offer_res.offer_obj.price.amount),
-            money.Currency(get_offer_res.offer_obj.price.currency),
-        ).protobuf()
-
         quote_obj = models_pb2.Quote(
-            price=base_price_proto,
-            required_documents=[
-                models_pb2.Quote.Required.REQUIRED_PASSPORT_NUMBER,
-            ],
-            rules=await fare_rules.get_fare_rules(
-                benerail_client=self._client,
-                offer_obj=get_offer_res.offer_obj,
-            ),
-            price_breakdown=[
-                models_pb2.PriceBreakdown(
-                    price=base_price_proto,
-                    breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE,
-                ),
-            ],
+            pay_company_id=self._pay_company_id,
+            expires_at=protobuf.datetime_to_protobuf(expires_at),
+            total_price=total_price.protobuf(),
+            quoted_offers=quoted_offers,
         )
 
         quote_obj.MergeFrom(message.body.quote)

@@ -62,9 +62,11 @@ class Generator:
         self,
         search_result_cache: cache.SearchResultCache,
         ttl: datetime.timedelta,
+        pay_company_id: str,
     ):
         self._cache = search_result_cache
         self._ttl = ttl
+        self._pay_company_id = pay_company_id
 
     async def generate(
         self,
@@ -123,6 +125,7 @@ class Generator:
         return models_pb2.SearchResult(
             id=string.uuid(),
             provider_id=str(PROVIDER_ID),
+            pay_company_id=self._pay_company_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offers=[
                 models_pb2.Offer(
@@ -196,6 +199,7 @@ class Generator:
             id=string.uuid(),
             search_id=search.search_id,
             provider_id=str(PROVIDER_ID),
+            pay_company_id=self._pay_company_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
             offers=[
                 models_pb2.Offer(

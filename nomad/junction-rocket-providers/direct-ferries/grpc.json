@@ -7,7 +7,8 @@
       "affiliate_api_url": "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com",
       "client_id": "3r2ha5jopuaphv9fctntqtraso",
       "partner_code": "F5152",
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "pay_company_id": "3270a409-43b5-4be6-aebd-c3adc6ebfd0f"
     }
   },
   "production": {
@@ -18,7 +19,8 @@
       "affiliate_api_url": "",
       "client_id": "",
       "partner_code": "",
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "pay_company_id": ""
     }
   },
   "sandbox": {
@@ -29,7 +31,8 @@
       "affiliate_api_url": "https://tf-test-affiliate-api-sandbox.auth.eu-west-1.amazoncognito.com",
       "client_id": "3r2ha5jopuaphv9fctntqtraso",
       "partner_code": "F5152",
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "pay_company_id": ""
     }
   }
 }

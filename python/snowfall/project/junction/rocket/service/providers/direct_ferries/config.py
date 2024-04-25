@@ -17,6 +17,7 @@ class DfBaseSettings(service.Settings):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_API_TIMEOUT_DEFAULT_SECONDS,
     )
+    pay_company_id: str
 
 
 class Settings(DfBaseSettings, service.ProviderSettings):

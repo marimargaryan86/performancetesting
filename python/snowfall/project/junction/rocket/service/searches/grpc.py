@@ -121,7 +121,7 @@ class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateQuoteResponse:
         quote = await self._quotes_repo.create(
-            request.offer_id,
+            request.offer_ids,
         )
         await self._publisher.publish(quote, request.reseller_id)
 

@@ -42,6 +42,10 @@ variable "affiliate_api_url" {
   type = string
 }
 
+variable "pay_company_id" {
+  type = string
+}
+
 job "junction-rocket-providers-direct-ferries-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -134,6 +138,7 @@ EOH
         CLIENT_ID         = "${var.client_id}"
         AFFILIATE_API_URL = "${var.affiliate_api_url}"
         API_URL           = "${var.api_url}"
+        PAY_COMPANY_ID    = "${var.pay_company_id}"
       }
     }
   }

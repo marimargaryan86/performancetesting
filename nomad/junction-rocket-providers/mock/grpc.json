@@ -3,21 +3,24 @@
     "deploy": true,
     "variables": {
       "count": 1,
-      "bucket": "junction-provider-data-development"
+      "bucket": "junction-provider-data-development",
+      "pay_company_id": "fake-pay-company-id-for-provider"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
       "count": 1,
-      "bucket": "junction-provider-data-production"
+      "bucket": "junction-provider-data-production",
+      "pay_company_id": "fake-pay-company-id-for-provider"
     }
   },
   "sandbox": {
     "deploy": false,
     "variables": {
       "count": 1,
-      "bucket": "junction-provider-data-sandbox"
+      "bucket": "junction-provider-data-sandbox",
+      "pay_company_id": "fake-pay-company-id-for-provider"
     }
   }
 }

@@ -2,19 +2,22 @@
   "development": {
     "deploy": true,
     "variables": {
-      "count": 1
+      "count": 1,
+      "pay_company_id": "fake-pay-company-id-for-provider"
     }
   },
   "production": {
     "deploy": false,
     "variables": {
-      "count": 1
+      "count": 1,
+      "pay_company_id": "fake-pay-company-id-for-provider"
     }
   },
   "sandbox": {
     "deploy": false,
     "variables": {
-      "count": 1
+      "count": 1,
+      "pay_company_id": "fake-pay-company-id-for-provider"
     }
   }
 }

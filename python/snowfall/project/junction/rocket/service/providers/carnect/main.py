@@ -43,6 +43,7 @@ class _Settings(service.ProviderSettings):
     api_timeout: datetime.timedelta = datetime.timedelta(
         seconds=_DEFAULT_API_TIMEOUT_IN_SECONDS,
     )
+    pay_company_id: str
     env_name: str = "local"
 
     @property
@@ -92,6 +93,7 @@ async def _search_factory(
             client=redis.Client(redis_conn, prefix=app.name),
         ),
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     return searches.SearchImplementation(
@@ -147,6 +149,7 @@ async def _pricing(
         carnect_client=carnect_client,
         carnect_config=carnect_config,
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     await quote_task_consumer.consume()

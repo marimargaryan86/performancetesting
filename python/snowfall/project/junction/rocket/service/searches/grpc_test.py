@@ -12,7 +12,7 @@ async def test_search_task_published(
     response = await quote_service_tester.invoke_unary_unary(
         method=grpc.QuoteService.CreateQuote,
         request=grpc_pb2.CreateQuoteRequest(
-            offer_id="",
+            offer_ids=[""],
             reseller_id="",
         ),
     )
@@ -33,7 +33,7 @@ async def test_search_task_persisted(
     response = await quote_service_tester.invoke_unary_unary(
         method=grpc.QuoteService.CreateQuote,
         request=grpc_pb2.CreateQuoteRequest(
-            offer_id="",
+            offer_ids=[""],
             reseller_id="",
         ),
     )
@@ -53,7 +53,7 @@ async def test_quote_is_retrievable(
     create_response = await quote_service_tester.invoke_unary_unary(
         method=grpc.QuoteService.CreateQuote,
         request=grpc_pb2.CreateQuoteRequest(
-            offer_id="",
+            offer_ids=[""],
             reseller_id="",
         ),
     )

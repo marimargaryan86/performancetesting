@@ -34,6 +34,7 @@ class QuoteTaskConsumer:
         offers_cache: cache.OffersCache,
         quote_cache: cache.QuoteCache,
         ttl: datetime.timedelta,
+        pay_company_id: str,
     ):
         self._df_client = df_client
         self._consumer = consumer_obj
@@ -41,6 +42,7 @@ class QuoteTaskConsumer:
         self._offers_cache = offers_cache
         self._quote_cache = quote_cache
         self._ttl = ttl
+        self._pay_company_id = pay_company_id
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -49,7 +51,8 @@ class QuoteTaskConsumer:
         self,
         message: types.Message[amqp_pb2.QuoteTask],
     ) -> None:
-        offer_cache = await self._offers_cache.fetch(message.body.quote.offer_id)
+        offer_id = message.body.quote.offer_ids[0]
+        offer_cache = await self._offers_cache.fetch(offer_id)
 
         if not offer_cache:
             raise SearchError("Offer not found")
@@ -64,7 +67,7 @@ class QuoteTaskConsumer:
 
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
 
-        quote_id = await self._quote_cache.store(
+        await self._quote_cache.store(
             cache.OfferDetails(quote=offer_cache.quote),
             expires_at=expires_at,
         )
@@ -75,24 +78,28 @@ class QuoteTaskConsumer:
         ).protobuf()
 
         quote_obj = models_pb2.Quote(
-            id=quote_id,
-            offer_id=message.body.quote.offer_id,
+            pay_company_id=self._pay_company_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),
-            price=base_price_proto,
-            required_documents=required_passenger_information,
-            rules=[
-                models_pb2.FareRule(
-                    title="Ticket conditions",
-                    body=offer_cache.quote.ticket_conditions or "",
-                ),
-            ],
-            price_breakdown=[
-                models_pb2.PriceBreakdown(
+            total_price=base_price_proto,
+            quoted_offers=[
+                models_pb2.QuotedOffer(
+                    offer_id=offer_id,
                     price=base_price_proto,
-                    breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE,
+                    required_documents=required_passenger_information,
+                    rules=[
+                        models_pb2.FareRule(
+                            title="Ticket conditions",
+                            body=offer_cache.quote.ticket_conditions or "",
+                        ),
+                    ],
+                    price_breakdown=[
+                        models_pb2.PriceBreakdown(
+                            price=base_price_proto,
+                            breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_BASE_FARE,
+                        ),
+                    ],
                 ),
             ],
-            conditional_prices=None,
         )
 
         quote_obj.MergeFrom(message.body.quote)
@@ -142,22 +149,26 @@ class QuoteTaskConsumer:
     def _generate_passenger_requirement_response(
         self,
         passenger_requirements: passenger.RoutePassengerInfo,
-    ) -> list[models_pb2.Quote.Required.ValueType]:
+    ) -> list[models_pb2.QuotedOffer.Required.ValueType]:
         requirements = []
 
         if passenger_requirements.need_date_of_birth:
-            requirements.append(models_pb2.Quote.Required.REQUIRED_DATE_OF_BIRTH)
+            requirements.append(models_pb2.QuotedOffer.Required.REQUIRED_DATE_OF_BIRTH)
 
         if passenger_requirements.need_nationality:
-            requirements.append(models_pb2.Quote.Required.REQUIRED_NATIONALITY)
+            requirements.append(models_pb2.QuotedOffer.Required.REQUIRED_NATIONALITY)
 
         if passenger_requirements.need_passport_expiry_date:
-            requirements.append(models_pb2.Quote.Required.REQUIRED_EXPIRATION_DATE)
+            requirements.append(
+                models_pb2.QuotedOffer.Required.REQUIRED_EXPIRATION_DATE,
+            )
 
         if passenger_requirements.need_passport:
-            requirements.append(models_pb2.Quote.Required.REQUIRED_PASSPORT_NUMBER)
+            requirements.append(
+                models_pb2.QuotedOffer.Required.REQUIRED_PASSPORT_NUMBER,
+            )
 
         if passenger_requirements.need_passport_start_date:
-            requirements.append(models_pb2.Quote.Required.REQUIRED_ISSUE_DATE)
+            requirements.append(models_pb2.QuotedOffer.Required.REQUIRED_ISSUE_DATE)
 
         return requirements

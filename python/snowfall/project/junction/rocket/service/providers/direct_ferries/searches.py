@@ -62,11 +62,13 @@ class SearchResultGenerator:
         df_client: client.DfHttpClient,
         offers_cache: cache.OffersCache,
         ttl: datetime.timedelta,
+        pay_company_id: str,
     ):
         self._client = df_client
         self._offers_cache = offers_cache
         self._ttl = ttl
         self._logger = stdout.get_logger()
+        self._pay_company_id = pay_company_id
 
     async def generate(
         self,
@@ -91,6 +93,7 @@ class SearchResultGenerator:
                 id=string.uuid(),
                 search_id=search_criteria.search_id,
                 provider_id=str(PROVIDER_ID),
+                pay_company_id=self._pay_company_id,
                 expires_at=protobuf.datetime_to_protobuf(expires_at),
                 offers=[
                     models_pb2.Offer(

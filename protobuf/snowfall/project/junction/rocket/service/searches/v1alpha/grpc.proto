@@ -45,7 +45,7 @@ message ListSearchResultsResponse {
 }
 
 message CreateQuoteRequest {
-  string offer_id = 1;
+  repeated string offer_ids = 1;
   string reseller_id = 2;
 }
 

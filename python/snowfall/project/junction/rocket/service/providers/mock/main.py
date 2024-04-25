@@ -40,6 +40,7 @@ class _Settings(service.ProviderSettings):
     reseller_disabled_operators: _RESELLERS_TO_PROVIDER_OPERATORS = pydantic.Field(
         default_factory=dict,
     )
+    pay_company_id: str
 
 
 class _BookingsSettings(service.Settings):
@@ -52,6 +53,7 @@ class _PricingSettings(service.ProviderSettings):
     amqp_dsn: pydantic.AmqpDsn
     redis_dsn: pydantic.RedisDsn
     ttl: datetime.timedelta = datetime.timedelta(minutes=45)
+    pay_company_id: str
 
 
 async def _meta_factory() -> meta.MetaImplementation:
@@ -76,6 +78,7 @@ async def _search_factory(
                 client=redis.Client(redis_conn, prefix=app.name),
             ),
             ttl=app.settings.ttl,
+            pay_company_id=app.settings.pay_company_id,
         ),
     )
 
@@ -111,6 +114,7 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
             client=redis_client,
         ),
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     await quote_task_consumer.consume()

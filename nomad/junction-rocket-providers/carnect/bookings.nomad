@@ -34,6 +34,10 @@ variable "bucket" {
   type = string
 }
 
+variable "pay_company_id" {
+  type = string
+}
+
 job "junction-rocket-providers-carnect-bookings" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -126,6 +130,7 @@ EOH
         SENTRY_DSN      = "https://42f90df64e3e5561186843dda5f21130@sentry.snowfall.se/245"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
         API_BASE_URL    = "${var.api_base_url}"
+        PAY_COMPANY_ID  = "${var.pay_company_id}"
       }
     }
   }

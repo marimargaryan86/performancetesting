@@ -34,6 +34,10 @@ variable "bucket" {
   type = string
 }
 
+variable "pay_company_id" {
+  type = string
+}
+
 job "junction-rocket-providers-benerail-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -150,6 +154,7 @@ EOH
         API_BASE_URL    = "${var.api_base_url}"
         GRPC_ADDRESS    = "0.0.0.0"
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
+        PAY_COMPANY_ID  = "${var.pay_company_id}"
       }
     }
   }

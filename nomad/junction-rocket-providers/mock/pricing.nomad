@@ -26,6 +26,10 @@ variable "count" {
   type = number
 }
 
+variable "pay_company_id" {
+  type = string
+}
+
 job "junction-rocket-providers-mock-pricing" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -107,6 +111,7 @@ EOH
         ENV_NAME        = "${var.environment}"
         SENTRY_DSN      = "https://8d3acd7cc1d70e249514494e2f90bcd6@sentry.snowfall.se/242"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        PAY_COMPANY_ID  = "${var.pay_company_id}"
       }
     }
   }

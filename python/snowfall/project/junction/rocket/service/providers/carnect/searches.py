@@ -52,12 +52,14 @@ class SearchResultGenerator:
         carnect_config: config.Config,
         search_result_cache: cache.SearchResultCache,
         ttl: datetime.timedelta,
+        pay_company_id: str,
     ):
         self._client = carnect_client
         self._config = carnect_config
         self._search_result_cache = search_result_cache
         self._logger = stdout.get_logger()
         self._ttl = ttl
+        self._pay_company_id = pay_company_id
 
     async def gather_search_results(
         self,
@@ -188,6 +190,7 @@ class SearchResultGenerator:
                 id=string.uuid(),
                 search_id=search_task.search_id,
                 provider_id=str(constants.PROVIDER_ID),
+                pay_company_id=self._pay_company_id,
                 expires_at=protobuf.datetime_to_protobuf(
                     datetime.datetime.now(datetime.UTC) + self._ttl,
                 ),

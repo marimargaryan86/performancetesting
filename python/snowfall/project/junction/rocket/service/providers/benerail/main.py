@@ -46,6 +46,7 @@ class _Settings(service.ProviderSettings):
     subscription_key: str
     api_base_url: pydantic.AnyUrl
     cert_base64: str
+    pay_company_id: str
 
 
 class _PricingSettings(service.ProviderSettings):
@@ -55,6 +56,7 @@ class _PricingSettings(service.ProviderSettings):
     cert_base64: str
     subscription_key: str
     api_base_url: pydantic.AnyUrl
+    pay_company_id: str
 
 
 def cert_tmp_path(cert_base64: str) -> str:
@@ -108,6 +110,7 @@ async def _pricing(app: service.Application[_PricingSettings]) -> None:
         benerail_adapter=adapter.BenerailAdapter(benerail_client),
         client=benerail_client,
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     await quote_task_consumer.consume()
@@ -149,6 +152,7 @@ async def _search_factory(
             client=redis.Client(redis_conn, prefix=app.name),
         ),
         ttl=app.settings.ttl,
+        pay_company_id=app.settings.pay_company_id,
     )
 
     return searches.SearchImplementation(

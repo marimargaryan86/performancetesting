@@ -501,6 +501,7 @@ class BenerailOffersAdapter(BenerailAdapter):
         offers_cache: cache.OffersCache,
         ttl: datetime.timedelta,
         provider_cabin_class_mapping: cabin_classes.CabinMappingRepository,
+        pay_company_id: str,
     ) -> None:
         super().__init__(benerail_client)
         self._train_stations = train_station_repository
@@ -508,6 +509,7 @@ class BenerailOffersAdapter(BenerailAdapter):
         self._offers_cache = offers_cache
         self._ttl = ttl
         self._logger = stdout.get_logger()
+        self._pay_company_id = pay_company_id
 
     async def gather_search_results(
         self,
@@ -719,6 +721,7 @@ class BenerailOffersAdapter(BenerailAdapter):
                     details_list,
                 ),
                 provider_id=str(PROVIDER_ID),
+                pay_company_id=self._pay_company_id,
             )
 
     async def _parse_result_details(

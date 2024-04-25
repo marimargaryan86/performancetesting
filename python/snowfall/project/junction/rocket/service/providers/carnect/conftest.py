@@ -41,6 +41,8 @@ from snowfall.stdlib.v1 import (
 )
 from snowfall.vendor.carnect.models import service as carnect_service
 
+PAY_COMPANY_ID = "0b4d5313-ce67-4532-9885-f32f204aa17c"
+
 
 @pytest_asyncio.fixture()
 async def consumer_mock() -> pricing.QuoteTaskConsumer:
@@ -100,6 +102,7 @@ async def consumer_mock() -> pricing.QuoteTaskConsumer:
         ),
         carnect_config=mock.Mock(name="CarnectConfig"),
         ttl=datetime.timedelta(minutes=30),
+        pay_company_id=PAY_COMPANY_ID,
     )
 
 
@@ -116,37 +119,50 @@ async def search_result_generator() -> searches.SearchResultGenerator:
         carnect_config=mock.Mock(name="CarnectConfig"),
         search_result_cache=mock.AsyncMock(name="SearchResultCache"),
         ttl=datetime.timedelta(seconds=15),
+        pay_company_id=PAY_COMPANY_ID,
     )
 
 
 @pytest_asyncio.fixture
 async def mock_message() -> AsyncIterator[types.Message[amqp_pb2.QuoteTask]]:
+    offer_id = "65df9a88-bfb1-482d-9061-37f9c4ed989e"
+    price = money_pb2.Money(currency_code="USD", units=100)
     with mock.patch("snowfall.stdlib.transport.amqp.types.Message") as msg:
         message = msg.return_value
         message.body = amqp_pb2.QuoteTask(
             quote=models_pb2.Quote(
                 id="4530844688",
-                price=money_pb2.Money(currency_code="USD", units=100),
-                price_breakdown=[
-                    models_pb2.PriceBreakdown(
-                        price=money_pb2.Money(currency_code="USD", units=100),
-                        breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_UNSPECIFIED,
+                pay_company_id=PAY_COMPANY_ID,
+                total_price=price,
+                offer_ids=[offer_id],
+                quoted_offers=[
+                    models_pb2.QuotedOffer(
+                        offer_id=offer_id,
+                        price=price,
+                        price_breakdown=[
+                            models_pb2.PriceBreakdown(
+                                price=money_pb2.Money(currency_code="USD", units=100),
+                                breakdown_type=models_pb2.PriceBreakdown.BREAKDOWN_TYPE_UNSPECIFIED,
+                            ),
+                        ],
+                        conditional_prices=[
+                            models_pb2.ConditionalPrice(
+                                price=money_pb2.Money(currency_code="USD", units=100),
+                                description="Description",
+                                included_in_total=True,
+                            ),
+                        ],
+                        rules=[
+                            models_pb2.FareRule(
+                                title="Test title",
+                                body="Test Body",
+                            ),
+                        ],
+                        required_documents=[
+                            models_pb2.QuotedOffer.REQUIRED_DATE_OF_BIRTH,
+                        ],
                     ),
                 ],
-                conditional_prices=[
-                    models_pb2.ConditionalPrice(
-                        price=money_pb2.Money(currency_code="USD", units=100),
-                        description="Description",
-                        included_in_total=True,
-                    ),
-                ],
-                rules=[
-                    models_pb2.FareRule(
-                        title="Test title",
-                        body="Test Body",
-                    ),
-                ],
-                required_documents=[models_pb2.Quote.REQUIRED_DATE_OF_BIRTH],
             ),
             reseller_id="mock_reseller_id",
         )

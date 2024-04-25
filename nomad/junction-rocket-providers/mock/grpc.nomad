@@ -30,6 +30,10 @@ variable "bucket" {
   type = string
 }
 
+variable "pay_company_id" {
+  type = string
+}
+
 job "junction-rocket-providers-mock-grpc" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -134,6 +138,7 @@ EOH
         GRPC_PORT       = "${NOMAD_PORT_grpc}"
         SENTRY_DSN      = "https://8d3acd7cc1d70e249514494e2f90bcd6@sentry.snowfall.se/242"
         PROMETHEUS_PORT = "${NOMAD_PORT_prometheus}"
+        PAY_COMPANY_ID  = "${var.pay_company_id}"
       }
     }
   }
