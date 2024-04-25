@@ -75,6 +75,10 @@ class PlaceListData(BaseResult):
         return get_nested_attribute(self._data, "data.0.attributes.countryCode")
 
     @property
+    def country_name(self) -> str:
+        return get_nested_attribute(self._data, "data.0.attributes.countryName")
+
+    @property
     def place_type(self) -> str:
         return get_nested_attribute(self._data, "data.0.attributes.placeType")
 

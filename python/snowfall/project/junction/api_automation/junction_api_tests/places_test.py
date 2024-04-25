@@ -34,6 +34,13 @@ valid_place_filters = PlaceListFilters(
     coordinates="13.3888599,52.5170365,0",
     place_to_search_within="c6c12798-1668-5812-b611-7aa1709daee4",
 )
+valid_place_filters_combination = PlaceListFilters(
+    name_like="Berlin",
+    type_eq="airport",
+    iata_eq="LON",
+    coordinates="13.49691,52.3665044,0",
+    place_to_search_within="c6c12798-1668-5812-b611-7aa1709daee4",
+)
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -179,4 +186,74 @@ async def test_places_search_within(
         place_data.country_code == "DE"
     ), "Expected all places to have the country code 'DE', but found a country code of '{0}' in the data.".format(
         place_data.country_code,
+    )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_combination_no_iata(  # noqa: WPS218
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        name_like=valid_place_filters_combination.name_like,
+        type_eq=valid_place_filters_combination.type_eq,
+        coordinates=valid_place_filters_combination.coordinates,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert (
+        valid_place_filters_combination.name_like in place_data.name
+    ), "{0} is not contained in {1}".format(
+        valid_place_filters_combination.name_like,
+        place_data.name,
+    )
+    assert place_data.place_type == valid_place_filters_combination.type_eq
+    longitude, latitude, _radius = map(
+        float,
+        valid_place_filters_combination.coordinates.split(","),
+    )
+
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.latitude == latitude, "Expected latitude {0}, but got {1}".format(
+        latitude,
+        place_data.latitude,
+    )
+    assert (
+        place_data.longitude == longitude
+    ), "Expected longitude {0}, but got {1}".format(longitude, place_data.longitude)
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_combination_with_iata(  # noqa: WPS218
+    qa_client: QaClient,
+) -> None:
+    expected_data = ExpectedPlaceData(
+        place_id="6da9e96b-5f05-5034-b5d5-993086525f0d",
+        latitude=51.5073219,
+        longitude=-0.1276474,
+        country_code="GB",
+        country_name="United Kingdom",
+        iata_code="LON",
+    )
+    place_data = await qa_client.places.get_place_list(
+        name_like=valid_place_filters_combination.name_like,
+        type_eq=valid_place_filters_combination.type_eq,
+        iata_eq=valid_place_filters_combination.iata_eq,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.country_code == expected_data.country_code
+    assert place_data.country_name == expected_data.country_name
+    assert place_data.iata_code == expected_data.iata_code
+
+    assert (
+        place_data.latitude == expected_data.latitude
+    ), "Expected latitude {0}, but got {1}".format(
+        expected_data.latitude,
+        place_data.latitude,
+    )
+    assert (
+        place_data.longitude == expected_data.longitude
+    ), "Expected longitude {0}, but got {1}".format(
+        expected_data.longitude,
+        place_data.longitude,
     )
