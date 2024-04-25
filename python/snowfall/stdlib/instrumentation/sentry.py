@@ -6,13 +6,13 @@ def get_span(op: str, name: str | None = None) -> Span:
     if Hub.current.scope.span:
         return Hub.current.scope.span.start_child(
             op=op,
-            description=name or op,
+            description=name,
             status="ok",
         )
 
     return start_transaction(
         op=op,
-        name=name or op,
-        description=name or op,
+        name=name,
+        description=name,
         status="ok",
     )

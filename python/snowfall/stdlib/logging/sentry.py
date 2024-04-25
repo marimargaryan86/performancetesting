@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from importlib import import_module, util
 from typing import Any
 
 import sentry_sdk
@@ -39,7 +40,7 @@ def configure_sentry(
     sentry_sdk.init(
         default_integrations=True,
         auto_enabling_integrations=True,
-        integrations=integrations,
+        integrations=_with_additional_integrations(integrations),
         traces_sample_rate=kwargs.get(
             "traces_sample_rate",
             _DEFAULT_TRACES_SAMPLE_RATE,
@@ -51,3 +52,11 @@ def configure_sentry(
         in_app_include=["snowfall"],
         **kwargs,
     )
+
+
+def _with_additional_integrations(integrations: Integrations) -> Integrations:
+    if util.find_spec("pymongo"):
+        pymongo_module = import_module("sentry_sdk.integrations.pymongo")
+        integrations = [*integrations, pymongo_module.PyMongoIntegration()]
+
+    return integrations
