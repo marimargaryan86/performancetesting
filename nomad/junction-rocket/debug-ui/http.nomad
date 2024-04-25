@@ -71,19 +71,6 @@ job "junction-rocket-debug-ui-http" {
 
     service {
       name = "${JOB}-${var.environment}"
-      port = "prometheus"
-      tags = ["metrics"]
-
-      check {
-        type     = "http"
-        path     = "/"
-        interval = "30s"
-        timeout  = "4s"
-      }
-    }
-
-    service {
-      name = "${JOB}-${var.environment}"
       port = "http"
       tags = [
         "http",
@@ -114,6 +101,19 @@ job "junction-rocket-debug-ui-http" {
       check {
         type     = "http"
         path     = "/health"
+        interval = "30s"
+        timeout  = "4s"
+      }
+    }
+
+    service {
+      name = "${JOB}-${var.environment}"
+      port = "prometheus"
+      tags = ["metrics"]
+
+      check {
+        type     = "http"
+        path     = "/"
         interval = "30s"
         timeout  = "4s"
       }
