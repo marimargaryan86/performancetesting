@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "524b703a-1637-4de2-8de9-33816116d5dc",
-    "name": "Rail",
+    "_postman_id": "250d9063-b416-496d-8fbf-5002fc6aa18d",
+    "name": "train",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "33483058"
   },
@@ -15,7 +15,7 @@
             "exec": [
               "var json_data = pm.response.json();",
               "var search_id = json_data.data.id;",
-              "pm.collectionVariables.set(\"rail_search_id\", search_id);",
+              "pm.collectionVariables.set(\"train_search_id\", search_id);",
               "",
               "",
               "pm.test(\"Response status code is 200\", function () {",
@@ -77,7 +77,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"rail-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"000ab964-4bd2-51d2-bb2b-85c94fb98bf9\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"00568d06-4509-54d4-832e-68f1463128d8\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"train-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"000ab964-4bd2-51d2-bb2b-85c94fb98bf9\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"00568d06-4509-54d4-832e-68f1463128d8\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -85,12 +85,12 @@
           }
         },
         "url": {
-          "raw": "{{junction_api_url}}/rail/searches",
+          "raw": "{{junction_api_url}}/trains/searches",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "rail",
+            "trains",
             "searches"
           ]
         }
@@ -116,14 +116,14 @@
           }
         },
         "url": {
-          "raw": "{{junction_api_url}}/rail/searches/{{rail_search_id}}",
+          "raw": "{{junction_api_url}}/trains/searches/{{train_search_id}}",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "rail",
+            "trains",
             "searches",
-            "{{rail_search_id}}"
+            "{{train_search_id}}"
           ]
         },
         "description": "Used to initiate a search for offers based on the provided Offer Search context."
@@ -142,6 +142,9 @@
               "    pm.expect(pm.response.code).to.equal(200);",
               "});",
               "",
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data[0].relationships.offers.data[0].id;",
+              "pm.collectionVariables.set(\"train_search_outbound_offer_id\", search_id);",
               ""
             ],
             "type": "text/javascript",
@@ -159,14 +162,14 @@
           }
         ],
         "url": {
-          "raw": "{{junction_api_url}}/rail/searches/{{rail_search_id}}/results?include=offers,resultDetails",
+          "raw": "{{junction_api_url}}/trains/searches/{{train_search_id}}/results?include=offers,resultDetails",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "rail",
+            "trains",
             "searches",
-            "{{rail_search_id}}",
+            "{{train_search_id}}",
             "results"
           ],
           "query": [
@@ -188,7 +191,7 @@
             "exec": [
               "var json_data = pm.response.json();",
               "var search_id = json_data.data.id;",
-              "pm.collectionVariables.set(\"rail_search_id_outbound_offer\", search_id);",
+              "pm.collectionVariables.set(\"train_search_id_return_offer\", search_id);",
               "",
               "",
               "pm.test(\"Response status code is 200\", function () {",
@@ -250,7 +253,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"rail-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"000ab964-4bd2-51d2-bb2b-85c94fb98bf9\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"00568d06-4509-54d4-832e-68f1463128d8\",\n                    \"type\": \"places\"\n                }\n            },\n            \"selectedOutboundOffer\": {\n                \"data\": {\n                    \"id\": \"{{ADD AN OFFER ID}}\",\n                    \"type\": \"rail-offers\"\n                }\n            }\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"train-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"000ab964-4bd2-51d2-bb2b-85c94fb98bf9\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"00568d06-4509-54d4-832e-68f1463128d8\",\n                    \"type\": \"places\"\n                }\n            },\n            \"selectedOutboundOffer\": {\n                \"data\": {\n                    \"id\": \"{{train_search_outbound_offer_id}}\",\n                    \"type\": \"train-offers\"\n                }\n            }\n        }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -258,12 +261,12 @@
           }
         },
         "url": {
-          "raw": "{{junction_api_url}}/rail/searches",
+          "raw": "{{junction_api_url}}/trains/searches",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "rail",
+            "trains",
             "searches"
           ]
         }
@@ -289,14 +292,14 @@
           }
         },
         "url": {
-          "raw": "{{junction_api_url}}/rail/searches/{{rail_search_id_outbound_offer}}",
+          "raw": "{{junction_api_url}}/trains/searches/{{train_search_id_return_offer}}",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "rail",
+            "trains",
             "searches",
-            "{{rail_search_id_outbound_offer}}"
+            "{{train_search_id_return_offer}}"
           ]
         },
         "description": "Used to initiate a search for offers based on the provided Offer Search context."
@@ -332,14 +335,14 @@
           }
         ],
         "url": {
-          "raw": "{{junction_api_url}}/rail/searches/{{rail_search_id_outbound_offer}}/results?include=offers,resultDetails",
+          "raw": "{{junction_api_url}}/trains/searches/{{train_search_id_return_offer}}/results?include=offers,resultDetails",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "rail",
+            "trains",
             "searches",
-            "{{rail_search_id_outbound_offer}}",
+            "{{train_search_id_return_offer}}",
             "results"
           ],
           "query": [
@@ -412,11 +415,27 @@
       "value": ""
     },
     {
-      "key": "rail_search_id",
+      "key": "train_search_id",
       "value": ""
     },
     {
-      "key": "rail_search_id_outbound_offer",
+      "key": "train_search_id_outbound_offer",
+      "value": ""
+    },
+    {
+      "key": "first_outbound_offer_id",
+      "value": ""
+    },
+    {
+      "key": "train_search_id",
+      "value": ""
+    },
+    {
+      "key": "train_search_outbound_offer_id",
+      "value": ""
+    },
+    {
+      "key": "train_search_id_return_offer",
       "value": ""
     }
   ]

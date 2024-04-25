@@ -217,7 +217,7 @@ class FerryOfferResult(BaseResult):
         return get_nested_attribute(self._data, "data")
 
 
-class RailSearchResult(BaseResult):
+class TrainSearchResult(BaseResult):
     def __init__(self, data: Mapping[str, Any]):
         super().__init__(data)
         self._data = data
@@ -231,11 +231,41 @@ class RailSearchResult(BaseResult):
         return get_nested_attribute(self._data, "data.attributes.status")
 
 
-class RailOfferResult(BaseResult):
+class TrainOfferResult(BaseResult):
     def __init__(self, data: Mapping[str, Any]):
         super().__init__(data)
         self._data = data
 
     @property
-    def offers(self) -> str:
-        return get_nested_attribute(self._data, "data")
+    def id(self) -> str:
+        return get_nested_attribute(self._data, "id")
+
+    @property
+    def offer_ids(self) -> list[str]:
+        return [
+            get_nested_attribute(offer, "id")
+            for offer in get_nested_attribute(self._data, "relationships.offers.data")
+        ]
+
+    @property
+    def result_detail_ids(self) -> list[str]:
+        return [
+            get_nested_attribute(rd, "id")
+            for rd in get_nested_attribute(
+                self._data,
+                "relationships.resultDetails.data",
+            )
+        ]
+
+
+class TrainOffers(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def offer_results(self) -> list[TrainOfferResult]:
+        return [
+            TrainOfferResult(offer_result)
+            for offer_result in get_nested_attribute(self._data, "data")
+        ]
