@@ -5,9 +5,9 @@ import itertools
 from collections.abc import Awaitable, Callable, Iterable, Sequence
 from typing import TypeAlias
 
-from snowfall.project.junction.rocket.service.api.air import models, repositories
-from snowfall.project.junction.rocket.service.api.air.transforms import transforms
 from snowfall.project.junction.rocket.service.api.common import passengers
+from snowfall.project.junction.rocket.service.api.flights import models, repositories
+from snowfall.project.junction.rocket.service.api.flights.transforms import transforms
 from snowfall.project.junction.rocket.service.api.multi_modality import routes
 from snowfall.project.junction.rocket.service.api.places.models.places import (
     IATA_PROVIDER_ID,
@@ -125,12 +125,12 @@ SearchImplementations: TypeAlias = Iterable[
 ]
 
 
-class AirSearcher:
+class FlightSearcher:
     def __init__(
         self,
         client: j1_client.JunctionOneClient,
-        j1_transformer: transforms.AirSearchResultTransformer,
-        repository: repositories.AirSearchResultRepository,
+        j1_transformer: transforms.FlightSearchResultTransformer,
+        repository: repositories.FlightSearchResultRepository,
         temp_auth: auth.TemporaryTokenAuth,
     ):
         self._logger = stdout.get_logger()
@@ -192,7 +192,7 @@ class AirSearcher:
 
     def _transform_result(
         self,
-        result: models.AirSearchResult,
+        result: models.FlightSearchResult,
     ) -> list[Offer]:
         departure_at = result.result_details[0].departure_at
         arrival_at = result.result_details[-1].arrival_at

@@ -7,8 +7,8 @@ import pytest
 import pytest_httpx
 import pytest_mock
 
-from snowfall.project.junction.rocket.service.api.air import repositories
-from snowfall.project.junction.rocket.service.api.air.transforms import transforms
+from snowfall.project.junction.rocket.service.api.flights import repositories
+from snowfall.project.junction.rocket.service.api.flights.transforms import transforms
 from snowfall.project.junction.rocket.service.api.multi_modality import routes, search
 from snowfall.project.junction.rocket.service.api.places.models.places import (
     IATA_PROVIDER_ID,
@@ -146,12 +146,12 @@ def junction_one_client(
 
 
 @pytest.fixture()
-async def air_searcher(
+async def flight_searcher(
     junction_one_client: j1_client.JunctionOneClient,
-    air_search_repo: repositories.AirSearchResultRepository,
+    flights_search_repo: repositories.FlightSearchResultRepository,
     temp_auth: auth.TemporaryTokenAuth,
     httpx_mock: pytest_httpx.HTTPXMock,
-) -> search.AirSearcher:
+) -> search.FlightSearcher:
     httpx_mock.add_response(
         method="POST",
         url="https://localhost/v1/travel/flight/search",
@@ -159,10 +159,10 @@ async def air_searcher(
             "POST-v1-travel-flight-search-ARN-BRU.json",
         ),
     )
-    return search.AirSearcher(
+    return search.FlightSearcher(
         client=junction_one_client,
-        j1_transformer=transforms.AirSearchResultTransformer(),
-        repository=air_search_repo,
+        j1_transformer=transforms.FlightSearchResultTransformer(),
+        repository=flights_search_repo,
         temp_auth=temp_auth,
     )
 
@@ -225,16 +225,16 @@ def multi_route() -> routes.Route:
     )
 
 
-class TestAirSearch:
+class TestFlightSearch:
     async def test_unsupported_reseller_raises_error(
         self,
-        air_searcher: search.AirSearcher,
+        flight_searcher: search.FlightSearcher,
         mono_route: routes.Route,
         httpx_mock: pytest_httpx.HTTPXMock,
     ) -> None:
         httpx_mock.reset(assert_all_responses_were_requested=False)
         with pytest.raises(search.ModeNotSupportedForResellerError):
-            await air_searcher.search(
+            await flight_searcher.search(
                 search.SegmentSearchRequest(
                     segment=mono_route.segments[0],
                     departure_after=datetime.datetime.now(datetime.UTC),
@@ -245,10 +245,10 @@ class TestAirSearch:
 
     async def test_offers_are_found(
         self,
-        air_searcher: search.AirSearcher,
+        flight_searcher: search.FlightSearcher,
         mono_route: routes.Route,
     ) -> None:
-        offers = await air_searcher.search(
+        offers = await flight_searcher.search(
             search.SegmentSearchRequest(
                 segment=mono_route.segments[0],
                 departure_after=datetime.datetime.now(datetime.UTC),
@@ -260,10 +260,10 @@ class TestAirSearch:
 
     async def test_offers_have_ids(
         self,
-        air_searcher: search.AirSearcher,
+        flight_searcher: search.FlightSearcher,
         mono_route: routes.Route,
     ) -> None:
-        offers = await air_searcher.search(
+        offers = await flight_searcher.search(
             search.SegmentSearchRequest(
                 segment=mono_route.segments[0],
                 departure_after=datetime.datetime.now(datetime.UTC),
@@ -278,10 +278,10 @@ class TestAirSearch:
 
     async def test_offers_have_arrival_after_departure(
         self,
-        air_searcher: search.AirSearcher,
+        flight_searcher: search.FlightSearcher,
         mono_route: routes.Route,
     ) -> None:
-        offers = await air_searcher.search(
+        offers = await flight_searcher.search(
             search.SegmentSearchRequest(
                 segment=mono_route.segments[0],
                 departure_after=datetime.datetime.now(datetime.UTC),
@@ -507,11 +507,11 @@ def mono_search_result(mono_route: routes.Route) -> search.SearchResult:
 @pytest.fixture()
 def multi_search_result(multi_route: routes.Route) -> search.SearchResult:
     now = datetime.datetime.now(datetime.UTC)
-    air_offers = []
+    flight_offers = []
     train_offers = []
 
     with freezegun.freeze_time(time_to_freeze=now) as frozen_datetime:
-        air_offers.append(
+        flight_offers.append(
             _mock_offer(
                 "air_1",
                 datetime.timedelta(hours=4),
@@ -519,7 +519,7 @@ def multi_search_result(multi_route: routes.Route) -> search.SearchResult:
             ),
         )
         frozen_datetime.tick(datetime.timedelta(hours=6))
-        air_offers.append(
+        flight_offers.append(
             _mock_offer(
                 "air_2",
                 datetime.timedelta(hours=4),
@@ -546,7 +546,7 @@ def multi_search_result(multi_route: routes.Route) -> search.SearchResult:
     return search.SearchResult(
         route=multi_route,
         segments=[
-            search.Segment(segment=multi_route.segments[0], offers=air_offers),
+            search.Segment(segment=multi_route.segments[0], offers=flight_offers),
             search.Segment(segment=multi_route.segments[1], offers=train_offers),
         ],
     )

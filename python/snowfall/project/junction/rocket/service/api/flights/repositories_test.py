@@ -3,16 +3,16 @@ from typing import Any
 
 import pytest
 
-from snowfall.project.junction.rocket.service.api.air.models import (
-    AirSearchResult,
+from snowfall.project.junction.rocket.service.api.flights.models import (
     CabinDetails,
     FareTypeEnum,
+    FlightSearchResult,
     Offer,
     Price,
     ResultDetails,
 )
-from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AirSearchResultRepository,
+from snowfall.project.junction.rocket.service.api.flights.repositories import (
+    FlightSearchResultRepository,
 )
 
 UUID = "eaaf5ab5-64f3-4190-a6a7-d4b40e6010b2"
@@ -25,8 +25,8 @@ FLIGHT_REF_ID = "1P0_1234ABC"
 
 
 @pytest.fixture()
-def example_air_search_result() -> Any:
-    return AirSearchResult(
+def example_flight_search_result() -> Any:
+    return FlightSearchResult(
         id=UUID,
         search_id=SEARCH_ID,
         provider_id="",
@@ -36,8 +36,8 @@ def example_air_search_result() -> Any:
 
 
 @pytest.fixture()
-def example_air_search_result_one() -> Any:
-    return AirSearchResult(
+def example_flight_search_result_one() -> Any:
+    return FlightSearchResult(
         id=UUID,
         search_id=SEARCH_ID,
         provider_id="",
@@ -77,8 +77,8 @@ def example_air_search_result_one() -> Any:
 
 
 @pytest.fixture()
-def example_air_search_result_two() -> Any:
-    return AirSearchResult(
+def example_flight_search_result_two() -> Any:
+    return FlightSearchResult(
         id=UUID,
         search_id=SEARCH_ID,
         provider_id="",
@@ -146,38 +146,38 @@ def example_air_search_result_two() -> Any:
 
 
 async def test_find_result_exists_by_search_id(
-    air_search_repo: AirSearchResultRepository,
-    example_air_search_result: AirSearchResult,
+    flights_search_repo: FlightSearchResultRepository,
+    example_flight_search_result: FlightSearchResult,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result)
+    await flights_search_repo.insert(example_flight_search_result)
 
-    results_response = await air_search_repo.find_any_result_by_search_id(SEARCH_ID)
+    results_response = await flights_search_repo.find_any_result_by_search_id(SEARCH_ID)
     assert results_response
 
 
 async def test_find_results_by_search_id(
-    air_search_repo: AirSearchResultRepository,
-    example_air_search_result: AirSearchResult,
+    flights_search_repo: FlightSearchResultRepository,
+    example_flight_search_result: FlightSearchResult,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result)
+    await flights_search_repo.insert(example_flight_search_result)
 
-    results_response = await air_search_repo.find_results_by_search_id(SEARCH_ID)
+    results_response = await flights_search_repo.find_results_by_search_id(SEARCH_ID)
     assert results_response is not None
     async for result in results_response:
-        assert result == example_air_search_result
+        assert result == example_flight_search_result
 
 
 async def test_find_result_by_outbound_offer_id(
-    air_search_repo: AirSearchResultRepository,
-    example_air_search_result_one: AirSearchResult,
+    flights_search_repo: FlightSearchResultRepository,
+    example_flight_search_result_one: FlightSearchResult,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result_one)
+    await flights_search_repo.insert(example_flight_search_result_one)
 
-    result = await air_search_repo.find_result_by_offer_id(
+    result = await flights_search_repo.find_result_by_offer_id(
         OUTBOUND_SEARCH_OFFER_ID,
     )
     assert result is not None
-    assert result == example_air_search_result_one
+    assert result == example_flight_search_result_one
     assert result.search_id == SEARCH_ID
 
     assert result.offers
@@ -189,17 +189,17 @@ async def test_find_result_by_outbound_offer_id(
 
 
 async def test_find_results_by_multiple_outbound_offer_ids(
-    air_search_repo: AirSearchResultRepository,
-    example_air_search_result_two: AirSearchResult,
+    flights_search_repo: FlightSearchResultRepository,
+    example_flight_search_result_two: FlightSearchResult,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result_two)
+    await flights_search_repo.insert(example_flight_search_result_two)
 
-    example_new = example_air_search_result_two
+    example_new = example_flight_search_result_two
     example_new.id = "70c57962-0596-4663-8c3a-1730442c1f4c"
-    await air_search_repo.insert(example_new)
+    await flights_search_repo.insert(example_new)
 
     offer_id_inputs = [OUTBOUND_SEARCH_OFFER_ID, OUTBOUND_SEARCH_OFFER_ID2]
-    results_response = await air_search_repo.find_results_by_offer_ids(
+    results_response = await flights_search_repo.find_results_by_offer_ids(
         offer_id_inputs,
     )
     assert results_response is not None
@@ -217,38 +217,38 @@ async def test_find_results_by_multiple_outbound_offer_ids(
     for offer_id in offer_id_inputs:
         assert offer_id in offer_ids_set
 
-    for result_id in (example_air_search_result_two.id, example_new.id):
+    for result_id in (example_flight_search_result_two.id, example_new.id):
         assert result_id in result_ids
 
 
 async def test_find_result_by_result_detail_id(
-    air_search_repo: AirSearchResultRepository,
-    example_air_search_result_one: AirSearchResult,
+    flights_search_repo: FlightSearchResultRepository,
+    example_flight_search_result_one: FlightSearchResult,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result_one)
+    await flights_search_repo.insert(example_flight_search_result_one)
 
-    result = await air_search_repo.find_result_by_result_detail_id(
+    result = await flights_search_repo.find_result_by_result_detail_id(
         RESULT_DETAILS_ID,
     )
     assert result is not None
-    assert result == example_air_search_result_one
+    assert result == example_flight_search_result_one
     assert result.search_id == SEARCH_ID
 
     assert result.result_details
 
 
 async def test_find_results_by_multiple_result_detail_ids(
-    air_search_repo: AirSearchResultRepository,
-    example_air_search_result_two: AirSearchResult,
+    flights_search_repo: FlightSearchResultRepository,
+    example_flight_search_result_two: FlightSearchResult,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result_two)
+    await flights_search_repo.insert(example_flight_search_result_two)
 
-    example_new = example_air_search_result_two
+    example_new = example_flight_search_result_two
     example_new.id = "70c57962-0596-4663-8c3a-1730442c1f4c"
-    await air_search_repo.insert(example_new)
+    await flights_search_repo.insert(example_new)
 
     result_detail_id_inputs = [RESULT_DETAILS_ID, RESULT_DETAILS_ID2]
-    results_response = await air_search_repo.find_results_by_result_detail_ids(
+    results_response = await flights_search_repo.find_results_by_result_detail_ids(
         result_detail_id_inputs,
     )
     assert results_response is not None
@@ -268,5 +268,5 @@ async def test_find_results_by_multiple_result_detail_ids(
     for result_detail_id in result_detail_id_inputs:
         assert result_detail_id in result_detail_ids_set
 
-    for result_id in (example_air_search_result_two.id, example_new.id):
+    for result_id in (example_flight_search_result_two.id, example_new.id):
         assert result_id in result_ids

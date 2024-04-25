@@ -4,7 +4,6 @@ from typing import Any
 
 from starlette import status
 
-from snowfall.project.junction.rocket.service.api.air.models import Passenger
 from snowfall.project.junction.rocket.service.api.common.date import (
     convert_datetime_to_date,
 )
@@ -12,6 +11,7 @@ from snowfall.project.junction.rocket.service.api.common.passengers import (
     passengers_to_fake_user_ids,
 )
 from snowfall.project.junction.rocket.service.api.errors import RequestValidationError
+from snowfall.project.junction.rocket.service.api.flights.models import Passenger
 from snowfall.project.junction.rocket.service.api.hotel import types
 from snowfall.project.junction.rocket.service.api.hotel.models import (
     HotelSearchResult,

@@ -16,20 +16,20 @@ from snowfall.project.junction.rocket.service.api import (
     errors,
     settings,
 )
-from snowfall.project.junction.rocket.service.api.air import (
-    repositories as air_repository,
-)
-from snowfall.project.junction.rocket.service.api.air import (
-    router as air_router,
-)
-from snowfall.project.junction.rocket.service.api.air.transforms import (
-    transforms as air_transformers,
-)
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
 )
 from snowfall.project.junction.rocket.service.api.ferry import (
     router as ferry_router,
+)
+from snowfall.project.junction.rocket.service.api.flights import (
+    repositories as flights_repository,
+)
+from snowfall.project.junction.rocket.service.api.flights import (
+    router as flights_router,
+)
+from snowfall.project.junction.rocket.service.api.flights.transforms import (
+    transforms as flights_transformers,
 )
 from snowfall.project.junction.rocket.service.api.hotel import (
     router as hotel_router,
@@ -115,7 +115,7 @@ async def _http(app: application.Application[settings.Settings]) -> None:
     )
 
     routes = [
-        *air_router.get_routes(integration),
+        *flights_router.get_routes(integration),
         *hotel_router.get_routes(integration),
         *car_rental_router.get_routes(integration),
         *ferry_router.get_routes(integration),
@@ -210,8 +210,8 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
         http_client=await httpx_factory.make_client(app),
         auth=junction_one_auth,
     )
-    air_transformer = air_transformers.AirSearchResultTransformer()
-    air_search_result_repository = air_repository.AirSearchResultRepository(
+    flights_transformer = flights_transformers.FlightSearchResultTransformer()
+    flights_search_result_repository = flights_repository.FlightSearchResultRepository(
         collection=mongo_db.search_results,
     )
 
@@ -237,10 +237,10 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
                 search_implementations=[
                     (
                         segment_type_pb2.SEGMENT_TYPE_FLIGHT,
-                        multi_modal_search.AirSearcher(
+                        multi_modal_search.FlightSearcher(
                             client=junction_one_client,
-                            j1_transformer=air_transformer,
-                            repository=air_search_result_repository,
+                            j1_transformer=flights_transformer,
+                            repository=flights_search_result_repository,
                             temp_auth=junction_one_auth,
                         ).search,
                     ),

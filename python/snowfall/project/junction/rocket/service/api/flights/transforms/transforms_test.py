@@ -5,21 +5,21 @@ import freezegun
 import pytest
 
 from snowfall.project.junction.rocket import fixtures
-from snowfall.project.junction.rocket.service.api.air.models import (
-    AirSearchRequest,
-    AirSearchResult,
+from snowfall.project.junction.rocket.service.api.flights.models import (
     CabinDetails,
     FareTypeEnum,
+    FlightSearchRequest,
+    FlightSearchResult,
     Offer,
     Price,
     ResultDetails,
 )
-from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AirSearchResultRepository,
+from snowfall.project.junction.rocket.service.api.flights.repositories import (
+    FlightSearchResultRepository,
 )
-from snowfall.project.junction.rocket.service.api.air.transforms.transforms import (
-    AirSearchRequestTransformer,
-    AirSearchResultTransformer,
+from snowfall.project.junction.rocket.service.api.flights.transforms.transforms import (
+    FlightSearchRequestTransformer,
+    FlightSearchResultTransformer,
 )
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.stdlib import string
@@ -37,7 +37,7 @@ FLIGHT_REF_ID = "1P0_1234ABC"
 def example_request_one_way() -> Any:
     return {
         "data": {
-            "type": "air-searches",
+            "type": "flight-searches",
             "attributes": {
                 "departureAfter": date(2024, 1, 1),
                 "passengers": [
@@ -58,7 +58,7 @@ def example_request_one_way() -> Any:
 def example_request_round_trip() -> Any:
     return {
         "data": {
-            "type": "air-searches",
+            "type": "flight-searches",
             "attributes": {
                 "departureAfter": date(2024, 1, 1),
                 "returnAt": date(2024, 1, 2),
@@ -73,7 +73,7 @@ def example_request_round_trip() -> Any:
                 "selected_outbound_offer": {
                     "data": {
                         "id": OUTBOUND_SEARCH_OFFER_ID,
-                        "type": "air-offers",
+                        "type": "flight-offers",
                     },
                 },
                 "origin": {"data": {"id": fixtures.PLACES[0], "type": "places"}},
@@ -84,8 +84,8 @@ def example_request_round_trip() -> Any:
 
 
 @pytest.fixture()
-def example_air_search_result_one() -> Any:
-    return AirSearchResult(
+def example_flight_search_result_one() -> Any:
+    return FlightSearchResult(
         id=UUID,
         search_id=SEARCH_ID,
         provider_id="",
@@ -129,8 +129,8 @@ async def test_transform_basic_request(
     example_request_one_way: Any,
     places_stub: places_pb2_grpc.PlacesServiceStub,
 ) -> None:
-    search_request = AirSearchRequest(**example_request_one_way)
-    transformed = await AirSearchRequestTransformer().transform_outbound_query(
+    search_request = FlightSearchRequest(**example_request_one_way)
+    transformed = await FlightSearchRequestTransformer().transform_outbound_query(
         search_request,
         places_stub,
     )
@@ -151,17 +151,17 @@ async def test_transform_basic_request(
 @freezegun.freeze_time("2024-03-20")
 async def test_transform_round_trip_request(
     example_request_round_trip: Any,
-    example_air_search_result_one: Any,
-    air_search_repo: AirSearchResultRepository,
+    example_flight_search_result_one: Any,
+    flights_search_repo: FlightSearchResultRepository,
     places_stub: places_pb2_grpc.PlacesServiceStub,
 ) -> None:
-    await air_search_repo.insert(example_air_search_result_one)
+    await flights_search_repo.insert(example_flight_search_result_one)
 
-    result = await air_search_repo.find_result_by_offer_id(OUTBOUND_SEARCH_OFFER_ID)
+    result = await flights_search_repo.find_result_by_offer_id(OUTBOUND_SEARCH_OFFER_ID)
     assert result is not None
 
-    search_request = AirSearchRequest(**example_request_round_trip)
-    transformed = await AirSearchRequestTransformer().transform_inbound_query(
+    search_request = FlightSearchRequest(**example_request_round_trip)
+    transformed = await FlightSearchRequestTransformer().transform_inbound_query(
         search_request,
         "FLIGHT_REF_EXAMPLE",
         places_stub,
@@ -189,11 +189,11 @@ async def test_transform_round_trip_request(
 async def test_transform_basic_response() -> None:
     fixture = await load_file_fixture("POST-v1-travel-flight-search-return.json")
     j1_response = j1.SearchFlightsResponse(**fixture["data"])
-    transformed = AirSearchResultTransformer().transform(
+    transformed = FlightSearchResultTransformer().transform(
         j1_response,
         search_id=string.uuid(),
     )
 
     assert transformed is not None
     for result in transformed:
-        assert isinstance(result, AirSearchResult)
+        assert isinstance(result, FlightSearchResult)

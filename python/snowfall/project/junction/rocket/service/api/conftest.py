@@ -15,25 +15,25 @@ from starlette.middleware import Middleware, authentication
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket import fixtures
 from snowfall.project.junction.rocket.service.api import errors, includes
-from snowfall.project.junction.rocket.service.api.air import (
-    router as air_router,
-)
-from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AirSearchRequestRepository,
-    AirSearchResultRepository,
-)
-from snowfall.project.junction.rocket.service.api.air.transforms import (
-    transforms as air_transforms,
-)
-from snowfall.project.junction.rocket.service.api.air.types import (
-    AirSearchRequestTransformer,
-    AirSearchResultTransformer,
-)
 from snowfall.project.junction.rocket.service.api.car_rental import (
     router as car_rental_router,
 )
 from snowfall.project.junction.rocket.service.api.ferry import (
     router as ferry_router,
+)
+from snowfall.project.junction.rocket.service.api.flights import (
+    router as flights_router,
+)
+from snowfall.project.junction.rocket.service.api.flights.repositories import (
+    FlightSearchRequestRepository,
+    FlightSearchResultRepository,
+)
+from snowfall.project.junction.rocket.service.api.flights.transforms import (
+    transforms as flights_transforms,
+)
+from snowfall.project.junction.rocket.service.api.flights.types import (
+    FlightSearchRequestTransformer,
+    FlightSearchResultTransformer,
 )
 from snowfall.project.junction.rocket.service.api.hotel import (
     router as hotel_router,
@@ -159,8 +159,8 @@ def container(
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
     places_stub: places_pb2_grpc.PlacesServiceStub,
     junction_one_client: JunctionOneClient,
-    air_search_repo: AirSearchResultRepository,
-    air_search_request_repo: AirSearchRequestRepository,
+    flights_search_repo: FlightSearchResultRepository,
+    flights_search_request_repo: FlightSearchRequestRepository,
     hotel_search_repo: HotelSearchRepository,
     hotel_rooms_search_repo: HotelRoomsSearchRepository,
 ) -> lagom.Container:
@@ -171,13 +171,13 @@ def container(
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
     container[places_pb2_grpc.PlacesServiceStub] = places_stub
     container[JunctionOneClient] = junction_one_client
-    container[AirSearchResultRepository] = air_search_repo
-    container[AirSearchRequestRepository] = air_search_request_repo
-    container[AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
-        air_transforms.AirSearchRequestTransformer
+    container[FlightSearchResultRepository] = flights_search_repo
+    container[FlightSearchRequestRepository] = flights_search_request_repo
+    container[FlightSearchRequestTransformer] = (  # type: ignore[type-abstract]
+        flights_transforms.FlightSearchRequestTransformer
     )
-    container[AirSearchResultTransformer] = (  # type: ignore[type-abstract]
-        air_transforms.AirSearchResultTransformer
+    container[FlightSearchResultTransformer] = (  # type: ignore[type-abstract]
+        flights_transforms.FlightSearchResultTransformer
     )
     container[HotelSearchRepository] = hotel_search_repo
     container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
@@ -189,7 +189,7 @@ def container(
     container[HotelRoomsSearchRepository] = hotel_rooms_search_repo
 
     includes.register_resolvers(
-        air_results_repo=air_search_repo,
+        flights_results_repo=flights_search_repo,
     )
 
     return container
@@ -246,7 +246,7 @@ def app(
 ) -> applications.Starlette:
     integration = StarletteIntegration(container)
     route_list = [
-        *air_router.get_routes(integration),
+        *flights_router.get_routes(integration),
         *car_rental_router.get_routes(integration),
         *ferry_router.get_routes(integration),
         *hotel_router.get_routes(integration),
@@ -432,17 +432,19 @@ async def _list_places(
 
 
 @pytest.fixture()
-async def air_search_request_repo(
+async def flights_search_request_repo(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> AirSearchRequestRepository:
-    return AirSearchRequestRepository(collection=mongo_client["db"]["air_request"])
+) -> FlightSearchRequestRepository:
+    return FlightSearchRequestRepository(
+        collection=mongo_client["db"]["flight_request"],
+    )
 
 
 @pytest.fixture()
-async def air_search_repo(
+async def flights_search_repo(
     mongo_client: motor_asyncio.AsyncIOMotorClient,
-) -> AirSearchResultRepository:
-    return AirSearchResultRepository(collection=mongo_client["db"]["air_search"])
+) -> FlightSearchResultRepository:
+    return FlightSearchResultRepository(collection=mongo_client["db"]["flight_search"])
 
 
 @pytest.fixture()

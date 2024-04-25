@@ -37,7 +37,7 @@ class Passenger(BaseModel):
     date_of_birth: date
 
 
-class AirSearchAttributes(BaseModel):
+class FlightSearchAttributes(BaseModel):
     departure_after: datetime
     return_at: datetime | None = None
     passengers: list[Passenger]
@@ -45,7 +45,7 @@ class AirSearchAttributes(BaseModel):
 
 class SelectedOutboundOfferData(BaseModel):
     id: str
-    type: Literal["air-offers"]
+    type: Literal["flight-offers"]
 
 
 class SelectedOutboundOffer(BaseModel):
@@ -61,20 +61,20 @@ class PlaceContainer(BaseModel):
     data: PlaceIdentifier
 
 
-class AirSearchRelationships(BaseModel):
+class FlightSearchRelationships(BaseModel):
     selected_outbound_offer: SelectedOutboundOffer | None = None
     origin: PlaceContainer
     destination: PlaceContainer
 
 
-class AirSearchRequestData(BaseModel):
-    type: Literal["air-searches"]
-    attributes: AirSearchAttributes
-    relationships: AirSearchRelationships
+class FlightSearchRequestData(BaseModel):
+    type: Literal["flight-searches"]
+    attributes: FlightSearchAttributes
+    relationships: FlightSearchRelationships
 
 
-class AirSearchRequest(BaseModel):
-    data: AirSearchRequestData
+class FlightSearchRequest(BaseModel):
+    data: FlightSearchRequestData
 
 
 class SearchCapabilities(BaseModel):
@@ -116,7 +116,7 @@ class Offer(BaseModel):
     ref_ids: list[str]
 
 
-class AirSearchResult(BaseModel):
+class FlightSearchResult(BaseModel):
     id: str = Field(..., alias="_id")
     search_id: str
     provider_id: str
@@ -132,33 +132,33 @@ def expires_factory() -> datetime:
     return now_factory() + timedelta(hours=1)
 
 
-class AirSearchRequestStorage(BaseModel):
+class FlightSearchRequestStorage(BaseModel):
     search_id: str
     reseller_id: str
     expires_at: datetime = Field(default_factory=expires_factory)
     created_at: datetime = Field(default_factory=now_factory)
     updated_at: datetime = Field(default_factory=now_factory)
-    air: AirSearchAttributes
+    flight: FlightSearchAttributes
 
 
-class AirSearchResponseAttributes(AirSearchAttributes):
+class FlightSearchResponseAttributes(FlightSearchAttributes):
     status: StatusTypeEnum
     expires_at: str
 
 
-class AirSearchResultResource(models.Resource):
-    api_type: ClassVar[str] = "air-search-results"
+class FlightSearchResultResource(models.Resource):
+    api_type: ClassVar[str] = "flight-search-results"
 
     @classmethod
     def from_model(
         cls,
-        search_result: AirSearchResult,
-        search: AirSearchRequestStorage,
-    ) -> AirSearchResultResource:
+        search_result: FlightSearchResult,
+        search: FlightSearchRequestStorage,
+    ) -> FlightSearchResultResource:
         expires_at = search.expires_at.isoformat()
         return cls(
             id=search_result.id,
-            type="air-search-results",
+            type="flight-search-results",
             attributes={"expiresAt": expires_at},
             relationships={
                 "offers": {
@@ -181,10 +181,10 @@ class AirSearchResultResource(models.Resource):
 
 
 class SearchResource(models.Resource):
-    api_type: ClassVar[str] = "air-searches"
+    api_type: ClassVar[str] = "flight-searches"
 
     @classmethod
-    def from_model(cls, search: AirSearchRequestStorage) -> SearchResource:
+    def from_model(cls, search: FlightSearchRequestStorage) -> SearchResource:
         return cls(
             id=search.search_id,
             type=SearchResource.api_type,
@@ -192,7 +192,7 @@ class SearchResource(models.Resource):
 
 
 class ResultDetailResource(models.Resource):
-    api_type: ClassVar[str] = "air-result-details"
+    api_type: ClassVar[str] = "flight-result-details"
 
     @classmethod
     def from_model(cls, result_detail: ResultDetails) -> ResultDetailResource:
@@ -213,7 +213,7 @@ class ResultDetailResource(models.Resource):
 
 
 class OfferResource(models.Resource):
-    api_type: ClassVar[str] = "air-offers"
+    api_type: ClassVar[str] = "flight-offers"
 
     @classmethod
     def from_model(cls, offer: Offer) -> OfferResource:

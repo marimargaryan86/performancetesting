@@ -4,20 +4,20 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import errors
-from snowfall.project.junction.rocket.service.api.air.models import (
-    AirSearchRequest,
-    AirSearchRequestStorage,
-    AirSearchResponseAttributes,
-    AirSearchResultResource,
+from snowfall.project.junction.rocket.service.api.flights.models import (
+    FlightSearchRequest,
+    FlightSearchRequestStorage,
+    FlightSearchResponseAttributes,
+    FlightSearchResultResource,
     StatusTypeEnum,
 )
-from snowfall.project.junction.rocket.service.api.air.repositories import (
-    AirSearchRequestRepository,
-    AirSearchResultRepository,
+from snowfall.project.junction.rocket.service.api.flights.repositories import (
+    FlightSearchRequestRepository,
+    FlightSearchResultRepository,
 )
-from snowfall.project.junction.rocket.service.api.air.types import (
-    AirSearchRequestTransformer,
-    AirSearchResultTransformer,
+from snowfall.project.junction.rocket.service.api.flights.types import (
+    FlightSearchRequestTransformer,
+    FlightSearchResultTransformer,
 )
 from snowfall.project.junction.rocket.service.places.v1alpha import (
     places_pb2_grpc,
@@ -32,14 +32,14 @@ from snowfall.vendor.junction_one.client import JunctionOneClient
 
 
 def is_inbound(
-    air_search_request: AirSearchRequest,
+    flight_search_request: FlightSearchRequest,
 ) -> bool:
-    return air_search_request.data.relationships.selected_outbound_offer is not None
+    return flight_search_request.data.relationships.selected_outbound_offer is not None
 
 
 async def get_selected_outbound_offer_ref_ids(
     outbound_offer_id: str,
-    results_repo: AirSearchResultRepository,
+    results_repo: FlightSearchResultRepository,
 ) -> str:
     search_result = await results_repo.find_result_by_offer_id(
         outbound_offer_id,
@@ -50,23 +50,23 @@ async def get_selected_outbound_offer_ref_ids(
     return selected_offer.ref_ids[0]
 
 
-class AirSearch(endpoints.HTTPEndpoint):
+class FlightSearch(endpoints.HTTPEndpoint):
     @errors.handle_grpc_errors
     async def post(  # noqa: WPS217
         self,
         request: requests.Request,
         junction_one_client: JunctionOneClient = lagom.injectable,
-        air_search_request_transformer: AirSearchRequestTransformer = lagom.injectable,
-        air_search_result_transformer: AirSearchResultTransformer = lagom.injectable,
-        requests_repo: AirSearchRequestRepository = lagom.injectable,
-        results_repo: AirSearchResultRepository = lagom.injectable,
+        flight_search_request_transformer: FlightSearchRequestTransformer = lagom.injectable,
+        flight_search_result_transformer: FlightSearchResultTransformer = lagom.injectable,
+        requests_repo: FlightSearchRequestRepository = lagom.injectable,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
         places: places_pb2_grpc.PlacesServiceStub = lagom.injectable,
     ) -> responses.Response:
         reseller_id = request.user.username
         request_data = await request.json()
         search_id = string.uuid()
 
-        search_request = AirSearchRequest(**request_data)
+        search_request = FlightSearchRequest(**request_data)
         if is_inbound(search_request):
             relationships = search_request.data.relationships
             if relationships is None:
@@ -79,31 +79,31 @@ class AirSearch(endpoints.HTTPEndpoint):
                 results_repo=results_repo,
             )
 
-            query = await air_search_request_transformer.transform_inbound_query(
+            query = await flight_search_request_transformer.transform_inbound_query(
                 search_request,
                 outbound_flight_ref_id,
                 places,
             )
         else:
-            query = await air_search_request_transformer.transform_outbound_query(
+            query = await flight_search_request_transformer.transform_outbound_query(
                 search_request,
                 places,
             )
         j1_search_response = await junction_one_client.search_flights(query)
-        transformed = air_search_result_transformer.transform(
+        transformed = flight_search_result_transformer.transform(
             j1_search_response,
             search_id,
         )
 
         insert_response = await requests_repo.insert(
-            AirSearchRequestStorage(
+            FlightSearchRequestStorage(
                 search_id=search_id,
                 reseller_id=reseller_id,
-                air=request_data["data"]["attributes"],
+                flight=request_data["data"]["attributes"],
             ),
         )
         expires_at = insert_response.expires_at.isoformat()
-        attributes_response = AirSearchResponseAttributes(
+        attributes_response = FlightSearchResponseAttributes(
             **request_data["data"]["attributes"],
             status=StatusTypeEnum.pending,
             expires_at=expires_at,
@@ -113,12 +113,12 @@ class AirSearch(endpoints.HTTPEndpoint):
 
         response_model = models.Resource(
             id=search_id,
-            type="air-searches",
+            type="flight-searches",
             attributes=attributes_response,
             links={
                 "self": str(
                     request.url_for(
-                        "AirSearch",
+                        "FlightsSearch",
                     ),
                 ),
             },
@@ -133,12 +133,12 @@ class AirSearch(endpoints.HTTPEndpoint):
         )
 
 
-class AirSearchStatus(endpoints.HTTPEndpoint):
+class FlightSearchStatus(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        requests_repo: AirSearchRequestRepository = lagom.injectable,
-        results_repo: AirSearchResultRepository = lagom.injectable,
+        requests_repo: FlightSearchRequestRepository = lagom.injectable,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
         search_id: str = request.path_params["searchId"]
 
@@ -150,7 +150,7 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
             raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
 
         search_status = StatusTypeEnum.processing
-        search_data = search_result_from_requests_repo.air.model_dump(by_alias=True)
+        search_data = search_result_from_requests_repo.flight.model_dump(by_alias=True)
         expires_at = search_result_from_requests_repo.expires_at.isoformat()
 
         search_result_from_results_repo = (
@@ -159,7 +159,7 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
         if search_result_from_results_repo:
             search_status = StatusTypeEnum.completed
 
-        attributes_response = AirSearchResponseAttributes(
+        attributes_response = FlightSearchResponseAttributes(
             **search_data,
             status=search_status,
             expires_at=expires_at,
@@ -167,12 +167,12 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
 
         response_model = models.Resource(
             id=search_id,
-            type="air-searches",
+            type="flight-searches",
             attributes=attributes_response,
             links={
                 "self": str(
                     request.url_for(
-                        "AirSearchStatus",
+                        "FlightsSearchStatus",
                         searchId=request.path_params["searchId"],
                     ),
                 ),
@@ -188,12 +188,12 @@ class AirSearchStatus(endpoints.HTTPEndpoint):
         )
 
 
-class AirSearchRetrieval(endpoints.HTTPEndpoint):
+class FlightSearchRetrieval(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        requests_repo: AirSearchRequestRepository = lagom.injectable,
-        results_repo: AirSearchResultRepository = lagom.injectable,
+        requests_repo: FlightSearchRequestRepository = lagom.injectable,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
     ) -> responses.Response:
         search_id = request.path_params["searchId"]
         search = await requests_repo.find_by_search_id(search_id)
@@ -203,7 +203,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
         result_set = await results_repo.find_results_by_search_id(search_id)
 
         response_data = [
-            AirSearchResultResource.from_model(
+            FlightSearchResultResource.from_model(
                 search_result=search_result,
                 search=search,
             )
@@ -222,7 +222,7 @@ class AirSearchRetrieval(endpoints.HTTPEndpoint):
                 data=response_data,
                 links=pagination_helpers.get_next_url(
                     request.url_for(
-                        "AirSearchRetrieval",
+                        "FlightsSearchRetrieval",
                         searchId=request.path_params["searchId"],
                     ),
                     items_page.cursor,

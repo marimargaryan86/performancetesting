@@ -41,9 +41,11 @@ class PlacesResource(models.Resource):
                 "countryName": place.country_name,
                 "iataCode": iata,
                 "timeZone": place.time_zone,
-                "searchCapabilities": cls._get_search_capabiltiies(
-                    place.search_capabilities,
-                ),
+                "searchCapabilities": {
+                    "flight": bool(place.search_capabilities.air),
+                    "train": bool(place.search_capabilities.rail),
+                    "ferry": bool(place.search_capabilities.ferry),
+                },
                 "updatedAt": protobuf.protobuf_to_datetime(place.updated_at),
             },
             relationships=cls._get_relationships(place),
@@ -56,20 +58,6 @@ class PlacesResource(models.Resource):
                 ),
             },
         )
-
-    @classmethod
-    def _get_search_capabiltiies(
-        cls,
-        search_capabilities: models_pb2.ProviderMappings,
-    ) -> dict[str, bool]:
-        search_caps: dict[str, bool] = {
-            key: bool(getattr(search_capabilities, key))
-            for key in iter(["air", "ferry"])
-        }
-
-        search_caps["train"] = bool(search_capabilities.rail)
-
-        return search_caps
 
     @classmethod
     def _get_relationships(

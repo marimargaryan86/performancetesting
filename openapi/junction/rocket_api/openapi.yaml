@@ -22,11 +22,11 @@ info:
     name: Junction
     url: https://www.snowfalltravel.com
 x-tagGroups:
-  - name: Air
+  - name: Flights
     tags:
-      - air-searches
-      - air-quotes
-      - air-bookings
+      - flight-searches
+      - flight-quotes
+      - flight-bookings
   - name: Car Rental
     tags:
       - car-rental-searches
@@ -54,18 +54,6 @@ x-tagGroups:
     tags:
       - journey-suggestion-searches
 tags:
-  - name: air-bookings
-    description: 'TODO: ...'
-    x-displayName: Bookings
-  - name: air-quotes
-    description: 'TODO: ...'
-    x-displayName: Quotes
-  - name: air-searches
-    description: >-
-      TODO: To search for flights, you'll need to create an air search request.
-      An air search request describes the passengers and where and when they
-      want to travel.
-    x-displayName: Searches
   - name: car-rental-bookings
     description: 'TODO: ...'
     x-displayName: Bookings
@@ -89,6 +77,18 @@ tags:
       TODO: To search for ferries, you'll need to create an ferry search
       request. A ferry search request describes the passengers and where and
       when they want to travel.
+    x-displayName: Searches
+  - name: flight-bookings
+    description: 'TODO: ...'
+    x-displayName: Bookings
+  - name: flight-quotes
+    description: 'TODO: ...'
+    x-displayName: Quotes
+  - name: flight-searches
+    description: >-
+      TODO: To search for flights, you'll need to create an flight search request.
+      A flight search request describes the passengers and where and when they
+      want to travel.
     x-displayName: Searches
   - name: hotel-bookings
     description: 'TODO: ...'
@@ -128,112 +128,6 @@ tags:
       to travel.
     x-displayName: Searches
 paths:
-  /air/searches:
-    post:
-      summary: Create air search
-      tags:
-        - air-searches
-      operationId: post-air-searches
-      description: Used to initiate an air search
-      requestBody:
-        required: true
-        content:
-          application/vnd.api+json:
-            schema:
-              type: object
-              properties:
-                data:
-                  $ref: '#/components/schemas/AirSearch'
-              required:
-                - data
-      responses:
-        '201':
-          description: Created
-          content:
-            application/vnd.api+json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/AirSearch'
-                required:
-                  - data
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '422':
-          $ref: '#/components/responses/UnprocessableEntity'
-  /air/searches/{searchId}:
-    parameters:
-      - $ref: '#/components/parameters/searchId'
-    get:
-      summary: Get air search
-      tags:
-        - air-searches
-      operationId: get-air-searches-id
-      description: Used to retrieve an Air Search by ID
-      responses:
-        '200':
-          description: OK
-          content:
-            application/vnd.api+json:
-              schema:
-                type: object
-                description: Air Search Response
-                properties:
-                  data:
-                    oneOf:
-                      - $ref: '#/components/schemas/AirSearch'
-                required:
-                  - data
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-  /air/searches/{searchId}/results:
-    parameters:
-      - $ref: '#/components/parameters/searchId'
-      - $ref: '#/components/parameters/searchResultInclude'
-    get:
-      summary: List air search results
-      tags:
-        - air-searches
-      operationId: get-air-searches-id-results
-      description: Used to retrieve Search Results for an Air Search ID
-      parameters:
-        - $ref: '#/components/parameters/page-cursor'
-        - $ref: '#/components/parameters/page-limit'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/vnd.api+json:
-              schema:
-                allOf:
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        minItems: 0
-                        uniqueItems: true
-                        items:
-                          $ref: '#/components/schemas/AirSearchResult'
-                      included:
-                        $ref: '#/components/schemas/AirSearchResultIncluded'
-                    required:
-                      - data
-                  - $ref: '#/components/schemas/NextLink'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
   /car-rental/searches:
     post:
       summary: Create car rental search
@@ -427,6 +321,112 @@ paths:
                           $ref: '#/components/schemas/FerrySearchResult'
                       included:
                         $ref: '#/components/schemas/FerrySearchResultIncluded'
+                    required:
+                      - data
+                  - $ref: '#/components/schemas/NextLink'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /flights/searches:
+    post:
+      summary: Create flight search
+      tags:
+        - flight-searches
+      operationId: post-flights-searches
+      description: Used to initiate a flight search
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/FlightSearch'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FlightSearch'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /flights/searches/{searchId}:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+    get:
+      summary: Get flight search
+      tags:
+        - flight-searches
+      operationId: get-flights-searches-id
+      description: Used to retrieve a Flight Search by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Flight Search Response
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/FlightSearch'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /flights/searches/{searchId}/results:
+    parameters:
+      - $ref: '#/components/parameters/searchId'
+      - $ref: '#/components/parameters/searchResultInclude'
+    get:
+      summary: List flight search results
+      tags:
+        - flight-searches
+      operationId: get-flights-searches-id-results
+      description: Used to retrieve Search Results for a Flight Search ID
+      parameters:
+        - $ref: '#/components/parameters/page-cursor'
+        - $ref: '#/components/parameters/page-limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        minItems: 0
+                        uniqueItems: true
+                        items:
+                          $ref: '#/components/schemas/FlightSearchResult'
+                      included:
+                        $ref: '#/components/schemas/FlightSearchResultIncluded'
                     required:
                       - data
                   - $ref: '#/components/schemas/NextLink'
@@ -915,412 +915,6 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
-    AirCabinDetails:
-      title: Air Cabin Details
-      description: Cabin Information for Air Offers
-      type: object
-      properties:
-        resultDetail:
-          type: string
-          description: The Result Detail ID related to this air cabin detail
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        marketingName:
-          type: string
-          description: The cabin marketing name specific to each airline
-          example: Economy
-    AirOffer:
-      title: Air Offer
-      required:
-        - id
-        - type
-        - attributes
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              description: >-
-                Unique identifier (UUID) for the Air Offer object in [RFC
-                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              description: The Junction resource type
-              enum:
-                - air-offers
-              example: air-offers
-            attributes:
-              type: object
-              description: The properties that define an Air Offer object
-              required:
-                - price
-                - fareType
-                - name
-                - cabinDetails
-              properties:
-                price:
-                  $ref: '#/components/schemas/Price'
-                fareType:
-                  type: string
-                  description: The normalized Junction fare type used for all airlines
-                  enum:
-                    - basic
-                    - standard
-                    - enhanced
-                    - premium
-                    - premium-plus
-                    - lux
-                  example: basic
-                name:
-                  type: string
-                  description: The fare brand marketing name, specific to each airline
-                  example: Economy Basic
-                cabinDetails:
-                  type: array
-                  description: The list of cabin information relating to each result detail of the air offer
-                  items:
-                    $ref: '#/components/schemas/AirCabinDetails'
-    AirOfferIdentifier:
-      title: Air Offer Identifier
-      description: A unique identifier for an air offer
-      type: object
-      required:
-        - id
-        - type
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Air Offer object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - air-offers
-          example: air-offers
-    AirResultDetail:
-      title: Air Result Detail
-      required:
-        - id
-        - type
-        - attributes
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              description: >-
-                Unique identifier (UUID) for the Air Result Detail object in [RFC
-                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              description: The Junction resource type
-              enum:
-                - air-result-details
-              example: air-result-details
-            attributes:
-              type: object
-              description: The properties that define a Air Result Detail object
-              required:
-                - flightNumber
-                - marketingAirline
-                - arrivalStation
-                - departureStation
-                - departureTime
-                - arrivalTime
-                - duration
-                - operatingAirline
-              properties:
-                flightNumber:
-                  type: string
-                  description: The flight number of the marketing carrier
-                  example: '71'
-                marketingAirline:
-                  type: string
-                  description: The airline code of the marketing carrier
-                  example: EK
-                arrivalStation:
-                  type: string
-                  example: LON
-                departureStation:
-                  type: string
-                  example: PAR
-                departureAt:
-                  type: string
-                  description: >-
-                    The departure date time for the air result detail in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                arrivalAt:
-                  type: string
-                  description: >-
-                    The arrival date time for the air result detail in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                duration:
-                  type: integer
-                  example: 460
-                  description: >-
-                    The total duration of the segment, in minutes, defined by
-                    this air result detail
-                operatingAirline:
-                  type: string
-                  description: >-
-                    The airline code of the operating carrier, this may differ
-                    from the marketing carrier when one airline sells flights
-                    operated by another airline
-                  example: EK
-    AirResultDetailIdentifier:
-      title: Air Result Detail Identifier
-      description: A unique identifier for an air result detail
-      type: object
-      required:
-        - id
-        - type
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Air Result Detail object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - air-result-details
-          example: air-result-details
-    AirSearch:
-      title: Air Search
-      x-tags:
-        - air-searches
-      allOf:
-        - type: object
-          required:
-            - id
-            - type
-            - attributes
-          properties:
-            id:
-              type: string
-              description: >-
-                Unique identifier (UUID) for the Air Search object in [RFC
-                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              description: The Junction resource type
-              enum:
-                - air-searches
-              example: air-searches
-            attributes:
-              type: object
-              description: The properties that define an Air Search object
-              required:
-                - expiresAt
-                - status
-                - departureAfter
-                - passengers
-              properties:
-                expiresAt:
-                  type: string
-                  description: >-
-                    The time at which the object will expire in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-                  format: date-time
-                  readOnly: true
-                  example: '2019-08-24T14:15:22Z'
-                status:
-                  type: string
-                  description: The status of the Air Search
-                  readOnly: true
-                  enum:
-                    - unspecified
-                    - pending
-                    - processing
-                    - completed
-                    - failed
-                  example: completed
-                departureAfter:
-                  type: string
-                  description: >-
-                    The requested departure after date time for the air search in
-                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                returnAt:
-                  type: string
-                  description: >-
-                    The requested return date time for the air search in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format.
-                    Only required if performing a round trip search
-                  format: date-time
-                  example: '2019-08-25T14:15:22Z'
-                passengers:
-                  type: array
-                  description: >-
-                    The list of passengers that will be traveling on the requested
-                    air search
-                  minItems: 1
-                  items:
-                    $ref: '#/components/schemas/Passenger'
-            relationships:
-              type: object
-              description: The Junction resources related to this Air Search object
-              properties:
-                selectedOutboundOffer:
-                  type: object
-                  description: >-
-                    The selected outbound Offer ID for use when performing the inbound
-                    search on a roundtrip. Not required for one-way scenarios
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/AirOfferIdentifier'
-                origin:
-                  type: object
-                  description: The Junction Place ID that represents the origin location for the air search
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/PlaceIdentifier'
-                destination:
-                  type: object
-                  description: The Junction Place ID that represents the destination location for the air search
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/PlaceIdentifier'
-              required:
-                - origin
-                - destination
-        - $ref: '#/components/schemas/SelfLink'
-    AirSearchIdentifier:
-      title: Air Search Identifier
-      description: A unique identifier for air search
-      type: object
-      required:
-        - id
-        - type
-      properties:
-        id:
-          type: string
-          description: >-
-            Unique identifier (UUID) for the Air Search object in [RFC
-            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-          format: uuid
-          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-        type:
-          type: string
-          description: The Junction resource type
-          enum:
-            - air-searches
-          example: air-searches
-    AirSearchResult:
-      title: Air Search Result
-      type: object
-      x-tags:
-        - air-searches
-      required:
-        - id
-        - type
-        - attributes
-        - relationships
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              description: >-
-                Unique identifier (UUID) for the Air Search Result object in [RFC
-                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
-              format: uuid
-              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
-              readOnly: true
-            type:
-              type: string
-              description: The Junction resource type
-              enum:
-                - air-search-results
-              example: air-search-results
-            attributes:
-              type: object
-              description: The properties that define a Air Search Result object
-              required:
-                - expiresAt
-              properties:
-                expiresAt:
-                  type: string
-                  description: >-
-                    The time at which the object will expire in [RFC
-                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
-                  format: date-time
-                  example: '2019-08-24T14:15:22Z'
-                  readOnly: true
-            relationships:
-              type: object
-              description: The Junction resources related to this Air Search Result object
-              required:
-                - offers
-                - resultDetails
-                - search
-              properties:
-                offers:
-                  type: object
-                  description: The list of Offer IDs associated with this air search result
-                  required:
-                    - data
-                  properties:
-                    data:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/AirOfferIdentifier'
-                resultDetails:
-                  type: object
-                  description: The list of Result Detail IDs associated with this air search result
-                  required:
-                    - data
-                  properties:
-                    data:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/AirResultDetailIdentifier'
-                search:
-                  type: object
-                  description: The Air Search ID that this ferry search result belongs to
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/AirSearchIdentifier'
-    AirSearchResultIncluded:
-      title: OfferIncluded
-      type: array
-      items:
-        oneOf:
-          - $ref: '#/components/schemas/AirOffer'
-          - $ref: '#/components/schemas/AirResultDetail'
-        discriminator:
-          propertyName: type
-          mapping:
-            air-offers: '#/components/schemas/AirOffer'
-            air-result-details: '#/components/schemas/AirResultDetail'
     CarRentalOffer:
       title: Car Rental Offer
       type: object
@@ -2243,6 +1837,412 @@ components:
             - car
             - bicycle
           example: car
+    FlightCabinDetails:
+      title: Flight Cabin Details
+      description: Cabin Information for Flight Offers
+      type: object
+      properties:
+        resultDetail:
+          type: string
+          description: The Result Detail ID related to this flight cabin detail
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        marketingName:
+          type: string
+          description: The cabin marketing name specific to each airline
+          example: Economy
+    FlightOffer:
+      title: Flight Offer
+      required:
+        - id
+        - type
+        - attributes
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Flight Offer object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - flight-offers
+              example: flight-offers
+            attributes:
+              type: object
+              description: The properties that define a Flight Offer object
+              required:
+                - price
+                - fareType
+                - name
+                - cabinDetails
+              properties:
+                price:
+                  $ref: '#/components/schemas/Price'
+                fareType:
+                  type: string
+                  description: The normalized Junction fare type used for all airlines
+                  enum:
+                    - basic
+                    - standard
+                    - enhanced
+                    - premium
+                    - premium-plus
+                    - lux
+                  example: basic
+                name:
+                  type: string
+                  description: The fare brand marketing name, specific to each airline
+                  example: Economy Basic
+                cabinDetails:
+                  type: array
+                  description: The list of cabin information relating to each result detail of the flight offer
+                  items:
+                    $ref: '#/components/schemas/FlightCabinDetails'
+    FlightOfferIdentifier:
+      title: Flight Offer Identifier
+      description: A unique identifier for a flight offer
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Flight Offer object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - flight-offers
+          example: flight-offers
+    FlightResultDetail:
+      title: Flight Result Detail
+      required:
+        - id
+        - type
+        - attributes
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Flight Result Detail object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - flight-result-details
+              example: flight-result-details
+            attributes:
+              type: object
+              description: The properties that define a Flight Result Detail object
+              required:
+                - flightNumber
+                - marketingAirline
+                - arrivalStation
+                - departureStation
+                - departureTime
+                - arrivalTime
+                - duration
+                - operatingAirline
+              properties:
+                flightNumber:
+                  type: string
+                  description: The flight number of the marketing carrier
+                  example: '71'
+                marketingAirline:
+                  type: string
+                  description: The airline code of the marketing carrier
+                  example: EK
+                arrivalStation:
+                  type: string
+                  example: LON
+                departureStation:
+                  type: string
+                  example: PAR
+                departureAt:
+                  type: string
+                  description: >-
+                    The departure date time for the flight result detail in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                arrivalAt:
+                  type: string
+                  description: >-
+                    The arrival date time for the flight result detail in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                duration:
+                  type: integer
+                  example: 460
+                  description: >-
+                    The total duration of the segment, in minutes, defined by
+                    this flight result detail
+                operatingAirline:
+                  type: string
+                  description: >-
+                    The airline code of the operating carrier, this may differ
+                    from the marketing carrier when one airline sells flights
+                    operated by another airline
+                  example: EK
+    FlightResultDetailIdentifier:
+      title: Flight Result Detail Identifier
+      description: A unique identifier for a flight result detail
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Flight Result Detail object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - flight-result-details
+          example: flight-result-details
+    FlightSearch:
+      title: Flight Search
+      x-tags:
+        - flight-searches
+      allOf:
+        - type: object
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Flight Search object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - flight-searches
+              example: flight-searches
+            attributes:
+              type: object
+              description: The properties that define a Flight Search object
+              required:
+                - expiresAt
+                - status
+                - departureAfter
+                - passengers
+              properties:
+                expiresAt:
+                  type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                status:
+                  type: string
+                  description: The status of the Flight Search
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                departureAfter:
+                  type: string
+                  description: >-
+                    The requested departure after date time for the flight search in
+                    [RFC 3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                returnAt:
+                  type: string
+                  description: >-
+                    The requested return date time for the flight search in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format.
+                    Only required if performing a round trip search
+                  format: date-time
+                  example: '2019-08-25T14:15:22Z'
+                passengers:
+                  type: array
+                  description: >-
+                    The list of passengers that will be traveling on the requested
+                    flight search
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/Passenger'
+            relationships:
+              type: object
+              description: The Junction resources related to this Flight Search object
+              properties:
+                selectedOutboundOffer:
+                  type: object
+                  description: >-
+                    The selected outbound Offer ID for use when performing the inbound
+                    search on a roundtrip. Not required for one-way scenarios
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/FlightOfferIdentifier'
+                origin:
+                  type: object
+                  description: The Junction Place ID that represents the origin location for the flight search
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+                destination:
+                  type: object
+                  description: The Junction Place ID that represents the destination location for the flight search
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PlaceIdentifier'
+              required:
+                - origin
+                - destination
+        - $ref: '#/components/schemas/SelfLink'
+    FlightSearchIdentifier:
+      title: Flight Search Identifier
+      description: A unique identifier for a flight search
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Flight Search object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - flight-searches
+          example: flight-searches
+    FlightSearchResult:
+      title: Flight Search Result
+      type: object
+      x-tags:
+        - flight-searches
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Flight Search Result object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - flight-search-results
+              example: flight-search-results
+            attributes:
+              type: object
+              description: The properties that define a Flight Search Result object
+              required:
+                - expiresAt
+              properties:
+                expiresAt:
+                  type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  example: '2019-08-24T14:15:22Z'
+                  readOnly: true
+            relationships:
+              type: object
+              description: The Junction resources related to this Flight Search Result object
+              required:
+                - offers
+                - resultDetails
+                - search
+              properties:
+                offers:
+                  type: object
+                  description: The list of Offer IDs associated with this flight search result
+                  required:
+                    - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FlightOfferIdentifier'
+                resultDetails:
+                  type: object
+                  description: The list of Result Detail IDs associated with this flight search result
+                  required:
+                    - data
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FlightResultDetailIdentifier'
+                search:
+                  type: object
+                  description: The Flight Search ID that this flight search result belongs to
+                  required:
+                    - data
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/FlightSearchIdentifier'
+    FlightSearchResultIncluded:
+      title: Flight Search Result Included
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/FlightOffer'
+          - $ref: '#/components/schemas/FlightResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            flight-offers: '#/components/schemas/FlightOffer'
+            flight-result-details: '#/components/schemas/FlightResultDetail'
     HotelRoomsSearchRequest:
       title: Hotel Rooms Search Request
       type: object
@@ -2359,7 +2359,7 @@ components:
                     data:
                       type: array
                       items:
-                        $ref: '#/components/schemas/AirOfferIdentifier'
+                        $ref: '#/components/schemas/FlightOfferIdentifier'
                   required:
                     - data
                 trainOffers:
@@ -2731,10 +2731,10 @@ components:
           description: >-
             Indicates whether train searches support this Place
           example: false
-        air:
+        flight:
           type: boolean
           description: >-
-            Indicates whether air searches support this Place
+            Indicates whether flight searches support this Place
           example: true
         ferry:
           type: boolean
@@ -2743,7 +2743,7 @@ components:
           example: false
       required:
         - train
-        - air
+        - flight
         - ferry
     SelfLink:
       title: Self Link

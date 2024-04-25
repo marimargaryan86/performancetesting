@@ -58,7 +58,7 @@ class Suggestion(std_models.Resource):
                     data=[
                         std_models.ResourceIdentifier(
                             id=flight_offer.id,
-                            type="air-offers",
+                            type="flight-offers",
                         )
                         for flight_offer in offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT]
                     ],

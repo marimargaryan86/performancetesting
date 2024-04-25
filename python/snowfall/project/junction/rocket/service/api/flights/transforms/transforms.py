@@ -5,11 +5,13 @@ from collections.abc import Mapping, Sequence
 from starlette import exceptions, status
 
 from snowfall.project.junction.rocket.service.api import constants
-from snowfall.project.junction.rocket.service.api.air import models as rocket
-from snowfall.project.junction.rocket.service.api.air import types
-from snowfall.project.junction.rocket.service.api.air.transforms import models as safej1
 from snowfall.project.junction.rocket.service.api.common.passengers import (
     passengers_to_fake_user_ids,
+)
+from snowfall.project.junction.rocket.service.api.flights import models as rocket
+from snowfall.project.junction.rocket.service.api.flights import types
+from snowfall.project.junction.rocket.service.api.flights.transforms import (
+    models as safej1,
 )
 from snowfall.project.junction.rocket.service.places.v1alpha import (
     places_pb2,
@@ -23,15 +25,15 @@ class SearchCriteriaUnfulfilledError(Exception):
     """Search Criteria is missing values."""
 
 
-class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
+class FlightSearchRequestTransformer(types.FlightSearchRequestTransformer):
     async def transform_outbound_query(
         self,
-        air_search_request: rocket.AirSearchRequest,
+        flight_search_request: rocket.FlightSearchRequest,
         places_grpc: places_pb2_grpc.PlacesServiceStub,
     ) -> j1.SearchFlightsRequest:
-        attributes = air_search_request.data.attributes
-        destination = air_search_request.data.relationships.destination
-        origin = air_search_request.data.relationships.origin
+        attributes = flight_search_request.data.attributes
+        destination = flight_search_request.data.relationships.destination
+        origin = flight_search_request.data.relationships.origin
 
         (origin_airport, destination_airport) = await asyncio.gather(
             self._get_place_iata_by_id(
@@ -57,11 +59,11 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
 
     async def transform_inbound_query(
         self,
-        air_search_request: rocket.AirSearchRequest,
+        flight_search_request: rocket.FlightSearchRequest,
         outbound_flight_ref_id: str,
         places_grpc: places_pb2_grpc.PlacesServiceStub,
     ) -> j1.SearchFlightsRequest:
-        attributes = air_search_request.data.attributes
+        attributes = flight_search_request.data.attributes
 
         return_departure_at = attributes.return_at
         return_departure_after = (
@@ -70,8 +72,8 @@ class AirSearchRequestTransformer(types.AirSearchRequestTransformer):
         if not return_departure_after:
             raise SearchCriteriaUnfulfilledError()
 
-        destination = air_search_request.data.relationships.destination
-        origin = air_search_request.data.relationships.origin
+        destination = flight_search_request.data.relationships.destination
+        origin = flight_search_request.data.relationships.origin
 
         (origin_airport, destination_airport) = await asyncio.gather(
             self._get_place_iata_by_id(
@@ -140,12 +142,12 @@ def _transform_result_detail(
     )
 
 
-class AirSearchResultTransformer(types.AirSearchResultTransformer):
+class FlightSearchResultTransformer(types.FlightSearchResultTransformer):
     def transform(
         self,
         j1_response: j1.SearchFlightsResponse,
         search_id: str,
-    ) -> list[rocket.AirSearchResult]:
+    ) -> list[rocket.FlightSearchResult]:
         safe_j1_response = safej1.SearchFlightsResponse(**j1_response.model_dump())
         offers = safe_j1_response.offers
         search_results = []
@@ -164,7 +166,7 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
         offer: safej1.Offer,
         j1_response: safej1.SearchFlightsResponse,
         search_id: str,
-    ) -> rocket.AirSearchResult:
+    ) -> rocket.FlightSearchResult:
         result_details = []
         result_detail_id_from_segments = {}
 
@@ -208,7 +210,7 @@ class AirSearchResultTransformer(types.AirSearchResultTransformer):
                 )
                 offers.append(new_offer)
 
-        return rocket.AirSearchResult(
+        return rocket.FlightSearchResult(
             id=string.uuid(),
             search_id=search_id,  # TODO(reuben.t): store the search in mongo
             provider_id=str(constants.JUNCTION_ONE_PROVIDER_ID),

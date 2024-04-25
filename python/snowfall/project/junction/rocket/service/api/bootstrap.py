@@ -8,12 +8,12 @@ from motor import motor_asyncio
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket.service.api import includes
-from snowfall.project.junction.rocket.service.api.air import (
+from snowfall.project.junction.rocket.service.api.flights import (
     repositories,
     types,
 )
-from snowfall.project.junction.rocket.service.api.air.transforms import (
-    transforms as air_transforms,
+from snowfall.project.junction.rocket.service.api.flights.transforms import (
+    transforms as flights_transforms,
 )
 from snowfall.project.junction.rocket.service.api.hotel import (
     repositories as hotel_repositories,
@@ -103,18 +103,20 @@ async def create_dependencies(
         http_client=await httpx_factory.make_client(app),
         auth=container[TemporaryTokenAuth],
     )
-    air_search_results_repository = repositories.AirSearchResultRepository(
+    flights_search_results_repository = repositories.FlightSearchResultRepository(
         collection=mongo_db.search_results,
     )
-    container[repositories.AirSearchResultRepository] = air_search_results_repository
-    container[repositories.AirSearchRequestRepository] = (
-        repositories.AirSearchRequestRepository(collection=mongo_db.searches)
+    container[repositories.FlightSearchResultRepository] = (
+        flights_search_results_repository
     )
-    container[types.AirSearchRequestTransformer] = (  # type: ignore[type-abstract]
-        air_transforms.AirSearchRequestTransformer
+    container[repositories.FlightSearchRequestRepository] = (
+        repositories.FlightSearchRequestRepository(collection=mongo_db.searches)
     )
-    container[types.AirSearchResultTransformer] = (  # type: ignore[type-abstract]
-        air_transforms.AirSearchResultTransformer
+    container[types.FlightSearchRequestTransformer] = (  # type: ignore[type-abstract]
+        flights_transforms.FlightSearchRequestTransformer
+    )
+    container[types.FlightSearchResultTransformer] = (  # type: ignore[type-abstract]
+        flights_transforms.FlightSearchResultTransformer
     )
     container[hotel_repositories.HotelSearchRepository] = (
         hotel_repositories.HotelSearchRepository(
@@ -134,7 +136,7 @@ async def create_dependencies(
     )
 
     includes.register_resolvers(
-        air_results_repo=air_search_results_repository,
+        flights_results_repo=flights_search_results_repository,
     )
 
     return container

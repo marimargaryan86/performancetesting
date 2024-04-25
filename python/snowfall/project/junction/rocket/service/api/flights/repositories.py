@@ -2,38 +2,38 @@ from collections.abc import Sequence
 
 import pymongo
 
-from snowfall.project.junction.rocket.service.api.air.models import (
-    AirSearchRequestStorage,
-    AirSearchResult,
+from snowfall.project.junction.rocket.service.api.flights.models import (
+    FlightSearchRequestStorage,
+    FlightSearchResult,
 )
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
-class AirSearchRequestRepository(
-    repository.PydanticRepository[AirSearchRequestStorage],
-    mixins.InsertMixin[AirSearchRequestStorage],
-    mixins.ExistsMixin[AirSearchRequestStorage],
-    mixins.FindByIdMixin[AirSearchRequestStorage],
+class FlightSearchRequestRepository(
+    repository.PydanticRepository[FlightSearchRequestStorage],
+    mixins.InsertMixin[FlightSearchRequestStorage],
+    mixins.ExistsMixin[FlightSearchRequestStorage],
+    mixins.FindByIdMixin[FlightSearchRequestStorage],
 ):
-    _model = AirSearchRequestStorage
+    _model = FlightSearchRequestStorage
 
     async def find_by_search_id(
         self,
         identifier: str,
-    ) -> AirSearchRequestStorage | None:
+    ) -> FlightSearchRequestStorage | None:
         return await self._execute(self._collection.find_one, {"search_id": identifier})
 
 
 # TODO(jeremy): Add new repository for ResultDetails (https://git.snowfall.se/junction/junction/-/merge_requests/5178#note_252722)
 
 
-class AirSearchResultRepository(
-    repository.PydanticRepository[AirSearchResult],
-    mixins.InsertMixin[AirSearchResult],
-    mixins.ExistsMixin[AirSearchResult],
-    mixins.FindByIdMixin[AirSearchResult],
+class FlightSearchResultRepository(
+    repository.PydanticRepository[FlightSearchResult],
+    mixins.InsertMixin[FlightSearchResult],
+    mixins.ExistsMixin[FlightSearchResult],
+    mixins.FindByIdMixin[FlightSearchResult],
 ):
-    _model = AirSearchResult
+    _model = FlightSearchResult
     _indexes = (
         pymongo.IndexModel("offers._id", background=True),
         pymongo.IndexModel("result_details._id", background=True),
@@ -42,7 +42,7 @@ class AirSearchResultRepository(
     async def find_results_by_search_id(
         self,
         search_id: str,
-    ) -> resultset.ResultSet[AirSearchResult]:
+    ) -> resultset.ResultSet[FlightSearchResult]:
         return await self._execute(
             query=self._collection.find,
             filter={"search_id": search_id},
@@ -64,7 +64,7 @@ class AirSearchResultRepository(
     async def find_result_by_offer_id(
         self,
         identifier: str,
-    ) -> AirSearchResult:
+    ) -> FlightSearchResult:
         return await self._execute(
             self._collection.find_one,
             {"offers._id": identifier},
@@ -73,7 +73,7 @@ class AirSearchResultRepository(
     async def find_results_by_offer_ids(
         self,
         identifiers: Sequence[str],
-    ) -> resultset.ResultSet[AirSearchResult]:
+    ) -> resultset.ResultSet[FlightSearchResult]:
         return await self._execute(
             self._collection.find,
             {"offers._id": {"$in": identifiers}},
@@ -82,7 +82,7 @@ class AirSearchResultRepository(
     async def find_result_by_result_detail_id(
         self,
         identifier: str,
-    ) -> AirSearchResult:
+    ) -> FlightSearchResult:
         return await self._execute(
             self._collection.find_one,
             {"result_details._id": identifier},
@@ -91,7 +91,7 @@ class AirSearchResultRepository(
     async def find_results_by_result_detail_ids(
         self,
         identifiers: Sequence[str],
-    ) -> resultset.ResultSet[AirSearchResult]:
+    ) -> resultset.ResultSet[FlightSearchResult]:
         return await self._execute(
             self._collection.find,
             {"result_details._id": {"$in": identifiers}},
