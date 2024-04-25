@@ -1,0 +1,21 @@
+.dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dots img {
+  width: 29px;
+  margin-bottom: 16px;
+}
+
+.dots span {
+  font-family: Releway, sans-serif;
+  letter-spacing: .5px;
+  line-height: 18px;
+  font-size: 14px;
+  border-radius: 22px;
+  padding: 10px 16px;
+  color: #4BB69C;
+  background-color: #4BB69C1A;
+}

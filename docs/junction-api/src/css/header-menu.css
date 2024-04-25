@@ -1,0 +1,38 @@
+.header-menu {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  min-height: 96px;
+  max-height: 96px;
+  margin-bottom: -96px;
+  z-index: 100;
+  transition: 0.25s;
+}
+
+.header-menu {
+  display: flex;
+  flex-direction: row;
+  gap: 48px;
+  align-items: center;
+}
+
+.header-menu img {
+  margin-left: 64px;
+}
+
+.header-menu a {
+  font-family: Releway, sans-serif;
+  line-height: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFF;
+}
+
+.header-menu a:hover {
+  text-decoration: none;
+}
+
+.header-background {
+  transition: 0.25s;
+  background-color: #17372F;
+}

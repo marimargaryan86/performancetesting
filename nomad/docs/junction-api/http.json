@@ -1,0 +1,15 @@
+{
+  "development": {
+    "deploy": false
+  },
+  "production": {
+    "variables": {
+      "traefik_entrypoints": "web",
+      "traefik_rule": "(Host(`docs2.junction.travel`))",
+      "traefik_doc_ui_users": []
+    }
+  },
+  "sandbox": {
+    "deploy": false
+  }
+}

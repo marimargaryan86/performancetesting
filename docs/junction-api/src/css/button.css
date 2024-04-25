@@ -1,0 +1,39 @@
+.button {
+  border-radius: 34px;
+  cursor: pointer;
+  padding: 11px 24px;
+  font-family: Inter, 'sans-serif';
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFF;
+}
+
+.button:hover {
+  color: #FFF;
+}
+
+img {
+  margin-right: 8px;
+}
+
+.outline {
+  background: none;
+  border: 1px #6DC4AF solid;
+  transition: 150ms;
+}
+
+.outline:hover {
+  background-color: rgba(75, 182, 156, 0.2);
+  transition: 150ms;
+}
+
+.filled {
+  background-color: #4BB69C;
+  border: none;
+  transition: 150ms;
+}
+
+.filled:hover {
+  background-color: #317665;
+  transition: 150ms;
+}
