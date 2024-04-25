@@ -1,5 +1,7 @@
 from collections.abc import Sequence
 
+import pymongo
+
 from snowfall.project.junction.rocket.service.api.air.models import (
     AirSearchRequestStorage,
     AirSearchResult,
@@ -32,6 +34,10 @@ class AirSearchResultRepository(
     mixins.FindByIdMixin[AirSearchResult],
 ):
     _model = AirSearchResult
+    _indexes = (
+        pymongo.IndexModel("offers._id", background=True),
+        pymongo.IndexModel("result_details._id", background=True),
+    )
 
     async def find_results_by_search_id(
         self,
