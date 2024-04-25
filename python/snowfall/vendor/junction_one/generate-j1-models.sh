@@ -48,8 +48,10 @@ class BaseModel(model.DefaultingBaseModel):
 	)
 
 		'
-		docker run --rm -v "$PWD":/dir koxudaxi/datamodel-code-generator:0.25.5 \
-			--url https://api.one.junction.dev/v1/api-docs.json \
+		curl -s https://api.one.junction.dev/v1/api-docs.json | jq --sort-keys >spec.json
+
+		docker run --rm -v "$PWD:/dir" koxudaxi/datamodel-code-generator:0.25.5 \
+			--input /dir/spec.json \
 			--input-file-type openapi \
 			--output-model-type pydantic_v2.BaseModel \
 			--output /dir/temp.py \
