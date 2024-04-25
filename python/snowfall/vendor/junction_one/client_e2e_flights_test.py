@@ -26,7 +26,7 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
             auto_models.OriginDestinationRequest(
                 departure_airport="LON",
                 arrival_airport="PAR",
-                departure_date=datetime.now(tz=UTC).date() + timedelta(days=1),
+                departure_date=datetime.now(tz=UTC).date() + timedelta(days=30),
             ),
         ],
     )
