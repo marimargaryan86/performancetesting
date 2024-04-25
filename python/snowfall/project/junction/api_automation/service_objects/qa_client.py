@@ -1,7 +1,7 @@
 import httpx
 
 from snowfall.project.junction.api_automation.service_objects.air import (
-    AirClient,
+    FlightClient,
 )
 from snowfall.project.junction.api_automation.service_objects.car_rental import (
     CarRentalClient,
@@ -40,7 +40,7 @@ class QaClient:
             sentry_url,
         )
 
-        self.air = AirClient(self._client_wrapper)
+        self.flight = FlightClient(self._client_wrapper)
         self.car_rental = CarRentalClient(self._client_wrapper)
         self.ferry = FerryClient(self._client_wrapper)
         self.hotel = HotelClient(self._client_wrapper)

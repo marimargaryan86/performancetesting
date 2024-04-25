@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "9063e7a2-827f-4f17-9c5f-d5a1a1bea8ab",
-    "name": "Air",
+    "_postman_id": "6ea5fa69-5f4d-4153-b87d-9e70fbb2db2c",
+    "name": "Flights",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "33483058"
   },
@@ -15,7 +15,7 @@
             "exec": [
               "var json_data = pm.response.json();",
               "var search_id = json_data.data.id;",
-              "pm.collectionVariables.set(\"air_search_id\", search_id);",
+              "pm.collectionVariables.set(\"flight_search_id\", search_id);",
               "",
               "pm.test(\"Response status code is 200\", function () {",
               "    pm.expect(pm.response.code).to.equal(200);",
@@ -66,7 +66,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"air-searches\",\n        \"attributes\": {\n            \"origin\": \"LAX\",\n            \"destination\": \"JFK\",\n            \"departureAfter\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"air-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"b917b2a4-b8d6-53d6-b9b9-a90eb1da01af\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"c7dcabc2-a4e1-5b78-8314-0891095205ae\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -144,14 +144,14 @@
           }
         },
         "url": {
-          "raw": "{{junction_api_url}}/air/searches/{{air_search_id}}",
+          "raw": "{{junction_api_url}}/air/searches/{{flight_search_id}}",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
             "air",
             "searches",
-            "{{air_search_id}}"
+            "{{flight_search_id}}"
           ]
         }
       },
@@ -180,15 +180,21 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{junction_api_url}}/air/searches/{{air_search_id}}/results",
+          "raw": "{{junction_api_url}}/air/searches/{{flight_search_id}}/results?include=offers,resultDetails",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
             "air",
             "searches",
-            "{{air_search_id}}",
+            "{{flight_search_id}}",
             "results"
+          ],
+          "query": [
+            {
+              "key": "include",
+              "value": "offers,resultDetails"
+            }
           ]
         }
       },
