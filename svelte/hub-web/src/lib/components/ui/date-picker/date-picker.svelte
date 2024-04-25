@@ -102,7 +102,7 @@
     </span>
   {/if}
 
-  <div use:melt={$field} class="input" typography="body-large" class:error>
+  <div use:melt={$field} class="input" typography="body-medium" class:error>
     <div class="segments">
       {#each $segmentContents as seg, idx (idx)}
         <div use:melt={$segment(seg.part)} class="segment">
@@ -119,7 +119,7 @@
   {#if $open}
     <div class="popover" use:melt={$content} transition:scale={{ duration: 200, start: 0.8 }}>
       {#if externalLabel}
-        <div typography="headline-small" class="title">{externalLabel}</div>
+        <div typography="headline-medium" class="title">{externalLabel}</div>
       {/if}
 
       <Calendar

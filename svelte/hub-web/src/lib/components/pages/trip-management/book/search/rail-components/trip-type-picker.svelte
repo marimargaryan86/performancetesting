@@ -12,7 +12,7 @@
     <!-- TODO(2024-03-20/alvin.s): In E2E, use the `testid` only when other selector strats fail.-->
     <label data-testid={tripType}>
       <input type="radio" bind:group={value} value={tripType} />
-      <span>{$t(`tripTypes.${tripType}`)}</span>
+      <span typography="body-medium">{$t(`tripTypes.${tripType}`)}</span>
     </label>
   {/each}
 </div>
