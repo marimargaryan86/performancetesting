@@ -8,7 +8,7 @@
   "production": {
     "variables": {
       "count": 1,
-      "memory_value": 40960
+      "memory_value": 81920
     }
   },
   "sandbox": {
