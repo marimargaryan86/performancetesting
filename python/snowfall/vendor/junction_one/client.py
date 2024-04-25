@@ -1,5 +1,6 @@
 import inspect
-from typing import Any, Literal
+from collections.abc import Mapping, Sequence
+from typing import Any, Literal, TypedDict
 
 import httpx
 from pydantic import BaseModel
@@ -11,6 +12,10 @@ from snowfall.vendor.junction_one.models import base as models
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Method = Literal["GET", "POST"]
+
+
+class EncodedData(TypedDict):
+    data: dict[str, str]
 
 
 class JunctionOneClient:
@@ -216,6 +221,20 @@ class JunctionOneClient:
 
         return auto_models.ReservationFieldResponse(**response.data)
 
+    async def update_reservation(
+        self,
+        query: models.UpdateReservationRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.Reservation:
+        response = await self._make_request_with_data(
+            "POST",
+            "/v1/reservation/update",
+            self._encode_fields(query),
+            rate_limit_timeout=rate_limit_timeout,
+        )
+
+        return auto_models.Reservation(**response.data)
+
     async def get_seatmap_for_flights(
         self,
         query: auto_models.FlightSeatMapRequest,
@@ -245,6 +264,43 @@ class JunctionOneClient:
         )
 
         return auto_models.SearchFlightsResponse(**response.data)
+
+    async def create_reseller_user(
+        self,
+        model: auto_models.CreateUserAccountRequest,
+        org_id: int,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.UserAccount:
+        response = await self._make_request_with_data(
+            "POST",
+            "/v1/reseller/user/create",
+            {
+                "data": {
+                    "data": model.model_dump_json(exclude_unset=True, by_alias=True),
+                    "orgId": org_id,
+                },
+            },
+            rate_limit_timeout=rate_limit_timeout,
+        )
+
+        return auto_models.UserAccount(**response.data)
+
+    def _encode_fields(self, model: auto_models.BaseModel) -> EncodedData:
+        ret = {}
+        for field_name, field in model.__class__.__fields__.items():  # type: ignore[attr-defined]
+            value = getattr(model, field_name)
+            if value is None:
+                continue
+            if isinstance(value, BaseModel):
+                ret[field.alias] = value.model_dump_json(
+                    by_alias=True,
+                    exclude_none=True,
+                )
+            elif isinstance(value, Sequence):
+                ret[field.alias] = ",".join(map(str, value))
+            else:
+                ret[field.alias] = str(value)
+        return {"data": ret}
 
     def _encode_data(
         self,
@@ -285,6 +341,21 @@ class JunctionOneClient:
     ) -> models.Response:
         if hasattr(payload, "org_id"):  # noqa: WPS421
             payload.org_id = payload.org_id or self._get_org_id_from_auth()
+
+        return await self._make_request_with_data(
+            method,
+            url,
+            self._encode_data(method, payload, encode_json=encode_json),
+            rate_limit_timeout,
+        )
+
+    async def _make_request_with_data(  # noqa: WPS238,WPS231
+        self,
+        method: _Method,
+        url: str,
+        encoded_data: Mapping[str, Any],
+        rate_limit_timeout: float | None = 60,
+    ) -> models.Response:
         if self._rate_limit_client and rate_limit_timeout:
             try:
                 await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
@@ -296,7 +367,7 @@ class JunctionOneClient:
                 method=method,
                 url=self._api_base_url.copy_with(path=url),
                 timeout=self.timeout,
-                **self._encode_data(method, payload, encode_json=encode_json),
+                **encoded_data,
             )
         except httpx.TimeoutException as timeout_exc:
             raise errors.TimeOutError.from_error(timeout_exc) from timeout_exc

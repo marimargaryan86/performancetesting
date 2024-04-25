@@ -1,4 +1,5 @@
-from datetime import UTC, datetime, timedelta
+from collections.abc import Sequence
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -15,10 +16,12 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     2. Create a trip
     3. Update trip information with credit card - get card_id to use to addFop
     """
+    user_ids = [-10]
+    org_id = 2623634
     search_req = auto_models.SearchFlightsRequest(
         refs=[],
-        user_ids=[2602533],
-        org_id=635604,
+        user_ids=user_ids,
+        org_id=org_id,
         ods=[
             auto_models.OriginDestinationRequest(
                 departure_airport="LON",
@@ -44,6 +47,23 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     assert flight_offer_ref
     assert search_req.ods
     destination_loc = search_req.ods[0].arrival_airport
+
+    # Create the user.
+    new_user = await remote_junction_one_client.create_reseller_user(
+        auto_models.CreateUserAccountRequest(
+            email="email@example.com",
+            first_name="John",
+            middle_name="Middle",
+            last_name="Smith",
+            suffix="SR",
+            dob=date(2000, 1, 1),
+            gender=auto_models.Gender.male,
+            phone_number="4407771000000",
+            flags=0,
+        ),
+        org_id=org_id,
+    )
+    assert new_user.id
 
     # Get seatmap
     seatmaps = await remote_junction_one_client.get_seatmap_for_flights(
@@ -72,21 +92,18 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     board = trip_create_response.boards[0]
     assert board.refs
 
+    # Assert that the users are the anonymous ones.
+    assert isinstance(board.summary, Sequence)
+    assert board.summary[0].user_ids == user_ids
+
     tripboard_ref = board.refs[0]
     flight_reservations = tripboard_ref.reservation_ids
     assert flight_reservations
 
-    # Update reservation field
     reservation_id = flight_reservations[0]
-    field_id = 872543  # Department field
-    field_value_id = 872547  # Department value: Engineering
-    remark = ""
 
-    request = models.UpdateReservationFieldRequest(
-        reservation_id=reservation_id,
-        field_id=field_id,
-        field_value_id=field_value_id,
-        remark=remark,
+    # Replace the users with the new reseller user.
+    reservation = await remote_junction_one_client.update_reservation(
+        models.UpdateReservationRequest(id=reservation_id, user_ids=[new_user.id]),
     )
-
-    await remote_junction_one_client.update_reservation_field(request)
+    assert reservation.user_ids == [new_user.id]
