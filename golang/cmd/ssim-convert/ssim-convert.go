@@ -221,6 +221,10 @@ ResultParser:
 			fmt.Printf("Exporting carrier: %s\n", v.AirlineDesignator)
 
 		case ssim.FlightLeg:
+			if v.AircraftOwner != "" && v.AircraftOwner != v.AirlineDesignator {
+				continue ResultParser
+			}
+
 			if zipWriter == nil {
 				continue ResultParser
 			}

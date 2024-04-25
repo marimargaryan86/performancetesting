@@ -431,7 +431,7 @@ func (p *Parser) parseFlightLeg(b block) (FlightLeg, error) {
 	fl.PassengerReservationsBookingDesignator = string(b[75:95])
 	fl.PassengerReservationsBookingModifier = string(b[95:100])
 	fl.MealServiceNote = string(b[100:110])
-	fl.JointOperationAirlineDesignators = string(b[110:119])
+	fl.JointOperationAirlineDesignators = strings.TrimSpace(string(b[110:119]))
 	fl.MinimumConnectingTimeStatus = string(b[119:121])
 	fl.SecureFlightIndicator = string(b[121])
 
@@ -445,7 +445,7 @@ func (p *Parser) parseFlightLeg(b block) (FlightLeg, error) {
 		}
 	}
 
-	fl.AircraftOwner = string(b[128:131])
+	fl.AircraftOwner = strings.TrimSpace(string(b[128:131]))
 	fl.CockpitCrewEmployer = string(b[131:134])
 	fl.CabinCrewEmployer = string(b[134:137])
 
