@@ -126,9 +126,11 @@ class SuggestionSearchProcessor:
         try:
             search_results = await self._searcher.find_results(
                 search.SearchRequest(
-                    route=route,
-                    departure_after=protobuf.protobuf_to_datetime(
-                        criteria.departure_after,
+                    outbound=search.TripRequest(
+                        route=route,
+                        departure_after=protobuf.protobuf_to_datetime(
+                            criteria.departure_after,
+                        ),
                     ),
                     date_of_births=[
                         protobuf.protobuf_to_date(passenger.date_of_birth)

@@ -323,11 +323,17 @@ class RailSearcher:
 
 
 @dataclasses.dataclass(frozen=True)
-class SearchRequest:
+class TripRequest:
     route: routes.Route
     departure_after: datetime.datetime
+
+
+@dataclasses.dataclass(frozen=True)
+class SearchRequest:
+    outbound: TripRequest
     date_of_births: Sequence[datetime.date]
     reseller_id: str
+    inbound: TripRequest | None = None
 
 
 class Searcher:
@@ -341,10 +347,10 @@ class Searcher:
         }
 
     async def find_results(self, request: SearchRequest) -> SearchResult:
-        self._validate_route(route=request.route)
+        self._validate_route(route=request.outbound.route)
 
         return SearchResult(
-            route=request.route,
+            route=request.outbound.route,
             segments=await self._find_offers_sequential(request),
         )
 
@@ -362,9 +368,9 @@ class Searcher:
 
     async def _find_offers_sequential(self, request: SearchRequest) -> list[Segment]:
         segments = []
-        departure_after = request.departure_after
+        departure_after = request.outbound.departure_after
 
-        for idx, segment in enumerate(request.route.segments):
+        for idx, segment in enumerate(request.outbound.route.segments):
             if idx > 0:
                 departure_after += segment.mct_prefix
 

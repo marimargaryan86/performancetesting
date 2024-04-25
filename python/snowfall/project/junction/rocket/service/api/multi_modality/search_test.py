@@ -384,8 +384,10 @@ class TestSearcher:
         searcher = search.Searcher(search_implementations=[])
         search_result = await searcher.find_results(
             search.SearchRequest(
-                route=routes.Route(segments=[]),
-                departure_after=datetime.datetime.now(datetime.UTC),
+                outbound=search.TripRequest(
+                    route=routes.Route(segments=[]),
+                    departure_after=datetime.datetime.now(datetime.UTC),
+                ),
                 date_of_births=[_DOB],
                 reseller_id="foo",
             ),
@@ -400,8 +402,10 @@ class TestSearcher:
         with pytest.raises(search.UnsupportedSegmentTypeError):
             await searcher.find_results(
                 search.SearchRequest(
-                    route=mono_route,
-                    departure_after=datetime.datetime.now(datetime.UTC),
+                    outbound=search.TripRequest(
+                        route=mono_route,
+                        departure_after=datetime.datetime.now(datetime.UTC),
+                    ),
                     date_of_births=[_DOB],
                     reseller_id="foo",
                 ),
@@ -415,8 +419,10 @@ class TestSearcher:
         )
         search_result = await searcher.find_results(
             search.SearchRequest(
-                route=mono_route,
-                departure_after=_OFFER_DATE,
+                outbound=search.TripRequest(
+                    route=mono_route,
+                    departure_after=_OFFER_DATE,
+                ),
                 date_of_births=[_DOB],
                 reseller_id="foo",
             ),
@@ -437,8 +443,10 @@ class TestSearcher:
         )
         search_result = await searcher.find_results(
             search.SearchRequest(
-                route=mono_route,
-                departure_after=_OFFER_DATETIME1,
+                outbound=search.TripRequest(
+                    route=mono_route,
+                    departure_after=_OFFER_DATETIME1,
+                ),
                 date_of_births=[_DOB],
                 reseller_id="foo",
             ),
@@ -460,8 +468,10 @@ class TestSearcher:
         )
         search_result = await searcher.find_results(
             search.SearchRequest(
-                route=multi_route,
-                departure_after=_OFFER_DATE,
+                outbound=search.TripRequest(
+                    route=multi_route,
+                    departure_after=_OFFER_DATE,
+                ),
                 date_of_births=[_DOB],
                 reseller_id="foo",
             ),
