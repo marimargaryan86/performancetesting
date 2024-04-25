@@ -6,7 +6,9 @@
     "variables": {
       "traefik_entrypoints": "web",
       "traefik_rule": "(Host(`docs2.junction.travel`))",
-      "traefik_doc_ui_users": []
+      "traefik_doc_ui_users": [
+        "snowfall:$apr1$nVeL//e6$BP5DcRDvCLbuXfWca.jzc."
+      ]
     }
   },
   "sandbox": {
