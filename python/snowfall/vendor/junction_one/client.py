@@ -262,7 +262,6 @@ class JunctionOneClient:
             rate_limit_timeout=rate_limit_timeout,
             encode_json=True,
         )
-
         return auto_models.SearchFlightsResponse(**response.data)
 
     async def create_reseller_user(

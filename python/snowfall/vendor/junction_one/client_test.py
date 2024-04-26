@@ -257,6 +257,37 @@ async def test_search_flights(
     assert response == auto_models.SearchFlightsResponse(**fixture["data"])
 
 
+async def test_search_flights_no_offers(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-travel-flight-search-zero-offers.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/travel/flight/search",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    response = await junction_one_client.search_flights(
+        auto_models.SearchFlightsRequest(
+            refs=[],
+            user_ids=[2602533],
+            org_id=635604,
+            ods=[
+                auto_models.OriginDestinationRequest(
+                    departure_airport="NOS",
+                    arrival_airport="TVU",
+                    departure_date=datetime.now(tz=UTC).date() + timedelta(days=1),
+                ),
+            ],
+        ),
+    )
+
+    assert response == auto_models.SearchFlightsResponse(**fixture["data"])
+
+
 async def test_update_reservation_field(
     junction_one_client: JunctionOneClient,
     httpx_mock: pytest_httpx.HTTPXMock,

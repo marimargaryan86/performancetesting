@@ -1,0 +1,8 @@
+{
+    "status": "OK",
+    "code": 200,
+    "data": {
+        "rateCodeDescr": "Special Rate!",
+        "odCount": 2
+    }
+}
