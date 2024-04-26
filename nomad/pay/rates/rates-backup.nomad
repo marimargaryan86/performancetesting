@@ -31,7 +31,7 @@ job "pay-rates-rates-backup" {
   type        = "batch"
 
   periodic {
-    cron             = "*/8 * * * *"
+    cron             = "0 * * * *"
     prohibit_overlap = true
   }
 

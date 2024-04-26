@@ -1,5 +1,6 @@
 {
   "development": {
+    "deploy": false,
     "variables": {
       "xe_address": "https://xecdapi.xe.com/v1"
     }
@@ -10,6 +11,7 @@
     }
   },
   "sandbox": {
+    "deploy": false,
     "variables": {
       "xe_address": "https://xecdapi.xe.com/v1"
     }
