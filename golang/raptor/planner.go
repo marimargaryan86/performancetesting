@@ -9,7 +9,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/uber/h3-go/v4"
-	"runtime"
 	"sort"
 	"time"
 
@@ -17,6 +16,12 @@ import (
 )
 
 const maxSearchRange = 28 * time.Hour
+
+// The Raptor algorithm does not seem to scale very well with a high number of
+// workers due to the overhead of sharing data among workers. So we should not
+// set this based on underlying available CPU cores, instead we hard code this
+// number to something that seems to give good results.
+const workerCount = 4
 
 var executionTimes = promauto.NewHistogram(prometheus.HistogramOpts{
 	Name: "planner_execution_time_seconds",
@@ -76,7 +81,6 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 		}
 	}
 
-	workerCount := (runtime.NumCPU() * 2) + 1
 	seen := make(map[uuid.UUID]struct{})
 	trips := make([]*Trip, 0)
 	iterations := 0
