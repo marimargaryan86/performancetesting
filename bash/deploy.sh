@@ -21,15 +21,32 @@ for TEMPLATE_FILE in "$@"; do
 	}
 
 	if hcl2json "${TEMPLATE_FILE}" | jq -e 'try((.job[][].group[][].service[] | select(.port == "grpc")) != null)' >/dev/null; then
-		echo -n "[${SERVICE_NAME}] registering as grpc service in consul: "
-		jq -nc --arg Name "${SERVICE_NAME}" \
-			'{"Kind": "service-defaults", $Name, "LocalRequestTimeoutMs": 50000, "Protocol": "grpc"}' |
-			curl -sL -X PUT "${NOMAD_ADDR%:*}:8500/v1/config" --data @-
+		CONSUL_SERVICE_NAME=$(
+			hcl2json "${TEMPLATE_FILE}" |
+				jq -er --arg ENVIRONMENT_NAME "${ENVIRONMENT_NAME}" '
+				try(
+				if (.job[][].group[][].service[] | select(.port == "grpc").name) == "${JOB}-${var.environment}"
+				then (.job | to_entries[].key) + "-${var.environment}"
+				else (.job[][].group[][].service[] | select(.tags[] == "grpc").name)
+				end |
+				sub("\\${var\\.environment}";$ENVIRONMENT_NAME))'
+		)
 
-		echo -n "[${SERVICE_NAME}] setting 50s timeout in consul: "
-		jq -nc --arg Name "${SERVICE_NAME}" \
-			'{"Kind":"service-router", $Name, "Routes": [{"Match": {"HTTP":{}}, "Destination": {"RequestTimeout": "50s"}}]}' |
-			curl -sL -X PUT "${NOMAD_ADDR%:*}:8500/v1/config" --data @-
+		if [[ -n ${CONSUL_SERVICE_NAME} ]]; then
+			echo -n "[${CONSUL_SERVICE_NAME}]: register grpc service-defaults in consul: "
+			jq -nc --arg Name "${CONSUL_SERVICE_NAME}" \
+				'{"Kind": "service-defaults", $Name, "LocalRequestTimeoutMs": 50000, "Protocol": "grpc"}' |
+				curl -sL -X PUT "${NOMAD_ADDR%:*}:8500/v1/config" --data @-
+			echo
+
+			echo -n "[${CONSUL_SERVICE_NAME}]: setting 50s service-router timeout in consul: "
+			jq -nc --arg Name "${CONSUL_SERVICE_NAME}" \
+				'{"Kind":"service-router", $Name, "Routes": [{"Match": {"HTTP":{}}, "Destination": {"RequestTimeout": "50s"}}]}' |
+				curl -sL -X PUT "${NOMAD_ADDR%:*}:8500/v1/config" --data @-
+			echo
+		else
+			echo "Found grpc service in ${TEMPLATE_FILE} (${SERVICE_NAME}), but couldn't find correct service name for grpc."
+		fi
 	fi
 
 	CHECK_INDEX=$(awk '/Job Modify Index:/ {print $NF}' <<<"${PLAN_OUTPUT}")
