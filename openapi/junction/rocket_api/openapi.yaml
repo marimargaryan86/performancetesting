@@ -1,7 +1,7 @@
 ---
 openapi: 3.0.0
 info:
-  title: Junction Rocket API
+  title: Junction API
   version: 1.0.0
   description: |-
     This API follows the [JSON:API][jsonapi] specification.
@@ -22,31 +22,14 @@ info:
     name: Junction
     url: https://www.snowfalltravel.com
 x-tagGroups:
-  - name: Flights
+  - name: Search
     tags:
       - flight-searches
-      - flight-quotes
-      - flight-bookings
-  - name: Car Rental
-    tags:
-      - car-rental-searches
-      - car-rental-quotes
-      - car-rental-bookings
-  - name: Ferry
-    tags:
-      - ferry-searches
-      - ferry-quotes
-      - ferry-bookings
-  - name: Hotel
-    tags:
-      - hotel-searches
-      - hotel-quotes
-      - hotel-bookings
-  - name: Trains
-    tags:
       - train-searches
-      - train-quotes
-      - train-bookings
+  - name: Book
+    tags:
+      - quotes
+      - bookings
   - name: Places
     tags:
       - places
@@ -54,54 +37,34 @@ x-tagGroups:
     tags:
       - journey-suggestion-searches
 tags:
-  - name: car-rental-bookings
-    description: 'TODO: ...'
+  - name: bookings
+    description: >-
+      TODO: To create a booking...
     x-displayName: Bookings
-  - name: car-rental-quotes
-    description: 'TODO: ...'
-    x-displayName: Quotes
   - name: car-rental-searches
     description: >-
       TODO: To search for car rentals, you'll need to create an car rental
       search request. A car rental search request describes the passengers and
       where and when they want to travel.
-    x-displayName: Searches
-  - name: ferry-bookings
-    description: 'TODO: ...'
-    x-displayName: Bookings
-  - name: ferry-quotes
-    description: 'TODO: ...'
-    x-displayName: Quotes
+    x-displayName: Car Rental
   - name: ferry-searches
     description: >-
       TODO: To search for ferries, you'll need to create an ferry search
       request. A ferry search request describes the passengers and where and
       when they want to travel.
-    x-displayName: Searches
-  - name: flight-bookings
-    description: 'TODO: ...'
-    x-displayName: Bookings
-  - name: flight-quotes
-    description: 'TODO: ...'
-    x-displayName: Quotes
+    x-displayName: Ferries
   - name: flight-searches
     description: >-
       TODO: To search for flights, you'll need to create an flight search request.
       A flight search request describes the passengers and where and when they
       want to travel.
-    x-displayName: Searches
-  - name: hotel-bookings
-    description: 'TODO: ...'
-    x-displayName: Bookings
-  - name: hotel-quotes
-    description: 'TODO: ...'
-    x-displayName: Quotes
+    x-displayName: Flights
   - name: hotel-searches
     description: >-
       TODO: To search for hotels, you'll need to create a hotel search request.
       A hotel search request describes the passengers and where and when they
       want to stay.
-    x-displayName: Searches
+    x-displayName: Hotels
   - name: internal
     description: Endpoints not for public use.
     x-displayName: Internal
@@ -115,19 +78,83 @@ tags:
       you to find these locations and identify which verticals you can search
       with them.
     x-displayName: Places
-  - name: train-bookings
-    description: 'TODO: ...'
-    x-displayName: Bookings
-  - name: train-quotes
-    description: 'TODO: ...'
+  - name: quotes
+    description: >-
+      TODO: To create a quote...
     x-displayName: Quotes
   - name: train-searches
     description: >-
       TODO: To search for trains, you'll need to create a train search request. A
       train search request describes the passengers and where and when they want
       to travel.
-    x-displayName: Searches
+    x-displayName: Trains
 paths:
+  /bookings:
+    post:
+      summary: Create booking
+      tags:
+        - bookings
+      operationId: post-bookings
+      description: Used to initiate a Booking
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/Booking'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Booking'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /bookings/{bookingId}:
+    parameters:
+      - $ref: '#/components/parameters/bookingId'
+    get:
+      summary: Get booking
+      tags:
+        - bookings
+      operationId: get-bookings-id
+      description: Used to retrieve a Booking by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Booking'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /car-rental/searches:
     post:
       summary: Create car rental search
@@ -816,6 +843,76 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
+  /quotes:
+    post:
+      summary: Create quote
+      tags:
+        - quotes
+      operationId: post-quotes
+      description: Used to initiate a quote
+      requestBody:
+        required: true
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/Quote'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Quote'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /quotes/{quoteId}:
+    parameters:
+      - $ref: '#/components/parameters/quoteId'
+    get:
+      summary: Get quote
+      tags:
+        - quotes
+      operationId: get-quotes-id
+      description: Used to retrieve a Quote
+      responses:
+        '200':
+          description: Success
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Quote'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /trains/searches:
     post:
       summary: Create train search
@@ -915,6 +1012,28 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
+    Booking:
+      title: Booking
+      type: object
+      description: Booking placeholder
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Booking object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+          readOnly: true
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - bookings
+          example: bookings
     CarRentalOffer:
       title: Car Rental Offer
       type: object
@@ -1435,6 +1554,27 @@ components:
       required:
         - status
         - detail
+    FareRules:
+      type: object
+      title: Fare Rules
+      description: >-
+        Fare Rules describe the rules and restrictions that apply to the travel offer
+        that is being booked. The amount and type of rules will depend on the provider
+        and supplier. Examples include things such as cancellation policies, travel
+        restrictions, stay requirements, etc
+      properties:
+        title:
+          type: string
+          example: Cancellation policy
+          description: The operator's name for the fare rule
+        body:
+          type: string
+          description: The operator's detailed description of the fare rule
+          example: >-
+            Tickets can be cancelled until the day of departure without any charges.
+            After that, no refund is possible anymore.  NOTE: the refund delay for
+            Homeprint and Mobile tickets is 2 days. Except for agency fee of 20euro
+            for handling.
     FerryOffer:
       title: Ferry Offer
       type: object
@@ -2516,6 +2656,64 @@ components:
           example: '2000-01-01'
       required:
         - dateOfBirth
+    Penalties:
+      type: object
+      title: Penalties
+      description: >-
+        Penalties describe the various fees or other penalties that could
+        potentially be applied to the requested travel, if the conditions are met
+      properties:
+        applicableTo:
+          type: object
+          title: Applicable To
+          description: >-
+            This describes who this penalty could apply to based on
+            the passengers date of birth
+          properties:
+            dateOfBirthAfter:
+              type: string
+              description: >-
+                If set, the penalty applies to all passengers whose
+                date of birth is **after** the date specified by this field
+              format: date
+              example: '2000-01-01'
+            dateOfBirthBefore:
+              type: string
+              description: >-
+                If set, the penalty applies to all passengers whose
+                date of birth is **before** the date specified by this field
+              format: date
+              example: '2000-01-01'
+        penaltyType:
+          type: string
+          description: The penalty type
+          enum:
+            - exchange
+            - refund
+          example: exchange
+        changeable:
+          type: boolean
+          description: A flag indicating whether the penalty can be changed or not
+          example: true
+        refundable:
+          type: boolean
+          description: A flag indicating whether the penalty is refundable or not
+          example: false
+        conditionsApply:
+          description: >-
+            A flag indicating whether there are some restrictions to this penalty
+            rule. Check the fare rules for conditions
+          type: boolean
+          example: false
+        applicability:
+          type: string
+          description: This describes whether the penalty will apply before or after
+          enum:
+            - before
+            - after
+          example: before
+        price:
+          $ref: '#/components/schemas/Price'
     Place:
       title: Place
       x-tags:
@@ -2720,6 +2918,131 @@ components:
       required:
         - price
         - breakdownType
+    Quote:
+      title: Quote
+      description: A Quote is...
+      x-tags:
+        - quotes
+      allOf:
+        - type: object
+          required:
+            - id
+            - type
+            - attributes
+            - relationships
+          properties:
+            id:
+              type: string
+              description: >-
+                Unique identifier (UUID) for the Quote object in [RFC
+                4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+              format: uuid
+              example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+              readOnly: true
+            type:
+              type: string
+              description: The Junction resource type
+              enum:
+                - quotes
+              example: quotes
+            attributes:
+              type: object
+              description: The properties that define a Quote object
+              readOnly: true
+              required:
+                - expiresAt
+                - totalPrice
+                - quotedOffers
+              properties:
+                expiresAt:
+                  type: string
+                  description: >-
+                    The time at which the object will expire in [RFC
+                    3339](https://datatracker.ietf.org/doc/html/rfc3339) format
+                  format: date-time
+                  readOnly: true
+                  example: '2019-08-24T14:15:22Z'
+                totalPrice:
+                  $ref: '#/components/schemas/Price'
+                quotedOffers:
+                  type: array
+                  description: The quoted offers that make up this quote
+                  readOnly: true
+                  items:
+                    $ref: '#/components/schemas/QuotedOffer'
+            relationships:
+              description: The Junction resources related to this Quote object
+              oneOf:
+                - type: object
+                  title: Train Offers
+                  description: The list of Train Offer IDs associated to this quote
+                  required:
+                    - offers
+                  properties:
+                    offers:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TrainOfferIdentifier'
+                - type: object
+                  title: Flight Offers
+                  description: The list of Flight Offer IDs associated to this quote
+                  required:
+                    - offers
+                  properties:
+                    offers:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FlightOfferIdentifier'
+        - $ref: '#/components/schemas/SelfLink'
+    QuotedOffer:
+      title: Quoted Offer
+      type: object
+      description: A Quoted Offer is created to prepare a selected offer to be booked
+      required:
+        - offer
+        - price
+      properties:
+        offer:
+          type: string
+          description: The Offer ID related to this Quoted Offer
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        price:
+          $ref: '#/components/schemas/Price'
+        priceBreakdown:
+          $ref: '#/components/schemas/PriceBreakdown'
+        requiredDocuments:
+          type: array
+          description: The list of required documents for this Quoted Offer
+          example:
+            - passport-number
+            - residence-address
+          items:
+            type: string
+            enum:
+              - date-of-birth
+              - nationality
+              - expiration-date
+              - issuing-country
+              - passport-number
+              - residence-country-code
+              - residence-address
+              - issue-date
+            example: passport-number
+        penalties:
+          type: array
+          description: The list of penalties that apply to this Quoted Offer
+          items:
+            $ref: '#/components/schemas/Penalties'
+        fareRules:
+          type: array
+          description: The list of fare rules that apply to this Quoted Offer
+          items:
+            $ref: '#/components/schemas/FareRules'
+        conditionalPrices:
+          type: array
+          description: The list of conditional prices for this Quoted Offer
+          items:
+            $ref: '#/components/schemas/ConditionalPrice'
     SearchCapabilities:
       type: object
       title: Search Capabilities
@@ -3392,6 +3715,28 @@ components:
         type: string
         example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
       description: Journey Suggestion identifier
+    quoteId:
+      name: quoteId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: >-
+        Unique identifier (UUID) for the Quote object in [RFC
+        4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+    bookingId:
+      name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: >-
+        Unique identifier (UUID) for the Booking object in [RFC
+        4122](https://datatracker.ietf.org/doc/html/rfc4122) format
   securitySchemes:
     jwt:
       type: http
