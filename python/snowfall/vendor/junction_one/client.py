@@ -113,7 +113,7 @@ class JunctionOneClient:
 
         return auto_models.GetTripBoardsResponse(**response.data)
 
-    async def get_tripboard(
+    async def get_tripboards(
         self,
         trip_id: int,
         rate_limit_timeout: float | None = None,
@@ -195,7 +195,7 @@ class JunctionOneClient:
             "/v1/tripboard/process",
             query,
             rate_limit_timeout=rate_limit_timeout,
-            encode_json=True,
+            encode_json=False,
         )
 
         if not response.data:

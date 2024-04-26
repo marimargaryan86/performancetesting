@@ -158,7 +158,7 @@ async def test_get_tripboard(
         json=fixture,
     )
 
-    response = await junction_one_client.get_tripboard(1234)
+    response = await junction_one_client.get_tripboards(1234)
 
     assert response == auto_models.GetTripBoardsResponse(**fixture["data"])
 

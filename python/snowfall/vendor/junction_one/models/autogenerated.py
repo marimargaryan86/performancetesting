@@ -23,6 +23,7 @@ class BaseModel(model.DefaultingBaseModel):
         alias_generator=alias_generators.to_camel,
         populate_by_name=True,
         from_attributes=True,
+        use_enum_values=True,
     )
 
 

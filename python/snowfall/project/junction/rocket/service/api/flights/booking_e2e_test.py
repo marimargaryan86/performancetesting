@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Sequence
 from datetime import UTC, date, datetime, timedelta
 
@@ -79,15 +80,15 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     assert new_user.id
 
     # Create a trip
-    trip_create_response = await remote_junction_one_client.create_trip_with_refs(
+    trip_boards_response = await remote_junction_one_client.create_trip_with_refs(
         models.TripCreateRefsRequest(
             name="Trip to {0}".format(destination_loc),
             flight_refs=flight_offer_ref[0],
         ),
     )
 
-    assert trip_create_response.boards
-    board = trip_create_response.boards[0]
+    assert trip_boards_response.boards
+    board = trip_boards_response.boards[0]
     assert board.refs
 
     # Assert that the users are the anonymous ones.
@@ -132,6 +133,15 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     # 5. Reprice/Quote creation
     ####################################################################################
 
+    assert trip_boards_response.trip
+    assert trip_boards_response.trip.id
+    assert board.id
+    trip_boards_response = await _reprice_trip_board(
+        remote_junction_one_client=remote_junction_one_client,
+        trip_board_id=board.id,
+        trip_id=trip_boards_response.trip.id,
+    )
+
     ####################################################################################
     # 6. Get transaction token
     ####################################################################################
@@ -147,3 +157,41 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     ####################################################################################
     # 9. Poll until tripboard is processed.
     ####################################################################################
+
+
+_SLEEP_SECONDS = 5
+_CUT_OFF_SECONDS = 60
+
+
+async def _reprice_trip_board(
+    remote_junction_one_client: JunctionOneClient,
+    trip_board_id: int,
+    trip_id: int,
+) -> auto_models.GetTripBoardsResponse:
+    await remote_junction_one_client.process_tripboard(
+        models.TripboardProcessRequest(
+            id=trip_board_id,
+            flag=auto_models.TripBoardProcessingFlags.reprice,
+        ),
+    )
+
+    await asyncio.sleep(_SLEEP_SECONDS)
+
+    async with asyncio.timeout(_CUT_OFF_SECONDS):
+        while True:
+            boards_response = await remote_junction_one_client.get_tripboards(
+                trip_id=trip_id,
+            )
+            board = next(
+                board_obj
+                for board_obj in boards_response.boards
+                if board_obj.id == trip_board_id
+            )
+
+            if board.processing_flags == 0:
+                return boards_response
+
+            if board.exception_flags:
+                raise ValueError("Exception flags are set")
+
+            await asyncio.sleep(_SLEEP_SECONDS)

@@ -77,7 +77,7 @@ async def test_e2e_flow(remote_junction_one_client: JunctionOneClient) -> None: 
     )
 
     # Check that the room was added.
-    tripboards = (await remote_junction_one_client.get_tripboard(trip.id)).boards
+    tripboards = (await remote_junction_one_client.get_tripboards(trip.id)).boards
     assert tripboards
     assert len(tripboards) == 1
     assert tripboards[0].refs
