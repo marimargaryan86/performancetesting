@@ -6,6 +6,7 @@ import (
 	models "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/go/v1"
 	"github.com/uber/h3-go/v4"
 	"math"
+	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -30,7 +31,6 @@ type raptor struct {
 	marked         []uint64                         // a list of stops we can start from in the current round
 	round          uint8                            // an index of the round, starts at 0
 	rounds         []map[uint64]uint32              // a map of round number to a map of Stop.Sequence to unix timestamps (basically a round number to that rounds `best`)
-	trips          *sync.Map                        // a map of route.Sequence to index of route.Schedules
 	kindList       []models.Schedule_Type           // list of schedule types to search for
 	stopsMap       map[h3.Cell][]*planner.Stop
 	maxConnections int
@@ -91,7 +91,6 @@ func newRaptor(
 		marked:         marked,
 		round:          0,
 		rounds:         rounds,
-		trips:          &sync.Map{},
 		kindList:       kindList,
 		stopsMap:       stopsMap,
 		maxConnections: maxConnections,
@@ -190,19 +189,19 @@ func (r *raptor) queue() []uint64 {
 func (r *raptor) scanRoutes() {
 	wg := &sync.WaitGroup{}
 	qItems := r.queue()
-	results := make(chan workerResult, len(qItems))
+	results := make(chan workerResult, len(qItems)*r.workerCount)
 	jobs := make(chan uint64, len(qItems))
+
+	for w := 1; w <= r.workerCount; w++ {
+		wg.Add(1)
+		go r.routeWorker(wg, jobs, results)
+	}
 
 	for _, qItem := range qItems {
 		jobs <- qItem
 	}
 
 	close(jobs)
-
-	for w := 1; w <= r.workerCount; w++ {
-		wg.Add(1)
-		go r.routeWorker(wg, jobs, results)
-	}
 
 	go func() {
 		wg.Wait()
@@ -250,6 +249,8 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 		var current *planner.Schedule
 		var boarding uint32
 
+		index := -1
+
 		for _, p := range qRoute.RouteStops[qRouteSegment.Order:] {
 			routeSegment := r.data.RouteStopBySequence(p)
 
@@ -287,29 +288,18 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 			previousArrival, ok := lastRound[routeSegment.Stop]
 
 			if ok && (current == nil || previousArrival < arrival) {
-				index, ok := r.trips.Load(qRoute.Sequence)
-
-				if !ok {
+				if index == -1 {
 					index = sort.Search(len(qRoute.Schedules)-1, func(i int) bool {
 						trip := r.data.ScheduleBySequence(qRoute.Schedules[i])
 						tripSegment := r.data.ScheduleStopBySequence(trip.ScheduleStops[routeSegment.Order])
 						return tripSegment.DepartureAt > r.earliestPossibleDeparture(tripSegment, previousArrival)
 					})
-					r.trips.Store(qRoute.Sequence, index)
 				}
 
-				for i := index.(int); i >= 0; i-- {
+				for i := index; i >= 0; i-- {
 					trip := r.data.ScheduleBySequence(qRoute.Schedules[i])
-					found := false
 
-					for _, tid := range r.kindList {
-						if tid == trip.Type {
-							found = true
-							break
-						}
-					}
-
-					if !found {
+					if !slices.Contains(r.kindList, trip.Type) {
 						continue
 					}
 
@@ -326,7 +316,6 @@ func (r *raptor) routeWorker(wg *sync.WaitGroup, jobs chan uint64, results chan 
 
 					current = trip
 					boarding = tripSegment.Order
-					r.trips.Store(qRoute.Sequence, i)
 				}
 			}
 		}
