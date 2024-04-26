@@ -54,7 +54,7 @@ class CompaniesService(
                 + datetime.timedelta(request.company.invoice_generation_frequency),
             ),
         )
-
+        request.company.is_active = False
         try:
             inserted_company = await self._companies.insert(request.company)
         except DuplicateKeyError:

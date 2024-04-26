@@ -63,6 +63,7 @@ message Company {
   int32 invoice_generation_frequency = 17;
   snowfall.stdlib.v1.Date invoice_generation_date = 18;
   repeated VerticalFee vertical_fees = 19;
+  bool is_active = 20;
 }
 
 message Contact {
