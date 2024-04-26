@@ -18,6 +18,7 @@ from snowfall.vendor.junction_one.auth import (
 from snowfall.vendor.junction_one.client import (
     JunctionOneClient,
 )
+from snowfall.vendor.payment_gateway.client import PayGwClient
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -30,7 +31,37 @@ def pytest_configure(config: pytest.Config) -> None:
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--API_KEY", action="store", help="api key")
     parser.addoption("--AUTHORIZATION", action="store", help="api key")
-    parser.addoption("--PAY_ADDRESS", action="store", help="pay address")
+    parser.addoption("--PAY_GRPC", action="store", help="pay GRPC address")
+    parser.addoption(
+        "--SEATMAPS",
+        action="store_true",
+        default=False,
+        help="test seatmap flow",
+    )
+
+    # for pay gateway interaction
+    parser.addoption("--ORY_SESSION", action="store", help="ory session key")
+    parser.addoption(
+        "--PAY_GW_URL",
+        action="store",
+        default="https://payment-gw.junction.dev/",
+        help="pay gateway url",
+    )
+
+
+@pytest.fixture()
+def ory_session(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption("ORY_SESSION")
+
+
+@pytest.fixture()
+def seatmap_flow(request: pytest.FixtureRequest) -> bool:
+    return bool(request.config.getoption("SEATMAPS"))
+
+
+@pytest.fixture()
+def pay_gw_url(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption("PAY_GW_URL")
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -44,8 +75,8 @@ def authorization(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture(scope="package", autouse=True)
-def pay_address(request: pytest.FixtureRequest) -> str:
-    return request.config.getoption("PAY_ADDRESS")
+def pay_grpc(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption("PAY_GRPC")
 
 
 def pytest_collection_modifyitems(
@@ -61,10 +92,10 @@ def pytest_collection_modifyitems(
 
 @pytest.fixture()
 def remote_quotations_stub(
-    pay_address: str,
+    pay_grpc: str,
 ) -> transactions_pb2_grpc.QuotationsServiceStub:
     return transactions_pb2_grpc.QuotationsServiceStub(
-        aio.insecure_channel(pay_address),
+        aio.insecure_channel(pay_grpc),
     )
 
 
@@ -89,8 +120,27 @@ async def http_client() -> AsyncIterator[httpx.AsyncClient]:
 
 
 @pytest.fixture()
+async def pay_http_client() -> AsyncIterator[httpx.AsyncClient]:
+    async with httpx.AsyncClient() as http_client:
+        yield http_client
+
+
+@pytest.fixture()
 def junction_one_client(http_client: httpx.AsyncClient) -> JunctionOneClient:
     return JunctionOneClient(api_base_url="https://localhost/", http_client=http_client)
+
+
+@pytest.fixture()
+def pay_gw_client(
+    pay_http_client: httpx.AsyncClient,
+    pay_gw_url: str,
+    ory_session: str,
+) -> PayGwClient:
+    return PayGwClient(
+        api_base_url=pay_gw_url,
+        http_client=pay_http_client,
+        ory_session=ory_session,
+    )
 
 
 @pytest.fixture()
