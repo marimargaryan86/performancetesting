@@ -2567,6 +2567,7 @@ components:
                   example: '2019-08-24T14:15:22Z'
                 passengers:
                   type: array
+                  minItems: 1
                   items:
                     $ref: '#/components/schemas/Passenger'
                 status:
