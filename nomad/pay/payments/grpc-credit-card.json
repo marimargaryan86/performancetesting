@@ -5,7 +5,6 @@
     }
   },
   "production": {
-    "deploy": false,
     "variables": {
       "count": 2
     }
