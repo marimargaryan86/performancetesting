@@ -34,6 +34,11 @@ variable "base_url_URL" {
   type = string
 }
 
+variable "static_places_file" {
+  type = string
+}
+
+
 
 
 job "junction-go-dogfood-ui-http" {
@@ -150,6 +155,7 @@ EOH
         HTTP_ADDRESS          = "0.0.0.0"
         HTTP_PORT             = "${NOMAD_PORT_http}"
         BASE_URL              = "${var.base_url_URL}"
+        STATIC_PLACES_FILE    = "${var.static_places_file}"
         SENTRY_DSN            = "https://063e03b4d8fd4fa7b13e0729950f3cee@sentry.snowfall.se/52"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
       }

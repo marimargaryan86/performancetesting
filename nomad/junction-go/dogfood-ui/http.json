@@ -3,21 +3,24 @@
     "variables": {
       "base_url_URL": "https://api.junction.dev",
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "dogfood.junction.dev"
+      "traefik_host_URL": "dogfood.junction.dev",
+      "static_places_file": "https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/places-d8c16ae2dbe75116c5913c35fc624c5c995a1bd97a977993710c95066bdb7153.json"
     }
   },
   "production": {
     "variables": {
       "base_url_URL": "https://api.junction.travel",
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "dogfood.junction.travel"
+      "traefik_host_URL": "dogfood.junction.travel",
+      "static_places_file": "https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/places-d8c16ae2dbe75116c5913c35fc624c5c995a1bd97a977993710c95066bdb7153.json"
     }
   },
   "sandbox": {
     "variables": {
       "base_url_URL": "https://api.sandbox.junction.dev",
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "dogfood.sandbox.junction.dev"
+      "traefik_host_URL": "dogfood.sandbox.junction.dev",
+      "static_places_file": "https://junction-build-artifacts.s3.eu-west-2.amazonaws.com/places-d8c16ae2dbe75116c5913c35fc624c5c995a1bd97a977993710c95066bdb7153.json"
     }
   }
 }

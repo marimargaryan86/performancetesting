@@ -89,6 +89,9 @@
 <script src="static/locations.js?_={{ hashes['locations.js'] }}" integrity="sha512-{{ hashes['locations.js'] }}"></script>
 <script src="static/map.js?_={{ hashes['map.js'] }}" integrity="sha512-{{ hashes['map.js'] }}"></script>
 <script src="static/trip-candidates.js?_={{ hashes['trip-candidates.js'] }}" integrity="sha512-{{ hashes['trip-candidates.js'] }}"></script>
-<script>const sessionToken = "{{ session_token }}";</script>
+<script>
+  const sessionToken = "{{ session_token }}";
+  const staticPlacesFile = "{{ static_places_file }}";
+</script>
 </body>
 </html>

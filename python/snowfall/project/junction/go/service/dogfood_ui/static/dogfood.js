@@ -58,6 +58,62 @@ function clear_places() {
   };
 }
 
+async function load_static_places() {
+  const response = await fetch(staticPlacesFile).then((res) => res.json())
+
+  for (const place of response) {
+    const transaction = db.transaction("places", "readwrite");
+    const objectStore = transaction.objectStore("places");
+    let types = []
+
+    for (const placeType of place.location.types) {
+      switch (placeType) {
+        case 0:
+          types.push({"id": "unspecified","type": "place-types"})
+          break
+        case 1:
+          types.push({"id": "city","type": "place-types"})
+          break
+        case 2:
+          types.push({"id": "railway-station","type": "place-types"})
+          break
+        case 3:
+          types.push({"id": "airport","type": "place-types"})
+          break
+        case 4:
+          types.push({"id": "bus-station","type": "place-types"})
+          break
+        case 5:
+          types.push({"id": "ferry-port","type": "place-types"})
+          break
+      }
+    }
+
+    const transformed = {
+      id: place._id,
+      type: "places",
+      attributes: {
+        countryCode: place.location.country_code,
+        iataCode: null,
+        latitude: place.location.coordinates.coordinates[1],
+        longitude: place.location.coordinates.coordinates[0],
+        name: place.location.name,
+        timeZone: place.location.time_zone,
+        updatedAt: place.location.updated_at["$date"],
+      },
+      relationships: {
+        types: {
+          data: types,
+        }
+      }
+    }
+
+    const addRequest = objectStore.add(transformed);
+  }
+
+  inject_places();
+}
+
 function count_places() {
   const transaction = db.transaction("places", "readonly");
   const objectStore = transaction.objectStore("places");
@@ -74,7 +130,12 @@ function count_places() {
     } else {
       console.log("No places in DB, indexing...");
       show_loader("Indexing places, this could take several minutes...");
-      load_places();
+
+      if (staticPlacesFile != "") {
+        load_static_places();
+      } else {
+        load_places();
+      }
     }
   };
 }
@@ -658,12 +719,12 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
 
 async function load_places() {
   let url = "/places?page[limit]=100";
-  const transaction = db.transaction("places", "readwrite");
-  const objectStore = transaction.objectStore("places");
 
   while (true) {
     const response = await fetch(url).then((res) => res.json())
     for (const place of response.data) {
+      const transaction = db.transaction("places", "readwrite");
+      const objectStore = transaction.objectStore("places");
       const addRequest = objectStore.add(place);
     }
 

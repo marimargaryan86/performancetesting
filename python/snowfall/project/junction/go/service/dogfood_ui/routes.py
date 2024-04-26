@@ -4,6 +4,7 @@ import hashlib
 from collections.abc import Mapping
 
 import httpx
+import pydantic
 from starlette import responses, status, templating
 
 from snowfall.project.junction.go.service.dogfood_ui import locations
@@ -101,7 +102,12 @@ class Locations:
 
 
 class UI:
-    def __init__(self, template: templating.Jinja2Templates) -> None:
+    def __init__(
+        self,
+        template: templating.Jinja2Templates,
+        static_places_file: pydantic.AnyHttpUrl | None = None,
+    ) -> None:
+        self._static_places_file = static_places_file
         self._template = template
 
     async def get(
@@ -113,6 +119,7 @@ class UI:
             {
                 "request": request.starlette_request,
                 "session_token": string.random(_SESSION_TOKEN_LENGTH),
+                "static_places_file": self._static_places_file or "",
                 "hashes": _hash_static_resources(),
             },
         )

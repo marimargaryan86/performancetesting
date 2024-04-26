@@ -11,6 +11,7 @@ from snowfall.stdlib.service import application, httpx_factory
 class _Settings(starlette.Settings):
     auth_token: str
     base_url: pydantic.AnyHttpUrl
+    static_places_file: pydantic.AnyHttpUrl | None = None
 
 
 async def _routes(app: application.Application[_Settings]) -> list[routing.BaseRoute]:
@@ -29,7 +30,10 @@ async def _routes(app: application.Application[_Settings]) -> list[routing.BaseR
         },
     )
 
-    ui = routes.UI(template=jinja2_templates)
+    ui = routes.UI(
+        template=jinja2_templates,
+        static_places_file=app.settings.static_places_file,
+    )
     locations = routes.Locations(client=http_client)
 
     return [
