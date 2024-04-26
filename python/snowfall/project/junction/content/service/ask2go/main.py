@@ -1,3 +1,4 @@
+import datetime
 import random
 import uuid
 from collections.abc import Sequence
@@ -35,7 +36,10 @@ class _Settings(bootstrap.Settings):
 async def _factory(
     app: application.Application[_Settings],
 ) -> bootstrap.ProviderConfiguration:
-    httpx_client = await httpx_factory.make_client(app)
+    httpx_client = await httpx_factory.make_client(
+        app,
+        timeout=datetime.timedelta(seconds=app.settings.http_timeout),
+    )
     rate_limit_client = rate_limiter.Client(
         gubernator_pb2_grpc.V1Stub(
             await grpc_factory.make_insecure_channel(
