@@ -1,0 +1,110 @@
+{
+  "info": {
+    "_postman_id": "e28d13bc-4169-42f0-9bee-8eaeaebeecd1",
+    "name": "Junction One - Air Search",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33483058"
+  },
+  "item": [
+    {
+      "name": "flight/search",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "name": "Authorization",
+            "value": "{{j1_token}}",
+            "type": "text"
+          },
+          {
+            "key": "X-Api-Key",
+            "name": "X-Api-Key",
+            "value": "{{j1_api_key}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "data",
+              "value": "{\n    \"userIds\": [\n        2623641\n    ], \n    \"orgId\": 2623634, \n    \"ods\": \n    [\n        {\n            \"departureDate\": \"{{now_plus_random_num_days}}\", \n            \"departureAirport\": \"{{origin_airport}}\", \n            \"arrivalAirport\": \"{{destination_airport}}\"\n        }\n    ]\n}",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{junction_one_api_url}}/v1/travel/flight/search",
+          "host": [
+            "{{junction_one_api_url}}"
+          ],
+          "path": [
+            "v1",
+            "travel",
+            "flight",
+            "search"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "var moment = require('moment');",
+          "var randomDays = Math.floor(Math.random() * (200 - 10 + 1)) + 10;",
+          "var now_plus_random_num_days = moment().add(randomDays, 'days').utc(true).format('YYYY-MM-DD')",
+          "pm.collectionVariables.set(\"now_plus_random_num_days\", now_plus_random_num_days);",
+          "",
+          "",
+          "const airportPairs = [",
+          "    { origin: \"JFK\", destination: \"LAX\" },",
+          "    { origin: \"LHR\", destination: \"CDG\" },",
+          "    { origin: \"NRT\", destination: \"SIN\" },",
+          "    { origin: \"BOS\", destination: \"MIA\" },",
+          "    { origin: \"SFO\", destination: \"ORD\" },",
+          "    { origin: \"DXB\", destination: \"IST\" },",
+          "    { origin: \"SYD\", destination: \"AKL\" }",
+          "];",
+          "",
+          "function getRandomItem(list) {",
+          "    return list[Math.floor(Math.random() * list.length)];",
+          "}",
+          "",
+          "const selectedPair = getRandomItem(airportPairs);",
+          "",
+          "pm.environment.set(\"origin_airport\", selectedPair.origin);",
+          "pm.environment.set(\"destination_airport\", selectedPair.destination);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "now_plus_random_num_days",
+      "value": ""
+    }
+  ]
+}

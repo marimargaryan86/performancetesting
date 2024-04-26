@@ -1,0 +1,194 @@
+{
+  "info": {
+    "_postman_id": "d70bc382-2bbf-4c27-a7f9-d5b88f59bc10",
+    "name": "Junction API - Flight Search",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33483058"
+  },
+  "item": [
+    {
+      "name": "searches",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data.id;",
+              "pm.collectionVariables.set(\"air_search_id\", search_id);",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"flight-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_random_num_days}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"{{origin_airport}}\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"{{destination_airport}}\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/flights/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "flights",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}/results",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{junction_api_url}}/air/searches/{{air_search_id}}/results?include=offers,resultDetails",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "air",
+            "searches",
+            "{{air_search_id}}",
+            "results"
+          ],
+          "query": [
+            {
+              "key": "include",
+              "value": "offers,resultDetails"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          "var moment = require('moment');",
+          "var randomDays = Math.floor(Math.random() * (200 - 10 + 1)) + 10;",
+          "var now_plus_random_num_days = moment().add(randomDays, 'days').utc(true).format()",
+          "pm.collectionVariables.set(\"now_plus_random_num_days\", now_plus_random_num_days);",
+          "",
+          "",
+          "const airportPairs = [",
+          "    { origin: \"b917b2a4-b8d6-53d6-b9b9-a90eb1da01af\", destination: \"c7dcabc2-a4e1-5b78-8314-0891095205ae\" },",
+          "    { origin: \"6eb4104f-c710-54da-9b1e-68f0b2be5727\", destination: \"88d67f82-9382-5821-8460-6471588102c2\" },",
+          "    { origin: \"7ef9230f-67f7-5f0d-abd9-086086834862\", destination: \"31a0f76b-0eab-5507-a1c5-4261e0bba721\" },",
+          "    { origin: \"74eb8fdf-34ce-5732-bd7b-7604e3ba1cf8\", destination: \"dd858893-dfb3-5c17-9181-fd65ebd248d0\" },",
+          "    { origin: \"51271150-bf64-535a-adbe-01d26e509512\", destination: \"b5a9e7f0-4c28-5c9c-8f0a-54dbf7bf76d2\" },",
+          "    // { origin: \"6e17bd3b-d541-5e64-b984-56bfeacd9540\", destination: \"c723f553-670e-5a9f-8d9f-bca99ac71ec9\" },",
+          "    { origin: \"dae05e4f-8c39-598e-8814-cbbee9bd5269\", destination: \"a3666e14-a0dd-542c-8ea8-f4c1d476c70b\" }",
+          "];",
+          "",
+          "function getRandomItem(list) {",
+          "    return list[Math.floor(Math.random() * list.length)];",
+          "}",
+          "",
+          "const selectedPair = getRandomItem(airportPairs);",
+          "",
+          "pm.environment.set(\"origin_airport\", selectedPair.origin);",
+          "pm.environment.set(\"destination_airport\", selectedPair.destination);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "search_id",
+      "value": ""
+    },
+    {
+      "key": "air_search_id",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_week_utc",
+      "value": ""
+    },
+    {
+      "key": "now_plus_random_num_days",
+      "value": ""
+    }
+  ]
+}
