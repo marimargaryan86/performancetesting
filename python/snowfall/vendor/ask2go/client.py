@@ -86,6 +86,11 @@ class Ask2GoClient:
                 payload=repr(payload),
                 response=repr(response_json),
             )
+        else:
+            self._logger.info(
+                "Created search in Ask2Go",
+                result=repr(response_json),
+            )
 
         return search.CreateSearchResponse(**response_json)
 
@@ -96,6 +101,11 @@ class Ask2GoClient:
         page_offset: int,
         rate_limit_timeout: float = 60,
     ) -> search.SearchResultsResponse:
+        self._logger.info(
+            "Fetching Ask2Go results",
+            ask2go_transaction_id=transaction_id,
+        )
+
         response = await self._make_request(
             "GET",
             self._api_base_url.copy_with(
@@ -106,6 +116,11 @@ class Ask2GoClient:
                 ),
             ),
             rate_limit_timeout=rate_limit_timeout,
+        )
+
+        self._logger.info(
+            "Fetched Ask2Go results",
+            ask2go_transaction_id=transaction_id,
         )
 
         return search.SearchResultsResponse(**response.json())
