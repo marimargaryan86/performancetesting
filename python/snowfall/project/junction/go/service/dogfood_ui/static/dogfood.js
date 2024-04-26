@@ -349,28 +349,32 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
   mega.innerText = "Search Results: " + response.data.length + " trips found";
   new_children.push(mega);
 
+  let searchInfo = document.createElement("dl");
+  searchInfo.className = "row";
+
   if (showDebug) {
-    let searchInfo = document.createElement("dl");
-    searchInfo.className = "row";
     searchInfo.innerHTML +=
       '<dt class="col-sm-2">Trip Search ID</dt><dd class="col-sm-10">' +
       tripSearchId +
       "</dd>";
-    searchInfo.innerHTML +=
-      '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
-      sessionToken +
-      "</dd>";
+  }
+  searchInfo.innerHTML +=
+    '<dt class="col-sm-2">Session Token</dt><dd class="col-sm-10">' +
+    sessionToken +
+    "</dd>";
+  if (showDebug) {
     searchInfo.innerHTML += '<dt class="col-sm-2">Provider Mapping</dt>';
     let provider_mapping = document.createElement("dd");
     provider_mapping.className = "col-sm-10"
     searchInfo.append(provider_mapping);
-    new_children.push(searchInfo);
-
+  }
+  new_children.push(searchInfo);
+  if (showDebug) {
     inject_provider_mapping(origin, provider_mapping)
     inject_provider_mapping(destination, provider_mapping)
   }
 
-  included = {};
+  let included = {};
 
   for (const resource of response.included) {
     included[resource.type + resource.id] = resource;
