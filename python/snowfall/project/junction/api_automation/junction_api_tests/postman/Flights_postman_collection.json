@@ -180,12 +180,12 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{junction_api_url}}/air/searches/{{flight_search_id}}/results?include=offers,resultDetails",
+          "raw": "{{junction_api_url}}/flights/searches/{{flight_search_id}}/results?include=offers,resultDetails",
           "host": [
             "{{junction_api_url}}"
           ],
           "path": [
-            "air",
+            "flights",
             "searches",
             "{{flight_search_id}}",
             "results"
@@ -247,6 +247,10 @@
     },
     {
       "key": "now_plus_one_week_utc",
+      "value": ""
+    },
+    {
+      "key": "flight_search_id",
       "value": ""
     }
   ]
