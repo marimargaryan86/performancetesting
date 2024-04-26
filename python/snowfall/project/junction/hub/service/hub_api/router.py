@@ -125,6 +125,16 @@ def get_routes(dependencies: lagom.Container) -> list[routing.BaseRoute]:
             name="Companies",
         ),
         integration.route(
+            "/onboarding-tokens",
+            companies.CompanyOnboardingTokens,
+            name="CompanyOnboardingTokens",
+        ),
+        integration.route(
+            "/onboarding-tokens/{token}",
+            companies.CompanyOnboardingToken,
+            name="CompanyOnboardingToken",
+        ),
+        integration.route(
             "/companies/{companyId}",
             companies.AdminCompany,
             name="Company",

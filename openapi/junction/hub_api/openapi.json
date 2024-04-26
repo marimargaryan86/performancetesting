@@ -53,6 +53,12 @@
       ]
     },
     {
+      "name": "Onboarding-Tokens",
+      "tags": [
+        "onboarding-tokens"
+      ]
+    },
+    {
       "name": "Contacts",
       "tags": [
         "contacts"
@@ -168,6 +174,11 @@
       "name": "journeys",
       "description": "Journeys are a collection of placed orders and the bookings they resulted in.",
       "x-displayName": "Journeys"
+    },
+    {
+      "name": "onboarding-tokens",
+      "description": "Onboarding tokens.",
+      "x-displayName": "Onboarding Tokens"
     },
     {
       "name": "payments",
@@ -1563,6 +1574,105 @@
         },
         "operationId": "get-companies",
         "description": "Get companies"
+      }
+    },
+    "/onboarding-tokens": {
+      "post": {
+        "summary": "Create onboarding token",
+        "description": "Create onboarding token for resellers",
+        "tags": [
+          "onboarding-tokens"
+        ],
+        "operationId": "post-onboarding-tokens",
+        "responses": {
+          "201": {
+            "description": "Token is created",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OnboardingToken"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/vnd.api+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/OnboardingTokenCreatable"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/onboarding-tokens/{onboardingToken}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/onboardingToken"
+        }
+      ],
+      "get": {
+        "summary": "Get Company onboarding details",
+        "description": "Get Company onboarding details",
+        "tags": [
+          "onboarding-tokens"
+        ],
+        "operationId": "get-onboarding-tokens-id",
+        "responses": {
+          "200": {
+            "description": "Company details are fetched",
+            "content": {
+              "application/vnd.api+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OnboardingTokenCompanyDetails"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": []
       }
     },
     "/companies/{companyId}": {
@@ -3525,6 +3635,16 @@
           "example": "271f6d54-9e59-407e-a860-b0771d9e3d26"
         },
         "description": "Company id"
+      },
+      "onboardingToken": {
+        "name": "onboardingToken",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "271f6d5e3df6d5e3df6d571f6d5e3df6d5e3df6d571f6d5e3df6d5e3de3d26="
+        },
+        "description": "Onboarding token"
       },
       "filterCompaniesType": {
         "name": "filter[type][eq]",
@@ -6231,6 +6351,149 @@
             }
           }
         ]
+      },
+      "OnboardingTokenCreatable": {
+        "title": "Onboarding Token (Creatable)",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "d6cfe9e8-bbc9-485f-912f-7ba97ab2cf34",
+                "readOnly": true
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "onboarding-tokens"
+                ],
+                "example": "onboarding-tokens"
+              },
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "unspecified",
+                      "pending",
+                      "completed"
+                    ],
+                    "example": "pending"
+                  }
+                },
+                "readOnly": true
+              },
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "company"
+                ],
+                "properties": {
+                  "company": {
+                    "type": "object",
+                    "required": [
+                      "data"
+                    ],
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/CompanyIdentifier"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "attributes",
+              "relationships"
+            ]
+          },
+          {
+            "$ref": "#/components/schemas/SelfLink"
+          }
+        ],
+        "description": "Cancellation Request for one or more Bookings."
+      },
+      "OnboardingToken": {
+        "title": "Onboarding Token",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCIRJSMeKKFOiJIUzI1NiIsInR5cCIRJSMeKKF2Q2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "onboarding-tokens"
+            ],
+            "example": "onboarding-tokens"
+          },
+          "attributes": {
+            "properties": {
+              "token": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCIRJSMeKKFOiJIUzI1NiIsInR5cCIRJSMeKKF2Q2QT4fwpMeJf36POk6yJV_adQssw5c"
+              }
+            },
+            "required": [
+              "token"
+            ]
+          }
+        }
+      },
+      "OnboardingTokenCompanyDetails": {
+        "title": "Onboarding Token Company Details",
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "attributes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCIRJSMeKKFOiJIUzI1NiIsInR5cCIRJSMeKKF2Q2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "readOnly": true
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "onboarding-tokens"
+            ],
+            "example": "onboarding-tokens"
+          },
+          "attributes": {
+            "properties": {
+              "paymentReference": {
+                "type": "string",
+                "example": "cus_Rdf789sbk3bVhb7"
+              },
+              "companyName": {
+                "type": "string",
+                "example": "Company Name"
+              }
+            },
+            "required": [
+              "paymentReference",
+              "companyName"
+            ]
+          }
+        }
       },
       "Money": {
         "title": "Money",

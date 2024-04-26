@@ -2,7 +2,11 @@ import lagom
 
 from snowfall.adapter import identities
 from snowfall.project.junction.go.adapter import orders, resellers
-from snowfall.project.junction.hub.service.hub_api import includes, repository
+from snowfall.project.junction.hub.service.hub_api import (
+    crypto_manager,
+    includes,
+    repository,
+)
 from snowfall.project.junction.plus.adapter import (
     configuration_vectors as config_vectors_adapter,
 )
@@ -32,6 +36,7 @@ def create_dependencies(
     credit_card_payment_client: credit_card_payment.Client,
     config_vectors_client: config_vectors_adapter.Client,
     users_repository: repository.UsersRepository,
+    crypto_client: crypto_manager.CryptoManager,
 ) -> lagom.Container:
     container = lagom.Container()
     container[orders.Client] = orders_client  # type: ignore[type-abstract]
@@ -47,6 +52,7 @@ def create_dependencies(
     container[credit_card_payment.Client] = credit_card_payment_client  # type: ignore[type-abstract]
     container[config_vectors_adapter.Client] = config_vectors_client  # type: ignore[type-abstract]
     container[repository.UsersRepository] = users_repository
+    container[crypto_manager.CryptoManager] = crypto_client
 
     includes.register_resolvers(
         orders_client=orders_client,

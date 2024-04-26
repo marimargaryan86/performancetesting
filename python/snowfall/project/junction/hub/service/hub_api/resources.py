@@ -675,6 +675,43 @@ class Company(models.Resource):
         )
 
 
+class OnboardingToken(models.Resource):
+    api_type: ClassVar[str] = "onboarding-tokens"
+
+    @classmethod
+    def from_values(
+        cls,
+        token: str,
+    ) -> OnboardingToken:
+        return cls(
+            id=token,
+            type=OnboardingToken.api_type,
+            attributes={
+                "token": token,
+            },
+        )
+
+
+class OnboardingTokenCompanyDetails(models.Resource):
+    api_type: ClassVar[str] = "onboarding-tokens"
+
+    @classmethod
+    def from_values(
+        cls,
+        token: str,
+        company_name: str,
+        customer_id: str,
+    ) -> OnboardingTokenCompanyDetails:
+        return cls(
+            id=token,
+            type=OnboardingTokenCompanyDetails.api_type,
+            attributes={
+                "companyName": company_name,
+                "paymentReference": customer_id,
+            },
+        )
+
+
 class Transaction(models.Resource):
     api_type: ClassVar[str] = "transactions"
 

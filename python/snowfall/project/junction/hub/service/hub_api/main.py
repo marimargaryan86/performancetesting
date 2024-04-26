@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import random
 from collections.abc import Sequence
 from typing import NamedTuple
@@ -17,6 +18,7 @@ from snowfall.project.junction.go.service.orders.v1 import orders_pb2_grpc
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
 from snowfall.project.junction.hub.service.hub_api import (
     bootstrap,
+    crypto_manager,
     permissions,
     repository,
     router,
@@ -73,6 +75,8 @@ class Settings(starlette.Settings):
     credit_card_address: str
     notifications_address: str
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    ot_secret_key: bytes
+    ot_ttl: datetime.timedelta = datetime.timedelta(days=2)
 
 
 class _Channels(NamedTuple):
@@ -98,6 +102,10 @@ async def _http(app: application.Application[Settings]) -> None:
         app.settings.authentication_address,
     )
     session_client = sessions_pb2_grpc.SessionServiceStub(authentication_channel)
+    crypto_client = crypto_manager.CryptoManager(
+        app.settings.ot_secret_key,
+        app.settings.ot_ttl,
+    )
     channels = _Channels(
         *await asyncio.gather(
             grpc_factory.make_insecure_channel(
@@ -201,6 +209,7 @@ async def _http(app: application.Application[Settings]) -> None:
                 users_repository=repository.UsersRepository(
                     collection=mongo.hub.users,
                 ),
+                crypto_client=crypto_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),

@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import AsyncIterator, Awaitable, Callable, Mapping, Sequence
 
 import httpx
@@ -12,6 +13,7 @@ from snowfall.project.junction.go import fixtures
 from snowfall.project.junction.go.adapter import errors, orders, resellers
 from snowfall.project.junction.hub.service.hub_api import (
     bootstrap,
+    crypto_manager,
     permissions,
     repository,
     router,
@@ -288,6 +290,14 @@ async def users_repository(
     return users_repository
 
 
+@pytest.fixture()
+def crypto_client() -> crypto_manager.CryptoManager:
+    return crypto_manager.CryptoManager(
+        key=b"test_key",
+        ttl=datetime.timedelta(seconds=3600),
+    )
+
+
 def _create_app(
     orders_client: orders.Client,
     companies_client: companies.Client,
@@ -303,6 +313,7 @@ def _create_app(
     config_vector_client: config_vector_adapter.Client,
     users_repository: repository.UsersRepository,
     cookie_to_user: Callable[[str], Awaitable[stdlib_auth.User]],
+    crypto_client: crypto_manager.CryptoManager,
 ) -> applications.Starlette:
     asgi_app = application.create_starlette_app(
         routes=router.get_routes(
@@ -320,6 +331,7 @@ def _create_app(
                 credit_card_payment_client=credit_card_payment_client,
                 config_vectors_client=config_vector_client,
                 users_repository=users_repository,
+                crypto_client=crypto_client,
             ),
         ),
         openapi_path=filesystem.resource_path("junction.hub_api", "openapi.json"),
@@ -406,6 +418,7 @@ def app(
     credit_card_payment_client: credit_card_payment.Client,
     config_vector_client: config_vector_adapter.Client,
     users_repository: repository.UsersRepository,
+    crypto_client: crypto_manager.CryptoManager,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -422,6 +435,7 @@ def app(
         config_vector_client=config_vector_client,
         users_repository=users_repository,
         cookie_to_user=mock_cookie_to_user,
+        crypto_client=crypto_client,
     )
 
 
@@ -440,6 +454,7 @@ def users_app(
     credit_card_payment_client: credit_card_payment.Client,
     config_vector_client: config_vector_adapter.Client,
     users_repository: repository.UsersRepository,
+    crypto_client: crypto_manager.CryptoManager,
 ) -> applications.Starlette:
     return _create_app(
         orders_client=orders_client,
@@ -456,4 +471,5 @@ def users_app(
         config_vector_client=config_vector_client,
         users_repository=users_repository,
         cookie_to_user=mock_cookie_to_reseller_user,
+        crypto_client=crypto_client,
     )

@@ -1,7 +1,7 @@
 import lagom
 from starlette import endpoints, requests, status
 
-from snowfall.project.junction.hub.service.hub_api import resources
+from snowfall.project.junction.hub.service.hub_api import crypto_manager, resources
 from snowfall.project.junction.hub.service.hub_api.routes import routes_handlers
 from snowfall.project.pay.adapter import companies as companies_adapter
 from snowfall.project.pay.service.companies.v1 import models_pb2
@@ -195,6 +195,67 @@ class AdminCompanies(endpoints.HTTPEndpoint):
                     request.url_for("Companies"),
                     response.next_page_token,
                     pagination,
+                ),
+            ),
+            request=request,
+        )
+
+
+class CompanyOnboardingTokens(endpoints.HTTPEndpoint):
+    async def post(
+        self,
+        request: requests.Request,
+        crypto_client: crypto_manager.CryptoManager = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        body = await request_helpers.flatten_request(request)
+        company_id = body["company"]
+        token = crypto_client.encrypt({
+            "companyId": company_id,
+        })
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.OnboardingToken.from_values(
+                    token=token,
+                ),
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
+        )
+
+
+class CompanyOnboardingToken(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        companies_client: companies_adapter.Client = lagom.injectable,
+        crypto_client: crypto_manager.CryptoManager = lagom.injectable,
+    ) -> models.JsonApiResponse:
+        token = request.path_params["token"]
+        try:
+            decrypted_data = crypto_client.decrypt(token)
+        except crypto_manager.CryptoManagerError as err:
+            return models.JsonApiResponse(
+                models.Body(
+                    errors=[
+                        models.Error(
+                            status=str(status.HTTP_400_BAD_REQUEST),
+                            code="bad_request",
+                            detail=str(err),
+                        ),
+                    ],
+                ),
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        company = await companies_client.get(decrypted_data["companyId"])
+
+        return await messages.create_response(
+            body=models.Body(
+                data=resources.OnboardingTokenCompanyDetails.from_values(
+                    token=token,
+                    company_name=company.name,
+                    customer_id=company.payment_reference,
                 ),
             ),
             request=request,

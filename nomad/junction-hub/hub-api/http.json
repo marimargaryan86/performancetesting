@@ -4,7 +4,8 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "api.hub.junction.dev"
+      "traefik_host_URL": "api.hub.junction.dev",
+      "ot_ttl": "PT48H"
     }
   },
   "production": {
@@ -12,7 +13,8 @@
     "variables": {
       "count": 2,
       "traefik_entrypoints": "web",
-      "traefik_host_URL": "api.hub.junction.travel"
+      "traefik_host_URL": "api.hub.junction.travel",
+      "ot_ttl": "PT48H"
     }
   },
   "sandbox": {
@@ -20,7 +22,8 @@
     "variables": {
       "count": 1,
       "traefik_entrypoints": "websecure",
-      "traefik_host_URL": "api.hub.sandbox.junction.dev"
+      "traefik_host_URL": "api.hub.sandbox.junction.dev",
+      "ot_ttl": "PT48H"
     }
   }
 }

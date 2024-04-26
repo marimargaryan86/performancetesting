@@ -34,6 +34,10 @@ variable "count" {
   type = number
 }
 
+variable "ot_ttl" {
+  type = string
+}
+
 job "junction-hub-hub-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -171,6 +175,7 @@ NOTIFICATIONS_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_notifications-${v
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 {{ with secret "kv/data/${var.environment}/hub-api" }}
 STRIPE_API_KEY={{ .Data.data.stripe_api_key }}
+OT_SECRET_KEY={{ .Data.data.ot_secret_key }}
 {{ end }}
 EOH
       }
@@ -196,6 +201,7 @@ EOH
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://7a9e03aa0fa24aed8155a1475b8be273@sentry.snowfall.se/147"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        OT_TTL                = var.ot_ttl
       }
     }
   }
