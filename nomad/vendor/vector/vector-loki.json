@@ -1,17 +1,20 @@
 {
   "development": {
     "variables": {
-      "loki_endpoint": "http://172.31.46.153:3100"
+      "loki_endpoint": "http://172.31.46.153:3100",
+      "elk_endpoint": "http://18.171.203.250:9200"
     }
   },
   "production": {
     "variables": {
-      "loki_endpoint": "http://172.31.46.153:3100"
+      "loki_endpoint": "http://172.31.46.153:3100",
+      "elk_endpoint": "http://18.171.203.250:9200"
     }
   },
   "sandbox": {
     "variables": {
-      "loki_endpoint": "http://13.53.74.59:3100"
+      "loki_endpoint": "http://13.53.74.59:3100",
+      "elk_endpoint": "http://18.171.203.250:9200"
     }
   }
 }
