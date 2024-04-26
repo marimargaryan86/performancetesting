@@ -140,8 +140,8 @@ async def _consume_notifications(
             connection=amqp_connection,
             queue_name="{0}_notifications".format(app.name),
             queue_arguments={
-                "x-dead-letter-exchange": "junction-providers-benerail.notifications.retry",
-                "x-dead-letter-routing-key": "{0}.junction-providers-benerail.notifications.retry".format(
+                "x-dead-letter-exchange": "{0}.notifications.retry".format(app.name),
+                "x-dead-letter-routing-key": "{0}.notifications.retry".format(
                     app.name,
                 ),
             },
@@ -174,15 +174,15 @@ async def _configure_queue(
         prefetch_count=((os.cpu_count() or 1) * 2) + 1,
     )
     queue = await channel.declare_queue(
-        name="{0}.junction-providers-benerail.notifications.retry".format(app.name),
+        name="{0}.notifications.retry".format(app.name),
         durable=True,
         arguments={
             "x-message-ttl": 300000,
-            "x-dead-letter-exchange": "notifications",
+            "x-dead-letter-exchange": "{0}.notifications".format(app.name),
             "x-dead-letter-routing-key": "{0}.notifications".format(app.name),
         },
     )
-    exchange = types.Exchange("junction-providers-benerail.notifications.retry")
+    exchange = types.Exchange("{0}.notifications.retry".format(app.name))
     declared_exchange = await channel.declare_exchange(
         name=exchange.name,
         type=exchange.type_,
@@ -190,7 +190,7 @@ async def _configure_queue(
     )
     await queue.bind(
         declared_exchange,
-        "{0}.junction-providers-benerail.notifications.retry".format(app.name),
+        "{0}.notifications.retry".format(app.name),
     )
 
 
