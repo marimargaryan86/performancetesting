@@ -5,7 +5,11 @@ import aiofiles
 import httpx
 import orjson
 import pytest
+from grpc import aio
 
+from snowfall.project.pay.service.transactions.v1 import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
+)
 from snowfall.stdlib.persistence import filesystem
 from snowfall.vendor.junction_one.auth import (
     JunctionOneAuth,
@@ -26,6 +30,7 @@ def pytest_configure(config: pytest.Config) -> None:
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--API_KEY", action="store", help="api key")
     parser.addoption("--AUTHORIZATION", action="store", help="api key")
+    parser.addoption("--PAY_ADDRESS", action="store", help="pay address")
 
 
 @pytest.fixture(scope="package", autouse=True)
@@ -38,6 +43,11 @@ def authorization(request: pytest.FixtureRequest) -> str:
     return request.config.getoption("AUTHORIZATION")
 
 
+@pytest.fixture(scope="package", autouse=True)
+def pay_address(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption("PAY_ADDRESS")
+
+
 def pytest_collection_modifyitems(
     config: pytest.Config,
     items: Sequence[pytest.Item],
@@ -47,6 +57,15 @@ def pytest_collection_modifyitems(
         for test_item in items:
             if "integration" in test_item.keywords:
                 test_item.add_marker(skip_marker)
+
+
+@pytest.fixture()
+def remote_quotations_stub(
+    pay_address: str,
+) -> transactions_pb2_grpc.QuotationsServiceStub:
+    return transactions_pb2_grpc.QuotationsServiceStub(
+        aio.insecure_channel(pay_address),
+    )
 
 
 async def load_file_fixture(
