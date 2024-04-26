@@ -1,0 +1,69 @@
+{
+    "status": "OK",
+    "code": 200,
+    "data": [
+        {
+            "id": 776,
+            "name": "Corporate Card",
+            "address": {
+                "country": "US",
+                "countryCode": "US",
+                "state": "AL",
+                "stateCode": "AL",
+                "city": "Test",
+                "address1": "123 Main Street",
+                "zipCode": "22222"
+            },
+            "isDefault": true,
+            "brand": "Visa",
+            "expDate": "11/2026",
+            "lastDigits": "4242",
+            "type": "VISA",
+            "holderName": "Kevin Drury",
+            "reservationTypes": 23,
+            "missingFieldsFlags": 0
+        },
+        {
+            "id": 967,
+            "name": "Test Card Doppio",
+            "address": {
+                "country": "US",
+                "countryCode": "US",
+                "state": "CA",
+                "stateCode": "CA",
+                "city": "Mountain View",
+                "address1": "1600 Amphitheater Parkway ",
+                "zipCode": "94043"
+            },
+            "isDefault": false,
+            "brand": "MasterCard",
+            "expDate": "11/2029",
+            "lastDigits": "4444",
+            "type": "MASTERCARD",
+            "holderName": "Kevin Drury",
+            "reservationTypes": 6,
+            "missingFieldsFlags": 0
+        },
+        {
+            "id": 969,
+            "name": "AirPlus",
+            "address": {
+                "country": "United States",
+                "countryCode": "US",
+                "state": "California",
+                "stateCode": "CA",
+                "city": "Mountain View",
+                "address1": "1600 Amphitheater Parkway ",
+                "zipCode": "94043"
+            },
+            "isDefault": false,
+            "brand": "UATP",
+            "expDate": "11/2029",
+            "lastDigits": "5121",
+            "type": "UATP",
+            "holderName": "Kevin Drury",
+            "reservationTypes": 0,
+            "missingFieldsFlags": 0
+        }
+    ]
+}

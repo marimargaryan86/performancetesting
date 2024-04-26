@@ -285,6 +285,20 @@ class JunctionOneClient:
 
         return auto_models.UserAccount(**response.data)
 
+    async def list_all_credit_cards(
+        self,
+        query: models.ListCreditCardRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.MaskedCreditCardListResponse:
+        response = await self._make_request_expecting_list(
+            "GET",
+            "/v1/creditcard/list",
+            query,
+            rate_limit_timeout=rate_limit_timeout,
+        )
+
+        return auto_models.MaskedCreditCardListResponse(**response.model_dump())
+
     def _encode_fields(self, model: auto_models.BaseModel) -> EncodedData:
         ret = {}
         for field_name, field in model.__class__.__fields__.items():  # type: ignore[attr-defined]
@@ -330,6 +344,29 @@ class JunctionOneClient:
 
         return {"params": payload.model_dump(exclude_unset=True, by_alias=True)}
 
+    async def _make_request_expecting_list(
+        self,
+        method: _Method,
+        url: str,
+        payload: BaseModel,
+        rate_limit_timeout: float | None = 60,
+        *,
+        encode_json: bool = False,
+    ) -> models.ListResponse:
+        if hasattr(payload, "org_id"):  # noqa: WPS421
+            payload.org_id = payload.org_id or self._get_org_id_from_auth()
+
+        response = await self._make_request_with_data(
+            method,
+            url,
+            self._encode_data(method, payload, encode_json=encode_json),
+            rate_limit_timeout,
+        )
+        list_data = response.data["list_data"]
+        response_model = response.model_dump()
+        response_model["data"] = list_data
+        return models.ListResponse(**response_model)
+
     async def _make_request(  # noqa: WPS238,WPS231
         self,
         method: _Method,
@@ -361,7 +398,6 @@ class JunctionOneClient:
                 await self._rate_limit_client.rate_limit(timeout=rate_limit_timeout)
             except TimeoutError as raw_exc:
                 raise errors.AsyncTimeOutError(inspect.getdoc(raw_exc)) from raw_exc
-
         try:
             response = await self._http_client.request(
                 method=method,
@@ -379,7 +415,13 @@ class JunctionOneClient:
         except httpx.HTTPStatusError as exc:
             raise errors.HttpStatusError.from_error(exc) from exc
 
-        response_model = models.Response(**response.json())
+        response_data = response.json().get("data")
+        if isinstance(response_data, list):
+            response_json = response.json()
+            response_json["data"] = {"list_data": response_data}
+            response_model = models.Response(**response_json)
+        else:
+            response_model = models.Response(**response.json())
 
         if response_model.status == auto_models.ResponseStatus.failed:
             raise errors.ProtocolError.from_error(response_model, response)

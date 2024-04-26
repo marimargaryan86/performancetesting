@@ -350,3 +350,21 @@ async def test_process_tripboard(
     )
 
     assert response == auto_models.GetTripBoardsResponse(**fixture["data"])
+
+
+async def test_list_all_credit_cards(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("GET-v1-credit-card-list.json")
+    httpx_mock.add_response(
+        method="GET",
+        url="https://localhost/v1/creditcard/list",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    response = await junction_one_client.list_all_credit_cards(
+        models.ListCreditCardRequest(),
+    )
+    assert response == auto_models.MaskedCreditCardListResponse(**fixture)
