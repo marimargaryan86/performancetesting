@@ -364,8 +364,10 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
     "</dd>";
   if (showDebug) {
     searchInfo.innerHTML += '<dt class="col-sm-2">Provider Mapping</dt>';
+  }
     let provider_mapping = document.createElement("dd");
     provider_mapping.className = "col-sm-10"
+    if (showDebug) {
     searchInfo.append(provider_mapping);
   }
   new_children.push(searchInfo);
