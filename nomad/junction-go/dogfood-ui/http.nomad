@@ -38,8 +38,9 @@ variable "static_places_file" {
   type = string
 }
 
-
-
+variable "downstream_timeout" {
+  type = string
+}
 
 job "junction-go-dogfood-ui-http" {
   datacenters = ["${var.datacenter}"]
@@ -158,6 +159,7 @@ EOH
         STATIC_PLACES_FILE    = "${var.static_places_file}"
         SENTRY_DSN            = "https://063e03b4d8fd4fa7b13e0729950f3cee@sentry.snowfall.se/52"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
+        DOWNSTREAM_TIMEOUT    = "${var.downstream_timeout}"
       }
     }
   }

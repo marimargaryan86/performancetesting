@@ -1,3 +1,5 @@
+import datetime
+
 import pydantic
 from starlette import routing, staticfiles, templating
 
@@ -11,6 +13,7 @@ from snowfall.stdlib.service import application, httpx_factory
 class _Settings(starlette.Settings):
     auth_token: str
     base_url: pydantic.AnyHttpUrl
+    downstream_timeout: datetime.timedelta | None = None
     static_places_file: pydantic.AnyHttpUrl | None = None
 
 
@@ -28,6 +31,7 @@ async def _routes(app: application.Application[_Settings]) -> list[routing.BaseR
             "Authorization": "Bearer {0}".format(app.settings.auth_token),
             "Content-Type": "application/vnd.api+json",
         },
+        timeout=app.settings.downstream_timeout,
     )
 
     ui = routes.UI(

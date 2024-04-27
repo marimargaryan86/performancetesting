@@ -2,6 +2,9 @@ function load_trip_candidates(id, origin, destination) {
   fetch("/trip-candidates/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
+      if (response.hasOwnProperty('errors')) {
+        server_error()
+      }
       if (
         response.data.attributes.status == "completed" ||
         response.data.attributes.status == "failed"
@@ -13,6 +16,9 @@ function load_trip_candidates(id, origin, destination) {
         )
         .then((res) => res.json())
         .then((response) => {
+          if (response.hasOwnProperty('errors')) {
+            server_error()
+          }
           inject_trips(id, transform_trip_candidates(response), origin, destination, false);
         }).catch(error_handler);
       } else {

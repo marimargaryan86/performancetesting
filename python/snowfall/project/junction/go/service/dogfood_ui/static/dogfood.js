@@ -728,6 +728,11 @@ async function load_places() {
 
   while (true) {
     const response = await fetch(url).then((res) => res.json()).catch(error_handler)
+
+    if (response.hasOwnProperty('errors')) {
+      server_error()
+    }
+
     for (const place of response.data) {
       const transaction = db.transaction("places", "readwrite");
       const objectStore = transaction.objectStore("places");
@@ -792,10 +797,18 @@ function load_offers(id, tripId, showDebug) {
   fetch("/offers/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
+      if (response.hasOwnProperty('errors')) {
+        server_error()
+      }
+
       if (response.data.attributes.status == "completed") {
         fetch("/offers/searches/" + id + "/offers?include=groups,groups.options")
           .then((res) => res.json())
           .then((offersResponse) => {
+            if (offersResponse.hasOwnProperty('errors')) {
+              server_error()
+            }
+
             inject_offers(
               offersResponse,
               id,
@@ -819,6 +832,10 @@ function load_trips(id, origin, destination) {
   fetch("/trips/searches/" + id)
     .then((res) => res.json())
     .then((response) => {
+      if (response.hasOwnProperty('errors')) {
+        server_error()
+      }
+
       if (
         response.data.attributes.status == "completed" ||
         response.data.attributes.status == "failed"
@@ -830,6 +847,9 @@ function load_trips(id, origin, destination) {
         )
           .then((res) => res.json())
           .then((response) => {
+            if (response.hasOwnProperty('errors')) {
+              server_error()
+            }
             inject_trips(id, response, origin, destination, document.getElementById("search-offers").checked);
           }).catch(error_handler);
       } else {
@@ -880,7 +900,9 @@ function search_offers(tripId, showDebug) {
         return response.json()
       })
       .then((data) => {
-
+        if (data.hasOwnProperty('errors')) {
+          server_error()
+        }
         const search = document.getElementById("offer-search-" + tripId);
         if (search) {
           search.innerHTML = data.data.id;
@@ -988,6 +1010,9 @@ function search_trips(event) {
         })
         .then((response) => response.json())
         .then((data) => {
+          if (data.hasOwnProperty('errors')) {
+            server_error()
+          }
           load_trip_candidates(data.data.id, originRequest.result, destinationRequest.result);
         }).catch(error_handler);
       } else {
@@ -1024,6 +1049,9 @@ function search_trips(event) {
         })
           .then((response) => response.json())
           .then((data) => {
+            if (data.hasOwnProperty('errors')) {
+              server_error()
+            }
             load_trips(data.data.id, originRequest.result, destinationRequest.result);
           }).catch(error_handler);
       }
@@ -1059,6 +1087,10 @@ window.onload = () => {
   searchForm.addEventListener("submit", search_trips);
   document.getElementById("clear-places-cache").addEventListener("click", clear_places_cache);
 };
+
+function server_error() {
+  show_loader("The server returned an error. Please reload the application.");
+}
 
 function error_handler(error) {
   show_loader("An unexpected error has occurred. Please reload the application.<br>" + error.message);
