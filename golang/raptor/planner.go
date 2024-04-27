@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/uber/h3-go/v4"
 	"sort"
+	"sync"
 	"time"
 
 	"go.uber.org/zap"
@@ -68,7 +69,10 @@ func NewPlanner(
 	}
 }
 
-func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+// Run Raptor Search using an iterative algorithm to return multiple options in
+// the given time window.
+func (p *Planner) RangeRaptorSearch(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+
 	if len(kindList) == 0 {
 		kindList = []models.Schedule_Type{
 			models.Schedule_TYPE_UNSPECIFIED,
@@ -83,8 +87,6 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 
 	seen := make(map[uuid.UUID]struct{})
 	trips := make([]*Trip, 0)
-	iterations := 0
-	start := time.Now()
 	sTime := departureAfter
 	eTime := departureBefore
 	difference := eTime.Sub(sTime)
@@ -94,7 +96,6 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 	}
 
 	for !eTime.Before(sTime) {
-		iterations++
 
 		r := newRaptor(p.data, froms, tos, sTime, kindList, p.stopsMap, maxConnections, workerCount)
 		results := r.run()
@@ -134,6 +135,41 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 		}
 
 		sTime = minTime.Add(time.Minute)
+	}
+	return trips, nil
+}
+
+func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+
+	start := time.Now()
+
+	var trips []*Trip
+	workerResults := make([][]*Trip, 0)
+
+	chunks := timeChunks(departureAfter, departureBefore)
+	wg := &sync.WaitGroup{}
+	for i := range chunks {
+		workerResults = append(workerResults, nil)
+		after := chunks[i]
+		var before time.Time
+		if i == len(chunks)-1 {
+			before = departureBefore
+		} else {
+			before = chunks[i+1]
+		}
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+			res, err := p.RangeRaptorSearch(froms, tos, after, before, kindList, maxConnections)
+			if err != nil {
+				return
+			}
+			workerResults[idx] = res
+		}(i)
+	}
+	wg.Wait()
+	for _, res := range workerResults {
+		trips = append(trips, res...)
 	}
 
 	sort.SliceStable(trips, func(i, j int) bool {
@@ -185,11 +221,28 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 		"departureBefore", departureBefore.Format(time.RFC3339),
 		"segment_types", kindList,
 		"max_connections", maxConnections,
-		"iterations", iterations,
 		"results", len(trips),
 		"workers", workerCount,
 		"exec", time.Since(start),
 	)
 
 	return trips, nil
+}
+
+// The number of chunks in which we want to split the search window, each chunk
+// will be run independently (using Raptor) and can be processed in parallel.
+const totalChunks = 12.0
+
+func timeChunks(departureTime time.Time, departureBefore time.Time) []time.Time {
+	totalHours := departureBefore.Sub(departureTime).Hours()
+	hoursPerChunk := totalHours / totalChunks
+
+	t := departureTime
+	res := make([]time.Time, 0)
+	for t.Before(departureBefore) {
+		res = append(res, t)
+		t = t.Add(time.Hour * time.Duration(hoursPerChunk))
+	}
+
+	return res
 }

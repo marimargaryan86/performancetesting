@@ -20,7 +20,6 @@ import (
 	"math"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -339,35 +338,7 @@ func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.
 		maxConnections = int(*req.MaximumConnections)
 	}
 
-	var results []*raptor.Trip
-	workerResults := make([][]*raptor.Trip, 0)
-
-	chunks := ps.timeChunks(departureTime, departureBefore)
-	wg := &sync.WaitGroup{}
-	for i := range chunks {
-		workerResults = append(workerResults, nil)
-		after := chunks[i]
-		var before time.Time
-		if i == len(chunks)-1 {
-			before = departureBefore
-		} else {
-			before = chunks[i+1]
-		}
-		wg.Add(1)
-		go func(idx int) {
-			defer wg.Done()
-			res, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), after, before, allowedSegmentTypes, maxConnections)
-			if err != nil {
-				return
-			}
-			workerResults[idx] = res
-		}(i)
-	}
-	wg.Wait()
-
-	for _, res := range workerResults {
-		results = append(results, res...)
-	}
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureBefore, allowedSegmentTypes, maxConnections)
 
 	if err != nil {
 		ps.Logger.Error(err)
@@ -410,22 +381,4 @@ func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.
 	return &planner.SearchJourneyResponse{
 		Trips: trips,
 	}, nil
-}
-
-// The number of chunks in which we want to split the search window, each chunk
-// will be run independently (using Raptor) and can be processed in parallel.
-const totalChunks = 12.0
-
-func (ps *PlannerServiceServer) timeChunks(departureTime time.Time, departureBefore time.Time) []time.Time {
-	totalHours := departureBefore.Sub(departureTime).Hours()
-	hoursPerChunk := totalHours / totalChunks
-
-	t := departureTime
-	res := make([]time.Time, 0)
-	for t.Before(departureBefore) {
-		res = append(res, t)
-		t = t.Add(time.Hour * time.Duration(hoursPerChunk))
-	}
-
-	return res
 }
