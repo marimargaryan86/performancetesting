@@ -342,7 +342,7 @@ def _create_single_criteria(
             if "departureBefore" in search_criteria
             else None
         ),
-        maximum_connections=search_criteria.get("maximumConnections", 0),
+        maximum_connections=search_criteria.get("maximumConnections"),
     )
 
 
