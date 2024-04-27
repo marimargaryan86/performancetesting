@@ -32,6 +32,8 @@ async def _routes(app: application.Application[_Settings]) -> list[routing.BaseR
 
     ui = routes.UI(
         template=jinja2_templates,
+        version=app.version,
+        environment=app.environment,
         static_places_file=app.settings.static_places_file,
     )
     locations = routes.Locations(client=http_client)

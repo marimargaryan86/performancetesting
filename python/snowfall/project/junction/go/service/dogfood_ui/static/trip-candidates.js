@@ -14,13 +14,13 @@ function load_trip_candidates(id, origin, destination) {
         .then((res) => res.json())
         .then((response) => {
           inject_trips(id, transform_trip_candidates(response), origin, destination, false);
-        }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
+        }).catch(error_handler);
       } else {
         setTimeout(() => {
           load_trip_candidates(id, origin, destination);
         }, "2000");
       }
-    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
+    }).catch(error_handler);
 }
 
 function transform_trip_candidates(response) {

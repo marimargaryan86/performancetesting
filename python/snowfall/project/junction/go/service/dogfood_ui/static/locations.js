@@ -34,5 +34,5 @@ function inject_provider_mapping(place, domElement) {
         dd.innerText = value
         innerDl.append(dd)
       }
-    }).catch(error => show_loader("An unexpected error has occurred. Please reload the application.<br>" + error));
+    }).catch(error_handler);
 }

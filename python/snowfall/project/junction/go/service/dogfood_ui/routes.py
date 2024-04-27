@@ -105,10 +105,14 @@ class UI:
     def __init__(
         self,
         template: templating.Jinja2Templates,
+        version: str,
+        environment: str,
         static_places_file: pydantic.AnyHttpUrl | None = None,
     ) -> None:
+        self._environment = environment
         self._static_places_file = static_places_file
         self._template = template
+        self._version = version
 
     async def get(
         self,
@@ -121,5 +125,7 @@ class UI:
                 "session_token": string.random(_SESSION_TOKEN_LENGTH),
                 "static_places_file": self._static_places_file or "",
                 "hashes": _hash_static_resources(),
+                "version": self._version,
+                "environment": self._environment,
             },
         )
