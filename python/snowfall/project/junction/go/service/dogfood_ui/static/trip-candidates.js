@@ -24,10 +24,10 @@ function load_trip_candidates(id, origin, destination) {
 }
 
 function transform_trip_candidates(response) {
-  trips = [];
-  segments = [];
-  legs = [];
-  included = {};
+  let trips = [];
+  let segments = [];
+  let legs = [];
+  let included = {};
 
   if (response.data.length == 0) {
     return {
@@ -41,7 +41,7 @@ function transform_trip_candidates(response) {
   }
 
   for (const [i, resource] of response.data.entries()) {
-    candidate = flatten(resource, included);
+    let candidate = flatten(resource, included);
 
     segment_ids = [];
 

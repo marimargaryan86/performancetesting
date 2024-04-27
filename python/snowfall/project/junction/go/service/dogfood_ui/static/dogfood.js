@@ -196,16 +196,16 @@ function flatten(resource, included) {
     if (resource.relationships[key].data instanceof Array) {
       for (const [i, value] of resource.relationships[key].data.entries()) {
         resource.relationships[key].data[i] = flatten(
-          included[value.type + value.id],
+          structuredClone(included[value.type + value.id]),
           included
         );
       }
     } else {
       resource.relationships[key].data = flatten(
-        included[
+        structuredClone(included[
           resource.relationships[key].data.type +
             resource.relationships[key].data.id
-        ],
+        ]),
         included
       );
     }
