@@ -8,7 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/spf13/viper"
 	"github.com/uber/h3-go/v4"
+	"math"
 	"sort"
 	"sync"
 	"time"
@@ -17,12 +19,6 @@ import (
 )
 
 const maxSearchRange = 28 * time.Hour
-
-// The Raptor algorithm does not seem to scale very well with a high number of
-// workers due to the overhead of sharing data among workers. So we should not
-// set this based on underlying available CPU cores, instead we hard code this
-// number to something that seems to give good results.
-const workerCount = 4
 
 var executionTimes = promauto.NewHistogram(prometheus.HistogramOpts{
 	Name: "planner_execution_time_seconds",
@@ -71,7 +67,7 @@ func NewPlanner(
 
 // Run Raptor Search using an iterative algorithm to return multiple options in
 // the given time window.
-func (p *Planner) RangeRaptorSearch(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+func (p *Planner) RangeRaptorSearch(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int, workerCount int) ([]*Trip, error) {
 
 	if len(kindList) == 0 {
 		kindList = []models.Schedule_Type{
@@ -139,7 +135,7 @@ func (p *Planner) RangeRaptorSearch(froms []*planner.Stop, tos []*planner.Stop, 
 	return trips, nil
 }
 
-func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int) ([]*Trip, error) {
+func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAfter time.Time, departureBefore time.Time, kindList []models.Schedule_Type, maxConnections int, workerCount int) ([]*Trip, error) {
 
 	start := time.Now()
 
@@ -160,7 +156,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
-			res, err := p.RangeRaptorSearch(froms, tos, after, before, kindList, maxConnections)
+			res, err := p.RangeRaptorSearch(froms, tos, after, before, kindList, maxConnections, workerCount)
 			if err != nil {
 				return
 			}
@@ -231,17 +227,22 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 
 // The number of chunks in which we want to split the search window, each chunk
 // will be run independently (using Raptor) and can be processed in parallel.
-const totalChunks = 12.0
 
 func timeChunks(departureTime time.Time, departureBefore time.Time) []time.Time {
-	totalHours := departureBefore.Sub(departureTime).Hours()
-	hoursPerChunk := totalHours / totalChunks
+	totalChunks := viper.GetInt("raptor_chunks")
+	minDuration := viper.GetInt("raptor_chunk_min_duration")
+	totalMinutes := math.Ceil(departureBefore.Sub(departureTime).Minutes())
+
+	minutesPerChunk := int(math.Ceil(totalMinutes / float64(totalChunks)))
+	if minutesPerChunk < minDuration {
+		minutesPerChunk = minDuration
+	}
 
 	t := departureTime
 	res := make([]time.Time, 0)
 	for t.Before(departureBefore) {
 		res = append(res, t)
-		t = t.Add(time.Hour * time.Duration(hoursPerChunk))
+		t = t.Add(time.Minute * time.Duration(minutesPerChunk))
 	}
 
 	return res

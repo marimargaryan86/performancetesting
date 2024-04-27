@@ -25,10 +25,11 @@ import (
 
 type PlannerServiceServer struct {
 	planner.UnimplementedPlannerServiceServer
-	Planner    *raptor.Planner
-	Stops      map[h3.Cell][]*planner.Stop
-	Logger     *zap.SugaredLogger
-	Repository *legacy.Repository
+	Planner     *raptor.Planner
+	Stops       map[h3.Cell][]*planner.Stop
+	Logger      *zap.SugaredLogger
+	Repository  *legacy.Repository
+	WorkerCount int
 }
 
 var scheduleTypeToSegmentType map[models.Schedule_Type]v1.SegmentType
@@ -128,7 +129,7 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 		maxConnections = int(*req.MaximumConnections)
 	}
 
-	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureAfter, departureBefore, allowedSegmentTypes, maxConnections)
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureAfter, departureBefore, allowedSegmentTypes, maxConnections, ps.WorkerCount)
 
 	if err != nil {
 		ps.Logger.Error(err)
@@ -338,7 +339,7 @@ func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.
 		maxConnections = int(*req.MaximumConnections)
 	}
 
-	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureBefore, allowedSegmentTypes, maxConnections)
+	results, err := ps.Planner.Search(sliceutil.Unique(origins), sliceutil.Unique(destinations), departureTime, departureBefore, allowedSegmentTypes, maxConnections, ps.WorkerCount)
 
 	if err != nil {
 		ps.Logger.Error(err)

@@ -35,12 +35,26 @@ func init() {
 	var grpcPort int
 	var prometheusPort int
 	var protoDir string
+	var workerCount int
+	var raptorChunks int
+	var raptorChunkMinDuration int
 
 	service.Root().AddCommand(serveCmd)
 
 	serveCmd.PersistentFlags().IntVar(&grpcPort, "grpc-port", 50053, "")
 	serveCmd.PersistentFlags().IntVar(&prometheusPort, "prometheus-port", 0, "")
 	serveCmd.PersistentFlags().StringVar(&protoDir, "proto-dir", "./", "")
+
+	// The Raptor algorithm does not seem to scale very well with a high number of
+	// workers due to the overhead of sharing data among workers. So we should not
+	// set the number of workers based on underlying available CPU cores, instead this should be
+	// tweaked based on the experiments with real schedules and queries. A
+	// default of 4 seems to work well in practice, but this is exported as a
+	// flag to make it easy to rapidly experiment with different configurations.
+	serveCmd.PersistentFlags().IntVar(&workerCount, "worker-count", 4, "How many internal worker to use during a Raptor search. Note that this applies per raptor search, so this can be multiplied by the number of raptor searches we perform in parallel chunks.")
+
+	serveCmd.PersistentFlags().IntVar(&raptorChunks, "raptor-chunks", 12, "")
+	serveCmd.PersistentFlags().IntVar(&raptorChunkMinDuration, "raptor-chunk-min-duration", 120, "The minimum duration of a Raptor chunk, in minutes.")
 
 	if err := viper.BindPFlag("grpc_port", serveCmd.PersistentFlags().Lookup("grpc-port")); err != nil {
 		panic(err)
@@ -51,6 +65,15 @@ func init() {
 	}
 
 	if err := viper.BindPFlag("proto_dir", serveCmd.PersistentFlags().Lookup("proto-dir")); err != nil {
+		panic(err)
+	}
+	if err := viper.BindPFlag("worker_count", serveCmd.PersistentFlags().Lookup("worker-count")); err != nil {
+		panic(err)
+	}
+	if err := viper.BindPFlag("raptor_chunks", serveCmd.PersistentFlags().Lookup("raptor-chunks")); err != nil {
+		panic(err)
+	}
+	if err := viper.BindPFlag("raptor_chunk_min_duration", serveCmd.PersistentFlags().Lookup("raptor-chunk-min-duration")); err != nil {
 		panic(err)
 	}
 }
@@ -128,10 +151,11 @@ func serve(cmd *cobra.Command, args []string) error {
 	grpcServer := grpc.NewServer()
 	healthgrpc.RegisterHealthServer(grpcServer, health.NewServer())
 	planner.RegisterPlannerServiceServer(grpcServer, &PlannerServiceServer{
-		Planner:    raptor.NewPlanner(repository, stopsMap, sugar),
-		Stops:      stopsMap,
-		Logger:     sugar,
-		Repository: repository,
+		Planner:     raptor.NewPlanner(repository, stopsMap, sugar),
+		Stops:       stopsMap,
+		Logger:      sugar,
+		Repository:  repository,
+		WorkerCount: viper.GetInt("worker_count"),
 	})
 	reflection.Register(grpcServer)
 
