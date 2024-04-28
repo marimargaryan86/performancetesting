@@ -221,8 +221,6 @@ class OfferImporter:
             if not response.is_in_progress:
                 break
 
-            await asyncio.sleep(self._gateway_poll_sleep)
-
         self._logger.info(
             "Marking as completed",
             now=datetime.datetime.now(tz=datetime.UTC).isoformat(),
