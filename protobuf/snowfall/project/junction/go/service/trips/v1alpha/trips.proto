@@ -5,6 +5,7 @@ package snowfall.project.junction.go.service.trips.v1alpha;
 import "google/protobuf/timestamp.proto";
 import "snowfall/project/junction/go/service/offers/v1/models.proto";
 import "snowfall/project/junction/go/service/places/v1/places.proto";
+import "snowfall/project/junction/go/service/planner/v1/planner.proto";
 import "snowfall/project/junction/go/v1/models.proto";
 import "snowfall/stdlib/v1/amqp.proto";
 import "snowfall/stdlib/v1/datetime.proto";
@@ -167,5 +168,11 @@ message ListTripCandidatesResponse {
 message LegCache {
   string id = 1;
   snowfall.project.junction.go.v1.Leg leg = 2;
+  google.protobuf.Timestamp expires_at = 3 [(snowfall.stdlib.v1.read_only) = true];
+}
+
+message JourneyResponseCache {
+  string id = 1;
+  snowfall.project.junction.go.service.planner.v1.SearchJourneyResponse response = 2;
   google.protobuf.Timestamp expires_at = 3 [(snowfall.stdlib.v1.read_only) = true];
 }

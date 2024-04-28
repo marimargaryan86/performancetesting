@@ -7,6 +7,7 @@ import pymongo
 from pymongo import errors as pymongo_errors
 
 from snowfall.project.junction.go.adapter import legs
+from snowfall.project.junction.go.service.planner.v1 import planner_pb2
 from snowfall.project.junction.go.service.trips.v1alpha import trips_pb2
 from snowfall.project.junction.go.v1 import models_pb2
 from snowfall.stdlib.format import protobuf
@@ -169,3 +170,34 @@ class TripMetadataRepository(
         )
 
         return metadata
+
+
+_JOURNEY_RESPONSE_CACHE_TTL_HOURS = 12
+
+
+class JourneyResponseRepository(
+    mongo_repository.ProtoRepository[trips_pb2.JourneyResponseCache],
+    mixins.FindByIdMixin[trips_pb2.JourneyResponseCache],
+    mixins.InsertMixin[trips_pb2.JourneyResponseCache],
+):
+    _proto = trips_pb2.JourneyResponseCache
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
+    _ttl = datetime.timedelta(hours=_JOURNEY_RESPONSE_CACHE_TTL_HOURS)
+
+    async def insert_response(
+        self,
+        identifier: str,
+        response: planner_pb2.SearchJourneyResponse,
+    ) -> None:
+        with contextlib.suppress(pymongo_errors.DuplicateKeyError):
+            await self.insert(
+                trips_pb2.JourneyResponseCache(
+                    id=identifier,
+                    response=response,
+                    expires_at=protobuf.datetime_to_protobuf(
+                        datetime.datetime.now(datetime.UTC) + self._ttl,
+                    ),
+                ),
+            )

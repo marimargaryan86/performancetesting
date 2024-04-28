@@ -135,6 +135,9 @@ async def _consume_trip_candidate_search_tasks(
         leg_cache_repository=leg_cache_repo,
         trip_orchestrator=orchestrator.TripOrchestrator(
             planner=planner,
+            journey_response_repository=cache.JourneyResponseRepository(
+                collection=trips_db["journey_response_cache"],
+            ),
         ),
         leg_adapter=legs.GrpcClient(
             schedules_pb2_grpc.ScheduleServiceStub(schedules_channel),

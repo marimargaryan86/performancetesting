@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import datetime
 import itertools
 import zoneinfo
@@ -41,8 +42,10 @@ class TripOrchestrator:
     def __init__(
         self,
         planner: planner_pb2_grpc.PlannerServiceStub,
+        journey_response_repository: cache.JourneyResponseRepository,
     ):
         self._planner = planner
+        self._journey_response_repository = journey_response_repository
         self._logger = stdout.get_logger()
 
     async def get_trip_reference_groups(
@@ -57,7 +60,7 @@ class TripOrchestrator:
         trip_reference_groups = []
 
         for response in journey_search_responses:
-            if isinstance(response, Exception):
+            if isinstance(response, BaseException):
                 raise CantFulfillFullTripError from response
 
             trip_reference_groups.append(list(response.trips))
@@ -68,7 +71,7 @@ class TripOrchestrator:
         self,
         criteria: Sequence[trips_pb2.TripCandidateSearchCriteria],
         allowed_segment_types: Sequence[models_pb2.Schedule.Type.ValueType],
-    ) -> list[planner_pb2.SearchJourneyResponse | Exception]:
+    ) -> list[planner_pb2.SearchJourneyResponse | BaseException]:
         tasks = []
 
         for criteria_obj in criteria:
@@ -118,13 +121,33 @@ class TripOrchestrator:
             if criteria_obj.HasField("maximum_connections"):
                 request.maximum_connections = criteria_obj.maximum_connections
 
-            tasks.append(
-                self._planner.SearchJourney(
-                    request=request,
-                ),
-            )
+            tasks.append(self._search_journeys(request))
 
         return await asyncio.gather(*tasks, return_exceptions=True)
+
+    async def _search_journeys(
+        self,
+        request: planner_pb2.SearchJourneyRequest,
+    ) -> planner_pb2.SearchJourneyResponse:
+        request_str = string.to_uuid(
+            base64.b64encode(request.SerializeToString(deterministic=True)).decode(),
+        )
+
+        journey_response_cache = await self._journey_response_repository.find_by_id(
+            request_str,
+        )
+
+        if journey_response_cache:
+            return journey_response_cache.response
+
+        journey_response = await self._planner.SearchJourney(request=request)
+
+        await self._journey_response_repository.insert_response(
+            request_str,
+            journey_response,
+        )
+
+        return journey_response
 
 
 _OFFER_SEARCH_LIMIT = 50
