@@ -172,6 +172,7 @@ class TripSearchRepository(
 
         new_trip_search.CopyFrom(trip_search)
 
+        new_trip_search.id = string.uuid()
         new_trip_search.status = amqp_pb2.Trackable.STATUS_PENDING
         expires_at = timestamp_pb2.Timestamp()
 
