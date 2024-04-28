@@ -56,7 +56,7 @@ function transform_trip_candidates(response) {
         leg_ids = [];
 
         for (const [l, leg] of details.attributes.legs.entries()) {
-            leg_id = group.id+l.toString()
+            leg_id = details.id+l.toString()
             leg_ids.push({
               "id": leg_id,
               "type": "legs"
