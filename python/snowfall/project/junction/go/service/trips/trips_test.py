@@ -75,7 +75,6 @@ async def _insert_trip_search(
 ) -> trips_pb2.TripSearch:
     inserted = await repository.insert(trip_search)
 
-    assert uuid.UUID(inserted.id).version == 4
     assert inserted.expires_at.ToDatetime().isoformat() == "2022-04-21T08:30:30"
     assert trip_search.departure_after == inserted.departure_after
 
@@ -93,6 +92,7 @@ async def test_trip_search_repository(
     )
 
     trip = trips_pb2.TripSearch(
+        id=str(uuid.uuid4()),
         departure_after=protobuf.datetime_to_protobuf_datetime(
             datetime.datetime.now(datetime.UTC),
         ),

@@ -9,6 +9,7 @@ from snowfall.project.junction.go.service.trips.v1alpha import (
     trips_pb2,
     trips_pb2_grpc,
 )
+from snowfall.stdlib import string
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.grpc import service
 from snowfall.stdlib.v1 import amqp_pb2 as std_amqp_pb2
@@ -110,6 +111,16 @@ class TripSearchService(service.Service, trips_pb2_grpc.TripSearchServiceService
         request: trips_pb2.EnqueueTripSearchRequest,
         context: aio.ServicerContext,
     ) -> trips_pb2.EnqueueTripSearchResponse:
+        request.trip_search.id = string.to_uuid(
+            request.trip_search.SerializeToString(deterministic=True).decode(),
+        )
+        trip_search = await self._repository.find_by_id(request.trip_search.id)
+
+        if trip_search:
+            return trips_pb2.EnqueueTripSearchResponse(
+                trip_search=trip_search,
+            )
+
         trip_search = await self._repository.insert(request.trip_search)
         await self._producer.publish(
             amqp_pb2.TripSearchTask(
