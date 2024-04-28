@@ -6,7 +6,7 @@
       "provider_company_id": "f3f20e54-abbb-454f-893e-3d8b81551277",
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
       "bucket": "junction-provider-data-development",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "production": {
@@ -16,7 +16,7 @@
       "provider_company_id": "62468aa0-da3b-45c4-817e-ae3597a54507",
       "api_base_url": "https://benerail-prd-apim.azure-api.net",
       "bucket": "junction-provider-data-production",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "sandbox": {
@@ -26,7 +26,7 @@
       "provider_company_id": "ee3d9a5a-548b-4fcc-9b29-ff05ef7caec7",
       "api_base_url": "https://benerail-stg-apim.azure-api.net",
       "bucket": "junction-provider-data-sandbox",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   }
 }

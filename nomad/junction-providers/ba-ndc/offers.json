@@ -5,7 +5,7 @@
       "api_base_url": "https://ndc.junction.dev",
       "count": 2,
       "provider_company_id": "bd38cf96-c6e4-4a4e-88cd-fe0d397f009c",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "production": {
@@ -14,7 +14,7 @@
       "api_base_url": "https://ndc.junction.travel",
       "count": 5,
       "provider_company_id": "4f4f78cf-626f-4298-9864-4a14a0fd2be7",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "sandbox": {
@@ -23,7 +23,7 @@
       "api_base_url": "https://ndc.junction.dev",
       "count": 1,
       "provider_company_id": "bd38cf96-c6e4-4a4e-88cd-fe0d397f009c",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   }
 }

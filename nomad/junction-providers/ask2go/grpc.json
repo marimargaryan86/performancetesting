@@ -6,7 +6,7 @@
       "api_base_url": "https://search.ask2go.com",
       "api_booking_base_url": "https://booking.ask2go.com",
       "bucket": "junction-provider-data-development",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "production": {
@@ -16,7 +16,7 @@
       "api_base_url": "https://search.production.ask2go.com/",
       "api_booking_base_url": "https://book.production.ask2go.com/",
       "bucket": "junction-provider-data-production",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "sandbox": {
@@ -27,7 +27,7 @@
       "api_base_url": "https://search.ask2go.com",
       "api_booking_base_url": "https://booking.ask2go.com",
       "bucket": "junction-provider-data-sandbox",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   }
 }

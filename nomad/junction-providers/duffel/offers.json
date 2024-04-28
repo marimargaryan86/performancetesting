@@ -5,7 +5,7 @@
       "provider_company_id": "50bebe1e-aa8a-47ac-bf34-503c877a68d6",
       "api_base_url": "https://api.duffel.com",
       "disabled_airlines": "BA",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "production": {
@@ -15,7 +15,7 @@
       "provider_company_id": "a0f3a2aa-d9aa-4361-b952-b60086af92f5",
       "api_base_url": "https://api.duffel.com",
       "disabled_airlines": "",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "sandbox": {
@@ -25,7 +25,7 @@
       "provider_company_id": "50bebe1e-aa8a-47ac-bf34-503c877a68d6",
       "api_base_url": "https://api.duffel.com",
       "disabled_airlines": "BA",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   }
 }

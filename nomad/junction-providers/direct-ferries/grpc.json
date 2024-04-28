@@ -8,7 +8,7 @@
       "client_id": "3r2ha5jopuaphv9fctntqtraso",
       "partner_code": "F5152",
       "provider_company_id": "3270a409-43b5-4be6-aebd-c3adc6ebfd0f",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "production": {
@@ -20,7 +20,7 @@
       "client_id": "",
       "partner_code": "",
       "provider_company_id": "551f8e9a-be94-473b-b5aa-cf3b53ce6664",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   },
   "sandbox": {
@@ -32,7 +32,7 @@
       "client_id": "3r2ha5jopuaphv9fctntqtraso",
       "partner_code": "F5152",
       "provider_company_id": "3270a409-43b5-4be6-aebd-c3adc6ebfd0f",
-      "allowed_window_td": "PT15M"
+      "allowed_window_td": "PT0S"
     }
   }
 }
