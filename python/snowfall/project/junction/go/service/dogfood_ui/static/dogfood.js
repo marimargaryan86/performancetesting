@@ -535,8 +535,12 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
         '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
         trip.id +
         '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
-      search_offers(trip.id, showDebug);
-    }
+    } else if (trip.hasOwnProperty("meta") && trip.meta.hasOwnProperty("offer")) {
+    infoList.innerHTML +=
+      '<dt class="col-sm-2">Offers</dt><dd class="col-sm-10" id="offers-' +
+      trip.id +
+      '"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></dd>';
+  }
 
     let badges = document.createElement("p");
 
@@ -716,6 +720,17 @@ function inject_trips(tripSearchId, response, origin, destination, searchOffers)
 
   container.replaceChildren(...new_children)
 
+  for (const [i, trip] of response.data.entries()) {
+    if (searchOffers) {
+      search_offers(trip.id, showDebug);
+    } else if (trip.hasOwnProperty("meta") && trip.meta.hasOwnProperty("offer")) {
+      inject_offers({
+        data: [trip.meta.offer],
+        included: response.included,
+      }, trip.id, showDebug)
+    }
+  }
+
   if (showMaps) {
     for (const [i, trip] of response.data.entries()) {
       render_map("map" + i, trip)
@@ -749,7 +764,7 @@ async function load_places() {
   inject_places();
 }
 
-function inject_offers(response, offerSearchId, tripId, searchStatus, showDebug) {
+function inject_offers(response, tripId, showDebug) {
   const status = document.getElementById("offers-" + tripId);
   if (response.data.length > 0) {
     status.innerHTML =
@@ -811,9 +826,7 @@ function load_offers(id, tripId, showDebug) {
 
             inject_offers(
               offersResponse,
-              id,
               tripId,
-              response.data.attributes.status,
               showDebug
             );
           }).catch(error_handler)

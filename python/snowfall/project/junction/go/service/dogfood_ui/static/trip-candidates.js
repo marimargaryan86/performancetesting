@@ -12,7 +12,7 @@ function load_trip_candidates(id, origin, destination) {
         fetch(
           "/trip-candidates/searches/" +
             id +
-            "/offers?page[limit]=100&include=groups,groups.details,groups.details.legType"
+            "/offers?page[limit]=100&include=groups,groups.details,groups.options,groups.details.legType"
         )
         .then((res) => res.json())
         .then((response) => {
@@ -90,7 +90,7 @@ function transform_trip_candidates(response) {
             "id": details.id,
             "type": "segments",
             "attributes": {
-              "name": details.attributes.vendor,
+              "name": details.attributes.vendor + details.attributes.routeIdentifiers.vendor,
               "operator": details.attributes.operator
             },
             "relationships": {
@@ -112,6 +112,9 @@ function transform_trip_candidates(response) {
           "segments": {
             "data": segment_ids,
           }
+        },
+        "meta": {
+          "offer": resource,
         }
       }
     )
