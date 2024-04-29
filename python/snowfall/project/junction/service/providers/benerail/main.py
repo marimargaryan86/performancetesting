@@ -146,7 +146,10 @@ async def _consume_notifications(
                 ),
             },
             binds=[
-                (types.Exchange("notifications"), "{0}.notifications".format(app.name)),
+                (
+                    types.Exchange("{0}.notifications".format(app.name)),
+                    "{0}.notifications".format(app.name),
+                ),
             ],
         ),
         benerail_client=benerail_client,
