@@ -29,6 +29,7 @@ message SuggestionSearch {
     string origin_id = 1;
     string destination_id = 2;
     snowfall.stdlib.v1.DateTime departure_after = 3;
+    snowfall.stdlib.v1.DateTime return_departure_after = 6;
     message Passenger {
       snowfall.stdlib.v1.Date date_of_birth = 1;
     }
