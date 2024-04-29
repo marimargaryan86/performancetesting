@@ -208,9 +208,18 @@ async def test_e2e_booking_flow(  # noqa: WPS217,WPS218
     # 8. Book
     ####################################################################################
 
+    await remote_junction_one_client.process_tripboard(
+        models.TripboardProcessRequest(
+            id=board.id,
+            flag=auto_models.TripBoardProcessingFlags.commit,
+        ),
+    )
+
     ####################################################################################
     # 9. Poll until tripboard is processed.
     ####################################################################################
+
+    await remote_junction_one_client.get_tripboards(board.id)
 
 
 _SLEEP_SECONDS = 5
