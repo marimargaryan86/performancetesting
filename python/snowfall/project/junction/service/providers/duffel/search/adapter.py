@@ -24,6 +24,7 @@ from snowfall.project.junction.service.providers.duffel.v1 import amqp_pb2
 from snowfall.stdlib import string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
+from snowfall.vendor.duffel import errors
 from snowfall.vendor.duffel.builders.offer_request import (
     OfferRequestData,
     OfferRequestPassenger,
@@ -34,6 +35,7 @@ from snowfall.vendor.duffel.models.offer import Offer, PrivateFare
 from snowfall.vendor.duffel.models.offer_slice import OfferSliceSegment
 
 _ADULT_AGE = 18
+_INVALID_IATA_CODE = "Invalid IATA code"
 
 
 def _fares_sort_key(
@@ -205,12 +207,23 @@ class DuffelSearchAdapter:
         duffel_client = self._offers_client_factory.for_reseller(
             search_criteria_wrapper.reseller_id,
         )
-        res = await duffel_client.create_offer_request(
-            search_criteria_wrapper.search_criteria,
-            rate_limit_timeout=30,  # noqa: WPS432
-        )
 
-        if res.offers:
+        res = None
+        try:
+            res = await duffel_client.create_offer_request(
+                search_criteria_wrapper.search_criteria,
+                rate_limit_timeout=30,  # noqa: WPS432
+            )
+        except errors.ServiceError as ex:
+            if _INVALID_IATA_CODE not in str(ex):
+                raise
+            else:
+                self._logger.exception(
+                    "IATA Code not supported by Duffel",
+                    search=repr(search_criteria_wrapper.search_criteria),
+                )
+
+        if res and res.offers:
             validator = Validators(
                 self._airline_validator,
             )

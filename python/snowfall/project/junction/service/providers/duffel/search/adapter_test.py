@@ -37,6 +37,32 @@ async def get_search_task_for_fixture(
     return search_task_from_offer(offer_response.response_data.offers[0])
 
 
+async def get_search_task_for_fixture_without_mocking_resp(
+    name: str,
+) -> SearchCriteriaTask:
+    json = await load_file_fixture(name)
+    assert json is not None
+    offer_response = OfferRequestResponse.model_validate(json)
+    return search_task_from_offer(offer_response.response_data.offers[0])
+
+
+async def mock_error_response_for_offer_request(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    name: str,
+    code: int,
+) -> None:
+    json = await load_file_fixture(name)
+    assert json is not None
+    httpx_mock.add_response(
+        url="{api_base_url}/air/offer_requests".format(
+            api_base_url=API_BASE_URL,
+        ),
+        status_code=code,
+        method="POST",
+        json=json,
+    )
+
+
 async def test_adapter(
     httpx_mock: pytest_httpx.HTTPXMock,
     search_adapter: adapter.DuffelSearchAdapter,
@@ -59,6 +85,30 @@ async def test_adapter(
         "Economy Essential",
     ]
     assert [offer.baggage_allowances[0].free for offer in offers] == [True, True]
+
+
+async def test_gather_search_results_handles_invalid_iata_codes_gracefully(
+    httpx_mock: pytest_httpx.HTTPXMock,
+    search_adapter: adapter.DuffelSearchAdapter,
+) -> None:
+    search_task = await get_search_task_for_fixture_without_mocking_resp(
+        "offer_request_response.json",
+    )
+
+    await mock_error_response_for_offer_request(
+        httpx_mock,
+        "invalid_iata_error.json",
+        422,
+    )
+
+    offer_groups = [
+        offer_group
+        async for offer_group in search_adapter.gather_search_results(
+            search_adapter.search_criteria_generator(search_task),
+        )
+    ]
+
+    assert not offer_groups
 
 
 async def test_offer_with_stop(
