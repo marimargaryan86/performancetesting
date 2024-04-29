@@ -1,0 +1,23 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "j_one_api_base_url": "https://one.junction.dev"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "j_one_api_base_url": "https://one.junction.travel"
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "j_one_api_base_url": "https://one.junction.dev"
+    }
+  }
+}

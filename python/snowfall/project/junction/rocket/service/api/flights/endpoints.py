@@ -1,9 +1,10 @@
-import asyncio
+import json
 
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api.flights import amqp
 from snowfall.project.junction.rocket.service.api.flights.models import (
     FlightSearchRequest,
     FlightSearchRequestStorage,
@@ -15,23 +16,15 @@ from snowfall.project.junction.rocket.service.api.flights.repositories import (
     FlightSearchRequestRepository,
     FlightSearchResultRepository,
 )
-from snowfall.project.junction.rocket.service.api.flights.types import (
-    FlightSearchRequestTransformer,
-    FlightSearchResultTransformer,
-)
-from snowfall.project.junction.rocket.service.places.v1alpha import (
-    places_pb2_grpc,
-)
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.integration.starlette import (
     messages,
     models,
     pagination_helpers,
 )
-from snowfall.vendor.junction_one.client import JunctionOneClient
 
 
-def is_inbound(
+def _is_inbound(
     flight_search_request: FlightSearchRequest,
 ) -> bool:
     return flight_search_request.data.relationships.selected_outbound_offer is not None
@@ -50,50 +43,27 @@ async def get_selected_outbound_offer_ref_ids(
     return selected_offer.ref_ids[0]
 
 
+def _validate_request(search_request: FlightSearchRequest) -> None:
+    if _is_inbound(search_request):
+        relationships = search_request.data.relationships
+        if relationships.selected_outbound_offer is None:
+            raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
+
+
 class FlightSearch(endpoints.HTTPEndpoint):
     @errors.handle_grpc_errors
     async def post(  # noqa: WPS217
         self,
         request: requests.Request,
-        junction_one_client: JunctionOneClient = lagom.injectable,
-        flight_search_request_transformer: FlightSearchRequestTransformer = lagom.injectable,
-        flight_search_result_transformer: FlightSearchResultTransformer = lagom.injectable,
         requests_repo: FlightSearchRequestRepository = lagom.injectable,
-        results_repo: FlightSearchResultRepository = lagom.injectable,
-        places: places_pb2_grpc.PlacesServiceStub = lagom.injectable,
+        search_task_producer: amqp.SearchTaskProducer = lagom.injectable,
     ) -> responses.Response:
         reseller_id = request.user.username
         request_data = await request.json()
         search_id = string.uuid()
-
         search_request = FlightSearchRequest(**request_data)
-        if is_inbound(search_request):
-            relationships = search_request.data.relationships
-            if relationships is None:
-                raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
-            if relationships.selected_outbound_offer is None:
-                raise exceptions.HTTPException(status.HTTP_400_BAD_REQUEST)
 
-            outbound_flight_ref_id = await get_selected_outbound_offer_ref_ids(
-                outbound_offer_id=relationships.selected_outbound_offer.data.id,
-                results_repo=results_repo,
-            )
-
-            query = await flight_search_request_transformer.transform_inbound_query(
-                search_request,
-                outbound_flight_ref_id,
-                places,
-            )
-        else:
-            query = await flight_search_request_transformer.transform_outbound_query(
-                search_request,
-                places,
-            )
-        j1_search_response = await junction_one_client.search_flights(query)
-        transformed = flight_search_result_transformer.transform(
-            j1_search_response,
-            search_id,
-        )
+        _validate_request(search_request)
 
         insert_response = await requests_repo.insert(
             FlightSearchRequestStorage(
@@ -102,14 +72,20 @@ class FlightSearch(endpoints.HTTPEndpoint):
                 flight=request_data["data"]["attributes"],
             ),
         )
+
+        await search_task_producer.publish(
+            search_id=search_id,
+            search_request_json=json.dumps(request_data),
+            reseller_id=reseller_id,
+            expires_at=insert_response.expires_at,
+        )
+
         expires_at = insert_response.expires_at.isoformat()
         attributes_response = FlightSearchResponseAttributes(
             **request_data["data"]["attributes"],
             status=StatusTypeEnum.pending,
             expires_at=expires_at,
         ).model_dump(by_alias=True, exclude_none=True)
-
-        await asyncio.gather(*(results_repo.insert(doc) for doc in transformed))
 
         response_model = models.Resource(
             id=search_id,

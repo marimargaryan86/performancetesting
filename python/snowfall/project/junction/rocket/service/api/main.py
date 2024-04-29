@@ -1,8 +1,9 @@
 import asyncio
 import datetime
-from typing import NamedTuple, cast
+from typing import Any, NamedTuple, cast
 
 import grpc
+import pydantic
 from google.protobuf import message
 from lagom.integrations.starlette import StarletteIntegration
 from starlette.middleware import Middleware, authentication
@@ -23,7 +24,8 @@ from snowfall.project.junction.rocket.service.api.ferry import (
     router as ferry_router,
 )
 from snowfall.project.junction.rocket.service.api.flights import (
-    repositories as flights_repository,
+    repositories,
+    searches,
 )
 from snowfall.project.junction.rocket.service.api.flights import (
     router as flights_router,
@@ -91,6 +93,16 @@ class _ConsumerSettings(settings.CommonSettings):
     searches_time_window: datetime.timedelta = datetime.timedelta(hours=2)
 
 
+class _FlightSearchConsumerSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    amqp_timeout: datetime.timedelta | None = None
+    mongo_dsn: pydantic.MongoDsn
+    places_address: str
+    j_one_api_base_url: str
+    j_one_api_key: str
+    reseller_j1_credentials_mapping: dict[str, Any]
+
+
 class _ConsumerChannels(NamedTuple):
     locations: grpc.aio.Channel
     searches: grpc.aio.Channel
@@ -100,15 +112,15 @@ class _ConsumerChannels(NamedTuple):
 
 async def _http(app: application.Application[settings.Settings]) -> None:
     mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
-    container = await bootstrap.create_dependencies(app, mongo_db)
-
-    integration = StarletteIntegration(container)
-
     amqp_connection = await amqp_factory.make_connection(
         app=app,
         dsn=app.settings.amqp_dsn,
         timeout=app.settings.amqp_timeout,
     )
+    container = await bootstrap.create_dependencies(app, mongo_db, amqp_connection)
+
+    integration = StarletteIntegration(container)
+
     suggestion_repository = multi_modal_repository.SuggestionRepository(
         collection=mongo_db.suggestions,
         ttl=app.settings.suggestion_search_ttl,
@@ -211,7 +223,7 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
         auth=junction_one_auth,
     )
     flights_transformer = flights_transformers.FlightSearchResultTransformer()
-    flights_search_result_repository = flights_repository.FlightSearchResultRepository(
+    flights_search_result_repository = repositories.FlightSearchResultRepository(
         collection=mongo_db.search_results,
     )
 
@@ -270,6 +282,49 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
     await consumer.consume()
 
 
+async def _consume_flight_searches(
+    app: application.Application[_FlightSearchConsumerSettings],
+) -> None:
+    amqp_connection = await amqp_factory.make_connection(
+        app=app,
+        dsn=app.settings.amqp_dsn,
+        timeout=app.settings.amqp_timeout,
+    )
+    mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
+    auth = j1_auth.TemporaryTokenAuth(
+        api_key=app.settings.j_one_api_key,
+        reseller_credentials_mapping=app.settings.reseller_j1_credentials_mapping,
+    )
+
+    flight_search_queue = searches.FlightSearchQueue(
+        name_prefix=app.name,
+        processor=searches.SearchProcessor(
+            results_repository=repositories.FlightSearchResultRepository(
+                collection=mongo_db.search_results,
+            ),
+            places=places_pb2_grpc.PlacesServiceStub(
+                await grpc_factory.make_insecure_channel(
+                    app,
+                    app.settings.places_address,
+                ),
+            ),
+            junction_one_client=j1_client.JunctionOneClient(
+                api_base_url=app.settings.j_one_api_base_url,
+                http_client=await httpx_factory.make_client(app),
+                auth=auth,
+            ),
+            auth=auth,
+        ).perform_search,
+    )
+
+    consumer = amqp_consumer.QueueConsumer(
+        connection=amqp_connection,
+        queues=cast(list[protocol.Queue[message.Message]], [flight_search_queue]),
+    )
+
+    await consumer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="junction-rocket-api")
 
@@ -278,6 +333,11 @@ if __name__ == "__main__":
             name="http",
             callback=_http,
             settings_class=settings.Settings,
+        ),
+        application.Command(
+            name="consume-flight-searches",
+            callback=_consume_flight_searches,
+            settings_class=_FlightSearchConsumerSettings,
         ),
         application.Command(
             name="consume",

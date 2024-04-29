@@ -3,12 +3,14 @@ import datetime
 from typing import NamedTuple
 
 import lagom
+from aio_pika import abc
 from grpc import aio
 from motor import motor_asyncio
 
 from snowfall.adapter import authentication as auth_adapter
 from snowfall.project.junction.rocket.service.api import includes
 from snowfall.project.junction.rocket.service.api.flights import (
+    amqp,
     repositories,
     types,
 )
@@ -35,6 +37,8 @@ from snowfall.stdlib.service import (
     grpc_factory,
     httpx_factory,
 )
+from snowfall.stdlib.transport.amqp import producer
+from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
 from snowfall.vendor.junction_one.client import JunctionOneClient
 
@@ -48,6 +52,7 @@ class _Channels(NamedTuple):
 async def create_dependencies(
     app: application.Application[Settings],
     mongo_db: motor_asyncio.AsyncIOMotorDatabase,
+    amqp_connection: abc.AbstractConnection,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -133,6 +138,12 @@ async def create_dependencies(
         hotel_repositories.HotelRoomsSearchRepository(
             collection=mongo_db.hotel_rooms_results,
         )
+    )
+    container[amqp.SearchTaskProducer] = amqp.SearchTaskProducer(
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=amqp_types.Exchange(app.name),
+        ),
     )
 
     includes.register_resolvers(

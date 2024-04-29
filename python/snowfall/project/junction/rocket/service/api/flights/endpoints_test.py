@@ -240,7 +240,7 @@ async def test_flight_search_get_status(
 
     response = await client.get("/flights/searches/{0}".format(search_id))
     assert response.status_code == 200
-    assert response.json()["data"]["attributes"]["status"] == "completed"
+    assert response.json()["data"]["attributes"]["status"] == "processing"
 
 
 async def test_flight_search_retrieval(

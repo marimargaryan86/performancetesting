@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.api.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/api/v1alpha";
+
+message SearchTask {
+  string search_id = 1;
+  string search_request_data = 2;
+  string reseller_id = 3;
+  google.protobuf.Timestamp expires_at = 4;
+}

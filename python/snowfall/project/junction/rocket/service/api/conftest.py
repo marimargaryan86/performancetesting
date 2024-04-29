@@ -22,6 +22,9 @@ from snowfall.project.junction.rocket.service.api.ferry import (
     router as ferry_router,
 )
 from snowfall.project.junction.rocket.service.api.flights import (
+    amqp,
+)
+from snowfall.project.junction.rocket.service.api.flights import (
     router as flights_router,
 )
 from snowfall.project.junction.rocket.service.api.flights.repositories import (
@@ -163,6 +166,7 @@ def container(
     flights_search_request_repo: FlightSearchRequestRepository,
     hotel_search_repo: HotelSearchRepository,
     hotel_rooms_search_repo: HotelRoomsSearchRepository,
+    search_task_producer: amqp.SearchTaskProducer,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -179,6 +183,7 @@ def container(
     container[FlightSearchResultTransformer] = (  # type: ignore[type-abstract]
         flights_transforms.FlightSearchResultTransformer
     )
+    container[amqp.SearchTaskProducer] = search_task_producer
     container[HotelSearchRepository] = hotel_search_repo
     container[hotel_types.HotelSearchRequestTransformer] = (  # type: ignore[type-abstract]
         hotel_transformers.HotelSearchRequestTransformer
@@ -212,6 +217,13 @@ async def suggestion_repository(
     return multi_modal_repository.SuggestionRepository(
         collection=mongo_client["test"]["suggestions"],
         ttl=datetime.timedelta(minutes=30),
+    )
+
+
+@pytest.fixture()
+def search_task_producer() -> amqp.SearchTaskProducer:
+    return amqp.SearchTaskProducer(
+        producer_obj=memory.Producer(),
     )
 
 
