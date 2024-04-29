@@ -25,6 +25,7 @@ class PlaceListFilters:
     iata_eq: str
     coordinates: str
     place_to_search_within: str
+    page_limit: int
 
 
 valid_place_filters = PlaceListFilters(
@@ -33,6 +34,7 @@ valid_place_filters = PlaceListFilters(
     iata_eq="BER",
     coordinates="13.3888599,52.5170365,0",
     place_to_search_within="c6c12798-1668-5812-b611-7aa1709daee4",
+    page_limit=5,
 )
 valid_place_filters_combination = PlaceListFilters(
     name_like="Berlin",
@@ -40,6 +42,15 @@ valid_place_filters_combination = PlaceListFilters(
     iata_eq="LON",
     coordinates="13.49691,52.3665044,0",
     place_to_search_within="c6c12798-1668-5812-b611-7aa1709daee4",
+    page_limit=3,
+)
+empty_places_filters_params = PlaceListFilters(
+    name_like="",
+    type_eq="",
+    iata_eq="",
+    coordinates="",
+    place_to_search_within="",
+    page_limit=0,
 )
 
 
@@ -135,6 +146,23 @@ async def test_places_list_type_eq(
     )
     assert place_data.id, "Place data does not have an id"
     assert place_data.place_type == valid_place_filters.type_eq
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_multi_type_eq(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        type_eq="airport,railway-station",
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.place_type in {
+        "airport",
+        "railway-station",
+    }, "Expected place_type to be 'airport' or 'railway-station', got {0}".format(
+        place_data.place_type,
+    )
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -256,4 +284,137 @@ async def test_combination_with_iata(  # noqa: WPS218
     ), "Expected longitude {0}, but got {1}".format(
         expected_data.longitude,
         place_data.longitude,
+    )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_empty_name(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.places.get_place_list(
+            name_like=empty_places_filters_params.name_like,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_empty_iata_eq(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.places.get_place_list(
+            iata_eq=empty_places_filters_params.iata_eq,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_empty_type_eq(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.places.get_place_list(
+            type_eq=empty_places_filters_params.type_eq,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_empty_coordinates(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.places.get_place_list(
+            coordinates=empty_places_filters_params.coordinates,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_empty_search_within(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.places.get_place_list(
+            place_to_search_within=empty_places_filters_params.place_to_search_within,
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_short_name(
+    qa_client: QaClient,
+) -> None:
+    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+        await qa_client.places.get_place_list(
+            name_like="Lo",
+        )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_name_like_no_iata(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        name_like="Vienna",
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert place_data.name == "Vienna", "The response value is not 'Vienna'"
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_pagination(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        name_like=valid_place_filters.name_like,
+        page_limit=valid_place_filters.page_limit,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert (
+        len(place_data.items) == valid_place_filters.page_limit
+    ), "Expected {0} items in the first response, found {1}".format(
+        valid_place_filters.page_limit,
+        len(place_data.items),
+    )
+
+    next_link = place_data.next_link
+    next_page_data = await qa_client.places.get_place_by_next_link(url=next_link)
+    assert next_page_data.id, "Next page data does not have an id"
+    assert (
+        len(next_page_data.items) == valid_place_filters.page_limit
+    ), "Expected {0} items in the second response, found {1}".format(
+        valid_place_filters.page_limit,
+        len(next_page_data.items),
+    )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+async def test_places_list_not_default_limit(
+    qa_client: QaClient,
+) -> None:
+    place_data = await qa_client.places.get_place_list(
+        page_limit=valid_place_filters_combination.page_limit,
+    )
+    assert place_data.id, "Place data does not have an id"
+    assert (
+        len(place_data.items) == valid_place_filters_combination.page_limit
+    ), "Expected {0} items in the first response, found {1}".format(
+        valid_place_filters_combination.page_limit,
+        len(place_data.items),
+    )
+
+    next_link = place_data.next_link
+    next_page_data = await qa_client.places.get_place_by_next_link(url=next_link)
+    assert next_page_data.id, "Next page data does not have an id"
+    assert (
+        len(next_page_data.items) == valid_place_filters_combination.page_limit
+    ), "Expected {0} items in the second response, found {1}".format(
+        valid_place_filters_combination.page_limit,
+        len(next_page_data.items),
     )

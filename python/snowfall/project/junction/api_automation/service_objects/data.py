@@ -90,6 +90,14 @@ class PlaceListData(BaseResult):
     def place_to_search_within(self) -> str:
         return get_nested_attribute(self._data, "data.0.attributes.iataCode")
 
+    @property
+    def next_link(self) -> str:
+        return get_nested_attribute(self._data, "links.next")
+
+    @property
+    def items(self) -> list[dict[str, Any]]:
+        return get_nested_attribute(self._data, "data")
+
 
 class FlightSearchResult:
     def __init__(self, data: Mapping[str, Any]):
