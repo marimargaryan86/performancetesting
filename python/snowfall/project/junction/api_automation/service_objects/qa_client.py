@@ -1,8 +1,5 @@
 import httpx
 
-from snowfall.project.junction.api_automation.service_objects.air import (
-    FlightClient,
-)
 from snowfall.project.junction.api_automation.service_objects.car_rental import (
     CarRentalClient,
 )
@@ -11,6 +8,9 @@ from snowfall.project.junction.api_automation.service_objects.client_wrapper imp
 )
 from snowfall.project.junction.api_automation.service_objects.ferry import (
     FerryClient,
+)
+from snowfall.project.junction.api_automation.service_objects.flight import (
+    FlightClient,
 )
 from snowfall.project.junction.api_automation.service_objects.hotel import (
     HotelClient,

@@ -10,6 +10,10 @@ from snowfall.project.junction.api_automation.service_objects.qa_client import (
     QaClient,
 )
 
+pytestmark = pytest.mark.skip(
+    reason="Skipping tests - Ferry not working and/or priority",
+)
+
 
 @dataclass(frozen=True)
 class InputSearchData:

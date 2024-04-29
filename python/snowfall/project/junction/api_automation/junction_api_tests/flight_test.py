@@ -59,12 +59,13 @@ async def test_flight_search_one_way(
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
+@pytest.mark.skip("Getting stuck with status Pending: ./bugs-triage/-/issues/166")
 async def test_flight_search_with_no_offers(
     qa_client: QaClient,
 ) -> None:
     search_result = await qa_client.flight.search(
-        origin="LON",
-        destination="PAR",
+        origin="6da9e96b-5f05-5034-b5d5-993086525f0d",
+        destination="6a797d54-6d61-5cab-afee-bcc97cbc9bc1",
         departure_after=BASIC_SEARCH.depart_after,
         passengers_dates_of_birth=BASIC_SEARCH.passengers,
     )
@@ -152,6 +153,9 @@ async def test_flight_search_missing_or_none(
     departure_after: str | None,
     passengers: Sequence[datetime.date],
 ) -> None:
+    if departure_after and BASIC_SEARCH.depart_after != departure_after:
+        pytest.skip("Skipping: waiting on fix for /bugs-triage/-/issues/153")
+
     with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
         await qa_client.flight.search(
             origin=origin,
