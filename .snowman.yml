@@ -101,5 +101,5 @@ commits:
 metrics:
   base_size: 75
 stale_branches:
-  should_delete: true
+  should_delete: false
 use_merge_train: true
