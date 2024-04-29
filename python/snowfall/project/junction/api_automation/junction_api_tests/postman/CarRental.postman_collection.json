@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "6ed51593-41fc-40d4-9aff-7b8e3b6fe4ad",
+    "_postman_id": "b6d93d44-0973-45bb-bf17-38f3465358ce",
     "name": "Car Rental",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "33483058"
@@ -77,7 +77,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"car-rental-searches\",\n        \"attributes\": {\n            \"origin\": {\n                \"latitude\": 50.89369066956447, \n                \"longitude\": 4.47136870945399\n            },\n            \"destination\": {\n                \"latitude\": 48.96691462802318, \n                \"longitude\": 2.52817297961273\n            },\n            \"pickupAt\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"driverAge\": 25\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"car-rental-searches\",\n        \"attributes\": {\n            \"pickupAt\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"driverAge\": 25\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"a0c5695e-69e2-56b2-bf0e-ad9eec7bf812\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"7c17d8b8-cf07-57a8-8cf2-0d7d8927de15\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n\n    }\n}",
           "options": {
             "raw": {
               "language": "json"

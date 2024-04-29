@@ -1,8 +1,5 @@
 import datetime
-from collections.abc import Mapping
 from dataclasses import dataclass
-from types import MappingProxyType
-from typing import Any
 
 import pytest
 from httpx import HTTPStatusError
@@ -14,16 +11,16 @@ from snowfall.project.junction.api_automation.service_objects.qa_client import (
 
 @dataclass(frozen=True)
 class InputSearchData:
-    pickup_location: Mapping[str, Any]
-    return_location: Mapping[str, Any]
+    pickup_location: str
+    return_location: str
     pickup_at: str
     return_at: str
     driver_age: int
 
 
 BASIC_SEARCH = InputSearchData(
-    pickup_location={"latitude": 50.89369066956447, "longitude": 4.47136870945399},
-    return_location={"latitude": 48.96691462802318, "longitude": 2.52817297961273},
+    pickup_location="a0c5695e-69e2-56b2-bf0e-ad9eec7bf812",
+    return_location="7c17d8b8-cf07-57a8-8cf2-0d7d8927de15",
     pickup_at=(
         datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=10)
     ).strftime("%Y-%m-%dT08:00:00.000Z"),
@@ -39,12 +36,6 @@ NO_RESULTS_PICKUP_DATE = (  # No results for pickup after 2050
 NO_RESULTS_RETURN_DATE = (  # No results for RETURN after 2050
     datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=(365 * 50) + 10)
 ).strftime("%Y-%m-%dT08:00:00.000Z")
-COORDINATES = MappingProxyType({
-    "ocean": {
-        "latitude": -30.14512718,
-        "longitude": 61.25976562,
-    },
-})
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -86,7 +77,7 @@ async def test_car_rental_search(
             BASIC_SEARCH.driver_age,
         ),
         (
-            {},
+            "",
             BASIC_SEARCH.return_location,
             BASIC_SEARCH.pickup_at,
             BASIC_SEARCH.return_at,
@@ -101,7 +92,7 @@ async def test_car_rental_search(
         ),
         (
             BASIC_SEARCH.pickup_location,
-            {},
+            "",
             BASIC_SEARCH.pickup_at,
             BASIC_SEARCH.return_at,
             BASIC_SEARCH.driver_age,
@@ -140,8 +131,8 @@ async def test_car_rental_search(
 )
 async def test_car_rental_search_missing_or_none(
     qa_client: QaClient,
-    pickup_location: Mapping[str, Any] | None,
-    return_location: Mapping[str, Any] | None,
+    pickup_location: str | None,
+    return_location: str | None,
     pickup_at: str | None,
     return_at: str | None,
     driver_age: int | None,
@@ -158,52 +149,16 @@ async def test_car_rental_search_missing_or_none(
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
-@pytest.mark.parametrize(
-    ("pickup_location", "return_location", "pickup_at", "return_at", "driver_age"),
-    [
-        (
-            {"latitude": 200.89369066956447, "longitude": 4.47136870945399},
-            BASIC_SEARCH.return_location,
-            BASIC_SEARCH.pickup_at,
-            BASIC_SEARCH.return_at,
-            BASIC_SEARCH.driver_age,
-        ),
-        (
-            BASIC_SEARCH.pickup_location,
-            {"latitude": 48.96691462802318, "longitude": -200.52817297961273},
-            BASIC_SEARCH.pickup_at,
-            BASIC_SEARCH.return_at,
-            BASIC_SEARCH.driver_age,
-        ),
-        (
-            BASIC_SEARCH.pickup_location,
-            BASIC_SEARCH.return_location,
-            BASIC_SEARCH.pickup_at,
-            BASIC_SEARCH.return_at,
-            0,
-        ),
-    ],
-    ids=[
-        "Search where Pickup Location is out of bounds, expecting HTTPStatusError, 400",
-        "Search where Return Location is out of bounds, expecting HTTPStatusError, 400",
-        "Search where Driver Age is 0, expecting HTTPStatusError, 400",
-    ],
-)
-async def test_car_rental_search_invalid(
+async def test_car_rental_search_invalid_age(
     qa_client: QaClient,
-    pickup_location: Mapping[str, Any],
-    return_location: Mapping[str, Any],
-    pickup_at: str,
-    return_at: str,
-    driver_age: int,
 ) -> None:
     with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
         await qa_client.car_rental.search(
-            pickup_location=pickup_location,
-            return_location=return_location,
-            pickup_at=pickup_at,
-            return_at=return_at,
-            driver_age=driver_age,
+            pickup_location=BASIC_SEARCH.pickup_location,
+            return_location=BASIC_SEARCH.return_location,
+            pickup_at=BASIC_SEARCH.pickup_at,
+            return_at=BASIC_SEARCH.return_at,
+            driver_age=0,
         )
 
 
@@ -242,8 +197,8 @@ async def test_car_rental_search_invalid(
 )
 async def test_car_rental_search_unprocessable(
     qa_client: QaClient,
-    pickup_location: Mapping[str, Any],
-    return_location: Mapping[str, Any],
+    pickup_location: str | None,
+    return_location: str | None,
     pickup_at: str,
     return_at: str,
     driver_age: int,
@@ -314,9 +269,11 @@ async def test_car_rental_search_for_no_offers(
 async def test_mock_car_rental_search(
     qa_client: QaClient,
 ) -> None:
+    middle_of_nowhere = "5822a70d-b129-5ce4-85ca-04d4e48a9026"
+
     car_rental_search = await qa_client.car_rental.search(
-        pickup_location=COORDINATES["ocean"],
-        return_location=COORDINATES["ocean"],
+        pickup_location=middle_of_nowhere,
+        return_location=middle_of_nowhere,
         pickup_at=BASIC_SEARCH.pickup_at,
         return_at=BASIC_SEARCH.return_at,
         driver_age=BASIC_SEARCH.driver_age,

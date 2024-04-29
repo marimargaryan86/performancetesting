@@ -21,18 +21,14 @@ class CarRentalClient:
 
     async def search(
         self,
-        pickup_location: Mapping[str, Any] | None,
-        return_location: Mapping[str, Any] | None,
+        pickup_location: str | None,
+        return_location: str | None,
         pickup_at: str | None,
         return_at: str | None,
         driver_age: int | None,
     ) -> CarRentalSearchResult:
         criteria: dict[str, Any] = {}
 
-        if pickup_location is not None:
-            criteria["origin"] = pickup_location
-        if return_location is not None:
-            criteria["destination"] = return_location
         if pickup_at is not None:
             criteria["pickupAt"] = pickup_at
         if return_at is not None:
@@ -40,10 +36,28 @@ class CarRentalClient:
         if driver_age is not None:
             criteria["driverAge"] = driver_age
 
+        relationships: dict[str, Any] = {}
+
+        if pickup_location is not None:
+            relationships["origin"] = {
+                "data": {
+                    "id": pickup_location,
+                    "type": "places",
+                },
+            }
+        if return_location is not None:
+            relationships["destination"] = {
+                "data": {
+                    "id": return_location,
+                    "type": "places",
+                },
+            }
+
         body = {
             "data": {
                 "type": "car-rental-searches",
                 "attributes": criteria,
+                "relationships": relationships,
             },
         }
 
