@@ -28,7 +28,7 @@ func (mr *mergeRequest) merge() error {
 		return nil
 	}
 
-	if !hasSnowman {
+	if !hasSnowman && mr.object.Author.ID != mr.snowman.ID {
 		if err = mr.approve(); err != nil {
 			return err
 		}
