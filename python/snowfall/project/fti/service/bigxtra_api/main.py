@@ -3,7 +3,7 @@ import random
 
 import aiofiles
 import lagom
-from motor import motor_asyncio
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from snowfall.project.fti.service.bigxtra_api import bootstrap, repository
 from snowfall.project.fti.service.bigxtra_api.routes import router
@@ -19,13 +19,17 @@ _schema_path = filesystem.resource_path(
 
 
 async def _http(app: application.Application[bootstrap.Settings]) -> None:
-    mongo = motor_asyncio.AsyncIOMotorClient(
-        str(random.choice(app.settings.mongo_dsn)),  # noqa: S311
-    )[app.settings.mongo_db]
+    engine = create_async_engine(
+        "{0}/{1}".format(
+            random.choice(app.settings.postgresql_dsn),  # noqa: S311
+            app.settings.db_name,
+        ),
+    )
+    session = async_sessionmaker(engine, expire_on_commit=False)
     asgi_app = starlette.create_starlette_app(
         routes=router.get_routes(
             bootstrap.create_dependencies(
-                places_repository=repository.PlacesRepository(mongo["flights"]),
+                fti_repository=repository.Repository(session),
             ),
         ),
         openapi_path=_schema_path,

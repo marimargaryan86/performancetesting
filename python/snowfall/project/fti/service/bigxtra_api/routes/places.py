@@ -16,11 +16,10 @@ class Places(endpoints.HTTPEndpoint):
     async def get(
         self,
         request: requests.Request,
-        places_repository: repository.PlacesRepository = lagom.injectable,
+        fti_repository: repository.Repository = lagom.injectable,
     ) -> responses.JSONResponse:
         query_params = models.PlacesQueryParams.model_validate(request.query_params)
-        result = await places_repository.find_places(query_params.destination)
-        places = await result.take()
+        places = await fti_repository.find_places(query_params.destination)
         return responses.JSONResponse(
             content=models.PlacesModel(
                 places=[

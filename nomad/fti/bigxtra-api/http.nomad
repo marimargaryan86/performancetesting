@@ -116,7 +116,7 @@ job "fti-bigxtra-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
+POSTGRESQL_DSN={{range $index, $service := service "fti-${var.environment}"}}rds://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}} {{end}}
 EOH
       }
 
@@ -141,7 +141,7 @@ EOH
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://7c15cfeb8465df35675c0152bd626f7d@sentry.snowfall.se/246"
         PROMETHEUS_PORT       = "${NOMAD_PORT_prometheus}"
-        MONGO_DB              = "fti"
+        DB_NAME               = "fti"
       }
     }
   }

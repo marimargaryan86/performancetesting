@@ -8,13 +8,13 @@ from snowfall.stdlib.integration.starlette import application
 
 
 class Settings(application.Settings):
-    mongo_db: str
-    mongo_dsn: Sequence[AnyUrl]
+    postgresql_dsn: Sequence[AnyUrl]
+    db_name: str
 
 
 def create_dependencies(
-    places_repository: repository.PlacesRepository,
+    fti_repository: repository.Repository,
 ) -> lagom.Container:
     container = lagom.Container()
-    container[repository.PlacesRepository] = places_repository
+    container[repository.Repository] = fti_repository
     return container
