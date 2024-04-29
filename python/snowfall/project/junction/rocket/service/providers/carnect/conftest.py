@@ -305,6 +305,24 @@ async def booking_consumer_mock(
     )
 
 
+@pytest_asyncio.fixture()
+async def cancellation_handler_mock() -> carnect_bookings.CancellationHandler:
+    return carnect_bookings.CancellationHandler(
+        carnect_client=mock.AsyncMock(
+            name="CarnectClient",
+            cancel_reservation=mock.AsyncMock(
+                name="cancel_reservation",
+                return_value=await get_cancellation_response(),
+            ),
+            retrieve_reservation=mock.AsyncMock(
+                name="cancel_reservation",
+                return_value=await get_retrieve_reservation_response(),
+            ),
+        ),
+        carnect_config=mock.Mock(name="CarnectConfig"),
+    )
+
+
 async def _load_xml_fixture(
     file_name: str,
     package: str | None = None,
@@ -340,3 +358,29 @@ async def get_reservation_response() -> tuple[Any, bytes]:
         response,
         carnect_service.ServiceSoapGetVehReservationOutput,
     ), response
+
+
+async def get_cancellation_response() -> (
+    carnect_service.ServiceSoapGetVehCancelReservationOutput
+):
+    parser = parsers.XmlParser(
+        config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
+    )
+    response = await _load_xml_fixture("cancellation_result.xml")
+    return parser.from_bytes(
+        response,
+        carnect_service.ServiceSoapGetVehCancelReservationOutput,
+    )
+
+
+async def get_retrieve_reservation_response() -> (
+    carnect_service.ServiceSoapGetVehRetReservationOutput
+):
+    parser = parsers.XmlParser(
+        config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
+    )
+    response = await _load_xml_fixture("retrieve_reservation_result.xml")
+    return parser.from_bytes(
+        response,
+        carnect_service.ServiceSoapGetVehRetReservationOutput,
+    )

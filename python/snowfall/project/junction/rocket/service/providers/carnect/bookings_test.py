@@ -1,5 +1,6 @@
 from unittest import mock
 
+from snowfall.project.junction.rocket.provider.v1alpha import bookings_pb2
 from snowfall.project.junction.rocket.service.bookings.v1alpha import (
     amqp_pb2,
     models_pb2,
@@ -42,3 +43,16 @@ async def test_consume_process_message_successful(  # noqa: WPS218
     )
     assert booking.provider_booking.booking_reference == "VEVTNzU1NjAxNDQxMzc0AExhc3QA"
     assert booking.provider_booking.raw_data is not None
+
+
+async def test_booking_cancellation_successful(
+    cancellation_handler_mock: bookings.CancellationHandler,
+) -> None:
+    booking_reference = "VEVTNzU4MTQxMDcwNDQwAFRlc3QA"
+
+    cancellation = await cancellation_handler_mock.cancel(identifier=booking_reference)
+
+    assert cancellation.status == bookings_pb2.BookingCancellation.STATUS_REFUND_DUE
+    assert cancellation.provider_booking_reference == booking_reference
+    assert cancellation.refunded_us.units == 62
+    assert cancellation.refunded_us.currency_code == "EUR"
