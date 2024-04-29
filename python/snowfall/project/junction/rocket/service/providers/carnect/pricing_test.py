@@ -24,3 +24,13 @@ async def test_consume_process_message_successful(
     await consumer_mock._process_message(mock_message)  # noqa: SLF001
 
     mock_producer.publish.assert_awaited_once()
+
+    quote = mock_producer.publish.call_args[0][0].quote  # noqa: WPS219
+    assert quote.id == mock_message.body.quote.id
+    assert quote.pay_company_id == mock_message.body.quote.pay_company_id
+    assert (
+        quote.total_price.currency_code
+        == mock_message.body.quote.total_price.currency_code
+    )
+    assert quote.total_price.units == mock_message.body.quote.total_price.units
+    assert quote.offer_ids == mock_message.body.quote.offer_ids
