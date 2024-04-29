@@ -51,6 +51,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--BASIC_TOKEN", action="store", help="token to use with ORY")
     parser.addoption("--ORY_URL", action="store", help="url to get access token")
     parser.addoption("--LOCAL_API_URL", action="store", help="url to run locally")
+    parser.addoption("--LOG_ROOT", action="store", help="where to save log files")
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -159,6 +160,11 @@ def sentry_url(
     host: str,
 ) -> str:
     return get_variable_value(host, api_token, "sentry_url")
+
+
+@pytest.fixture()
+def log_root_dir(request: pytest.FixtureRequest) -> str:
+    return request.config.getoption(name="LOG_ROOT")
 
 
 def pytest_collection_modifyitems(
@@ -270,14 +276,30 @@ def _save_properties_to_allure_file(
     )
 
 
+def _get_new_log_file_path(log_root_dir: str | None = None) -> Path:
+    unique_logfile_name = "{0}.log".format(string.uuid())
+    if log_root_dir:
+        log_path = Path(log_root_dir)
+        if not log_path.is_dir():
+            raise ValueError(
+                "Provided log root directory {0} is not a valid.".format(log_root_dir),
+            )
+        return log_path / unique_logfile_name
+    return Path.cwd() / unique_logfile_name
+
+
 @pytest.fixture(autouse=True)
 def _generate_sentry_url(
     sentry_url: str,
+    log_root_dir: str | None,
 ) -> Generator[None, None, None]:
     while logger.hasHandlers():
         logger.handlers[0].close()
         logger.removeHandler(logger.handlers[0])
-    fh = logging.FileHandler("{0}.log".format(string.uuid()))
+
+    log_file_path = _get_new_log_file_path(log_root_dir)
+
+    fh = logging.FileHandler(log_file_path)
     tmp_log_file = fh.baseFilename
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)

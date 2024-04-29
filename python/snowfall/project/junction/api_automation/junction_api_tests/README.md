@@ -82,7 +82,7 @@ If you wish to run against a local url then you can override using dev by using
 the arg below instead:
 
 ```
---LOCAL_API_URL='http://localhost:8000'
+--LOCAL_API_URL="http://localhost:8000"
 ```
 
 #### Using a different token (non-mocked) via Ory
@@ -96,7 +96,25 @@ LOCAL_API_URL
 
 ```
 --BASIC_TOKEN="ADD BASIC TOKEN HERE"
---ORY_URL='https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/oauth2/token'
+--ORY_URL="https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/oauth2/token"
+```
+
+#### A word on logs
+
+Every test creates a log file containing the requests, etc. that
+have been executed. This is used for debugging and generating a sentry url.
+
+By default, the log files are saved to the root directory from where the tests
+are executed from.
+
+You can override this and provide a default log directory
+using the command line arg `LOG_ROOT` with the absolute path to you log
+directory.
+
+For example;
+
+```
+--LOG_ROOT="/Users/thehulk/tmp/testing/logs"
 ```
 
 ### Examples
@@ -112,6 +130,7 @@ To run & debug in Pycharm update your:
 -m verify
 --alluredir=/tmp/allure-report
 --API-TOKEN="ADD VAULT TOKEN HERE"
+--LOG_ROOT="/Users/thehulk/tmp/testing/logs"
 ```
 
 Tests live under:
@@ -132,6 +151,7 @@ python/snowfall/project/junction/api_automation/junction_api_tests/::
 -- --alluredir=/tmp/allure-report
 --API-TOKEN="ADD VAULT TOKEN HERE"
 --HOST="ADD VAULT URL HERE"
+--LOG_ROOT="/Users/thehulk/tmp/testing/logs"
 ```
 
 ### Running Tests via Pants (local env)
@@ -143,7 +163,8 @@ python/snowfall/project/junction/api_automation/junction_api_tests/::
 -- --alluredir=/tmp/allure-report
 --ORY_URL="https://exciting-boyd-kr7iwir8gj.projects.oryapis.com/oauth2/token"
 --BASIC_TOKEN="ADD BASIC TOKEN HERE"
---LOCAL_API_URL='http://localhost:8000'
+--LOCAL_API_URL="http://localhost:8000"
+--LOG_ROOT="/Users/thehulk/tmp/testing/logs"
 ```
 
 ## Postman

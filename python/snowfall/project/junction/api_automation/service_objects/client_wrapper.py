@@ -10,8 +10,6 @@ from snowfall.project.junction.api_automation.service_objects.helper import (
 )
 from snowfall.vendor.junction.client import BaseClient
 
-logger = logging.getLogger()
-
 METHOD_GET = "GET"
 METHOD_POST = "POST"
 
