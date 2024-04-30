@@ -138,16 +138,16 @@ async def _consume_notifications(
     notifications_consumer = consumer.NotificationsConsumer(
         consumer_obj=amqp_consumer.Consumer(
             connection=amqp_connection,
-            queue_name="{0}_notifications".format(app.name),
+            queue_name="{0}.notifications".format(app.name),
             queue_arguments={
-                "x-dead-letter-exchange": "{0}.notifications.retry".format(app.name),
+                "x-dead-letter-exchange": "notifications.retry",
                 "x-dead-letter-routing-key": "{0}.notifications.retry".format(
                     app.name,
                 ),
             },
             binds=[
                 (
-                    types.Exchange("{0}.notifications".format(app.name)),
+                    types.Exchange("notifications"),
                     "{0}.notifications".format(app.name),
                 ),
             ],
@@ -181,11 +181,11 @@ async def _configure_queue(
         durable=True,
         arguments={
             "x-message-ttl": 300000,
-            "x-dead-letter-exchange": "{0}.notifications".format(app.name),
+            "x-dead-letter-exchange": "notifications",
             "x-dead-letter-routing-key": "{0}.notifications".format(app.name),
         },
     )
-    exchange = types.Exchange("{0}.notifications.retry".format(app.name))
+    exchange = types.Exchange("notifications.retry")
     declared_exchange = await channel.declare_exchange(
         name=exchange.name,
         type=exchange.type_,

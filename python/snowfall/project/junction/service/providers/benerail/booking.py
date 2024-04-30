@@ -509,7 +509,7 @@ class BookingCreationHandler:
     async def _notify(self, msg: amqp_pb2.BookingNotificationTask) -> None:
         await self._notifications_producer.publish(
             msg=msg,
-            routing_key="benerail.notifications",
+            routing_key="junction-providers-benerail.notifications",  # make dynamic
         )
 
 
