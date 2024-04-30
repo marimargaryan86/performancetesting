@@ -208,3 +208,53 @@ class TestTrainListSearchResults:
         included_types = [resource["type"] for resource in results["included"]]
         assert "train-offers" in included_types
         assert "train-result-details" in included_types
+
+
+class TestTrainGetOffer:
+    async def test_get_trains_offer_should_fail_when_unauthorized(
+        self,
+        unauthorized_client: httpx.AsyncClient,
+    ) -> None:
+        response = await unauthorized_client.get(
+            "/trains/offers/{offerId}".format(
+                offerId=fixtures.RAIL_OFFERS[0],
+            ),
+        )
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    async def test_get_trains_offer_should_fail_when_not_found(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/trains/offers/{offerId}".format(
+                offerId=fixtures.NOT_FOUND,
+            ),
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    async def test_get_trains_offer_is_successful(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/trains/offers/{offerId}".format(
+                offerId=fixtures.RAIL_OFFERS[0],
+            ),
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    async def test_get_rail_offer_should_fail_when_wrong_offer_type(
+        self,
+        client: httpx.AsyncClient,
+    ) -> None:
+        response = await client.get(
+            "/rail/offers/{offerId}".format(
+                offerId=fixtures.CAR_RENTAL_OFFERS[0],
+            ),
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND

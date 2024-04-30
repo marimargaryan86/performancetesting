@@ -17,6 +17,7 @@ from snowfall.project.junction.rocket.service.searches.amqp import (
     SearchProducer,
 )
 from snowfall.project.junction.rocket.service.searches.grpc import (
+    OfferService,
     QuoteService,
     SearchResultService,
     SearchService,
@@ -102,6 +103,11 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                     mongo.searches.search_results,
                 ),
                 default_page_size=app.settings.default_page_size,
+            ),
+            OfferService(
+                offers_repo=repository.OfferRepository(
+                    mongo.searches.search_results,
+                ),
             ),
             QuoteService(
                 quotes_repo=repository.QuoteRepository(

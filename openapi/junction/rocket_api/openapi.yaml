@@ -913,6 +913,32 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /trains/offers/{offerId}:
+    parameters:
+      - $ref: '#/components/parameters/offerId'
+    get:
+      summary: Get train offer
+      operationId: get-trains-offers-id
+      description: Used to retrieve a Train Offer by ID
+      tags:
+        - train-searches
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/TrainOffer'
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /trains/searches:
     post:
       summary: Create train search
@@ -3712,6 +3738,17 @@ components:
         example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
       description: >-
         Unique identifier (UUID) for the Place object in [RFC
+        4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+    offerId:
+      name: offerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: >-
+        Unique identifier (UUID) for the Offer object in [RFC
         4122](https://datatracker.ietf.org/doc/html/rfc4122) format
     searchId:
       name: searchId

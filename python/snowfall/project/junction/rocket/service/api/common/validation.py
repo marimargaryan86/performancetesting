@@ -5,6 +5,7 @@ from typing import Any
 
 from starlette import status
 
+from snowfall.project.junction.rocket.service.api import errors
 from snowfall.stdlib.integration.starlette import models
 
 
@@ -34,7 +35,9 @@ class RequestValidator(abc.ABC):
         error_message: str,
         pointer: str,
     ) -> None:
-        self._errors.append(self._generate_validation_error(error_message, pointer))
+        self._errors.append(
+            errors.generate_unprocessable_entity_error(error_message, pointer),
+        )
 
     def validate_passengers(
         self,
@@ -96,17 +99,3 @@ class RequestValidator(abc.ABC):
                 ),
                 "attributes/{0}".format(next_date_field_name),
             )
-
-    def _generate_validation_error(
-        self,
-        error_message: str,
-        pointer: str,
-    ) -> models.Error:
-        return models.Error(
-            status=str(status.HTTP_422_UNPROCESSABLE_ENTITY),
-            code="VALIDATION_ERROR",
-            detail=error_message,
-            source=models.ErrorSourcePointer(
-                pointer="/data/{pointer}".format(pointer=pointer),
-            ),
-        )

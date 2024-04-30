@@ -5,6 +5,7 @@ from typing import ParamSpec, TypeVar
 import grpc
 from google.protobuf import message
 from google.rpc import error_details_pb2
+from starlette import status as http_status
 
 from snowfall.stdlib.integration.starlette import models
 from snowfall.stdlib.transport.grpc import rich_status
@@ -86,3 +87,30 @@ def _handle_grpc_exception(err: grpc.aio.AioRpcError) -> None:
 class RequestValidationError(Exception):
     def __init__(self, errors: Sequence[models.Error]) -> None:
         self.errors = errors
+
+
+def generate_unprocessable_entity_error(
+    error_message: str,
+    pointer: str,
+) -> models.Error:
+    return models.Error(
+        status=str(http_status.HTTP_422_UNPROCESSABLE_ENTITY),
+        code="VALIDATION_ERROR",
+        detail=error_message,
+        source=models.ErrorSourcePointer(
+            pointer="/data/{pointer}".format(pointer=pointer),
+        ),
+    )
+
+
+def generate_not_found_error(
+    parameter: str,
+) -> models.Error:
+    return models.Error(
+        status=str(http_status.HTTP_404_NOT_FOUND),
+        code="NOT_FOUND_ERROR",
+        detail="Nothing found for the provided ID",
+        source=models.ErrorSourceParameter(
+            parameter="{0}".format(parameter),
+        ),
+    )

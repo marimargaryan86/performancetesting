@@ -132,6 +132,21 @@ def search_results(
 
 
 @pytest.fixture()
+def offers(mocker: pytest_mock.MockerFixture) -> grpc_pb2_grpc.OfferServiceStub:
+    offers = grpc_pb2_grpc.OfferServiceStub(
+        grpc_testing.channel([], grpc_testing.strict_real_time()),
+    )
+
+    mocker.patch.object(
+        offers,
+        "GetOffer",
+        side_effect=_get_offer,
+    )
+
+    return offers
+
+
+@pytest.fixture()
 def places_stub(mocker: pytest_mock.MockerFixture) -> places_pb2_grpc.PlacesServiceStub:
     places = places_pb2_grpc.PlacesServiceStub(
         grpc_testing.channel([], grpc_testing.strict_real_time()),
@@ -160,6 +175,7 @@ def places_stub(mocker: pytest_mock.MockerFixture) -> places_pb2_grpc.PlacesServ
 def container(
     searches: grpc_pb2_grpc.SearchServiceStub,
     search_results: grpc_pb2_grpc.SearchResultServiceStub,
+    offers: grpc_pb2_grpc.OfferServiceStub,
     places_stub: places_pb2_grpc.PlacesServiceStub,
     junction_one_client: JunctionOneClient,
     flights_search_repo: FlightSearchResultRepository,
@@ -173,6 +189,7 @@ def container(
     container[datetime.timedelta] = datetime.timedelta(seconds=45)
     container[grpc_pb2_grpc.SearchServiceStub] = searches
     container[grpc_pb2_grpc.SearchResultServiceStub] = search_results
+    container[grpc_pb2_grpc.OfferServiceStub] = offers
     container[places_pb2_grpc.PlacesServiceStub] = places_stub
     container[JunctionOneClient] = junction_one_client
     container[FlightSearchResultRepository] = flights_search_repo
@@ -395,6 +412,28 @@ async def _get_search_results(
 
     return grpc_pb2.ListSearchResultsResponse(
         search_results=fixtures.generate_search_results(request.search_id),
+    )
+
+
+async def _get_offer(
+    request: grpc_pb2.GetOfferRequest,
+    timeout: datetime.datetime | None = None,
+) -> grpc_pb2.GetOfferResponse:
+    if request.id in fixtures.CAR_RENTAL_OFFERS:
+        return grpc_pb2.GetOfferResponse(
+            offer=fixtures.generate_car_rental_offer(request.id),
+        )
+    if request.id in fixtures.FERRY_OFFERS:
+        return grpc_pb2.GetOfferResponse(
+            offer=fixtures.generate_ferry_offer(request.id),
+        )
+    if request.id in fixtures.RAIL_OFFERS:
+        return grpc_pb2.GetOfferResponse(offer=fixtures.generate_rail_offer(request.id))
+
+    raise grpc.aio.AioRpcError(
+        code=grpc.StatusCode.NOT_FOUND,
+        initial_metadata=grpc.aio.Metadata(),
+        trailing_metadata=grpc.aio.Metadata(),
     )
 
 

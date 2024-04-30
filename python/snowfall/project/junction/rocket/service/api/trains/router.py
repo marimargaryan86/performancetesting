@@ -21,4 +21,9 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             searches.TrainSearchResults,
             name="ListTrainsSearchResults",
         ),
+        integration.route(
+            "/trains/offers/{offerId}",
+            searches.TrainOffers,
+            name="ViewTrainsOffer",
+        ),
     ]

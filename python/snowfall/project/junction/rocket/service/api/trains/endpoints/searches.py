@@ -208,3 +208,33 @@ class TrainSearchResults(endpoints.HTTPEndpoint):
                 for result_detail in search_result.result_details
             ])
         return included
+
+
+class TrainOffers(endpoints.HTTPEndpoint):
+    @errors.handle_grpc_errors
+    async def get(
+        self,
+        request: requests.Request,
+        grpc_timeout: datetime.timedelta = lagom.injectable,
+        offers: grpc_pb2_grpc.OfferServiceStub = lagom.injectable,
+    ) -> responses.Response:
+        offer_id = request.path_params["offerId"]
+        response: grpc_pb2.GetOfferResponse = await offers.GetOffer(
+            grpc_pb2.GetOfferRequest(id=offer_id),
+            timeout=grpc_timeout.total_seconds(),
+        )
+
+        if not response.offer.HasField("rail"):
+            return models.JsonApiResponse(
+                models.Body(errors=[errors.generate_not_found_error("offerId")]),
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=search_models.OfferResource.from_proto(
+                    response.offer,
+                ),
+            ),
+            request=request,
+        )

@@ -52,9 +52,21 @@ RESULT_DETAILS = (
     "2d178001-46ea-415f-8ec7-f22f2318b7c0",
     "6b368a44-0e01-43cf-80ab-f9a16f40f2b6",
 )
-OFFERS = (
-    "2d178001-46ea-415f-8ec7-f22f2318b7c0",
-    "6b368a44-0e01-43cf-80ab-f9a16f40f2b6",
+CAR_RENTAL_OFFERS = (
+    "dd217ca8-1333-414b-80cb-bc325bd6f3ab",
+    "52ff573d-7821-4b39-9b53-2c4626010d91",
+)
+RAIL_OFFERS = (
+    "9e86aba5-167d-4ce2-bcc1-ece05878af72",
+    "b35882bb-2f3d-40bb-8ddf-77bdb4a2d74c",
+)
+FERRY_OFFERS = (
+    "9774c54b-0364-4c18-a8aa-7c8acfcb5028",
+    "493ea130-97ca-41ef-b59b-c2aae725277b",
+)
+FLIGHT_OFFERS = (
+    "a17a3403-2a91-45ea-b8c2-888370dc83bd",
+    "31450b2f-e5f7-4e1d-9e26-ebe6f859ef17",
 )
 DATETIME_NOW = datetime.datetime.now(datetime.UTC)
 DATETIME_TOMORROW = DATETIME_NOW + datetime.timedelta(days=1)
@@ -205,7 +217,7 @@ def generate_car_rental_search_results(
             search_id=search_id,
             provider_id=PROVIDERS[0],
             expires_at=EXPIRES_AT,
-            offers=[generate_car_rental_offer(offer) for offer in OFFERS],
+            offers=[generate_car_rental_offer(offer) for offer in CAR_RENTAL_OFFERS],
             result_details=[
                 generate_car_rental_result_detail(result_detail)
                 for result_detail in RESULT_DETAILS
@@ -224,7 +236,7 @@ def generate_ferry_search_results(
             search_id=search_id,
             provider_id=PROVIDERS[0],
             expires_at=EXPIRES_AT,
-            offers=[generate_ferry_offer(offer) for offer in OFFERS],
+            offers=[generate_ferry_offer(offer) for offer in FERRY_OFFERS],
             result_details=[
                 generate_ferry_result_detail(result_detail)
                 for result_detail in RESULT_DETAILS
@@ -243,7 +255,7 @@ def generate_rail_search_results(
             search_id=search_id,
             provider_id=PROVIDERS[0],
             expires_at=EXPIRES_AT,
-            offers=[generate_rail_offer(offer) for offer in OFFERS],
+            offers=[generate_rail_offer(offer) for offer in RAIL_OFFERS],
             result_details=[
                 generate_rail_result_detail(result_detail)
                 for result_detail in RESULT_DETAILS

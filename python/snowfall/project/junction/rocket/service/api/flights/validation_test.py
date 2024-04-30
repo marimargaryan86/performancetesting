@@ -41,7 +41,7 @@ def example_request_inbound() -> Any:
             },
             "relationships": {
                 "selectedOutboundOffer": {
-                    "data": {"id": fixtures.OFFERS[0], "type": "flight-offers"},
+                    "data": {"id": fixtures.FLIGHT_OFFERS[0], "type": "flight-offers"},
                 },
                 "origin": {"data": {"id": fixtures.PLACES[0], "type": "places"}},
                 "destination": {"data": {"id": fixtures.PLACES[1], "type": "places"}},

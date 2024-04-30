@@ -104,6 +104,9 @@ async def create_dependencies(
     container[grpc_pb2_grpc.QuoteServiceStub] = grpc_pb2_grpc.QuoteServiceStub(
         channels.searches,
     )
+    container[grpc_pb2_grpc.OfferServiceStub] = grpc_pb2_grpc.OfferServiceStub(
+        channels.searches,
+    )
     container[places_pb2_grpc.PlacesServiceStub] = places_pb2_grpc.PlacesServiceStub(
         channels.places,
     )

@@ -102,6 +102,32 @@ class SearchResultService(service.Service, grpc_pb2_grpc.SearchResultServiceServ
         return await context.abort(grpc.StatusCode.NOT_FOUND)
 
 
+class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
+    def __init__(
+        self,
+        offers_repo: repository.OfferRepository,
+    ):
+        self._offers_repo = offers_repo
+
+    def get_name(self) -> str:
+        return grpc_pb2.DESCRIPTOR.services_by_name["OfferService"].full_name
+
+    def register(self, server: grpc.aio.Server) -> None:
+        grpc_pb2_grpc.add_OfferServiceServicer_to_server(self, server)
+
+    async def GetOffer(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.GetOfferRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.GetOfferResponse:
+        offer = await self._offers_repo.find_by_id(request.id)
+
+        if not offer:
+            return await context.abort(grpc.StatusCode.NOT_FOUND)
+
+        return grpc_pb2.GetOfferResponse(offer=offer)
+
+
 class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
     def __init__(
         self,
