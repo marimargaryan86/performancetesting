@@ -62,15 +62,13 @@ def example_request_round_trip() -> Any:
             "attributes": {
                 "departureAfter": date(2024, 1, 1),
                 "returnAt": date(2024, 1, 2),
-                "origin": "JFK",
-                "destination": "LAX",
                 "passengers": [
                     {"date_of_birth": date(1980, 1, 1)},
                     {"date_of_birth": date(2010, 1, 1)},
                 ],
             },
             "relationships": {
-                "selected_outbound_offer": {
+                "selectedOutboundOffer": {
                     "data": {
                         "id": OUTBOUND_SEARCH_OFFER_ID,
                         "type": "flight-offers",

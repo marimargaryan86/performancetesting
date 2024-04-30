@@ -56,6 +56,9 @@ OFFERS = (
     "2d178001-46ea-415f-8ec7-f22f2318b7c0",
     "6b368a44-0e01-43cf-80ab-f9a16f40f2b6",
 )
+DATETIME_NOW = datetime.datetime.now(datetime.UTC)
+DATETIME_TOMORROW = DATETIME_NOW + datetime.timedelta(days=1)
+DATETIME_AFTER_TOMORROW = DATETIME_TOMORROW + datetime.timedelta(days=1)
 EXPIRES_AT = protobuf.datetime_to_protobuf(
     datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=1),
 )

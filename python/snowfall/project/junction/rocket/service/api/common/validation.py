@@ -1,6 +1,6 @@
 import abc
 import datetime
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from starlette import status
@@ -36,6 +36,21 @@ class RequestValidator(abc.ABC):
     ) -> None:
         self._errors.append(self._generate_validation_error(error_message, pointer))
 
+    def validate_passengers(
+        self,
+        passengers: Sequence[Mapping[str, Any]],
+    ) -> None:
+        for idx, passenger in enumerate(passengers):
+            date_of_birth = datetime.datetime.strptime(
+                passenger["dateOfBirth"],
+                "%Y-%m-%d",
+            ).replace(tzinfo=datetime.UTC)
+
+            self.validate_date_after_current(
+                date_of_birth,
+                "passengers[{0}].dateOfBirth".format(idx),
+            )
+
     def validate_date_before_current(
         self,
         date_to_validate: datetime.datetime,
@@ -48,6 +63,21 @@ class RequestValidator(abc.ABC):
         if date_to_validate < current_time:
             self.capture_error(
                 "`{0}` cannot be in the past".format(field_name),
+                "attributes/{0}".format(field_name),
+            )
+
+    def validate_date_after_current(
+        self,
+        date_to_validate: datetime.datetime,
+        field_name: str,
+    ) -> None:
+        current_time = datetime.datetime.now(
+            datetime.UTC,
+        ) + datetime.timedelta(minutes=1)
+
+        if date_to_validate > current_time:
+            self.capture_error(
+                "`{0}` cannot be in the future".format(field_name),
                 "attributes/{0}".format(field_name),
             )
 

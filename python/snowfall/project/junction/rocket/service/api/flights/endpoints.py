@@ -16,6 +16,9 @@ from snowfall.project.junction.rocket.service.api.flights.repositories import (
     FlightSearchRequestRepository,
     FlightSearchResultRepository,
 )
+from snowfall.project.junction.rocket.service.api.flights.validation import (
+    SearchRequestValidator,
+)
 from snowfall.stdlib import sequence, string
 from snowfall.stdlib.integration.starlette import (
     messages,
@@ -61,6 +64,11 @@ class FlightSearch(endpoints.HTTPEndpoint):
         reseller_id = request.user.username
         request_data = await request.json()
         search_id = string.uuid()
+
+        request_validator = SearchRequestValidator(request_data)
+        if request_validator.validation_errors:
+            return request_validator.as_json_api_response()
+
         search_request = FlightSearchRequest(**request_data)
 
         _validate_request(search_request)

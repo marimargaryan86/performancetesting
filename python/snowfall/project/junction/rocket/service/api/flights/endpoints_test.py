@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from typing import Any
 
 import httpx
@@ -30,6 +30,9 @@ OUTBOUND_SEARCH_OFFER_ID = "a7384289-a633-4bb3-83c6-3aafcb20a4dc"
 RESULT_DETAILS_ID = "7434860a-0ee5-4639-8bce-9b48a3ecbc78"
 FLIGHT_REF_ID = "1P0_1234ABC"
 
+TOMORROW = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
+AFTER_TOMORROW = TOMORROW + datetime.timedelta(days=1)
+
 
 @pytest.fixture()
 async def example_search_flight_response() -> SearchFlightsResponse:
@@ -43,7 +46,7 @@ def example_request() -> Any:
         "data": {
             "type": "flight-searches",
             "attributes": {
-                "departureAfter": "2024-03-24T00:00:00Z",
+                "departureAfter": TOMORROW.strftime("%Y-%m-%dT08:00:00.000Z"),
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
             },
             "relationships": {
@@ -63,7 +66,7 @@ def example_response(
             "id": mocker.mock_module.ANY,
             "type": "flight-searches",
             "attributes": {
-                "departureAfter": "2024-03-24T00:00:00Z",
+                "departureAfter": TOMORROW.strftime("%Y-%m-%dT08:00:00Z"),
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
                 "status": "pending",
                 "expiresAt": mocker.mock_module.ANY,
@@ -79,16 +82,14 @@ def example_request_inbound() -> Any:
         "data": {
             "type": "flight-searches",
             "attributes": {
-                "origin": "PAR",
-                "destination": "LON",
-                "departureAfter": "2024-03-24T00:00:00Z",
-                "returnAt": "2024-03-25T00:00:00Z",
+                "departureAfter": TOMORROW.strftime("%Y-%m-%dT08:00:00.000Z"),
+                "returnAt": AFTER_TOMORROW.strftime("%Y-%m-%dT08:00:00.000Z"),
                 "passengers": [{"dateOfBirth": "1980-02-03"}],
             },
             "relationships": {
                 "origin": {"data": {"id": fixtures.PLACES[0], "type": "places"}},
                 "destination": {"data": {"id": fixtures.PLACES[1], "type": "places"}},
-                "selected_outbound_offer": {
+                "selectedOutboundOffer": {
                     "data": {
                         "id": OUTBOUND_SEARCH_OFFER_ID,
                         "type": "flight-offers",
@@ -141,8 +142,8 @@ def example_flight_search_result_one() -> Any:
                 marketing_airline="marketing_airline",
                 arrival_station="arrival_station",
                 departure_station="departure_station",
-                departure_at=datetime.fromisoformat("2024-03-24T00:00:00Z"),
-                arrival_at=datetime.fromisoformat("2024-03-24T00:00:00Z"),
+                departure_at=TOMORROW,
+                arrival_at=AFTER_TOMORROW,
                 duration=123,
                 segment_key="segment_key",
                 operating_airline="operating_airline",
@@ -156,7 +157,6 @@ async def test_flight_search_round_trip(
     mocker: MockerFixture,
     flights_search_request_repo: FlightSearchRequestRepository,
     flights_search_repo: FlightSearchResultRepository,
-    example_request: Any,
     example_request_inbound: Any,
     example_flight_search_result_one: Any,
     example_search_flight_response: SearchFlightsResponse,
@@ -170,7 +170,7 @@ async def test_flight_search_round_trip(
     search_object = FlightSearchRequestStorage(
         search_id=SEARCH_ID,
         reseller_id="RESELLER_ID",
-        flight=example_request["data"]["attributes"],
+        flight=example_request_inbound["data"]["attributes"],
     )
     await flights_search_request_repo.insert(search_object)
 
@@ -181,7 +181,6 @@ async def test_flight_search_round_trip(
 
     # Inbound response
     response = await client.post("/flights/searches", json=example_request_inbound)
-
     assert response.status_code == 201
 
     result_id = response.json()["data"]["id"]
