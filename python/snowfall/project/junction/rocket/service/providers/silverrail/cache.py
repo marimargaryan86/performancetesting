@@ -1,3 +1,7 @@
+import datetime
+from collections.abc import Sequence
+
+from snowfall.project.junction.go.v1 import models_pb2 as go_models
 from snowfall.project.junction.rocket.service.providers.silverrail import criteria
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.redis.repository import (
@@ -12,12 +16,15 @@ class Coordinates(RedisRecord):
 
 
 class RailResultDetail(RedisRecord):
-    origin: Coordinates
-    destination: Coordinates
-    # TODO(regis.blanc): Add missing props
+    origin: str
+    destination: str
+    outbound_departure_after: datetime.datetime
+    outbound_departure_before: datetime.datetime
+    passenger_dobs: Sequence[datetime.date]
+    cabin_class: go_models.CabinClass.Type.ValueType
 
 
-class SearchResultCache(RedisRepository[RailResultDetail]):
+class ResultDetailCache(RedisRepository[RailResultDetail]):
     """Stores search result in the cache."""
 
     _record_type: type[RailResultDetail] = RailResultDetail
@@ -26,7 +33,8 @@ class SearchResultCache(RedisRepository[RailResultDetail]):
 class PriceQuote(RedisRecord):
     """Stores price quotes in the cache."""
 
-    quote_id: str
+    leg_solution: bytes
+    ptp_price: bytes
 
 
 class QuoteCache(RedisRepository[PriceQuote]):

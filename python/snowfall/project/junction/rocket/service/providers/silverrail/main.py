@@ -19,6 +19,7 @@ from snowfall.project.junction.rocket.service.providers.silverrail import (
     adapter,
     cache,
     criteria,
+    pricing,
     train_stations,
 )
 from snowfall.project.junction.rocket.service.providers.silverrail import (
@@ -29,6 +30,8 @@ from snowfall.project.junction.rocket.service.providers.silverrail.constant impo
 )
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.service import amqp_factory, redis_factory
+from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.silverrail import client
 
 _PROVIDER_NAME = "Silverrail"
@@ -42,6 +45,7 @@ class _Settings(service.ProviderSettings):
     distributor_code: str
     pos_code: str
     channel_code: str
+    pay_company_id: str
 
 
 def cert_tmp_path(cert_base64: str) -> str:
@@ -64,6 +68,67 @@ async def _meta_factory() -> meta.MetaImplementation:
         name=_PROVIDER_NAME,
         search_capabilities=meta_pb2.SearchCapabilities(rail=True),
     )
+
+
+async def _pricing(
+    app: service.Application[_Settings],
+) -> None:
+    stations = await train_stations.load_train_stations()
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            http2=True,
+            cert=(
+                cert_tmp_path(app.settings.cert_base64),
+                key_tmp_path(app.settings.key_base64),
+            ),
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    silverrail_client = client.SilverrailClient(
+        base_url=str(app.settings.api_base_url),
+        settings=client.SilverrailSettings(
+            distributor_code=app.settings.distributor_code,
+            pos_code=app.settings.pos_code,
+            channel_code=app.settings.channel_code,
+        ),
+        http_client=http_client,
+    )
+    offer_matcher = adapter.SilverrailOfferMatcher(
+        silverrail_client=silverrail_client,
+        train_station_repository=train_stations.TrainStationRepository(
+            train_stations=stations,
+        ),
+    )
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
+
+    amqp_connection = await amqp_factory.make_connection(
+        app=app,
+        dsn=app.settings.amqp_dsn,
+    )
+
+    quote_task_consumer = pricing.QuoteTaskConsumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_pricing_consumer".format(app.name),
+            binds=[(types.Exchange("searches"), "searches.pricing")],
+        ),
+        quote_result_producer=pricing.QuoteResultProducer(
+            producer_obj=producer.Producer(amqp_connection, types.Exchange("searches")),
+            routing_key="searches.pricing_results",
+        ),
+        result_detail_cache=cache.ResultDetailCache(client=redis_client),
+        quote_cache=cache.QuoteCache(client=redis_client),
+        ttl=app.settings.ttl,
+        offer_matcher=offer_matcher,
+        pay_company_id=app.settings.pay_company_id,
+    )
+
+    await quote_task_consumer.consume()
 
 
 async def _search_factory(
@@ -93,13 +158,20 @@ async def _search_factory(
         ),
         http_client=http_client,
     )
-
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
     silverrail_adapter = adapter.SilverrailOffersAdapter(
         silverrail_client=silverrail_client,
         train_station_repository=train_stations.TrainStationRepository(
             train_stations=stations,
         ),
         ttl=app.settings.ttl,
+        result_detail_cache=cache.ResultDetailCache(
+            client=redis_client,
+        ),
     )
 
     return searches.SearchImplementation(
@@ -122,4 +194,10 @@ if __name__ == "__main__":
         search_factory=_search_factory,
     )
 
-    entrypoint.enter()
+    entrypoint.enter_with_commands(
+        service.Command(
+            name="pricing",
+            callback=_pricing,
+            settings_class=_Settings,
+        ),
+    )

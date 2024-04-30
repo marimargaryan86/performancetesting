@@ -11,6 +11,7 @@ from xsdata.models.datatype import (
 
 from snowfall.project.junction.go.v1 import models_pb2 as go_models_pb2
 from snowfall.project.junction.rocket.service.providers.silverrail import (
+    cache,
     constant,
     criteria,
     train_stations,
@@ -18,18 +19,20 @@ from snowfall.project.junction.rocket.service.providers.silverrail import (
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib import money, string
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.logging import stdout
 from snowfall.stdlib.time import date_to_age
 from snowfall.stdlib.v1 import latlng_pb2, money_pb2
 from snowfall.vendor.silverrail import client, errors
 from snowfall.vendor.silverrail.models.shopping import (
     DateTimeWindowType,
     FareCodeType,
+    LegSolutionType,
+    LegType,
     PointToPointPriceType,
     PointToPointShoppingQuery,
     PointToPointShoppingResponse,
     PriceTypeType,
     QueryTravelPointPairType,
+    RuleType,
     ServiceClassType,
     TicketableFareType,
     TotalPriceType,
@@ -39,35 +42,53 @@ from snowfall.vendor.silverrail.models.shopping import (
 )
 
 
+class NoMatchingOfferFoundError(Exception):
+    """Raised when failed to find matching offer to one customer selected."""
+
+
 class _SilverrailAdapter:
-    def __init__(self, silverrail_client: client.SilverrailClient) -> None:
-        self._client = silverrail_client
-
-
-class SilverrailOffersAdapter(_SilverrailAdapter):
     def __init__(
         self,
         silverrail_client: client.SilverrailClient,
         train_station_repository: train_stations.TrainStationRepository,
-        ttl: datetime.timedelta,
     ) -> None:
-        super().__init__(silverrail_client)
+        self._client = silverrail_client
         self._train_stations = train_station_repository
-        self._ttl = ttl
-        self._logger = stdout.get_logger()
 
-    async def gather_search_results(
+    def convert_total_price(self, total_price: TotalPriceType) -> money_pb2.Money:
+        if total_price.currency is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if total_price.value is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        return money.from_string(
+            str(total_price.value),
+            Currency(total_price.currency),
+        ).protobuf()
+
+    def convert_price_breakdown(
         self,
-        search_task: criteria.Criteria,
-    ) -> AsyncIterator[models_pb2.SearchResult]:
-        query = self._make_query(search_task)
-        response = await self._client.shopping_point_to_point(query)
-        search_results = self._convert_point_to_point_response(
-            search_task.search_id,
-            response,
-        )
-        for search_result in search_results:
-            yield search_result
+        fares: PointToPointPriceType.TicketableFares,
+    ) -> list[models_pb2.PriceBreakdown]:
+        breakdown = []
+
+        prices = []
+        for fare in fares.ticketable_fare:
+            if fare.prices:
+                prices.extend(fare.prices.price)
+
+        for price in prices:
+            if price.type_value is None:
+                raise errors.SilverrailUnexpectedFormatError("Fare price is absent")
+            breakdown.append(
+                models_pb2.PriceBreakdown(
+                    breakdown_type=self._map_breakdown_type(price.type_value),
+                    price=money.from_string(
+                        str(price.value),
+                        Currency(price.currency),
+                    ).protobuf(),
+                ),
+            )
+        return breakdown
 
     def _make_query(
         self,
@@ -77,13 +98,15 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
             travel_point_pair=[
                 QueryTravelPointPairType(
                     origin_travel_point=TravelPointType(
-                        value=self._train_stations.get_by_id(search_task.origin).name,
+                        value=self._train_stations.get_by_id(
+                            search_task.origin,
+                        ).identifier,
                         type_value=TravelPointTypeEnumeration.STATION,
                     ),
                     destination_travel_point=TravelPointType(
                         value=self._train_stations.get_by_id(
                             search_task.destination,
-                        ).name,
+                        ).identifier,
                         type_value=TravelPointTypeEnumeration.STATION,
                     ),
                     departure_date_time_window=DateTimeWindowType(
@@ -112,6 +135,249 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
             travel_point_pairs=travel_point_pairs,
             passenger_specs=passenger_specs,
         )
+
+    # Map each passenger fare to the cabin class of the fare.
+    def _read_cabin_classes(  # noqa: WPS231
+        self,
+        ticketable_fares: PointToPointPriceType.TicketableFares,
+    ) -> dict[str, go_models_pb2.CabinClass]:
+        res: dict[str, go_models_pb2.CabinClass] = {}
+
+        for fare in ticketable_fares.ticketable_fare:
+            refs = fare.passenger_references
+            if refs is None or refs.passenger_reference is None:
+                raise errors.SilverrailUnexpectedFormatError()
+
+            for pass_ref in refs.passenger_reference:
+                pass_id = pass_ref.passenger_idref
+                if pass_id is None:
+                    raise errors.SilverrailUnexpectedFormatError()
+                cabin_class = self._convert_passenger_reference(pass_ref)
+                res[pass_id] = cabin_class
+        return res
+
+    def _convert_passenger_reference(
+        self,
+        pass_ref: TicketableFareType.PassengerReferences.PassengerReference,
+    ) -> go_models_pb2.CabinClass:
+        fare_codes = pass_ref.fare_codes
+
+        if fare_codes is None or fare_codes.fare_code is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        # TODO(regis.blanc): process pass_ref.fare_codes.fare_code list.
+        fare_code = fare_codes.fare_code[0]
+        return self._convert_fare_code(fare_code)
+
+    def _convert_fare_code(self, fare_code: FareCodeType) -> go_models_pb2.CabinClass:
+        if fare_code.service_class is None or fare_code.cabin_class is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        return go_models_pb2.CabinClass(
+            type=self._convert_service_class(fare_code.service_class),
+            marketing_name=fare_code.cabin_class,
+        )
+
+    def _convert_service_class(
+        self,
+        service_class: ServiceClassType,
+    ) -> go_models_pb2.CabinClass.Type.ValueType:
+        # These service classes are defined by Silverrail here: https://docs.silverrailtech.com/v1/docs/content-codes#Service_classes
+        match service_class:
+            case ServiceClassType.PREMIER:
+                return go_models_pb2.CabinClass.TYPE_FIRST
+            case ServiceClassType.FIRST:
+                return go_models_pb2.CabinClass.TYPE_BUSINESS
+            case ServiceClassType.SECOND | ServiceClassType.THIRD:
+                return go_models_pb2.CabinClass.TYPE_ECONOMY
+            case _:
+                return go_models_pb2.CabinClass.TYPE_UNSPECIFIED
+
+    def _get_cabin_class(
+        self,
+        fares: PointToPointPriceType.TicketableFares,
+    ) -> go_models_pb2.CabinClass:
+        cabins = self._read_cabin_classes(fares)
+        # TODO(regis.blanc): How to treat different cabin classes for different passengers?
+        return next(iter(cabins.values()))
+
+    def _map_breakdown_type(
+        self,
+        price_type: PriceTypeType,
+    ) -> models_pb2.PriceBreakdown.BreakdownType.ValueType:
+        tax = [
+            PriceTypeType.TAX,
+            PriceTypeType.TAX_NATIONAL,
+            PriceTypeType.TAX_STATEPROVINCE,
+            PriceTypeType.VAT,
+            PriceTypeType.VAT_TICKET,
+            PriceTypeType.VAT_RESERVATION,
+            PriceTypeType.VAT_FEE,
+            PriceTypeType.VAT_ONBOARD_SERVICES,
+        ]
+        base_fares = [
+            PriceTypeType.TICKET,
+            PriceTypeType.RESERVATION,
+            PriceTypeType.TICKETED_RES,
+            PriceTypeType.TRAVEL_PASS,
+            PriceTypeType.ACCOMMODATION,
+            PriceTypeType.FEE,
+            PriceTypeType.CORP_DISCOUNT,
+            PriceTypeType.ONBOARD_SERVICES,
+            PriceTypeType.SUPPLEMENT,
+        ]
+        if price_type in tax:
+            return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX
+        if price_type in base_fares:
+            return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE
+
+        return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_UNSPECIFIED
+
+
+class SilverrailOfferMatcher(_SilverrailAdapter):
+    async def get_matching_offer(  # noqa: WPS238
+        self,
+        selected_offer: cache.RailResultDetail,
+    ) -> tuple[LegSolutionType, PointToPointPriceType]:
+        query = self._make_query(self._create_criteria(selected_offer))
+        response = await self._client.shopping_point_to_point(query)
+
+        if response.results is None or response.results.fare_information is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        fare_information = response.results.fare_information
+        if fare_information.prices is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if fare_information.prices.point_to_point_price is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        point_to_point_price = self._get_matching_ptp_price(
+            fare_information.prices.point_to_point_price,
+            selected_offer,
+        )
+
+        if response.results.legs is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        if point_to_point_price.leg_references is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        leg_solution = self._get_matching_leg_solution(
+            response.results.legs.leg,
+            point_to_point_price.leg_references.leg_solution_idref[0],
+        )
+
+        return leg_solution, point_to_point_price
+
+    def get_fare_rules(self, ptp_price: PointToPointPriceType) -> list[RuleType]:
+        rules = []
+        if ptp_price.ticketable_fares is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if ptp_price.ticketable_fares.ticketable_fare is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        for fare in ptp_price.ticketable_fares.ticketable_fare:
+            if fare.rules is None:
+                continue
+            rules.extend([
+                rule
+                for rule in fare.rules.rule
+                if rule.language and rule.language.upper() == "EN"
+            ])
+
+        return rules
+
+    def _get_matching_ptp_price(
+        self,
+        ptp_prices: Sequence[PointToPointPriceType],
+        selected_offer: cache.RailResultDetail,
+    ) -> PointToPointPriceType:
+        for point_to_point_price in ptp_prices:
+            fares = point_to_point_price.ticketable_fares
+            if fares is None:
+                continue
+
+            cabin_class = self._get_cabin_class(fares)
+            if cabin_class.type == selected_offer.cabin_class:
+                return point_to_point_price
+
+        raise NoMatchingOfferFoundError()
+
+    def _get_matching_leg_solution(
+        self,
+        legs: Sequence[LegType],
+        leg_solution_ref: str,
+    ) -> LegSolutionType:
+        leg_solutions = {}
+        for leg in legs:
+            if leg.leg_solutions is None or leg.leg_solutions.leg_solution is None:
+                raise errors.SilverrailUnexpectedFormatError()
+            for leg_solution in leg.leg_solutions.leg_solution:
+                leg_solutions[leg_solution.leg_solution_id] = leg_solution
+
+        try:
+            return leg_solutions[leg_solution_ref]
+        except KeyError as error:
+            raise errors.SilverrailUnexpectedFormatError() from error
+
+    def _create_criteria(
+        self,
+        selected_offer: cache.RailResultDetail,
+    ) -> criteria.Criteria:
+        return criteria.Criteria(
+            search_id="",
+            origin=selected_offer.origin,
+            destination=selected_offer.destination,
+            outbound_departure_after=selected_offer.outbound_departure_after,
+            outbound_departure_before=selected_offer.outbound_departure_before,
+            passenger_dobs=selected_offer.passenger_dobs,
+        )
+
+
+class SilverrailOffersAdapter(_SilverrailAdapter):
+    def __init__(
+        self,
+        silverrail_client: client.SilverrailClient,
+        train_station_repository: train_stations.TrainStationRepository,
+        result_detail_cache: cache.ResultDetailCache,
+        ttl: datetime.timedelta,
+    ) -> None:
+        super().__init__(silverrail_client, train_station_repository)
+        self._result_detail_cache = result_detail_cache
+        self._ttl = ttl
+
+    async def gather_search_results(
+        self,
+        search_task: criteria.Criteria,
+    ) -> AsyncIterator[models_pb2.SearchResult]:
+        query = self._make_query(search_task)
+        response = await self._client.shopping_point_to_point(query)
+        search_results = self._convert_point_to_point_response(
+            search_task.search_id,
+            response,
+        )
+        for search_result in search_results:
+            await self._cache_result_detail(search_task, search_result)
+            yield search_result
+
+    async def _cache_result_detail(
+        self,
+        search_task: criteria.Criteria,
+        search_result: models_pb2.SearchResult,
+    ) -> None:
+        for offer in search_result.offers:
+            await self._result_detail_cache.store(
+                cache.RailResultDetail(
+                    origin=search_task.origin,
+                    destination=search_task.destination,
+                    outbound_departure_after=search_task.outbound_departure_after,
+                    outbound_departure_before=search_task.outbound_departure_before,
+                    passenger_dobs=search_task.passenger_dobs,
+                    cabin_class=offer.rail.cabin_class[0].cabin_class.type,  # noqa: WPS219
+                ),
+                expires_at=datetime.datetime.now(datetime.UTC) + self._ttl,
+                key=offer.id,
+            )
 
     def _convert_point_to_point_response(
         self,
@@ -284,9 +550,7 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
         if total_price is None:
             raise errors.SilverrailUnexpectedFormatError("No total price information")
 
-        cabins = self._read_cabin_classes(fares)
-        # TODO(regis.blanc): How to treat different cabin classes for different passengers?
-        cabin_class = next(iter(cabins.values()))
+        cabin_class = self._get_cabin_class(fares)
 
         leg_ref = ptp_price.leg_references
         if leg_ref is None or leg_ref.leg_solution_idref is None:
@@ -297,8 +561,8 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
 
         offer = models_pb2.Offer(
             id=string.uuid(),
-            price=self._convert_total_price(total_price),
-            price_breakdown=self._convert_price_breakdown(fares),
+            price=self.convert_total_price(total_price),
+            price_breakdown=self.convert_price_breakdown(fares),
             rail=models_pb2.RailOffer(
                 cabin_class=[
                     models_pb2.CabinDetails(
@@ -309,127 +573,3 @@ class SilverrailOffersAdapter(_SilverrailAdapter):
             ),
         )
         return (leg_solution_ref, offer)
-
-    def _convert_total_price(self, total_price: TotalPriceType) -> money_pb2.Money:
-        if total_price.currency is None:
-            raise errors.SilverrailUnexpectedFormatError()
-        if total_price.value is None:
-            raise errors.SilverrailUnexpectedFormatError()
-        return money.from_string(
-            str(total_price.value),
-            Currency(total_price.currency),
-        ).protobuf()
-
-    # Map each passenger fare to the cabin class of the fare.
-    def _read_cabin_classes(  # noqa: WPS231
-        self,
-        ticketable_fares: PointToPointPriceType.TicketableFares,
-    ) -> dict[str, go_models_pb2.CabinClass]:
-        res: dict[str, go_models_pb2.CabinClass] = {}
-
-        for fare in ticketable_fares.ticketable_fare:
-            refs = fare.passenger_references
-            if refs is None or refs.passenger_reference is None:
-                raise errors.SilverrailUnexpectedFormatError()
-
-            for pass_ref in refs.passenger_reference:
-                pass_id = pass_ref.passenger_idref
-                if pass_id is None:
-                    raise errors.SilverrailUnexpectedFormatError()
-                cabin_class = self._convert_passenger_reference(pass_ref)
-                res[pass_id] = cabin_class
-        return res
-
-    def _convert_passenger_reference(
-        self,
-        pass_ref: TicketableFareType.PassengerReferences.PassengerReference,
-    ) -> go_models_pb2.CabinClass:
-        fare_codes = pass_ref.fare_codes
-
-        if fare_codes is None or fare_codes.fare_code is None:
-            raise errors.SilverrailUnexpectedFormatError()
-
-        # TODO(regis.blanc): process pass_ref.fare_codes.fare_code list.
-        fare_code = fare_codes.fare_code[0]
-        return self._convert_fare_code(fare_code)
-
-    def _convert_fare_code(self, fare_code: FareCodeType) -> go_models_pb2.CabinClass:
-        if fare_code.service_class is None or fare_code.cabin_class is None:
-            raise errors.SilverrailUnexpectedFormatError()
-
-        return go_models_pb2.CabinClass(
-            type=self._convert_service_class(fare_code.service_class),
-            marketing_name=fare_code.cabin_class,
-        )
-
-    def _convert_service_class(
-        self,
-        service_class: ServiceClassType,
-    ) -> go_models_pb2.CabinClass.Type.ValueType:
-        # These service classes are defined by Silverrail here: https://docs.silverrailtech.com/v1/docs/content-codes#Service_classes
-        match service_class:
-            case ServiceClassType.PREMIER:
-                return go_models_pb2.CabinClass.TYPE_FIRST
-            case ServiceClassType.FIRST:
-                return go_models_pb2.CabinClass.TYPE_BUSINESS
-            case ServiceClassType.SECOND | ServiceClassType.THIRD:
-                return go_models_pb2.CabinClass.TYPE_ECONOMY
-            case _:
-                return go_models_pb2.CabinClass.TYPE_UNSPECIFIED
-
-    def _convert_price_breakdown(
-        self,
-        fares: PointToPointPriceType.TicketableFares,
-    ) -> list[models_pb2.PriceBreakdown]:
-        breakdown = []
-
-        prices = []
-        for fare in fares.ticketable_fare:
-            if fare.prices:
-                prices.extend(fare.prices.price)
-
-        for price in prices:
-            if price.type_value is None:
-                raise errors.SilverrailUnexpectedFormatError("Fare price is absent")
-            breakdown.append(
-                models_pb2.PriceBreakdown(
-                    breakdown_type=self._map_breakdown_type(price.type_value),
-                    price=money.from_string(
-                        str(price.value),
-                        Currency(price.currency),
-                    ).protobuf(),
-                ),
-            )
-        return breakdown
-
-    def _map_breakdown_type(
-        self,
-        price_type: PriceTypeType,
-    ) -> models_pb2.PriceBreakdown.BreakdownType.ValueType:
-        tax = [
-            PriceTypeType.TAX,
-            PriceTypeType.TAX_NATIONAL,
-            PriceTypeType.TAX_STATEPROVINCE,
-            PriceTypeType.VAT,
-            PriceTypeType.VAT_TICKET,
-            PriceTypeType.VAT_RESERVATION,
-            PriceTypeType.VAT_FEE,
-            PriceTypeType.VAT_ONBOARD_SERVICES,
-        ]
-        base_fares = [
-            PriceTypeType.TICKET,
-            PriceTypeType.RESERVATION,
-            PriceTypeType.TICKETED_RES,
-            PriceTypeType.TRAVEL_PASS,
-            PriceTypeType.ACCOMMODATION,
-            PriceTypeType.FEE,
-            PriceTypeType.CORP_DISCOUNT,
-            PriceTypeType.ONBOARD_SERVICES,
-            PriceTypeType.SUPPLEMENT,
-        ]
-        if price_type in tax:
-            return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_TAX
-        if price_type in base_fares:
-            return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE
-
-        return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_UNSPECIFIED

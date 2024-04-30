@@ -1,6 +1,7 @@
 import datetime
 import uuid
 import zoneinfo
+from unittest import mock
 
 from snowfall.project.junction.go.v1 import models_pb2 as go_models
 from snowfall.project.junction.rocket import fixtures
@@ -25,6 +26,7 @@ def is_uuid(value: str) -> bool:
 
 async def test_successful(  # noqa: WPS218
     silverrail_search_result_generator: adapter.SilverrailOffersAdapter,
+    silverrail_result_detail_cache: mock.AsyncMock,
 ) -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     search_task = criteria.Criteria(
@@ -109,3 +111,17 @@ async def test_successful(  # noqa: WPS218
         latitude=45.7611339,
         longitude=4.8527867,
     )
+    silverrail_result_detail_cache.store.assert_awaited()
+    rail_result_detail = silverrail_result_detail_cache.store.await_args_list[0][0][0]  # noqa: WPS219
+    assert rail_result_detail.origin == search_task.origin
+    assert rail_result_detail.destination == search_task.destination
+    assert (
+        rail_result_detail.outbound_departure_after
+        == search_task.outbound_departure_after
+    )
+    assert (
+        rail_result_detail.outbound_departure_before
+        == search_task.outbound_departure_before
+    )
+    assert rail_result_detail.passenger_dobs == search_task.passenger_dobs
+    assert rail_result_detail.cabin_class == go_models.CabinClass.TYPE_ECONOMY

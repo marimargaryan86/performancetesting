@@ -7,11 +7,19 @@ import pytest
 from xsdata.formats.dataclass import parsers
 from xsdata.formats.dataclass.parsers import config as parsers_config
 
+from snowfall.project.junction.go.v1 import models_pb2 as go_models
 from snowfall.project.junction.rocket.service.providers.silverrail import (
     adapter as silverrail_adapter,
 )
-from snowfall.project.junction.rocket.service.providers.silverrail import train_stations
+from snowfall.project.junction.rocket.service.providers.silverrail import (
+    cache,
+    train_stations,
+)
+from snowfall.project.junction.rocket.service.providers.silverrail import (
+    pricing as silverrail_pricing,
+)
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.vendor.silverrail.models import shopping
 
 
@@ -79,8 +87,14 @@ async def train_station_repository() -> train_stations.TrainStationRepository:
 
 
 @pytest.fixture()
+async def silverrail_result_detail_cache() -> cache.ResultDetailCache:
+    return mock.AsyncMock()
+
+
+@pytest.fixture()
 async def silverrail_search_result_generator(
     train_station_repository: train_stations.TrainStationRepository,
+    silverrail_result_detail_cache: cache.ResultDetailCache,
 ) -> silverrail_adapter.SilverrailOffersAdapter:
     return silverrail_adapter.SilverrailOffersAdapter(
         silverrail_client=mock.Mock(
@@ -91,5 +105,62 @@ async def silverrail_search_result_generator(
             ),
         ),
         train_station_repository=train_station_repository,
+        ttl=datetime.timedelta(seconds=15),
+        result_detail_cache=silverrail_result_detail_cache,
+    )
+
+
+@pytest.fixture()
+async def silverrail_offer_matcher(
+    train_station_repository: train_stations.TrainStationRepository,
+) -> silverrail_adapter.SilverrailOfferMatcher:
+    return silverrail_adapter.SilverrailOfferMatcher(
+        silverrail_client=mock.Mock(
+            name="SilverRailClient",
+            shopping_point_to_point=mock.AsyncMock(
+                name="shopping_point_to_point",
+                return_value=await get_shopping_point_to_point_response(),
+            ),
+        ),
+        train_station_repository=train_station_repository,
+    )
+
+
+@pytest.fixture()
+async def silverrail_quote_result_producer() -> producer.Producer:
+    return mock.AsyncMock(spec=producer.Producer)
+
+
+@pytest.fixture()
+async def silverrail_quote_task_consumer(
+    silverrail_offer_matcher: silverrail_adapter.SilverrailOfferMatcher,
+    silverrail_quote_result_producer: producer.Producer,
+) -> silverrail_pricing.QuoteTaskConsumer:
+    now = datetime.datetime.now(tz=datetime.UTC)
+    return silverrail_pricing.QuoteTaskConsumer(
+        offer_matcher=silverrail_offer_matcher,
+        consumer_obj=mock.AsyncMock(spec=consumer.Consumer),
+        quote_result_producer=silverrail_pricing.QuoteResultProducer(
+            producer_obj=silverrail_quote_result_producer,
+            routing_key="quote-result",
+        ),
+        result_detail_cache=mock.AsyncMock(
+            name="ResultDetailCache",
+            fetch=mock.AsyncMock(
+                name="fetch",
+                return_value=cache.RailResultDetail(
+                    origin="FRLYS",
+                    destination="FRXYD",
+                    outbound_departure_after=now,
+                    outbound_departure_before=now + datetime.timedelta(days=2),
+                    passenger_dobs=[
+                        (now - datetime.timedelta(days=365 * 30)).date(),
+                    ],
+                    cabin_class=go_models.CabinClass.TYPE_ECONOMY,
+                ),
+            ),
+        ),
+        quote_cache=mock.AsyncMock(name="QuoteCache"),
+        pay_company_id="fake-pay-company-id",
         ttl=datetime.timedelta(seconds=15),
     )
