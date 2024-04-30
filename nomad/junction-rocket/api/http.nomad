@@ -38,6 +38,10 @@ variable "j_one_api_base_url" {
   type = string
 }
 
+variable "j_one_pay_company_id" {
+  type = string
+}
+
 job "junction-rocket-api-http" {
   datacenters = ["${var.datacenter}"]
   type        = "service"
@@ -136,6 +140,7 @@ RESELLER_J1_CREDENTIALS_MAPPING={{keyOrDefault "${var.environment}/rocket-api/re
 J_ONE_API_KEY={{ .Data.data.j_one_api_key }}
 {{ end }}
 RESELLER_PAY_COMPANIES={{keyOrDefault "${var.environment}/rocket-api/reseller-pay-companies" "{}" | toJSON }}
+RESELLER_CURRENCIES={{keyOrDefault "${var.environment}/rocket-api/reseller-currencies" "{}" | toJSON }}
 EOH
       }
 
@@ -161,6 +166,7 @@ EOH
         HTTP_PORT             = "${NOMAD_PORT_http}"
         SENTRY_DSN            = "https://303cafc116e642efe7c538795b0c2e7a@sentry.snowfall.se/238"
         J_ONE_API_BASE_URL    = "${var.j_one_api_base_url}"
+        J_ONE_PAY_COMPANY_ID  = "${var.j_one_pay_company_id}"
       }
     }
   }

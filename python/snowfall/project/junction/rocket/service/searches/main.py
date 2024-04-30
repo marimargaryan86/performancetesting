@@ -9,6 +9,7 @@ from motor import motor_asyncio
 from snowfall.project.junction.rocket.service.gateway.v1alpha import searches_pb2_grpc
 from snowfall.project.junction.rocket.service.searches import (
     importer,
+    pay_quotes,
     repository,
 )
 from snowfall.project.junction.rocket.service.searches.amqp import (
@@ -19,6 +20,12 @@ from snowfall.project.junction.rocket.service.searches.grpc import (
     QuoteService,
     SearchResultService,
     SearchService,
+)
+from snowfall.project.pay.service.companies.v1 import (
+    grpc_pb2_grpc as companies_pb2_grpc,
+)
+from snowfall.project.pay.service.transactions.v1 import (
+    grpc_pb2_grpc as pay_pb2_grpc,
 )
 from snowfall.stdlib.service import (
     amqp_factory,
@@ -52,7 +59,10 @@ class _ImportSettings(application.Settings):
 
 class _ConsumeQuoteSettings(application.Settings):
     amqp_dsn: pydantic.AmqpDsn
+    amqp_timeout: datetime.timedelta | None = None
     mongo_dsn: Sequence[pydantic.AnyUrl]
+    transactions_address: str
+    companies_address: str
 
 
 async def _serve(app: application.Application[_GrpcSettings]) -> None:
@@ -97,6 +107,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                 quotes_repo=repository.QuoteRepository(
                     collection=mongo.searches.quotes,
                     ttl=app.settings.quote_ttl,
+                ),
+                offers_repo=repository.OfferRepository(
+                    mongo.searches.search_results,
                 ),
                 publisher=QuoteTaskProducer(
                     producer=amqp_producer,
@@ -163,6 +176,15 @@ async def _consume_quotes(app: application.Application[_ConsumeQuoteSettings]) -
     )
     connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
 
+    transactions_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.transactions_address,
+    )
+    companies_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.companies_address,
+    )
+
     quote_result_importer = importer.QuoteResultImporter(
         consumer_obj=consumer.Consumer(
             connection=connection,
@@ -173,6 +195,14 @@ async def _consume_quotes(app: application.Application[_ConsumeQuoteSettings]) -
         ),
         quotes=repository.QuoteRepository(
             collection=mongo.searches.quotes,
+        ),
+        pay_quotes_processor=pay_quotes.PayQuotes(
+            pay_transactions_service=pay_pb2_grpc.QuotationsServiceStub(
+                channel=transactions_channel,
+            ),
+            pay_companies_service=companies_pb2_grpc.CompaniesServiceStub(
+                channel=companies_channel,
+            ),
         ),
     )
     await quote_result_importer.consume()

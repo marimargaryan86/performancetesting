@@ -12,6 +12,16 @@ import "snowfall/stdlib/v1/money.proto";
 
 option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/searches/v1alpha";
 
+enum VerticalType {
+  VERTICAL_TYPE_UNSPECIFIED = 0;
+  VERTICAL_TYPE_AIR = 1;
+  VERTICAL_TYPE_RAIL = 2;
+  VERTICAL_TYPE_FERRY = 3;
+  VERTICAL_TYPE_HOTEL = 4;
+  VERTICAL_TYPE_BUS = 5;
+  VERTICAL_TYPE_CAR = 6;
+}
+
 message Rail {
   snowfall.project.junction.rocket.service.places.v1alpha.Place origin = 1;
   snowfall.project.junction.rocket.service.places.v1alpha.Place destination = 2;
@@ -216,10 +226,14 @@ message Quote {
   string id = 1;
   string pay_quote_id = 2;
   string pay_company_id = 3;
-  google.protobuf.Timestamp expires_at = 4;
-  snowfall.stdlib.v1.Money total_price = 5;
-  repeated string offer_ids = 6;
-  repeated QuotedOffer quoted_offers = 7;
+  string reseller_id = 4;
+  string reseller_pay_company_id = 5;
+  string reseller_currency = 6;
+  google.protobuf.Timestamp expires_at = 7;
+  snowfall.stdlib.v1.Money total_price = 8;
+  repeated string offer_ids = 9;
+  repeated QuotedOffer quoted_offers = 10;
+  VerticalType vertical_type = 11;
 }
 
 message QuotedOffer {

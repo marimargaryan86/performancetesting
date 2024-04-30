@@ -2955,10 +2955,20 @@ components:
               description: The properties that define a Quote object
               readOnly: true
               required:
+                - status
                 - expiresAt
-                - totalPrice
-                - quotedOffers
               properties:
+                status:
+                  type: string
+                  description: The status of the Quote
+                  readOnly: true
+                  enum:
+                    - unspecified
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
                 expiresAt:
                   type: string
                   description: >-
@@ -2976,28 +2986,33 @@ components:
                   items:
                     $ref: '#/components/schemas/QuotedOffer'
             relationships:
+              type: object
               description: The Junction resources related to this Quote object
-              oneOf:
-                - type: object
-                  title: Train Offers
-                  description: The list of Train Offer IDs associated to this quote
-                  required:
-                    - offers
-                  properties:
-                    offers:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/TrainOfferIdentifier'
-                - type: object
-                  title: Flight Offers
-                  description: The list of Flight Offer IDs associated to this quote
-                  required:
-                    - offers
-                  properties:
-                    offers:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/FlightOfferIdentifier'
+              required:
+                - offers
+              properties:
+                offers:
+                  oneOf:
+                    - type: object
+                      title: Train Offers
+                      description: The list of Train Offer IDs associated to this quote
+                      required:
+                        - data
+                      properties:
+                        data:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/TrainOfferIdentifier'
+                    - type: object
+                      title: Flight Offers
+                      description: The list of Flight Offer IDs associated to this quote
+                      required:
+                        - offers
+                      properties:
+                        offers:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/FlightOfferIdentifier'
         - $ref: '#/components/schemas/SelfLink'
     QuotedOffer:
       title: Quoted Offer
@@ -3014,8 +3029,13 @@ components:
         price:
           $ref: '#/components/schemas/Price'
         priceBreakdown:
-          $ref: '#/components/schemas/PriceBreakdown'
-        requiredDocuments:
+          type: array
+          description: >-
+            A list of Price Breakdown objects that indicates the various
+            fees and charges that make up the total price
+          items:
+            $ref: '#/components/schemas/PriceBreakdown'
+        required:
           type: array
           description: The list of required documents for this Quoted Offer
           example:

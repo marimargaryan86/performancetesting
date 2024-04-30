@@ -9,10 +9,9 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     searches_pb2,
     searches_pb2_grpc,
 )
-from snowfall.project.junction.rocket.service.searches import (
-    repository,
-)
+from snowfall.project.junction.rocket.service.searches import pay_quotes, repository
 from snowfall.project.junction.rocket.service.searches.v1alpha import amqp_pb2
+from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.instrumentation import prometheus
 from snowfall.stdlib.logging import stdout
@@ -215,9 +214,11 @@ class QuoteResultImporter:
         self,
         consumer_obj: consumer.Consumer[amqp_pb2.QuoteTaskResult],
         quotes: repository.QuoteRepository,
+        pay_quotes_processor: pay_quotes.PayQuotes,
     ):
         self._consumer = consumer_obj
         self._quotes = quotes
+        self._pay_quotes_processor = pay_quotes_processor
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
@@ -226,4 +227,16 @@ class QuoteResultImporter:
         self,
         message: amqp_types.Message[amqp_pb2.QuoteTaskResult],
     ) -> None:
+        await self._quotes.upsert(message.body.quote)
+
+        pay_quote = await self._pay_quotes_processor.create_pay_quote(
+            amount=money.from_protobuf(message.body.quote.total_price).amount,
+            reseller_currency=message.body.quote.reseller_currency,
+            provider_currency=message.body.quote.total_price.currency_code,
+            reseller_company_id=message.body.quote.reseller_pay_company_id,
+            provider_pay_company_id=message.body.quote.pay_company_id,
+            vertical_type=message.body.quote.vertical_type,
+        )
+
+        message.body.quote.pay_quote_id = pay_quote.quotation.id
         await self._quotes.upsert(message.body.quote)

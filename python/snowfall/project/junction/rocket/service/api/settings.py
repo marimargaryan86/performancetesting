@@ -29,3 +29,5 @@ class Settings(starlette.Settings, CommonSettings):
     ory_jwk_ttl: datetime.timedelta = datetime.timedelta(hours=1)
     grpc_timeout: datetime.timedelta = datetime.timedelta(seconds=DEFAULT_GRPC_TIMEOUT)
     reseller_pay_companies: dict[str, str]
+    reseller_currencies: dict[str, str]
+    j_one_pay_company_id: str

@@ -1,5 +1,6 @@
 import asyncio
 import typing
+from collections.abc import Sequence
 
 import grpc
 
@@ -7,6 +8,7 @@ from snowfall.project.junction.rocket.service.searches import amqp, repository
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
+    models_pb2,
 )
 from snowfall.stdlib.transport.grpc import service
 
@@ -104,9 +106,11 @@ class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
     def __init__(
         self,
         quotes_repo: repository.QuoteRepository,
+        offers_repo: repository.OfferRepository,
         publisher: amqp.QuoteTaskProducer,
     ):
         self._quotes_repo = quotes_repo
+        self._offers_repo = offers_repo
         self._publisher = publisher
 
     def get_name(self) -> str:
@@ -120,9 +124,36 @@ class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
         request: grpc_pb2.CreateQuoteRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateQuoteResponse:
-        quote = await self._quotes_repo.create(
-            request.offer_ids,
+        offers_result = await self._offers_repo.find(
+            ids=list(request.offer_ids),
+            cursor="",
         )
+        offers = [offer async for offer in offers_result]
+
+        if not offers or len(offers) < len(request.offer_ids):
+            return await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="No offers found for the provided offer ids {0}".format(
+                    list(set(request.offer_ids) - {offer.id for offer in offers}),
+                ),
+            )
+
+        vertical_type = self._get_vertical_type(offers)
+
+        if vertical_type == models_pb2.VERTICAL_TYPE_UNSPECIFIED:
+            return await context.abort(
+                code=grpc.StatusCode.FAILED_PRECONDITION,
+                details="Invalid vertical types found",
+            )
+
+        quote = await self._quotes_repo.create(
+            offer_ids=request.offer_ids,
+            reseller_id=request.reseller_id,
+            reseller_pay_company_id=request.reseller_pay_company_id,
+            reseller_currency=request.reseller_currency,
+            vertical_type=vertical_type,
+        )
+
         await self._publisher.publish(quote, request.reseller_id)
 
         return grpc_pb2.CreateQuoteResponse(quote=quote)
@@ -138,3 +169,21 @@ class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
             return await context.abort(grpc.StatusCode.NOT_FOUND)
 
         return grpc_pb2.GetQuoteResponse(quote=quote)
+
+    def _get_vertical_type(
+        self,
+        offers: Sequence[models_pb2.Offer],
+    ) -> models_pb2.VerticalType.ValueType:
+        offer_verticals: set[models_pb2.VerticalType.ValueType] = set()
+        for offer in offers:
+            if offer.HasField("rail"):
+                offer_verticals.add(models_pb2.VERTICAL_TYPE_RAIL)
+            elif offer.HasField("car_rental"):
+                offer_verticals.add(models_pb2.VERTICAL_TYPE_CAR)
+            elif offer.HasField("ferry"):
+                offer_verticals.add(models_pb2.VERTICAL_TYPE_FERRY)
+
+        if not offer_verticals or len(offer_verticals) > 1:
+            return models_pb2.VERTICAL_TYPE_UNSPECIFIED
+
+        return offer_verticals.pop()

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import pydantic
 from starlette import requests
 
 from snowfall.project.junction.rocket.service.api.common import models as common_models
@@ -66,23 +65,6 @@ class CarSearchResource(models.Resource):
         )
 
 
-class ConditionalPrice(models.BaseModel):
-    price: common_models.Price
-    description: str | None
-    included_in_total: bool | None = pydantic.Field(alias="includedInTotal")
-
-    @classmethod
-    def from_proto(
-        cls,
-        conditional_price: models_pb2.ConditionalPrice,
-    ) -> ConditionalPrice:
-        return cls(
-            price=common_models.Price.from_proto(conditional_price.price),
-            description=conditional_price.description,
-            includedInTotal=conditional_price.included_in_total,
-        )
-
-
 class OfferResource(models.Resource):
     api_type: typing.ClassVar[str] = "car-rental-offers"
 
@@ -98,7 +80,7 @@ class OfferResource(models.Resource):
                     for price_breakdown in offer.price_breakdown
                 ],
                 "conditionalPrices": [
-                    ConditionalPrice.from_proto(conditional_price)
+                    common_models.ConditionalPrice.from_proto(conditional_price)
                     for conditional_price in offer.car_rental.conditional_prices
                 ],
             },

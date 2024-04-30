@@ -39,3 +39,20 @@ class PriceBreakdown(models.BaseModel):
                 enum_value=price_breakdown.breakdown_type,
             ),
         )
+
+
+class ConditionalPrice(models.BaseModel):
+    price: Price
+    description: str | None
+    included_in_total: bool | None = pydantic.Field(alias="includedInTotal")
+
+    @classmethod
+    def from_proto(
+        cls,
+        conditional_price: models_pb2.ConditionalPrice,
+    ) -> ConditionalPrice:
+        return cls(
+            price=Price.from_proto(conditional_price.price),
+            description=conditional_price.description,
+            includedInTotal=conditional_price.included_in_total,
+        )

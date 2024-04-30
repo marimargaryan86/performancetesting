@@ -26,6 +26,7 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.hotel import (
     types as hotel_types,
 )
+from snowfall.project.junction.rocket.service.api.quotes.endpoints import QuotesSettings
 from snowfall.project.junction.rocket.service.api.settings import Settings
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_grpc
@@ -100,6 +101,9 @@ async def create_dependencies(
     container[grpc_pb2_grpc.SearchResultServiceStub] = (
         grpc_pb2_grpc.SearchResultServiceStub(channels.searches)
     )
+    container[grpc_pb2_grpc.QuoteServiceStub] = grpc_pb2_grpc.QuoteServiceStub(
+        channels.searches,
+    )
     container[places_pb2_grpc.PlacesServiceStub] = places_pb2_grpc.PlacesServiceStub(
         channels.places,
     )
@@ -144,6 +148,11 @@ async def create_dependencies(
             connection=amqp_connection,
             exchange=amqp_types.Exchange(app.name),
         ),
+    )
+
+    container[QuotesSettings] = QuotesSettings(
+        reseller_currencies=app.settings.reseller_currencies,
+        reseller_pay_company_mapping=app.settings.reseller_pay_companies,
     )
 
     includes.register_resolvers(

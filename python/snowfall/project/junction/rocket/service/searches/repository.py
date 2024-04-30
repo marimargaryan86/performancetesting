@@ -196,6 +196,10 @@ class QuoteRepository(
     async def create(
         self,
         offer_ids: Sequence[str],
+        reseller_id: str,
+        reseller_pay_company_id: str,
+        reseller_currency: str,
+        vertical_type: models_pb2.VerticalType.ValueType,
     ) -> models_pb2.Quote:
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(
@@ -206,6 +210,10 @@ class QuoteRepository(
             id=string.uuid(),
             expires_at=expires_at,
             offer_ids=offer_ids,
+            reseller_id=reseller_id,
+            reseller_pay_company_id=reseller_pay_company_id,
+            reseller_currency=reseller_currency,
+            vertical_type=vertical_type,
         )
 
         return await self.insert(quote)

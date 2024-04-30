@@ -57,6 +57,9 @@ from snowfall.project.junction.rocket.service.api.multi_modality import (
 from snowfall.project.junction.rocket.service.api.places import (
     router as places_router,
 )
+from snowfall.project.junction.rocket.service.api.quotes import (
+    router as quotes_router,
+)
 from snowfall.project.junction.rocket.service.api.trains import (
     router as trains_router,
 )
@@ -133,6 +136,7 @@ async def _http(app: application.Application[settings.Settings]) -> None:
         *ferry_router.get_routes(integration),
         *trains_router.get_routes(integration),
         *places_router.get_routes(integration),
+        *quotes_router.get_routes(integration),
         *multi_modal_endpoints.get_routes(
             suggestions=multi_modal_endpoints.Suggestions(
                 _repository=suggestion_repository,

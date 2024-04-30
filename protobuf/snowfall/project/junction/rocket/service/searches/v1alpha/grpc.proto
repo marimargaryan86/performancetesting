@@ -47,6 +47,8 @@ message ListSearchResultsResponse {
 message CreateQuoteRequest {
   repeated string offer_ids = 1;
   string reseller_id = 2;
+  string reseller_pay_company_id = 3;
+  string reseller_currency = 4;
 }
 
 message CreateQuoteResponse {

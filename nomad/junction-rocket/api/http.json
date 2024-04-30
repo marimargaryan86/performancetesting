@@ -5,7 +5,8 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "j_one_api_base_url": "https://one.junction.dev",
-      "traefik_host_URL": "rocket.api.junction.dev"
+      "traefik_host_URL": "rocket.api.junction.dev",
+      "j_one_pay_company_id": "2d36a7ee-7193-4c00-b817-d83e30caa6ba"
     }
   },
   "production": {
@@ -14,7 +15,8 @@
       "count": 2,
       "traefik_entrypoints": "web",
       "j_one_api_base_url": "https://one.junction.travel/",
-      "traefik_host_URL": "rocket.api.junction.travel"
+      "traefik_host_URL": "rocket.api.junction.travel",
+      "j_one_pay_company_id": ""
     }
   },
   "sandbox": {
@@ -23,7 +25,8 @@
       "count": 1,
       "traefik_entrypoints": "websecure",
       "j_one_api_base_url": "https://one.junction.dev",
-      "traefik_host_URL": "rocket.api.sandbox.junction.dev"
+      "traefik_host_URL": "rocket.api.sandbox.junction.dev",
+      "j_one_pay_company_id": ""
     }
   }
 }

@@ -152,37 +152,64 @@ class Generator:
         price: money.Money,
     ) -> models_pb2.SearchResult:
         arrival_date = search.departure_datetime + datetime.timedelta(days=1)
-        result_details = [
-            models_pb2.ResultDetail(
-                id=string.uuid(),
-                rail=models_pb2.RailResultDetail(
-                    origin=legacy_go_pb2.Point(
-                        ref=search.origin.id,
-                        name=search.origin.name,
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=search.origin.latitude,
-                            longitude=search.origin.longitude,
-                        ),
-                        time_zone=search.origin.time_zone,
-                    ),
-                    destination=legacy_go_pb2.Point(
-                        ref=search.destination.id,
-                        name=search.destination.name,
-                        coordinates=latlng_pb2.LatLng(
-                            latitude=search.destination.latitude,
-                            longitude=search.destination.longitude,
-                        ),
-                        time_zone=search.destination.time_zone,
-                    ),
-                    departure_date=protobuf.datetime_to_protobuf_datetime(
-                        search.departure_datetime,
-                    ),
-                    arrival_date=protobuf.datetime_to_protobuf_datetime(arrival_date),
-                    outbound_segment=True,
-                    segment_sequence=1,
-                ),
+        origin = legacy_go_pb2.Point(
+            ref=search.origin.id,
+            name=search.origin.name,
+            coordinates=latlng_pb2.LatLng(
+                latitude=search.origin.latitude,
+                longitude=search.origin.longitude,
             ),
-        ]
+            time_zone=search.origin.time_zone,
+        )
+        destination = legacy_go_pb2.Point(
+            ref=search.destination.id,
+            name=search.destination.name,
+            coordinates=latlng_pb2.LatLng(
+                latitude=search.destination.latitude,
+                longitude=search.destination.longitude,
+            ),
+            time_zone=search.destination.time_zone,
+        )
+        if search.outbound_offer_id:
+            return_date = (
+                search.return_datetime
+                or search.departure_datetime + datetime.timedelta(days=7)
+            )
+            result_details = [
+                models_pb2.ResultDetail(
+                    id=string.uuid(),
+                    rail=models_pb2.RailResultDetail(
+                        origin=destination,
+                        destination=origin,
+                        departure_date=protobuf.datetime_to_protobuf_datetime(
+                            return_date,
+                        ),
+                        arrival_date=protobuf.datetime_to_protobuf_datetime(
+                            return_date + datetime.timedelta(days=1),
+                        ),
+                        outbound_segment=False,
+                        segment_sequence=2,
+                    ),
+                ),
+            ]
+        else:
+            result_details = [
+                models_pb2.ResultDetail(
+                    id=string.uuid(),
+                    rail=models_pb2.RailResultDetail(
+                        origin=origin,
+                        destination=destination,
+                        departure_date=protobuf.datetime_to_protobuf_datetime(
+                            search.departure_datetime,
+                        ),
+                        arrival_date=protobuf.datetime_to_protobuf_datetime(
+                            arrival_date,
+                        ),
+                        outbound_segment=True,
+                        segment_sequence=1,
+                    ),
+                ),
+            ]
 
         cabin_details = [
             models_pb2.CabinDetails(
@@ -211,6 +238,12 @@ class Generator:
                         expires_at=expires_at,
                     ),
                     price=price.protobuf(),
+                    price_breakdown=[
+                        models_pb2.PriceBreakdown(
+                            price=price.protobuf(),
+                            breakdown_type=models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_BASE_FARE,
+                        ),
+                    ],
                     rail=models_pb2.RailOffer(
                         cabin_class=cabin_details,
                     ),
