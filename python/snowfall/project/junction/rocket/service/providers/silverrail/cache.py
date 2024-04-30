@@ -10,6 +10,10 @@ from snowfall.stdlib.persistence.redis.repository import (
 from snowfall.stdlib.persistence.redis.repository import RedisRecord
 
 
+class QuoteNotFoundError(Exception):
+    """Raised when quote is not found in the cache."""
+
+
 class Coordinates(RedisRecord):
     latitude: float
     longitude: float

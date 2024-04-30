@@ -17,6 +17,7 @@ from snowfall.project.junction.rocket.provider import (
 from snowfall.project.junction.rocket.provider.v1alpha import meta_pb2
 from snowfall.project.junction.rocket.service.providers.silverrail import (
     adapter,
+    bookings,
     cache,
     criteria,
     pricing,
@@ -30,6 +31,7 @@ from snowfall.project.junction.rocket.service.providers.silverrail.constant impo
 )
 from snowfall.stdlib import h3
 from snowfall.stdlib.instrumentation.httpx import logging, metrics
+from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.service import amqp_factory, redis_factory
 from snowfall.stdlib.transport.amqp import consumer, producer, types
 from snowfall.vendor.silverrail import client
@@ -46,6 +48,7 @@ class _Settings(service.ProviderSettings):
     pos_code: str
     channel_code: str
     pay_company_id: str
+    storage_dsn: service.AnyDsn
 
 
 def cert_tmp_path(cert_base64: str) -> str:
@@ -68,6 +71,60 @@ async def _meta_factory() -> meta.MetaImplementation:
         name=_PROVIDER_NAME,
         search_capabilities=meta_pb2.SearchCapabilities(rail=True),
     )
+
+
+async def _bookings(
+    app: service.Application[_Settings],
+) -> None:
+    http_client = await app.stack.enter_async_context(
+        httpx.AsyncClient(
+            http2=True,
+            cert=(
+                cert_tmp_path(app.settings.cert_base64),
+                key_tmp_path(app.settings.key_base64),
+            ),
+        ),
+    )
+    logging.register(http_client)
+    metrics.register(http_client)
+    silverrail_client = client.SilverrailClient(
+        base_url=str(app.settings.api_base_url),
+        settings=client.SilverrailSettings(
+            distributor_code=app.settings.distributor_code,
+            pos_code=app.settings.pos_code,
+            channel_code=app.settings.channel_code,
+        ),
+        http_client=http_client,
+    )
+
+    redis_client = await redis_factory.make_client(
+        app=app,
+        dsn=app.settings.redis_dsn,
+        decode_responses=False,
+    )
+    amqp_connection = await amqp_factory.make_connection(app, app.settings.amqp_dsn)
+    storage = await app.stack.enter_async_context(
+        filesystem.Storage.from_dsn(str(app.settings.storage_dsn)),
+    )
+
+    await bookings.Consumer(
+        consumer_obj=consumer.Consumer(
+            connection=amqp_connection,
+            queue_name="{0}_bookings".format(app.name),
+            binds=[(types.Exchange("bookings"), "bookings.prices")],
+        ),
+        producer_obj=producer.Producer(
+            connection=amqp_connection,
+            exchange=types.Exchange("bookings"),
+        ),
+        booker=bookings.Booker(
+            quote_cache=cache.QuoteCache(client=redis_client),
+            booking_storage=storage,
+            silverrail_client=silverrail_client,
+            provider_id=PROVIDER_ID,
+            provider_name=_PROVIDER_NAME,
+        ),
+    ).consume()
 
 
 async def _pricing(
@@ -198,6 +255,11 @@ if __name__ == "__main__":
         service.Command(
             name="pricing",
             callback=_pricing,
+            settings_class=_Settings,
+        ),
+        service.Command(
+            name="bookings",
+            callback=_bookings,
             settings_class=_Settings,
         ),
     )
