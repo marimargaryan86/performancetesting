@@ -31,11 +31,11 @@ class BookingImporter:
 
         if message.body.trip_option.pay_quote_id:
             try:  # noqa: WPS229
-                booking_with_transaction = (
-                    await self._pay_transaction_creator.create_transaction_and_set_id(
-                        message.body,
-                    )
+                booking_with_transaction = message.body
+                transaction_id = await self._pay_transaction_creator.create_transaction(
+                    message.body,
                 )
+                booking_with_transaction.transaction_id = transaction_id
                 await self._bookings.update(booking=booking_with_transaction)
             except PayTransactionCreationError:
                 # Only logging exceptions as we'd rather successful bookings

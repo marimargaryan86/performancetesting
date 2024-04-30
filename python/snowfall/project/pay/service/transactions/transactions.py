@@ -11,6 +11,7 @@ from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 class TransactionsRepository(
     repository.ProtoRepository[models_pb2.Transaction],
     mixins.InsertMixin[models_pb2.Transaction],
+    mixins.ExistsMixin[models_pb2.Transaction],
 ):
     _proto = models_pb2.Transaction
     _indexes = (
@@ -190,6 +191,19 @@ class TransactionsRepository(
             upsert=False,
         )
         return update_result.matched_count != 0
+
+    async def exists_by_external_reference(
+        self,
+        identifier: str,
+    ) -> bool:
+        return (
+            await self._execute(
+                self._collection.find_one,
+                {"external_reference_id": identifier},
+                projection={repository.mongo_id_key: 1},
+            )
+            is not None
+        )
 
 
 class QuotationsRepository(

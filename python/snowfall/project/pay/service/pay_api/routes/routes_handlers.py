@@ -34,6 +34,12 @@ field_to_source = {
     "to_currency": models.ErrorSourcePointer(
         pointer="/data/relationships/toCurrency/data/id",
     ),
+    "quotation_id": models.ErrorSourcePointer(
+        pointer="/data/relationships/quotation/data/id",
+    ),
+    "external_reference_id": models.ErrorSourcePointer(
+        pointer="/data/attributes/externalReference",
+    ),
 }
 
 

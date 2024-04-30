@@ -63,7 +63,7 @@ class TransactionsFlow:
 
         self._logger.info("Creating transaction step...")
         created_transaction = await self._transactions_client.create(
-            quotation=quotation,
+            quotation_id=quotation.id,
             external_reference=string.uuid(),
             invoice_reference=string.uuid(),
             order_id=string.uuid(),

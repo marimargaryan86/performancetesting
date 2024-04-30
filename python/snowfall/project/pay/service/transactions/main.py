@@ -134,6 +134,9 @@ async def _serve(app: application.Application[_GrpcSettings]) -> None:
                         ),
                     ),
                 ),
+                quotations=transactions.QuotationsRepository(
+                    mongo.transactions.quotations,
+                ),
             ),
             QuotationsService(
                 quotations=transactions.QuotationsRepository(

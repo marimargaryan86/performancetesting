@@ -33,8 +33,8 @@ from snowfall.project.junction.go.service.passenger_name_records.v1 import (
     passenger_name_records_pb2_grpc,
 )
 from snowfall.project.junction.go.service.resellers.v1 import resellers_pb2_grpc
-from snowfall.project.pay.adapter import quotations, transactions
 from snowfall.project.pay.adapter import refunds as refunds_adapter
+from snowfall.project.pay.adapter import transactions
 from snowfall.project.pay.service.refunds.v1 import (
     grpc_pb2_grpc as refund_pb2_grpc,
 )
@@ -218,9 +218,6 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
             use_pay_to_create_transaction=app.settings.use_pay_to_create_transaction,
             transactions_client=transactions.GrpcClient(
                 transactions_pb2_grpc.TransactionsServiceStub(transactions_channel),
-            ),
-            quotations_client=quotations.GrpcClient(
-                transactions_pb2_grpc.QuotationsServiceStub(transactions_channel),
             ),
         ),
     )

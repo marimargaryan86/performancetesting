@@ -14,7 +14,7 @@ from snowfall.project.pay.service.transactions.v1 import (
     grpc_pb2_grpc,
     models_pb2,
 )
-from snowfall.stdlib import sequence, string
+from snowfall.stdlib import money, sequence, string
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import sort_pb2
 
@@ -23,7 +23,7 @@ class Client(abc.ABC):
     @abc.abstractmethod
     async def create(
         self,
-        quotation: models_pb2.Quotation,
+        quotation_id: str,
         external_reference: str,
         invoice_reference: str,
         order_id: str,
@@ -78,11 +78,33 @@ class DictClient(Client):
 
     async def create(
         self,
-        quotation: models_pb2.Quotation,
+        quotation_id: str,
         external_reference: str,
         invoice_reference: str,
         order_id: str,
     ) -> models_pb2.Transaction:
+        money_usd = money.from_string("1000", money.Currency("USD")).protobuf()
+        basic_rate = float(1)
+        quotation = models_pb2.Quotation(
+            id=quotation_id,
+            amounts=models_pb2.QuotationAmounts(
+                beneficiary=money_usd,
+                base_converted=money_usd,
+                fx_margin=money_usd,
+                processing_margin=money_usd,
+                sales_margin=money_usd,
+                quotation=money_usd,
+            ),
+            rates=models_pb2.QuotationRates(
+                fx_quote=basic_rate,
+                fx_buffer=basic_rate,
+                fx_markup=basic_rate,
+                sales_markup=basic_rate,
+                processing_markup=basic_rate,
+            ),
+            payer_id=string.uuid(),
+            beneficiary_id=string.uuid(),
+        )
         transaction = models_pb2.Transaction(
             id=string.uuid(),
             external_reference_id=external_reference,
@@ -204,19 +226,17 @@ class GrpcClient(Client):
 
     async def create(
         self,
-        quotation: models_pb2.Quotation,
+        quotation_id: str,
         external_reference: str,
         invoice_reference: str,
         order_id: str,
     ) -> models_pb2.Transaction:
-        response = await errors.handle_grpc_errors(
-            self._transactions.CreateTransaction(
-                grpc_pb2.CreateTransactionRequest(
-                    quotation=quotation,
-                    external_reference=external_reference,
-                    invoice_reference=invoice_reference,
-                    order_id=order_id,
-                ),
+        response = await self._transactions.CreateTransaction(
+            grpc_pb2.CreateTransactionRequest(
+                quotation_id=quotation_id,
+                external_reference=external_reference,
+                invoice_reference=invoice_reference,
+                order_id=order_id,
             ),
         )
 

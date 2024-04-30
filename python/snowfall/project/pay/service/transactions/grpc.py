@@ -1,4 +1,5 @@
 import types
+from typing import cast
 
 import grpc
 
@@ -18,7 +19,7 @@ from snowfall.project.pay.service.transactions.v1 import (
     models_pb2,
 )
 from snowfall.stdlib import money, string
-from snowfall.stdlib.transport.grpc import service, sorting
+from snowfall.stdlib.transport.grpc import rich_status, service, sorting
 from snowfall.stdlib.v1 import money_pb2
 
 _TRANSACTION_STATUS_MAPPING = types.MappingProxyType({
@@ -34,12 +35,14 @@ class TransactionsService(
     def __init__(
         self,
         transactions: TransactionsRepository,
+        quotations: QuotationsRepository,
         bills: BillsRepository,
         companies_client: companies.Client,
         invoices: InvoiceRepository,
         credit_card_client: credit_card_payment.Client,
     ):
         self._transactions = transactions
+        self._quotations = quotations
         self._invoices = invoices
         self._bills = bills
         self._companies = companies_client
@@ -114,11 +117,35 @@ class TransactionsService(
         request: grpc_pb2.CreateTransactionRequest,
         context: grpc.aio.ServicerContext,
     ) -> grpc_pb2.CreateTransactionResponse:
+        quotation = await self._quotations.find_by_id(
+            request.quotation_id,
+        )
+
+        await self._validate_quotation(
+            request.quotation_id,
+            quotation,
+            context,
+        )
+
+        exist_transaction = await self._transactions.exists_by_external_reference(
+            request.external_reference,
+        )
+        if exist_transaction:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="external_reference_id",
+                    field_description="Transaction already exists",
+                ),
+            )
+
+        quotation = cast(models_pb2.Quotation, quotation)
+
         bill = await self._bills.find_by_order_id(request.order_id)
         if bill:
             bill = self._add_amount_to_bill_amount(
                 bill,
-                request.quotation.amounts.total_amount,
+                quotation.amounts.total_amount,
             )
             await self._bills.update(bill)
         else:
@@ -126,17 +153,17 @@ class TransactionsService(
                 models_pb2.Bill(
                     id=string.uuid(),
                     order_id=request.order_id,
-                    total_amount=request.quotation.amounts.total_amount,
+                    total_amount=quotation.amounts.total_amount,
                 ),
             )
 
         transaction_id = string.uuid()
 
-        payer = await self._companies.get(request.quotation.payer_id)
+        payer = await self._companies.get(quotation.payer_id)
         charge_amount = money.total(
             [
-                money.from_protobuf(request.quotation.amounts.base_converted),
-                money.from_protobuf(request.quotation.amounts.tax_converted),
+                money.from_protobuf(quotation.amounts.base_converted),
+                money.from_protobuf(quotation.amounts.tax_converted),
             ],
         )
         try:
@@ -156,10 +183,10 @@ class TransactionsService(
             id=transaction_id,
             external_reference_id=request.external_reference,
             invoice_reference_id=request.invoice_reference,
-            amounts=request.quotation.amounts,
-            rates=request.quotation.rates,
-            payer_id=request.quotation.payer_id,
-            beneficiary_id=request.quotation.beneficiary_id,
+            amounts=quotation.amounts,
+            rates=quotation.rates,
+            payer_id=quotation.payer_id,
+            beneficiary_id=quotation.beneficiary_id,
             payment_type=payer.payment_type,
             payment_method=payer.payment_method,
             bill_id=bill.id,
@@ -167,7 +194,14 @@ class TransactionsService(
             charge_status=charge_status,
         )
 
-        inserted_transaction = await self._transactions.insert(transaction)
+        inserted_transaction = await self._transactions.insert(
+            transaction,
+        )
+
+        await self._quotations.update_status(
+            request.quotation_id,
+            models_pb2.QuotationStatus.QUOTATION_STATUS_CONFIRMED,
+        )
 
         return grpc_pb2.CreateTransactionResponse(transaction=inserted_transaction)
 
@@ -242,6 +276,37 @@ class TransactionsService(
         )
 
         return processed_payment.status == "succeeded"
+
+    async def _validate_quotation(
+        self,
+        quotation_id: str,
+        quotation: models_pb2.Quotation | None,
+        context: grpc.aio.ServicerContext,
+    ) -> None:
+        if not quotation:
+            return await context.abort(
+                grpc.StatusCode.NOT_FOUND,
+                details="Quotation not found",
+                trailing_metadata=(
+                    ("field_name", "quotation_id"),
+                    (
+                        "field_description",
+                        "Quotation not found {0}".format(
+                            quotation_id,
+                        ),
+                    ),
+                ),
+            )
+
+        if quotation.status != models_pb2.QuotationStatus.QUOTATION_STATUS_QUOTED:
+            await rich_status.abort_with_rich_status(
+                context=context,
+                status=rich_status.build_bad_request(
+                    field_name="quotation_id",
+                    field_description="Quotation not valid",
+                ),
+            )
+        return None
 
 
 class QuotationsService(

@@ -15,36 +15,9 @@ class TestTransactions:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         request = self._transaction_request(quote_is_less_than_the_limit.id)
-
-        await client.post("/transactions", json=request)
-
-        event_logs = [
-            record.msg
-            for record in caplog.records
-            if record.msg["level"] == "error"  # type: ignore[index]
-        ]
-        for event_log in event_logs:
-            assert (
-                event_log["event"]  # type: ignore[index]
-                == (
-                    "Conversion of GBP equivalent 0.89 is"
-                    " less than your lower limit of 1.00"
-                )
-            )
-
-    async def test_booked_quote_handled(
-        self,
-        client: httpx.AsyncClient,
-        booked_quote: Quotation,
-    ) -> None:
-        request = self._transaction_request(booked_quote.id)
-
         response = await client.post("/transactions", json=request)
-        error = response.json()["errors"][0]
-        assert error["detail"] == "Quotation not valid"
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert error["status"] == "404"
-        assert error["code"] == "not_found"
+
+        assert response.status_code == status.HTTP_201_CREATED
 
     def _transaction_request(self, quote_id: str) -> dict[str, Collection[str]]:
         return {

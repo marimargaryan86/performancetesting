@@ -13,7 +13,7 @@ from snowfall.project.junction.go.service.orders.v1.models_pb2 import (
     TripOption,
 )
 from snowfall.project.pay import fixtures as pay_fixtures
-from snowfall.project.pay.adapter import quotations, transactions
+from snowfall.project.pay.adapter import transactions
 from snowfall.project.pay.service.transactions.v1 import (
     models_pb2 as transactions_models_pb2,
 )
@@ -38,62 +38,43 @@ def booking() -> Booking:
     )
 
 
-async def test_that_transaction_created_and_id_set_in_booking(
+async def test_that_transaction_is_created(
     transactions_client: transactions.Client,
-    quotations_client: quotations.Client,
     booking: Booking,
 ) -> None:
     pay_transactions = PayTransactionCreator(
         use_pay_to_create_transaction=True,
         transactions_client=transactions_client,
-        quotations_client=quotations_client,
     )
 
-    updated_booking = await pay_transactions.create_transaction_and_set_id(
+    transaction_id = await pay_transactions.create_transaction(
         booking=booking,
     )
 
-    assert updated_booking.transaction_id
+    booking.transaction_id = transaction_id
+
+    assert booking.transaction_id
 
 
 async def test_that_transaction_not_created(
     transactions_client: transactions.Client,
-    quotations_client: quotations.Client,
     booking: Booking,
 ) -> None:
     pay_transactions = PayTransactionCreator(
         use_pay_to_create_transaction=False,
         transactions_client=transactions_client,
-        quotations_client=quotations_client,
     )
 
-    updated_booking = await pay_transactions.create_transaction_and_set_id(
+    transaction_id = await pay_transactions.create_transaction(
         booking=booking,
     )
 
-    assert not updated_booking.transaction_id
+    booking.transaction_id = transaction_id
 
-
-async def test_quotation_not_found_raises_error(
-    transactions_client: transactions.Client,
-    quotations_client: quotations.Client,
-    booking: Booking,
-) -> None:
-    pay_transactions = PayTransactionCreator(
-        use_pay_to_create_transaction=True,
-        transactions_client=transactions_client,
-        quotations_client=quotations_client,
-    )
-
-    booking.trip_option.MergeFrom(TripOption(pay_quote_id=pay_fixtures.NOT_FOUND))
-    with pytest.raises(PayTransactionCreationError):
-        await pay_transactions.create_transaction_and_set_id(
-            booking=booking,
-        )
+    assert not booking.transaction_id
 
 
 async def test_quotation_not_in_quoted_status_raises_error(
-    transactions_client: transactions.Client,
     booking: Booking,
 ) -> None:
     quotation = pay_fixtures.get_quotations()[0]
@@ -101,62 +82,43 @@ async def test_quotation_not_in_quoted_status_raises_error(
         transactions_models_pb2.QuotationStatus.QUOTATION_STATUS_CONFIRMED
     )
 
-    quotations_client = mock.create_autospec(quotations.Client)
-    quotations_client.get = mock.AsyncMock(return_value=quotation)
+    transactions_mock_client = mock.create_autospec(transactions.Client)
+    transactions_mock_client.create = mock.AsyncMock(
+        side_effect=errors.UnhandledError("Quotation not valid"),
+    )
+
     pay_transactions = PayTransactionCreator(
         use_pay_to_create_transaction=True,
-        transactions_client=transactions_client,
-        quotations_client=quotations_client,
+        transactions_client=transactions_mock_client,
     )
 
     with pytest.raises(PayTransactionCreationError):
-        await pay_transactions.create_transaction_and_set_id(
+        await pay_transactions.create_transaction(
             booking=booking,
         )
 
 
-async def test_create_transaction_failed_raises_error(
-    quotations_client: quotations.Client,
+async def test_create_transaction_logs_error(
     booking: Booking,
 ) -> None:
-    transactions_client = mock.create_autospec(transactions.Client)
-    transactions_client.create = mock.AsyncMock(side_effect=errors.UnhandledError())
+    transactions_mock_client = mock.create_autospec(transactions.Client)
+    transactions_mock_client.create = mock.AsyncMock(
+        side_effect=errors.NotFoundError("Quotation not found"),
+    )
 
     pay_transactions = PayTransactionCreator(
         use_pay_to_create_transaction=True,
-        transactions_client=transactions_client,
-        quotations_client=quotations_client,
-    )
-
-    with pytest.raises(PayTransactionCreationError):
-        await pay_transactions.create_transaction_and_set_id(
-            booking=booking,
-        )
-
-
-async def test_update_quotation_status_failed_logs_error(
-    transactions_client: transactions.Client,
-    booking: Booking,
-) -> None:
-    quotations_client = mock.create_autospec(quotations.Client)
-    quotations_client.get = mock.AsyncMock(
-        return_value=pay_fixtures.get_quotations()[0],
-    )
-    quotations_client.update_status = mock.AsyncMock(return_value=False)
-
-    pay_transactions = PayTransactionCreator(
-        use_pay_to_create_transaction=True,
-        transactions_client=transactions_client,
-        quotations_client=quotations_client,
+        transactions_client=transactions_mock_client,
     )
 
     with stdout.capture_logs() as cap_logs:
-        await pay_transactions.create_transaction_and_set_id(
-            booking=booking,
-        )
+        with pytest.raises(PayTransactionCreationError):
+            await pay_transactions.create_transaction(
+                booking=booking,
+            )
 
         assert len(cap_logs) == 1
 
         for log in cap_logs:
             assert log["pay_quote_id"] == pay_fixtures.QUOTATIONS[0]
-            assert log["event"] == "Failed to update quotation status in Pay"
+            assert log["event"] == "Transaction creation failed"
