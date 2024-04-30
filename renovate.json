@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
+  "postUpgradeTasks": {
+    "commands": ["pants generate-lockfiles --resolve=python-default"],
+    "executionMode": "branch"
+  },
+  "reviewersFromCodeOwners": true,
+  "semanticCommitScope": null,
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/examples/**",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/__fixtures__/**"
+  ]
+}
