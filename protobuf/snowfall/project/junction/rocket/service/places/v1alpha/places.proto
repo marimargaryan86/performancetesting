@@ -16,6 +16,7 @@ message GetPlaceResponse {
 
 message GetPlaceClosestToCoordinatesRequest {
   CoordinatesAndRadius coordinates_and_radius = 1;
+  Type type = 2;
 }
 
 message GetPlaceClosestToCoordinatesResponse {

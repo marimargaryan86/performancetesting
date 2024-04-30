@@ -113,6 +113,7 @@ class TestGrpc:
         mock_repository.find_closest_within_radius.assert_called_once_with(
             coordinates=LatLng(latitude=0, longitude=0),
             radius=100,
+            type_=None,
         )
         assert place_resp.place.id == "an-id"
 
@@ -139,6 +140,7 @@ class TestGrpc:
         mock_repository.find_closest_within_radius.assert_called_once_with(
             coordinates=LatLng(latitude=0, longitude=0),
             radius=100,
+            type_=None,
         )
 
     async def test_that_when_get_place_by_iata_has_place_its_returned(

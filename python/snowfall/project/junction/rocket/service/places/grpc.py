@@ -2,6 +2,7 @@ from grpc import StatusCode, aio
 
 from snowfall.project.junction.rocket.service.places import places
 from snowfall.project.junction.rocket.service.places.v1alpha import (
+    models_pb2,
     places_pb2,
     places_pb2_grpc,
 )
@@ -43,9 +44,14 @@ class PlacesService(
         request: places_pb2.GetPlaceClosestToCoordinatesRequest,
         context: aio.ServicerContext,
     ) -> places_pb2.GetPlaceClosestToCoordinatesResponse:
+        type_: models_pb2.Type.ValueType | None = None
+        if request.type != models_pb2.TYPE_UNSPECIFIED:
+            type_ = request.type
+
         closest_place = await self._places.find_closest_within_radius(
             coordinates=request.coordinates_and_radius.coordinates,
             radius=request.coordinates_and_radius.radius,
+            type_=type_,
         )
         if not closest_place:
             await context.abort(code=StatusCode.NOT_FOUND)
