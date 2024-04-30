@@ -1,0 +1,108 @@
+{
+  "code": 200,
+  "data": {
+    "agencyCode": "JN",
+    "bookerId": 2623641,
+    "createdOn": "2024-04-29T10:15:55.872566",
+    "currency": "USD",
+    "endDate": "2024-05-02T21:15:00",
+    "ext": {
+      "airPrice": 334.61,
+      "consumers": [
+        {
+          "dob": "2000-01-01",
+          "firstName": "John",
+          "lastName": "Smith SR",
+          "middleName": "Middle",
+          "userId": 2757995
+        },
+        {
+          "dob": "2001-01-01",
+          "firstName": "Johne",
+          "lastName": "Smithe SR",
+          "middleName": "Middlee",
+          "userId": 2759609
+        }
+      ],
+      "od": {
+        "arrivalOffsetDateTime": "2024-05-02T21:15:00-04:00",
+        "arrivalStation": "JFK",
+        "arrivalTime": "2024-05-02T21:15:00",
+        "arrivalTimeOffset": -240,
+        "departureOffsetDateTime": "2024-05-02T11:00:00-07:00",
+        "departureStation": "LAX",
+        "departureTime": "2024-05-02T11:00:00",
+        "departureTimeOffset": -420,
+        "duration": 435,
+        "fareName": "Blue Basic",
+        "fareType": "1",
+        "segments": [
+          {
+            "aircraft": "321",
+            "airline": "B6",
+            "arrivalOffsetDateTime": "2024-05-02T18:25:00-04:00",
+            "arrivalStation": "FLL",
+            "arrivalTime": "2024-05-02T18:25:00",
+            "arrivalTimeOffset": -240,
+            "departureOffsetDateTime": "2024-05-02T11:00:00-07:00",
+            "departureStation": "LAX",
+            "departureTime": "2024-05-02T11:00:00",
+            "departureTimeOffset": -420,
+            "duration": 265,
+            "fareBasisCode": "MC3AUEL1",
+            "fareBrand": "DN",
+            "fareName": "Blue Basic",
+            "fareType": "1",
+            "flightClass": "Economy",
+            "flightClassPremium": false,
+            "flightNumber": "3629",
+            "operatingAirline": "B6",
+            "segmentKey": "B63629",
+            "serviceClass": "L"
+          },
+          {
+            "aircraft": "321",
+            "airline": "B6",
+            "arrivalOffsetDateTime": "2024-05-02T21:15:00-04:00",
+            "arrivalStation": "JFK",
+            "arrivalTime": "2024-05-02T21:15:00",
+            "arrivalTimeOffset": -240,
+            "departureOffsetDateTime": "2024-05-02T19:25:00-04:00",
+            "departureStation": "FLL",
+            "departureTime": "2024-05-02T19:25:00",
+            "departureTimeOffset": -240,
+            "duration": 110,
+            "fareBasisCode": "MC3AUEL1",
+            "fareBrand": "DN",
+            "fareName": "Blue Basic",
+            "fareType": "1",
+            "flightClass": "Economy",
+            "flightClassPremium": false,
+            "flightNumber": "3501",
+            "operatingAirline": "B6",
+            "segmentKey": "B63501",
+            "serviceClass": "L"
+          }
+        ]
+      },
+      "taxesAndFees": 46.23
+    },
+    "flags": 5,
+    "id": 2759960,
+    "label": "LAX-JFK",
+    "orgId": 2623634,
+    "providerCode": "SB",
+    "startDate": "2024-05-02T11:00:00",
+    "status": "PENDING",
+    "totalPrice": 334.61,
+    "tripId": 2759957,
+    "type": "Flight",
+    "updatedAt": "2024-04-29T10:15:56.238471361",
+    "userIds": [
+      2757995,
+      2759609
+    ],
+    "vendor": "B6"
+  },
+  "status": "OK"
+}

@@ -6,6 +6,10 @@ from snowfall.project.junction.rocket.service.api.flights import (
 )
 
 
+def no_such_route() -> None:
+    """It hasn't been added yet."""
+
+
 def get_routes(integration: starlette.StarletteIntegration) -> list[routing.BaseRoute]:
     return [
         integration.route(
@@ -22,5 +26,15 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             "/flights/searches/{searchId:str}/results",
             endpoints.FlightSearchRetrieval,
             name="FlightsSearchRetrieval",
+        ),
+        integration.route(
+            "/flights/offers/{offerId:str}/passengers",
+            endpoints.FlightOfferAddPassenger,
+            name="FlightOfferAddPassenger",
+        ),
+        integration.route(
+            "/passengers/{passengerId:str}",
+            no_such_route,
+            name="FlightPassenger",
         ),
     ]

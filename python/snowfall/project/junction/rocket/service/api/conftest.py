@@ -1,5 +1,6 @@
 import datetime
 from collections.abc import AsyncIterator, Mapping
+from typing import Any
 
 import grpc
 import grpc_testing
@@ -30,6 +31,7 @@ from snowfall.project.junction.rocket.service.api.flights import (
 from snowfall.project.junction.rocket.service.api.flights.repositories import (
     FlightSearchRequestRepository,
     FlightSearchResultRepository,
+    RocketTripRepository,
 )
 from snowfall.project.junction.rocket.service.api.flights.transforms import (
     transforms as flights_transforms,
@@ -74,6 +76,7 @@ from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import application, handlers
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.persistence import filesystem
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.transport.amqp import memory
 from snowfall.stdlib.v1 import amqp_pb2
 from snowfall.vendor.junction_one.client import JunctionOneClient
@@ -183,6 +186,8 @@ def container(
     hotel_search_repo: HotelSearchRepository,
     hotel_rooms_search_repo: HotelRoomsSearchRepository,
     search_task_producer: amqp.SearchTaskProducer,
+    redis_client: Any,
+    flights_rocket_trip_repo: RocketTripRepository,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -209,6 +214,9 @@ def container(
         hotel_transformers.HotelSearchResultTransformer
     )
     container[HotelRoomsSearchRepository] = hotel_rooms_search_repo
+
+    container[redis.Client[bytes]] = redis_client
+    container[RocketTripRepository] = flights_rocket_trip_repo
 
     includes.register_resolvers(
         flights_results_repo=flights_search_repo,
@@ -488,6 +496,15 @@ async def flights_search_request_repo(
 ) -> FlightSearchRequestRepository:
     return FlightSearchRequestRepository(
         collection=mongo_client["db"]["flight_request"],
+    )
+
+
+@pytest.fixture()
+async def flights_rocket_trip_repo(
+    mongo_client: motor_asyncio.AsyncIOMotorClient,
+) -> RocketTripRepository:
+    return RocketTripRepository(
+        collection=mongo_client["db"]["rocket_trips"],
     )
 
 

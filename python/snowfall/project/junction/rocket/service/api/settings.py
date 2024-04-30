@@ -31,3 +31,4 @@ class Settings(starlette.Settings, CommonSettings):
     reseller_pay_companies: dict[str, str]
     reseller_currencies: dict[str, str]
     j_one_pay_company_id: str
+    redis_dsn: pydantic.RedisDsn

@@ -33,10 +33,12 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import grpc_pb2_g
 from snowfall.service.authentication.v1 import oauth_pb2_grpc
 from snowfall.stdlib.format import jwt
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
+from snowfall.stdlib.persistence.redis import types as redis
 from snowfall.stdlib.service import (
     application,
     grpc_factory,
     httpx_factory,
+    redis_factory,
 )
 from snowfall.stdlib.transport.amqp import producer
 from snowfall.stdlib.transport.amqp import types as amqp_types
@@ -151,6 +153,14 @@ async def create_dependencies(
             connection=amqp_connection,
             exchange=amqp_types.Exchange(app.name),
         ),
+    )
+    container[redis.Client[bytes]] = await redis_factory.make_client(
+        app,
+        app.settings.redis_dsn,
+        decode_responses=False,
+    )
+    container[repositories.RocketTripRepository] = repositories.RocketTripRepository(
+        collection=mongo_db.rocket_trips,
     )
 
     container[QuotesSettings] = QuotesSettings(

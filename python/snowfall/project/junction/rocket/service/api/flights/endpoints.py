@@ -1,4 +1,7 @@
+import asyncio
+import functools
 import json
+import operator
 
 import lagom
 from starlette import endpoints, exceptions, requests, responses, status
@@ -6,15 +9,19 @@ from starlette import endpoints, exceptions, requests, responses, status
 from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.flights import amqp
 from snowfall.project.junction.rocket.service.api.flights.models import (
+    AddPassengerRequest,
     FlightSearchRequest,
     FlightSearchRequestStorage,
     FlightSearchResponseAttributes,
     FlightSearchResultResource,
+    PassengerIds,
+    RocketTrip,
     StatusTypeEnum,
 )
 from snowfall.project.junction.rocket.service.api.flights.repositories import (
     FlightSearchRequestRepository,
     FlightSearchResultRepository,
+    RocketTripRepository,
 )
 from snowfall.project.junction.rocket.service.api.flights.validation import (
     SearchRequestValidator,
@@ -25,6 +32,12 @@ from snowfall.stdlib.integration.starlette import (
     models,
     pagination_helpers,
 )
+from snowfall.stdlib.persistence.redis import types as redis
+from snowfall.vendor.junction_one.client import JunctionOneClient
+from snowfall.vendor.junction_one.models.base import (
+    TripCreateRefsRequest,
+    UpdateReservationRequest,
+)
 
 
 def _is_inbound(
@@ -33,17 +46,15 @@ def _is_inbound(
     return flight_search_request.data.relationships.selected_outbound_offer is not None
 
 
-async def get_selected_outbound_offer_ref_ids(
-    outbound_offer_id: str,
+async def get_ref_ids_for_offer(
+    offer_id: str,
     results_repo: FlightSearchResultRepository,
-) -> str:
-    search_result = await results_repo.find_result_by_offer_id(
-        outbound_offer_id,
-    )
+) -> list[str]:
+    search_result = await results_repo.find_result_by_offer_id(offer_id)
     selected_offer = next(
-        offer for offer in search_result.offers if offer.id == outbound_offer_id
+        offer for offer in search_result.offers if offer.id == offer_id
     )
-    return selected_offer.ref_ids[0]
+    return selected_offer.ref_ids
 
 
 def _validate_request(search_request: FlightSearchRequest) -> None:
@@ -215,3 +226,111 @@ class FlightSearchRetrieval(endpoints.HTTPEndpoint):
             ),
             request=request,
         )
+
+
+class FlightOfferAddPassenger(endpoints.HTTPEndpoint):
+    async def post(  # noqa: WPS217
+        self,
+        request: requests.Request,
+        redis_client: redis.Client[bytes] = lagom.injectable,
+        junction_one_client: JunctionOneClient = lagom.injectable,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
+        trip_repo: RocketTripRepository = lagom.injectable,
+    ) -> responses.Response:
+        offer_id = request.path_params["offerId"]
+        add_passenger_request = AddPassengerRequest(**(await request.json()))
+
+        reseller_user = await junction_one_client.create_reseller_user(
+            add_passenger_request.data.attributes,
+        )
+
+        if not reseller_user.id:
+            raise ValueError(
+                "Failed to create user: {0}".format(
+                    add_passenger_request.data.attributes,
+                ),
+            )
+
+        async with redis_client.lock("lock:offers:{0}:trip".format(offer_id)):
+            passenger_ids = await self._add_passenger_to_trip(
+                offer_id,
+                reseller_user.id,
+                junction_one_client,
+                results_repo,
+                trip_repo,
+            )
+
+        self_url = request.url_for("FlightPassenger", passengerId=passenger_ids.id)
+
+        return await messages.create_response(
+            body=models.Body(
+                data=models.Resource(
+                    id=passenger_ids.id,
+                    type="passengers",
+                    links={"self": str(self_url)},
+                    attributes={},
+                ),
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    async def _add_passenger_to_trip(
+        self,
+        offer_id: str,
+        reseller_user_id: int,
+        junction_one_client: JunctionOneClient = lagom.injectable,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
+        trip_repo: RocketTripRepository = lagom.injectable,
+    ) -> PassengerIds:
+        trip = await trip_repo.find_by_offer_id(offer_id)
+        passenger_ids = PassengerIds(
+            id=string.uuid(),
+            reseller_user_id=reseller_user_id,
+        )
+
+        if trip:
+            same_id = [
+                pa
+                for pa in trip.passenger_ids
+                if pa.reseller_user_id == reseller_user_id
+            ]
+            if same_id:
+                return same_id[0]
+
+            trip.passenger_ids.append(passenger_ids)
+        else:
+            refs = await get_ref_ids_for_offer(offer_id, results_repo)
+            trip_create_response = await junction_one_client.create_trip_with_refs(
+                TripCreateRefsRequest(
+                    name="Trip {0}".format(refs[0]),
+                    flight_refs=",".join(map(str, refs)),
+                ),
+            )
+            trip = RocketTrip(
+                id=string.uuid(),
+                offer_id=offer_id,
+                passenger_ids=[passenger_ids],
+                reservation_ids=functools.reduce(
+                    operator.iadd,
+                    [
+                        ref.reservation_ids
+                        for board in trip_create_response.boards
+                        for ref in board.refs
+                    ],
+                    [],
+                ),
+            )
+        await trip_repo.upsert(trip)
+        await asyncio.gather(
+            *(
+                junction_one_client.update_reservation(
+                    UpdateReservationRequest(
+                        id=id_,
+                        user_ids=[pa.reseller_user_id for pa in trip.passenger_ids],
+                    ),
+                )
+                for id_ in trip.reservation_ids
+            ),
+        )
+        return passenger_ids

@@ -267,7 +267,7 @@ class JunctionOneClient:
     async def create_reseller_user(
         self,
         model: auto_models.CreateUserAccountRequest,
-        org_id: int,
+        org_id: int | None = None,
         rate_limit_timeout: float | None = None,
     ) -> auto_models.UserAccount:
         response = await self._make_request_with_data(
@@ -276,7 +276,7 @@ class JunctionOneClient:
             {
                 "data": {
                     "data": model.model_dump_json(exclude_unset=True, by_alias=True),
-                    "orgId": org_id,
+                    "orgId": org_id or self._get_org_id_from_auth(),
                 },
             },
             rate_limit_timeout=rate_limit_timeout,

@@ -1,0 +1,22 @@
+{
+  "code": 200,
+  "data": {
+    "active": true,
+    "dob": "2001-01-01",
+    "firstName": "Johne",
+    "flags": 0,
+    "fullName": "Johne Middlee Smithe SR",
+    "gender": "female",
+    "id": 2759609,
+    "lastName": "Smithe",
+    "middleName": "Middlee",
+    "nms": 1714143474493,
+    "phoneNumber": "4407771000001",
+    "primaryEmail": "emaile@example.com",
+    "role": "User",
+    "shortName": "Johne Smithe",
+    "status": "Active",
+    "suffix": "SR"
+  },
+  "status": "OK"
+}

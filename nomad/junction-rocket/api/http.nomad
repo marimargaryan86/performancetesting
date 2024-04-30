@@ -141,6 +141,7 @@ J_ONE_API_KEY={{ .Data.data.j_one_api_key }}
 {{ end }}
 RESELLER_PAY_COMPANIES={{keyOrDefault "${var.environment}/rocket-api/reseller-pay-companies" "{}" | toJSON }}
 RESELLER_CURRENCIES={{keyOrDefault "${var.environment}/rocket-api/reseller-currencies" "{}" | toJSON }}
+REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 EOH
       }
 

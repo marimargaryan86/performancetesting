@@ -257,6 +257,30 @@ async def test_search_flights(
     assert response == auto_models.SearchFlightsResponse(**fixture["data"])
 
 
+async def test_create_reseller_user(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-reseller-user-create.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/reseller/user/create",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    response = await junction_one_client.create_reseller_user(
+        auto_models.CreateUserAccountRequest(
+            email="email@example.com",
+            dob=date(2000, 1, 1),
+        ),
+        org_id=1000,
+    )
+
+    assert response == auto_models.UserAccount(**fixture["data"])
+
+
 async def test_search_flights_no_offers(
     junction_one_client: JunctionOneClient,
     httpx_mock: pytest_httpx.HTTPXMock,
@@ -316,6 +340,29 @@ async def test_update_reservation_field(
     )
 
     assert response == auto_models.ReservationFieldResponse(**fixture["data"])
+
+
+async def test_update_reservation(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-reservation-update.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/reservation/update",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    response = await junction_one_client.update_reservation(
+        models.UpdateReservationRequest(
+            id=1,
+            user_ids=[1234],
+        ),
+    )
+
+    assert response == auto_models.Reservation(**fixture["data"])
 
 
 async def test_add_fop_to_tripboard(

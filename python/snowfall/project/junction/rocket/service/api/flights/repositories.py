@@ -5,6 +5,7 @@ import pymongo
 from snowfall.project.junction.rocket.service.api.flights.models import (
     FlightSearchRequestStorage,
     FlightSearchResult,
+    RocketTrip,
 )
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
@@ -100,3 +101,14 @@ class FlightSearchResultRepository(
             self._collection.find,
             {"result_details._id": {"$in": identifiers}},
         )
+
+
+class RocketTripRepository(
+    repository.PydanticRepository[RocketTrip],
+    mixins.UpsertMixin[RocketTrip],
+):
+    _model = RocketTrip
+    _indexes = (pymongo.IndexModel("offer_id", background=True),)
+
+    async def find_by_offer_id(self, offer_id: str) -> RocketTrip | None:
+        return await self._execute(self._collection.find_one, {"offer_id": offer_id})
