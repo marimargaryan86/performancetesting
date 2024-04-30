@@ -133,7 +133,7 @@ def expires_factory() -> datetime:
 
 
 class FlightSearchRequestStorage(BaseModel):
-    search_id: str
+    id: str = Field(..., alias="_id")
     reseller_id: str
     expires_at: datetime = Field(default_factory=expires_factory)
     created_at: datetime = Field(default_factory=now_factory)
@@ -186,7 +186,7 @@ class SearchResource(models.Resource):
     @classmethod
     def from_model(cls, search: FlightSearchRequestStorage) -> SearchResource:
         return cls(
-            id=search.search_id,
+            id=search.id,
             type=SearchResource.api_type,
         )
 

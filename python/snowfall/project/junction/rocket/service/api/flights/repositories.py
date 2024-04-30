@@ -21,7 +21,7 @@ class FlightSearchRequestRepository(
         self,
         identifier: str,
     ) -> FlightSearchRequestStorage | None:
-        return await self._execute(self._collection.find_one, {"search_id": identifier})
+        return await self._execute(self._collection.find_one, {"_id": identifier})
 
 
 # TODO(jeremy): Add new repository for ResultDetails (https://git.snowfall.se/junction/junction/-/merge_requests/5178#note_252722)

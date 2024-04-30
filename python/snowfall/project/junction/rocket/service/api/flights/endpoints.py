@@ -75,7 +75,7 @@ class FlightSearch(endpoints.HTTPEndpoint):
 
         insert_response = await requests_repo.insert(
             FlightSearchRequestStorage(
-                search_id=search_id,
+                id=search_id,
                 reseller_id=reseller_id,
                 flight=request_data["data"]["attributes"],
             ),

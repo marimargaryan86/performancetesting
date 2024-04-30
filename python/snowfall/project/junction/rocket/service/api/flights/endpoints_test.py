@@ -168,7 +168,7 @@ async def test_flight_search_round_trip(
 
     # Outbound insert
     search_object = FlightSearchRequestStorage(
-        search_id=SEARCH_ID,
+        id=SEARCH_ID,
         reseller_id="RESELLER_ID",
         flight=example_request_inbound["data"]["attributes"],
     )
@@ -186,7 +186,7 @@ async def test_flight_search_round_trip(
     result_id = response.json()["data"]["id"]
     found_result = await flights_search_request_repo.find_by_search_id(result_id)
     assert found_result is not None
-    assert result_id == found_result.search_id
+    assert result_id == found_result.id
 
     search_result = await flights_search_repo.find_results_by_search_id(result_id)
     async for result in search_result:
@@ -215,7 +215,7 @@ async def test_flight_search_creation_and_storage(
     result_id = response.json()["data"]["id"]
     found_result = await flights_search_request_repo.find_by_search_id(result_id)
     assert found_result is not None
-    assert result_id == found_result.search_id
+    assert result_id == found_result.id
 
     search_result = await flights_search_repo.find_results_by_search_id(result_id)
     async for result in search_result:
@@ -250,7 +250,7 @@ async def test_flight_search_retrieval(
     example_flight_search_result_one: Any,
 ) -> None:
     search_object = FlightSearchRequestStorage(
-        search_id=SEARCH_ID,
+        id=SEARCH_ID,
         reseller_id="RESELLER_ID",
         flight=example_request["data"]["attributes"],
     )
@@ -273,7 +273,7 @@ async def test_flight_search_retrieval_includes(
     example_flight_search_result_one: Any,
 ) -> None:
     search_object = FlightSearchRequestStorage(
-        search_id=SEARCH_ID,
+        id=SEARCH_ID,
         reseller_id="RESELLER_ID",
         flight=example_request["data"]["attributes"],
     )
