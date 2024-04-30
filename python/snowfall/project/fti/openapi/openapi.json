@@ -431,11 +431,6 @@
                         "title": "Roomlabel",
                         "type": "string"
                     },
-                    "numOfGuests": {
-                        "example": 2,
-                        "title": "Numofguests",
-                        "type": "integer"
-                    },
                     "seaView": {
                         "example": false,
                         "title": "Seaview",
@@ -450,13 +445,30 @@
                         },
                         "title": "Includedmealoptions",
                         "type": "array"
+                    },
+                    "pricePerNight": {
+                        "example": 120.0,
+                        "title": "Pricepernight",
+                        "type": "number"
+                    },
+                    "unit": {
+                        "example": "DZ",
+                        "title": "Unit",
+                        "type": "string"
+                    },
+                    "board": {
+                        "example": "A",
+                        "title": "Board",
+                        "type": "string"
                     }
                 },
                 "required": [
                     "roomLabel",
-                    "numOfGuests",
                     "seaView",
-                    "includedMealOptions"
+                    "includedMealOptions",
+                    "pricePerNight",
+                    "unit",
+                    "board"
                 ],
                 "title": "AccommodationRoomModel",
                 "type": "object"

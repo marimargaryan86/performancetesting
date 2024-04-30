@@ -5,6 +5,10 @@ from snowfall.project.fti.service.bigxtra_api.models import (
     BaseModel,
     PaginationQueryParams,
 )
+from snowfall.project.fti.service.bigxtra_api.repository import (
+    Accommodations,
+    PriceItems,
+)
 
 
 class PlaceModel(BaseModel):
@@ -50,11 +54,24 @@ class ReviewModel(BaseModel):
 
 class AccommodationRoomModel(BaseModel):
     room_label: str = Field(json_schema_extra={"example": "Double room"})
-    num_of_guests: int = Field(json_schema_extra={"example": 2})
     sea_view: bool = Field(json_schema_extra={"example": False})
     included_meal_options: list[str] = Field(
         json_schema_extra={"example": ["All inclusive"]},
     )
+    price_per_night: float = Field(json_schema_extra={"example": 120.0})
+    unit: str = Field(json_schema_extra={"example": "DZ"})
+    board: str = Field(json_schema_extra={"example": "A"})
+
+    @classmethod
+    def from_model(cls, model: PriceItems) -> "AccommodationRoomModel":
+        return cls(
+            room_label="Double room",
+            sea_view=False,
+            included_meal_options=["All inclusive"],
+            price_per_night=model.price,
+            unit=model.unit,
+            board=model.board,
+        )
 
 
 class AccommodationModel(BaseModel):
@@ -69,6 +86,36 @@ class AccommodationModel(BaseModel):
     cancellation_policy: str = Field(json_schema_extra={"example": "Flexible"})
     cms_info: str = Field(json_schema_extra={"example": "Photos URL and stuff"})
     tour_operator: str = Field(json_schema_extra={"example": "FTI tours"})
+
+    @classmethod
+    def from_model(cls, model: Accommodations) -> "AccommodationModel":
+        return cls(
+            type="Hotel",
+            address="Miracle street 69",
+            category=4,
+            rating=3.8,  # noqa: WPS432
+            location=PlaceModel(
+                name="Athens",
+                country="Greece",
+                latitude=90.0,  # noqa: WPS432
+                longitude=180.0,  # noqa: WPS432
+            ),
+            services=["Pool", "Transfer"],
+            reviews=[
+                ReviewModel(
+                    user_id="2ea5bf94-8cc5-47b5-baad-2c3ca9169a1a",
+                    details="It was ok",
+                    rating=4.0,  # noqa: WPS432
+                ),
+            ],
+            cancellation_policy="Flexible",
+            cms_info="Photos URL and stuff",
+            tour_operator="FTI tours",
+            rooms=[
+                AccommodationRoomModel.from_model(price_item)
+                for price_item in model.price_items
+            ],
+        )
 
 
 class AccommodationsModel(BaseModel):
