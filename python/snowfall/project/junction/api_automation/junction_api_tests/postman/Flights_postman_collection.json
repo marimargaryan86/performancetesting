@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "6ea5fa69-5f4d-4153-b87d-9e70fbb2db2c",
+    "_postman_id": "9d41a8fe-0438-4dac-b58c-9a5df2a59881",
     "name": "Flights",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "33483058"
+    "_exporter_id": "27748424"
   },
   "item": [
     {
@@ -17,22 +17,22 @@
               "var search_id = json_data.data.id;",
               "pm.collectionVariables.set(\"flight_search_id\", search_id);",
               "",
-              "pm.test(\"Response status code is 200\", function () {",
-              "    pm.expect(pm.response.code).to.equal(200);",
+              "pm.test(\"Response status code is 201\", function () {",
+              "    pm.expect(pm.response.code).to.equal(201);",
               "});",
               "",
               "",
               "pm.test(\"Id field should not be empty\", function () {",
               "    const responseData = pm.response.json();",
               "    ",
-              "    pm.expect(responseData.id).to.exist.and.to.not.be.empty;",
+              "    pm.expect(responseData.data.id).to.exist.and.to.not.be.empty;",
               "});",
               "",
               "",
               "pm.test(\"Status field should not be empty\", function () {",
               "    const responseData = pm.response.json();",
               "    ",
-              "    pm.expect(responseData.attributes.status).to.exist.and.to.not.be.empty;",
+              "    pm.expect(responseData.data.attributes.status).to.exist.and.to.not.be.empty;",
               "});",
               "",
               "",
@@ -40,7 +40,7 @@
               "    const responseData = pm.response.json();",
               "    ",
               "    pm.expect(responseData).to.be.an('object');",
-              "    pm.expect(responseData.id).to.exist.and.to.not.be.empty;",
+              "    pm.expect(responseData.data.id).to.exist.and.to.not.be.empty;",
               "});",
               "",
               ""
@@ -66,7 +66,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"data\": {\n        \"type\": \"flight-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"b917b2a4-b8d6-53d6-b9b9-a90eb1da01af\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"c7dcabc2-a4e1-5b78-8314-0891095205ae\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n    }\n}",
+          "raw": "{\n    \"data\": {\n        \"type\": \"flight-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"b917b2a4-b8d6-53d6-b9b9-a90eb1da01af\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"c7dcabc2-a4e1-5b78-8314-0891095205ae\",\n                    \"type\": \"places\"\n                }\n            }\n        }\n    }\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -103,22 +103,22 @@
               "  const responseData = pm.response.json();",
               "",
               "  pm.expect(responseData).to.be.an('object');",
-              "  pm.expect(responseData.id).to.exist;",
-              "  pm.expect(responseData.attributes.status).to.exist;",
+              "  pm.expect(responseData.data.id).to.exist;",
+              "  pm.expect(responseData.data.attributes.status).to.exist;",
               "});",
               "",
               "",
               "pm.test(\"Id is a non-empty string\", function () {",
               "  const responseData = pm.response.json();",
               "  ",
-              "  pm.expect(responseData.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");",
+              "  pm.expect(responseData.data.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");",
               "});",
               "",
               "",
               "pm.test(\"Status is a non-empty string\", function () {",
               "    const responseData = pm.response.json();",
               "    ",
-              "    pm.expect(responseData.attributes.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+              "    pm.expect(responseData.data.attributes.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
               "});",
               "",
               ""
@@ -169,7 +169,9 @@
               "    pm.expect(pm.response.code).to.equal(200);",
               "});",
               "",
-              ""
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data[0].relationships.offers.data[0].id;",
+              "pm.collectionVariables.set(\"flight_search_outbound_offer_id\", search_id);"
             ],
             "type": "text/javascript",
             "packages": {}
@@ -188,6 +190,199 @@
             "flights",
             "searches",
             "{{flight_search_id}}",
+            "results"
+          ],
+          "query": [
+            {
+              "key": "include",
+              "value": "offers,resultDetails"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches - with outbound offer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var json_data = pm.response.json();",
+              "var search_id = json_data.data.id;",
+              "pm.collectionVariables.set(\"flight_search_id_return_offer\", search_id);",
+              "",
+              "pm.test(\"Response status code is 201\", function () {",
+              "    pm.expect(pm.response.code).to.equal(201);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.data.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status field should not be empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.data.attributes.status).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Search ID is saved to collection variables and is not empty\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData).to.be.an('object');",
+              "    pm.expect(responseData.data.id).to.exist.and.to.not.be.empty;",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.api+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"data\": {\n        \"type\": \"flight-searches\",\n        \"attributes\": {\n            \"departureAfter\": \"{{now_plus_one_day_utc}}\",\n            \"returnAt\": \"{{now_plus_one_week_utc}}\",\n            \"passengers\": [\n                {\"dateOfBirth\": \"2000-01-01\"}\n            ]\n        },\n        \"relationships\": {\n            \"origin\": {\n                \"data\": {\n                    \"id\": \"b917b2a4-b8d6-53d6-b9b9-a90eb1da01af\",\n                    \"type\": \"places\"\n                }\n            },\n            \"destination\": {\n                \"data\": {\n                    \"id\": \"c7dcabc2-a4e1-5b78-8314-0891095205ae\",\n                    \"type\": \"places\"\n                }\n            },\n            \"selectedOutboundOffer\": {\n                \"data\": {\n                    \"id\": \"{{flight_search_outbound_offer_id}}\",\n                    \"type\": \"flight-offers\"\n                }\n            }\n        }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/flights/searches",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "flights",
+            "searches"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}  - with outbound offer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "",
+              "pm.test(\"Response has the required fields - id and status\", function () {",
+              "  const responseData = pm.response.json();",
+              "",
+              "  pm.expect(responseData).to.be.an('object');",
+              "  pm.expect(responseData.data.id).to.exist;",
+              "  pm.expect(responseData.data.attributes.status).to.exist;",
+              "});",
+              "",
+              "",
+              "pm.test(\"Id is a non-empty string\", function () {",
+              "  const responseData = pm.response.json();",
+              "  ",
+              "  pm.expect(responseData.data.id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");",
+              "});",
+              "",
+              "",
+              "pm.test(\"Status is a non-empty string\", function () {",
+              "    const responseData = pm.response.json();",
+              "    ",
+              "    pm.expect(responseData.data.attributes.status).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Status should not be empty\");",
+              "});",
+              "",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{junction_api_url}}/flights/searches/{{flight_search_id_return_offer}}",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "flights",
+            "searches",
+            "{{flight_search_id_return_offer}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "searches/{search-id}/results  - with outbound offer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "",
+              "pm.test(\"Response status code is 200\", function () {",
+              "    pm.expect(pm.response.code).to.equal(200);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{junction_api_url}}/flights/searches/{{flight_search_id_return_offer}}/results?include=offers,resultDetails",
+          "host": [
+            "{{junction_api_url}}"
+          ],
+          "path": [
+            "flights",
+            "searches",
+            "{{flight_search_id_return_offer}}",
             "results"
           ],
           "query": [
@@ -219,7 +414,9 @@
         "packages": {},
         "exec": [
           "var moment = require('moment');",
+          "var now_plus_one_day_utc = moment().add(1, 'days').utc(true).format()",
           "var now_plus_one_week_utc = moment().add(7, 'days').utc(true).format()",
+          "pm.collectionVariables.set(\"now_plus_one_day_utc\", now_plus_one_day_utc);",
           "pm.collectionVariables.set(\"now_plus_one_week_utc\", now_plus_one_week_utc);",
           ""
         ]
@@ -251,6 +448,22 @@
     },
     {
       "key": "flight_search_id",
+      "value": ""
+    },
+    {
+      "key": "now_plus_two_weeks_utc",
+      "value": ""
+    },
+    {
+      "key": "now_plus_one_day_utc",
+      "value": ""
+    },
+    {
+      "key": "flight_search_outbound_offer_id",
+      "value": ""
+    },
+    {
+      "key": "flight_search_id_return_offer",
       "value": ""
     }
   ]
