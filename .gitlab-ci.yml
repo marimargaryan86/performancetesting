@@ -20,6 +20,7 @@ variables:
   E2E:
     value: 'false'
     description: "Run the schedules pipeline e2e test? then set to 'true'"
+
 include:
   - local: .gitlab/junction/api_automation.gitlab-ci.yml
   - local: .gitlab/pants.gitlab-ci.yml
@@ -29,6 +30,16 @@ include:
   - local: protobuf/.gitlab-ci.yml
   - local: svelte/.gitlab-ci.yml
   - template: Jobs/Secret-Detection.latest.gitlab-ci.yml
+  - project: 'platform-engineers/renovate-runner'
+    file: '/templates/renovate-config-validator.gitlab-ci.yml'
+    ref: v17.195.3
+
+renovate-config-validator:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 
 make-uninterruptible:
   stage: setup

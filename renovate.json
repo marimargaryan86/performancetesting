@@ -3,10 +3,6 @@
   "extends": [
     "config:best-practices"
   ],
-  "postUpgradeTasks": {
-    "commands": ["pants generate-lockfiles --resolve=python-default"],
-    "executionMode": "branch"
-  },
   "reviewersFromCodeOwners": true,
   "semanticCommitScope": null,
   "ignorePaths": [
@@ -17,5 +13,18 @@
     "**/test/**",
     "**/tests/**",
     "**/__fixtures__/**"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["pypi"],
+      "registryUrls": ["https://gitlab+deploy-token-124:kNkm3XvTkUiWo86sa5EW@git.snowfall.se/api/v4/projects/677/packages/pypi/simple"]
+    },
+    {
+      "matchManagers": ["pip_requirements"],
+      "postUpgradeTasks": {
+        "commands": ["pants generate-lockfiles --resolve=python-default"],
+        "executionMode": "branch"
+      }
+    }
   ]
 }
