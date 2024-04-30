@@ -32,7 +32,7 @@ func ManageStaleBranches(client *gitlab.Client, logger *zap.SugaredLogger, loade
 			continue
 		}
 
-		threshold := time.Now().Add(config.StaleBranches.ActivityThreshold)
+		threshold := time.Now().Add(-config.StaleBranches.ActivityThreshold)
 		mrBranches := make([]string, 0)
 		mergeRequestsCh, g2 := common.Paginate(func(options gitlab.ListOptions) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
 			return client.MergeRequests.ListProjectMergeRequests(p.ID, &gitlab.ListProjectMergeRequestsOptions{
