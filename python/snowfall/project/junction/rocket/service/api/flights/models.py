@@ -11,6 +11,8 @@ from snowfall.stdlib.integration.starlette import (
     models,
 )
 
+_SEARCH_RESULT_DEFAULT_TTL_MINUTES: int = 45
+
 
 class StatusTypeEnum(Enum):
     """Status Types."""
@@ -116,20 +118,21 @@ class Offer(BaseModel):
     ref_ids: list[str]
 
 
-class FlightSearchResult(BaseModel):
-    id: str = Field(..., alias="_id")
-    search_id: str
-    provider_id: str
-    offers: list[Offer]
-    result_details: list[ResultDetails]
-
-
 def now_factory() -> datetime:
     return datetime.now(tz=UTC)
 
 
 def expires_factory() -> datetime:
-    return now_factory() + timedelta(hours=1)
+    return now_factory() + timedelta(minutes=_SEARCH_RESULT_DEFAULT_TTL_MINUTES)
+
+
+class FlightSearchResult(BaseModel):
+    id: str = Field(..., alias="_id")
+    search_id: str
+    provider_id: str
+    expires_at: datetime = Field(default_factory=expires_factory)
+    offers: list[Offer]
+    result_details: list[ResultDetails]
 
 
 class FlightSearchRequestStorage(BaseModel):

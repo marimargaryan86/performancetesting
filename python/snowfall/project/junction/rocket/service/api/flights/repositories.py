@@ -16,6 +16,9 @@ class FlightSearchRequestRepository(
     mixins.FindByIdMixin[FlightSearchRequestStorage],
 ):
     _model = FlightSearchRequestStorage
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
 
     async def find_by_search_id(
         self,
@@ -37,6 +40,7 @@ class FlightSearchResultRepository(
     _indexes = (
         pymongo.IndexModel("offers._id", background=True),
         pymongo.IndexModel("result_details._id", background=True),
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     )
 
     async def find_results_by_search_id(
