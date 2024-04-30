@@ -1,0 +1,33 @@
+{
+  "id": "6bceb792-b6d6-4aec-a5ed-e825867385cf",
+  "car_rental": {
+    "origin": {
+      "ref": "test_ref",
+      "name":"Point name",
+      "coordinates": {
+        "latitude": 46.287961,
+        "longitude" : 11.232652
+      },
+      "time_zone": "Europe/Stockholm"
+    },
+    "destination":
+    {
+      "ref": "test_ref",
+      "name":"Point name",
+      "coordinates": {
+        "latitude": 55.287961,
+        "longitude" : 56.232652
+      },
+      "time_zone": "Europe/Stockholm"
+    },
+    "pickup_at": {
+      "seconds":444625506,
+      "nanos":7000
+    },
+    "return_at": {
+            "seconds":444825506,
+      "nanos":7000
+    },
+    "driver_age": 32
+  }
+}

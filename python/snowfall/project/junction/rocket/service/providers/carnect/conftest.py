@@ -5,6 +5,7 @@ from typing import Any
 from unittest import mock
 
 import aiofiles
+import orjson
 import pytest
 import pytest_asyncio
 from xsdata.formats.dataclass import parsers
@@ -323,6 +324,16 @@ async def cancellation_handler_mock() -> carnect_bookings.CancellationHandler:
     )
 
 
+@pytest.fixture()
+async def search_criteria() -> models_pb2.Search:
+    data = await load_json_fixture("search_criteria.json")
+
+    return models_pb2.Search(
+        id=data["id"],
+        car_rental=models_pb2.CarRental(**data["car_rental"]),
+    )
+
+
 async def _load_xml_fixture(
     file_name: str,
     package: str | None = None,
@@ -339,6 +350,24 @@ async def _load_xml_fixture(
 
     async with aiofiles.open(file_path, "rb") as file_handle:
         return await file_handle.read()
+
+
+async def load_json_fixture(
+    file_name: str,
+    package: str | None = None,
+) -> Any:
+    if not package:
+        package = __name__
+
+    file_path = filesystem.resource_path(
+        package=package,
+        resource="fixtures/{file_name}.json".format(
+            file_name=file_name.removesuffix(".json"),
+        ),
+    )
+
+    async with aiofiles.open(file_path) as json_file:
+        return orjson.loads(await json_file.read())
 
 
 async def get_avail_rate_response() -> carnect_service.ServiceSoapGetVehAvailRateOutput:
