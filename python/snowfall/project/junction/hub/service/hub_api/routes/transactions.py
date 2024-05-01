@@ -62,8 +62,8 @@ class Transactions(endpoints.HTTPEndpoint):
                 data_resources.append(
                     resources.Transaction.from_proto(transaction, request),
                 )
-            except Exception:  # noqa: BLE001
-                _logger.error(  # noqa: TRY400
+            except Exception:
+                _logger.exception(
                     "data-model is not valid",
                     data=transaction,
                 )

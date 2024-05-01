@@ -62,7 +62,7 @@ class Middleware(base.BaseHTTPMiddleware):
                 path_template=path_template,
                 exception_type=type(err).__name__,
             ).inc()
-            raise err from None
+            raise
         else:
             status_code = response.status_code
             self._requests_processing_time.labels(
