@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from snowfall.project.junction.rocket.service.providers.benerail import (
     helper_models,
 )
+from snowfall.stdlib import money
 from snowfall.stdlib.persistence.redis.repository import (
     PydanticRepository as RedisRepository,
 )
@@ -48,10 +49,25 @@ class QuoteDetails(RedisRecord):
     currency: str
 
 
+class BookingOfferDetails(RedisRecord):
+    offer_ids: list[str]
+    total_price: money.Money
+    dialogue_id: str
+    passengers_info: Sequence[helper_models.PassengerInfo]
+    departure_at: str
+    session_token: str | None = None
+
+
 class QuoteCache(RedisRepository[QuoteDetails]):
     """Stores price quotes in the cache."""
 
     _record_type: type[QuoteDetails] = QuoteDetails
+
+
+class BookingOffersCache(RedisRepository[BookingOfferDetails]):
+    """Stores offer details in cache."""
+
+    _record_type: type[BookingOfferDetails] = BookingOfferDetails
 
 
 @dataclasses.dataclass(frozen=True)

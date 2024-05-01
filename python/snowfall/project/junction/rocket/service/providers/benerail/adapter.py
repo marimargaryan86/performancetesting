@@ -692,7 +692,9 @@ class BenerailOffersAdapter(BenerailAdapter):
                 await self._offers_cache.store(
                     cache.OfferDetails(
                         passengers_dobs=[pax.date_of_birth for pax in passengers_info],
-                        outward_passengers_info=outward_passengers_info,
+                        outward_passengers_info=outward_trip_info.outward_passengers_info
+                        if outward_trip_info
+                        else outward_passengers_info,
                         dialogue_id=dialogue_id,
                         dialogue_etag=trip_offer_responses_with_passengers.dialogue_info.etag,
                         origin_station=trip.origin.place_value,

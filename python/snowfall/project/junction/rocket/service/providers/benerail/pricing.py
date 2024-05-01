@@ -5,6 +5,9 @@ from snowfall.project.junction.rocket.service.providers.benerail import (
     cache,
     fare_rules,
 )
+from snowfall.project.junction.rocket.service.providers.benerail.adapter import (
+    OfferNotFoundError as BenerailOfferNotFoundError,
+)
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     amqp_pb2,
     models_pb2,
@@ -30,7 +33,7 @@ class QuoteTaskConsumer:
         consumer_obj: consumer.Consumer[amqp_pb2.QuoteTask],
         quote_result_producer: QuoteResultProducer,
         search_result_cache: cache.OffersCache,
-        quote_cache: cache.QuoteCache,
+        quote_cache: cache.BookingOffersCache,
         benerail_adapter: adapter.BenerailAdapter,
         ttl: datetime.timedelta,
         client: benerail_client.BenerailClient,
@@ -53,19 +56,25 @@ class QuoteTaskConsumer:
         message: types.Message[amqp_pb2.QuoteTask],
     ) -> None:
         quoted_offers: list[models_pb2.QuotedOffer] = []
+        get_offer_res = None
+        session_token = string.uuid()
+        offer_details_ids = []
         for offer_id in message.body.quote.offer_ids:
             offer_details = await self._search_result_cache.fetch(
                 offer_id,
             )
-
             if not offer_details:
                 return
 
-            session_token = string.uuid()
+            offer_details_ids.append(offer_details.outward_offer_id)
+
             get_offer_res = await self._adapter.verify_offer(
                 offer_details=offer_details,
                 session_token=session_token,
             )
+
+            if get_offer_res is None:
+                raise BenerailOfferNotFoundError()
 
             base_price_proto = money.from_string(
                 str(get_offer_res.offer_obj.price.amount),
@@ -92,19 +101,25 @@ class QuoteTaskConsumer:
                 ),
             )
 
+        if get_offer_res is None:
+            raise BenerailOfferNotFoundError()
+
         total_price = money.total([
             money.from_protobuf(offer.price) for offer in quoted_offers
         ])
         expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
+
         await self._quote_cache.store(
-            cache.QuoteDetails(
-                amount=total_price.amount,
-                currency=total_price.currency.code,
+            cache.BookingOfferDetails(
+                offer_ids=offer_details_ids,
+                total_price=total_price,
+                dialogue_id=get_offer_res.dialogue_info.identifier,
+                passengers_info=get_offer_res.passengers_info,
+                departure_at=get_offer_res.departure_at,
+                session_token=session_token,
             ),
-            expires_at=expires_at,
             key=message.body.quote.id,
         )
-
         quote_obj = models_pb2.Quote(
             pay_company_id=self._pay_company_id,
             expires_at=protobuf.datetime_to_protobuf(expires_at),

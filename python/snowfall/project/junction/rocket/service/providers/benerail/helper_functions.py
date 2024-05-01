@@ -1,4 +1,6 @@
+import base64
 import datetime
+import tempfile
 import types
 import zoneinfo
 from collections.abc import Mapping
@@ -74,3 +76,10 @@ def normalize_datetime(
     if dt.hour % 2 != 0:
         dt -= datetime.timedelta(hours=1)
     return dt.replace(minute=0, second=0, microsecond=0)
+
+
+def cert_tmp_path(cert_base64: str) -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(base64.b64decode(cert_base64))
+
+        return tmp_file.name
