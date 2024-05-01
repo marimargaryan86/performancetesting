@@ -116,7 +116,7 @@ job "fti-bigxtra-api-http" {
         env         = true
         change_mode = "restart"
         data        = <<EOH
-POSTGRESQL_DSN={{range $index, $service := service "fti-${var.environment}"}}postgresql+psycopg2://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}} {{end}}
+POSTGRESQL_DSN={{range $index, $service := service "fti-${var.environment}"}}postgresql+asyncpg://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}} {{end}}
 EOH
       }
 
