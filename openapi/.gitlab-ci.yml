@@ -41,7 +41,7 @@ openapi:breaking:
 openapi:test:
   stage: test
   image:
-    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/stoplight/spectral:6.11.0"
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/stoplight/spectral:6.11.1@sha256:d55a6be334e3d50e1f3598e1fd4d51c5c1734d033aae295b69efa829420cb979"
     entrypoint: [""]
   interruptible: true
   script:
