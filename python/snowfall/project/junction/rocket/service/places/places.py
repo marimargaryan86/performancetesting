@@ -30,6 +30,8 @@ _RADIUS_TO_MATCH_PLACE_FOR_VERTICAL_M = MappingProxyType({
     models_pb2.TYPE_AIRPORT: 5000,
 })
 _IATA_PATH = "{0}.{1}".format("search_capabilities.air", constants.IATA_ID)
+_BENERAIL_PATH = "search_capabilities.rail.{0}".format(constants.BENERAIL_ID)
+_DF_PATH = "search_capabilities.ferry.{0}".format(constants.DF_ID)
 _NAMESPACE = uuid.UUID("f9ec30af-54df-4bd3-8dd9-6c4b51341d6d")
 
 
@@ -55,7 +57,9 @@ class PlaceRepository(
         return await self._find_with_cursor(
             cur=cursor,
             filter_=({
-                repository.mongo_id_key: {"$in": identifiers} if identifiers else None,
+                repository.mongo_id_key: (
+                    {"$in": identifiers} if identifiers else None
+                ),
             }),
         )
 
@@ -66,6 +70,30 @@ class PlaceRepository(
                 _IATA_PATH: iata,
             },
         )
+
+    async def find_by_provider(
+        self,
+        provider_id: str,
+        provider_place_id: str,
+    ) -> models_pb2.Place | None:
+        if provider_id == constants.BENERAIL_ID:
+            return await self._execute(
+                self._collection.find_one,
+                {
+                    _BENERAIL_PATH: provider_place_id,
+                },
+            )
+        if provider_id == constants.DF_ID:
+            return await self._execute(
+                self._collection.find_one,
+                {
+                    _DF_PATH: provider_place_id,
+                },
+            )
+
+        _logger.warning("Invalid provider ID", provider_id=provider_id)
+
+        return None
 
     async def find_by_types(
         self,

@@ -178,6 +178,77 @@ class TestGrpc:
             )
         mock_repository.find_by_iata.assert_called_once_with(iata="LHR")
 
+    async def test_that_when_get_place_by_provider_benerail_has_place_its_returned(
+        self,
+        grpc_context: grpc.aio.ServicerContext,
+    ) -> None:
+        place = models_pb2.Place(id="an-id")
+        mock_repository = mock.AsyncMock()
+        mock_repository.find_by_provider.return_value = place
+        places_service = PlacesService(
+            places_repository=mock_repository,
+            default_page_size=10,
+        )
+        place_resp = await places_service.GetPlaceByProvider(
+            request=places_pb2.GetPlaceByProviderRequest(
+                provider_id="benerail-provider-id",
+                provider_place_id="a-bene-station-id",
+            ),
+            context=grpc_context,
+        )
+        mock_repository.find_by_provider.assert_called_once_with(
+            provider_id="benerail-provider-id",
+            provider_place_id="a-bene-station-id",
+        )
+        assert place_resp.place.id == "an-id"
+
+    async def test_that_when_get_place_by_provider_df_has_place_its_returned(
+        self,
+        grpc_context: grpc.aio.ServicerContext,
+    ) -> None:
+        place = models_pb2.Place(id="an-id")
+        mock_repository = mock.AsyncMock()
+        mock_repository.find_by_provider.return_value = place
+        places_service = PlacesService(
+            places_repository=mock_repository,
+            default_page_size=10,
+        )
+        place_resp = await places_service.GetPlaceByProvider(
+            request=places_pb2.GetPlaceByProviderRequest(
+                provider_id="df-provider-id",
+                provider_place_id="a-df-port-id",
+            ),
+            context=grpc_context,
+        )
+        mock_repository.find_by_provider.assert_called_once_with(
+            provider_id="df-provider-id",
+            provider_place_id="a-df-port-id",
+        )
+        assert place_resp.place.id == "an-id"
+
+    async def test_that_when_get_place_by_provider_has_no_place_then_aborted_with_not_found(
+        self,
+        grpc_context: grpc.aio.ServicerContext,
+    ) -> None:
+        mock_repository = mock.AsyncMock()
+        mock_repository.find_by_provider.return_value = None
+        places_service = PlacesService(
+            places_repository=mock_repository,
+            default_page_size=10,
+        )
+        with testing.assert_aborted(grpc.StatusCode.NOT_FOUND):
+            await places_service.GetPlaceByProvider(
+                request=places_pb2.GetPlaceByProviderRequest(
+                    provider_id="an-invalid-provider-id",
+                    provider_place_id="a-df-port-id",
+                ),
+                context=grpc_context,
+            )
+        mock_repository.find_by_provider.assert_called_once_with(
+            provider_id="an-invalid-provider-id",
+            provider_place_id="a-df-port-id",
+        )
+
     async def test_that_when_list_places_has_places_then_returned(
         self,
         grpc_context: grpc.aio.ServicerContext,

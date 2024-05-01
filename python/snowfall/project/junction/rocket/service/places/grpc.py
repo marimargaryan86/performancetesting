@@ -83,3 +83,18 @@ class PlacesService(
             places=[place async for place in found_places],
             next_page_token=await found_places.cursor(),
         )
+
+    async def GetPlaceByProvider(  # type: ignore[override]  # noqa: N802
+        self,
+        request: places_pb2.GetPlaceByProviderRequest,
+        context: aio.ServicerContext,
+    ) -> places_pb2.GetPlaceByProviderResponse:
+        place = await self._places.find_by_provider(
+            provider_id=request.provider_id,
+            provider_place_id=request.provider_place_id,
+        )
+
+        if not place:
+            await context.abort(code=StatusCode.NOT_FOUND)
+
+        return places_pb2.GetPlaceByProviderResponse(place=place)

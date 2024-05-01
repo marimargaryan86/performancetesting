@@ -50,9 +50,19 @@ message ListPlacesResponse {
   string next_page_token = 2;
 }
 
+message GetPlaceByProviderRequest {
+  string provider_id = 1;
+  string provider_place_id = 2;
+}
+
+message GetPlaceByProviderResponse {
+  Place place = 1;
+}
+
 service PlacesService {
   rpc GetPlace(GetPlaceRequest) returns (GetPlaceResponse) {}
   rpc GetPlaceClosestToCoordinates(GetPlaceClosestToCoordinatesRequest) returns (GetPlaceClosestToCoordinatesResponse) {}
   rpc GetPlaceByIata(GetPlaceByIataRequest) returns (GetPlaceByIataResponse) {}
   rpc ListPlaces(ListPlacesRequest) returns (ListPlacesResponse) {}
+  rpc GetPlaceByProvider(GetPlaceByProviderRequest) returns (GetPlaceByProviderResponse) {}
 }
