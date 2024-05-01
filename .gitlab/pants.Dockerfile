@@ -42,7 +42,7 @@ ENV SENTRY_CLI_VERSION=2.30.0
 RUN curl -fsSL https://sentry.io/get-cli/ | bash
 
 # renovate: datasource=github-releases depName=editorconfig-checker packageName=editorconfig-checker/editorconfig-checker
-ENV EDITORCONFIG_CHECKER_VERSION=v3.0.0
+ENV EDITORCONFIG_CHECKER_VERSION=v3.0.1
 RUN curl -fsSL https://github.com/editorconfig-checker/editorconfig-checker/releases/download/${EDITORCONFIG_CHECKER_VERSION}/ec-linux-amd64.tar.gz | tar xz -C /usr/local bin/ec-linux-amd64 && \
     mv /usr/local/bin/ec-linux-amd64 /usr/local/bin/editorconfig-checker
 
