@@ -446,3 +446,28 @@ async def test_list_all_credit_cards(
         models.ListCreditCardRequest(),
     )
     assert response == auto_models.MaskedCreditCardListResponse(**fixture)
+
+
+async def test_add_passport(
+    junction_one_client: JunctionOneClient,
+    httpx_mock: pytest_httpx.HTTPXMock,
+) -> None:
+    fixture = await load_file_fixture("POST-v1-user-account-passportUpdate.json")
+
+    httpx_mock.add_response(
+        method="POST",
+        url="https://localhost/v1/user/account/passportUpdate",
+        status_code=http.HTTPStatus.OK.value,
+        json=fixture,
+    )
+
+    passport_update_request = models.PassportUpdateRequest(
+        id=2757995,
+        country="CA",
+        expiry=date(2026, 10, 10),
+        nationality="CA",
+        number="123456789",
+    )
+
+    response = await junction_one_client.update_passport(passport_update_request)
+    assert response == auto_models.User(**fixture["data"])

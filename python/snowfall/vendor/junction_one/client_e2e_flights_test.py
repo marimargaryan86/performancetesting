@@ -65,6 +65,16 @@ async def test_e2e_flights_flow(remote_junction_one_client: JunctionOneClient) -
     )
     assert new_user.id
 
+    passport_update_request = models.PassportUpdateRequest(
+        id=new_user.id,
+        country="CA",
+        expiry=date(2026, 10, 10),
+        nationality="CA",
+        number="123456789",
+    )
+
+    await remote_junction_one_client.update_passport(passport_update_request)
+
     # Get seatmap
     seatmaps = await remote_junction_one_client.get_seatmap_for_flights(
         auto_models.FlightSeatMapRequest(refs=flight_offer_ref),

@@ -1,9 +1,8 @@
 import inspect
-from collections.abc import Mapping, Sequence
-from typing import Any, Literal, TypedDict
+from collections.abc import Mapping
+from typing import Any, Literal
 
 import httpx
-from pydantic import BaseModel
 
 from snowfall.vendor.junction_one import errors
 from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
@@ -12,10 +11,6 @@ from snowfall.vendor.junction_one.models import base as models
 from snowfall.vendor.rate_limiter.client import Client as RateLimitClient
 
 _Method = Literal["GET", "POST"]
-
-
-class EncodedData(TypedDict):
-    data: dict[str, str]
 
 
 class JunctionOneClient:
@@ -229,7 +224,7 @@ class JunctionOneClient:
         response = await self._make_request_with_data(
             "POST",
             "/v1/reservation/update",
-            self._encode_fields(query),
+            {"data": self._encode_fields(query)},
             rate_limit_timeout=rate_limit_timeout,
         )
 
@@ -284,6 +279,32 @@ class JunctionOneClient:
 
         return auto_models.UserAccount(**response.data)
 
+    async def update_passport(
+        self,
+        query: models.PassportUpdateRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.User:
+        response = await self._make_request(
+            "POST",
+            "/v1/user/account/passportUpdate",
+            query,
+            rate_limit_timeout=rate_limit_timeout,
+        )
+        return auto_models.User(**response.data)
+
+    async def delete_passport(
+        self,
+        query: models.PassportDeleteRequest,
+        rate_limit_timeout: float | None = None,
+    ) -> auto_models.User:
+        response = await self._make_request(
+            "POST",
+            "/v1/user/account/passportDelete",
+            query,
+            rate_limit_timeout=rate_limit_timeout,
+        )
+        return auto_models.User(**response.data)
+
     async def list_all_credit_cards(
         self,
         query: models.ListCreditCardRequest,
@@ -298,27 +319,27 @@ class JunctionOneClient:
 
         return auto_models.MaskedCreditCardListResponse(**response.model_dump())
 
-    def _encode_fields(self, model: auto_models.BaseModel) -> EncodedData:
-        ret = {}
+    def _encode_fields(self, model: auto_models.BaseModel) -> dict[str, str]:  # noqa: WPS231
+        ret: dict[str, str] = {}
         for field_name, field in model.__class__.__fields__.items():  # type: ignore[attr-defined]
             value = getattr(model, field_name)
             if value is None:
                 continue
-            if isinstance(value, BaseModel):
+            if isinstance(value, auto_models.BaseModel):
                 ret[field.alias] = value.model_dump_json(
                     by_alias=True,
                     exclude_none=True,
                 )
-            elif isinstance(value, Sequence):
+            elif isinstance(value, list | set):
                 ret[field.alias] = ",".join(map(str, value))
             else:
                 ret[field.alias] = str(value)
-        return {"data": ret}
+        return ret
 
     def _encode_data(
         self,
         method: _Method,
-        payload: BaseModel,
+        payload: auto_models.BaseModel,
         *,
         encode_json: bool,
     ) -> dict[str, Any]:
@@ -339,15 +360,15 @@ class JunctionOneClient:
                     },
                 }
 
-            return {"data": payload.model_dump(exclude_unset=True, by_alias=True)}
+            return {"data": self._encode_fields(payload)}
 
-        return {"params": payload.model_dump(exclude_unset=True, by_alias=True)}
+        return {"params": self._encode_fields(payload)}
 
     async def _make_request_expecting_list(
         self,
         method: _Method,
         url: str,
-        payload: BaseModel,
+        payload: auto_models.BaseModel,
         rate_limit_timeout: float | None = 60,
         *,
         encode_json: bool = False,
@@ -370,7 +391,7 @@ class JunctionOneClient:
         self,
         method: _Method,
         url: str,
-        payload: BaseModel,
+        payload: auto_models.BaseModel,
         rate_limit_timeout: float | None = 60,
         *,
         encode_json: bool = False,

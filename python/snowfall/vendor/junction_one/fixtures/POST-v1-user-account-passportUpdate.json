@@ -1,0 +1,30 @@
+{
+  "status": "OK",
+  "code": 200,
+  "data": {
+    "id": 2757995,
+    "nms": 1714486739663,
+    "active": true,
+    "firstName": "John",
+    "middleName": "Middle",
+    "lastName": "Smith",
+    "suffix": "SR",
+    "gender": "male",
+    "dob": "2000-01-01",
+    "primaryEmail": "email@example.com",
+    "phoneNumber": "4407775465056",
+    "documents": {
+      "passport": {
+        "number": "123456789",
+        "country": "CA",
+        "expiry": "2026-11-11",
+        "nationality": "CA"
+      }
+    },
+    "status": "Active",
+    "role": "User",
+    "flags": 0,
+    "fullName": "John Middle Smith SR",
+    "shortName": "John Smith"
+  }
+}
