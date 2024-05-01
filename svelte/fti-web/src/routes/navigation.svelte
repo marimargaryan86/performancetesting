@@ -39,7 +39,7 @@
         <a href="/coming-soon">Offers</a>
       </li>
       <li>
-        <a href="/coming-soon">Hotels</a>
+        <a href="/search/hotels">Hotels</a>
       </li>
       <li>
         <a href="/coming-soon">Car Rental</a>
