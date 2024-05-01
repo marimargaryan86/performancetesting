@@ -42,4 +42,27 @@ const renderStars = (stars: number): string[] => {
   return Array.from({ length: stars }, () => "⭐");
 };
 
-export { pluralise, setContainerScroll, setDropdown, getMonthNames, renderStars };
+function formatDate(date: Date): string {
+  return date.toISOString().split("T")[0];
+}
+
+function calculateThisWeekDates() {
+  const today = new Date();
+  const nextSunday = new Date(today.setDate(today.getDate() + (7 - today.getDay())));
+  const followingSunday = new Date(nextSunday.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  return {
+    arriveAt: formatDate(nextSunday),
+    returnAt: formatDate(followingSunday),
+  };
+}
+
+export {
+  pluralise,
+  setContainerScroll,
+  setDropdown,
+  getMonthNames,
+  renderStars,
+  formatDate,
+  calculateThisWeekDates,
+};

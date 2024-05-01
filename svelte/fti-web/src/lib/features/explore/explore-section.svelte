@@ -1,4 +1,23 @@
+<script context="module" lang="ts">
+  function getSearchFilterDatesQuery() {
+    const { arriveAt, returnAt } = calculateThisWeekDates();
+    const queryParams = new URLSearchParams({
+      destination: "popular",
+      arriveAt,
+      returnAt,
+      noOfTravellers: "2",
+    });
+
+    return `/search?${queryParams.toString()}`;
+  }
+</script>
+
 <script lang="ts">
+  import { calculateThisWeekDates } from "$lib/helpers/common";
+
+  const searchFilterDatesLink: string = getSearchFilterDatesQuery();
+  const packagesUnder250Link: string = `/search?${new URLSearchParams({ maxPrice: "250" }).toString()}`;
+  const allInclusiveHolidaysLink: string = `/search?${new URLSearchParams({ destination: "all-inclusive", noOfTravelers: "2" }).toString()}`;
 </script>
 
 <div class="explore-section">
@@ -10,19 +29,22 @@
     <p class="help-label">Need help finding an offer number?</p>
     <button class="find-order">Find Offer</button>
   </div>
+
   <div class="top-deals">
     <p class="title">Explore our top deals of the week</p>
     <p class="tag">Check out our top deals this week</p>
-    <a href="/search" class="explore-deals">Explore</a>
+    <a href={searchFilterDatesLink} class="explore-deals">Explore</a>
   </div>
+
   <div class="holidays">
     <div class="holiday holiday-cruise">
       <p>Packages under €250pp</p>
-      <a href="/search">Explore</a>
+      <a href={packagesUnder250Link}>Explore</a>
     </div>
+
     <div class="holiday holiday-inclusive">
       <p>All-inclusive Holidays</p>
-      <a href="/search">Explore</a>
+      <a href={allInclusiveHolidaysLink}>Explore</a>
     </div>
   </div>
 </div>
@@ -87,8 +109,7 @@
     line-height: normal;
   }
 
-  .holiday a:hover,
-  .top-deals a:hover {
+  .holiday a:hover {
     color: white;
     text-decoration: none;
     background-color: black;

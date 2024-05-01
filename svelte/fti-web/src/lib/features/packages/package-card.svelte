@@ -1,9 +1,23 @@
+<script context="module" lang="ts">
+  /**
+   * Also removes any commas from the stringified price number.
+   *
+   */
+  function getPriceSearchURL(holiday: Package): string {
+    const sanitizedPrice = holiday.price.replace(/,/g, "");
+    const params = new URLSearchParams({ maxPrice: sanitizedPrice });
+
+    return `/search?${params.toString()}`;
+  }
+</script>
+
 <script lang="ts">
   import Icon from "$lib/components/icon.svelte";
   import StarRating from "$lib/components/star-rating.svelte";
   import type { Package } from "$lib/models/common";
 
   export let holiday: Package;
+  const priceSearchLink: string = getPriceSearchURL(holiday);
 </script>
 
 <div class="package-card">
@@ -12,9 +26,11 @@
     <Icon variant="heart-full" />
   </button>
   <div class="card-content">
-    <div class="price-box">
-      <p>from<span class="bold">&nbsp;€{holiday.price}</span>pp</p>
-    </div>
+    <a href={priceSearchLink}>
+      <button class="price-box">
+        <p>from<span class="bold">&nbsp;€{holiday.price}</span>pp</p>
+      </button>
+    </a>
     <div class="rating">
       <StarRating starRating={holiday.stars} />
     </div>

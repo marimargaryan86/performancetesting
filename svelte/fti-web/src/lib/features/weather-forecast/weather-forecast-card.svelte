@@ -1,7 +1,19 @@
+<script context="module" lang="ts">
+  function getDestinationSearchURL(holiday: WeatherHoliday): string {
+    const encodedDestination = encodeURIComponent(holiday.name);
+    const params = new URLSearchParams({ destination: encodedDestination });
+
+    return `/search?${params.toString()}`;
+  }
+</script>
+
 <script lang="ts">
   import type { WeatherHoliday } from "$lib/models/common";
   import Icon from "$lib/components/icon.svelte";
+
   export let holiday: WeatherHoliday;
+
+  const destinationSearchLink: string = getDestinationSearchURL(holiday);
 </script>
 
 <div class="weather-forecast-card">
@@ -38,7 +50,9 @@
         </div>
       </div>
       <div class="explore">
-        <button class="explore-button">Explore</button>
+        <a href={destinationSearchLink}>
+          <button class="explore-button">Explore</button>
+        </a>
       </div>
     </div>
   </div>
