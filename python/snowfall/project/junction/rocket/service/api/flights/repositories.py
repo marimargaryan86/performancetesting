@@ -7,6 +7,7 @@ from snowfall.project.junction.rocket.service.api.flights.models import (
     FlightSearchResult,
     RocketTrip,
 )
+from snowfall.project.junction.rocket.service.api.v1alpha import pricing_pb2
 from snowfall.stdlib.persistence.mongo import mixins, repository, resultset
 
 
@@ -112,3 +113,11 @@ class RocketTripRepository(
 
     async def find_by_offer_id(self, offer_id: str) -> RocketTrip | None:
         return await self._execute(self._collection.find_one, {"offer_id": offer_id})
+
+
+class QuoteRepository(
+    repository.ProtoRepository[pricing_pb2.Quote],
+    mixins.UpsertMixin[pricing_pb2.Quote],
+    mixins.InsertMixin[pricing_pb2.Quote],
+):
+    _proto = pricing_pb2.Quote

@@ -26,6 +26,7 @@ from snowfall.project.junction.rocket.service.api.hotel import (
 from snowfall.project.junction.rocket.service.api.hotel import (
     types as hotel_types,
 )
+from snowfall.project.junction.rocket.service.api.quotes import quotes
 from snowfall.project.junction.rocket.service.api.quotes.endpoints import QuotesSettings
 from snowfall.project.junction.rocket.service.api.settings import Settings
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
@@ -131,6 +132,18 @@ async def create_dependencies(
     )
     container[types.FlightSearchResultTransformer] = (  # type: ignore[type-abstract]
         flights_transforms.FlightSearchResultTransformer
+    )
+    container[quotes.FlightQuoteManager] = quotes.FlightQuoteManager(
+        quotes_repository=repositories.QuoteRepository(
+            collection=mongo_db.quotes,
+        ),
+        task_producer=quotes.QuoteTaskProducer(
+            producer_obj=producer.Producer(
+                connection=amqp_connection,
+                exchange=amqp_types.Exchange(app.name),
+            ),
+            routing_key="tasks.pricing",
+        ),
     )
     container[hotel_repositories.HotelSearchRepository] = (
         hotel_repositories.HotelSearchRepository(

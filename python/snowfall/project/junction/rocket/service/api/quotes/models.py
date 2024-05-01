@@ -12,6 +12,7 @@ from snowfall.project.junction.rocket.service.api.flights import models as fligh
 from snowfall.project.junction.rocket.service.api.trains.models import (
     searches as train_models,
 )
+from snowfall.project.junction.rocket.service.api.v1alpha import pricing_pb2
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.integration.starlette import (
@@ -103,6 +104,16 @@ class FareRule(models.BaseModel):
             body=fare_rule.body,
         )
 
+    @classmethod
+    def from_flight_proto(
+        cls,
+        fare_rule: pricing_pb2.FareRule,
+    ) -> FareRule:
+        return cls(
+            title=fare_rule.title,
+            body=fare_rule.body,
+        )
+
 
 # TODO(justin.k): required_documents: list[str] = pydantic.Field("requiredDocuments")
 class QuotedOfferModel(models.BaseModel):
@@ -117,6 +128,27 @@ class QuotedOfferModel(models.BaseModel):
         alias="conditionalPrices",
     )
     required: list[str]
+
+    @classmethod
+    def from_flight_quote_proto(
+        cls,
+        quote: pricing_pb2.Quote,
+    ) -> QuotedOfferModel:
+        return cls(
+            offer=quote.offer_id,
+            price=common_models.Price.from_proto(quote.quoted_offer.price),
+            priceBreakdown=[
+                common_models.PriceBreakdown.from_flight_proto(price_breakdown)
+                for price_breakdown in quote.quoted_offer.price_breakdown
+            ],
+            penalties=[],
+            fareRules=[
+                FareRule.from_flight_proto(fare_rule)
+                for fare_rule in quote.quoted_offer.rules
+            ],
+            conditionalPrices=[],
+            required=[],
+        )
 
     @classmethod
     def from_proto(cls, quoted_offer: models_pb2.QuotedOffer) -> QuotedOfferModel:
@@ -153,6 +185,58 @@ class QuotedOfferModel(models.BaseModel):
 
 class QuoteResource(models.Resource):
     api_type: typing.ClassVar[str] = "quotes"
+
+    @classmethod
+    def from_flight_quote_proto(
+        cls,
+        quote: pricing_pb2.Quote,
+        request: requests.Request,
+    ) -> QuoteResource:
+        quoted_offers = []
+        total_price = None
+
+        if quote.HasField("quoted_offer"):
+            quoted_offers.append(QuotedOfferModel.from_flight_quote_proto(quote))
+
+            total_price = common_models.Price.from_proto(
+                quote.quoted_offer.price,
+            )
+
+        attributes = {
+            "status": protobuf.enum_value_to_slug(
+                pricing_pb2.Quote.Status.DESCRIPTOR,
+                quote.status,
+            ),
+            "expiresAt": protobuf.protobuf_to_datetime(quote.expires_at),
+            "quotedOffers": quoted_offers,
+        }
+
+        if total_price:
+            attributes["totalPrice"] = total_price
+
+        return cls(
+            id=quote.id,
+            type=QuoteResource.api_type,
+            attributes=attributes,
+            relationships={
+                "offers": {
+                    "data": [
+                        models.ResourceIdentifier(
+                            id=quote.offer_id,
+                            type="flight-offers",
+                        ),
+                    ],
+                },
+            },
+            links={
+                _SELF_HREF: str(
+                    request.url_for(
+                        "ViewQuotes",
+                        quoteId=quote.id,
+                    ),
+                ),
+            },
+        )
 
     @classmethod
     def from_proto(

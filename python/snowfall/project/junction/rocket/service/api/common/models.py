@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pydantic
 
+from snowfall.project.junction.rocket.service.api.v1alpha import pricing_pb2
 from snowfall.project.junction.rocket.service.searches.v1alpha import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -31,6 +32,19 @@ class PriceBreakdown(models.BaseModel):
     def from_proto(
         cls,
         price_breakdown: models_pb2.PriceBreakdown,
+    ) -> PriceBreakdown:
+        return cls(
+            price=Price.from_proto(price_breakdown.price),
+            breakdownType=protobuf.enum_value_to_slug(
+                enum_descriptor=models_pb2.PriceBreakdown.BreakdownType.DESCRIPTOR,
+                enum_value=price_breakdown.breakdown_type,
+            ),
+        )
+
+    @classmethod
+    def from_flight_proto(
+        cls,
+        price_breakdown: pricing_pb2.PriceBreakdown,
     ) -> PriceBreakdown:
         return cls(
             price=Price.from_proto(price_breakdown.price),

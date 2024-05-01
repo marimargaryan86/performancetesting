@@ -7,6 +7,7 @@ from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import errors
 from snowfall.project.junction.rocket.service.api.quotes import models as quote_models
+from snowfall.project.junction.rocket.service.api.quotes import quotes
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2 as searches_pb2,
 )
@@ -25,6 +26,13 @@ class QuotesSettings:
     reseller_pay_company_mapping: Mapping[str, str]
 
 
+async def _is_flight_quote(request: requests.Request) -> bool:
+    body = await request.json()
+    offers_rel = body["data"]["relationships"]["offers"]
+
+    return offers_rel["data"][0]["type"] == "flight-offers"
+
+
 class Quotes(endpoints.HTTPEndpoint):
     @errors.handle_grpc_errors
     async def post(
@@ -33,16 +41,25 @@ class Quotes(endpoints.HTTPEndpoint):
         quotes_settings: QuotesSettings = lagom.injectable,
         go_quotations: searches_pb2_grpc.QuoteServiceStub = lagom.injectable,
         grpc_timeout: datetime.timedelta = lagom.injectable,
+        flight_quotes_manager: quotes.FlightQuoteManager = lagom.injectable,
     ) -> responses.Response:
         body = await request_helpers.flatten_request(request)
         request_offer_ids = list(body["offers"])
-
-        # TODO(aram.h): handle J1
 
         reseller_pay_company_id, reseller_currency = self._get_reseller_config(
             quotes_settings,
             request.user.username,
         )
+
+        if await _is_flight_quote(request):
+            return await self._create_flight_quote_response(
+                flight_quotes_manager=flight_quotes_manager,
+                request=request,
+                offer_id=request_offer_ids[0],
+                reseller_pay_company_id=reseller_pay_company_id,
+                reseller_currency=reseller_currency,
+            )
+
         response: searches_pb2.CreateQuoteResponse = await go_quotations.CreateQuote(
             searches_pb2.CreateQuoteRequest(
                 offer_ids=request_offer_ids,
@@ -88,6 +105,32 @@ class Quotes(endpoints.HTTPEndpoint):
                 ),
             ),
             request=request,
+        )
+
+    async def _create_flight_quote_response(
+        self,
+        flight_quotes_manager: quotes.FlightQuoteManager,
+        request: requests.Request,
+        offer_id: str,
+        reseller_pay_company_id: str,
+        reseller_currency: str,
+    ) -> models.JsonApiResponse:
+        quote = await flight_quotes_manager.create(
+            offer_id,
+            request.user.username,
+            reseller_pay_company_id,
+            reseller_currency,
+        )
+
+        return await messages.create_response(
+            body=models.Body(
+                data=quote_models.QuoteResource.from_flight_quote_proto(
+                    quote,
+                    request,
+                ),
+            ),
+            request=request,
+            status_code=status.HTTP_201_CREATED,
         )
 
     def _get_reseller_config(

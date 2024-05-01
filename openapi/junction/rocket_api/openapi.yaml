@@ -3149,16 +3149,18 @@ components:
                       properties:
                         data:
                           type: array
+                          minItems: 1
                           items:
                             $ref: '#/components/schemas/TrainOfferIdentifier'
                     - type: object
                       title: Flight Offers
                       description: The list of Flight Offer IDs associated to this quote
                       required:
-                        - offers
+                        - data
                       properties:
-                        offers:
+                        data:
                           type: array
+                          minItems: 1
                           items:
                             $ref: '#/components/schemas/FlightOfferIdentifier'
         - $ref: '#/components/schemas/SelfLink'

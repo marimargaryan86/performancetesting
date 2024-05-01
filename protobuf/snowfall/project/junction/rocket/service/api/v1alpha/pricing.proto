@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package snowfall.project.junction.rocket.service.api.v1alpha;
+
+import "google/protobuf/timestamp.proto";
+import "snowfall/stdlib/v1/money.proto";
+
+option go_package = "git.snowfall.se/junction/junction/golang/protobuf/snowfall/project/junction/rocket/service/api/v1alpha";
+
+message Quote {
+  string id = 1;
+  string pay_quote_id = 2;
+  string reseller_id = 3;
+  string reseller_company_id = 4;
+  string reseller_currency = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  string offer_id = 7;
+  QuotedOffer quoted_offer = 8;
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_PENDING = 1;
+    STATUS_PROCESSING = 2;
+    STATUS_COMPLETED = 3;
+    STATUS_FAILED = 4;
+  }
+  Status status = 9;
+}
+
+message FareRule {
+  string title = 1;
+  string body = 2;
+}
+
+message PriceBreakdown {
+  snowfall.stdlib.v1.Money price = 1;
+  enum BreakdownType {
+    BREAKDOWN_TYPE_UNSPECIFIED = 0;
+    BREAKDOWN_TYPE_BASE_FARE = 1;
+    BREAKDOWN_TYPE_TAX = 2;
+  }
+  BreakdownType breakdown_type = 2;
+}
+
+message QuotedOffer {
+  snowfall.stdlib.v1.Money price = 1;
+  repeated PriceBreakdown price_breakdown = 2;
+  repeated FareRule rules = 3;
+  enum Required {
+    REQUIRED_UNSPECIFIED = 0;
+    REQUIRED_DATE_OF_BIRTH = 1;
+    REQUIRED_NATIONALITY = 2;
+    REQUIRED_EXPIRATION_DATE = 3;
+    REQUIRED_ISSUING_COUNTRY = 4;
+    REQUIRED_PASSPORT_NUMBER = 5;
+    REQUIRED_RESIDENCE_COUNTRY_CODE = 6;
+    REQUIRED_RESIDENCE_ADDRESS = 7;
+    REQUIRED_ISSUE_DATE = 8;
+  }
+}
+
+message CreateQuoteTask {
+  Quote quote = 1;
+}
