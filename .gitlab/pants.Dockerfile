@@ -32,7 +32,7 @@ ENV SCIE_PANTS_VERSION=v0.10.7
 RUN curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version ${SCIE_PANTS_VERSION:1}
 
 # renovate: datasource=github-releases depName=oasdiff packageName=Tufin/oasdiff
-ENV OASDIFF_VERSION=v1.10.11
+ENV OASDIFF_VERSION=v1.10.15
 RUN curl -fsSL https://github.com/Tufin/oasdiff/releases/download/${OASDIFF_VERSION}/oasdiff_${OASDIFF_VERSION:1}_linux_amd64.deb > /tmp/oasdiff.deb && \
     apt-get install -y --no-install-recommends /tmp/oasdiff.deb && \
     rm /tmp/oasdiff.deb
