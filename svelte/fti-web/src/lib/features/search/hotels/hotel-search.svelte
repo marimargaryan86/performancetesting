@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { SearchResultsData } from "../../../../routes/search/[searchType=search_type]/+page.svelte";
+  import SearchHeader from "$lib/features/search/search-header.svelte";
 
   export let searchResultsData: SearchResultsData = false;
 </script>
 
 <div class="wrapper">
-  <header>
-    <span>BigXtra</span>
-  </header>
+  <SearchHeader />
 
   <main>
     <div class="filters">
@@ -27,15 +26,6 @@
     width: 100%;
     height: 100vh;
     margin: 0;
-  }
-
-  header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 68px;
-    background-color: var(--colours-primary-blue);
-    padding: 0 68px;
   }
 
   main {

@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test:unit": "vitest",
+    "test:unit-ui": "vitest --coverage.enabled=true --ui",
+    "coverage": "vitest --coverage --run",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
@@ -16,10 +19,10 @@
     "@melt-ui/pp": "^0.3.0",
     "@melt-ui/svelte": "^0.72.0",
     "@neoconfetti/svelte": "^1.0.0",
+    "@snowfall/vitest-config": "workspace:configs/vitest",
     "@sveltejs/adapter-auto": "^3.1.1",
     "@sveltejs/adapter-node": "^5.0.1",
     "@sveltejs/kit": "^2.5.3",
-    "@sveltejs/vite-plugin-svelte": "^3.0.2",
     "@types/eslint": "8.56.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -33,8 +36,7 @@
     "svelte-check": "^3.6.0",
     "tslib": "^2.4.1",
     "typescript": "^5.0.0",
-    "vite": "^5.1.6",
-    "vitest": "^1.3.1"
+    "vite": "^5.1.6"
   },
   "type": "module"
 }
