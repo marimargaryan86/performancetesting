@@ -1,4 +1,4 @@
 nomad_template(
-    ["grpc"],
+    ["grpc", "pricing", "bookings"],
     "python/snowfall/project/junction/rocket/service/providers/benerail:main",
 )
