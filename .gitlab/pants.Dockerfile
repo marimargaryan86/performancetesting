@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     yq
 
 # renovate: datasource=github-releases depName=hcl2json packageName=tmccombs/hcl2json
-ENV HCL2JSON_VERSION=v0.6.1
+ENV HCL2JSON_VERSION=v0.6.2
 RUN curl -fsSL https://github.com/tmccombs/hcl2json/releases/download/${HCL2JSON_VERSION}/hcl2json_linux_amd64 -o /usr/local/bin/hcl2json && chmod +x /usr/local/bin/hcl2json
 
 # renovate: datasource=golang-version depName=go
