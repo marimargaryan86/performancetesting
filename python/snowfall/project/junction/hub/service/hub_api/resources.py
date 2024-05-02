@@ -701,6 +701,7 @@ class OnboardingTokenCompanyDetails(models.Resource):
         token: str,
         company_name: str,
         customer_id: str,
+        ephemeral_key: str,
     ) -> OnboardingTokenCompanyDetails:
         return cls(
             id=token,
@@ -708,6 +709,7 @@ class OnboardingTokenCompanyDetails(models.Resource):
             attributes={
                 "companyName": company_name,
                 "paymentReference": customer_id,
+                "ephemeralKey": ephemeral_key,
             },
         )
 

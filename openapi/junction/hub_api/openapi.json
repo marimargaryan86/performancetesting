@@ -6486,11 +6486,16 @@
               "companyName": {
                 "type": "string",
                 "example": "Company Name"
+              },
+              "ephemeralKey": {
+                "type": "string",
+                "example": "ek_test_YWNjdF8xTG9sSHJCb2k1a1JGWXViLG1HOEM1cVowR3V2Q0lmNW95TkxtdGdVd0lHOTVpVm8"
               }
             },
             "required": [
               "paymentReference",
-              "companyName"
+              "companyName",
+              "ephemeralKey"
             ]
           }
         }

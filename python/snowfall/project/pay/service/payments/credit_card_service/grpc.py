@@ -223,6 +223,25 @@ class CreditCardPaymentService(
 
         return credit_card_pb2.GetRefundResponse(refund=refund)
 
+    async def CreateEphemeralKey(  # type: ignore[override] # noqa: N802
+        self,
+        request: credit_card_pb2.CreateEphemeralKeyRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> credit_card_pb2.CreateEphemeralKeyResponse:
+        signature = await self._provider(  # type: ignore[attr-defined]
+            request.reseller_id,
+        ).get_ephemeral_key(
+            request.customer_id,
+        )
+
+        if not signature:
+            await context.abort(
+                code=grpc.StatusCode.NOT_FOUND,
+                details="Ephemeral key not found",
+            )
+
+        return credit_card_pb2.CreateEphemeralKeyResponse(signature=signature)
+
     def _provider(self, reseller_id: str) -> interfaces.CreditCardProvider:
         return self._providers.get(
             self._reseller_to_provider.get(reseller_id, ""),

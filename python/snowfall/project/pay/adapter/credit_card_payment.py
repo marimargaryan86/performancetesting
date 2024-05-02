@@ -105,6 +105,13 @@ class Client(abc.ABC):
     ) -> credit_card_models_pb2.Refund:
         """Get refund."""
 
+    @abc.abstractmethod
+    async def get_ephemeral_key(
+        self,
+        customer_id: str,
+    ) -> str:
+        """Get ephemeral key."""
+
 
 class DictClient(Client):
     def __init__(self) -> None:
@@ -260,6 +267,12 @@ class DictClient(Client):
         if refund:
             return refund
         raise errors.NotFoundError()
+
+    async def get_ephemeral_key(
+        self,
+        customer_id: str,
+    ) -> str:
+        return "ephemeral_key"
 
 
 class GrpcClient(Client):
@@ -477,3 +490,18 @@ class GrpcClient(Client):
         )
 
         return response.refund
+
+    async def get_ephemeral_key(
+        self,
+        customer_id: str,
+    ) -> str:
+        response = await errors.handle_grpc_errors(
+            self._client.CreateEphemeralKey(
+                credit_card_pb2.CreateEphemeralKeyRequest(
+                    customer_id=customer_id,
+                ),
+                timeout=self._timeout,
+            ),
+        )
+
+        return response.signature

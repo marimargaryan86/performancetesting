@@ -4,6 +4,9 @@ from starlette import endpoints, requests, status
 from snowfall.project.junction.hub.service.hub_api import crypto_manager, resources
 from snowfall.project.junction.hub.service.hub_api.routes import routes_handlers
 from snowfall.project.pay.adapter import companies as companies_adapter
+from snowfall.project.pay.adapter import (
+    credit_card_payment as credit_card_payment_adapter,
+)
 from snowfall.project.pay.service.companies.v1 import models_pb2
 from snowfall.stdlib import money
 from snowfall.stdlib.format import protobuf
@@ -230,6 +233,7 @@ class CompanyOnboardingToken(endpoints.HTTPEndpoint):
         request: requests.Request,
         companies_client: companies_adapter.Client = lagom.injectable,
         crypto_client: crypto_manager.CryptoManager = lagom.injectable,
+        credit_card_payment_client: credit_card_payment_adapter.Client = lagom.injectable,
     ) -> models.JsonApiResponse:
         token = request.path_params["token"]
         try:
@@ -249,13 +253,16 @@ class CompanyOnboardingToken(endpoints.HTTPEndpoint):
             )
 
         company = await companies_client.get(decrypted_data["companyId"])
-
+        ephemeral_key = await credit_card_payment_client.get_ephemeral_key(
+            company.payment_reference,
+        )
         return await messages.create_response(
             body=models.Body(
                 data=resources.OnboardingTokenCompanyDetails.from_values(
                     token=token,
                     company_name=company.name,
                     customer_id=company.payment_reference,
+                    ephemeral_key=ephemeral_key,
                 ),
             ),
             request=request,

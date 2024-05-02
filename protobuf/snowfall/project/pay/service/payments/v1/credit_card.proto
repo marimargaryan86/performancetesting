@@ -18,6 +18,7 @@ service CreditCardPaymentService {
   rpc CreateCreditCardHolder(CreateCreditCardHolderRequest) returns (CreateCreditCardHolderResponse) {}
   rpc GetRefund(GetRefundRequest) returns (GetRefundResponse) {}
   rpc CreateRefund(CreateRefundRequest) returns (CreateRefundResponse) {}
+  rpc CreateEphemeralKey(CreateEphemeralKeyRequest) returns (CreateEphemeralKeyResponse) {}
 }
 
 message GetCreditCardPaymentRequest {
@@ -115,4 +116,13 @@ message CreateRefundRequest {
 
 message CreateRefundResponse {
   Refund refund = 1;
+}
+
+message CreateEphemeralKeyRequest {
+  string customer_id = 1;
+  string reseller_id = 2;
+}
+
+message CreateEphemeralKeyResponse {
+  string signature = 1;
 }
