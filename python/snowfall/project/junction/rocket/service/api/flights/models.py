@@ -258,6 +258,7 @@ class PassengerIds(BaseModel):
 
 class RocketTrip(BaseModel):
     id: str
+    provider_trip_id: int
     offer_id: str
     passenger_ids: list[PassengerIds]
     reservation_ids: list[int]

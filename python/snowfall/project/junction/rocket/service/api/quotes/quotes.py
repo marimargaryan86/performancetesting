@@ -1,6 +1,9 @@
+import datetime
+
 from snowfall.project.junction.rocket.service.api.flights import repositories
 from snowfall.project.junction.rocket.service.api.v1alpha import pricing_pb2
 from snowfall.stdlib import string
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.transport.amqp import producer
 
 
@@ -23,6 +26,8 @@ class QuoteTaskProducer:
 
 
 class FlightQuoteManager:
+    _quote_ttl_minutes = 45
+
     def __init__(
         self,
         quotes_repository: repositories.QuoteRepository,
@@ -46,6 +51,12 @@ class FlightQuoteManager:
                 reseller_currency=reseller_currency,
                 offer_id=offer_id,
                 status=pricing_pb2.Quote.STATUS_PENDING,
+                expires_at=protobuf.datetime_to_protobuf(
+                    datetime.datetime.now(datetime.UTC)
+                    + datetime.timedelta(
+                        minutes=self._quote_ttl_minutes,
+                    ),
+                ),
             ),
         )
 

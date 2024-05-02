@@ -6,6 +6,7 @@ import grpc
 import pydantic
 from google.protobuf import message
 from lagom.integrations.starlette import StarletteIntegration
+from motor import motor_asyncio
 from starlette.middleware import Middleware, authentication
 
 from snowfall.project.junction.go.service.places.v1 import (
@@ -24,6 +25,7 @@ from snowfall.project.junction.rocket.service.api.ferry import (
     router as ferry_router,
 )
 from snowfall.project.junction.rocket.service.api.flights import (
+    pricing,
     repositories,
     searches,
 )
@@ -68,6 +70,9 @@ from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2_grpc as searches_pb2_grpc,
 )
 from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.project.pay.service.transactions.v1 import (
+    grpc_pb2_grpc as transactions_pb2_grpc,
+)
 from snowfall.stdlib.integration.starlette import application as starlette
 from snowfall.stdlib.integration.starlette import authentication as stdlib_auth
 from snowfall.stdlib.integration.starlette import handlers
@@ -78,6 +83,7 @@ from snowfall.stdlib.service import (
     grpc_factory,
     httpx_factory,
     mongo_factory,
+    redis_factory,
 )
 from snowfall.stdlib.transport.amqp import consumer as amqp_consumer
 from snowfall.stdlib.transport.amqp import producer as amqp_producer
@@ -104,6 +110,18 @@ class _FlightSearchConsumerSettings(application.Settings):
     j_one_api_base_url: str
     j_one_api_key: str
     reseller_j1_credentials_mapping: dict[str, Any]
+
+
+class _PricingSettings(application.Settings):
+    amqp_dsn: pydantic.AmqpDsn
+    amqp_timeout: datetime.timedelta | None = None
+    mongo_dsn: pydantic.MongoDsn
+    transactions_address: str
+    j_one_api_base_url: str
+    j_one_api_key: str
+    reseller_j1_credentials_mapping: dict[str, Any]
+    redis_dsn: pydantic.RedisDsn
+    j_one_pay_company_id: str
 
 
 class _ConsumerChannels(NamedTuple):
@@ -333,6 +351,78 @@ async def _consume_flight_searches(
     await consumer.consume()
 
 
+_QUOTE_DEFAULT_TTL_MINUTES = 45
+
+
+async def _create_quote_search_queue(
+    app: application.Application[_PricingSettings],
+    mongo_db: motor_asyncio.AsyncIOMotorDatabase,
+    auth: j1_auth.TemporaryTokenAuth,
+) -> pricing.PricingSearchQueue:
+    return pricing.PricingSearchQueue(
+        name_prefix=app.name,
+        processor=pricing.PricingProcessor(
+            repositories_obj=pricing.Repositories(
+                quotes_repository=repositories.QuoteRepository(
+                    collection=mongo_db.quotes,
+                ),
+                trips_repository=repositories.RocketTripRepository(
+                    collection=mongo_db.rocket_trips,
+                ),
+            ),
+            provider_client=pricing.ProviderClient(
+                junction_one_client=j1_client.JunctionOneClient(
+                    api_base_url=app.settings.j_one_api_base_url,
+                    http_client=await httpx_factory.make_client(app),
+                    auth=auth,
+                ),
+                auth=auth,
+            ),
+            redis_client=await redis_factory.make_client(
+                app,
+                app.settings.redis_dsn,
+                decode_responses=False,
+            ),
+            quotes_stub=transactions_pb2_grpc.QuotationsServiceStub(
+                await grpc_factory.make_insecure_channel(
+                    app,
+                    app.settings.transactions_address,
+                ),
+            ),
+            provider_company_id=app.settings.j_one_pay_company_id,
+            quote_ttl=datetime.timedelta(minutes=_QUOTE_DEFAULT_TTL_MINUTES),
+        ),
+    )
+
+
+async def _consume_quotes_searches(
+    app: application.Application[_PricingSettings],
+) -> None:
+    amqp_connection = await amqp_factory.make_connection(
+        app=app,
+        dsn=app.settings.amqp_dsn,
+        timeout=app.settings.amqp_timeout,
+    )
+    mongo_db = await mongo_factory.make_database(app, app.settings.mongo_dsn)
+    auth = j1_auth.TemporaryTokenAuth(
+        api_key=app.settings.j_one_api_key,
+        reseller_credentials_mapping=app.settings.reseller_j1_credentials_mapping,
+    )
+
+    quote_search_queue = await _create_quote_search_queue(
+        app=app,
+        mongo_db=mongo_db,
+        auth=auth,
+    )
+
+    consumer = amqp_consumer.QueueConsumer(
+        connection=amqp_connection,
+        queues=cast(list[protocol.Queue[message.Message]], [quote_search_queue]),
+    )
+
+    await consumer.consume()
+
+
 if __name__ == "__main__":
     entrypoint = application.Entrypoint(name="junction-rocket-api")
 
@@ -346,6 +436,11 @@ if __name__ == "__main__":
             name="consume-flight-searches",
             callback=_consume_flight_searches,
             settings_class=_FlightSearchConsumerSettings,
+        ),
+        application.Command(
+            name="pricing",
+            callback=_consume_quotes_searches,
+            settings_class=_PricingSettings,
         ),
         application.Command(
             name="consume",

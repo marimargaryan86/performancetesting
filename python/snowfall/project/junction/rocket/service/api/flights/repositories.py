@@ -121,3 +121,17 @@ class QuoteRepository(
     mixins.InsertMixin[pricing_pb2.Quote],
 ):
     _proto = pricing_pb2.Quote
+    _indexes = (
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
+
+    async def update_status(
+        self,
+        identifier: str,
+        status: pricing_pb2.Quote.Status.ValueType,
+    ) -> None:
+        await self._execute(
+            self._collection.update_one,
+            {"_id": identifier},
+            {"$set": {"status": status}},
+        )
