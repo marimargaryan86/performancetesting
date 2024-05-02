@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Any, TypeVar
 
 import httpx
 from xsdata.formats.dataclass.parsers import XmlParser
@@ -6,7 +7,7 @@ from xsdata.formats.dataclass.serializers import XmlSerializer
 
 from snowfall.stdlib.transport.http import client
 from snowfall.vendor.silverrail import errors
-from snowfall.vendor.silverrail.models import stations
+from snowfall.vendor.silverrail.models import booking, stations
 from snowfall.vendor.silverrail.models.shopping import (
     ContextType,
     PointToPointShoppingQuery,
@@ -16,7 +17,10 @@ from snowfall.vendor.silverrail.models.shopping import (
     ShoppingPointToPointShopOutput,
 )
 
+T = TypeVar("T")  # noqa: WPS111
+
 SHOPPING_SERVICE_PATH = "/shopping-ws/services/Shopping/v2"
+BOOKING_SERVICE_PATH = "/booking-ws/services/Booking/v2"
 PUBLISHED_DATA_API_PATH = "/pub-ws"
 
 
@@ -39,11 +43,46 @@ class SilverrailClient(client.HttpClient):
         http_client: httpx.AsyncClient,
     ):
         super().__init__(base_url, http_client)
-        self._context = ContextType(
+        self._shopping_context = ContextType(
             distributor_code=settings.distributor_code,
             point_of_sale_code=settings.pos_code,
             channel_code=settings.channel_code,
         )
+        self._booking_context = booking.ContextType(
+            distributor_code=settings.distributor_code,
+            point_of_sale_code=settings.pos_code,
+            channel_code=settings.channel_code,
+        )
+
+    async def create_booking_record(
+        self,
+        passengers: booking.CreateBookingRecordRequestType.Passengers,
+        leg_solution: booking.LegSolutionsType,
+        prices: booking.CreateBookingRecordRequestType.Prices,
+    ) -> booking.CreateBookingRecordResponse:
+        request = booking.BookingCreateBookingRecordInput(
+            body=booking.BookingCreateBookingRecordInput.Body(
+                create_booking_record_request=booking.CreateBookingRecordRequest(
+                    context=self._booking_context,
+                    passengers=passengers,
+                    leg_solutions=leg_solution,
+                    prices=prices,
+                ),
+            ),
+        )
+
+        output = await self._make_soap_request(
+            request=request,
+            api_path=BOOKING_SERVICE_PATH,
+            result_class=booking.BookingCreateBookingRecordOutput,
+        )
+
+        if output.body is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if output.body.create_booking_record_response is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        return output.body.create_booking_record_response
 
     async def shopping_point_to_point(
         self,
@@ -52,22 +91,16 @@ class SilverrailClient(client.HttpClient):
         req = ShoppingPointToPointShopInput(
             body=ShoppingPointToPointShopInput.Body(
                 point_to_point_shopping_request=PointToPointShoppingRequest(
-                    context=self._context,
+                    context=self._shopping_context,
                     point_to_point_shopping_query=query,
                 ),
             ),
         )
-        serializer = XmlSerializer()
-        soap_request_body = serializer.render(req)
-        response = await self._make_soap_request(
-            soap_request_body,
-            SHOPPING_SERVICE_PATH,
-        )
 
-        parser = XmlParser()
-        output: ShoppingPointToPointShopOutput = parser.from_string(
-            response.text,
-            ShoppingPointToPointShopOutput,
+        output = await self._make_soap_request(
+            request=req,
+            api_path=SHOPPING_SERVICE_PATH,
+            result_class=ShoppingPointToPointShopOutput,
         )
 
         if output.body is None:
@@ -85,17 +118,11 @@ class SilverrailClient(client.HttpClient):
                 ),
             ),
         )
-        serializer = XmlSerializer()
-        soap_request_body = serializer.render(req)
-        response = await self._make_soap_request(
-            soap_request_body=soap_request_body,
-            path=PUBLISHED_DATA_API_PATH,
-        )
 
-        parser = XmlParser()
-        output: stations.PublishingAPIOutput = parser.from_string(
-            response.text,
-            stations.PublishingAPIOutput,
+        output = await self._make_soap_request(
+            request=req,
+            api_path=PUBLISHED_DATA_API_PATH,
+            result_class=stations.PublishingAPIOutput,
         )
 
         if output.body is None or output.body.data_response is None:
@@ -107,6 +134,25 @@ class SilverrailClient(client.HttpClient):
         return output.body.data_response.stations
 
     async def _make_soap_request(
+        self,
+        request: Any,
+        api_path: str,
+        result_class: type[T],
+    ) -> T:
+        serializer = XmlSerializer()
+        soap_request_body = serializer.render(request)
+        response = await self._make_raw_soap_request(
+            soap_request_body=soap_request_body,
+            path=api_path,
+        )
+
+        parser = XmlParser()
+        return parser.from_string(
+            response.text,
+            result_class,
+        )
+
+    async def _make_raw_soap_request(
         self,
         soap_request_body: str,
         path: str,

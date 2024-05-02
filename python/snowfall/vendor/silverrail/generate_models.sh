@@ -1,6 +1,7 @@
 #!/bin/bash
 PACKAGE="models"
 
+xsdata wsdls/booking.wsdl --package $PACKAGE --structure-style filenames
 xsdata wsdls/shopping.wsdl --package $PACKAGE --structure-style filenames
 xsdata wsdls/stations.xsd --package $PACKAGE --structure-style filenames
 rm models/__init__.py
