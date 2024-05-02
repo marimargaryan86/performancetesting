@@ -273,19 +273,19 @@ class Stripe(interfaces.CreditCardProvider):
 
         return credit_card_holder, ephemeral_key_secret
 
-    async def get_ephemeral_key(
+    async def get_setup_client_secret(
         self,
         customer_id: str,
     ) -> str | None:
         try:
-            ephemeral_key = stripe.EphemeralKey.create(  # type: ignore[no-untyped-call]
+            client_secret = stripe.SetupIntent.create(
                 customer=customer_id,
-                stripe_version=self._stripe_version,
-            ).secret
+                automatic_payment_methods={"enabled": True},
+            ).client_secret
         except stripe.StripeError:
-            ephemeral_key = None
+            client_secret = None
 
-        return ephemeral_key
+        return client_secret
 
     async def create_credit_card_holder(
         self,

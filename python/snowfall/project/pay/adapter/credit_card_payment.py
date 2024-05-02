@@ -106,11 +106,11 @@ class Client(abc.ABC):
         """Get refund."""
 
     @abc.abstractmethod
-    async def get_ephemeral_key(
+    async def get_setup_client_secret(
         self,
         customer_id: str,
     ) -> str:
-        """Get ephemeral key."""
+        """Get setup client secret."""
 
 
 class DictClient(Client):
@@ -268,11 +268,11 @@ class DictClient(Client):
             return refund
         raise errors.NotFoundError()
 
-    async def get_ephemeral_key(
+    async def get_setup_client_secret(
         self,
         customer_id: str,
     ) -> str:
-        return "ephemeral_key"
+        return "client_secret"
 
 
 class GrpcClient(Client):
@@ -491,13 +491,13 @@ class GrpcClient(Client):
 
         return response.refund
 
-    async def get_ephemeral_key(
+    async def get_setup_client_secret(
         self,
         customer_id: str,
     ) -> str:
         response = await errors.handle_grpc_errors(
-            self._client.CreateEphemeralKey(
-                credit_card_pb2.CreateEphemeralKeyRequest(
+            self._client.CreateSetupClientSecret(
+                credit_card_pb2.CreateSetupClientSecretRequest(
                     customer_id=customer_id,
                 ),
                 timeout=self._timeout,

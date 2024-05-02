@@ -253,7 +253,7 @@ class CompanyOnboardingToken(endpoints.HTTPEndpoint):
             )
 
         company = await companies_client.get(decrypted_data["companyId"])
-        ephemeral_key = await credit_card_payment_client.get_ephemeral_key(
+        client_secret = await credit_card_payment_client.get_setup_client_secret(
             company.payment_reference,
         )
         return await messages.create_response(
@@ -261,8 +261,7 @@ class CompanyOnboardingToken(endpoints.HTTPEndpoint):
                 data=resources.OnboardingTokenCompanyDetails.from_values(
                     token=token,
                     company_name=company.name,
-                    customer_id=company.payment_reference,
-                    ephemeral_key=ephemeral_key,
+                    client_secret=client_secret,
                 ),
             ),
             request=request,
