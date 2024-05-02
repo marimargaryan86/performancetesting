@@ -1,10 +1,10 @@
 <script lang="ts">
-  export let searchType: string = "combo";
+  export let searchType: string = "packages";
 </script>
 
 <div class="search-header">
-  <label class:selected={searchType === "combo"}>
-    <input type="radio" value="combo" bind:group={searchType} hidden />
+  <label class:selected={searchType === "packages"}>
+    <input type="radio" value="packages" bind:group={searchType} hidden />
     <p>Holiday Packages</p>
   </label>
   <label class:selected={searchType === "hotels"}>

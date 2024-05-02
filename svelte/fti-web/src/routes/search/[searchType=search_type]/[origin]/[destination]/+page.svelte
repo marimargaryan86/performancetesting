@@ -12,7 +12,7 @@
   import LoadingScreen from "$lib/components/loading-screen.svelte";
   import HotelSearch from "$lib/features/search/hotels/hotel-search.svelte";
   import SearchStub from "$lib/features/search/search-stub.svelte";
-  import type { SearchType } from "../../../params/search_type";
+  import type { SearchType } from "../../../../../params/search_type";
 
   export let data;
   let searchType: SearchType;

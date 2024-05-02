@@ -1,4 +1,4 @@
-import type { SearchType } from "../../../params/search_type.js";
+import { getSearchTypeFromURL, type SearchType } from "../../../../../params/search_type.js";
 
 /** @type {import('../$types.js').PageServerLoad} */
 export function load({ url }): { searchParamsObj: Record<string, string>; searchType: SearchType } {
@@ -6,7 +6,7 @@ export function load({ url }): { searchParamsObj: Record<string, string>; search
   const searchParams = Array.from(queryParams.entries());
   const searchParamsObj = Object.fromEntries(searchParams);
 
-  const searchType = url.pathname.substring(url.pathname.lastIndexOf("/") + 1) as SearchType;
+  const searchType = getSearchTypeFromURL(url);
 
   return { searchParamsObj, searchType };
 }

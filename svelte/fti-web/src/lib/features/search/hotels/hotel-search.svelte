@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SearchResultsData } from "../../../../routes/search/[searchType=search_type]/+page.svelte";
+  import type { SearchResultsData } from "../../../../routes/search/[searchType=search_type]/[origin]/[destination]/+page.svelte";
   import SearchHeader from "$lib/features/search/search-header.svelte";
 
   export let searchResultsData: SearchResultsData = false;

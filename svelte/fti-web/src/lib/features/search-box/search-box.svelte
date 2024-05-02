@@ -8,7 +8,7 @@
 
   let searchOptions: SearchOptions = {
     passengers: { adults: 1, children: 0 },
-    searchType: "combo",
+    searchType: "packages",
     origin: "",
     destination: "",
   };
@@ -22,7 +22,7 @@
   <SearchBoxHeader bind:searchType={$_searchOptions.searchType} />
 
   <div class="search-panel">
-    {#if $_searchOptions.searchType === "combo"}
+    {#if $_searchOptions.searchType === "packages"}
       <SearchBoxPackages />
     {:else if $_searchOptions.searchType === "flights"}
       <SearchBoxFlights />
