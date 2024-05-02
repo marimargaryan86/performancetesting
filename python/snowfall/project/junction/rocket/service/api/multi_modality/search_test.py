@@ -1,6 +1,7 @@
 import datetime
 from collections.abc import Sequence
 from types import MappingProxyType
+from typing import TypeAlias
 
 import freezegun
 import httpx
@@ -886,3 +887,59 @@ class TestSearchResult:
 
         with pytest.raises(search.NoSuggestionError):
             invalid_result.optimize()
+
+
+_SuggestionType: TypeAlias = (
+    search.Suggestion[search.Offer] | search.Suggestion[search.RoundtripOffer]
+)
+
+
+@pytest.mark.parametrize(
+    ("suggestion", "expected"),
+    [
+        pytest.param(
+            search.Suggestion(
+                offers=[
+                    _mock_offer(
+                        key="foo",
+                        segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+                        duration=datetime.timedelta(hours=1),
+                    ),
+                    _mock_offer(
+                        key="bar",
+                        segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+                        duration=datetime.timedelta(hours=1),
+                    ),
+                ],
+            ),
+            frozenset(("foo", "bar")),
+            id="oneway",
+        ),
+        pytest.param(
+            search.Suggestion(
+                offers=[
+                    search.RoundtripOffer(
+                        id="bar",
+                        departure_at=_DEPARTURE_AT,
+                        arrival_at=_DEPARTURE_AT + datetime.timedelta(hours=1),
+                        type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+                        outbound=_mock_offer(
+                            key="foo",
+                            segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+                            duration=datetime.timedelta(hours=1),
+                        ),
+                    ),
+                ],
+            ),
+            frozenset(("foo", "bar")),
+            id="roundtrip",
+        ),
+    ],
+)
+def test_suggestion_can_be_turned_to_protos(
+    suggestion: _SuggestionType,
+    expected: frozenset[str],
+) -> None:
+    offer_protos = suggestion.to_offer_protos()
+    assert offer_protos
+    assert {proto.id for proto in offer_protos} == expected

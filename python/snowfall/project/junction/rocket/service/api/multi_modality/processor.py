@@ -122,6 +122,15 @@ class SuggestionSearchProcessor:
         route: routes.Route,
     ) -> None:
         criteria = suggestion_search.criteria
+        inbound = None
+
+        if criteria.return_departure_after.year:
+            inbound = search.TripRequest(
+                route=route.to_inverse(),
+                departure_after=protobuf.protobuf_to_datetime(
+                    criteria.return_departure_after,
+                ),
+            )
 
         try:
             search_results = await self._searcher.find_results(
@@ -132,6 +141,7 @@ class SuggestionSearchProcessor:
                             criteria.departure_after,
                         ),
                     ),
+                    inbound=inbound,
                     date_of_births=[
                         protobuf.protobuf_to_date(passenger.date_of_birth)
                         for passenger in criteria.passengers

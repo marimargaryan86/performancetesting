@@ -25,6 +25,13 @@ class SuggestionSearchBody(api_models.BaseModel):
     destination: str
     departure_after: types.FutureDatetime
     passengers: list[_Passenger]
+    return_departure_after: types.FutureDatetime | None = None
+
+    def departure_before_return(self) -> bool:
+        if not self.return_departure_after:
+            return True
+
+        return self.departure_after < self.return_departure_after
 
 
 class ValidationError(Exception):

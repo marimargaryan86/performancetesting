@@ -127,13 +127,7 @@ class SuggestionRepository(
             id=string.uuid(),
             suggestion_search_id=suggestion_search_id,
             expires_at=expires_at,
-            offers=[
-                multi_modal_pb2.Suggestion.Offer(
-                    id=offer.id,
-                    segment_type=offer.type,
-                )
-                for offer in suggestion.offers
-            ],
+            offers=suggestion.to_offer_protos(),
         )
 
         return await self.insert(new_suggestion)

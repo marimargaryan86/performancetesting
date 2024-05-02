@@ -12,6 +12,7 @@ from snowfall.project.junction.rocket.service.api.multi_modality import routes
 from snowfall.project.junction.rocket.service.api.places.models.places import (
     IATA_PROVIDER_ID,
 )
+from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
     grpc_pb2,
     grpc_pb2_grpc,
@@ -77,10 +78,24 @@ class Offer:
     type: segment_type_pb2.SegmentType.ValueType
     reference: str | None = None
 
+    def to_protos(self) -> list[multi_modal_pb2.Suggestion.Offer]:
+        return [
+            multi_modal_pb2.Suggestion.Offer(
+                id=self.id,
+                segment_type=self.type,
+            ),
+        ]
+
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class RoundtripOffer(Offer):
     outbound: Offer
+
+    def to_protos(self) -> list[multi_modal_pb2.Suggestion.Offer]:
+        return [
+            *super().to_protos(),
+            *self.outbound.to_protos(),
+        ]
 
 
 OfferType = TypeVar("OfferType", bound=Offer)
@@ -89,6 +104,11 @@ OfferType = TypeVar("OfferType", bound=Offer)
 @dataclasses.dataclass(frozen=True)
 class Suggestion(Generic[OfferType]):
     offers: Sequence[OfferType]
+
+    def to_offer_protos(self) -> list[multi_modal_pb2.Suggestion.Offer]:
+        return list(
+            itertools.chain.from_iterable([offer.to_protos() for offer in self.offers]),
+        )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -478,18 +498,8 @@ class SearchRequest:
         if not self.inbound:
             return
 
-        if len(self.outbound.route.segments) != len(self.inbound.route.segments):
+        if not self.outbound.route.is_inverse_of(self.inbound.route):
             raise UnsupportedRoundtripError()
-
-        segment_pairs = zip(
-            self.outbound.route.segments,
-            self.inbound.route.segments[::-1],
-            strict=True,
-        )
-
-        for outbound, inbound in segment_pairs:
-            if not outbound.is_inverse_of(inbound):
-                raise UnsupportedRoundtripError()
 
 
 class Searcher:

@@ -204,6 +204,40 @@ class TestCreateSuggestionSearch:
         assert len(errors) == 1
         assert_pointer(errors[0], "/data/attributes/departureAfter")
 
+    async def test_past_return_departure_fails(
+        self,
+        client: httpx.AsyncClient,
+        valid_payload: Mapping[str, Any],
+        yesterday: datetime.datetime,
+    ) -> None:
+        attributes = valid_payload["data"]["attributes"]
+        attributes["returnDepartureAfter"] = yesterday.isoformat()
+        response = await client.post(
+            url="/journeys/suggestions/searches",
+            json=valid_payload,
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        errors = response.json()["errors"]
+        assert len(errors) == 1
+        assert_pointer(errors[0], "/data/attributes/returnDepartureAfter")
+
+    async def test_same_return_departure_fails(
+        self,
+        client: httpx.AsyncClient,
+        valid_payload: Mapping[str, Any],
+        tomorrow: datetime.datetime,
+    ) -> None:
+        attributes = valid_payload["data"]["attributes"]
+        attributes["returnDepartureAfter"] = tomorrow.isoformat()
+        response = await client.post(
+            url="/journeys/suggestions/searches",
+            json=valid_payload,
+        )
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        errors = response.json()["errors"]
+        assert len(errors) == 1
+        assert_pointer(errors[0], "/data/attributes/returnDepartureAfter")
+
     async def test_search_is_successfully_created(
         self,
         client: httpx.AsyncClient,

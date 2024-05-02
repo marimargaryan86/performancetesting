@@ -153,6 +153,18 @@ class SuggestionSearches:
                 ),
             )
 
+        if not body.departure_before_return():
+            errors.append(
+                std_models.Error(
+                    status=str(status.HTTP_422_UNPROCESSABLE_ENTITY),
+                    code="departure_after_return",
+                    detail="Departure needs to be before return departure",
+                    source=std_models.ErrorSourcePointer(
+                        pointer="/data/attributes/returnDepartureAfter",
+                    ),
+                ),
+            )
+
         if errors:
             raise models.ValidationError(errors)
 
@@ -162,6 +174,11 @@ class SuggestionSearches:
             departure_after=protobuf.datetime_to_protobuf_datetime(
                 body.departure_after,
             ),
+            return_departure_after=protobuf.datetime_to_protobuf_datetime(
+                body.return_departure_after,
+            )
+            if body.return_departure_after
+            else None,
             passengers=[
                 multi_modal_pb2.SuggestionSearch.Criteria.Passenger(
                     date_of_birth=protobuf.date_to_protobuf(passenger.date_of_birth),

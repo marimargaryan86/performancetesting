@@ -64,6 +64,13 @@ class Segment:
             and self.destination.id == other.origin.id
         )
 
+    def to_inverse(self) -> Segment:
+        return self.create(
+            origin=self.destination,
+            destination=self.origin,
+            segment_type=self.type,
+        )
+
     @classmethod
     def create(
         cls,
@@ -105,6 +112,23 @@ class Route:
 
         new_segments.append(current_segment)
         return Route(segments=new_segments)
+
+    def is_inverse_of(self, other: Route) -> bool:
+        if len(self.segments) != len(other.segments):
+            return False
+
+        segment_pairs = zip(
+            self.segments,
+            other.segments[::-1],
+            strict=True,
+        )
+
+        return all(
+            outbound.is_inverse_of(inbound) for outbound, inbound in segment_pairs
+        )
+
+    def to_inverse(self) -> Route:
+        return Route(segments=[segment.to_inverse() for segment in self.segments[::-1]])
 
 
 class Routes:
