@@ -28,7 +28,7 @@ ENV PATH=/usr/local/go/bin:$PATH
 RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz | tar xz -C /usr/local
 
 # renovate: datasource=github-releases depName=scie-pants packageName=pantsbuild/scie-pants
-ENV SCIE_PANTS_VERSION=v0.10.7
+ENV SCIE_PANTS_VERSION=v0.11.0
 RUN curl -fsSL https://static.pantsbuild.org/setup/pantsup.sh | bash /dev/stdin --bin-dir /usr/local/bin --version ${SCIE_PANTS_VERSION:1}
 
 # renovate: datasource=github-releases depName=oasdiff packageName=Tufin/oasdiff
