@@ -153,10 +153,10 @@ async def test_flight_search_missing_or_none(
     departure_after: str | None,
     passengers: Sequence[datetime.date],
 ) -> None:
-    if departure_after and BASIC_SEARCH.depart_after != departure_after:
-        pytest.skip("Skipping: waiting on fix for /bugs-triage/-/issues/153")
-
-    with pytest.raises(HTTPStatusError, match="Client error '400 Bad Request"):
+    with pytest.raises(
+        HTTPStatusError,
+        match="Client error '400 Bad Request|422 Unprocessable Entity",
+    ):
         await qa_client.flight.search(
             origin=origin,
             destination=destination,
