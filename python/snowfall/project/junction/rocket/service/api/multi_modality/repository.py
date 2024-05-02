@@ -1,4 +1,5 @@
 import datetime
+from typing import TypeAlias
 
 import pymongo
 from google.protobuf import timestamp_pb2
@@ -88,6 +89,11 @@ class SuggestionSearchRepository(
         )
 
 
+SuggestionType: TypeAlias = (
+    search.Suggestion[search.Offer] | search.Suggestion[search.RoundtripOffer]
+)
+
+
 class SuggestionRepository(
     repository.ProtoRepository[multi_modal_pb2.Suggestion],
     mixins.FindByIdMixin[multi_modal_pb2.Suggestion],
@@ -111,7 +117,7 @@ class SuggestionRepository(
     async def create(
         self,
         suggestion_search_id: str,
-        suggestion: search.Suggestion,
+        suggestion: SuggestionType,
     ) -> multi_modal_pb2.Suggestion:
         expires_at = timestamp_pb2.Timestamp()
         expires_at.FromDatetime(

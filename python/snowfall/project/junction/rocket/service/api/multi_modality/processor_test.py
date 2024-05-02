@@ -20,11 +20,13 @@ from snowfall.project.junction.v1 import segment_type_pb2
 _RESELLER_NOT_SUPPORTED = "not_supported"
 
 
-async def _mock_search(request: search.SegmentSearchRequest) -> list[search.Offer]:
+async def _mock_outbound_search(
+    request: search.SegmentSearchRequest,
+) -> list[search.Offer]:
     if request.reseller_id == _RESELLER_NOT_SUPPORTED:
         raise search.ModeNotSupportedForResellerError(mode=request.segment.type)
 
-    departure_at = datetime.datetime.now(datetime.UTC)
+    departure_at = request.departure_after + datetime.timedelta(hours=1)
 
     return [
         search.Offer(
@@ -34,6 +36,13 @@ async def _mock_search(request: search.SegmentSearchRequest) -> list[search.Offe
             type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
         ),
     ]
+
+
+async def _mock_inbound_search(
+    offer: search.Offer,
+    request: search.SegmentSearchRequest,
+) -> list[search.RoundtripOffer]:
+    return []
 
 
 @pytest.fixture()
@@ -50,7 +59,11 @@ async def suggestion_search_processor(
         route_finder=route_finder,
         searcher=search.Searcher(
             search_implementations=[
-                (segment_type_pb2.SEGMENT_TYPE_FLIGHT, _mock_search),
+                search.SearchImplementation(
+                    segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+                    _mock_outbound_search,
+                    _mock_inbound_search,
+                ),
             ],
         ),
     )

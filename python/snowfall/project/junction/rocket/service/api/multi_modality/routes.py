@@ -58,6 +58,12 @@ class Segment:
     mct_prefix: datetime.timedelta
     mct_suffix: datetime.timedelta
 
+    def is_inverse_of(self, other: Segment) -> bool:
+        return (
+            self.origin.id == other.destination.id
+            and self.destination.id == other.origin.id
+        )
+
     @classmethod
     def create(
         cls,

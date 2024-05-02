@@ -151,7 +151,7 @@ def search_criteria() -> multi_modal_pb2.SuggestionSearch.Criteria:
         origin_id=fixtures.PLACES[0],
         destination_id=fixtures.PLACES[0],
         departure_after=protobuf.datetime_to_protobuf_datetime(
-            datetime.datetime.now(datetime.UTC),
+            datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1),
         ),
         passengers=[
             multi_modal_pb2.SuggestionSearch.Criteria.Passenger(

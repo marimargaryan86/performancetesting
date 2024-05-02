@@ -231,6 +231,22 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
         collection=mongo_db.search_results,
     )
 
+    flight_searcher = multi_modal_search.FlightSearcher(
+        client=junction_one_client,
+        j1_transformer=flights_transformer,
+        repository=flights_search_result_repository,
+        temp_auth=junction_one_auth,
+    )
+    train_searcher = multi_modal_search.RailSearcher(
+        searches=searches_pb2_grpc.SearchServiceStub(
+            channels.searches,
+        ),
+        search_results=searches_pb2_grpc.SearchResultServiceStub(
+            channels.searches,
+        ),
+        polling_interval=app.settings.searches_polling_interval,
+        search_window=app.settings.searches_time_window,
+    )
     suggestion_search_queue = multi_modal_processor.SuggestionSearchQueue(
         name_prefix=app.name,
         processor=multi_modal_processor.SuggestionSearchProcessor(
@@ -251,27 +267,15 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
             ),
             searcher=multi_modal_search.Searcher(
                 search_implementations=[
-                    (
+                    multi_modal_search.SearchImplementation(
                         segment_type_pb2.SEGMENT_TYPE_FLIGHT,
-                        multi_modal_search.FlightSearcher(
-                            client=junction_one_client,
-                            j1_transformer=flights_transformer,
-                            repository=flights_search_result_repository,
-                            temp_auth=junction_one_auth,
-                        ).search,
+                        flight_searcher.outbound,
+                        flight_searcher.inbound,
                     ),
-                    (
+                    multi_modal_search.SearchImplementation(
                         segment_type_pb2.SEGMENT_TYPE_TRAIN,
-                        multi_modal_search.RailSearcher(
-                            searches=searches_pb2_grpc.SearchServiceStub(
-                                channels.searches,
-                            ),
-                            search_results=searches_pb2_grpc.SearchResultServiceStub(
-                                channels.searches,
-                            ),
-                            polling_interval=app.settings.searches_polling_interval,
-                            search_window=app.settings.searches_time_window,
-                        ).search,
+                        train_searcher.outbound,
+                        train_searcher.inbound,
                     ),
                 ],
             ),
