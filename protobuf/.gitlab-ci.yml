@@ -6,7 +6,7 @@
 .protobuf:buf:
   interruptible: true
   image:
-    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bufbuild/buf:1.30.0"
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bufbuild/buf:1.31.0@sha256:657b34a1af5992fc91ecda848568d0c2e47b4dbeb381b987798060bf70dc9a78"
     pull_policy: always
     entrypoint: [""]
   variables:
