@@ -51,6 +51,8 @@ class SearchRequestValidator(validation.RequestValidator):
                 "returnAt",
             )
 
+        self.validate_passengers(body.get("passengers", []))
+
     def _validate_place_and_capabilties(
         self,
         place: places_models_pb2.Place | None,
