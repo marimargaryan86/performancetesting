@@ -43,6 +43,8 @@ _MCT_MAPPING = types.MappingProxyType({
     ),
 })
 
+_LOCATION = tuple[latlng_pb2.LatLng, segment_type_pb2.SegmentType.ValueType]
+
 
 class _PlaceNotFoundError(ValueError):
     """Raised when a place is not found for a given set of coordinates."""
@@ -135,7 +137,7 @@ class Routes:
         ]
         resolved_places = await self._resolve_coordinates(
             [
-                place
+                (place, segment.segment_type)
                 for segment in segments
                 for place in (segment.origin, segment.destination)
             ],
@@ -201,16 +203,16 @@ class Routes:
 
     async def _resolve_coordinates(
         self,
-        coordinates: Iterable[latlng_pb2.LatLng],
+        coordinates: Iterable[_LOCATION],
     ) -> dict[bytes, models_pb2.Place]:
         unique_coordinates = {
-            coordinate.SerializeToString(deterministic=True): coordinate
+            coordinate[0].SerializeToString(deterministic=True): coordinate
             for coordinate in coordinates
         }
 
         resolved_tasks = await asyncio.gather(
             *[
-                self._resolve_coordinate(coordinate)
+                self._resolve_coordinate(coordinate[0], coordinate[1])
                 for coordinate in unique_coordinates.values()
             ],
             return_exceptions=True,
@@ -226,6 +228,7 @@ class Routes:
     async def _resolve_coordinate(
         self,
         coordinate: latlng_pb2.LatLng,
+        segment_type: segment_type_pb2.SegmentType.ValueType,
     ) -> tuple[bytes, models_pb2.Place]:
         try:
             response = await self._places.GetPlaceClosestToCoordinates(
@@ -234,9 +237,22 @@ class Routes:
                         coordinates=coordinate,
                         radius=self._search_radius,
                     ),
+                    type=_convert_segment_type(segment_type),
                 ),
             )
         except grpc.aio.AioRpcError as err:
             raise _PlaceNotFoundError from err
 
         return coordinate.SerializeToString(deterministic=True), response.place
+
+
+def _convert_segment_type(
+    segment_type: segment_type_pb2.SegmentType.ValueType,
+) -> models_pb2.Type.ValueType:
+    match segment_type:
+        case segment_type_pb2.SEGMENT_TYPE_FLIGHT:
+            return models_pb2.Type.TYPE_AIRPORT
+        case segment_type_pb2.SEGMENT_TYPE_TRAIN:
+            return models_pb2.Type.TYPE_RAILWAY_STATION
+        case _:
+            return models_pb2.Type.TYPE_UNSPECIFIED

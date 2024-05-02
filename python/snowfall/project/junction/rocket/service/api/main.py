@@ -90,7 +90,7 @@ from snowfall.vendor.junction_one.auth import TemporaryTokenAuth
 
 class _ConsumerSettings(settings.CommonSettings):
     locations_address: str
-    place_search_radius_meters: int = 1500
+    place_search_radius_meters: int = 15000
     planner_address: str
     searches_polling_interval: datetime.timedelta = datetime.timedelta(seconds=2)
     searches_time_window: datetime.timedelta = datetime.timedelta(hours=2)
