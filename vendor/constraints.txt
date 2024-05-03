@@ -84,7 +84,7 @@
 //     "packaging==24.0",
 //     "pamqp==3.3.0",
 //     "pandas==2.2.2",
-//     "phonenumbers==8.13.35",
+//     "phonenumbers==8.13.36",
 //     "prometheus-async[aiohttp]==22.2.0",
 //     "prometheus-client==0.20.0",
 //     "protobuf==4.25.3",
@@ -4363,19 +4363,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "42942470d4062537be4d54c83511186da1fc14ba354961a2114da91efa9a4ed7",
-              "url": "https://files.pythonhosted.org/packages/ae/e2/4dea6313ef2b38442fccbbaf4017e50a6c3c8a50e8ee9b512783e5c90409/joblib-1.4.0-py3-none-any.whl"
+              "hash": "06d478d5674cbc267e7496a410ee875abd68e4340feff4490bcb7afb88060ae6",
+              "url": "https://files.pythonhosted.org/packages/91/29/df4b9b42f2be0b623cbd5e2140cafcaa2bef0759a00b7b70104dcfe2fb51/joblib-1.4.2-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1eb0dc091919cd384490de890cb5dfd538410a6d4b3b54eef09fb8c50b409b1c",
-              "url": "https://files.pythonhosted.org/packages/7c/c3/94c9e4886e8f33832690ab48fdac4a121a7bfec3e2c044c9f2762aa9068e/joblib-1.4.0.tar.gz"
+              "hash": "2382c5816b2636fbd20a09e0f4e9dad4736765fdfb7dca582943b9c1366b3f0e",
+              "url": "https://files.pythonhosted.org/packages/64/33/60135848598c076ce4b231e1b1895170f45fbcaeaa2c9d5e38b04db70c35/joblib-1.4.2.tar.gz"
             }
           ],
           "project_name": "joblib",
           "requires_dists": [],
           "requires_python": ">=3.8",
-          "version": "1.4.0"
+          "version": "1.4.2"
         },
         {
           "artifacts": [
@@ -5846,19 +5846,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "58286a8e617bd75f541e04313b28c36398be6d4443a778c85e9617a93c391310",
-              "url": "https://files.pythonhosted.org/packages/25/46/f0e2976a101003b1fac5b4836517fdd4a06ec2eccdf07314c457fb4b889c/phonenumbers-8.13.35-py2.py3-none-any.whl"
+              "hash": "68e06d20ae2f8fe5c7c7fd5b433f4257bc3cc747dc5196a029c7898ea449b012",
+              "url": "https://files.pythonhosted.org/packages/cc/07/d1b253ef0840a090686a061dbc68082c9f3c20a93c3841ae27728fc33a05/phonenumbers-8.13.36-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "64f061a967dcdae11e1c59f3688649e697b897110a33bb74d5a69c3e35321245",
-              "url": "https://files.pythonhosted.org/packages/6e/2b/087d09bccb1e769884831ccc7ad53773c71a97e6ffda25d6872b4c19798d/phonenumbers-8.13.35.tar.gz"
+              "hash": "b4e2371e35a1172aa2c91c9200b1e48e87b9355eb575768dd38058fc8d72c9ff",
+              "url": "https://files.pythonhosted.org/packages/6d/f8/528feb65fb3f729024ec9e96c0ceaac01400e71a2c570d6e0ded28cba5ce/phonenumbers-8.13.36.tar.gz"
             }
           ],
           "project_name": "phonenumbers",
           "requires_dists": [],
           "requires_python": null,
-          "version": "8.13.35"
+          "version": "8.13.36"
         },
         {
           "artifacts": [
@@ -8598,13 +8598,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "1ee4f8a893eb9bef51c6e35730cebf234d5d0b6bd112b0271e10ed7c24a02bd9",
-              "url": "https://files.pythonhosted.org/packages/2a/14/e75e52d521442e2fcc9f1df3c5e456aead034203d4797867980de558ab34/tqdm-4.66.2-py3-none-any.whl"
+              "hash": "b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644",
+              "url": "https://files.pythonhosted.org/packages/18/eb/fdb7eb9e48b7b02554e1664afd3bd3f117f6b6d6c5881438a0b055554f9b/tqdm-4.66.4-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "6cd52cdf0fef0e0f543299cfc96fec90d7b8a7e88745f411ec33eb44d5ed3531",
-              "url": "https://files.pythonhosted.org/packages/ea/85/3ce0f9f7d3f596e7ea57f4e5ce8c18cb44e4a9daa58ddb46ee0d13d6bff8/tqdm-4.66.2.tar.gz"
+              "hash": "e4d936c9de8727928f3be6079590e97d9abfe8d39a590be678eb5919ffc186bb",
+              "url": "https://files.pythonhosted.org/packages/5a/c0/b7599d6e13fe0844b0cda01b9aaef9a0e87dbb10b06e4ee255d3fa1c79a2/tqdm-4.66.4.tar.gz"
             }
           ],
           "project_name": "tqdm",
@@ -8619,7 +8619,7 @@
             "slack-sdk; extra == \"slack\""
           ],
           "requires_python": ">=3.7",
-          "version": "4.66.2"
+          "version": "4.66.4"
         },
         {
           "artifacts": [
@@ -10584,7 +10584,7 @@
     "packaging==24.0",
     "pamqp==3.3.0",
     "pandas==2.2.2",
-    "phonenumbers==8.13.35",
+    "phonenumbers==8.13.36",
     "prometheus-async[aiohttp]==22.2.0",
     "prometheus-client==0.20.0",
     "protobuf==4.25.3",
