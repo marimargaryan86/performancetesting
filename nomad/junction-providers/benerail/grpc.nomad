@@ -121,6 +121,11 @@ job "junction-providers-benerail-grpc" {
         policies = ["benerail-${var.environment}"]
       }
 
+      resources {
+        memory = 600
+      }
+
+
       template {
         data        = <<EOH
 AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}// {{end}}
