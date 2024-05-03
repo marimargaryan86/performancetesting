@@ -1,5 +1,6 @@
 import asyncio
-from collections.abc import Awaitable, Callable, Sequence
+import contextlib
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from typing import TypeAlias
 
 import grpc
@@ -52,21 +53,38 @@ class SuggestionSearchProcessor:
         self._logger = stdout.get_logger()
 
     async def process(self, body: multi_modal_pb2.SuggestionSearchTask) -> None:
-        suggestion_search = await self._get_search_to_process(body)
+        async with self._get_search_to_process(body) as suggestion_search:
+            try:
+                await self._process(suggestion_search)
+            except* search.ValidationError:
+                self._logger.warning("Search criteria did not validate")
+            except* search.ProviderTimeoutError:
+                self._logger.warning("One of the underlying providers timed out")
+            except* search.SearchError:
+                self._logger.info("No results found, search failed")
 
-        await asyncio.gather(
+    async def _process(
+        self,
+        suggestion_search: multi_modal_pb2.SuggestionSearch,
+    ) -> None:
+        possible_exceptions = await asyncio.gather(
             *[
                 self._find_suggestions(suggestion_search, route)
                 for route in await self._find_optimal_routes(suggestion_search)
             ],
+            return_exceptions=True,
         )
 
-        await self._search_repository.mark_as_completed(suggestion_search.id)
+        exceptions = list(filter(None, possible_exceptions))
 
+        if exceptions:
+            raise BaseExceptionGroup("One or more searches failed", exceptions)
+
+    @contextlib.asynccontextmanager
     async def _get_search_to_process(
         self,
         body: multi_modal_pb2.SuggestionSearchTask,
-    ) -> multi_modal_pb2.SuggestionSearch:
+    ) -> AsyncIterator[multi_modal_pb2.SuggestionSearch]:
         suggestion_search = await self._search_repository.find_by_id(
             body.suggestion_search_id,
         )
@@ -76,7 +94,13 @@ class SuggestionSearchProcessor:
 
         await self._search_repository.mark_as_processing(suggestion_search.id)
 
-        return suggestion_search
+        try:
+            yield suggestion_search
+        except Exception:
+            await self._search_repository.mark_as_failed(suggestion_search.id)
+            raise
+
+        await self._search_repository.mark_as_completed(suggestion_search.id)
 
     async def _find_optimal_routes(
         self,
@@ -111,7 +135,6 @@ class SuggestionSearchProcessor:
                 ),
             )
         except grpc.aio.AioRpcError as place_err:
-            await self._search_repository.mark_as_failed(suggestion_search.id)
             raise PlaceNotFoundError() from place_err
 
         return origin_response.place, destination_response.place

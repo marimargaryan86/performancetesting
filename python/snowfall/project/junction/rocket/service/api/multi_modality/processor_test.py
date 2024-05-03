@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 from unittest import mock
 
@@ -17,16 +18,32 @@ from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
 from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.v1 import segment_type_pb2
 
-_RESELLER_NOT_SUPPORTED = "not_supported"
+_CASE_NOT_SUPPORTED = "mode_not_supported"
+_CASE_NO_OFFERS = "no_offers"
+_CASE_TOO_LATE_OFFERS = "too_late_offers"
+_CASE_TIMEOUT = "timeout"
+_CASE_UNHANDLED_ERROR = "unhandled_error"
 
 
 async def _mock_outbound_search(
     request: search.SegmentSearchRequest,
 ) -> list[search.Offer]:
-    if request.reseller_id == _RESELLER_NOT_SUPPORTED:
+    if request.reseller_id == _CASE_NOT_SUPPORTED:
         raise search.ModeNotSupportedForResellerError(mode=request.segment.type)
 
-    departure_at = request.departure_after + datetime.timedelta(hours=1)
+    if request.reseller_id == _CASE_TIMEOUT:
+        raise search.ProviderTimeoutError("Provider timed out")
+
+    if request.reseller_id == _CASE_UNHANDLED_ERROR:
+        raise RuntimeError("An unhandled error occurred")
+
+    if request.reseller_id == _CASE_NO_OFFERS:
+        return []
+
+    if request.reseller_id == _CASE_TOO_LATE_OFFERS:
+        departure_at = request.departure_after - datetime.timedelta(hours=10)
+    else:
+        departure_at = request.departure_after + datetime.timedelta(hours=1)
 
     return [
         search.Offer(
@@ -131,29 +148,62 @@ class TestProcessor:
         assert processed
         assert processed.status == multi_modal_pb2.SuggestionSearch.STATUS_FAILED
 
-    async def test_unsupported_mode_search_status_is_completed(
+    @pytest.mark.parametrize(
+        ("reseller_id", "expected_status"),
+        [
+            pytest.param(
+                _CASE_NOT_SUPPORTED,
+                multi_modal_pb2.SuggestionSearch.STATUS_COMPLETED,
+                id=_CASE_NOT_SUPPORTED,
+            ),
+            pytest.param(
+                _CASE_NO_OFFERS,
+                multi_modal_pb2.SuggestionSearch.STATUS_COMPLETED,
+                id=_CASE_NO_OFFERS,
+            ),
+            pytest.param(
+                _CASE_TOO_LATE_OFFERS,
+                multi_modal_pb2.SuggestionSearch.STATUS_COMPLETED,
+                id=_CASE_TOO_LATE_OFFERS,
+            ),
+            pytest.param(
+                _CASE_TIMEOUT,
+                multi_modal_pb2.SuggestionSearch.STATUS_COMPLETED,
+                id=_CASE_TIMEOUT,
+            ),
+            pytest.param(
+                _CASE_UNHANDLED_ERROR,
+                multi_modal_pb2.SuggestionSearch.STATUS_FAILED,
+                id=_CASE_UNHANDLED_ERROR,
+            ),
+        ],
+    )
+    async def test_failures_have_expected_search_status(
         self,
         suggestion_search_processor: processor.SuggestionSearchProcessor,
         suggestion_search_repository: repository.SuggestionSearchRepository,
         planner: planner_pb2_grpc.PlannerServiceStub,
         find_routes_response: planner_pb2.FindRoutesResponse,
         search_criteria: multi_modal_pb2.SuggestionSearch.Criteria,
+        reseller_id: str,
+        expected_status: multi_modal_pb2.SuggestionSearch.Status.ValueType,
     ) -> None:
         planner.FindRoutes = mock.AsyncMock(return_value=find_routes_response)
-        search_criteria.reseller_id = _RESELLER_NOT_SUPPORTED
+        search_criteria.reseller_id = reseller_id
         suggestion_search = await suggestion_search_repository.create_from_criteria(
             search_criteria,
         )
 
-        await suggestion_search_processor.process(
-            multi_modal_pb2.SuggestionSearchTask(
-                suggestion_search_id=suggestion_search.id,
-            ),
-        )
+        with contextlib.suppress(Exception):
+            await suggestion_search_processor.process(
+                multi_modal_pb2.SuggestionSearchTask(
+                    suggestion_search_id=suggestion_search.id,
+                ),
+            )
 
         processed = await suggestion_search_repository.find_by_id(suggestion_search.id)
         assert processed
-        assert processed.status == multi_modal_pb2.SuggestionSearch.STATUS_COMPLETED
+        assert processed.status == expected_status
 
     async def test_search_status_is_completed_after_processing(
         self,
