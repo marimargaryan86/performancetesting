@@ -225,9 +225,6 @@ async def test_train_search_invalid(
     departure_after: str,
     passengers: Sequence[datetime.date],
 ) -> None:
-    if INVALID_SEARCH.passengers[0] == passengers[0]:
-        pytest.skip("Skipping: waiting on fix for /bugs-triage/-/issues/164")
-
     with pytest.raises(
         HTTPStatusError,
         match="Client error '422 Unprocessable Entity",
