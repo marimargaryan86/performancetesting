@@ -91,10 +91,16 @@ class Segment:
 @dataclasses.dataclass(frozen=True)
 class Route:
     segments: list[Segment]
+    estimated_travel_time: datetime.timedelta
+    estimated_daily_departures: int
 
     def reduce(self) -> Route:
         if not self.segments:
-            return Route(segments=[])
+            return Route(
+                segments=[],
+                estimated_travel_time=self.estimated_travel_time,
+                estimated_daily_departures=self.estimated_daily_departures,
+            )
 
         new_segments = []
         current_segment: Segment = self.segments[0]
@@ -111,7 +117,11 @@ class Route:
                 current_segment = segment
 
         new_segments.append(current_segment)
-        return Route(segments=new_segments)
+        return Route(
+            segments=new_segments,
+            estimated_travel_time=self.estimated_travel_time,
+            estimated_daily_departures=self.estimated_daily_departures,
+        )
 
     def is_inverse_of(self, other: Route) -> bool:
         if len(self.segments) != len(other.segments):
@@ -128,7 +138,11 @@ class Route:
         )
 
     def to_inverse(self) -> Route:
-        return Route(segments=[segment.to_inverse() for segment in self.segments[::-1]])
+        return Route(
+            segments=[segment.to_inverse() for segment in self.segments[::-1]],
+            estimated_travel_time=self.estimated_travel_time,
+            estimated_daily_departures=self.estimated_daily_departures,
+        )
 
 
 class Routes:
@@ -177,17 +191,9 @@ class Routes:
         for route in route_response.routes:
             with contextlib.suppress(KeyError):
                 resolved_routes.append(
-                    self._resolve_route(route, resolved_places).reduce(),
+                    self._resolve_route(route, resolved_places),
                 )
-
-        # We need to de-duplicate the routes after reducing the segments. We
-        # do it naively because the number of routes is expected to be small.
-        deduped_routes = []
-        for rte in resolved_routes:
-            if rte not in deduped_routes:
-                deduped_routes.append(rte)
-
-        return deduped_routes
+        return resolved_routes
 
     async def _find_location_coordinates(
         self,
@@ -229,6 +235,8 @@ class Routes:
                 )
                 for segment in route.segments
             ],
+            estimated_travel_time=route.estimated_travel_time.ToTimedelta(),
+            estimated_daily_departures=route.estimated_daily_departures,
         )
 
     async def _resolve_coordinates(

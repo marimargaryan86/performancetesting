@@ -12,6 +12,7 @@ from snowfall.project.junction.rocket.service.api.multi_modality import (
     processor,
     repository,
     routes,
+    routes_ranking,
     search,
 )
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
@@ -74,6 +75,7 @@ async def suggestion_search_processor(
         suggestion_repository=suggestion_repository,
         places=places,
         route_finder=route_finder,
+        ranking=routes_ranking.SimpleRouteRanking(),
         searcher=search.Searcher(
             search_implementations=[
                 search.SearchImplementation(

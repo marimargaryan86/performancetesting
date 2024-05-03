@@ -54,6 +54,9 @@ from snowfall.project.junction.rocket.service.api.multi_modality import (
     routes as multi_modal_routes,
 )
 from snowfall.project.junction.rocket.service.api.multi_modality import (
+    routes_ranking as multi_modal_routes_ranking,
+)
+from snowfall.project.junction.rocket.service.api.multi_modality import (
     search as multi_modal_search,
 )
 from snowfall.project.junction.rocket.service.api.places import (
@@ -283,6 +286,7 @@ async def _consume(app: application.Application[_ConsumerSettings]) -> None:
                 locations=locations_pb2_grpc.LocationsServiceStub(channels.locations),
                 place_search_radius=app.settings.place_search_radius_meters,
             ),
+            ranking=multi_modal_routes_ranking.SimpleRouteRanking(),
             searcher=multi_modal_search.Searcher(
                 search_implementations=[
                     multi_modal_search.SearchImplementation(

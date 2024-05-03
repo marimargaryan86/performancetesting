@@ -1,6 +1,6 @@
 import asyncio
 import contextlib
-from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
+from collections.abc import AsyncIterator, Awaitable, Callable
 from typing import TypeAlias
 
 import grpc
@@ -8,6 +8,7 @@ import grpc
 from snowfall.project.junction.rocket.service.api.multi_modality import (
     repository,
     routes,
+    routes_ranking,
     search,
 )
 from snowfall.project.junction.rocket.service.api.v1alpha import multi_modal_pb2
@@ -43,12 +44,14 @@ class SuggestionSearchProcessor:
         suggestion_repository: repository.SuggestionRepository,
         places: places_pb2_grpc.PlacesServiceStub,
         route_finder: routes.Routes,
+        ranking: routes_ranking.RouteRanking,
         searcher: search.Searcher,
     ):
         self._search_repository = suggestion_search_repository
         self._suggestions = suggestion_repository
         self._places = places
         self._routes = route_finder
+        self._routes_ranking = ranking
         self._searcher = searcher
         self._logger = stdout.get_logger()
 
@@ -108,16 +111,20 @@ class SuggestionSearchProcessor:
     ) -> list[routes.Route]:
         origin, destination = await self._get_origin_destination(suggestion_search)
         found_routes = await self._routes.find_routes(origin, destination)
+        prioritized_routes = self._routes_ranking(found_routes)
 
-        return self._select_optimal_routes(found_routes)
+        # We reduce the routes only after prioritizing them, because we want
+        # to use all relevant data about the route during the prioritization.
+        reduced_routes = [route.reduce() for route in prioritized_routes]
+        # We need to de-duplicate the routes after reducing the segments. We
+        # do it naively because the number of routes is expected to be small.
+        deduped_routes = []
+        for rte in reduced_routes:
+            if rte not in deduped_routes:
+                deduped_routes.append(rte)
 
-    def _select_optimal_routes(
-        self,
-        routes_to_optimize: Sequence[routes.Route],
-    ) -> list[routes.Route]:
-        return [
-            routes_to_optimize[0],
-        ]  # TODO(bolmis): Actually select the optimal routes.
+        routes_to_choose = 3
+        return deduped_routes[:routes_to_choose]
 
     async def _get_origin_destination(
         self,

@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from typing import NoReturn, TypeVar
 
 import grpc
@@ -88,9 +89,7 @@ class TestRouteFinder:
             "FindRoutes",
             return_value=_make_awaitable(
                 planner_pb2.FindRoutesResponse(
-                    routes=[
-                        planner_pb2.FindRoutesResponse.Route(),
-                    ],
+                    routes=[planner_pb2.FindRoutesResponse.Route()],
                 ),
             ),
         )
@@ -232,49 +231,6 @@ class TestRouteFinder:
 
         assert not found_routes
 
-    async def test_route_with_adjacent_segments_is_reduced_and_deduped(
-        self,
-        route_finder: routes.Routes,
-        planner: planner_pb2_grpc.PlannerServiceStub,
-        mocker: pytest_mock.MockerFixture,
-    ) -> None:
-        mocker.patch.object(
-            planner,
-            "FindRoutes",
-            return_value=_make_awaitable(
-                planner_pb2.FindRoutesResponse(
-                    routes=[
-                        planner_pb2.FindRoutesResponse.Route(
-                            segments=[
-                                planner_pb2.FindRoutesResponse.Segment(
-                                    segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
-                                ),
-                                planner_pb2.FindRoutesResponse.Segment(
-                                    segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
-                                ),
-                            ],
-                        ),
-                        planner_pb2.FindRoutesResponse.Route(
-                            segments=[
-                                planner_pb2.FindRoutesResponse.Segment(
-                                    segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
-                                ),
-                                planner_pb2.FindRoutesResponse.Segment(
-                                    segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
-                                ),
-                            ],
-                        ),
-                    ],
-                ),
-            ),
-        )
-        found_routes = await route_finder.find_routes(
-            origin=models_pb2.Place(),
-            destination=models_pb2.Place(),
-        )
-
-        assert len(found_routes) == 1
-
     async def test_valid_routes_are_not_discarded(
         self,
         route_finder: routes.Routes,
@@ -350,7 +306,11 @@ class TestRoute:
         self,
         train_segment1: routes.Segment,
     ) -> None:
-        route = routes.Route(segments=[train_segment1])
+        route = routes.Route(
+            segments=[train_segment1],
+            estimated_travel_time=datetime.timedelta(hours=1),
+            estimated_daily_departures=3,
+        )
         reduced_route = route.reduce()
 
         assert len(reduced_route.segments) == 1
@@ -361,7 +321,11 @@ class TestRoute:
         train_segment1: routes.Segment,
         train_segment2: routes.Segment,
     ) -> None:
-        route = routes.Route(segments=[train_segment1, train_segment2])
+        route = routes.Route(
+            segments=[train_segment1, train_segment2],
+            estimated_travel_time=datetime.timedelta(hours=1),
+            estimated_daily_departures=3,
+        )
         reduced_route = route.reduce()
 
         assert len(reduced_route.segments) == 1
@@ -373,7 +337,11 @@ class TestRoute:
         train_segment1: routes.Segment,
         air_segment1: routes.Segment,
     ) -> None:
-        route = routes.Route(segments=[train_segment1, air_segment1])
+        route = routes.Route(
+            segments=[train_segment1, air_segment1],
+            estimated_travel_time=datetime.timedelta(hours=1),
+            estimated_daily_departures=3,
+        )
         reduced_route = route.reduce()
 
         assert len(reduced_route.segments) == 2
@@ -386,7 +354,11 @@ class TestRoute:
         train_segment1: routes.Segment,
         train_segment2: routes.Segment,
     ) -> None:
-        route = routes.Route(segments=[air_segment1, train_segment1, train_segment2])
+        route = routes.Route(
+            segments=[air_segment1, train_segment1, train_segment2],
+            estimated_travel_time=datetime.timedelta(hours=1),
+            estimated_daily_departures=3,
+        )
         reduced_route = route.reduce()
 
         assert len(reduced_route.segments) == 2
@@ -413,6 +385,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 routes.Route(
                     segments=[
@@ -427,6 +401,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 id="different_lengths",
             ),
@@ -439,6 +415,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 routes.Route(
                     segments=[
@@ -448,6 +426,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 id="single_segment_mismatch",
             ),
@@ -465,6 +445,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 routes.Route(
                     segments=[
@@ -479,6 +461,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 id="multi_segment_order_mismatch",
             ),
@@ -503,6 +487,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 routes.Route(
                     segments=[
@@ -512,6 +498,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 id="single_segment",
             ),
@@ -529,6 +517,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 routes.Route(
                     segments=[
@@ -543,6 +533,8 @@ class TestRoute:
                             segment_type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
                         ),
                     ],
+                    estimated_travel_time=datetime.timedelta(hours=1),
+                    estimated_daily_departures=3,
                 ),
                 id="multi_segment",
             ),
@@ -560,6 +552,10 @@ class TestRoute:
         train_segment1: routes.Segment,
         train_segment2: routes.Segment,
     ) -> None:
-        original_route = routes.Route(segments=[train_segment1, train_segment2])
+        original_route = routes.Route(
+            segments=[train_segment1, train_segment2],
+            estimated_travel_time=datetime.timedelta(hours=1),
+            estimated_daily_departures=3,
+        )
         inverse_route = original_route.to_inverse()
         assert original_route.is_inverse_of(inverse_route)
