@@ -17,7 +17,7 @@ function HomepageHeader() {
                     text='View API Specification'
                     variant='outline'
                     icon='img/arrow.svg'
-                    href='/docs/resellers/openapi'
+                    href='/docs/api/openapi'
                 />
             </div>
         </header>

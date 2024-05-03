@@ -20,7 +20,7 @@
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ifm-color-primary: #3eb49c;
   --ifm-color-primary-dark: #21af90;
   --ifm-color-primary-darker: #1fa588;
@@ -45,4 +45,16 @@ button:hover {
 button[aria-label*="expand"]:hover,
 button[aria-label*="collapse"]:hover {
   text-decoration: underline;
+}
+
+.sc-dJGMql.dMYsNA.sc-dJGMql .dMYsNA {
+  background-color: #f2f2f264;
+  border-radius: 8px;
+  padding-left: 4px;
+}
+
+.sc-hIPBNq {
+  background-color: #f2f2f264;
+  border-radius: 8px;
+  padding-left: 4px;
 }

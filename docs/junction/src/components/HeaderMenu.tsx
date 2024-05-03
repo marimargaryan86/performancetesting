@@ -26,8 +26,8 @@ export default function Home(): JSX.Element {
             <a href='/'>
                 <img src='/img/snowfall-logo.svg' alt='logo' />
             </a>
-            <a href='/docs/resellers/openapi'>API Reference</a>
-            <a href='/docs/resellers/guides/create-an-order'>Guides</a>
+            <a href='/docs/guides/Introduction/overview'>Guides</a>
+            <a href='/docs/api/openapi'>API Spec</a>
         </header>
     );
 }
