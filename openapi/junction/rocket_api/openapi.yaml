@@ -2784,6 +2784,42 @@ components:
                   format: phone
                   example: '+4407770000001'
                   description: The passenger's phone number. The format should be in international E.164 standard, although not strictly enforced in this spec.
+                document:
+                  type: object
+                  description: The properties that define a Passport object
+                  required:
+                    - documentType
+                    - documentNumber
+                    - documentIssueCountry
+                    - documentExpirationDate
+                    - nationality
+                  properties:
+                    documentType:
+                      type: string
+                      enum:
+                        - passport
+                      example: passport
+                    documentNumber:
+                      type: string
+                      example: '1543343434'
+                    documentIssueCountry:
+                      type: string
+                      example: GB
+                      description: 2 letter country code
+                      minLength: 2
+                      maxLength: 2
+                      pattern: '^[A-Z]{2}$'
+                    documentExpirationDate:
+                      type: string
+                      example: '2025-02-03'
+                      format: date
+                    nationality:
+                      type: string
+                      description: 2 letter country code
+                      example: ES
+                      minLength: 2
+                      maxLength: 2
+                      pattern: '^[A-Z]{2}$'
         - $ref: '#/components/schemas/SelfLink'
     PassengerCreated:
       title: Passenger Created
