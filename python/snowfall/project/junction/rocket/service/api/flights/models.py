@@ -262,3 +262,4 @@ class RocketTrip(BaseModel):
     offer_id: str
     passenger_ids: list[PassengerIds]
     reservation_ids: list[int]
+    expires_at: datetime = Field(default_factory=expires_factory)

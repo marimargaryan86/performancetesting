@@ -109,7 +109,10 @@ class RocketTripRepository(
     mixins.UpsertMixin[RocketTrip],
 ):
     _model = RocketTrip
-    _indexes = (pymongo.IndexModel("offer_id", background=True),)
+    _indexes = (
+        pymongo.IndexModel("offer_id", background=True),
+        pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
+    )
 
     async def find_by_offer_id(self, offer_id: str) -> RocketTrip | None:
         return await self._execute(self._collection.find_one, {"offer_id": offer_id})
