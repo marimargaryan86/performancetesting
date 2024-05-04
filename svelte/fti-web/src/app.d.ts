@@ -1,6 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { Locale } from "$lib/i18n/lang";
+import type { Locale } from "$lib/i18n";
 
 // for information about these interfaces
 declare global {

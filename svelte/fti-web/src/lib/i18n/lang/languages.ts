@@ -1,5 +1,4 @@
-export default [{ locale: "en" as const, flag: "🇬🇧", name: "EN" }] satisfies {
-  locale: string;
-  flag: string;
-  name: string;
-}[];
+export default [
+  { locale: "en-GB" as const, flag: "🇬🇧", name: "EN" },
+  { locale: "de-DE" as const, flag: "🇩🇪", name: "DE" },
+] satisfies { locale: string; flag: string; name: string }[];

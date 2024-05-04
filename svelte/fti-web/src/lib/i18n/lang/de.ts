@@ -1,6 +1,8 @@
+import type { LocaleData } from "$lib/i18n";
+
 export default {
-  title: "Junction Hub",
+  title: "BigXtra",
   sentences: {
-    hello: "Hello",
+    hello: "Hallo",
   },
-};
+} satisfies LocaleData;

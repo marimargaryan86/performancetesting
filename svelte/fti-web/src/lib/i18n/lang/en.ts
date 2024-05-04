@@ -1,5 +1,5 @@
 export default {
-  title: "Junction Hub",
+  title: "BigXtra",
   sentences: {
     hello: "Hello",
   },

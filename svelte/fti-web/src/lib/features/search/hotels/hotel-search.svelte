@@ -1,8 +1,11 @@
 <script lang="ts">
   import type { SearchResultsData } from "../../../../routes/search/[searchType=search_type]/[origin]/[destination]/+page.svelte";
   import SearchHeader from "$lib/features/search/search-header.svelte";
+  import { getTranslator } from "$lib/i18n";
 
   export let searchResultsData: SearchResultsData = false;
+
+  const t = getTranslator();
 </script>
 
 <div class="wrapper">
@@ -10,11 +13,11 @@
 
   <main>
     <div class="filters">
-      <h2>Hello filters.</h2>
+      <h2>{$t("sentences.hello")} filters.</h2>
     </div>
 
     <div class="search-results">
-      <h2>Hello hotels.</h2>
+      <h2>{$t("sentences.hello")} hotels.</h2>
       <pre>{JSON.stringify(searchResultsData, null, 4)}</pre>
     </div>
   </main>

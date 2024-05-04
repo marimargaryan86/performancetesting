@@ -43,12 +43,13 @@ export function setTranslator(
 
   const localeStore = setContext(LOCALE, writable(locale));
   const localeDataStore = setContext(LOCALE_DATA, writable(localeData));
+  /** NB: Mattias is busy and he's the only one who knows whats going on here */
   const tStore = setContext<Readable<Translator>>(
     T_FUNC,
     derived([localeStore, localeDataStore], ([nextLocale, nextLang]) => {
       i18next.addResourceBundle(nextLocale, "translation", nextLang);
       i18next.changeLanguage(nextLocale);
-      // @ts-expect-error Mattias is busy and he's the only one who knows whats going on here
+
       return i18next.t;
     }),
   );
