@@ -47,7 +47,7 @@ RUN curl -fsSL https://github.com/editorconfig-checker/editorconfig-checker/rele
     mv /usr/local/bin/ec-linux-amd64 /usr/local/bin/editorconfig-checker
 
 # renovate: datasource=github-releases depName=git-cliff packageName=orhun/git-cliff
-ENV GIT_CLIFF_VERSION=v2.1.2
+ENV GIT_CLIFF_VERSION=v2.2.1
 RUN curl -sfSL https://github.com/orhun/git-cliff/releases/download/${GIT_CLIFF_VERSION}/git-cliff-${GIT_CLIFF_VERSION:1}-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /usr/local git-cliff-${GIT_CLIFF_VERSION:1}/git-cliff && \
     mv /usr/local/git-cliff-${GIT_CLIFF_VERSION:1}/git-cliff /usr/local/bin/git-cliff
 
