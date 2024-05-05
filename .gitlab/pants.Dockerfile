@@ -38,7 +38,7 @@ RUN curl -fsSL https://github.com/Tufin/oasdiff/releases/download/${OASDIFF_VERS
     rm /tmp/oasdiff.deb
 
 # renovate: datasource=github-releases depName=sentry-cli packageName=getsentry/sentry-cli
-ENV SENTRY_CLI_VERSION=2.30.0
+ENV SENTRY_CLI_VERSION=2.31.2
 RUN curl -fsSL https://sentry.io/get-cli/ | bash
 
 # renovate: datasource=github-releases depName=editorconfig-checker packageName=editorconfig-checker/editorconfig-checker
