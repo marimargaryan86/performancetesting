@@ -10,7 +10,7 @@
 //   ],
 //   "generated_with_requirements": [
 //     "Babel==2.15.0",
-//     "Faker==24.11.0",
+//     "Faker==24.14.1",
 //     "Flake8-pyproject==1.2.3",
 //     "Pillow==10.3.0",
 //     "Shapely==2.0.4",
@@ -2595,13 +2595,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "adb98e771073a06bdc5d2d6710d8af07ac5da64c8dc2ae3b17bb32319e66fd82",
-              "url": "https://files.pythonhosted.org/packages/17/22/a5424c499c0cbd0d793f7f1499a904f83efb5762950ff6bafe4bca314a38/Faker-24.11.0-py3-none-any.whl"
+              "hash": "a5edba3aa17a1d689c8907e5b0cd1653079c2466a4807f083aa7b5f80a00225d",
+              "url": "https://files.pythonhosted.org/packages/07/a3/62f91fea1dae6a178f53c4c5f5f28660c5ab900a0ed2ef40d603993cce24/Faker-24.14.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "34b947581c2bced340c39b35f89dbfac4f356932cfff8fe893bde854903f0e6e",
-              "url": "https://files.pythonhosted.org/packages/05/18/897bae41fedb7e366439f2e4756c21436ccc27bc3f6cac3ca143cf5d57e4/Faker-24.11.0.tar.gz"
+              "hash": "380a3697e696ae4fcf50a93a3d9e0286fab7dfbf05a9caa4421fa4727c6b1e89",
+              "url": "https://files.pythonhosted.org/packages/b1/70/b64e9b7adc0e7c8ecd15781cb495702ccf404203a98c69a5e665895aca04/Faker-24.14.1.tar.gz"
             }
           ],
           "project_name": "faker",
@@ -2610,7 +2610,7 @@
             "typing-extensions>=3.10.0.1; python_version <= \"3.8\""
           ],
           "requires_python": ">=3.8",
-          "version": "24.11.0"
+          "version": "24.14.1"
         },
         {
           "artifacts": [
@@ -10492,7 +10492,7 @@
   "prefer_older_binary": false,
   "requirements": [
     "Babel==2.15.0",
-    "Faker==24.11.0",
+    "Faker==24.14.1",
     "Flake8-pyproject==1.2.3",
     "Pillow==10.3.0",
     "Shapely==2.0.4",
