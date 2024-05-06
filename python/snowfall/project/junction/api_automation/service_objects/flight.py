@@ -8,7 +8,7 @@ from snowfall.project.junction.api_automation.service_objects.client_wrapper imp
     ClientWrapper,
 )
 from snowfall.project.junction.api_automation.service_objects.data import (
-    FlightOffersResult,
+    FlightOffers,
     FlightSearchResult,
 )
 from snowfall.project.junction.api_automation.service_objects.helper import (
@@ -26,11 +26,16 @@ class FlightClient:
         destination: str | None,
         departure_after: str | None,
         passengers_dates_of_birth: Sequence[date],
+        return_at: str | None = None,
+        outbound_offer_id: str | None = None,
     ) -> FlightSearchResult:
         attributes: dict[str, str | list[dict[str, str]]] = {}
 
         if departure_after is not None:
             attributes["departureAfter"] = departure_after
+
+        if return_at is not None:
+            attributes["returnAt"] = return_at
 
         passengers = [
             {"dateOfBirth": dob.strftime("%Y-%m-%d")}
@@ -58,6 +63,14 @@ class FlightClient:
                 "data": {
                     "id": destination,
                     "type": "places",
+                },
+            }
+
+        if outbound_offer_id is not None:
+            relationships["selectedOutboundOffer"] = {
+                "data": {
+                    "id": destination,
+                    "type": "flight-offers",
                 },
             }
 
@@ -89,12 +102,12 @@ class FlightClient:
         )
         return FlightSearchResult(search_status)
 
-    async def get_offers(self, search_id: str) -> FlightOffersResult:
+    async def get_offers(self, search_id: str) -> FlightOffers:
         result = await self._client.request(
             method=METHOD_GET,
             url="/flights/searches/{0}/results".format(search_id),
         )
-        return FlightOffersResult(result)
+        return FlightOffers(result)
 
     async def get_search_result(self, search_id: str) -> Mapping[str, Any]:
         return await self._client.request(

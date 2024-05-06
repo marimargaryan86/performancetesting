@@ -112,17 +112,44 @@ class FlightSearchResult:
         return get_nested_attribute(self._data, "data.attributes.status")
 
 
-class FlightOffersResult:
+class FlightOffersResult(BaseResult):
     def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
         self._data = data
 
     @property
-    def first_offer_id(self) -> str:
-        return get_nested_attribute(self._data, "data.0.id")
+    def id(self) -> str:
+        return get_nested_attribute(self._data, "id")
 
     @property
-    def first_result_offers(self) -> str:
-        return get_nested_attribute(self._data, "data.0.relationships.offers.data")
+    def offer_ids(self) -> list[str]:
+        return [
+            get_nested_attribute(offer, "id")
+            for offer in get_nested_attribute(self._data, "relationships.offers.data")
+        ]
+
+    @property
+    def result_detail_ids(self) -> list[str]:
+        return [
+            get_nested_attribute(rd, "id")
+            for rd in get_nested_attribute(
+                self._data,
+                "relationships.resultDetails.data",
+            )
+        ]
+
+
+class FlightOffers(BaseResult):
+    def __init__(self, data: Mapping[str, Any]):
+        super().__init__(data)
+        self._data = data
+
+    @property
+    def offer_results(self) -> list[FlightOffersResult]:
+        return [
+            FlightOffersResult(offer_result)
+            for offer_result in get_nested_attribute(self._data, "data")
+        ]
 
 
 class CarRentalSearchResult(BaseResult):

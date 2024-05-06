@@ -15,6 +15,7 @@ class InputSearchData:
     origin: str
     destination: str
     depart_after: str
+    return_at: str
     passengers: Sequence[datetime.date]
 
 
@@ -23,16 +24,17 @@ BASIC_SEARCH = InputSearchData(
     destination="c7dcabc2-a4e1-5b78-8314-0891095205ae",  # JFK
     depart_after=(
         datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=10)
-    ).strftime(
-        "%Y-%m-%dT08:00:00.000Z",
-    ),
+    ).strftime("%Y-%m-%dT08:00:00.000Z"),
+    return_at=(
+        datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=14)
+    ).strftime("%Y-%m-%dT08:00:00.000Z"),
     passengers=[datetime.date(1980, 2, 3)],
 )
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 @pytest.mark.verify()
-async def test_flight_search_one_way(
+async def test_flight_search_one_way(  # noqa: WPS218
     qa_client: QaClient,
 ) -> None:
     search_result = await qa_client.flight.search(
@@ -53,8 +55,9 @@ async def test_flight_search_one_way(
     search_offers = await qa_client.flight.get_offers(
         search_id=search_result.id,
     )
-    assert search_offers.first_offer_id
-    assert search_offers.first_result_offers
+    assert search_offers.offer_results
+    assert search_offers.offer_results[0].offer_ids
+    assert search_offers.offer_results[0].result_detail_ids
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -81,7 +84,7 @@ async def test_flight_search_with_no_offers(
     search_offers = await qa_client.flight.get_offers(
         search_id=search_result.id,
     )
-    assert not search_offers.first_result_offers
+    assert not search_offers.offer_results
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -189,3 +192,50 @@ async def test_flight_get_offer_list_with_invalid_search_id(
         await qa_client.flight.get_offers(
             search_id=invalid_search_id,
         )
+
+
+@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+@pytest.mark.verify()
+@pytest.mark.skip("Getting stuck with status Processing: ./bugs-triage/-/issues/167")
+async def test_flight_search_return(  # noqa: WPS217,WPS218
+    qa_client: QaClient,
+) -> None:
+    outbound_search = await qa_client.flight.search(
+        origin=BASIC_SEARCH.origin,
+        destination=BASIC_SEARCH.destination,
+        departure_after=BASIC_SEARCH.depart_after,
+        passengers_dates_of_birth=BASIC_SEARCH.passengers,
+        return_at=BASIC_SEARCH.return_at,
+    )
+
+    flight_search_result = await qa_client.flight.wait_for_completed_search(
+        search_id=outbound_search.id,
+    )
+
+    flight_offers = await qa_client.flight.get_offers(
+        search_id=flight_search_result.id,
+    )
+
+    assert flight_offers.offer_results
+    first_result_first_offer = flight_offers.offer_results[0].offer_ids[0]
+
+    return_search = await qa_client.flight.search(
+        origin=BASIC_SEARCH.origin,
+        destination=BASIC_SEARCH.destination,
+        departure_after=BASIC_SEARCH.depart_after,
+        passengers_dates_of_birth=BASIC_SEARCH.passengers,
+        return_at=BASIC_SEARCH.return_at,
+        outbound_offer_id=first_result_first_offer,
+    )
+
+    return_search_result = await qa_client.flight.wait_for_completed_search(
+        search_id=return_search.id,
+    )
+
+    return_offers = await qa_client.flight.get_offers(
+        search_id=return_search_result.id,
+    )
+
+    assert return_offers.offer_results
+    assert return_offers.offer_results[0].offer_ids
+    assert return_offers.offer_results[0].result_detail_ids
