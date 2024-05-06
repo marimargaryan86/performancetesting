@@ -26,6 +26,7 @@ from snowfall.project.junction.rocket.service.places.v1alpha import (
     places_pb2_grpc,
 )
 from snowfall.project.junction.v1 import segment_type_pb2
+from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.v1 import latlng_pb2
 
 _MCT_FLIGHT_PREFIX_MINUTES = 75
@@ -55,6 +56,11 @@ class Segment:
     origin: models_pb2.Place
     destination: models_pb2.Place
     type: segment_type_pb2.SegmentType.ValueType
+
+    estimated_travel_time: datetime.timedelta
+    estimated_daily_departures: int
+    estimated_departure_times: Iterable[datetime.datetime]
+
     mct_prefix: datetime.timedelta
     mct_suffix: datetime.timedelta
 
@@ -77,12 +83,26 @@ class Segment:
         origin: models_pb2.Place,
         destination: models_pb2.Place,
         segment_type: segment_type_pb2.SegmentType.ValueType,
+        estimated_travel_time: datetime.timedelta | None = None,
+        estimated_daily_departures: int = 0,
+        estimated_departure_times: Iterable[datetime.datetime] | None = None,
     ) -> Self:
+        estimated_travel_time = (
+            estimated_travel_time
+            if estimated_travel_time is not None
+            else datetime.timedelta(hours=0)
+        )
+        estimated_departure_times = (
+            estimated_departure_times if estimated_departure_times is not None else []
+        )
         mct = _MCT_MAPPING[segment_type]
         return cls(
             origin=origin,
             destination=destination,
             type=segment_type,
+            estimated_travel_time=estimated_travel_time,
+            estimated_daily_departures=estimated_daily_departures,
+            estimated_departure_times=sorted(estimated_departure_times),
             mct_prefix=mct[0],
             mct_suffix=mct[1],
         )
@@ -143,6 +163,32 @@ class Route:
             estimated_travel_time=self.estimated_travel_time,
             estimated_daily_departures=self.estimated_daily_departures,
         )
+
+    # Based on metadata from route and segments, predict the most likely sequence
+    # of departures on which each segment can be taken.
+    def optimistic_departures(
+        self,
+        departure_after: datetime.datetime,
+    ) -> list[tuple[Segment, datetime.datetime]]:
+        optimistic_departures = []
+
+        for idx, segment in enumerate(self.segments):
+            if idx > 0:
+                departure_after += segment.mct_prefix
+
+            next_departure = departure_after
+            for departure_time in segment.estimated_departure_times:
+                if departure_time >= departure_after:
+                    next_departure = departure_time
+                    break
+
+            optimistic_departures.append((segment, next_departure))
+
+            departure_after = (
+                next_departure + segment.estimated_travel_time + segment.mct_suffix
+            )
+
+        return optimistic_departures
 
 
 class Routes:
@@ -232,6 +278,12 @@ class Routes:
                         segment.destination.SerializeToString(deterministic=True)
                     ],
                     segment_type=segment.segment_type,
+                    estimated_travel_time=segment.estimated_travel_time.ToTimedelta(),
+                    estimated_daily_departures=segment.estimated_daily_departures,
+                    estimated_departure_times=[
+                        protobuf.protobuf_to_datetime(ts)
+                        for ts in segment.estimated_departure_times
+                    ],
                 )
                 for segment in route.segments
             ],

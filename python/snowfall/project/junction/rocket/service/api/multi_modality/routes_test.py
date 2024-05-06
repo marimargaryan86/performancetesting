@@ -280,6 +280,13 @@ def train_segment1() -> routes.Segment:
         origin=models_pb2.Place(id="train_segment1_origin"),
         destination=models_pb2.Place(id="train_segment1_destination"),
         segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+        estimated_travel_time=datetime.timedelta(hours=2),
+        estimated_daily_departures=3,
+        estimated_departure_times=[
+            datetime.datetime(2024, 4, 24, 6, 0, 0, 0, datetime.UTC),
+            datetime.datetime(2024, 4, 24, 10, 0, 0, 0, datetime.UTC),
+            datetime.datetime(2024, 4, 24, 16, 0, 0, 0, datetime.UTC),
+        ],
     )
 
 
@@ -289,6 +296,13 @@ def train_segment2() -> routes.Segment:
         origin=models_pb2.Place(id="train_segment2_origin"),
         destination=models_pb2.Place(id="train_segment2_destination"),
         segment_type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+        estimated_travel_time=datetime.timedelta(hours=3),
+        estimated_daily_departures=3,
+        estimated_departure_times=[
+            datetime.datetime(2024, 4, 24, 7, 0, 0, 0, datetime.UTC),
+            datetime.datetime(2024, 4, 24, 12, 15, 0, 0, datetime.UTC),
+            datetime.datetime(2024, 4, 24, 17, 30, 0, 0, datetime.UTC),
+        ],
     )
 
 
@@ -302,6 +316,72 @@ def air_segment1() -> routes.Segment:
 
 
 class TestRoute:
+    def test_route_optimistic_departures_single_segment(
+        self,
+        train_segment1: routes.Segment,
+    ) -> None:
+        route = routes.Route(
+            segments=[train_segment1],
+            estimated_travel_time=datetime.timedelta(hours=2),
+            estimated_daily_departures=3,
+        )
+        optimistic_departures = route.optimistic_departures(
+            datetime.datetime(2024, 4, 24, 6, 30, 0, 0, datetime.UTC),
+        )
+
+        assert len(optimistic_departures) == 1
+        assert optimistic_departures[0][0] == train_segment1
+        assert optimistic_departures[0][1] == datetime.datetime(
+            2024,
+            4,
+            24,
+            10,
+            0,
+            0,
+            0,
+            datetime.UTC,
+        )
+
+    def test_route_optimistic_departures_multi_segments(
+        self,
+        train_segment1: routes.Segment,
+        train_segment2: routes.Segment,
+    ) -> None:
+        route = routes.Route(
+            segments=[train_segment1, train_segment2],
+            estimated_travel_time=datetime.timedelta(hours=5),
+            estimated_daily_departures=3,
+        )
+        optimistic_departures = route.optimistic_departures(
+            datetime.datetime(2024, 4, 24, 7, 30, 0, 0, datetime.UTC),
+        )
+
+        assert len(optimistic_departures) == 2
+        assert optimistic_departures[0][0] == train_segment1
+        assert optimistic_departures[0][1] == datetime.datetime(
+            2024,
+            4,
+            24,
+            10,
+            0,
+            0,
+            0,
+            datetime.UTC,
+        )
+        assert optimistic_departures[1][0] == train_segment2
+        # We cannot catch the departure at 12:30 even though the first segment arrives
+        # at 12:00 because of an MCT of 45 minutes (15 + 30).
+        assert optimistic_departures[1][1] == datetime.datetime(
+            2024,
+            4,
+            24,
+            17,
+            30,
+            0,
+            0,
+            datetime.UTC,
+        )
+
     def test_route_reduce_single_segment_return_itself(
         self,
         train_segment1: routes.Segment,
