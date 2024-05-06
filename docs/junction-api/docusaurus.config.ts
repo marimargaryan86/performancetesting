@@ -1,6 +1,5 @@
-import { themes as prismThemes } from 'prism-react-renderer';
-import type { Config } from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+import { themes as prismThemes } from 'prism-react-renderer'
+import type { Config } from '@docusaurus/types'
 
 const config: Config = {
   title: 'WELCOME TO THE DEVELOPER PORTAL',
@@ -21,69 +20,75 @@ const config: Config = {
   // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en']
   },
 
   presets: [
     [
       'redocusaurus',
       {
-        // Plugin Options for loading OpenAPI files
+      // Plugin Options for loading OpenAPI files
         specs: [
           {
-            id: 'junction-api',
-            spec: 'openapi/junction/rocket_api/openapi.yaml',
-          },
-        ],
-      },
+            id: 'client-api',
+            spec: 'openapi/junction/client_api/openapi.json'
+          }
+        ]
+      }
     ],
     [
       'classic',
-      /** @type {import('@docusaurus/preset-classic').Options} */
       {
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
+          sidebarPath: require.resolve('./sidebars.js')
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
-      },
-    ],
+          customCss: require.resolve('./src/css/custom.css')
+        }
+      }
+    ]
   ],
   themes: ['@docusaurus/theme-mermaid'],
   markdown: {
-    mermaid: true,
+    mermaid: true
   },
-  themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    {
-      navbar: {
-        title: 'Junction',
-        logo: {
-          alt: 'Snowfall',
-          src: 'img/logo.svg',
+  themeConfig: {
+    navbar: {
+      title: 'Junction',
+      logo: {
+        alt: 'Snowfall',
+        src: 'img/logo.svg',
+      },
+      items: [
+        {
+          type: 'docSidebar',
+          sidebarId: 'guides',
+          position: 'left',
+          label: 'Guides'
         },
-        items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'resellers',
-            position: 'left',
-            label: 'Resellers',
-          },
-        ],
-      },
-      footer: {
-        style: 'dark',
-        links: [],
-        copyright: `Copyright © ${new Date().getFullYear()} Snowfall Limited.`,
-      },
-      prism: {
-        theme: prismThemes.github,
-        darkTheme: prismThemes.dracula,
+        {
+          type: 'docSidebar',
+          sidebarId: 'api',
+          position: 'left',
+          label: 'API Spec',
+        },
+      ],
+    },
+    footer: {
+      style: 'dark',
+      links: [],
+      copyright: `Copyright © ${new Date().getFullYear()} Snowfall Limited.`,
+    },
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+    },
+    docs: {
+      sidebar: {
+        hideable: true
       },
     },
+  },
 };
 
-export default config;
+export default config

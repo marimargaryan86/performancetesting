@@ -46,3 +46,15 @@ button[aria-label*="expand"]:hover,
 button[aria-label*="collapse"]:hover {
   text-decoration: underline;
 }
+
+.sc-dJGMql.dMYsNA.sc-dJGMql .dMYsNA {
+  background-color: #f2f2f264;
+  border-radius: 8px;
+  padding-left: 4px;
+}
+
+.sc-hIPBNq {
+  background-color: #f2f2f264;
+  border-radius: 8px;
+  padding-left: 4px;
+}
