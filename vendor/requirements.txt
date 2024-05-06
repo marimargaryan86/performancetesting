@@ -46,7 +46,7 @@ grpcio-status==1.62.2
 grpcio-testing==1.62.2
 h3[numpy]==3.7.7
 httpx[http2]==0.27.0
-hvac==2.1.0
+hvac==2.2.0
 iso4217==1.11.20220401
 isodate==0.6.1
 jinja2==3.1.4

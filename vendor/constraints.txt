@@ -59,7 +59,7 @@
 //     "grpcio==1.62.2",
 //     "h3[numpy]==3.7.7",
 //     "httpx[http2]==0.27.0",
-//     "hvac==2.1.0",
+//     "hvac==2.2.0",
 //     "iso4217==1.11.20220401",
 //     "isodate==0.6.1",
 //     "jinja2==3.1.4",
@@ -4109,13 +4109,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "73bc91e58c3fc7c6b8107cdaca9cb71fa0a893dfd80ffbc1c14e20f24c0c29d7",
-              "url": "https://files.pythonhosted.org/packages/8a/25/caafbb897518d08488daf6f43c49ffabcacbc6f9bae2de2dc99843988a31/hvac-2.1.0-py3-none-any.whl"
+              "hash": "f287a19940c6fc518c723f8276cc9927f7400734303ee5872ac2e84539466d8d",
+              "url": "https://files.pythonhosted.org/packages/82/cd/75dee999d3347bc2b91beafc74eaa2d44d2851887b5a030894f74d72027e/hvac-2.2.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "b48bcda11a4ab0a7b6c47232c7ba7c87fda318ae2d4a7662800c465a78742894",
-              "url": "https://files.pythonhosted.org/packages/9a/d1/b4b06bd69d541b9650646c930cab6b1d2ea02199c914c8fe8666d075a596/hvac-2.1.0.tar.gz"
+              "hash": "e4b0248c5672cb9a6f5974e7c8f5271a09c6c663cbf8ab11733a227f3d2db2c2",
+              "url": "https://files.pythonhosted.org/packages/ea/96/3d08ba4b59491941c83e46034c19d1b62c6966147bb2bb144788cf7c989c/hvac-2.2.0.tar.gz"
             }
           ],
           "project_name": "hvac",
@@ -4124,7 +4124,7 @@
             "requests<3.0.0,>=2.27.1"
           ],
           "requires_python": "<4.0,>=3.8",
-          "version": "2.1.0"
+          "version": "2.2.0"
         },
         {
           "artifacts": [
@@ -10541,7 +10541,7 @@
     "grpcio==1.62.2",
     "h3[numpy]==3.7.7",
     "httpx[http2]==0.27.0",
-    "hvac==2.1.0",
+    "hvac==2.2.0",
     "iso4217==1.11.20220401",
     "isodate==0.6.1",
     "jinja2==3.1.4",
