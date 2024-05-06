@@ -21,7 +21,7 @@ botocore-stubs==1.34.89
 check-jsonschema==0.28.2
 click==8.1.7
 coverage[toml]==7.5.1
-cryptography==42.0.6
+cryptography==42.0.7
 debugpy==1.8.1
 dnspython==2.6.1
 docformatter==1.7.5
