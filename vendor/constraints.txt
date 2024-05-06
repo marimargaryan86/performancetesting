@@ -9,7 +9,7 @@
 //     "CPython==3.11.*"
 //   ],
 //   "generated_with_requirements": [
-//     "Babel==2.14.0",
+//     "Babel==2.15.0",
 //     "Faker==24.11.0",
 //     "Flake8-pyproject==1.2.3",
 //     "Pillow==10.3.0",
@@ -820,13 +820,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "efb1a25b7118e67ce3a259bed20545c29cb68be8ad2c784c83689981b7a57287",
-              "url": "https://files.pythonhosted.org/packages/0d/35/4196b21041e29a42dc4f05866d0c94fa26c9da88ce12c38c2265e42c82fb/Babel-2.14.0-py3-none-any.whl"
+              "hash": "08706bdad8d0a3413266ab61bd6c34d0c28d6e1e7badf40a2cebe67644e2e1fb",
+              "url": "https://files.pythonhosted.org/packages/27/45/377f7e32a5c93d94cd56542349b34efab5ca3f9e2fd5a68c5e93169aa32d/Babel-2.15.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "6919867db036398ba21eb5c7a0f6b28ab8cbc3ae7a73a44ebe34ae74a4e7d363",
-              "url": "https://files.pythonhosted.org/packages/e2/80/cfbe44a9085d112e983282ee7ca4c00429bc4d1ce86ee5f4e60259ddff7f/Babel-2.14.0.tar.gz"
+              "hash": "8daf0e265d05768bc6c7a314cf1321e9a123afc328cc635c18622a2f30a04413",
+              "url": "https://files.pythonhosted.org/packages/15/d2/9671b93d623300f0aef82cde40e25357f11330bdde91743891b22a555bed/babel-2.15.0.tar.gz"
             }
           ],
           "project_name": "babel",
@@ -836,8 +836,8 @@
             "pytest>=6.0; extra == \"dev\"",
             "pytz>=2015.7; python_version < \"3.9\""
           ],
-          "requires_python": ">=3.7",
-          "version": "2.14.0"
+          "requires_python": ">=3.8",
+          "version": "2.15.0"
         },
         {
           "artifacts": [
@@ -10491,7 +10491,7 @@
   "pip_version": "24.0",
   "prefer_older_binary": false,
   "requirements": [
-    "Babel==2.14.0",
+    "Babel==2.15.0",
     "Faker==24.11.0",
     "Flake8-pyproject==1.2.3",
     "Pillow==10.3.0",
