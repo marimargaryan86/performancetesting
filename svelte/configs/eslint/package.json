@@ -6,7 +6,7 @@
     "eslint": "../../node_modules/eslint/bin/eslint.js"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.2",
+    "@types/eslint": "^8.56.3",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.56.0",
