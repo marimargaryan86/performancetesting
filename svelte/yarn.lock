@@ -1434,7 +1434,7 @@ __metadata:
     "@sveltejs/vite-plugin-svelte": "npm:^3.1.0"
     "@testing-library/dom": "npm:^9.3.4"
     "@testing-library/jest-dom": "npm:^6.4.2"
-    "@testing-library/svelte": "npm:4.1.0"
+    "@testing-library/svelte": "npm:4.2.3"
     "@testing-library/user-event": "npm:^14.5.2"
     "@vitest/coverage-istanbul": "npm:^1.3.1"
     "@vitest/ui": "npm:^1.3.1"
@@ -1594,14 +1594,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/svelte@npm:4.1.0":
-  version: 4.1.0
-  resolution: "@testing-library/svelte@npm:4.1.0"
+"@testing-library/svelte@npm:4.2.3":
+  version: 4.2.3
+  resolution: "@testing-library/svelte@npm:4.2.3"
   dependencies:
     "@testing-library/dom": "npm:^9.3.1"
   peerDependencies:
-    svelte: ^3 || ^4
-  checksum: 10c0/4335d8be01bd1e6475062be218577fa1d1b24e9dc97c33db523c5af6b044b97625f65a58bb5f73225064c5a2bf9ae9696948a2bcd2d82c1c25423014d635dce2
+    svelte: ^3 || ^4 || ^5
+  checksum: 10c0/eb5bbc923a82398abac7acadaf3128e5a47ab1eca6cdc216d6735096458cfdf5e77947614cda7683f38df7a0209334b6094d60c8f16fa4d382c0c3178742945a
   languageName: node
   linkType: hard
 
