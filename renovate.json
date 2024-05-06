@@ -17,7 +17,10 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["(^|/|\\.)Dockerfile$", "(^|/)Dockerfile\\.[^/]*$"],
+      "fileMatch": [
+        "(^|/|\\.)Dockerfile$",
+        "(^|/)Dockerfile\\.[^/]*$"
+      ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
       ]
@@ -25,45 +28,92 @@
   ],
   "packageRules": [
     {
-      "matchFileNames": ["svelte/**"],
+      "matchFileNames": [
+        "svelte/**"
+      ],
       "semanticCommitScope": "svelte"
     },
     {
-      "matchDatasources": ["pypi"],
-      "registryUrls": ["https://gitlab+deploy-token-124:kNkm3XvTkUiWo86sa5EW@git.snowfall.se/api/v4/projects/677/packages/pypi/simple"]
+      "matchDatasources": [
+        "pypi"
+      ],
+      "registryUrls": [
+        "https://gitlab+deploy-token-124:kNkm3XvTkUiWo86sa5EW@git.snowfall.se/api/v4/projects/677/packages/pypi/simple"
+      ]
     },
     {
-      "matchManagers": ["pip_requirements"],
+      "matchManagers": [
+        "pip_requirements"
+      ],
       "postUpgradeTasks": {
-        "commands": ["pants --no-pantsd generate-lockfiles --resolve=python-default"],
+        "commands": [
+          "pants --no-pantsd generate-lockfiles --resolve=python-default"
+        ],
         "executionMode": "branch"
       }
     },
     {
-      "matchManagers": ["pip_requirements"],
-      "matchPackageNames": ["aiobotocore", "boto3", "boto3-stubs", "botocore", "botocore-stubs", "mypy-boto3-location", "types-aiobotocore", "types-aiobotocore-sqs"],
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchPackageNames": [
+        "aiobotocore",
+        "boto3",
+        "boto3-stubs",
+        "botocore",
+        "botocore-stubs",
+        "mypy-boto3-location",
+        "types-aiobotocore",
+        "types-aiobotocore-sqs"
+      ],
       "groupName": "boto"
     },
     {
-      "matchManagers": ["pip_requirements"],
-      "matchPackageNames": ["grpcio", "grpcio-health-checking", "grpcio-reflection", "grpcio-status", "grpcio-testing"],
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchPackageNames": [
+        "grpcio",
+        "grpcio-health-checking",
+        "grpcio-reflection",
+        "grpcio-status",
+        "grpcio-testing"
+      ],
       "groupName": "grpc"
     },
     {
-      "matchManagers": ["pip_requirements"],
-      "matchPackageNames": ["pydantic", "pydantic-core"],
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchPackageNames": [
+        "pydantic",
+        "pydantic-core"
+      ],
       "groupName": "pydantic"
     },
     {
-      "matchManagers": ["regex"],
-      "matchPackageNames": ["oasdiff"],
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchPackageNames": [
+        "oasdiff"
+      ],
       "allowedVersions": "<2.0"
     },
     {
-      "matchManagers": ["pip_requirements"],
-      "matchPackageNames": ["add-trailing-comma", "docformatter", "ruff"],
+      "matchManagers": [
+        "pip_requirements"
+      ],
+      "matchPackageNames": [
+        "add-trailing-comma",
+        "docformatter",
+        "ruff"
+      ],
       "postUpgradeTasks": {
-        "commands": ["pants --no-pantsd generate-lockfiles --resolve=python-default", "pants --no-pantsd fix python/::"],
+        "commands": [
+          "pants --no-pantsd generate-lockfiles --resolve=python-default",
+          "pants --no-pantsd fix python/::"
+        ],
         "executionMode": "branch"
       }
     }
