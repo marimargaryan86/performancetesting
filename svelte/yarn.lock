@@ -1324,7 +1324,7 @@ __metadata:
     "@melt-ui/svelte": "npm:^0.72.0"
     "@neoconfetti/svelte": "npm:^1.0.0"
     "@snowfall/vitest-config": "workspace:configs/vitest"
-    "@sveltejs/adapter-auto": "npm:^3.1.1"
+    "@sveltejs/adapter-auto": "npm:^3.2.0"
     "@sveltejs/adapter-node": "npm:^5.0.1"
     "@sveltejs/kit": "npm:^2.5.3"
     "@types/eslint": "npm:8.56.0"
@@ -1358,7 +1358,7 @@ __metadata:
     "@snowfall/tsconfig": "workspace:configs/tsconfig"
     "@snowfall/vitest-config": "workspace:configs/vitest"
     "@stripe/stripe-js": "npm:^2.4.0"
-    "@sveltejs/adapter-auto": "npm:^3.1.1"
+    "@sveltejs/adapter-auto": "npm:^3.2.0"
     "@sveltejs/adapter-node": "npm:^5.0.1"
     "@sveltejs/kit": "npm:^2.5.3"
     "@sveltejs/vite-plugin-svelte": "npm:^3.0.2"
@@ -1454,14 +1454,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-auto@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "@sveltejs/adapter-auto@npm:3.1.1"
+"@sveltejs/adapter-auto@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "@sveltejs/adapter-auto@npm:3.2.0"
   dependencies:
     import-meta-resolve: "npm:^4.0.0"
   peerDependencies:
     "@sveltejs/kit": ^2.0.0
-  checksum: 10c0/a3dc52c65c4ed1e57341c5bf4d51de3edfc9cdbf306132de8774c4d2bfa94b9d419e14d88b01559b4fb177fa2675454a5125ab4c433df804814debfbf14f19c6
+  checksum: 10c0/2f7fbd947e208e604a08776cd4d32c228abd8ea912ef149bd21f395d9e40dceba5245c3fa722830d6ab1de27b86f3a29a71c5514472b902247073364b82ff6b1
   languageName: node
   linkType: hard
 
