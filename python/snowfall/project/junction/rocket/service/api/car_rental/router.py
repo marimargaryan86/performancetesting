@@ -2,6 +2,9 @@ from lagom.integrations import starlette
 from starlette import routing
 
 from snowfall.project.junction.rocket.service.api.car_rental.endpoints import (
+    offers as car_rental_offer,
+)
+from snowfall.project.junction.rocket.service.api.car_rental.endpoints import (
     searches as car_rental_search,
 )
 
@@ -22,5 +25,10 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             "/car-rental/searches/{searchId}/results",
             car_rental_search.CarSearchResults,
             name="ListCarSearchResults",
+        ),
+        integration.route(
+            "/car-rental/offers/{offerId}",
+            car_rental_offer.Offers,
+            name="ViewCarRentalOffer",
         ),
     ]

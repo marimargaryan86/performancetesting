@@ -12,6 +12,9 @@ from snowfall.project.junction.rocket.service.api.car_rental.endpoints import (
     searches_validation as validation,
 )
 from snowfall.project.junction.rocket.service.api.car_rental.models import (
+    offers as offer_models,
+)
+from snowfall.project.junction.rocket.service.api.car_rental.models import (
     searches as search_models,
 )
 from snowfall.project.junction.rocket.service.places.v1alpha import (
@@ -37,7 +40,7 @@ from snowfall.stdlib.integration.starlette import (
 from snowfall.stdlib.v1 import latlng_pb2
 
 _tz_finder = timezonefinder.TimezoneFinder()
-_IncludesType = search_models.ResultDetailResource | search_models.OfferResource
+_IncludesType = search_models.ResultDetailResource | offer_models.OfferResource
 
 
 class CarSearch(endpoints.HTTPEndpoint):
@@ -231,7 +234,7 @@ class CarSearchResults(endpoints.HTTPEndpoint):
         requested_includes = request.scope["parsed_query_string"].get("include", [])
         if "offers" in requested_includes:
             included.extend([
-                search_models.OfferResource.from_proto(offer)
+                offer_models.OfferResource.from_proto(offer)
                 for search_result in search_results
                 for offer in search_result.offers
             ])
