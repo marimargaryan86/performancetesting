@@ -109,7 +109,7 @@ setuptools==69.5.1
 Shapely==2.0.4
 snowfall.plugin.flake8==1.5.2
 snowfall.stdlib.format.filter-parser==1.5.2
-sqlalchemy[postgresql-asyncpg]==2.0.29
+sqlalchemy[postgresql-asyncpg]==2.0.30
 starlette==0.37.2
 stripe==9.3.0
 structlog==24.1.0
