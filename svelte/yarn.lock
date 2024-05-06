@@ -1361,7 +1361,7 @@ __metadata:
     "@sveltejs/adapter-auto": "npm:^3.2.0"
     "@sveltejs/adapter-node": "npm:^5.0.1"
     "@sveltejs/kit": "npm:^2.5.3"
-    "@sveltejs/vite-plugin-svelte": "npm:^3.0.2"
+    "@sveltejs/vite-plugin-svelte": "npm:^3.1.0"
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/md5": "npm:^2.3.5"
     "@types/mime-types": "npm:^2.1.4"
@@ -1431,7 +1431,7 @@ __metadata:
   resolution: "@snowfall/vitest-config@workspace:configs/vitest"
   dependencies:
     "@sveltejs/kit": "npm:^2.5.3"
-    "@sveltejs/vite-plugin-svelte": "npm:^3.0.2"
+    "@sveltejs/vite-plugin-svelte": "npm:^3.1.0"
     "@testing-library/dom": "npm:^9.3.4"
     "@testing-library/jest-dom": "npm:^6.4.2"
     "@testing-library/svelte": "npm:4.1.0"
@@ -1518,21 +1518,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/vite-plugin-svelte@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "@sveltejs/vite-plugin-svelte@npm:3.0.2"
+"@sveltejs/vite-plugin-svelte@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@sveltejs/vite-plugin-svelte@npm:3.1.0"
   dependencies:
     "@sveltejs/vite-plugin-svelte-inspector": "npm:^2.0.0"
     debug: "npm:^4.3.4"
     deepmerge: "npm:^4.3.1"
     kleur: "npm:^4.1.5"
-    magic-string: "npm:^0.30.5"
-    svelte-hmr: "npm:^0.15.3"
+    magic-string: "npm:^0.30.9"
+    svelte-hmr: "npm:^0.16.0"
     vitefu: "npm:^0.2.5"
   peerDependencies:
     svelte: ^4.0.0 || ^5.0.0-next.0
     vite: ^5.0.0
-  checksum: 10c0/7150877f61b65a51d55916fccacb7851859b0aab9c7e4f591c98b6775a7e55f5410cc854add4c427f99978f115a92ac75f116a813b67814cc7801daac1b78439
+  checksum: 10c0/08e572f3e141f3eccff93ac2456c3931f2d94f00b93b32d206bdbc76c9f8961905c5cdb69edab8088d838757af7b1437b4dbeef0e9872ab1a75dda3a961b223d
   languageName: node
   linkType: hard
 
@@ -5833,6 +5833,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"magic-string@npm:^0.30.9":
+  version: 0.30.10
+  resolution: "magic-string@npm:0.30.10"
+  dependencies:
+    "@jridgewell/sourcemap-codec": "npm:^1.4.15"
+  checksum: 10c0/aa9ca17eae571a19bce92c8221193b6f93ee8511abb10f085e55ffd398db8e4c089a208d9eac559deee96a08b7b24d636ea4ab92f09c6cf42a7d1af51f7fd62b
+  languageName: node
+  linkType: hard
+
 "magicast@npm:0.2.8":
   version: 0.2.8
   resolution: "magicast@npm:0.2.8"
@@ -8508,12 +8517,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-hmr@npm:^0.15.3":
-  version: 0.15.3
-  resolution: "svelte-hmr@npm:0.15.3"
+"svelte-hmr@npm:^0.16.0":
+  version: 0.16.0
+  resolution: "svelte-hmr@npm:0.16.0"
   peerDependencies:
     svelte: ^3.19.0 || ^4.0.0
-  checksum: 10c0/80b6df78e4bc1dd8d1beb4cfc5c341a7839a444b41320cb1ff56c19741346ecc07ee7cc989d7083b02c40bad80d989d52b0defac4126cd0013eaac378f626d63
+  checksum: 10c0/242c0775361b5e8e0c19550ce0f8d27f738c31f45684b8a8beb88e2cce931078ffab0a6793002b4879c2637fa698d559020e78cab40756be11341602284ed01e
   languageName: node
   linkType: hard
 
