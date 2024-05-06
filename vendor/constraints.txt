@@ -95,7 +95,7 @@
 //     "pydantic[email]==2.7.1",
 //     "pygments==2.17.2",
 //     "pyjwt==2.8.0",
-//     "pymongo==4.6.3",
+//     "pymongo==4.7.1",
 //     "pyshp==2.3.1",
 //     "pytest-asyncio==0.23.6",
 //     "pytest-cov==5.0.0",
@@ -6587,38 +6587,43 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "0e208f2ab7b495eff8fd175022abfb0abce6307ac5aee3f4de51fc1a459b71c9",
-              "url": "https://files.pythonhosted.org/packages/38/92/adea29f9f09cce0ab733b01a936ba7dbe5a617f6cf07f9a92b95c5b5e92f/pymongo-4.6.3-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+              "hash": "5119c66af8c4197c8757b4b7d98c443e5b127c224ac92fb657dbe2b512ae2713",
+              "url": "https://files.pythonhosted.org/packages/05/03/5f7d41bb65781c54f71e0791e6adeeb49560e4a2ca70127014369052c609/pymongo-4.7.1-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c2ad3e5bfcd345c0bfe9af69a82d720860b5b043c1657ffb513c18a0dee19c19",
-              "url": "https://files.pythonhosted.org/packages/00/07/9b7612de2ac167d1dee7d18fa4e37fa830e7242c3f249f5d824931dcd26d/pymongo-4.6.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              "hash": "811a07bba9d35f1e34159ede632ac71dbc429b372a20004e32d6578af872db1a",
+              "url": "https://files.pythonhosted.org/packages/14/8a/96b6a2c9a6ca2d28e3426d8298a914214f5368964c764d1e1095fcbf68e1/pymongo-4.7.1-cp311-cp311-macosx_11_0_arm64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "138b9fa18d40401c217bc038a48bcde4160b02d36d8632015b1804971a2eaa2f",
-              "url": "https://files.pythonhosted.org/packages/2b/f0/bc30f0d9f7f1b3de1eb51ef8ed85378ff237f551c28bf4a23e71cf92aa20/pymongo-4.6.3-cp311-cp311-macosx_10_9_universal2.whl"
+              "hash": "aa354933a158e57494c98b592f46d5d24d1b109e6ba05a05179cde719d9f7fd3",
+              "url": "https://files.pythonhosted.org/packages/16/01/51645b55f814d6bb00b7761d6aa8b7bc33067132a559753c905abf881387/pymongo-4.7.1-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "872bad5c83f7eec9da11e1fef5f858c6a4c79fe4a83c7780e7b0fe95d560ae3f",
-              "url": "https://files.pythonhosted.org/packages/62/ca/26b035ee50570a792269653ae91514fd25a843f540cf2b1c2ed385bae8e7/pymongo-4.6.3-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
+              "hash": "daf35ab13b86aba7cc8c4b019882f1fa8d287a26f586ef5eaf60a5233d3eaa52",
+              "url": "https://files.pythonhosted.org/packages/20/f1/078aeb15b00dc37c633f081aea4cccd7da29478971f48d1cc12d7726bb0d/pymongo-4.7.1-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "400074090b9a631f120b42c61b222fd743490c133a5d2f99c0208cefcccc964e",
-              "url": "https://files.pythonhosted.org/packages/6f/5d/b05b09299f0b03219db9e31ea404e89c056f55a0aafbb403f6710391c44d/pymongo-4.6.3.tar.gz"
+              "hash": "ad360630c221aee7c0841a51851496a3ca6fdea87007098a982c1aa26e34083a",
+              "url": "https://files.pythonhosted.org/packages/32/68/8be3c9fdc9fd823207675a3b6ca00dddde00ff397e48f2e7d94fa26349cd/pymongo-4.7.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "60931b0e07448afe8866ffff764cd5bf4b1a855dc84c7dcb3974c6aa6a377a59",
-              "url": "https://files.pythonhosted.org/packages/a3/18/1023fbf4882f04495faca58795d3d50bda565c1dc173b7201380af3c20e8/pymongo-4.6.3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+              "hash": "811c41c6227b7548afcb53e1b996c25262d837b5e5f519e2ddc2c7e59d8728a5",
+              "url": "https://files.pythonhosted.org/packages/6f/59/d3d75da83c40e7b0e3534656f949f5597a25729d452bc1bd7d680fe8d821/pymongo-4.7.1.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "9b35f8bded43ff91475305445fedf0613f880ff7e25c75ae1028e1260a9b7a86",
-              "url": "https://files.pythonhosted.org/packages/e0/e6/85a4776b85e58c6cb223bed574ff8c5f887feb31f98c1cf4aa91001d2c81/pymongo-4.6.3-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
+              "hash": "e4a63ba6813a2168ebd35ea5369f6c33f7787525986cd77668b7956acc3d2a38",
+              "url": "https://files.pythonhosted.org/packages/84/2a/17a45be93d2aa870029583b3ac875dfe5b8767a1d3ad47af9a4a738a26ca/pymongo-4.7.1-cp311-cp311-macosx_10_9_x86_64.whl"
+            },
+            {
+              "algorithm": "sha256",
+              "hash": "4d227555be35078b53f506f6b58bd0b0e8fd4513e89e6f29e83a97efab439250",
+              "url": "https://files.pythonhosted.org/packages/b7/db/cb26f94caf541f37f2f4658be2da58009cd0d5a69b98aaa233141bf11011/pymongo-4.7.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             }
           ],
           "project_name": "pymongo",
@@ -6628,8 +6633,8 @@
             "cryptography>=2.5; extra == \"ocsp\"",
             "dnspython<3.0.0,>=1.16.0",
             "pykerberos; os_name != \"nt\" and extra == \"gssapi\"",
-            "pymongo-auth-aws<2.0.0; extra == \"aws\"",
-            "pymongo[aws]; extra == \"encryption\"",
+            "pymongo-auth-aws<2.0.0,>=1.1.0; extra == \"aws\"",
+            "pymongo-auth-aws<2.0.0,>=1.1.0; extra == \"encryption\"",
             "pymongocrypt<2.0.0,>=1.6.0; extra == \"encryption\"",
             "pyopenssl>=17.2.0; extra == \"ocsp\"",
             "pytest>=7; extra == \"test\"",
@@ -6640,7 +6645,7 @@
             "zstandard; extra == \"zstd\""
           ],
           "requires_python": ">=3.7",
-          "version": "4.6.3"
+          "version": "4.7.1"
         },
         {
           "artifacts": [
@@ -10577,7 +10582,7 @@
     "pydantic[email]==2.7.1",
     "pygments==2.17.2",
     "pyjwt==2.8.0",
-    "pymongo==4.6.3",
+    "pymongo==4.7.1",
     "pyshp==2.3.1",
     "pytest-asyncio==0.23.6",
     "pytest-cov==5.0.0",
