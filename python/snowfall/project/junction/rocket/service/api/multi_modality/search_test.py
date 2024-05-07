@@ -33,6 +33,9 @@ _DOB = datetime.date(2000, 1, 1)
 _DEPARTURE_AT = datetime.datetime(2024, 1, 1, 0, 0, 0, 0, datetime.UTC)
 _OFFER_DATETIME1 = datetime.datetime(2024, 1, 1, 10, 0, 0, 0, datetime.UTC)
 _OFFER_DATETIME2 = datetime.datetime(2024, 1, 1, 18, 0, 0, 0, datetime.UTC)
+_INBOUND_DEPARTURE_AT = datetime.datetime(2024, 1, 4, 0, 0, 0, 0, datetime.UTC)
+_OFFER_INBOUND_DATETIME1 = datetime.datetime(2024, 1, 4, 10, 0, 0, 0, datetime.UTC)
+_OFFER_INBOUND_DATETIME2 = datetime.datetime(2024, 1, 4, 18, 0, 0, 0, datetime.UTC)
 
 
 def _mock_offer(
@@ -101,15 +104,20 @@ async def _mock_inbound_search(
     offer: search.Offer,
     request: search.SegmentSearchRequest,
 ) -> list[search.RoundtripOffer]:
-    departure_at = datetime.datetime.now(datetime.UTC)
-
     return [
         search.RoundtripOffer(
             id="air_3",
-            departure_at=departure_at,
-            arrival_at=departure_at + datetime.timedelta(hours=1),
+            departure_at=_OFFER_INBOUND_DATETIME1,
+            arrival_at=_OFFER_INBOUND_DATETIME1 + datetime.timedelta(hours=1),
             type=request.segment.type,
             outbound=_MOCK_OFFERS[request.segment.type][0],
+        ),
+        search.RoundtripOffer(
+            id="air_4",
+            departure_at=_OFFER_INBOUND_DATETIME2,
+            arrival_at=_OFFER_INBOUND_DATETIME2 + datetime.timedelta(hours=1),
+            type=request.segment.type,
+            outbound=_MOCK_OFFERS[request.segment.type][1],
         ),
     ]
 
@@ -579,7 +587,7 @@ class TestSearcherRoundtrip:
                         estimated_travel_time=datetime.timedelta(hours=1),
                         estimated_daily_departures=3,
                     ),
-                    departure_after=_DEPARTURE_AT,
+                    departure_after=_INBOUND_DEPARTURE_AT,
                 ),
                 id="different_lengths",
             ),
@@ -610,7 +618,7 @@ class TestSearcherRoundtrip:
                         estimated_travel_time=datetime.timedelta(hours=1),
                         estimated_daily_departures=3,
                     ),
-                    departure_after=_DEPARTURE_AT,
+                    departure_after=_INBOUND_DEPARTURE_AT,
                 ),
                 id="single_segment_mismatch",
             ),
@@ -651,7 +659,7 @@ class TestSearcherRoundtrip:
                         estimated_travel_time=datetime.timedelta(hours=1),
                         estimated_daily_departures=3,
                     ),
-                    departure_after=_DEPARTURE_AT,
+                    departure_after=_INBOUND_DEPARTURE_AT,
                 ),
                 id="multi_segment_order_mismatch",
             ),
@@ -717,7 +725,7 @@ class TestSearcherRoundtrip:
                         estimated_travel_time=datetime.timedelta(hours=1),
                         estimated_daily_departures=3,
                     ),
-                    departure_after=_DEPARTURE_AT,
+                    departure_after=_INBOUND_DEPARTURE_AT,
                 ),
                 id="single_segment",
             ),
@@ -758,7 +766,7 @@ class TestSearcherRoundtrip:
                         estimated_travel_time=datetime.timedelta(hours=1),
                         estimated_daily_departures=3,
                     ),
-                    departure_after=_DEPARTURE_AT,
+                    departure_after=_INBOUND_DEPARTURE_AT,
                 ),
                 id="multi_segment",
             ),

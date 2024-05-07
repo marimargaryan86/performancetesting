@@ -574,8 +574,10 @@ class Searcher:
                 )
 
             offers.sort(key=lambda offer: offer.arrival_at)
-            result_segments.append(Segment(segment=segment, offers=offers))
-            departure_after = offers[0].arrival_at + segment.mct_suffix
+            segment_with_offers = Segment(segment=segment, offers=offers)
+            result_segments.append(segment_with_offers)
+            first_offer = segment_with_offers.find_first_offer_after(departure_after)
+            departure_after = first_offer.arrival_at + segment.mct_suffix
 
         return SearchResult(
             route=request.outbound.route,
@@ -612,8 +614,10 @@ class Searcher:
                 )
 
             offers.sort(key=lambda offer: offer.arrival_at)
-            result_segments.append(Segment(segment=segment, offers=offers))
-            departure_after = offers[0].arrival_at + segment.mct_suffix
+            segment_with_offers = Segment(segment=segment, offers=offers)
+            result_segments.append(segment_with_offers)
+            first_offer = segment_with_offers.find_first_offer_after(departure_after)
+            departure_after = first_offer.arrival_at + segment.mct_suffix
 
         return SearchResult(
             route=request.outbound.route,
