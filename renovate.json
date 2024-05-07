@@ -29,16 +29,18 @@
     {
       "customType": "regex",
       "fileMatch": [
-        "^pants.toml$"
+        "(^|/)pants.toml$"
       ],
       "matchStrings": [
-        "^pants_version = \\\"(?<currentValue>.+?)\\\"$"
+        "\\spants_version = \\\"(?<currentValue>.+?)\\\"\\s"
       ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "pants",
-      "packageNameTemplate": "pantsbuild/pants"
+      "packageNameTemplate": "pantsbuild/pants",
+      "extractVersionTemplate": "^release_(?<version>.*)$"
     }
   ],
+  "prHourlyLimit": 10,
   "html": {
     "fileMatch": ["\\.html?\\.jinja$"]
   },
@@ -111,7 +113,7 @@
       "matchManagers": [
         "custom.regex"
       ],
-      "matchPackageNames": [
+      "matchDepNames": [
         "oasdiff"
       ],
       "allowedVersions": "<2.0"
@@ -132,6 +134,16 @@
         ],
         "executionMode": "branch"
       }
+    },
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDepNames": [
+        "pants"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.?(?<prerelease>.+))?$",
+      "ignoreUnstable": false
     }
   ]
 }
