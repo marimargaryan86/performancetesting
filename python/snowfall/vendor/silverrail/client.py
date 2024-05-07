@@ -63,6 +63,9 @@ class SilverrailClient(client.HttpClient):
         request = booking.BookingCreateBookingRecordInput(
             body=booking.BookingCreateBookingRecordInput.Body(
                 create_booking_record_request=booking.CreateBookingRecordRequest(
+                    response_spec=booking.CreateBookingRecordRequestType.ResponseSpec(
+                        return_reservation_details=True,
+                    ),
                     context=self._booking_context,
                     passengers=passengers,
                     leg_solutions=leg_solution,

@@ -1,8 +1,6 @@
 import datetime
-import typing
 
 import timezonefinder
-from xsdata.formats.dataclass import serializers
 
 from snowfall.project.junction.rocket.service.providers.silverrail import adapter, cache
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
@@ -58,16 +56,18 @@ class QuoteTaskConsumer:
             if not selected_offer:
                 return
 
-            leg_solution, ptp_price = await self._offer_matcher.get_matching_offer(
+            matched_offer = await self._offer_matcher.get_matching_offer(
                 selected_offer,
             )
 
             expires_at = datetime.datetime.now(tz=datetime.UTC) + self._ttl
+            ptp_price = matched_offer.ptp_price
 
             await self._quote_cache.store(
                 record=cache.PriceQuote(
-                    leg_solution=self._serialize(leg_solution),
-                    ptp_price=self._serialize(ptp_price),
+                    leg_solution=matched_offer.leg_solution,
+                    ptp_price=ptp_price,
+                    passengers=matched_offer.passengers,
                 ),
                 expires_at=expires_at,
                 key=message.body.quote.id,
@@ -83,8 +83,9 @@ class QuoteTaskConsumer:
                 )
                 return
 
-            price = self._offer_matcher.convert_total_price(ptp_price.total_price)
-
+            price = self._offer_matcher.convert_total_price(
+                ptp_price.total_price,
+            )
             quote_obj = models_pb2.Quote(
                 pay_company_id=self._pay_company_id,
                 expires_at=protobuf.datetime_to_protobuf(expires_at),
@@ -115,6 +116,3 @@ class QuoteTaskConsumer:
                     reseller_id=message.body.reseller_id,
                 ),
             )
-
-    def _serialize(self, obj: typing.Any) -> bytes:
-        return serializers.XmlSerializer().render(obj).encode()

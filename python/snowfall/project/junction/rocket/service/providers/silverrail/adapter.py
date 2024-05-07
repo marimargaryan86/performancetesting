@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import AsyncIterator, Mapping, Sequence
+from typing import NamedTuple
 
 from iso4217 import Currency
 from xsdata.models.datatype import (
@@ -30,6 +31,7 @@ from snowfall.vendor.silverrail.models.shopping import (
     PointToPointPriceType,
     PointToPointShoppingQuery,
     PointToPointShoppingResponse,
+    PointToPointShoppingResponseType,
     PriceTypeType,
     QueryTravelPointPairType,
     RuleType,
@@ -234,11 +236,17 @@ class _SilverrailAdapter:
         return models_pb2.PriceBreakdown.BreakdownType.BREAKDOWN_TYPE_UNSPECIFIED
 
 
+class MatchedOffer(NamedTuple):
+    leg_solution: LegSolutionType
+    ptp_price: PointToPointPriceType
+    passengers: PointToPointShoppingResponseType.Results.Passengers
+
+
 class SilverrailOfferMatcher(_SilverrailAdapter):
-    async def get_matching_offer(  # noqa: WPS238
+    async def get_matching_offer(  # noqa: WPS238, WPS231
         self,
         selected_offer: cache.RailResultDetail,
-    ) -> tuple[LegSolutionType, PointToPointPriceType]:
+    ) -> MatchedOffer:
         query = self._make_query(self._create_criteria(selected_offer))
         response = await self._client.shopping_point_to_point(query)
 
@@ -262,12 +270,19 @@ class SilverrailOfferMatcher(_SilverrailAdapter):
         if point_to_point_price.leg_references is None:
             raise errors.SilverrailUnexpectedFormatError()
 
+        if not response.results.passengers:
+            raise errors.SilverrailUnexpectedFormatError()
+
         leg_solution = self._get_matching_leg_solution(
             response.results.legs.leg,
             point_to_point_price.leg_references.leg_solution_idref[0],
         )
 
-        return leg_solution, point_to_point_price
+        return MatchedOffer(
+            leg_solution,
+            point_to_point_price,
+            response.results.passengers,
+        )
 
     def get_fare_rules(self, ptp_price: PointToPointPriceType) -> list[RuleType]:
         rules = []
