@@ -582,7 +582,7 @@ class Searcher:
         return SearchResult(
             route=request.outbound.route,
             segments=result_segments,
-            departure_after=departure_after,
+            departure_after=request.inbound.departure_after,
         )
 
     async def _find_outbound_sequential(
