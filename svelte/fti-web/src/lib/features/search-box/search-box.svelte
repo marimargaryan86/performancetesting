@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { constructQueryString } from "$lib/helpers/search-box";
+  import type { SearchOptions } from "$lib/models/common";
+  import { getSearchOptionsCtx, setSearchOptionsCtx } from "$lib/stores/search-box.store";
   import SearchBoxHeader from "./search-box-header.svelte";
   import SearchBoxPackages from "./search-box-packages.svelte";
-  import { getSearchOptionsCtx, setSearchOptionsCtx } from "$lib/stores/search-box.store";
-  import type { SearchOptions } from "$lib/models/common";
   import SearchBoxFlights from "./search-box-flights.svelte";
   import SearchBoxHotels from "./search-box-hotels.svelte";
 
@@ -14,22 +16,27 @@
   };
 
   setSearchOptionsCtx(searchOptions);
+  const searchOptionsStore = getSearchOptionsCtx();
+  $: _searchOptions = $searchOptionsStore;
 
-  const _searchOptions = getSearchOptionsCtx();
+  function performSearch(): void {
+    const queryString: string = constructQueryString($searchOptionsStore);
+    goto(`/search?${queryString}`);
+  }
 </script>
 
 <div class="search-box-container">
-  <SearchBoxHeader bind:searchType={$_searchOptions.searchType} />
+  <SearchBoxHeader bind:searchType={_searchOptions.searchType} />
 
   <div class="search-panel">
-    {#if $_searchOptions.searchType === "packages"}
+    {#if _searchOptions.searchType === "packages"}
       <SearchBoxPackages />
-    {:else if $_searchOptions.searchType === "flights"}
+    {:else if _searchOptions.searchType === "flights"}
       <SearchBoxFlights />
-    {:else if $_searchOptions.searchType === "hotels"}
+    {:else if _searchOptions.searchType === "hotels"}
       <SearchBoxHotels />
     {/if}
-    <button class="search-button">Search</button>
+    <button on:click={performSearch} class="search-button">Search</button>
   </div>
 </div>
 
