@@ -5,11 +5,12 @@ from collections.abc import Sequence
 
 from pydantic import v1 as pydantic
 from pydantic.v1 import Protocol, StrBytes
-from xsdata.formats.dataclass import serializers
-from xsdata.formats.dataclass.parsers import XmlParser
 
 from snowfall.project.junction.go.v1 import models_pb2 as go_models
-from snowfall.project.junction.rocket.service.providers.silverrail import criteria
+from snowfall.project.junction.rocket.service.providers.silverrail import (
+    criteria,
+    xml_serialization,
+)
 from snowfall.stdlib import string
 from snowfall.stdlib.persistence.redis.repository import (
     PydanticRepository as RedisRepository,
@@ -45,23 +46,15 @@ class ResultDetailCache(RedisRepository[RailResultDetail]):
     _record_type: type[RailResultDetail] = RailResultDetail
 
 
-def _serialize(obj: typing.Any) -> str:
-    return serializers.XmlSerializer().render(obj)
-
-
-def _parse_xml(raw: str, obj_class: type[T]) -> T:
-    return XmlParser().from_string(raw, obj_class)
-
-
 class PriceQuote(RedisRecord):
     """Stores price quotes in the cache."""
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders: typing.ClassVar = {
-            shopping.LegSolutionType: _serialize,
-            shopping.PointToPointPriceType: _serialize,
-            shopping.PointToPointShoppingResponseType.Results.Passengers: _serialize,
+            shopping.LegSolutionType: xml_serialization.serialize,
+            shopping.PointToPointPriceType: xml_serialization.serialize,
+            shopping.PointToPointShoppingResponseType.Results.Passengers: xml_serialization.serialize,
         }
 
     leg_solution: shopping.LegSolutionType
@@ -70,11 +63,17 @@ class PriceQuote(RedisRecord):
 
     @property
     def booking_leg_solution(self) -> booking.LegSolutionType:
-        return _parse_xml(_serialize(self.leg_solution), booking.LegSolutionType)
+        return xml_serialization.parse_xml(
+            xml_serialization.serialize(self.leg_solution),
+            booking.LegSolutionType,
+        )
 
     @property
     def booking_ptp_price(self) -> booking.PointToPointPriceType:
-        return _parse_xml(_serialize(self.ptp_price), booking.PointToPointPriceType)
+        return xml_serialization.parse_xml(
+            xml_serialization.serialize(self.ptp_price),
+            booking.PointToPointPriceType,
+        )
 
     @classmethod
     def parse_raw(
@@ -87,15 +86,15 @@ class PriceQuote(RedisRecord):
         allow_pickle: bool = False,
     ) -> "Model":
         data = json.loads(b)
-        data["leg_solution"] = _parse_xml(
+        data["leg_solution"] = xml_serialization.parse_xml(
             data["leg_solution"],
             shopping.LegSolutionType,
         )
-        data["ptp_price"] = _parse_xml(
+        data["ptp_price"] = xml_serialization.parse_xml(
             data["ptp_price"],
             shopping.PointToPointPriceType,
         )
-        data["passengers"] = _parse_xml(
+        data["passengers"] = xml_serialization.parse_xml(
             data["passengers"],
             shopping.PointToPointShoppingResponseType.Results.Passengers,
         )

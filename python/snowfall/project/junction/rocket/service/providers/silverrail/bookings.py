@@ -1,19 +1,19 @@
 import datetime
 import pathlib
-import uuid
 from collections.abc import Callable, Mapping
-from typing import Any, TypeVar
+from typing import TypeVar
 
 import httpx
 from dateutil import relativedelta
-from xsdata.formats.dataclass import serializers
-from xsdata.models.datatype import XmlDate
 
 from snowfall.project.junction.rocket.service.bookings.v1alpha import (
     amqp_pb2,
     models_pb2,
 )
-from snowfall.project.junction.rocket.service.providers.silverrail import cache
+from snowfall.project.junction.rocket.service.providers.silverrail import (
+    cache,
+    xml_serialization,
+)
 from snowfall.stdlib import money, sequence
 from snowfall.stdlib.format import protobuf
 from snowfall.stdlib.logging import stdout
@@ -32,13 +32,6 @@ class RequiredInformationMissingError(Exception):
 
 class BookingFailedError(Exception):
     """Raised when booking is not successful."""
-
-
-def _date_to_xml(dt: datetime.date | None) -> XmlDate | None:
-    if dt:
-        return XmlDate.from_date(dt)
-
-    return None
 
 
 class PassengerInformationValidator:
@@ -142,13 +135,13 @@ class Booker:
         quote_cache: cache.QuoteCache,
         booking_storage: filesystem.Storage,
         silverrail_client: client.SilverrailClient,
-        provider_id: uuid.UUID,
+        provider_id: str,
         provider_name: str,
     ):
         self._quote_cache = quote_cache
         self._storage = booking_storage
         self._client = silverrail_client
-        self._provider_id = str(provider_id)
+        self._provider_id = provider_id
         self._provider_name = provider_name
         self._logger = stdout.get_logger()
 
@@ -226,7 +219,9 @@ class Booker:
                 **exception_kwargs,
             )
             task_booking.status = models_pb2.Booking.STATUS_ERROR
-            task_booking.provider_booking.raw_data = self._serialize(response)
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
 
             return task_booking
 
@@ -247,7 +242,9 @@ class Booker:
             )
 
             task_booking.status = models_pb2.Booking.STATUS_ERROR
-            task_booking.provider_booking.raw_data = self._serialize(response)
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
 
             return task_booking
 
@@ -274,9 +271,6 @@ class Booker:
 
         if not response.booking_record.orders:
             raise RequiredInformationMissingError("Order information is absent.")
-
-    def _serialize(self, obj: Any) -> str:
-        return serializers.XmlSerializer().render(obj)
 
     def _response_to_booking(  # noqa: WPS238
         self,
@@ -310,7 +304,7 @@ class Booker:
             provider_booking=models_pb2.ProviderBooking(
                 record_locator=response.record_locator,
                 booking_reference=booking_reference,
-                raw_data=self._serialize(response),
+                raw_data=xml_serialization.serialize(response),
             ),
         )
 
@@ -337,7 +331,9 @@ class Booker:
         return booking_models.PassengerType(
             passenger_id=age_id_map[age],
             age_at_time_of_travel=age,
-            dob=_date_to_xml(protobuf.protobuf_to_date(passenger.date_of_birth)),
+            dob=xml_serialization.date_to_xml(
+                protobuf.protobuf_to_date(passenger.date_of_birth),
+            ),
             residence_information=booking_models.ResidenceInformationType(
                 country_code=passenger.doc_details.residence_country_code,
             ),
@@ -376,7 +372,7 @@ class Booker:
                     booking_models.TravelDocumentType(
                         document_number=passenger.doc_details.document_number,
                         document_type=booking_models.TravelDocumentTypeDocumentType.PASSPORT,
-                        expiration_date=_date_to_xml(
+                        expiration_date=xml_serialization.date_to_xml(
                             protobuf.protobuf_to_date(passenger.doc_details.exp_date),
                         ),
                         issuing_authority=booking_models.TravelDocumentType.IssuingAuthority(

@@ -121,7 +121,7 @@ async def _bookings(
             quote_cache=cache.QuoteCache(client=redis_client),
             booking_storage=storage,
             silverrail_client=silverrail_client,
-            provider_id=PROVIDER_ID,
+            provider_id=str(PROVIDER_ID),
             provider_name=_PROVIDER_NAME,
         ),
     ).consume()

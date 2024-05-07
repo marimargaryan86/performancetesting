@@ -1,4 +1,5 @@
 import datetime
+import json
 import zoneinfo
 from unittest import mock
 
@@ -12,14 +13,20 @@ from snowfall.project.junction.rocket.service.providers.silverrail import (
     adapter as silverrail_adapter,
 )
 from snowfall.project.junction.rocket.service.providers.silverrail import (
+    bookings as silverrail_bookings,
+)
+from snowfall.project.junction.rocket.service.providers.silverrail import (
     cache,
     train_stations,
+    xml_serialization,
 )
 from snowfall.project.junction.rocket.service.providers.silverrail import (
     pricing as silverrail_pricing,
 )
 from snowfall.stdlib.persistence import filesystem
 from snowfall.stdlib.transport.amqp import consumer, producer
+from snowfall.vendor.silverrail import client
+from snowfall.vendor.silverrail.models import booking as vendor_booking
 from snowfall.vendor.silverrail.models import shopping
 
 
@@ -163,4 +170,80 @@ async def silverrail_quote_task_consumer(
         quote_cache=mock.AsyncMock(name="QuoteCache"),
         pay_company_id="fake-pay-company-id",
         ttl=datetime.timedelta(seconds=15),
+    )
+
+
+async def get_cached_price_quote() -> cache.PriceQuote:
+    file_path = filesystem.resource_path(
+        package=__name__,
+        resource="fixtures/cached_price_quote.json",
+    )
+
+    async with aiofiles.open(file_path, "rb") as file_handle:
+        data = json.loads(await file_handle.read())
+
+    return cache.PriceQuote(
+        leg_solution=xml_serialization.parse_xml(
+            data["leg_solution"],
+            shopping.LegSolutionType,
+        ),
+        ptp_price=xml_serialization.parse_xml(
+            data["ptp_price"],
+            shopping.PointToPointPriceType,
+        ),
+        passengers=xml_serialization.parse_xml(
+            data["passengers"],
+            shopping.PointToPointShoppingResponseType.Results.Passengers,
+        ),
+    )
+
+
+async def get_create_booking_record() -> vendor_booking.CreateBookingRecordResponse:
+    response = await _load_xml_fixture("create_booking_record.xml")
+    parser = parsers.XmlParser(
+        config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
+    )
+    output: vendor_booking.BookingCreateBookingRecordOutput = parser.from_bytes(
+        response,
+        vendor_booking.BookingCreateBookingRecordOutput,
+    )
+    if not output.body or output.body.create_booking_record_response is None:
+        raise RuntimeError("Wrong configured fixture")
+
+    return output.body.create_booking_record_response
+
+
+@pytest.fixture()
+async def booking_storage() -> filesystem.Storage:
+    return mock.AsyncMock(name="BookingStorage")
+
+
+@pytest.fixture()
+async def silverrail_client() -> client.SilverrailClient:
+    return mock.Mock(
+        name="SilverRailClient",
+        create_booking_record=mock.AsyncMock(
+            name="create_booking_record",
+            return_value=await get_create_booking_record(),
+        ),
+    )
+
+
+@pytest.fixture()
+async def silverrail_booker(
+    booking_storage: filesystem.Storage,
+    silverrail_client: client.SilverrailClient,
+) -> silverrail_bookings.Booker:
+    return silverrail_bookings.Booker(
+        quote_cache=mock.AsyncMock(
+            name="ResultDetailCache",
+            fetch=mock.AsyncMock(
+                name="fetch",
+                return_value=await get_cached_price_quote(),
+            ),
+        ),
+        booking_storage=booking_storage,
+        silverrail_client=silverrail_client,
+        provider_name="Silverrail",
+        provider_id="fc4f9bbb-69d1-4cef-b8ac-ecd3661abba4",
     )
