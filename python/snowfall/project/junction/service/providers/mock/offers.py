@@ -278,8 +278,8 @@ def _trip_to_criteria(
 def _get_name_from_type(
     travel_type: common_pb2.Schedule.Type.ValueType,
     snowfall_mapping: Any,
-) -> str | None:
+) -> str:
     for schedule_type, operator_name in snowfall_mapping:
         if schedule_type == travel_type:
             return operator_name
-    return None
+    return ""

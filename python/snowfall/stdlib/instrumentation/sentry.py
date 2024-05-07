@@ -12,7 +12,7 @@ def get_span(op: str, name: str | None = None) -> Span:
 
     return start_transaction(
         op=op,
-        name=name,
-        description=name,
+        name=name or "",
+        description=name or "",
         status="ok",
     )
