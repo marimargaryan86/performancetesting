@@ -54,7 +54,7 @@ type LandingPageModel = {
 
 type SearchOptions = {
   destination: string;
-  origin: string;
+  origin: string | undefined;
   searchType: string;
   passengers: Passengers;
   rooms?: Room[];

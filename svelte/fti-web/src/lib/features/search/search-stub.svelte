@@ -1,14 +1,14 @@
 <script lang="ts">
-  import type { SearchResultsData } from "../../../routes/search/[searchType=search_type]/[origin]/[destination]/+page.svelte";
+  import type { SearchResultsData } from "../../../routes/search/[searchType=search_type]/+page.svelte";
   import SearchResultTile from "../../../components/search-result-tile.svelte";
 
-  export let searchResultsData: SearchResultsData = false;
+  export let searchResultsData: SearchResultsData | undefined;
 </script>
 
 <div class="page">
   <div class="filter-sidebar">
     <pre>
-    {JSON.stringify(searchResultsData, null, 2)}
+    {JSON.stringify(searchResultsData ?? {}, null, 2)}
   </pre>
   </div>
   <div class="main-content">

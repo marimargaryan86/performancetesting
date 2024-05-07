@@ -16,7 +16,9 @@ describe("match function", () => {
 
 describe("getSearchTypeFromURL function", () => {
   it("should extract the search type correctly from a well-formed URL", () => {
-    const url = new URL("http://junction.bigxtra.dev/search/packages/origin/destination/");
+    const url = new URL(
+      "http://junction.bigxtra.dev/search/packages?origin=munich&destination=bali",
+    );
     expect(getSearchTypeFromURL(url)).toBe("packages");
   });
 

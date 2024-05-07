@@ -1,15 +1,38 @@
 <script lang="ts">
-  import type { SearchResultsData } from "../../../../routes/search/[searchType=search_type]/[origin]/[destination]/+page.svelte";
+  import type { SearchResultsData } from "../../../../routes/search/[searchType=search_type]/+page.svelte";
   import SearchHeader from "$lib/features/search/search-header.svelte";
   import { getTranslator } from "$lib/i18n";
-
-  export let searchResultsData: SearchResultsData = false;
+  import type { SearchType } from "../../../../params/search_type";
+  import type { SearchOptions } from "$lib/models/common";
 
   const t = getTranslator();
+
+  const HOTEL_SEARCH_TYPE: SearchType = "hotels";
+
+  export let searchResultsData: SearchResultsData | undefined = undefined;
+  let destination: string;
+  let searchOptions: SearchOptions;
+
+  $: destination =
+    searchResultsData && searchResultsData?.destination
+      ? searchResultsData?.destination
+      : "anywhere";
+
+  $: passengers =
+    searchResultsData && searchResultsData?.passengers
+      ? searchResultsData?.passengers
+      : { adults: 1, children: 0 };
+
+  $: searchOptions = {
+    origin: undefined,
+    destination,
+    searchType: HOTEL_SEARCH_TYPE,
+    passengers,
+  };
 </script>
 
 <div class="wrapper">
-  <SearchHeader />
+  <SearchHeader {searchOptions} />
 
   <main>
     <div class="filters">

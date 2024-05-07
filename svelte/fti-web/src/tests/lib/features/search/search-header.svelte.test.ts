@@ -43,8 +43,8 @@ describe("SearchHeader with default options", () => {
 
 describe("SearchHeader with passed-in search options", () => {
   const customSearchOptions: SearchOptions = {
-    origin: "LAX",
-    destination: "SFO",
+    origin: "munich",
+    destination: "bali",
     searchType: "hotels",
     passengers: { adults: 2, children: 1 },
     rooms: [
@@ -63,11 +63,11 @@ describe("SearchHeader with passed-in search options", () => {
 
     const originAndDestination = screen.getByLabelText("Origin-Destination");
     expect(originAndDestination).toBeVisible();
-    expect(originAndDestination).toHaveValue("LAX–SFO");
+    expect(originAndDestination).toHaveValue("Munich-Bali");
 
     const dates = screen.getByLabelText("Dates");
     expect(dates).toBeVisible();
-    expect(dates).toHaveValue("12/20/2024–01/07/2025");
+    expect(dates).toHaveValue("12/20/2024-01/07/2025");
 
     const passengersAndRooms = screen.getByLabelText("Passengers and Rooms");
     expect(passengersAndRooms).toBeVisible();

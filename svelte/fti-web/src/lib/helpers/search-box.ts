@@ -20,8 +20,11 @@ export function constructQueryString(searchOptions: SearchOptions): string {
   const params = new URLSearchParams();
 
   params.set("destination", searchOptions.destination);
-  params.set("origin", searchOptions.origin);
   params.set("searchType", searchOptions.searchType);
+
+  if (searchOptions.origin) {
+    params.set("origin", searchOptions.origin);
+  }
 
   Object.entries(searchOptions.passengers).forEach(([key, value]) => {
     const sanitizedPassengers = encodeURIComponent(`passengers.${key}`);

@@ -10,6 +10,8 @@
   }
 
   let mobileExpand: boolean = false;
+
+  const hotelsLink = `/search/hotels?${new URLSearchParams({ destination: "anywhere" })}`;
 </script>
 
 <header>
@@ -39,7 +41,7 @@
         <a href="/coming-soon">Offers</a>
       </li>
       <li>
-        <a href="/search/hotels">Hotels</a>
+        <a href={hotelsLink}>Hotels</a>
       </li>
       <li>
         <a href="/coming-soon">Car Rental</a>

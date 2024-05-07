@@ -10,11 +10,18 @@
   } from "$lib/helpers/search-header";
   // TODO(04-24-2024/a.santos): Pull down URL query params.
 
-  export let searchOptions: SearchOptions = DEFAULT_SEARCH_OPTIONS;
+  export let searchOptions: SearchOptions | undefined;
 
-  $: originAndDestinationString = formatOriginDestination(searchOptions);
-  $: datesString = formatDates(searchOptions);
-  $: passengersAndRoomsString = formatPassengersAndRooms(searchOptions);
+  const nextSearchOptions = {
+    ...DEFAULT_SEARCH_OPTIONS,
+    ...searchOptions,
+  };
+
+  $: originAndDestinationString = formatOriginDestination(nextSearchOptions, {
+    useTitleCase: true,
+  });
+  $: datesString = formatDates(nextSearchOptions);
+  $: passengersAndRoomsString = formatPassengersAndRooms(nextSearchOptions);
 </script>
 
 <header>

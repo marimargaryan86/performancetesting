@@ -2,6 +2,17 @@ function pluralise(count: number, singular: string, plural: string): string {
   return count === 1 ? singular : plural;
 }
 
+/**
+ * Converts a given string to title case, where the first letter of each word
+ * is capitalized and the rest are in lowercase.
+ *
+ * @param str - The string to convert to title case.
+ * @returns The title-cased version of the input string.
+ */
+function toTitleCase(str: string): string {
+  return str.toLowerCase().replace(/(?:^|\s|["'([{])+\S/g, (match) => match.toUpperCase());
+}
+
 const setContainerScroll = ({
   detail,
   className,
@@ -65,4 +76,5 @@ export {
   renderStars,
   formatDate,
   calculateThisWeekDates,
+  toTitleCase,
 };

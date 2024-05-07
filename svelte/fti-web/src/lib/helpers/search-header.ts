@@ -1,4 +1,5 @@
 import type { SearchOptions } from "$lib/models/common";
+import { toTitleCase } from "./common";
 // TODO(04-24-2024/a.santos): Implement i18n translatable strings.
 
 /**
@@ -34,14 +35,19 @@ export const DEFAULT_SEARCH_OPTIONS: SearchOptions = {
  * @param {SearchOptions} searchOptions - The search options containing origin and destination.
  * @returns {string} Formatted origin and destination string.
  */
-export function formatOriginDestination(searchOptions: SearchOptions): string {
+export function formatOriginDestination(
+  searchOptions: SearchOptions,
+  config: { useTitleCase?: boolean } = {},
+): string {
   const { destination, origin } = searchOptions;
+  const nextDestination = config.useTitleCase ? toTitleCase(destination) : destination;
+  const nextOrigin = config.useTitleCase && origin ? toTitleCase(origin) : origin;
 
-  if (destination === "" && origin === "") {
-    return "Anywhere";
+  if (nextOrigin === undefined || nextOrigin === "") {
+    return nextDestination;
   }
 
-  return `${origin}–${destination}`;
+  return `${nextOrigin}-${nextDestination}`;
 }
 
 /**
@@ -58,7 +64,7 @@ export function formatDates(searchOptions: SearchOptions): string {
     return "Anytime";
   }
 
-  return `${start}–${end}`;
+  return `${start}-${end}`;
 }
 
 /**
@@ -70,6 +76,11 @@ export function formatDates(searchOptions: SearchOptions): string {
  */
 export function formatPassengersAndRooms(searchOptions: SearchOptions): string {
   const { passengers, rooms } = searchOptions;
+
+  if (rooms === undefined) {
+    throw new Error("Rooms undefined.");
+  }
+
   const { adults, children } = passengers;
 
   const numAdults = adults + (adults === 1 ? " adult" : " adults");

@@ -7,16 +7,27 @@ import {
 } from "$lib/helpers/search-header";
 
 describe("formatOriginDestination", () => {
-  it('returns "Anywhere" when origin and destination are empty', () => {
+  it("title cases strings correctly when configured", () => {
     expect(
-      formatOriginDestination({ ...DEFAULT_SEARCH_OPTIONS, origin: "", destination: "" }),
-    ).toBe("Anywhere");
+      formatOriginDestination(
+        { ...DEFAULT_SEARCH_OPTIONS, origin: "munich", destination: "bali" },
+        { useTitleCase: true },
+      ),
+    ).toBe("Munich-Bali");
+  });
+
+  it("returns destination only when origin is undefined or empty", () => {
+    expect(formatOriginDestination({ ...DEFAULT_SEARCH_OPTIONS, destination: "LAX" })).toBe("LAX");
+
+    expect(
+      formatOriginDestination({ ...DEFAULT_SEARCH_OPTIONS, origin: "", destination: "SFO" }),
+    ).toBe("SFO");
   });
 
   it("formats non-empty origin and destination", () => {
     expect(
       formatOriginDestination({ ...DEFAULT_SEARCH_OPTIONS, origin: "SFO", destination: "LAX" }),
-    ).toBe("SFO–LAX");
+    ).toBe("SFO-LAX");
   });
 });
 
@@ -33,13 +44,19 @@ describe("formatDates", () => {
         ...DEFAULT_SEARCH_OPTIONS,
         dates: { start: "08/01/2024", end: "08/15/2024" },
       }),
-    ).toBe("08/01/2024–08/15/2024");
+    ).toBe("08/01/2024-08/15/2024");
   });
 });
 
 describe("formatPassengersAndRooms", () => {
   it("formats default passengers and rooms", () => {
     expect(formatPassengersAndRooms(DEFAULT_SEARCH_OPTIONS)).toBe("2 adults, 1 child, 2 rooms");
+  });
+
+  it("errors when passengers or rooms is undefined", () => {
+    const formatWithErrors = () =>
+      formatPassengersAndRooms({ ...DEFAULT_SEARCH_OPTIONS, rooms: undefined });
+    expect(formatWithErrors).toThrowError("Rooms undefined.");
   });
 
   it("formats multiple rooms", () => {

@@ -1,10 +1,11 @@
 <script lang="ts" context="module">
-  export type SearchResultsData =
-    | boolean
-    | {
-        test: boolean;
-        data: Array<unknown>;
-      };
+  export type SearchResultsData = {
+    test: boolean;
+    data: Array<unknown>;
+    origin: string | undefined;
+    destination: string | undefined;
+    passengers: Passengers | undefined;
+  };
 </script>
 
 <script lang="ts">
@@ -12,16 +13,26 @@
   import LoadingScreen from "$lib/components/loading-screen.svelte";
   import HotelSearch from "$lib/features/search/hotels/hotel-search.svelte";
   import SearchStub from "$lib/features/search/search-stub.svelte";
-  import type { SearchType } from "../../../../../params/search_type";
+  import type { Passengers } from "$lib/models/common";
+  import type { SearchType } from "../../../params/search_type";
 
   export let data;
   let searchType: SearchType;
 
-  function fetchSearchResults(): Promise<{ test: boolean; data: Array<unknown> }> | boolean {
+  // TODO(2024-05-06/a.santos): figure out passenger strategy, cookie or param
+  function fetchSearchResults(): Promise<SearchResultsData> | undefined {
     // temp mock, Sandeep request
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve({ test: true, data: [{}] });
+        const testSearchResultsData: SearchResultsData = {
+          test: true,
+          data: new Array({}),
+          origin: data.searchParamsObj?.origin,
+          destination: data.searchParamsObj?.destination,
+          passengers: { adults: 2, children: 1 },
+        };
+
+        resolve(testSearchResultsData);
       }, 2000);
     });
   }
