@@ -5,6 +5,7 @@
   ],
   "reviewersFromCodeOwners": true,
   "semanticCommitScope": null,
+  "rebaseWhen": "conflicted",
   "ignorePaths": [
     "**/node_modules/**",
     "**/bower_components/**",
@@ -24,8 +25,23 @@
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>.+?)(?: (?:packageName|lookupName)=(?<packageName>.+?))?(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
       ]
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^pants.toml$"
+      ],
+      "matchStrings": [
+        "^pants_version = \\\"(?<currentValue>.+?)\\\"$"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "pants",
+      "packageNameTemplate": "pantsbuild/pants"
     }
   ],
+  "html": {
+    "fileMatch": ["\\.html?\\.jinja$"]
+  },
   "packageRules": [
     {
       "matchFileNames": [
