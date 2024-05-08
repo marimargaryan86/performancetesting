@@ -68,6 +68,24 @@ function calculateThisWeekDates() {
   };
 }
 
+/**
+ * Generates a URL-friendly slug from a given string. The function performs several transformations:
+ * 1. Converts all characters to lowercase to ensure uniformity.
+ * 2. Replaces spaces with hyphens to create web-friendly word separators.
+ * 3. Removes all non-alphanumeric characters except hyphens, filtering out unwanted punctuation and symbols.
+ * 4. Collapses any sequences of multiple hyphens into a single hyphen to avoid URL parsing issues and improve aesthetics.
+ *
+ * @param {string} name - The input string from which to generate the slug.
+ * @returns {string} The URL-friendly slug.
+ */
+function createSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/-+/g, "-");
+}
+
 export {
   pluralise,
   setContainerScroll,
@@ -77,4 +95,5 @@ export {
   formatDate,
   calculateThisWeekDates,
   toTitleCase,
+  createSlug,
 };
