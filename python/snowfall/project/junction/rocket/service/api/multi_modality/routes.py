@@ -11,6 +11,9 @@ from typing import Self
 import grpc
 
 from snowfall.project.junction.go.service.places.v1 import (
+    models_pb2 as locations_models_pb2,
+)
+from snowfall.project.junction.go.service.places.v1 import (
     places_pb2 as locations_pb2,
 )
 from snowfall.project.junction.go.service.places.v1 import (
@@ -245,6 +248,38 @@ class Routes:
         self,
         place: models_pb2.Place,
     ) -> list[latlng_pb2.LatLng]:
+        if place.type == models_pb2.Type.TYPE_CITY:
+            # If the place is a city, we need to map it to Go Locations for
+            # Planner. The Go Locations are aggregated into a city with the
+            # same algorithm as the AREA search for the ListNearbyLocations,
+            # so this is the most direct way to get a list of locations contained
+            # in the city identified by its coordinates.
+            found_locations = await self._locations.ListNearbyLocations(
+                locations_pb2.ListNearbyLocationsRequest(
+                    coordinates=place.coordinates,
+                    precision=locations_pb2.SearchPrecision(
+                        mode=locations_pb2.SearchPrecision.MODE_AREA,
+                    ),
+                ),
+            )
+            return list(
+                {
+                    location.coordinates.SerializeToString(
+                        deterministic=True,
+                    ): location.coordinates
+                    for location in found_locations.locations
+                }.values(),
+            )
+
+        # In the case when the Place is not a city, we try to map it to the
+        # corresponding Place in Planner, using a heuristic.
+        return [(await self._find_best_location(place))]
+
+    # Attemps to map a "Rocket" Place to a "Go" Place using some heuristics.
+    async def _find_best_location(
+        self,
+        place: models_pb2.Place,
+    ) -> latlng_pb2.LatLng:
         found_locations = await self._locations.ListNearbyLocations(
             locations_pb2.ListNearbyLocationsRequest(
                 coordinates=place.coordinates,
@@ -254,14 +289,47 @@ class Routes:
             ),
         )
 
-        return list(
-            {
-                location.coordinates.SerializeToString(
-                    deterministic=True,
-                ): location.coordinates
-                for location in found_locations.locations
-            }.values(),
-        )
+        candidate_locations = []
+        for location in found_locations.locations:
+            if self._same_type(location, place):
+                # If the names match, it's good enough and we return it.
+                if location.name == place.name:
+                    return location.coordinates
+
+                candidate_locations.append(location)
+
+        if not candidate_locations:
+            # If no candidate, we fallback on the coordinates of the Rocket
+            # Place. This can still work in Planner because Planner will try
+            # to map coordinates to an H3 cell and it could choose a Stop nearby.
+            return place.coordinates
+
+        # We could do something smarter, such as fuzzy matching of the name, but
+        # for now we return the first candidate.
+        # We probably should also sort this by distance to the points and keep
+        # the closest one. The Places service does not seem to guarantee that
+        # these will be returned sorted by distance.
+        return candidate_locations[0]
+
+    def _same_type(
+        self,
+        location: locations_models_pb2.Location,
+        place: models_pb2.Place,
+    ) -> bool:
+        for location_type in location.types:
+            match (place.type, location_type):
+                case (
+                    models_pb2.Type.TYPE_RAILWAY_STATION,
+                    locations_models_pb2.Location.Type.TYPE_RAILWAY_STATION,
+                ):
+                    return True
+                case (
+                    models_pb2.Type.TYPE_AIRPORT,
+                    locations_models_pb2.Location.Type.TYPE_AIRPORT,
+                ):
+                    return True
+
+        return False
 
     def _resolve_route(
         self,
