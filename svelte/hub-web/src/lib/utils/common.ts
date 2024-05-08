@@ -55,3 +55,7 @@ export function getHexColor(value: string): string {
 export function capitalize([first, ...rest]: string): string {
   return `${first?.toUpperCase()}${rest.join("")}`;
 }
+
+export function startsWith(target: string, ...prefixes: string[]): boolean {
+  return prefixes.some(target.startsWith);
+}

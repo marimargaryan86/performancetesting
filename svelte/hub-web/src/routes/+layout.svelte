@@ -21,7 +21,7 @@
   import DevTools from "$lib/components/partials/dev-tools.svelte";
   import { ensureDefined } from "$lib/utils/array";
   import Toaster from "$lib/components/ui/toaster.svelte";
-  import routeConfig from "$lib/route-config.js";
+  import routeConfig from "$lib/route-config";
 
   export let data;
 

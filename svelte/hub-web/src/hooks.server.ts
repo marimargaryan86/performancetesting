@@ -8,12 +8,33 @@ import type { Locale } from "$lib/i18n";
 import languageData from "$lib/i18n/lang";
 import { dev } from "$app/environment";
 import { LOCALE_COOKIE } from "./routes/+layout.svelte";
+import { startsWith } from "$lib/utils/common";
 
 // Environment variable check
 if (!env.JWT_SECRET) {
   // eslint-disable-next-line no-console
   console.error("Error: JWT_SECRET is not set.");
   process.exit(1);
+}
+
+function redirectLoggedInUser(pathname: string): void {
+  if (startsWith(pathname, routeConfig.routes.login.root, routeConfig.routes.onboarding.root)) {
+    throw redirect(303, routeConfig.root);
+  }
+}
+
+function redirectLoggedOutUser(pathname: string): void {
+  if (
+    !startsWith(
+      pathname,
+      routeConfig.routes.adapters.root,
+      routeConfig.routes.login.root,
+      routeConfig.routes.onboarding.root,
+      routeConfig.routes.integration.routes.ory.root,
+    )
+  ) {
+    throw redirect(303, routeConfig.routes.login.root);
+  }
 }
 
 function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Response> {
@@ -24,14 +45,7 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
     cookieStore.sessionToken.delete(event);
     cookieStore.sessionMetaToken.delete(event);
 
-    if (
-      !event.url.pathname.startsWith(routeConfig.routes.adapters.root) &&
-      !event.url.pathname.startsWith(routeConfig.routes.login.root) &&
-      !event.url.pathname.startsWith(routeConfig.routes.integration.routes.ory.root)
-    ) {
-      // Only allow the login page and the Ory integration for sessionless users.
-      throw redirect(303, routeConfig.routes.login.root);
-    }
+    redirectLoggedOutUser(event.url.pathname);
 
     return resolve(event);
   }
@@ -53,10 +67,7 @@ function authHandle({ event, resolve }: Parameters<Handle>[0]): MaybePromise<Res
   event.locals.user = sessionMeta.user;
   event.locals.sessionExpiresAt = sessionMeta.expiresAt;
 
-  if (event.url.pathname.startsWith(routeConfig.routes.login.root)) {
-    // Don't allow logged in users to view the login page
-    throw redirect(303, routeConfig.root);
-  }
+  redirectLoggedInUser(event.url.pathname);
 
   return resolve(event);
 }

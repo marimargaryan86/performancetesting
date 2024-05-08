@@ -11,6 +11,9 @@ export default {
   root: "/",
   get routes() {
     return {
+      onboarding: {
+        root: "/onboarding",
+      },
       tripManagement: {
         root: "/trip-management",
         get routes() {

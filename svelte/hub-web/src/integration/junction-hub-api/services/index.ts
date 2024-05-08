@@ -13,6 +13,7 @@ import CancellationRequestService from "./cancellation-request-service";
 import UserService from "./user-service";
 import RefundService from "./refund-service";
 import ResellerService from "./reseller-service";
+import OnboardingService from "./onboarding-service";
 
 export default {
   AccountService,
@@ -30,4 +31,5 @@ export default {
   UserService,
   RefundService,
   ResellerService,
+  OnboardingService,
 };

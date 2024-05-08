@@ -49,15 +49,19 @@ export default abstract class JunctionService {
       queryParams?: Record<string, string | number | undefined>;
       headers?: Record<string, string>;
       data?: unknown;
-      session: OrySchemas.Session;
-    },
+      session?: OrySchemas.Session;
+    } = {},
   ): Promise<Omit<Response, "json"> & { json: TResp }> {
     const resp = await fetch(
       new Request(new URLExtended(resource, { base: this.baseUrl, query: options.queryParams }), {
         headers: {
           "Content-Type": "application/vnd.api+json",
           ...options.headers,
-          cookie: `ory_kratos_session=${options.session.token}`,
+          ...(options.session
+            ? {
+                cookie: `ory_kratos_session=${options.session.token}`,
+              }
+            : undefined),
         },
         method: options.method,
         body: options.data ? JSON.stringify(options.data) : undefined,
