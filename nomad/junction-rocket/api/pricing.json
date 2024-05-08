@@ -1,0 +1,26 @@
+{
+  "development": {
+    "deploy": true,
+    "variables": {
+      "count": 1,
+      "j_one_api_base_url": "https://one.junction.dev",
+      "j_one_pay_company_id": "2d36a7ee-7193-4c00-b817-d83e30caa6ba"
+    }
+  },
+  "production": {
+    "deploy": false,
+    "variables": {
+      "count": 2,
+      "j_one_api_base_url": "https://one.junction.travel",
+      "j_one_pay_company_id": ""
+    }
+  },
+  "sandbox": {
+    "deploy": false,
+    "variables": {
+      "count": 1,
+      "j_one_api_base_url": "https://one.junction.dev",
+      "j_one_pay_company_id": ""
+    }
+  }
+}
