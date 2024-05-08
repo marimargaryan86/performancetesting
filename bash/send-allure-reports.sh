@@ -5,7 +5,7 @@ shopt -s nullglob
 ALLURE_PROJECT_ID=${1}
 ALLURE_SERVER="https://allureapi.junction.dev/allure-docker-service"
 allure_dir=${2}
-LOGIN_STRING='{"username": "'"\${ALLURE_USERNAME}"'", "password": "'"\${ALLURE_PASSWORD}"'"}'
+LOGIN_STRING="{\"username\": \"${ALLURE_USERNAME}\", \"password\": \"${ALLURE_PASSWORD}\"}"
 # login
 curl -s -o /dev/null -X POST "\${ALLURE_SERVER}/login" \
 	-H "Content-Type: application/json" \
