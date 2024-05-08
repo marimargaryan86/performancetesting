@@ -33,7 +33,7 @@
 //     "boto3==1.34.69",
 //     "botocore-stubs==1.34.94",
 //     "botocore==1.34.69",
-//     "check-jsonschema==0.28.2",
+//     "check-jsonschema==0.28.3",
 //     "click==8.1.7",
 //     "coverage[toml]==7.5.1",
 //     "cryptography==42.0.7",
@@ -2084,13 +2084,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "7c276904a04effe510b19fdc0ea9a0e30a943b92e5bfd731c76b5eee36b91e44",
-              "url": "https://files.pythonhosted.org/packages/c1/76/6a189c8c5370b3b6fb269bd7fdb39fe41269ae4808cb9d5b57a5891657eb/check_jsonschema-0.28.2-py3-none-any.whl"
+              "hash": "e9b17c413956f40a197e61369a7ccd501a5438219dc0cac6c57f84aea019ed2a",
+              "url": "https://files.pythonhosted.org/packages/14/ce/4a1f91a845e493ffb609f201530841af7a4890b43a1ecd5c21472fd254ec/check_jsonschema-0.28.3-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "6bb5a7aa16ca9854a6fd45b6037c28bc548612aedec1df57b154ecfce1441bea",
-              "url": "https://files.pythonhosted.org/packages/9a/ab/a2e1fa47c34fa64caae166afcf6b54466713bf17ebe960944fd16c6de140/check-jsonschema-0.28.2.tar.gz"
+              "hash": "ffd55ec4e1cf6aec2860cab18f0d0f1aa4a886d01b81395f6be50d0cc0201159",
+              "url": "https://files.pythonhosted.org/packages/a0/cf/7dd56b2153e42604a5d9e13983dea7d2979c0d587e0a6936978f6a3fd8a5/check_jsonschema-0.28.3.tar.gz"
             }
           ],
           "project_name": "check-jsonschema",
@@ -2098,7 +2098,7 @@
             "click-type-test==0.0.7; python_version >= \"3.10\" and extra == \"dev\"",
             "click<9,>=8",
             "coverage<8; extra == \"dev\"",
-            "furo==2024.1.29; extra == \"docs\"",
+            "furo==2024.4.27; extra == \"docs\"",
             "importlib-resources>=1.4.0; python_version < \"3.9\"",
             "jsonschema<5.0,>=4.18.0",
             "pytest-xdist<4; extra == \"dev\"",
@@ -2112,7 +2112,7 @@
             "tomli>=2.0; python_version < \"3.11\""
           ],
           "requires_python": ">=3.8",
-          "version": "0.28.2"
+          "version": "0.28.3"
         },
         {
           "artifacts": [
@@ -3338,13 +3338,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "d01c70c7840ec37888aa02b1aea5d9baba4c1701e268d1a0251640afd56e5e90",
-              "url": "https://files.pythonhosted.org/packages/fc/8e/c62e3ebc586e93a49f4276131eed57d11d2dc9af123dd532f259d8ed25b0/google_api_python_client-2.127.0-py2.py3-none-any.whl"
+              "hash": "99da6acb0acc648e309102b0e0262d7fef30f07f6bf56c6eeaa0504ceca113e3",
+              "url": "https://files.pythonhosted.org/packages/a2/04/0752bcbb291650c45fb736400a7bb26e55a75609fa437d6860beb483ecab/google_api_python_client-2.128.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "bbb51b0fbccdf40e536c26341e372d7800f09afebb53103bbcc94e08f14b523b",
-              "url": "https://files.pythonhosted.org/packages/cb/0f/6f0a8070802d6ee9a1393a4653202786c5ea9b10aa098a4c40c04be7c668/google-api-python-client-2.127.0.tar.gz"
+              "hash": "908af182dfc1cd79412a489b37fe45e4f3cc99c74e80c7c477ca5babaa54eea5",
+              "url": "https://files.pythonhosted.org/packages/dd/c5/774bdee54820d9d913fdaf5869298f99327f893daf91db5ec7af3525da25/google-api-python-client-2.128.0.tar.gz"
             }
           ],
           "project_name": "google-api-python-client",
@@ -3356,7 +3356,7 @@
             "uritemplate<5,>=3.0.1"
           ],
           "requires_python": ">=3.7",
-          "version": "2.127.0"
+          "version": "2.128.0"
         },
         {
           "artifacts": [
@@ -10521,7 +10521,7 @@
     "boto3==1.34.69",
     "botocore-stubs==1.34.94",
     "botocore==1.34.69",
-    "check-jsonschema==0.28.2",
+    "check-jsonschema==0.28.3",
     "click==8.1.7",
     "coverage[toml]==7.5.1",
     "cryptography==42.0.7",
