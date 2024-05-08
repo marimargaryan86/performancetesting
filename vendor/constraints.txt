@@ -41,7 +41,7 @@
 //     "dnspython==2.6.1",
 //     "docformatter==1.7.5",
 //     "email-validator==2.1.1",
-//     "fakeredis[lua]==2.22.0",
+//     "fakeredis[lua]==2.23.0",
 //     "firebase-admin==6.5.0",
 //     "flake8-deprecated==2.2.1",
 //     "flake8-if-expr==1.0.4",
@@ -2615,25 +2615,26 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "13ac8bd57c852d8b3c0684fa6755fac4abb4feab6483a52212b932d11c795bf3",
-              "url": "https://files.pythonhosted.org/packages/9c/4b/3cd9d9dab0e99a0540a80e62975699c2b12e102182a645ed84bed1dae441/fakeredis-2.22.0-py3-none-any.whl"
+              "hash": "619b4433dd8321f9f45a9e2714de088f0eec4c817e876532b15163c0a29619bd",
+              "url": "https://files.pythonhosted.org/packages/f3/e2/e7e0a6be79c598249d68ebd1ab351e129de29cf585c10d07bca6d4368218/fakeredis-2.23.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "d063085fe962d16637cfe21044f277cfc54d6fb456d12a7c87514990c3fac98e",
-              "url": "https://files.pythonhosted.org/packages/d5/25/8fdb2462cb37cc1f1fa35b59a548f2171fba715d19134568d892054ac6a8/fakeredis-2.22.0.tar.gz"
+              "hash": "7babb853a9a42ebe46acd89294bd7fc462dad619a870601f36c27dea007a0019",
+              "url": "https://files.pythonhosted.org/packages/b3/be/e835678a1ba65899d59ad516608fdf883b3d274038360bc8eb213b55b69a/fakeredis-2.23.0.tar.gz"
             }
           ],
           "project_name": "fakeredis",
           "requires_dists": [
             "jsonpath-ng<2.0,>=1.6; extra == \"json\"",
-            "lupa<3.0,>=1.14; extra == \"lua\"",
+            "lupa<3.0,>=2.1; extra == \"lua\"",
             "pyprobables<0.7,>=0.6; extra == \"bf\" or extra == \"cf\" or extra == \"probabilistic\"",
             "redis>=4",
-            "sortedcontainers<3,>=2"
+            "sortedcontainers<3,>=2",
+            "typing_extensions<5.0,>=4.7; python_version < \"3.11\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "2.22.0"
+          "version": "2.23.0"
         },
         {
           "artifacts": [
@@ -10529,7 +10530,7 @@
     "dnspython==2.6.1",
     "docformatter==1.7.5",
     "email-validator==2.1.1",
-    "fakeredis[lua]==2.22.0",
+    "fakeredis[lua]==2.23.0",
     "firebase-admin==6.5.0",
     "flake8-deprecated==2.2.1",
     "flake8-if-expr==1.0.4",
