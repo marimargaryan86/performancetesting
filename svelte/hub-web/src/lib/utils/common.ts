@@ -57,5 +57,5 @@ export function capitalize([first, ...rest]: string): string {
 }
 
 export function startsWith(target: string, ...prefixes: string[]): boolean {
-  return prefixes.some(target.startsWith);
+  return prefixes.some((prefix) => target.startsWith(prefix));
 }
