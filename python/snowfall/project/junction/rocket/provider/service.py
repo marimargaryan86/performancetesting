@@ -113,8 +113,8 @@ def _grpc_command(  # noqa: WPS217
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Entrypoint(
-    Generic[_Settings, _SearchCriteria],
     application.Entrypoint,
+    Generic[_Settings, _SearchCriteria],
 ):
     settings_class: type[_Settings]
     meta_factory: MetaFactory

@@ -12,7 +12,7 @@ from snowfall.stdlib.v1 import amqp_pb2
 Record = TypeVar("Record")
 
 
-class AllMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class AllMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def all_(
         self,
         cursor: str | None = None,
@@ -21,12 +21,12 @@ class AllMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         return await self._find_with_cursor(cur=cursor or "", sort=sort)
 
 
-class EstimatedCountMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class EstimatedCountMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def estimated_count(self) -> int:
         return await self._execute(self._collection.estimated_document_count)
 
 
-class ExistsMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class ExistsMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def exists(
         self,
         identifier: str,
@@ -41,7 +41,7 @@ class ExistsMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         )
 
 
-class FindByIdMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class FindByIdMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def find_by_id(self, document_id: str) -> Record | None:
         return await self._execute(
             self._collection.find_one,
@@ -51,7 +51,7 @@ class FindByIdMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         )
 
 
-class InsertMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class InsertMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def insert(
         self,
         document: Record,
@@ -67,7 +67,7 @@ class InsertMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         return document
 
 
-class InsertManyMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class InsertManyMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def insert_many(
         self,
         documents: Sequence[Record],
@@ -85,7 +85,7 @@ class InsertManyMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         return documents
 
 
-class StatusMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class StatusMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def mark_as_completed(
         self,
         document_id: str,
@@ -135,7 +135,7 @@ class StatusMixin(Generic[Record], repository.RepositoryProtocol[Record]):
         )
 
 
-class UpsertMixin(Generic[Record], repository.RepositoryProtocol[Record]):
+class UpsertMixin(repository.RepositoryProtocol[Record], Generic[Record]):
     async def upsert(
         self,
         document: Record,

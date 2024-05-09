@@ -15,7 +15,7 @@ _proto_id_key = "id"
 _Record = TypeVar("_Record")
 
 
-class ResultSet(abc.ABC, Generic[_Record], AsyncIterator[_Record]):
+class ResultSet(abc.ABC, AsyncIterator[_Record], Generic[_Record]):
     def __init__(
         self,
         cur: core.AgnosticBaseCursor,

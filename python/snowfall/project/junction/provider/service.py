@@ -228,8 +228,8 @@ def _simple_offers_command(
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Entrypoint(
-    Generic[_Settings, _SearchCriteriaTask, _SearchCriteria],
     application.Entrypoint,
+    Generic[_Settings, _SearchCriteriaTask, _SearchCriteria],
 ):
     settings_class: type[_Settings]
     meta_factory: MetaFactory

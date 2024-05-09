@@ -17,7 +17,7 @@ class _ProtoWithCreatedAt(Protocol):
     created_at: timestamp_pb2.Timestamp
 
 
-class BaseCoder(Generic[Record], abc.ABC):
+class BaseCoder(abc.ABC, Generic[Record]):
     @abc.abstractmethod
     def decode(self, as_dict: Mapping[str, Any]) -> Record:
         raise NotImplementedError()
@@ -35,7 +35,7 @@ class NoopCoder(BaseCoder[Mapping[str, Any]]):
         return dict(record)
 
 
-class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
+class ProtoCoder(BaseCoder[Proto], Generic[Proto]):
     def __init__(self, proto: type[Proto]):
         self._proto = proto
 
@@ -69,7 +69,7 @@ class ProtoCoder(Generic[Proto], BaseCoder[Proto]):
         )
 
 
-class PydanticCoder(Generic[Model], BaseCoder[Model]):
+class PydanticCoder(BaseCoder[Model], Generic[Model]):
     def __init__(self, model: type[Model]):
         self._model = model
 

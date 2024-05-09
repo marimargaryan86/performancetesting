@@ -85,7 +85,7 @@ def create_grpc_services(config: ProviderConfiguration) -> list[service.Service]
 
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
-class Entrypoint(Generic[_Settings], application.Entrypoint):
+class Entrypoint(application.Entrypoint, Generic[_Settings]):
     settings_class: type[_Settings]
     implementation_factory: ImplementationFactory[_Settings]
 
