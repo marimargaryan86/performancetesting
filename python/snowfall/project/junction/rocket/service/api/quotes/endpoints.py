@@ -6,6 +6,7 @@ import lagom
 from starlette import endpoints, exceptions, requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import errors
+from snowfall.project.junction.rocket.service.api.flights import repositories
 from snowfall.project.junction.rocket.service.api.quotes import models as quote_models
 from snowfall.project.junction.rocket.service.api.quotes import quotes
 from snowfall.project.junction.rocket.service.searches.v1alpha import (
@@ -87,23 +88,29 @@ class Quotes(endpoints.HTTPEndpoint):
         request: requests.Request,
         grpc_timeout: datetime.timedelta = lagom.injectable,
         go_quotations: searches_pb2_grpc.QuoteServiceStub = lagom.injectable,
+        quote_repo: repositories.QuoteRepository = lagom.injectable,
     ) -> responses.Response:
         quote_id = request.path_params["quoteId"]
 
-        # TODO(aram.h): handle J1, fetch the quote from the proper place
+        quote = await quote_repo.find_by_id(quote_id)
 
-        response: searches_pb2.GetQuoteResponse = await go_quotations.GetQuote(
-            searches_pb2.GetQuoteRequest(id=quote_id),
-            timeout=grpc_timeout.total_seconds(),
-        )
+        if quote is not None:
+            quote_resource = quote_models.QuoteResource.from_flight_quote_proto(
+                quote,
+                request,
+            )
+        else:
+            response: searches_pb2.GetQuoteResponse = await go_quotations.GetQuote(
+                searches_pb2.GetQuoteRequest(id=quote_id),
+                timeout=grpc_timeout.total_seconds(),
+            )
+            quote_resource = quote_models.QuoteResource.from_proto(
+                response.quote,
+                request,
+            )
 
         return await messages.create_response(
-            body=models.Body(
-                data=quote_models.QuoteResource.from_proto(
-                    response.quote,
-                    request,
-                ),
-            ),
+            body=models.Body(data=quote_resource),
             request=request,
         )
 

@@ -122,6 +122,7 @@ class QuoteRepository(
     repository.ProtoRepository[pricing_pb2.Quote],
     mixins.UpsertMixin[pricing_pb2.Quote],
     mixins.InsertMixin[pricing_pb2.Quote],
+    mixins.FindByIdMixin[pricing_pb2.Quote],
 ):
     _proto = pricing_pb2.Quote
     _indexes = (

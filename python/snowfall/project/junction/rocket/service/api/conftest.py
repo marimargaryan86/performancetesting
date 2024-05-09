@@ -31,6 +31,7 @@ from snowfall.project.junction.rocket.service.api.flights import (
 from snowfall.project.junction.rocket.service.api.flights.repositories import (
     FlightSearchRequestRepository,
     FlightSearchResultRepository,
+    QuoteRepository,
     RocketTripRepository,
 )
 from snowfall.project.junction.rocket.service.api.flights.transforms import (
@@ -59,6 +60,9 @@ from snowfall.project.junction.rocket.service.api.multi_modality import (
 )
 from snowfall.project.junction.rocket.service.api.places import (
     router as places_router,
+)
+from snowfall.project.junction.rocket.service.api.quotes import (
+    router as quotes_router,
 )
 from snowfall.project.junction.rocket.service.api.trains import (
     router as trains_router,
@@ -183,11 +187,13 @@ def container(
     junction_one_client: JunctionOneClient,
     flights_search_repo: FlightSearchResultRepository,
     flights_search_request_repo: FlightSearchRequestRepository,
+    quote_repo: QuoteRepository,
     hotel_search_repo: HotelSearchRepository,
     hotel_rooms_search_repo: HotelRoomsSearchRepository,
     search_task_producer: amqp.SearchTaskProducer,
     redis_client: Any,
     flights_rocket_trip_repo: RocketTripRepository,
+    mocker: pytest_mock.MockerFixture,
 ) -> lagom.Container:
     container = lagom.Container()
 
@@ -199,6 +205,8 @@ def container(
     container[JunctionOneClient] = junction_one_client
     container[FlightSearchResultRepository] = flights_search_repo
     container[FlightSearchRequestRepository] = flights_search_request_repo
+    container[QuoteRepository] = quote_repo
+    container[grpc_pb2_grpc.QuoteServiceStub] = mocker.MagicMock()
     container[FlightSearchRequestTransformer] = (  # type: ignore[type-abstract]
         flights_transforms.FlightSearchRequestTransformer
     )
@@ -293,6 +301,7 @@ def app(
             suggestions=suggestions,
             suggestion_searches=suggestions_searches,
         ),
+        *quotes_router.get_routes(integration),
     ]
     asgi_app = application.create_starlette_app(
         routes=route_list,
@@ -497,6 +506,11 @@ async def flights_search_request_repo(
     return FlightSearchRequestRepository(
         collection=mongo_client["db"]["flight_request"],
     )
+
+
+@pytest.fixture()
+async def quote_repo(mongo_client: motor_asyncio.AsyncIOMotorClient) -> QuoteRepository:
+    return QuoteRepository(collection=mongo_client["db"]["quote"])
 
 
 @pytest.fixture()

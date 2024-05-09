@@ -133,10 +133,11 @@ async def create_dependencies(
     container[types.FlightSearchResultTransformer] = (  # type: ignore[type-abstract]
         flights_transforms.FlightSearchResultTransformer
     )
+    container[repositories.QuoteRepository] = repositories.QuoteRepository(
+        collection=mongo_db.quotes,
+    )
     container[quotes.FlightQuoteManager] = quotes.FlightQuoteManager(
-        quotes_repository=repositories.QuoteRepository(
-            collection=mongo_db.quotes,
-        ),
+        quotes_repository=container[repositories.QuoteRepository],
         task_producer=quotes.QuoteTaskProducer(
             producer_obj=producer.Producer(
                 connection=amqp_connection,
