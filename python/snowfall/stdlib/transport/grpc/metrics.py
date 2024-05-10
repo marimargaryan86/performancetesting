@@ -84,6 +84,12 @@ class MetricsClientInterceptor(aio.UnaryUnaryClientInterceptor, _MetricsIntercep
         buckets=prometheus.BYTE_BUCKETS,
     )
 
+    _in_progress = prometheus_client.Gauge(
+        "grpc_client_requests_in_progress",
+        "Gauge of requests by RPC currently being processed",
+        ["rpc"],
+    )
+
     async def intercept_unary_unary(
         self,
         continuation: Callable[[aio.ClientCallDetails, Message], aio.UnaryUnaryCall],
@@ -91,13 +97,16 @@ class MetricsClientInterceptor(aio.UnaryUnaryClientInterceptor, _MetricsIntercep
         request: Message,
     ) -> aio.UnaryUnaryCall | Message:
         start = time.perf_counter()
-        response = await continuation(
-            client_call_details,
-            request,
-        )
+        method = bytes(client_call_details.method).decode()
+
+        with self._in_progress.labels(rpc=method).track_inprogress():
+            response = await continuation(
+                client_call_details,
+                request,
+            )
 
         self._log_metrics(
-            rpc_name=bytes(client_call_details.method).decode(),
+            rpc_name=method,
             status_code=await response.code(),
             request=request,
             response=response,
@@ -141,6 +150,12 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor, _MetricsIntercepto
         buckets=prometheus.BYTE_BUCKETS,
     )
 
+    _in_progress = prometheus_client.Gauge(
+        "grpc_server_requests_in_progress",
+        "Gauge of requests by RPC currently being processed",
+        ["rpc"],
+    )
+
     async def intercept_unary_unary(
         self,
         continuation: interceptor.UnaryUnary,
@@ -150,18 +165,19 @@ class MetricsServerInterceptor(interceptor.ServerInterceptor, _MetricsIntercepto
         start = time.perf_counter()
         response = None
 
-        try:
-            response = await continuation(request, context)
-        except Exception:
-            context.set_code(StatusCode.UNKNOWN)
-            raise
-        else:
-            return response
-        finally:
-            self._log_metrics(
-                rpc_name=continuation.__name__,
-                status_code=context.code() or StatusCode.OK,
-                request=request,
-                response=response,
-                start=start,
-            )
+        with self._in_progress.labels(rpc=continuation.__name__).track_inprogress():
+            try:
+                response = await continuation(request, context)
+            except Exception:
+                context.set_code(StatusCode.UNKNOWN)
+                raise
+            else:
+                return response
+            finally:
+                self._log_metrics(
+                    rpc_name=continuation.__name__,
+                    status_code=context.code() or StatusCode.OK,
+                    request=request,
+                    response=response,
+                    start=start,
+                )
