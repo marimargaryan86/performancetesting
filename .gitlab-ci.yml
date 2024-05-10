@@ -54,16 +54,31 @@ make-uninterruptible:
   tags:
     - shell
 
-allow-breaking-changes:
+generate-variables:
   stage: setup
   interruptible: true
   before_script:
     - set -euo pipefail
     - docker login -u "${PIPELINE_REGISTRY_USER}" -p "${PIPELINE_REGISTRY_USER_PASSWORD}" "${CI_REGISTRY}"
-    - docker pull "${CI_REGISTRY_IMAGE}/service/snowman:latest"
-  script:
-    - IS_BREAKING=$(docker run --rm "${CI_REGISTRY_IMAGE}/service/snowman:latest" parse "${CI_MERGE_REQUEST_TITLE}" 2>&1 | grep Breaking | cut -d ' ' -f2)
-    - if [ "${IS_BREAKING}" == "true" ]; then echo "BREAKING=1" > variables.env; else echo "BREAKING=0" > variables.env; fi
+    - docker pull "${CI_REGISTRY_IMAGE}/snowman:latest"
+  script: |
+    PARSER_OUTPUT=$(docker run --rm "${CI_REGISTRY_IMAGE}/snowman:latest" parse "${CI_MERGE_REQUEST_TITLE}" 2>&1 || true)
+    ERROR_MESSAGE=$(echo "${PARSER_OUTPUT}" | grep "Error: " || true)
+
+    if [[ "${ERROR_MESSAGE}" != "" ]]; then
+      echo "${ERROR_MESSAGE}"
+      exit 1
+    fi
+
+    IS_BREAKING=$(echo "${PARSER_OUTPUT}" | grep Breaking | cut -d ' ' -f2)
+
+    if [ "${IS_BREAKING}" == "true" ]; then
+      echo "BREAKING=1" > variables.env
+    else
+      echo "BREAKING=0" > variables.env
+    fi
+
+    cat variables.env
   needs: []
   retry: 2
   rules:

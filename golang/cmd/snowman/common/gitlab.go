@@ -14,7 +14,7 @@ import (
 var allowedTitle *regexp.Regexp
 
 func init() {
-	allowedTitle = regexp.MustCompile(`^(?P<prefix>WIP: |Draft: )?(?P<title>(?P<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?:\((?P<scope>[a-z\d\-/]+)\))?(?P<breaking>!)?: (?P<description>[a-z].*[^.]))$`)
+	allowedTitle = regexp.MustCompile(`^(?P<prefix>WIP: |Draft: )?(?P<title>(?P<type>build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?:\((?P<scope>[a-z\d\-/]+)\))?(?P<breaking>!)?: (?P<description>.*[^.]))$`)
 }
 
 type CommitTitle struct {
@@ -55,22 +55,22 @@ func ParseCommitTitle(message string) (CommitTitle, error) {
 		return CommitTitle{}, errors.New("unable to parse commit title")
 	}
 
-	title := matches[allowedTitle.SubexpIndex("title")]
+	description := matches[allowedTitle.SubexpIndex("description")]
 
-	if len(title) > 72 {
-		return CommitTitle{}, errors.New("commit title is too long")
+	if len(description) > 72 {
+		return CommitTitle{}, errors.New("commit description is too long")
 	}
 
-	if strings.HasSuffix(title, ".") {
-		return CommitTitle{}, errors.New("commit title must not end with a period")
+	if strings.HasSuffix(description, ".") {
+		return CommitTitle{}, errors.New("commit description must not end with a period")
 	}
 
 	return CommitTitle{
-		Description: matches[allowedTitle.SubexpIndex("description")],
+		Description: description,
 		IsBreaking:  matches[allowedTitle.SubexpIndex("breaking")] != "",
 		IsDraft:     matches[allowedTitle.SubexpIndex("prefix")] != "",
 		Scope:       matches[allowedTitle.SubexpIndex("scope")],
-		Title:       title,
+		Title:       matches[allowedTitle.SubexpIndex("title")],
 		Type:        matches[allowedTitle.SubexpIndex("type")],
 	}, nil
 }

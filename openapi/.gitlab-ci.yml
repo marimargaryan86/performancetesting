@@ -26,7 +26,7 @@ openapi:breaking:
     done
   needs:
     - "pants:setup"
-    - job: "allow-breaking-changes"
+    - job: "generate-variables"
       artifacts: true
   allow_failure:
     exit_codes:

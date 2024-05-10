@@ -33,7 +33,7 @@ protobuf:breaking:
       fi
     fi
   needs:
-    - job: "allow-breaking-changes"
+    - job: "generate-variables"
       artifacts: true
   variables:
     GIT_DEPTH: 0
