@@ -125,7 +125,7 @@ pants:package:
     PANTS_PUBLISH_OUTPUT: dist/deliverables.json
   services:
     - !reference [.pants, services]
-    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker@sha256:8bd6302a909f6f2ed9a17058cce2d83442bddb9e65c974352c2ba485a1e6d7ba"
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker@sha256:862b11fdc8eec08b4641c4c18b3b684ae5cc42f60a93b661884edb9f9ba2cbb5"
       alias: dockerdaemon
   resource_group: "pants-package-${CI_COMMIT_REF_SLUG}"
   artifacts:
@@ -145,7 +145,7 @@ pants:release:
   interruptible: false
   image: "${CI_REGISTRY_IMAGE}/pants:${CI_COMMIT_REF_SLUG}"
   services:
-    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker@sha256:8bd6302a909f6f2ed9a17058cce2d83442bddb9e65c974352c2ba485a1e6d7ba"
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker@sha256:862b11fdc8eec08b4641c4c18b3b684ae5cc42f60a93b661884edb9f9ba2cbb5"
       alias: dockerdaemon
   before_script:
     - mkdir -p ~/.ssh/
