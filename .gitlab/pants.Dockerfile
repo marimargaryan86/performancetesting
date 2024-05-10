@@ -23,7 +23,7 @@ ENV HCL2JSON_VERSION=v0.6.3
 RUN curl -fsSL https://github.com/tmccombs/hcl2json/releases/download/${HCL2JSON_VERSION}/hcl2json_linux_amd64 -o /usr/local/bin/hcl2json && chmod +x /usr/local/bin/hcl2json
 
 # renovate: datasource=golang-version depName=go
-ENV GO_VERSION=1.22.2
+ENV GO_VERSION=1.22.3
 ENV PATH=/usr/local/go/bin:$PATH
 RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz | tar xz -C /usr/local
 
