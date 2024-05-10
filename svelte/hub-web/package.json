@@ -1,6 +1,6 @@
 {
   "private": true,
-  "packageManager": "yarn@4.2.1",
+  "packageManager": "yarn@4.2.2",
   "name": "@snowfall/hub-web",
   "version": "0.0.1",
   "scripts": {
