@@ -145,6 +145,7 @@ type BoardOptions = {
   icon: IconTypes;
 };
 
+/** @deprecated use specific search result type instead */
 type SearchResultTile = {
   name: string;
   location: string;
@@ -174,6 +175,7 @@ export type {
   SelectedDate,
   SearchResultTile,
   IconTypes,
+  AmenityIcons,
   SliderRange,
   BoardOptions,
 };

@@ -37,11 +37,15 @@ export const DEFAULT_SEARCH_OPTIONS: SearchOptions = {
  */
 export function formatOriginDestination(
   searchOptions: SearchOptions,
-  config: { useTitleCase?: boolean } = {},
+  config: { useTitleCase?: boolean; replaceHyphensWithSpaces?: boolean } = {},
 ): string {
   const { destination, origin } = searchOptions;
-  const nextDestination = config.useTitleCase ? toTitleCase(destination) : destination;
-  const nextOrigin = config.useTitleCase && origin ? toTitleCase(origin) : origin;
+  let nextDestination = config.replaceHyphensWithSpaces
+    ? destination.replaceAll("-", " ")
+    : destination;
+  let nextOrigin = config.replaceHyphensWithSpaces && origin ? origin.replaceAll("-", " ") : origin;
+  nextDestination = config.useTitleCase ? toTitleCase(nextDestination) : nextDestination;
+  nextOrigin = config.useTitleCase && nextOrigin ? toTitleCase(nextOrigin) : nextOrigin;
 
   if (nextOrigin === undefined || nextOrigin === "") {
     return nextDestination;

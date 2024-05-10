@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { SearchResultsData } from "../../../routes/search/[searchType=search_type]/+page.svelte";
-  import SearchResultTile from "../../../components/search-result-tile.svelte";
+  import SearchResultTileOld from "../../../components/search-result-tile-old.svelte";
 
   export let searchResultsData: SearchResultsData | undefined;
 </script>
@@ -13,7 +13,7 @@
   </div>
   <div class="main-content">
     <div class="search-results">
-      <SearchResultTile />
+      <SearchResultTileOld />
     </div>
   </div>
 </div>

@@ -36,6 +36,7 @@
   };
 </script>
 
+<!-- @deprecated use SearchResultTile instead-->
 <div class="search-result-tile">
   <div class="search-result-tile-gallery">
     <img src="https://via.placeholder.com/254" alt="Placeholder" />
@@ -106,11 +107,6 @@
 </div>
 
 <style>
-  :global(.icon:hover) {
-    background-color: red;
-    cursor: pointer;
-  }
-
   .search-result-tile {
     display: flex;
     gap: 32px;

@@ -4,6 +4,9 @@
   import { getTranslator } from "$lib/i18n";
   import type { SearchType } from "../../../../params/search_type";
   import type { SearchOptions } from "$lib/models/common";
+  import type { Accommodation } from "$lib/data/accommodations";
+  import Container from "$lib/components/container.svelte";
+  import SearchResultTile from "../search-result-tile.svelte";
 
   const t = getTranslator();
 
@@ -12,6 +15,7 @@
   export let searchResultsData: SearchResultsData | undefined = undefined;
   let destination: string;
   let searchOptions: SearchOptions;
+  let hotelData: Accommodation[] = [];
 
   $: destination =
     searchResultsData && searchResultsData?.destination
@@ -29,20 +33,37 @@
     searchType: HOTEL_SEARCH_TYPE,
     passengers,
   };
+
+  $: if (searchResultsData?.data) {
+    hotelData = searchResultsData.data as Accommodation[];
+  }
 </script>
 
 <div class="wrapper">
   <SearchHeader {searchOptions} />
 
   <main>
-    <div class="filters">
+    <aside class="filters">
       <h2>{$t("sentences.hello")} filters.</h2>
-    </div>
+    </aside>
 
-    <div class="search-results">
-      <h2>{$t("sentences.hello")} hotels.</h2>
-      <pre>{JSON.stringify(searchResultsData, null, 4)}</pre>
-    </div>
+    <section class="search-results">
+      <header>
+        <h2>{`${hotelData.length.toString()} ${$t("sentences.hotelsFound")}`}</h2>
+        <button>Sort By</button>
+      </header>
+      {#if hotelData.length}
+        <article>
+          {#each hotelData as accommodation}
+            <Container>
+              <SearchResultTile {accommodation} />
+            </Container>
+          {/each}
+        </article>
+      {:else}
+        <h4>No Search Results</h4>
+      {/if}
+    </section>
   </main>
 </div>
 
@@ -73,8 +94,18 @@
   }
 
   .search-results {
-    border: 1px dashed red;
     width: 100%;
     max-width: 1012px;
+  }
+
+  .search-results header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  :global(.search-results article > div) {
+    margin-bottom: 24px;
   }
 </style>

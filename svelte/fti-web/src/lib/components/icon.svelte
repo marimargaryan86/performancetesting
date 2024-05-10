@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { IconTypes } from "$lib/models/common";
+  import type { IconTypes, AmenityIcons } from "$lib/models/common";
 
-  export let variant: IconTypes;
+  export let variant: IconTypes | AmenityIcons;
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 

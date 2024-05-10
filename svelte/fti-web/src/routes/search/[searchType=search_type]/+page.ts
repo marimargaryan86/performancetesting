@@ -5,7 +5,6 @@ export function load({ url }): { searchParamsObj: Record<string, string>; search
   const queryParams = url.searchParams;
   const searchParams = Array.from(queryParams.entries());
   const searchParamsObj = Object.fromEntries(searchParams);
-
   const searchType = getSearchTypeFromURL(url);
 
   return { searchParamsObj, searchType };

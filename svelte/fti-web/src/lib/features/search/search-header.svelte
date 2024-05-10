@@ -8,6 +8,7 @@
     formatDates,
     formatPassengersAndRooms,
   } from "$lib/helpers/search-header";
+  import Container from "$lib/components/container.svelte";
   // TODO(04-24-2024/a.santos): Pull down URL query params.
 
   export let searchOptions: SearchOptions | undefined;
@@ -19,6 +20,7 @@
 
   $: originAndDestinationString = formatOriginDestination(nextSearchOptions, {
     useTitleCase: true,
+    replaceHyphensWithSpaces: true,
   });
   $: datesString = formatDates(nextSearchOptions);
   $: passengersAndRoomsString = formatPassengersAndRooms(nextSearchOptions);
@@ -32,38 +34,40 @@
   </section>
 
   <section class="search">
-    <form class="header-search-panel" name="search-options">
-      <div class="input-wrapper">
-        <label for="search-header-origin-destination">Origin-Destination</label>
-        <input
-          type="text"
-          id="search-header-origin-destination"
-          name="origin-destination"
-          class="origin-destination"
-          bind:value={originAndDestinationString}
-        />
-      </div>
-      <div class="input-wrapper center">
-        <label for="search-header-dates">Dates</label>
-        <input
-          type="text"
-          id="search-header-dates"
-          name="dates"
-          class="dates"
-          bind:value={datesString}
-        />
-      </div>
-      <div class="input-wrapper">
-        <label for="search-header-passengers-and-rooms">Passengers and Rooms</label>
-        <input
-          type="text"
-          id="search-header-passengers-and-rooms"
-          name="passengers-and-rooms"
-          class="passengers-and-rooms"
-          bind:value={passengersAndRoomsString}
-        />
-      </div>
-    </form>
+    <Container>
+      <form class="header-search-panel" name="search-options">
+        <div class="input-wrapper">
+          <label for="search-header-origin-destination">Origin-Destination</label>
+          <input
+            type="text"
+            id="search-header-origin-destination"
+            name="origin-destination"
+            class="origin-destination"
+            bind:value={originAndDestinationString}
+          />
+        </div>
+        <div class="input-wrapper center">
+          <label for="search-header-dates">Dates</label>
+          <input
+            type="text"
+            id="search-header-dates"
+            name="dates"
+            class="dates"
+            bind:value={datesString}
+          />
+        </div>
+        <div class="input-wrapper">
+          <label for="search-header-passengers-and-rooms">Passengers and Rooms</label>
+          <input
+            type="text"
+            id="search-header-passengers-and-rooms"
+            name="passengers-and-rooms"
+            class="passengers-and-rooms"
+            bind:value={passengersAndRoomsString}
+          />
+        </div>
+      </form>
+    </Container>
   </section>
 
   <section class="widget">
@@ -106,10 +110,8 @@
     display: flex;
     align-items: center;
     flex: 1;
-    background-color: #ffffff;
-    border-radius: 8px;
     height: 45px;
-    padding: 4px 25px;
+    padding: 0 25px;
   }
 
   .input-wrapper {

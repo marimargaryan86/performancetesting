@@ -4,5 +4,6 @@ export default {
   title: "BigXtra",
   sentences: {
     hello: "Hallo",
+    hotelsFound: "Hotels gefunden",
   },
 } satisfies LocaleData;

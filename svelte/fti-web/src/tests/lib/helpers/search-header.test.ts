@@ -16,6 +16,15 @@ describe("formatOriginDestination", () => {
     ).toBe("Munich-Bali");
   });
 
+  it("replaces hyphens with spaces correctly when configured", () => {
+    expect(
+      formatOriginDestination(
+        { ...DEFAULT_SEARCH_OPTIONS, origin: "new-york-city", destination: "los-angeles" },
+        { replaceHyphensWithSpaces: true, useTitleCase: true },
+      ),
+    ).toBe("New York City-Los Angeles");
+  });
+
   it("returns destination only when origin is undefined or empty", () => {
     expect(formatOriginDestination({ ...DEFAULT_SEARCH_OPTIONS, destination: "LAX" })).toBe("LAX");
 
