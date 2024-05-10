@@ -3,6 +3,7 @@ import dataclasses
 import datetime
 import itertools
 from collections.abc import Awaitable, Callable, Iterable, Sequence
+from enum import Enum
 from typing import Generic, NamedTuple, TypeAlias, TypeVar
 
 from snowfall.project.junction.rocket.service.api.common import passengers
@@ -511,11 +512,18 @@ class SearchRequest:
             raise UnsupportedRoundtripError()
 
 
+class RouteSearchMode(Enum):
+    sequential = 1
+    parallel = 2
+
+
 class Searcher:
     def __init__(
         self,
         search_implementations: Iterable[SearchImplementation],
+        route_search_mode: RouteSearchMode = RouteSearchMode.sequential,
     ):
+        self._logger = stdout.get_logger()
         self._outbound = {
             implementation.mode: implementation.outbound
             for implementation in search_implementations
@@ -527,6 +535,7 @@ class Searcher:
         self._supported_modes = {
             implementation.mode for implementation in search_implementations
         }
+        self._route_search_mode = route_search_mode
 
     async def find_results(
         self,
@@ -540,7 +549,12 @@ class Searcher:
         self,
         request: SearchRequest,
     ) -> SearchResult[Offer] | SearchResult[RoundtripOffer]:
-        outbound = await self._find_outbound_sequential(request)
+        # TODO(regis): Handle parallel search for the return as well, and hoist
+        # it out of the _find_sequential once done.
+        if self._route_search_mode == RouteSearchMode.sequential:
+            outbound = await self._find_outbound_sequential(request)
+        else:
+            outbound = await self._find_outbound_parallel(request)
 
         if not request.inbound:
             return outbound
@@ -595,26 +609,11 @@ class Searcher:
         for idx, segment in enumerate(request.outbound.route.segments):
             if idx > 0:
                 departure_after += segment.mct_prefix
-
-            offers = await self._outbound[segment.type](
-                SegmentSearchRequest(
-                    segment=segment,
-                    departure_after=departure_after,
-                    date_of_births=request.date_of_births,
-                    reseller_id=request.reseller_id,
-                ),
+            segment_with_offers = await self._search_outbound_segment_offers(
+                request,
+                segment,
+                departure_after,
             )
-
-            if not offers:
-                raise OfferNotFoundError(
-                    "No offers found for segment {origin}->{destination}".format(
-                        origin=segment.origin.name,
-                        destination=segment.destination.name,
-                    ),
-                )
-
-            offers.sort(key=lambda offer: offer.arrival_at)
-            segment_with_offers = Segment(segment=segment, offers=offers)
             result_segments.append(segment_with_offers)
             first_offer = segment_with_offers.find_first_offer_after(departure_after)
             departure_after = first_offer.arrival_at + segment.mct_suffix
@@ -624,6 +623,121 @@ class Searcher:
             segments=result_segments,
             departure_after=request.outbound.departure_after,
         )
+
+    async def _find_outbound_parallel(  # noqa: WPS231
+        self,
+        request: SearchRequest,
+    ) -> SearchResult[Offer]:
+        optimistic_departures = request.outbound.route.optimistic_departures(
+            request.outbound.departure_after,
+        )
+
+        tasks: list[tuple[routes.Segment, asyncio.Task[Segment[Offer]]]] = []
+        for sgmt, optimistic_departure in optimistic_departures:
+            safe_departure_after = self._departure_after_add_buffer(
+                optimistic_departure,
+                sgmt.type,
+            )
+            tasks.append((
+                sgmt,
+                asyncio.create_task(
+                    self._search_outbound_segment_offers(
+                        request,
+                        sgmt,
+                        safe_departure_after,
+                    ),
+                ),
+            ))
+
+        departure_after = request.outbound.departure_after
+        result_segments = []
+        for idx, (segment, task) in enumerate(tasks):
+            if idx > 0:
+                departure_after += segment.mct_prefix
+
+            # This try block can fail in both statements, in either cases we need
+            # to retry the search with the concrete departure_after that was
+            # derived from the concrete sequence of offers that we used.
+            try:  # noqa: WPS229
+                # We await tasks in order to that we can immediately restart the search
+                # as soon as we identify the right time for the search.
+                segment_with_offers = await task
+                first_offer = segment_with_offers.find_first_offer_after(
+                    departure_after,
+                )
+            except OfferNotFoundError:
+                if idx == 0:
+                    raise
+
+                # TODO(regis): Check that it's worth redoing the call, by comparing
+                # the concrete departure_after with the optimistic departure after that
+                # was used to do the optimistic call.
+
+                self._logger.warning(
+                    "Failed to find an offer with optimistic departures, refining search window.",
+                )
+
+                segment_with_offers = await self._search_outbound_segment_offers(
+                    request,
+                    segment,
+                    departure_after,
+                )
+                first_offer = segment_with_offers.find_first_offer_after(
+                    departure_after,
+                )
+
+            result_segments.append(segment_with_offers)
+            departure_after = first_offer.arrival_at + segment.mct_suffix
+
+        return SearchResult(
+            route=request.outbound.route,
+            segments=result_segments,
+            departure_after=request.outbound.departure_after,
+        )
+
+    async def _search_outbound_segment_offers(
+        self,
+        request: SearchRequest,
+        segment: routes.Segment,
+        departure_after: datetime.datetime,
+    ) -> Segment[Offer]:
+        offers = await self._outbound[segment.type](
+            SegmentSearchRequest(
+                segment=segment,
+                departure_after=departure_after,
+                date_of_births=request.date_of_births,
+                reseller_id=request.reseller_id,
+            ),
+        )
+
+        if not offers:
+            raise OfferNotFoundError(
+                "No offers found for segment {origin}->{destination}".format(
+                    origin=segment.origin.name,
+                    destination=segment.destination.name,
+                ),
+            )
+
+        offers.sort(key=lambda offer: offer.arrival_at)
+        return Segment(segment=segment, offers=offers)
+
+    # Add (subtract) some buffer to departure_after to ensure the search catches
+    # results that may be just around the departure after (a few minutes before
+    # or after). This should be provider-specific as the size of the search will
+    # depend on the underlying provider.
+    def _departure_after_add_buffer(
+        self,
+        departure_after: datetime.datetime,
+        segment_type: segment_type_pb2.SegmentType.ValueType,
+    ) -> datetime.datetime:
+        match segment_type:
+            case segment_type_pb2.SEGMENT_TYPE_TRAIN:
+                minutes_offset = 20
+                return departure_after - datetime.timedelta(minutes=minutes_offset)
+            case segment_type_pb2.SEGMENT_TYPE_FLIGHT:
+                # For air, we do a full day search so no need to add buffer.
+                return departure_after
+        return departure_after
 
     def _validate_request(self, request: SearchRequest) -> None:
         self._validate_modes_are_supported(request)
