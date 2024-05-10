@@ -114,11 +114,30 @@ func (ps *PlannerServiceServer) FindRoutes(ctx context.Context, req *planner.Fin
 		return &planner.FindRoutesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	departureAfter := time.Now()
-	departureAfter = departureAfter.AddDate(0, 0, 1)
-	departureAfter = time.Date(departureAfter.Year(), departureAfter.Month(), departureAfter.Day(), 0, 0, 0, 0, time.UTC)
-	departureBefore := departureAfter.AddDate(0, 0, 1)
-	departureBefore = time.Date(departureBefore.Year(), departureBefore.Month(), departureBefore.Day(), 4, 0, 0, 0, departureBefore.Location())
+	var departureAfter time.Time
+	if req.DepartureAfter != nil {
+		var err error
+		departureAfter, err = timestampToTime(req.DepartureAfter)
+		if err != nil {
+			return &planner.FindRoutesResponse{}, err
+		}
+	} else {
+		after := time.Now().AddDate(0, 0, 1)
+		departureAfter = time.Date(after.Year(), after.Month(), after.Day(), 0, 0, 0, 0, time.UTC)
+	}
+
+	var departureBefore time.Time
+	if req.DepartureBefore != nil {
+		var err error
+		departureBefore, err = timestampToTime(req.DepartureBefore)
+		if err != nil {
+			return &planner.FindRoutesResponse{}, err
+		}
+	} else {
+		before := departureAfter.AddDate(0, 0, 1)
+		departureBefore = time.Date(before.Year(), before.Month(), before.Day(), 4, 0, 0, 0, before.Location())
+	}
+
 	tripCutoff := departureAfter.Add(48 * time.Hour)
 
 	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
@@ -271,31 +290,10 @@ func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.
 
 	if req.DepartureAfter != nil {
 		var err error
-		var originTz *time.Location
-
-		switch v := req.DepartureAfter.TimeOffset.(type) {
-		case *v1Stdlib.DateTime_TimeZone:
-			originTz, err = time.LoadLocation(v.TimeZone.Id)
-
-			if err != nil {
-				return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
-			}
-		case *v1Stdlib.DateTime_UtcOffset:
-			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
-		default:
-			return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
+		departureTime, err = timestampToTime(req.DepartureAfter)
+		if err != nil {
+			return &planner.SearchJourneyResponse{}, err
 		}
-
-		departureTime = time.Date(
-			int(req.DepartureAfter.Year),
-			time.Month(req.DepartureAfter.Month),
-			int(req.DepartureAfter.Day),
-			int(req.DepartureAfter.Hours),
-			int(req.DepartureAfter.Minutes),
-			int(req.DepartureAfter.Seconds),
-			int(req.DepartureAfter.Nanos),
-			originTz,
-		)
 	}
 
 	var departureBefore time.Time
@@ -304,31 +302,10 @@ func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.
 		departureBefore = time.Date(eTime.Year(), eTime.Month(), eTime.Day(), 4, 0, 0, 0, eTime.Location())
 	} else {
 		var err error
-		var originTz *time.Location
-
-		switch v := req.DepartureBefore.TimeOffset.(type) {
-		case *v1Stdlib.DateTime_TimeZone:
-			originTz, err = time.LoadLocation(v.TimeZone.Id)
-
-			if err != nil {
-				return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
-			}
-		case *v1Stdlib.DateTime_UtcOffset:
-			originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
-		default:
-			return &planner.SearchJourneyResponse{}, status.Errorf(codes.Internal, "unknown time zone")
+		departureBefore, err = timestampToTime(req.DepartureBefore)
+		if err != nil {
+			return &planner.SearchJourneyResponse{}, err
 		}
-
-		departureBefore = time.Date(
-			int(req.DepartureBefore.Year),
-			time.Month(req.DepartureBefore.Month),
-			int(req.DepartureBefore.Day),
-			int(req.DepartureBefore.Hours),
-			int(req.DepartureBefore.Minutes),
-			int(req.DepartureBefore.Seconds),
-			int(req.DepartureBefore.Nanos),
-			originTz,
-		)
 	}
 
 	allowedSegmentTypes := make([]models.Schedule_Type, len(req.AllowedSegmentTypes))
@@ -382,4 +359,33 @@ func (ps *PlannerServiceServer) SearchJourney(ctx context.Context, req *planner.
 	return &planner.SearchJourneyResponse{
 		Trips: trips,
 	}, nil
+}
+
+func timestampToTime(timestamp *v1Stdlib.DateTime) (time.Time, error) {
+	var originTz *time.Location
+
+	switch v := timestamp.TimeOffset.(type) {
+	case *v1Stdlib.DateTime_TimeZone:
+		var err error
+		originTz, err = time.LoadLocation(v.TimeZone.Id)
+
+		if err != nil {
+			return time.Time{}, status.Errorf(codes.Internal, "unknown time zone")
+		}
+	case *v1Stdlib.DateTime_UtcOffset:
+		originTz = time.FixedZone("custom", int(v.UtcOffset.Seconds))
+	default:
+		return time.Time{}, status.Errorf(codes.Internal, "unknown time zone")
+	}
+
+	return time.Date(
+		int(timestamp.Year),
+		time.Month(timestamp.Month),
+		int(timestamp.Day),
+		int(timestamp.Hours),
+		int(timestamp.Minutes),
+		int(timestamp.Seconds),
+		int(timestamp.Nanos),
+		originTz,
+	), nil
 }

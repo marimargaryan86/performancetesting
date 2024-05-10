@@ -32,6 +32,8 @@ message SearchJourneyResponse {
 message FindRoutesRequest {
   repeated snowfall.stdlib.v1.LatLng origins = 1;
   repeated snowfall.stdlib.v1.LatLng destinations = 2;
+  optional snowfall.stdlib.v1.DateTime departure_after = 5;
+  optional snowfall.stdlib.v1.DateTime departure_before = 6;
   optional uint32 maximum_connections = 3;
   repeated snowfall.project.junction.go.v1.Schedule.Type allowed_segment_types = 4;
 }
