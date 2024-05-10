@@ -32,7 +32,7 @@ include:
   - template: Jobs/Secret-Detection.latest.gitlab-ci.yml
   - project: 'platform-engineers/renovate-runner'
     file: '/templates/renovate-config-validator.gitlab-ci.yml'
-    ref: v17.208.0
+    ref: v17.217.1
 
 renovate-config-validator:
   rules:
