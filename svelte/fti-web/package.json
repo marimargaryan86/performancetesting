@@ -29,7 +29,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.38.0",
-    "i18next": "^23.10.0",
+    "i18next": "^23.11.3",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.2.1",
     "svelte": "^4.2.12",
