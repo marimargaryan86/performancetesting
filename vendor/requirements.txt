@@ -102,7 +102,7 @@ redis[hiredis]==5.0.4
 rfc3339-validator==0.1.4
 ruff==0.4.4
 s3fs==2024.3.1
-sagemaker==2.218.1
+sagemaker==2.219.0
 scikit-learn==1.4.2
 sentry-sdk==2.1.1
 setuptools==69.5.1
