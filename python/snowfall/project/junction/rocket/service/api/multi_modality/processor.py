@@ -110,7 +110,11 @@ class SuggestionSearchProcessor:
         suggestion_search: multi_modal_pb2.SuggestionSearch,
     ) -> list[routes.Route]:
         origin, destination = await self._get_origin_destination(suggestion_search)
-        found_routes = await self._routes.find_routes(origin, destination)
+        found_routes = await self._routes.find_routes(
+            origin,
+            destination,
+            suggestion_search.criteria.departure_after,
+        )
         prioritized_routes = self._routes_ranking(found_routes)
 
         # We reduce the routes only after prioritizing them, because we want

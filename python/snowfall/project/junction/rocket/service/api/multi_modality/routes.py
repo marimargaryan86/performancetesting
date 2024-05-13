@@ -30,7 +30,7 @@ from snowfall.project.junction.rocket.service.places.v1alpha import (
 )
 from snowfall.project.junction.v1 import segment_type_pb2
 from snowfall.stdlib.format import protobuf
-from snowfall.stdlib.v1 import latlng_pb2
+from snowfall.stdlib.v1 import datetime_pb2, latlng_pb2
 
 _MCT_FLIGHT_PREFIX_MINUTES = 75
 _MCT_FLIGHT_SUFFIX_MINUTES = 45
@@ -211,12 +211,14 @@ class Routes:
         self,
         origin: models_pb2.Place,
         destination: models_pb2.Place,
+        departure_after: datetime_pb2.DateTime | None = None,
     ) -> list[Route]:
         try:
             route_response = await self._planner.FindRoutes(
                 planner_pb2.FindRoutesRequest(
                     origins=await self._find_location_coordinates(origin),
                     destinations=await self._find_location_coordinates(destination),
+                    departure_after=departure_after,
                 ),
             )
         except grpc.aio.AioRpcError as err:
