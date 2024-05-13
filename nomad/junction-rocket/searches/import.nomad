@@ -76,6 +76,11 @@ job "junction-rocket-searches-import" {
               local_bind_port  = 8010
               destination_name = "junction-rocket-gateway-serve-${var.environment}"
             }
+
+            upstreams {
+              local_bind_port  = 8030
+              destination_name = "junction-rocket-places-grpc-${var.environment}"
+            }
           }
         }
       }
@@ -102,6 +107,7 @@ AMQP_DSN={{range $index, $service := service "amqp-${var.environment}"}}amqps://
 MONGO_DSN={{range $index, $service := service "mongodb-${var.environment}"}}mongodb://{{.ServiceMeta.username}}:{{.ServiceMeta.password}}@{{.Address}}:{{.Port}}/?{{.ServiceMeta.parameters}} {{end}}
 REDIS_DSN={{range $index, $service := service "redis-${var.environment}"}}redis://{{.Address}}:{{.Port}}// {{end}}
 GATEWAY_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-rocket-gateway-serve-${var.environment}"))}}
+PLACES_ADDRESS={{(printf "%s" (env "NOMAD_UPSTREAM_ADDR_junction-rocket-places-grpc-${var.environment}"))}}
 EOH
         destination = "services.env"
         env         = true

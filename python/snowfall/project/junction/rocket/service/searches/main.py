@@ -7,6 +7,7 @@ import pydantic
 from motor import motor_asyncio
 
 from snowfall.project.junction.rocket.service.gateway.v1alpha import searches_pb2_grpc
+from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.rocket.service.searches import (
     importer,
     pay_quotes,
@@ -56,6 +57,7 @@ class _ImportSettings(application.Settings):
     gateway_address: str
     gateway_timeout: datetime.timedelta = datetime.timedelta(seconds=45)
     gateway_poll_sleep: int = 5
+    places_address: str
 
 
 class _ConsumeQuoteSettings(application.Settings):
@@ -146,6 +148,11 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         app.settings.gateway_address,
     )
 
+    places_channel = await grpc_factory.make_insecure_channel(
+        app,
+        app.settings.places_address,
+    )
+
     searches_repo = repository.SearchRepository(
         mongo.searches.searches,
         app.settings.default_ttl,
@@ -172,6 +179,7 @@ async def _import(app: application.Application[_ImportSettings]) -> None:
         gateway_stubs=searches_pb2_grpc.SearchServiceStub(gateway_channel),
         gateway_timeout=app.settings.gateway_timeout,
         gateway_poll_sleep=app.settings.gateway_poll_sleep,
+        places_stubs=places_pb2_grpc.PlacesServiceStub(places_channel),
     )
     await search_result_importer.consume()
 

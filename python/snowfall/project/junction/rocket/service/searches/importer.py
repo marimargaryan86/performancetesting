@@ -9,6 +9,7 @@ from snowfall.project.junction.rocket.service.gateway.v1alpha import (
     searches_pb2,
     searches_pb2_grpc,
 )
+from snowfall.project.junction.rocket.service.places.v1alpha import places_pb2_grpc
 from snowfall.project.junction.rocket.service.searches import pay_quotes, repository
 from snowfall.project.junction.rocket.service.searches.v1alpha import amqp_pb2
 from snowfall.stdlib import money
@@ -105,6 +106,7 @@ class SearchResultImporter:
         status_handler: StatusHandler,
         searches: repository.SearchRepository,
         gateway_stubs: searches_pb2_grpc.SearchServiceStub,
+        places_stubs: places_pb2_grpc.PlacesServiceStub,
         gateway_timeout: datetime.timedelta,
         gateway_poll_sleep: int,
     ):
@@ -117,6 +119,7 @@ class SearchResultImporter:
         self._gateway_stubs = gateway_stubs
         self._gateway_timeout = gateway_timeout
         self._gateway_poll_sleep = gateway_poll_sleep
+        self._places_stubs = places_stubs
 
     async def consume(self) -> None:
         await self._consumer.consume(self._process_message)
