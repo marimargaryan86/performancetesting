@@ -2465,6 +2465,28 @@ components:
                   properties:
                     data:
                       $ref: '#/components/schemas/FlightSearchIdentifier'
+    FlightSearchResultIdentifier:
+      title: Flight Search Result
+      type: object
+      x-tags:
+        - flight-searches
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Flight Search Result object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - flight-search-results
+          example: flight-search-results
     FlightSearchResultIncluded:
       title: Flight Search Result Included
       type: array
@@ -2605,9 +2627,29 @@ components:
                         $ref: '#/components/schemas/TrainOfferIdentifier'
                   required:
                     - data
+                flightResults:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/FlightSearchResultIdentifier'
+                  required:
+                    - data
+                trainResults:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TrainSearchResultIdentifier'
+                  required:
+                    - data
               required:
                 - flightOffers
                 - trainOffers
+                - flightResults
+                - trainResults
           required:
             - id
             - type
@@ -3741,6 +3783,28 @@ components:
         - type
         - attributes
         - relationships
+    TrainSearchResultIdentifier:
+      title: Train Search Result Identifier
+      type: object
+      x-tags:
+        - train-searches
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          description: >-
+            Unique identifier (UUID) for the Train Search Result object in [RFC
+            4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+          format: uuid
+          example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+        type:
+          type: string
+          description: The Junction resource type
+          enum:
+            - train-search-results
+          example: train-search-results
     TrainSearchResultIncluded:
       title: Train Search Result Included
       type: array

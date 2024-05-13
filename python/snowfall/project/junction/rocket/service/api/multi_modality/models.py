@@ -6,6 +6,9 @@ from pydantic import types
 from starlette import requests, responses, status
 
 from snowfall.project.junction.rocket.service.api import models as api_models
+from snowfall.project.junction.rocket.service.api.flights import (
+    models as flight_models,
+)
 from snowfall.project.junction.rocket.service.api.places.models import places
 from snowfall.project.junction.rocket.service.api.trains.models import (
     searches as train_models,
@@ -65,7 +68,7 @@ class Suggestion(std_models.Resource):
                     data=[
                         std_models.ResourceIdentifier(
                             id=flight_offer.id,
-                            type="flight-offers",
+                            type=flight_models.OfferResource.api_type,
                         )
                         for flight_offer in offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT]
                     ],
@@ -75,6 +78,24 @@ class Suggestion(std_models.Resource):
                         std_models.ResourceIdentifier(
                             id=train_offer.id,
                             type=train_models.OfferResource.api_type,
+                        )
+                        for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
+                    ],
+                ),
+                "flightResults": std_models.Relationship(
+                    data=[
+                        std_models.ResourceIdentifier(
+                            id=flight_offer.result_id,
+                            type=flight_models.FlightSearchResultResource.api_type,
+                        )
+                        for flight_offer in offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT]
+                    ],
+                ),
+                "trainResults": std_models.Relationship(
+                    data=[
+                        std_models.ResourceIdentifier(
+                            id=train_offer.result_id,
+                            type=train_models.SearchResultResource.api_type,
                         )
                         for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
                     ],
