@@ -1,9 +1,11 @@
 import asyncio
 import contextlib
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
+from types import MappingProxyType
 from typing import TypeAlias
 
 import grpc
+import prometheus_client
 
 from snowfall.project.junction.rocket.service.api.multi_modality import (
     repository,
@@ -35,6 +37,25 @@ ProcessorImplementation: TypeAlias = Callable[
     [multi_modal_pb2.SuggestionSearchTask],
     Awaitable[None],
 ]
+
+_counter_searches = prometheus_client.Counter(
+    "suggestion_search_processor_searches_total",
+    "Total number of searches.",
+)
+
+_counter_failed_searches = prometheus_client.Counter(
+    "suggestion_search_processor_failed_searches_total",
+    "Total number of failed searches.",
+    labelnames=("reason",),
+)
+
+
+_FAILURE_REASONS: Mapping[type[BaseException], str] = MappingProxyType({
+    search.ProviderTimeoutError: "provider_timeout",
+    search.UnusableResponseError: "unusable_response",
+    search.NoSuggestionError: "no_valid_suggestion",
+    search.OfferNotFoundError: "no_offers_found",
+})
 
 
 class SuggestionSearchProcessor:
@@ -77,8 +98,18 @@ class SuggestionSearchProcessor:
             ],
             return_exceptions=True,
         )
+        exceptions = []
 
-        exceptions = list(filter(None, possible_exceptions))
+        for possible_exception in possible_exceptions:
+            _counter_searches.inc()
+
+            if possible_exception is None:
+                continue
+
+            _counter_failed_searches.labels(
+                reason=_FAILURE_REASONS.get(type(possible_exception), "unknown"),
+            ).inc()
+            exceptions.append(possible_exception)
 
         if exceptions:
             raise BaseExceptionGroup("One or more searches failed", exceptions)
