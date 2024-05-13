@@ -41,7 +41,7 @@
 //     "dnspython==2.6.1",
 //     "docformatter==1.7.5",
 //     "email-validator==2.1.1",
-//     "fakeredis[lua]==2.23.0",
+//     "fakeredis[lua]==2.23.1",
 //     "firebase-admin==6.5.0",
 //     "flake8-deprecated==2.2.1",
 //     "flake8-if-expr==1.0.4",
@@ -2618,13 +2618,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "619b4433dd8321f9f45a9e2714de088f0eec4c817e876532b15163c0a29619bd",
-              "url": "https://files.pythonhosted.org/packages/f3/e2/e7e0a6be79c598249d68ebd1ab351e129de29cf585c10d07bca6d4368218/fakeredis-2.23.0-py3-none-any.whl"
+              "hash": "07012df037488e5c95e7301f93f2a39a5351bd6c0f2f6e261dc20122329194a5",
+              "url": "https://files.pythonhosted.org/packages/21/e7/0e33e43bc8a81c3f70564d001b598b7f968d6ff11c893eb71feb31428303/fakeredis-2.23.1-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "7babb853a9a42ebe46acd89294bd7fc462dad619a870601f36c27dea007a0019",
-              "url": "https://files.pythonhosted.org/packages/b3/be/e835678a1ba65899d59ad516608fdf883b3d274038360bc8eb213b55b69a/fakeredis-2.23.0.tar.gz"
+              "hash": "b45f419e4564ebaaf4a0a8a28d890f5b5797abe14f439969e290f3d57e862c3e",
+              "url": "https://files.pythonhosted.org/packages/94/e0/426036589e8646cc94df41f68783eefdd366deae5877ae609323ef1ef869/fakeredis-2.23.1.tar.gz"
             }
           ],
           "project_name": "fakeredis",
@@ -2637,7 +2637,7 @@
             "typing_extensions<5.0,>=4.7; python_version < \"3.11\""
           ],
           "requires_python": "<4.0,>=3.7",
-          "version": "2.23.0"
+          "version": "2.23.1"
         },
         {
           "artifacts": [
@@ -3342,13 +3342,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "99da6acb0acc648e309102b0e0262d7fef30f07f6bf56c6eeaa0504ceca113e3",
-              "url": "https://files.pythonhosted.org/packages/a2/04/0752bcbb291650c45fb736400a7bb26e55a75609fa437d6860beb483ecab/google_api_python_client-2.128.0-py2.py3-none-any.whl"
+              "hash": "d50f7e2dfdbb7fc2732f6a0cba1c54d7bb676390679526c6bb628c901e43ec86",
+              "url": "https://files.pythonhosted.org/packages/af/ec/3265b145597c456396695d9e24a713dd4749d0dc1327a8287c198df951d1/google_api_python_client-2.129.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "908af182dfc1cd79412a489b37fe45e4f3cc99c74e80c7c477ca5babaa54eea5",
-              "url": "https://files.pythonhosted.org/packages/dd/c5/774bdee54820d9d913fdaf5869298f99327f893daf91db5ec7af3525da25/google-api-python-client-2.128.0.tar.gz"
+              "hash": "984cc8cc8eb4923468b1926d2b8effc5b459a4dda3c845896eb87c153b28ef84",
+              "url": "https://files.pythonhosted.org/packages/c2/97/56b0c6661e0b60e9d743a2eed018329a5265bd37d1b14969ef53cd06239b/google-api-python-client-2.129.0.tar.gz"
             }
           ],
           "project_name": "google-api-python-client",
@@ -3360,7 +3360,7 @@
             "uritemplate<5,>=3.0.1"
           ],
           "requires_python": ">=3.7",
-          "version": "2.128.0"
+          "version": "2.129.0"
         },
         {
           "artifacts": [
@@ -10533,7 +10533,7 @@
     "dnspython==2.6.1",
     "docformatter==1.7.5",
     "email-validator==2.1.1",
-    "fakeredis[lua]==2.23.0",
+    "fakeredis[lua]==2.23.1",
     "firebase-admin==6.5.0",
     "flake8-deprecated==2.2.1",
     "flake8-if-expr==1.0.4",

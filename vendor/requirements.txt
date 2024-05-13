@@ -27,7 +27,7 @@ dnspython==2.6.1
 docformatter==1.7.5
 email-validator==2.1.1
 Faker==25.1.0
-fakeredis[lua]==2.23.0
+fakeredis[lua]==2.23.1
 firebase-admin==6.5.0
 flake8==7.0.0
 flake8-deprecated==2.2.1
