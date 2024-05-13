@@ -129,7 +129,7 @@
 //     "timezonefinder==6.5.0",
 //     "twilio-stubs==0.2.0",
 //     "twilio==9.0.5",
-//     "types-Pillow==10.2.0.20240423",
+//     "types-Pillow==10.2.0.20240511",
 //     "types-aiobotocore-sqs==2.12.3",
 //     "types-aiobotocore==2.12.3",
 //     "types-aiofiles==23.2.0.20240403",
@@ -9577,19 +9577,19 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "bd12923093b96c91d523efcdb66967a307f1a843bcfaf2d5a529146c10a9ced3",
-              "url": "https://files.pythonhosted.org/packages/0e/6b/a0649d4b0cb35590d601eb4adbcd289fadf1c27a986da6f70311aa7b64d6/types_Pillow-10.2.0.20240423-py3-none-any.whl"
+              "hash": "ef87a19ea0a02a89c784cbc1b99dfff6c00dd0d5796a8ac868cf7ec69c5f88ff",
+              "url": "https://files.pythonhosted.org/packages/72/19/dfbede37e41bb56e9eae08193127666aab5473a09b6ced0d5d2c56edf256/types_Pillow-10.2.0.20240511-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "696e68b9b6a58548fc307a8669830469237c5b11809ddf978ac77fafa79251cd",
-              "url": "https://files.pythonhosted.org/packages/56/53/ec536e358370aaf797b251b4263cab35bf1c8d37a13bcd248bb1361c0d21/types-Pillow-10.2.0.20240423.tar.gz"
+              "hash": "b2fcc27b8e15ae3741941e43b4f39eba6fce6bcb152af90bbb07b387d2585783",
+              "url": "https://files.pythonhosted.org/packages/b8/1d/8c5fada746c08341f41f33990fba91237678878e2fdd1883bb5ee6f4cb7c/types-Pillow-10.2.0.20240511.tar.gz"
             }
           ],
           "project_name": "types-pillow",
           "requires_dists": [],
           "requires_python": ">=3.8",
-          "version": "10.2.0.20240423"
+          "version": "10.2.0.20240511"
         },
         {
           "artifacts": [
@@ -10621,7 +10621,7 @@
     "timezonefinder==6.5.0",
     "twilio-stubs==0.2.0",
     "twilio==9.0.5",
-    "types-Pillow==10.2.0.20240423",
+    "types-Pillow==10.2.0.20240511",
     "types-aiobotocore-sqs==2.12.3",
     "types-aiobotocore==2.12.3",
     "types-aiofiles==23.2.0.20240403",
