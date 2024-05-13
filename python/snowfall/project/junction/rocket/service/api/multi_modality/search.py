@@ -79,6 +79,7 @@ class ModeNotSupportedForResellerError(SearchError):
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Offer:
     id: str
+    result_id: str
     departure_at: datetime.datetime
     arrival_at: datetime.datetime
     type: segment_type_pb2.SegmentType.ValueType
@@ -88,6 +89,7 @@ class Offer:
         return [
             multi_modal_pb2.Suggestion.Offer(
                 id=self.id,
+                result_id=self.result_id,
                 segment_type=self.type,
             ),
         ]
@@ -293,6 +295,7 @@ class FlightSearcher:
         return [
             Offer(
                 id=offer.id,
+                result_id=result.id,
                 departure_at=departure_at,
                 arrival_at=arrival_at,
                 type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
@@ -312,6 +315,7 @@ class FlightSearcher:
         return [
             RoundtripOffer(
                 id=offer.id,
+                result_id=result.id,
                 departure_at=departure_at,
                 arrival_at=arrival_at,
                 type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
@@ -420,6 +424,7 @@ class RailSearcher:
         return [
             Offer(
                 id=offer.id,
+                result_id=search_result.id,
                 departure_at=protobuf.protobuf_to_datetime(
                     first_segment.rail.departure_date,
                 ),
@@ -448,6 +453,7 @@ class RailSearcher:
         return [
             RoundtripOffer(
                 id=offer.id,
+                result_id=search_result.id,
                 departure_at=protobuf.protobuf_to_datetime(
                     first_segment.rail.departure_date,
                 ),

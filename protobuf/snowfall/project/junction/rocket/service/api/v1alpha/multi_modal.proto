@@ -14,6 +14,7 @@ message Suggestion {
   string suggestion_search_id = 5;
   message Offer {
     string id = 1;
+    string result_id = 3;
     snowfall.project.junction.v1.SegmentType segment_type = 2;
   }
   repeated Offer offers = 6;

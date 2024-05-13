@@ -111,12 +111,14 @@ class TestGetSuggestion:
     ) -> None:
         flight_offer = search.Offer(
             id=string.uuid(),
+            result_id=string.uuid(),
             departure_at=now,
             arrival_at=now,
             type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
         )
         train_offer = search.Offer(
             id=string.uuid(),
+            result_id=string.uuid(),
             departure_at=now,
             arrival_at=now,
             type=segment_type_pb2.SEGMENT_TYPE_TRAIN,

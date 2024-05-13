@@ -49,6 +49,7 @@ def _mock_offer(
 
     return search.Offer(
         id=key,
+        result_id=key,
         departure_at=departure_at,
         arrival_at=departure_at + duration,
         type=segment_type,
@@ -107,6 +108,7 @@ async def _mock_inbound_search(
     return [
         search.RoundtripOffer(
             id="air_3",
+            result_id="bar",
             departure_at=_OFFER_INBOUND_DATETIME1,
             arrival_at=_OFFER_INBOUND_DATETIME1 + datetime.timedelta(hours=1),
             type=request.segment.type,
@@ -114,6 +116,7 @@ async def _mock_inbound_search(
         ),
         search.RoundtripOffer(
             id="air_4",
+            result_id="bar",
             departure_at=_OFFER_INBOUND_DATETIME2,
             arrival_at=_OFFER_INBOUND_DATETIME2 + datetime.timedelta(hours=1),
             type=request.segment.type,
@@ -956,6 +959,7 @@ _SuggestionType: TypeAlias = (
                 offers=[
                     search.RoundtripOffer(
                         id="bar",
+                        result_id="baz",
                         departure_at=_DEPARTURE_AT,
                         arrival_at=_DEPARTURE_AT + datetime.timedelta(hours=1),
                         type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
