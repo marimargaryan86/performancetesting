@@ -77,7 +77,7 @@
 //     "mypy-protobuf==3.4.0",
 //     "mypy==1.10.0",
 //     "numpy==1.26.4",
-//     "openai==1.28.1",
+//     "openai==1.29.0",
 //     "openapi-core==0.19.1",
 //     "openapi-schema-validator==0.6.2",
 //     "orjson==3.10.3",
@@ -5357,13 +5357,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "943e0d0d587b9a62f99bd3acbaf479ae5362986e5fff013f57b5b7bde85cce93",
-              "url": "https://files.pythonhosted.org/packages/8d/36/47f191936fb61eb7efaee5e727fb962be82b0f66e979a32446d22f3f99cc/openai-1.28.1-py3-none-any.whl"
+              "hash": "c61cd12376c84362d406341f9e2f9a9d6b81c082b133b44484dc0f43954496b1",
+              "url": "https://files.pythonhosted.org/packages/1d/f8/e36df35b6c3f5fd73cdc655a717931a1d035b441685bc8f7b4aa6076a780/openai-1.29.0-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "8a3adbba16882434768d76fd3129fcc9b40ace98f8d55a6ddacfc05c4096ac30",
-              "url": "https://files.pythonhosted.org/packages/97/ac/6b93ea37bd489aea886cc6f87cbf3cc427a0d6ffc00319d6b722b90a020c/openai-1.28.1.tar.gz"
+              "hash": "d5a769f485610cff8bae14343fa45a8b1d346be3d541fa5b28ccd040dbc8baf8",
+              "url": "https://files.pythonhosted.org/packages/b3/3e/5dbfcc57dbffc8b8a52aff5d154115c19f3ffaff8c73d9418a5c1e33fbfd/openai-1.29.0.tar.gz"
             }
           ],
           "project_name": "openai",
@@ -5381,7 +5381,7 @@
             "typing-extensions<5,>=4.7"
           ],
           "requires_python": ">=3.7.1",
-          "version": "1.28.1"
+          "version": "1.29.0"
         },
         {
           "artifacts": [
@@ -10569,7 +10569,7 @@
     "mypy-protobuf==3.4.0",
     "mypy==1.10.0",
     "numpy==1.26.4",
-    "openai==1.28.1",
+    "openai==1.29.0",
     "openapi-core==0.19.1",
     "openapi-schema-validator==0.6.2",
     "orjson==3.10.3",
