@@ -68,7 +68,7 @@
 //     "lagom==2.6.0",
 //     "lupa==2.1",
 //     "lxml-stubs==0.5.1",
-//     "lxml==5.2.1",
+//     "lxml==5.2.2",
 //     "matrix-nio==0.24.0",
 //     "mongomock-motor==0.0.29",
 //     "more-itertools==10.2.0",
@@ -4618,103 +4618,103 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "c94e75445b00319c1fad60f3c98b09cd63fe1134a8a953dcd48989ef42318534",
-              "url": "https://files.pythonhosted.org/packages/4f/64/fa14006c8f955ae4ec47f556ffc18091c5ed4343d475a80c83c063b38438/lxml-5.2.1-cp311-cp311-musllinux_1_2_x86_64.whl"
+              "hash": "6dcc3d17eac1df7859ae01202e9bb11ffa8c98949dcbeb1069c8b9a75917e01b",
+              "url": "https://files.pythonhosted.org/packages/ec/ab/189f571450e3393d4d442f88683d11b5a47c88e66a4e6b0d467500360483/lxml-5.2.2-cp311-cp311-musllinux_1_2_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "ab31a88a651039a07a3ae327d68ebdd8bc589b16938c09ef3f32a4b809dc96ef",
-              "url": "https://files.pythonhosted.org/packages/15/e2/84850d643534c55cbb053721948f1ce6622c14d98bdd824d04a49e20faee/lxml-5.2.1-cp311-cp311-musllinux_1_1_ppc64le.whl"
+              "hash": "657a972f46bbefdbba2d4f14413c0d079f9ae243bd68193cb5061b9732fa54c1",
+              "url": "https://files.pythonhosted.org/packages/15/3d/d84d07fc450af34ce49b88a5aac805b486f38c9f9305fba647a39367c51c/lxml-5.2.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "df2e6f546c4df14bc81f9498bbc007fbb87669f1bb707c6138878c46b06f6510",
-              "url": "https://files.pythonhosted.org/packages/25/13/6be6821e9aa13eacdc8ddc2c8906003151b8bf2bb98b59dad75344d63aa6/lxml-5.2.1-cp311-cp311-musllinux_1_1_s390x.whl"
+              "hash": "d237ba6664b8e60fd90b8549a149a74fcc675272e0e95539a00522e4ca688b04",
+              "url": "https://files.pythonhosted.org/packages/2f/ca/0376418e202e9423d47f86ae09db885fa6e109d0efb602f6468e6d1e8e77/lxml-5.2.2-cp311-cp311-musllinux_1_1_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "e196a4ff48310ba62e53a8e0f97ca2bca83cdd2fe2934d8b5cb0df0a841b193a",
-              "url": "https://files.pythonhosted.org/packages/27/a7/75fb1eb9e4437333a23b5bd406773a4303f12b6f01bd3d0daf333def79e8/lxml-5.2.1-cp311-cp311-manylinux_2_28_s390x.whl"
+              "hash": "23441e2b5339bc54dc949e9e675fa35efe858108404ef9aa92f0456929ef6fe8",
+              "url": "https://files.pythonhosted.org/packages/3b/ca/5d74a0572c911f8dbf12d89abe0fdcbe0409c18978b5694392becd4d56fb/lxml-5.2.2-cp311-cp311-musllinux_1_2_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "764b521b75701f60683500d8621841bec41a65eb739b8466000c6fdbc256c240",
-              "url": "https://files.pythonhosted.org/packages/29/10/4d64f96167e4492f1087a9269b371c420fd6ee2308454cff2199af14de27/lxml-5.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+              "hash": "b0b3f2df149efb242cee2ffdeb6674b7f30d23c9a7af26595099afaf46ef4e88",
+              "url": "https://files.pythonhosted.org/packages/4e/42/3bfe92749715c819763d2205370ecc7f586b44e277f38839e27cce7d6bb8/lxml-5.2.2-cp311-cp311-macosx_10_9_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "9b9ec9c9978b708d488bec36b9e4c94d88fd12ccac3e62134a9d17ddba910ea9",
-              "url": "https://files.pythonhosted.org/packages/38/f6/32f13ac4813d386e85e3c7303705a8541b532d89b17ce2d7db78c1e9f41b/lxml-5.2.1-cp311-cp311-musllinux_1_2_aarch64.whl"
+              "hash": "2eb2227ce1ff998faf0cd7fe85bbf086aa41dfc5af3b1d80867ecfe75fb68df3",
+              "url": "https://files.pythonhosted.org/packages/4e/56/c35969591789763657eb16c2fa79c924823b97da5536da8b89e11582da89/lxml-5.2.2-cp311-cp311-manylinux_2_28_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "70ac664a48aa64e5e635ae5566f5227f2ab7f66a3990d67566d9907edcbbf867",
-              "url": "https://files.pythonhosted.org/packages/43/43/66a84c2a034f5df2782240cb2f68696a72ad6734d7a91f824e0360cde08b/lxml-5.2.1-cp311-cp311-macosx_10_9_universal2.whl"
+              "hash": "1a2569a1f15ae6c8c64108a2cd2b4a858fc1e13d25846be0666fc144715e32ab",
+              "url": "https://files.pythonhosted.org/packages/5f/e0/4cd021850f2e8ab5ce6ce294556300bd4b5c1eb7def88b5f859449dc883c/lxml-5.2.2-cp311-cp311-musllinux_1_1_aarch64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "c6f2c8372b98208ce609c9e1d707f6918cc118fea4e2c754c9f0812c04ca116d",
-              "url": "https://files.pythonhosted.org/packages/52/82/04cc05851d414417f0404625bf217de4b9d82651a501e59f85ad9e52d8de/lxml-5.2.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+              "hash": "bb2dc4898180bea79863d5487e5f9c7c34297414bad54bcd0f0852aee9cfdb87",
+              "url": "https://files.pythonhosted.org/packages/63/f7/ffbb6d2eb67b80a45b8a0834baa5557a14a5ffce0979439e7cd7f0c4055b/lxml-5.2.2.tar.gz"
             },
             {
               "algorithm": "sha256",
-              "hash": "5dd1537e7cc06efd81371f5d1a992bd5ab156b2b4f88834ca852de4a8ea523fa",
-              "url": "https://files.pythonhosted.org/packages/5c/a3/fda21d82a80912eba14a4a1495e25712aec2ad652eeaaf8cfa8f87eceddb/lxml-5.2.1-cp311-cp311-musllinux_1_1_x86_64.whl"
+              "hash": "07542787f86112d46d07d4f3c4e7c760282011b354d012dc4141cc12a68cef5f",
+              "url": "https://files.pythonhosted.org/packages/67/c7/6060ea3efbd1a60a10963b1b09f493fc8f6f6728310a7a77479a3f9ab20a/lxml-5.2.2-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5ea7b6766ac2dfe4bcac8b8595107665a18ef01f8c8343f00710b85096d1b53a",
-              "url": "https://files.pythonhosted.org/packages/64/8f/3218eb5ab4965b2a8bef85fbee99b1c03e3b851890bf14e04a72ebe7beab/lxml-5.2.1-cp311-cp311-manylinux_2_28_ppc64le.whl"
+              "hash": "0b3f5016e00ae7630a4b83d0868fca1e3d494c78a75b1c7252606a3a1c5fc2ad",
+              "url": "https://files.pythonhosted.org/packages/74/c4/4e6f5e2be18f8eb76dff5bff3619c2c654650fee93aea37a92866efe90bc/lxml-5.2.2-cp311-cp311-musllinux_1_1_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "3a6b45da02336895da82b9d472cd274b22dc27a5cea1d4b793874eead23dd14f",
-              "url": "https://files.pythonhosted.org/packages/6e/27/5775154626e0898a82dba7a7ee8bb503c78f64d33e56c3a031bd1bf4e336/lxml-5.2.1-cp311-cp311-manylinux_2_28_aarch64.whl"
+              "hash": "2fb0ba3e8566548d6c8e7dd82a8229ff47bd8fb8c2da237607ac8e5a1b8312e5",
+              "url": "https://files.pythonhosted.org/packages/83/07/d95e9663ad8d875f344930e4fb52a0a6f56225267d3cc6e3e9bfa44ca736/lxml-5.2.2-cp311-cp311-musllinux_1_2_ppc64le.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "5d077bc40a1fe984e1a9931e801e42959a1e6598edc8a3223b061d30fbd26bbc",
-              "url": "https://files.pythonhosted.org/packages/94/63/3fb6513259a541650a9a0cd6cbeec93202f078892b513709cad11aab6803/lxml-5.2.1-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl"
+              "hash": "303f540ad2dddd35b92415b74b900c749ec2010e703ab3bfd6660979d01fd4ed",
+              "url": "https://files.pythonhosted.org/packages/8a/f7/f5df71c70c4d14d186dd86fd0e9ebeffdb63b9b86fb19fe9315f9576266b/lxml-5.2.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "1ae67b4e737cddc96c99461d2f75d218bdf7a0c3d3ad5604d1f5e7464a2f9ffe",
-              "url": "https://files.pythonhosted.org/packages/95/4c/fc5e63fb41e867f530a70519e1bcab0c14e84a95aa659f697bc97531be96/lxml-5.2.1-cp311-cp311-macosx_10_9_x86_64.whl"
+              "hash": "56793b7a1a091a7c286b5f4aa1fe4ae5d1446fe742d00cdf2ffb1077865db10d",
+              "url": "https://files.pythonhosted.org/packages/99/a1/d91217a8d7fef5ac41af87c916d322c273a9b2047c735ea1dafa2ac46d16/lxml-5.2.2-cp311-cp311-manylinux_2_28_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "a8d5c70e04aac1eda5c829a26d1f75c6e5286c74743133d9f742cda8e53b9c2f",
-              "url": "https://files.pythonhosted.org/packages/9c/81/cca70c416063636dd8862f04cf96548175b05cf8c1e29d0c6787d0c250d5/lxml-5.2.1-cp311-cp311-musllinux_1_2_s390x.whl"
+              "hash": "eb00b549b13bd6d884c863554566095bf6fa9c3cecb2e7b399c4bc7904cb33b5",
+              "url": "https://files.pythonhosted.org/packages/ad/b7/0dc82afed00c4c189cfd0b83464f9a431c66de8e73d911063956a147276a/lxml-5.2.2-cp311-cp311-manylinux_2_28_x86_64.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "dae0ed02f6b075426accbf6b2863c3d0a7eacc1b41fb40f2251d931e50188dad",
-              "url": "https://files.pythonhosted.org/packages/af/ac/fa3d31d9a5889814b49c8bfaecdc922431a5756d28b9209bc9e4ce239766/lxml-5.2.1-cp311-cp311-musllinux_1_1_aarch64.whl"
+              "hash": "b74b9ea10063efb77a965a8d5f4182806fbf59ed068b3c3fd6f30d2ac7bee734",
+              "url": "https://files.pythonhosted.org/packages/bc/c6/32af0ec3e8323e12212c064f924ddf993017e68d1f50e03da2a3be1289c1/lxml-5.2.2-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "200e63525948e325d6a13a76ba2911f927ad399ef64f57898cf7c74e69b71095",
-              "url": "https://files.pythonhosted.org/packages/be/c3/1765e019344d3f042dfe750eb9a424c0ea2fd43deb6b2ac176b5603a436e/lxml-5.2.1-cp311-cp311-manylinux_2_28_x86_64.whl"
+              "hash": "d28cb356f119a437cc58a13f8135ab8a4c8ece18159eb9194b0d269ec4e28083",
+              "url": "https://files.pythonhosted.org/packages/d5/fd/4899215277e3ef1767019fab178fad8a149081f80cf886a73dc0ba1badae/lxml-5.2.2-cp311-cp311-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "394ed3924d7a01b5bd9a0d9d946136e1c2f7b3dc337196d99e61740ed4bc6fe1",
-              "url": "https://files.pythonhosted.org/packages/db/9b/0d26a0f9dcb8f80b84d23f127b4d2644339e55377ee8ab8e9be7a9d575d8/lxml-5.2.1-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl"
+              "hash": "45f9494613160d0405682f9eee781c7e6d1bf45f819654eb249f8f46a2c22545",
+              "url": "https://files.pythonhosted.org/packages/da/6a/24e9f77d17668dd4ac0a6c2a56113fd3e0db07cee51e3a67afcd47c597e5/lxml-5.2.2-cp311-cp311-macosx_10_9_universal2.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "3f7765e69bbce0906a7c74d5fe46d2c7a7596147318dbc08e4a2431f3060e306",
-              "url": "https://files.pythonhosted.org/packages/ea/e2/3834472e7f18801e67a3cd6f3c203a5456d6f7f903cfb9a990e62098a2f3/lxml-5.2.1.tar.gz"
+              "hash": "79d1fb9252e7e2cfe4de6e9a6610c7cbb99b9708e2c3e29057f487de5a9eaefa",
+              "url": "https://files.pythonhosted.org/packages/df/e1/9ebae8d05492a8e9f632f2add15199e7bca5c1b063444e360a7bde685718/lxml-5.2.2-cp311-cp311-musllinux_1_2_s390x.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "8e77c69d5892cb5ba71703c4057091e31ccf534bd7f129307a4d084d90d014b8",
-              "url": "https://files.pythonhosted.org/packages/f5/b2/eae0826c0250ddf6f3397d9f72a8922997aa22c306e05488709a8a6cf205/lxml-5.2.1-cp311-cp311-musllinux_1_2_ppc64le.whl"
+              "hash": "1d8a701774dfc42a2f0b8ccdfe7dbc140500d1049e0632a611985d943fcf12df",
+              "url": "https://files.pythonhosted.org/packages/e7/28/1809a5406282c03df561a3c8143c143bd515d5668f1a138f51aec6d2618e/lxml-5.2.2-cp311-cp311-manylinux_2_28_ppc64le.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "f18a5a84e16886898e51ab4b1d43acb3083c39b14c8caeb3589aabff0ee0b270",
-              "url": "https://files.pythonhosted.org/packages/fa/d9/f770b2220a6d6d33f4385a36a266c6967a112a960b8402cbb6850f74a0e4/lxml-5.2.1-cp311-cp311-manylinux_2_12_i686.manylinux2010_i686.manylinux_2_17_i686.manylinux2014_i686.whl"
+              "hash": "8cf85a6e40ff1f37fe0f25719aadf443686b1ac7652593dc53c7ef9b8492b115",
+              "url": "https://files.pythonhosted.org/packages/f0/f4/fb01451fda1e121eb8f117a00040454ca05a9c9d82b308272042eebd05f3/lxml-5.2.2-cp311-cp311-musllinux_1_1_ppc64le.whl"
             }
           ],
           "project_name": "lxml",
@@ -4726,7 +4726,7 @@
             "lxml-html-clean; extra == \"html-clean\""
           ],
           "requires_python": ">=3.6",
-          "version": "5.2.1"
+          "version": "5.2.2"
         },
         {
           "artifacts": [
@@ -10560,7 +10560,7 @@
     "lagom==2.6.0",
     "lupa==2.1",
     "lxml-stubs==0.5.1",
-    "lxml==5.2.1",
+    "lxml==5.2.2",
     "matrix-nio==0.24.0",
     "mongomock-motor==0.0.29",
     "more-itertools==10.2.0",

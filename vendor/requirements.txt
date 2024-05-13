@@ -54,7 +54,7 @@ json_api_doc==0.15.0
 jsonschema==4.22.0
 lagom==2.6.0
 lupa==2.1
-lxml==5.2.1
+lxml==5.2.2
 lxml-stubs==0.5.1
 matrix-nio==0.24.0
 mongomock-motor==0.0.29
