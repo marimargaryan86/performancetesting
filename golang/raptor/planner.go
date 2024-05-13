@@ -218,6 +218,7 @@ func (p *Planner) Search(froms []*planner.Stop, tos []*planner.Stop, departureAf
 		"segment_types", kindList,
 		"max_connections", maxConnections,
 		"results", len(trips),
+		"chunks", len(chunks),
 		"workers", workerCount,
 		"exec", time.Since(start),
 	)
