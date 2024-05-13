@@ -111,7 +111,7 @@ snowfall.plugin.flake8==1.5.2
 snowfall.stdlib.format.filter-parser==1.5.2
 sqlalchemy[postgresql-asyncpg]==2.0.30
 starlette==0.37.2
-stripe==9.5.0
+stripe==9.6.0
 structlog==24.1.0
 structlog-sentry==2.1.0
 tenacity==8.3.0

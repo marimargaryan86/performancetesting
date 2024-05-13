@@ -122,7 +122,7 @@
 //     "snowfall.stdlib.format.filter-parser==1.5.2",
 //     "sqlalchemy[postgresql-asyncpg]==2.0.30",
 //     "starlette==0.37.2",
-//     "stripe==9.5.0",
+//     "stripe==9.6.0",
 //     "structlog-sentry==2.1.0",
 //     "structlog==24.1.0",
 //     "tenacity==8.3.0",
@@ -8412,13 +8412,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "ace24a3ed07cff3b8efe0e23a72e02372f26124b034d1d3b78f58afdcd5bd390",
-              "url": "https://files.pythonhosted.org/packages/fc/f0/4706e9c7f0e2f2c95a75ebe8a06c346678f052dcc71ef6894f4fbc303ab8/stripe-9.5.0-py2.py3-none-any.whl"
+              "hash": "f519f6810ac7f6e096b4faf562c44b1f8e365138441548e4ab0bc93f86368ad7",
+              "url": "https://files.pythonhosted.org/packages/45/21/90a451882006b9c647fed5dfa10f3e7ecc778bbc45817893a16716874cae/stripe-9.6.0-py2.py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "cd38369641ae6140e1ce9edcd5400aecdb1a10ba704e653a2f2a7550cb8f277e",
-              "url": "https://files.pythonhosted.org/packages/f9/d5/ad027adc46853d14dea24be31fb01fc54c72a3029298b0e4462df9748700/stripe-9.5.0.tar.gz"
+              "hash": "9305d849cea715dc59c5e39d01891475b82e10edb9d95ee1d8189457e5de792f",
+              "url": "https://files.pythonhosted.org/packages/ce/33/498077ba61dd8b26c631b24efec9e0b4d1f52e87c11e834cc3674f5ae91a/stripe-9.6.0.tar.gz"
             }
           ],
           "project_name": "stripe",
@@ -8428,7 +8428,7 @@
             "typing-extensions>=4.5.0; python_version >= \"3.7\""
           ],
           "requires_python": ">=3.6",
-          "version": "9.5.0"
+          "version": "9.6.0"
         },
         {
           "artifacts": [
@@ -10614,7 +10614,7 @@
     "snowfall.stdlib.format.filter-parser==1.5.2",
     "sqlalchemy[postgresql-asyncpg]==2.0.30",
     "starlette==0.37.2",
-    "stripe==9.5.0",
+    "stripe==9.6.0",
     "structlog-sentry==2.1.0",
     "structlog==24.1.0",
     "tenacity==8.3.0",
