@@ -35,7 +35,7 @@
 
   <section class="search">
     <Container>
-      <form class="header-search-panel" name="search-options">
+      <form class="header-search-panel" name="search-options" slot="content">
         <div class="input-wrapper">
           <label for="search-header-origin-destination">Origin-Destination</label>
           <input
@@ -77,7 +77,12 @@
       </a>
     </div>
 
-    <a class="phone-box" href="tel:+089710451462">
+    <a
+      data-testid="phoneLink"
+      class="phone-box"
+      href="tel:+089710451462"
+      aria-label="Link for support phone number"
+    >
       <div class="icon">
         <Icon variant="phone" color="white" />
       </div>

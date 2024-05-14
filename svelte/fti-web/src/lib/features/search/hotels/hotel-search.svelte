@@ -56,7 +56,7 @@
         <article>
           {#each hotelData as accommodation}
             <Container>
-              <SearchResultTile {accommodation} />
+              <SearchResultTile {accommodation} slot="content" />
             </Container>
           {/each}
         </article>

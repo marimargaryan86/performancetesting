@@ -1,7 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import SearchHeader from "$lib/features/search/search-header.svelte";
-import { DEFAULT_SUPPORT_TELEPHONE_NUMBER } from "$lib/helpers/search-header";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { SearchOptions } from "$lib/models/common";
 
@@ -25,7 +24,7 @@ describe("SearchHeader with default options", () => {
   });
 
   // TODO(04-26-2024/a.santos): Get real support number.
-  it("has like icons and the correct phone number link", async () => {
+  it("has like icons and the correct phone number link", () => {
     const likeLink = screen.getByRole("link", { description: "search-header-heart-icon" });
     const likeIcon = likeLink.children[0];
     expect(likeIcon).toBeVisible();
@@ -33,7 +32,7 @@ describe("SearchHeader with default options", () => {
     const likeIconStyles = likeIcon.getAttribute("style");
     expect(likeIconStyles).toContain('url("/icons/heart-');
 
-    const phoneLink = await screen.getByRole("link", { name: DEFAULT_SUPPORT_TELEPHONE_NUMBER });
+    const phoneLink = screen.getByTestId("phoneLink");
     expect(phoneLink).toBeVisible();
 
     const telephoneNumber = phoneLink.getAttribute("href");

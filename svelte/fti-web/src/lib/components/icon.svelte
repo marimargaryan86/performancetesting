@@ -1,15 +1,26 @@
+<script context="module" lang="ts">
+  export function toAriaLabel(icon: IconTypes | AmenityIcons): string {
+    return toTitleCase(icon).replaceAll("-", " ").concat(" icon");
+  }
+</script>
+
 <script lang="ts">
+  import { toTitleCase } from "$lib/helpers/common";
   import type { IconTypes, AmenityIcons } from "$lib/models/common";
 
   export let variant: IconTypes | AmenityIcons;
   export let size: string | undefined = undefined;
   export let color: string | undefined = undefined;
 
+  const ariaLabel = toAriaLabel(variant);
+
   $: mask = `url("/icons/${variant}.svg")`;
 </script>
 
 <div
   class="icon"
+  role="img"
+  aria-label={ariaLabel}
   style:mask-image={mask}
   style:-webkit-mask-image={mask}
   style:--size={size}
