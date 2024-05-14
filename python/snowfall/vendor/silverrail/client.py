@@ -136,6 +136,110 @@ class SilverrailClient(client.HttpClient):
             raise errors.RequestFailedError()
         return output.body.data_response.stations
 
+    async def get_acceptable_fop(self) -> list[stations.AcceptableFopType]:
+        request = stations.PublishingAPIInput(
+            body=stations.PublishingAPIInput.Body(
+                request=stations.DataRequestType(
+                    type_value=stations.SrtDataType.ACCEPTABLE_FOP,
+                ),
+            ),
+        )
+
+        output = await self._make_soap_request(
+            request=request,
+            api_path=PUBLISHED_DATA_API_PATH,
+            result_class=stations.PublishingAPIAcceptableFOPOutput,
+        )
+
+        if output.body is None or output.body.data_response is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if output.body.data_response.request_status is None:
+            raise errors.SilverrailUnexpectedFormatError()
+        if not output.body.data_response.request_status.success:
+            raise errors.RequestFailedError()
+        return output.body.data_response.acceptable_fop
+
+    async def get_booking_record(
+        self,
+        record_locator: str,
+    ) -> booking.RetrieveBookingRecordResponse:
+        request = booking.BookingRetrieveBookingRecordRequestInput(
+            body=booking.BookingRetrieveBookingRecordRequestInput.Body(
+                retrieve_booking_record_request=booking.RetrieveBookingRecordRequest(
+                    response_spec=booking.RetrieveBookingRecordRequestType.ResponseSpec(
+                        include_financials=True,
+                    ),
+                    record_locator=record_locator,
+                    context=self._booking_context,
+                ),
+            ),
+        )
+        output = await self._make_soap_request(
+            request=request,
+            api_path=BOOKING_SERVICE_PATH,
+            result_class=booking.BookingRetrieveBookingRecordRequestOutput,
+        )
+
+        if output.body is None or output.body.retrieve_booking_record_response is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        return output.body.retrieve_booking_record_response
+
+    async def add_payment(
+        self,
+        record_locator: str,
+        payment: booking.AbstractPaymentRequestType.Payment,
+    ) -> booking.AddPaymentResponse:
+        request = booking.BookingAddPaymentRequestInput(
+            body=booking.BookingAddPaymentRequestInput.Body(
+                add_payment_request=booking.AddPaymentRequest(
+                    context=self._booking_context,
+                    record_locator=record_locator,
+                    payment=payment,
+                    fulfillment_information=booking.FulfillmentInformationType(
+                        ticket_option=booking.TicketingOptionType(
+                            code=booking.TicketingOptionTypeCode.EML,
+                            type_value="E_MAIL",
+                            destination="Ticket by E-mail",
+                        ),
+                    ),
+                ),
+            ),
+        )
+        output = await self._make_soap_request(
+            request=request,
+            api_path=BOOKING_SERVICE_PATH,
+            result_class=booking.BookingAddPaymentRequestOutput,
+        )
+
+        if output.body is None or output.body.add_payment_response is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        return output.body.add_payment_response
+
+    async def confirm_booking(
+        self,
+        record_locator: str,
+    ) -> booking.ConfirmBookingRecordResponse:
+        request = booking.BookingConfirmBookingRecordRequestInput(
+            body=booking.BookingConfirmBookingRecordRequestInput.Body(
+                confirm_booking_record_request=booking.ConfirmBookingRecordRequest(
+                    context=self._booking_context,
+                    record_locator=record_locator,
+                ),
+            ),
+        )
+        output = await self._make_soap_request(
+            request=request,
+            api_path=BOOKING_SERVICE_PATH,
+            result_class=booking.BookingConfirmBookingRecordRequestOutput,
+        )
+
+        if output.body is None or output.body.confirm_booking_record_response is None:
+            raise errors.SilverrailUnexpectedFormatError()
+
+        return output.body.confirm_booking_record_response
+
     async def _make_soap_request(
         self,
         request: Any,

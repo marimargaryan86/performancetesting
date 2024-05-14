@@ -1785,7 +1785,7 @@ class RequestStatusType:
 
 
 @dataclass(frozen=True)
-class DataResponseType:
+class DataStationsResponseType:
     class Meta:
         target_namespace = "http://railgds.net/ws/publishing"
 
@@ -1803,6 +1803,32 @@ class DataResponseType:
         default_factory=list,
         metadata={
             "name": "station",
+            "type": "Element",
+            "namespace": "http://railgds.net/ws/publishing",
+            "min_occurs": 0,
+        },
+    )
+
+
+@dataclass(frozen=True)
+class DataAcceptableFOPResponseType:
+    class Meta:
+        target_namespace = "http://railgds.net/ws/publishing"
+
+    request_status: RequestStatusType | None = field(
+        default=None,
+        metadata={
+            "name": "requestStatus",
+            "type": "Element",
+            "namespace": "http://railgds.net/ws/publishing",
+            "required": True,
+        },
+    )
+
+    acceptable_fop: list[AcceptableFopType] = field(
+        default_factory=list,
+        metadata={
+            "name": "acceptableFop",
             "type": "Element",
             "namespace": "http://railgds.net/ws/publishing",
             "min_occurs": 0,
@@ -1838,7 +1864,45 @@ class PublishingAPIOutput:
 
     @dataclass(frozen=True)
     class Body:
-        data_response: DataResponseType | None = field(
+        data_response: DataStationsResponseType | None = field(
+            default=None,
+            metadata={
+                "name": "dataResponse",
+                "type": "Element",
+                "namespace": "http://railgds.net/ws/publishing",
+            },
+        )
+
+
+@dataclass(frozen=True)
+class PublishingAPIAcceptableFOPOutput:
+    class Meta:
+        name = "Envelope"
+        namespace = "http://schemas.xmlsoap.org/soap/envelope/"
+        target_namespace = "http://railgds.net/ws/publishing"
+
+    body: Optional["PublishingAPIAcceptableFOPOutput.Body"] = field(
+        default=None,
+        metadata={
+            "name": "Body",
+            "type": "Element",
+        },
+    )
+    header: Optional["PublishingAPIAcceptableFOPOutput.Header"] = field(
+        default=None,
+        metadata={
+            "name": "Header",
+            "type": "Element",
+        },
+    )
+
+    @dataclass(frozen=True)
+    class Header:
+        """Empty header."""
+
+    @dataclass(frozen=True)
+    class Body:
+        data_response: DataAcceptableFOPResponseType | None = field(
             default=None,
             metadata={
                 "name": "dataResponse",
