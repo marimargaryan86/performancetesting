@@ -399,6 +399,35 @@ class FlightOfferRetrieval(endpoints.HTTPEndpoint):
         )
 
 
+class FlightSearchResultRetrieval(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
+        requests_repo: FlightSearchRequestRepository = lagom.injectable,
+    ) -> responses.Response:
+        search_result_id = request.path_params["searchResultId"]
+        search_result = await results_repo.find_by_id(search_result_id)
+
+        if search_result is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        search = await requests_repo.find_by_search_id(search_result.search_id)
+
+        if search is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        return await messages.create_response(
+            body=models.Body(
+                data=FlightSearchResultResource.from_model(
+                    search_result=search_result,
+                    search=search,
+                ),
+            ),
+            request=request,
+        )
+
+
 def _get_trip_id(get_boards_response: auto_models.GetTripBoardsResponse) -> int:
     if not get_boards_response.trip or not get_boards_response.trip.id:
         raise ValueError("Trip ID is missing")

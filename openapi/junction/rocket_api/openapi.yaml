@@ -450,6 +450,34 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
+  /flights/search-results/{searchResultId}:
+    parameters:
+      - $ref: '#/components/parameters/searchResultId'
+    get:
+      summary: Get flight search result
+      tags:
+        - flight-searches
+      operationId: get-flights-search-results-id
+      description: Used to retrieve Search Result for a given ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                description: Flight Search Result Response
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FlightSearchResult'
+                required:
+                  - data
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /flights/searches:
     post:
       summary: Create flight search
@@ -4040,6 +4068,17 @@ components:
         4122](https://datatracker.ietf.org/doc/html/rfc4122) format
     searchId:
       name: searchId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
+      description: >-
+        Unique identifier (UUID) for the Search object in [RFC
+        4122](https://datatracker.ietf.org/doc/html/rfc4122) format
+    searchResultId:
+      name: searchResultId
       in: path
       required: true
       schema:
