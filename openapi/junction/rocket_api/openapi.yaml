@@ -381,6 +381,33 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /flights/offers/{offerId}:
+    parameters:
+      - $ref: '#/components/parameters/offerId'
+    get:
+      summary: Get single flight offer
+      tags:
+        - flight-searches
+      operationId: get-flights-offers-id
+      description: Used to retrieve a single offer
+      responses:
+        '200':
+          description: Offer retrieved
+          content:
+            application/vnd.api+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FlightOffer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /flights/offers/{offerId}/passengers:
     parameters:
       - $ref: '#/components/parameters/offerId'

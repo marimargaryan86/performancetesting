@@ -17,6 +17,7 @@ from snowfall.project.junction.rocket.service.api.flights.models import (
     FlightSearchResponseAttributes,
     FlightSearchResult,
     FlightSearchResultResource,
+    OfferResource,
     PassengerIds,
     RocketTrip,
     StatusTypeEnum,
@@ -367,6 +368,35 @@ class FlightOfferAddPassenger(endpoints.HTTPEndpoint):
             ),
         )
         return passenger_ids
+
+
+class FlightOfferRetrieval(endpoints.HTTPEndpoint):
+    async def get(
+        self,
+        request: requests.Request,
+        results_repo: FlightSearchResultRepository = lagom.injectable,
+    ) -> responses.Response:
+        offer_id = request.path_params["offerId"]
+        search_result = await results_repo.find_result_by_offer_id(offer_id)
+
+        if search_result is None:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND)
+
+        try:
+            offer = next(
+                offer for offer in search_result.offers if offer.id == offer_id
+            )
+        except StopIteration as exc:
+            raise exceptions.HTTPException(status.HTTP_404_NOT_FOUND) from exc
+
+        return await messages.create_response(
+            body=models.Body(
+                data=OfferResource.from_model(
+                    offer=offer,
+                ),
+            ),
+            request=request,
+        )
 
 
 def _get_trip_id(get_boards_response: auto_models.GetTripBoardsResponse) -> int:

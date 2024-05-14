@@ -33,6 +33,11 @@ def get_routes(integration: starlette.StarletteIntegration) -> list[routing.Base
             name="FlightOfferAddPassenger",
         ),
         integration.route(
+            "/flights/offers/{offerId:str}",
+            endpoints.FlightOfferRetrieval,
+            name="FlightOfferRetrieval",
+        ),
+        integration.route(
             "/passengers/{passengerId:str}",
             no_such_route,
             name="FlightPassenger",
