@@ -6,8 +6,8 @@
   ): string {
     const age = getAge(passenger.birthDate, createdAt);
     const def = objectExt.entries(PASSENGER_DEFINITIONS).find(([, val]) => {
-      if (val.span.from <= age) {
-        return age <= (val.span.to ?? Number.MAX_SAFE_INTEGER);
+      if (val.from <= age) {
+        return age <= (val.to ?? Number.MAX_SAFE_INTEGER);
       }
 
       return false;

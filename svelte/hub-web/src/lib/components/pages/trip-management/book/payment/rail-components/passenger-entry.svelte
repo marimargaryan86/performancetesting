@@ -7,7 +7,6 @@
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { getLocale, getTranslator } from "$lib/i18n";
   import {
-    getPassengerFullLabel,
     formatTitleOption,
     getPassengerTitles,
     PASSENGER_GENDERS,
@@ -41,7 +40,11 @@
       {passengerNumber}
     </strong>
     <span typography="title-small">
-      {getPassengerFullLabel(passenger.type, $t)}
+      {$t(`passengerTypes.${passenger.type}`, { count: 1 })}
+
+      {#if passenger.type !== "adult"}
+        ({$t("words.year", { count: passenger.age })})
+      {/if}
     </span>
   </h2>
 

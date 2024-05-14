@@ -1,6 +1,5 @@
 import type { Locale, Translator } from "$lib/i18n";
 import objectExt from "$lib/object-ext";
-import { ensureDefined } from "$lib/utils/array";
 import { z } from "zod";
 import type * as CommonSchemas from "~/integration/common/schemas";
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
@@ -10,9 +9,16 @@ export const PASSENGER_GENDERS: CommonSchemas.Gender[] = ["unspecified", "male",
 export const TRAVELER_DOCUMENT_TYPES: CommonSchemas.TravelerDocumentType[] = ["passport"];
 
 export type PartialPassengerData = Omit<Partial<MobileSchemas.OrderPassenger>, "document"> & {
-  type: keyof PassengerPickerData;
   document?: Require<Partial<MobileSchemas.TravelerDocument>, "countryCodes">;
-};
+} & (
+    | {
+        type: "adult";
+      }
+    | {
+        type: Exclude<PassengerType, "adult">;
+        age: number;
+      }
+  );
 
 export function formatTitleOption(
   translator: Translator,
@@ -43,86 +49,64 @@ export function getPassengerTitles(locale: Locale): CommonSchemas.PassengerTitle
   return [...base, "ms"];
 }
 
-export type PassengerType = "senior" | "adult" | "youth" | "child";
-
 export const MAX_TOTAL_COUNT = 9;
-export const PASSENGER_DEFINITIONS: Record<
-  keyof PassengerPickerData,
-  { type: PassengerType; span: { from: number; to?: number } }
-> = {
-  seniors65: { type: "senior", span: { from: 65 } },
-  seniors60: { type: "senior", span: { from: 60, to: 64 } },
-  adults: { type: "adult", span: { from: 26, to: 59 } },
-  youths18: { type: "youth", span: { from: 18, to: 25 } },
-  youths15: { type: "youth", span: { from: 15, to: 17 } },
-  youths12: { type: "youth", span: { from: 12, to: 14 } },
-  children10: { type: "child", span: { from: 10, to: 11 } },
-  children6: { type: "child", span: { from: 6, to: 9 } },
-  children4: { type: "child", span: { from: 4, to: 5 } },
-  children0: { type: "child", span: { from: 0, to: 3 } },
-};
+export const PASSENGER_DEFINITIONS = {
+  senior: { from: 60, to: undefined },
+  adult: { from: 28, to: 59 },
+  youth: { from: 0, to: 27 },
+} as const satisfies Record<PassengerType, { from: number; to?: number }>;
+
+export function getPassengerAgeSpan(type: PassengerType): string {
+  const def = PASSENGER_DEFINITIONS[type];
+
+  return `(${def.from}${def.to === undefined ? "+" : `-${def.to}`})`;
+}
 
 export function getPassengerFullLabel(
-  type: keyof PassengerPickerData,
+  type: PassengerType,
   translator: Translator,
   count = 1,
 ): string {
-  const def = PASSENGER_DEFINITIONS[type];
-
-  return `${translator(`passengerTypes.${def.type}`, { count })} (${def.span.from}${
-    def.span.to === undefined ? "+" : `-${def.span.to}`
-  })`;
+  return `${translator(`passengerTypes.${type}`, { count })} ${getPassengerAgeSpan(type)}`;
 }
 
+export const PASSENGER_TYPES = ["adult", "youth", "senior"] as const;
+export type PassengerType = (typeof PASSENGER_TYPES)[number];
 export const passengerPickerData = z
-  .object({
-    seniors65: z.number().min(0),
-    seniors60: z.number().min(0),
-    adults: z.number().min(0),
-    youths18: z.number().min(0),
-    youths15: z.number().min(0),
-    youths12: z.number().min(0),
-    children10: z.number().min(0),
-    children6: z.number().min(0),
-    children4: z.number().min(0),
-    children0: z.number().min(0),
-  })
-  .superRefine((arg, ctx) => {
-    if (Object.values(arg).reduce((prev, curr) => prev + curr, 0) === 0) {
-      ctx.addIssue({ message: "At least one passenger is mandatory", code: "custom" });
-    }
-  });
+  .array(
+    z.discriminatedUnion("type", [
+      z.object({ type: z.literal("adult"), age: z.undefined().optional() }),
+      z.object({
+        type: z.literal("youth"),
+        age: z.number().min(PASSENGER_DEFINITIONS.youth.from).max(PASSENGER_DEFINITIONS.youth.to),
+      }),
+      z.object({
+        type: z.literal("senior"),
+        age: z.number().min(PASSENGER_DEFINITIONS.senior.from),
+      }),
+    ]),
+  )
+  .min(1, { message: "At least one passenger is mandatory" });
 
 export type PassengerPickerData = z.infer<typeof passengerPickerData>;
+export type PassengerEntry = PassengerPickerData[number];
 
 export function getPassengersPresentation(
   passengers: PassengerPickerData,
   translator: Translator,
 ): string {
-  return objectExt
-    .entries(PASSENGER_DEFINITIONS)
-    .map(([type]) => {
-      if (!passengers[type]) {
-        return undefined;
-      }
+  const mapping = passengers.reduce<Partial<Record<PassengerType, number>>>(
+    (prev, curr) => ({ ...prev, [curr.type]: (prev[curr.type] ?? 0) + 1 }),
+    {},
+  );
 
-      return `${passengers[type]} ${getPassengerFullLabel(type, translator, passengers[type])}`;
-    })
-    .filter(ensureDefined)
+  return objectExt
+    .entries(mapping)
+    .filter((item): item is [PassengerType, number] => Boolean(item[1]))
+    .map(([type, count]) => `${count} ${translator(`passengerTypes.${type}`, { count })}`)
     .join(", ");
 }
 
 export function getDefaultValue(): PassengerPickerData {
-  return {
-    adults: 1,
-    children0: 0,
-    children4: 0,
-    children6: 0,
-    children10: 0,
-    seniors60: 0,
-    seniors65: 0,
-    youths12: 0,
-    youths15: 0,
-    youths18: 0,
-  };
+  return [{ type: "adult" }];
 }

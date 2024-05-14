@@ -1,21 +1,36 @@
+<script lang="ts" context="module">
+  type PartialPassengerEntry = Partial<PassengerEntry>;
+  type PartialPassengerPickerData = PartialPassengerEntry[];
+</script>
+
 <script lang="ts">
+  import type { z } from "zod";
   import ChevronIcon from "$lib/components/icons/chevron-icon.svelte";
   import { clickOutside } from "$lib/directives/click-outside";
-  import PassengerCounter from "./passenger-counter.svelte";
   import { scale } from "svelte/transition";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { getTranslator } from "$lib/i18n";
-  import { getPassengerFullLabel, type PassengerPickerData } from "$lib/models/passenger";
+  import {
+    MAX_TOTAL_COUNT,
+    PASSENGER_DEFINITIONS,
+    PASSENGER_TYPES,
+    getPassengerAgeSpan,
+    passengerPickerData,
+    type PassengerEntry,
+    type PassengerPickerData,
+    type PassengerType,
+  } from "$lib/models/passenger";
+  import TextField from "$lib/components/ui/text-field.svelte";
 
-  export let passengers: PassengerPickerData;
+  export let passengers: PartialPassengerPickerData;
   export let error: string | string[] | boolean = false;
 
   const t = getTranslator();
-  const passengerKeys = Object.keys(passengers) as unknown as (keyof PassengerPickerData)[];
 
   let expanded = false;
+  let ageErrors: z.ZodFormattedError<PassengerPickerData> | undefined = undefined;
 
-  $: totalCount = Object.values(passengers).reduce((prev, curr) => prev + curr, 0);
+  $: totalCount = passengers.length;
   $: displayError = error instanceof Array ? error.join(", ") : error;
   $: passengers, (error = false);
 
@@ -24,6 +39,15 @@
   }
 
   function close(): void {
+    clearAgeErrors();
+
+    const validation = passengerPickerData.safeParse(passengers);
+
+    if (!validation.success) {
+      ageErrors = validation.error.format();
+      return;
+    }
+
     expanded = false;
   }
 
@@ -33,6 +57,35 @@
     } else {
       open();
     }
+  }
+
+  function clearAgeErrors(): void {
+    ageErrors = undefined;
+  }
+
+  function addPassenger(type: PassengerType): void {
+    clearAgeErrors();
+
+    if (passengers.length === MAX_TOTAL_COUNT) {
+      return;
+    }
+
+    passengers = [...passengers, { type }];
+  }
+
+  function removePassenger(type: PassengerType): void {
+    clearAgeErrors();
+
+    passengers = [
+      ...passengers.filter((passenger) => passenger.type !== type),
+      ...passengers.filter((passenger) => passenger.type === type).slice(0, -1),
+    ];
+  }
+
+  function removePassengerItem(passenger: PartialPassengerEntry): void {
+    clearAgeErrors();
+
+    passengers = passengers.filter((item) => item !== passenger);
   }
 </script>
 
@@ -56,13 +109,70 @@
         {$t("words.passenger_other")}
       </div>
 
-      <div class="counters">
-        {#each passengerKeys as key}
-          <PassengerCounter
-            label={getPassengerFullLabel(key, $t)}
-            bind:count={passengers[key]}
-            {totalCount}
-          />
+      <div class="passengers">
+        {#each PASSENGER_TYPES as passengerType}
+          {@const items = passengers.filter((passenger) => passenger.type === passengerType)}
+
+          <div typography="body-medium" class="passenger-type">
+            <div class="passenger-label">
+              <span weight="bold">{$t(`passengerTypes.${passengerType}`, { count: 2 })}</span>
+              <em typography="body-small">{getPassengerAgeSpan(passengerType)}</em>
+            </div>
+
+            <div class="counter">
+              <button
+                variant="primary"
+                size="xx-small"
+                type="button"
+                on:click|stopPropagation={removePassenger.bind(removePassenger, passengerType)}
+              >
+                -
+              </button>
+
+              <span class="passenger-count">{items.length}</span>
+
+              <button
+                variant="primary"
+                size="xx-small"
+                type="button"
+                on:click|stopPropagation={addPassenger.bind(addPassenger, passengerType)}
+              >
+                +
+              </button>
+            </div>
+
+            {#if passengerType !== "adult" && items.length}
+              <ul class="ages">
+                {#each items as item}
+                  {@const idx = passengers.indexOf(item)}
+                  <li class="age">
+                    <TextField
+                      type="number"
+                      bind:value={item.age}
+                      placeholder={$t("actions.enterAge")}
+                      min={PASSENGER_DEFINITIONS[passengerType].from}
+                      max={PASSENGER_DEFINITIONS[passengerType].to}
+                    />
+
+                    <button
+                      variant="outline"
+                      size="xx-small"
+                      type="button"
+                      on:click|stopPropagation={removePassengerItem.bind(removePassengerItem, item)}
+                    >
+                      -
+                    </button>
+
+                    {#if ageErrors?.[idx]?.age?._errors}
+                      <span class="error-message" transition:slideFade={{ duration: 300 }}>
+                        {ageErrors[idx]?.age?._errors.join(", ")}
+                      </span>
+                    {/if}
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </div>
         {/each}
       </div>
     </div>
@@ -77,7 +187,7 @@
     display: inline-block;
   }
 
-  button {
+  button:not([variant]) {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -93,7 +203,7 @@
     top: var(--x-height);
     left: 0;
     z-index: var(--z-index-ui-dialog);
-    width: 300px;
+    width: 340px;
     margin-top: 4px;
     padding: 20px;
     color: var(--color-main-neutral-900);
@@ -115,10 +225,55 @@
     white-space: nowrap;
   }
 
-  .counters {
+  .passengers {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
+  }
+
+  .passenger-type {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .passenger-label {
+    display: flex;
+    flex-flow: column;
+    gap: 2px;
+  }
+
+  .passenger-label > em {
+    color: var(--color-common-light-medium);
+  }
+
+  .counter {
+    display: grid;
+    grid-template-columns: 32px 32px 32px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ages {
+    display: flex;
+    flex-flow: column;
+    grid-column: 1 / -1;
+    gap: 4px;
+  }
+
+  .age {
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    gap: 4px;
+  }
+
+  .age > :global(.text-field) {
+    --x-height: 32px;
+    --x-icon-padding: 12px;
+
+    width: 100%;
   }
 
   .error-message {
@@ -129,5 +284,10 @@
     font-family: Poppins, Arial, Helvetica, sans-serif;
     font-style: normal;
     line-height: 16px;
+  }
+
+  .age > .error-message {
+    grid-column: 1 / -1;
+    margin-top: 0;
   }
 </style>

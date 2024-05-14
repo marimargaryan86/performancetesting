@@ -8,6 +8,11 @@ import { getRandomAlphaNumericString } from "$lib/utils/random";
 import integrationInstancesClient from "~/integration-instances-client";
 import { sleep } from "$lib/utils/common";
 import { dev } from "$app/environment";
+import {
+  PASSENGER_DEFINITIONS,
+  passengerPickerData,
+  type PassengerEntry,
+} from "$lib/models/passenger";
 
 export const markupsModel: z.ZodType<Omit<MobileSchemas.MarkupsCreate, "orderId">> = z.object({
   serviceFee: CommonSchemas.priceModel.refine((value) => value.amount >= 0, {
@@ -64,7 +69,7 @@ const searchDataModel = z.object({
   destination: MobileSchemas.placeModel,
   outbound: z.date(),
   inbound: z.date().optional(),
-  passengers: z.array(z.date()),
+  passengers: passengerPickerData,
   windowH: z.number().optional(),
   transportTypes: z.array(z.enum(CommonSchemas.transportTypes)),
 });
@@ -165,6 +170,26 @@ export function setCookie<TStep extends Step>(step: TStep, data: StepDataType<TS
   document.cookie = `booking-session=${encodeSessionCookie(getModel(step), data)}; Path=/; SameSite=${sameSite}; ${secure}`;
 }
 
+function parsePassenger(
+  passenger: PassengerEntry,
+  outbound: Date,
+): MobileSchemas.TripOfferPassenger {
+  const birthDate = new Date(outbound);
+
+  if (passenger.type === "adult") {
+    birthDate.setFullYear(birthDate.getFullYear() - PASSENGER_DEFINITIONS.adult.from);
+    birthDate.setDate(birthDate.getDate() - 1);
+
+    return { birthDate };
+  }
+
+  birthDate.setFullYear(
+    birthDate.getFullYear() - (passenger.age ?? PASSENGER_DEFINITIONS.senior.from),
+  );
+
+  return { birthDate };
+}
+
 async function search(
   data: SearchData,
   useWindow: boolean,
@@ -179,7 +204,7 @@ async function search(
         inbound: data.inbound,
         windowH: useWindow ? data.windowH : undefined,
       },
-      passengers: data.passengers.map((birthDate) => ({ birthDate })),
+      passengers: data.passengers.map((passenger) => parsePassenger(passenger, data.outbound)),
       allowedSegmentTypes: data.transportTypes,
       sessionToken,
     },

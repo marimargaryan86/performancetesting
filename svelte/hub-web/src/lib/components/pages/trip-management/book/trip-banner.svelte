@@ -2,15 +2,11 @@
   import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
   import { slideFade } from "$lib/transitions/slide-fade";
   import { getLegsFromPriceQuote } from "$lib/utils/offer";
-  import { getPassengersPresentation } from "$lib/models/passenger";
+  import { getPassengersPresentation, type PassengerPickerData } from "$lib/models/passenger";
   import { getLocale, getTranslator } from "$lib/i18n";
-  import { passengerParser } from "../book/search/trip-search-data";
 
-  let passengersExt: Date[];
-  export { passengersExt as passengers };
+  export let passengers: PassengerPickerData;
   export let priceQuote: MobileSchemas.TripOfferPriceQuote;
-
-  $: passengers = passengerParser.fromSearchData(passengersExt);
 
   const locale = getLocale();
   const t = getTranslator();

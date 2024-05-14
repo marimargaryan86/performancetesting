@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { TripOfferPriceQuote } from "~/integration/junction-mobile-api/schemas";
-import type { PassengerPickerData, PartialPassengerData } from "$lib/models/passenger";
-import { getPassengerValidator, getDefaultPassengers } from "../passenger";
+import { getPassengerValidator } from "../passenger";
 
 describe("passenger utils", () => {
   const mockRequiredFields: TripOfferPriceQuote["required"] = [
@@ -12,12 +11,6 @@ describe("passenger utils", () => {
     "nationality",
     "residence-country-code",
   ];
-
-  const mockPassengerPickerData: Partial<PassengerPickerData> = {
-    adults: 2,
-    youths15: 1,
-    children6: 1,
-  };
 
   describe("getPassengerValidator", () => {
     it("returns a validator for the required fields", () => {
@@ -42,19 +35,6 @@ describe("passenger utils", () => {
       };
       const result = validator.safeParse(validPassenger);
       expect(result.success).toBe(true);
-    });
-  });
-
-  describe("getDefaultPassengers", () => {
-    it("returns an array of default passengers", () => {
-      const result = getDefaultPassengers(mockPassengerPickerData as PassengerPickerData);
-      const expected: PartialPassengerData[] = [
-        { type: "adults" },
-        { type: "adults" },
-        { type: "youths15" },
-        { type: "children6" },
-      ];
-      expect(result).toEqual(expected);
     });
   });
 });

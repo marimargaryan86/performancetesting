@@ -1,5 +1,4 @@
 import type { SearchData } from "$lib/booking-manager/booking-manager";
-import { getAge } from "$lib/utils/date-time";
 import { z } from "zod";
 import * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 
@@ -26,7 +25,7 @@ export type CarSearchDataError = z.ZodFormattedError<CarSearchData>;
 
 export const carSearchDataParser = {
   toSearchData: (data: CarSearchData): SearchData => {
-    const today = new Date();
+    // const today = new Date();
 
     return {
       origin: data.origin,
@@ -34,7 +33,8 @@ export const carSearchDataParser = {
       outbound: data.pickup,
       inbound: data.dropoff,
       passengers: [
-        new Date(today.getFullYear() - data.driverAge, today.getMonth(), today.getDate()),
+        // TODO(2024-05-14/mandersson): Fix when we implement cars
+        // new Date(today.getFullYear() - data.driverAge, today.getMonth(), today.getDate()),
       ],
       transportTypes: ["car"],
     };
@@ -44,6 +44,8 @@ export const carSearchDataParser = {
     destination: data.destination,
     pickup: data.outbound,
     dropoff: data.inbound as Date,
-    driverAge: getAge(data.passengers[0] as Date),
+    // TODO(2024-05-14/mandersson): Fix when we implement cars
+    driverAge: 25,
+    // driverAge: getAge(data.passengers[0] as Date),
   }),
 };

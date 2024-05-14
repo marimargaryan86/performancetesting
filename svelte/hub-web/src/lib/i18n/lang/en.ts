@@ -116,6 +116,8 @@ export default {
     resellers: "Resellers",
     parentReseller: "Parent",
     childReseller: "Child",
+    year_one: "{{count}} year",
+    year_other: "{{count}} years",
   },
   actions: {
     logout: "Logout",
@@ -181,6 +183,7 @@ export default {
     enterUserRole: "Define the role of the user",
     resellersSearch: "Resellers Search",
     deleteUser: "Delete User",
+    enterAge: "Enter age",
   },
   sentences: {
     priceChange: "Price change",
@@ -338,8 +341,6 @@ export default {
   passengerTypes: {
     adult_one: "Adult",
     adult_other: "Adults",
-    child_one: "Child",
-    child_other: "Children",
     senior_one: "Senior",
     senior_other: "Seniors",
     youth_one: "Youth",

@@ -1,10 +1,31 @@
+<script lang="ts" context="module">
+  const SORT_MAPPING = {
+    adult: 0,
+    youth: 1,
+    senior: 2,
+  };
+
+  function sortPassengers(a: PassengerEntryModel, b: PassengerEntryModel): number {
+    const typeSort = SORT_MAPPING[a.type] - SORT_MAPPING[b.type];
+
+    if (typeSort === 0) {
+      return (a.age ?? 0) - (b.age ?? 0);
+    }
+
+    return typeSort;
+  }
+</script>
+
 <script lang="ts">
   import LoadingIcon from "$lib/components/icons/loading-icon.svelte";
   import routeConfig from "$lib/route-config";
   import Payment from "$lib/components/pages/trip-management/book/payment/rail-components/payment.svelte";
   import Fees from "$lib/components/pages/trip-management/book/payment/rail-components/fees.svelte";
   import PassengerEntry from "$lib/components/pages/trip-management/book/payment/rail-components/passenger-entry.svelte";
-  import type { PartialPassengerData } from "$lib/models/passenger";
+  import type {
+    PartialPassengerData,
+    PassengerEntry as PassengerEntryModel,
+  } from "$lib/models/passenger";
   import ContactInformation from "$lib/components/pages/trip-management/book/payment/rail-components/contact-information.svelte";
   import { contactDetailsModel } from "$lib/models/contact-details";
   import Countdown from "$lib/components/pages/trip-management/book/countdown.svelte";
@@ -14,7 +35,7 @@
   import Summary from "$lib/components/pages/trip-management/book/summary/rail-components/summary.svelte";
   import { onDestroy } from "svelte";
   import FareRulesDialog from "$lib/components/pages/trip-management/book/fare-rules-dialog.svelte";
-  import { getDefaultPassengers, getPassengerValidator } from "$lib/utils/passenger";
+  import { getPassengerValidator } from "$lib/utils/passenger";
   import { writable } from "svelte/store";
   import { formatAmount } from "$lib/formatting/currency";
   import { getLocale, getTranslator } from "$lib/i18n";
@@ -27,7 +48,6 @@
   } from "$lib/booking-manager/booking-manager";
   import { browser } from "$app/environment";
   import BookingLayout from "$lib/components/pages/trip-management/booking-layout.svelte";
-  import { passengerParser } from "$lib/components/pages/trip-management/book/search/trip-search-data";
   import type { PageData } from "./$types";
 
   export let data: PageData;
@@ -39,9 +59,7 @@
     passengers: PartialPassengerData[];
     contact: MobileSchemas.ContactDetails;
   } = {
-    passengers: getDefaultPassengers(
-      passengerParser.fromSearchData(data.bookingSession.searchData.passengers),
-    ),
+    passengers: data.bookingSession.searchData.passengers,
     contact: {
       phone: data.profile.contacts[0]?.phone ?? "",
       address: {
@@ -209,7 +227,7 @@
 
     <div class="wrapper">
       <div class="column passengers">
-        {#each bookingData.passengers as passenger, idx}
+        {#each bookingData.passengers.sort(sortPassengers) as passenger, idx}
           <PassengerEntry
             bind:passenger
             errors={errors?.passengers?.[idx]}

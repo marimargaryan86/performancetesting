@@ -1,6 +1,5 @@
 import type * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import { z } from "zod";
-import type { PartialPassengerData, PassengerPickerData } from "$lib/models/passenger";
 
 const countryCodesValidator = z.object({
   issue: z
@@ -83,12 +82,4 @@ export function getPassengerValidator(
   }
 
   return passengerValidator;
-}
-
-export function getDefaultPassengers(passengers: PassengerPickerData): PartialPassengerData[] {
-  return (Object.keys(passengers) as unknown as (keyof PassengerPickerData)[]).flatMap((type) =>
-    Array(passengers[type])
-      .fill(undefined)
-      .map<PartialPassengerData>(() => ({ type })),
-  );
 }

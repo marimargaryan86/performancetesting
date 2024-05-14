@@ -1,8 +1,7 @@
-import { PASSENGER_DEFINITIONS, passengerPickerData } from "$lib/models/passenger";
+import { passengerPickerData } from "$lib/models/passenger";
 import * as MobileSchemas from "~/integration/junction-mobile-api/schemas";
 import type { SearchData } from "$lib/booking-manager/booking-manager";
 import { z } from "zod";
-import { getAge } from "$lib/utils/date-time";
 
 export const TRIP_TYPES = ["one-way", "round-trip"] as const;
 export type TripType = (typeof TRIP_TYPES)[number];
@@ -51,115 +50,13 @@ export type TripSearchData = z.infer<typeof searchDataModel>;
 export type PartialTripSearchData = PartialSearchDataOneWay | PartialSearchDataRoundTrip;
 export type TripSearchDataError = z.ZodFormattedError<TripSearchData>;
 
-function getBirthDate(age: number): Date {
-  const date = new Date();
-  date.setFullYear(date.getFullYear() - age);
-
-  return date;
-}
-
-function getBirthDates(): Record<keyof typeof PASSENGER_DEFINITIONS, Date> {
-  return {
-    adults: getBirthDate(PASSENGER_DEFINITIONS.adults.span.from),
-    children0: getBirthDate(PASSENGER_DEFINITIONS.children0.span.from),
-    children4: getBirthDate(PASSENGER_DEFINITIONS.children0.span.from),
-    children6: getBirthDate(PASSENGER_DEFINITIONS.children6.span.from),
-    children10: getBirthDate(PASSENGER_DEFINITIONS.children10.span.from),
-    seniors60: getBirthDate(PASSENGER_DEFINITIONS.seniors60.span.from),
-    seniors65: getBirthDate(PASSENGER_DEFINITIONS.seniors65.span.from),
-    youths12: getBirthDate(PASSENGER_DEFINITIONS.youths12.span.from),
-    youths15: getBirthDate(PASSENGER_DEFINITIONS.youths15.span.from),
-    youths18: getBirthDate(PASSENGER_DEFINITIONS.youths18.span.from),
-  };
-}
-
-function getPassengerCount(ages: number[], min: number, max: number): number {
-  return ages.filter((age) => age < max && age >= min).length;
-}
-
-export const passengerParser = {
-  toSearchData: (data: TripSearchData["passengers"]): Date[] => {
-    const birthDates = getBirthDates();
-
-    return [
-      ...Array.from(Array(data.adults), () => new Date(birthDates.adults)),
-      ...Array.from(Array(data.children0), () => new Date(birthDates.children0)),
-      ...Array.from(Array(data.children4), () => new Date(birthDates.children4)),
-      ...Array.from(Array(data.children6), () => new Date(birthDates.children6)),
-      ...Array.from(Array(data.children10), () => new Date(birthDates.children10)),
-      ...Array.from(Array(data.seniors60), () => new Date(birthDates.seniors60)),
-      ...Array.from(Array(data.seniors65), () => new Date(birthDates.seniors65)),
-      ...Array.from(Array(data.youths12), () => new Date(birthDates.youths12)),
-      ...Array.from(Array(data.youths15), () => new Date(birthDates.youths15)),
-      ...Array.from(Array(data.youths18), () => new Date(birthDates.youths18)),
-    ];
-  },
-  // eslint-disable-next-line max-lines-per-function
-  fromSearchData: (data: Date[]): TripSearchData["passengers"] => {
-    const ages = data.map((date) => getAge(date));
-
-    return {
-      adults: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.adults.span.from,
-        PASSENGER_DEFINITIONS.seniors60.span.from,
-      ),
-      children0: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.children0.span.from,
-        PASSENGER_DEFINITIONS.children4.span.from,
-      ),
-      children4: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.children4.span.from,
-        PASSENGER_DEFINITIONS.children6.span.from,
-      ),
-      children6: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.children6.span.from,
-        PASSENGER_DEFINITIONS.children10.span.from,
-      ),
-      children10: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.children10.span.from,
-        PASSENGER_DEFINITIONS.youths12.span.from,
-      ),
-      seniors60: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.seniors60.span.from,
-        PASSENGER_DEFINITIONS.seniors65.span.from,
-      ),
-      seniors65: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.seniors65.span.from,
-        Number.MAX_SAFE_INTEGER,
-      ),
-      youths12: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.youths12.span.from,
-        PASSENGER_DEFINITIONS.youths15.span.from,
-      ),
-      youths15: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.youths15.span.from,
-        PASSENGER_DEFINITIONS.youths18.span.from,
-      ),
-      youths18: getPassengerCount(
-        ages,
-        PASSENGER_DEFINITIONS.youths18.span.from,
-        PASSENGER_DEFINITIONS.adults.span.from,
-      ),
-    };
-  },
-};
-
 export const tripSearchDataParser = {
   toSearchData: (data: TripSearchData): SearchData => ({
     origin: data.origin,
     destination: data.destination,
     outbound: data.outbound,
     inbound: data.tripType === "round-trip" ? data.inbound : undefined,
-    passengers: passengerParser.toSearchData(data.passengers),
+    passengers: data.passengers,
     transportTypes: ["rail"],
     windowH: data.windowH,
   }),
@@ -168,7 +65,7 @@ export const tripSearchDataParser = {
       origin: data.origin,
       destination: data.destination,
       outbound: data.outbound,
-      passengers: passengerParser.fromSearchData(data.passengers),
+      passengers: data.passengers,
       windowH: data.windowH ?? SEARCH_WINDOW_H,
     };
 

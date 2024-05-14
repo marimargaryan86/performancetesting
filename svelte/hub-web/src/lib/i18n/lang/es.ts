@@ -110,6 +110,8 @@ export default {
     resellers: "Revendedores",
     parentReseller: "Nombre de Grupo de Agencias",
     childReseller: "Nombre de Agencia",
+    year_one: "{{count}} año",
+    year_other: "{{count}} años",
   },
   actions: {
     logout: "Cerrar sesión",
@@ -175,6 +177,7 @@ export default {
     enterUserRole: "Definir el rol del usuario",
     resellersSearch: "Búsqueda de revendedores",
     deleteUser: "Borrar Usuario",
+    enterAge: "Ingrese la edad",
   },
   sentences: {
     priceChange: "Cambio de precio",
@@ -359,8 +362,6 @@ export default {
   passengerTypes: {
     adult_one: "Adulto",
     adult_other: "Adultos",
-    child_one: "Niño",
-    child_other: "Niños",
     senior_one: "Persona Mayor",
     senior_other: "Personas Mayores",
     youth_one: "Jóven",
