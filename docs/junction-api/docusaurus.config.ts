@@ -30,8 +30,8 @@ const config: Config = {
       // Plugin Options for loading OpenAPI files
         specs: [
           {
-            id: 'client-api',
-            spec: 'openapi/junction/client_api/openapi.json'
+            id: 'junction-api',
+            spec: 'openapi/junction/rocket_api/openapi.yaml'
           }
         ]
       }
