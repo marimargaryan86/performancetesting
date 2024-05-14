@@ -54,7 +54,6 @@ class ScheduleRepository(
     mixins.FindByIdMixin[models_pb2.Schedule],
 ):
     _proto = models_pb2.Schedule
-    _indexes = (IndexModel("updated_at", background=True),)
 
     async def find(
         self,
