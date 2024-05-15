@@ -9,7 +9,7 @@ allure_dir=${2}
 LOGIN_STRING="{\"username\": \"${ALLURE_USERNAME}\", \"password\": \"${ALLURE_PASSWORD}\"}"
 
 # login
-curl -s -o /dev/null -X POST "\${ALLURE_SERVER}/login" \
+curl -s -o /dev/null -X POST "${ALLURE_SERVER}/login" \
 	-H "Content-Type: application/json" \
 	-d "${LOGIN_STRING}" -c cookiesFile
 
