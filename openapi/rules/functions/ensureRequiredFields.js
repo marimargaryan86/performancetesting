@@ -19,6 +19,7 @@ const checkRequiredFields = (input, options, context, path) => {
 
     if (difference.length > 0) {
       for (const diff of difference) {
+        if (diff === "included") continue
         errors.push({
           message: `Property '${diff}' is not marked as required`,
           path: [...path]

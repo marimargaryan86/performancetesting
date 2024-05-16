@@ -7,6 +7,7 @@ import pytest
 from starlette import status
 
 from snowfall.project.junction.rocket import fixtures
+from snowfall.project.junction.rocket.service.api.flights import models, repositories
 from snowfall.project.junction.rocket.service.api.multi_modality import (
     repository,
     search,
@@ -103,7 +104,7 @@ class TestGetSuggestion:
         )
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_suggestion_has_offers(
+    async def test_suggestion_has_relationships(
         self,
         client: httpx.AsyncClient,
         suggestion_repository: repository.SuggestionRepository,
@@ -132,11 +133,82 @@ class TestGetSuggestion:
         )
         relationships = response.json()["data"]["relationships"]
         flight_offers = relationships["flightOffers"]["data"]
-        assert flight_offers
         assert flight_offers[0]["id"] == flight_offer.id
         train_offers = relationships["trainOffers"]["data"]
-        assert train_offers
         assert train_offers[0]["id"] == train_offer.id
+        flight_results = relationships["flightResults"]["data"]
+        assert flight_results[0]["id"] == flight_offer.result_id
+        train_results = relationships["trainResults"]["data"]
+        assert train_results[0]["id"] == train_offer.result_id
+
+    async def test_suggestion_has_includes(
+        self,
+        client: httpx.AsyncClient,
+        suggestion_repository: repository.SuggestionRepository,
+        flights_search_repo: repositories.FlightSearchResultRepository,
+        now: datetime.datetime,
+    ) -> None:
+        flight_offer = search.Offer(
+            id=string.uuid(),
+            result_id=string.uuid(),
+            departure_at=now,
+            arrival_at=now,
+            type=segment_type_pb2.SEGMENT_TYPE_FLIGHT,
+        )
+        flight_result_detail_id = string.uuid()
+        await flights_search_repo.insert(
+            models.FlightSearchResult(
+                id=flight_offer.result_id,
+                search_id=string.uuid(),
+                provider_id="foo",
+                offers=[
+                    models.Offer(
+                        id=flight_offer.id,
+                        ref_ids=[],
+                        price=models.Price(price=0, currency="EUR"),
+                        fare_type=models.FareTypeEnum.basic,
+                        name="foo",
+                        cabin_details=[],
+                    ),
+                ],
+                result_details=[
+                    models.ResultDetails(
+                        id=flight_result_detail_id,
+                        flight_number="123",
+                        marketing_airline="AA",
+                        arrival_station="ARN",
+                        departure_station="LHR",
+                        departure_at=now,
+                        arrival_at=now,
+                        duration=0,
+                        segment_key="foo",
+                        operating_airline="AA",
+                    ),
+                ],
+            ),
+        )
+        train_offer = search.Offer(
+            id=fixtures.RAIL_OFFERS[0],
+            result_id=fixtures.RAIL_SEARCH_RESULTS[0],
+            departure_at=now,
+            arrival_at=now,
+            type=segment_type_pb2.SEGMENT_TYPE_TRAIN,
+        )
+        suggestion = await suggestion_repository.create(
+            "foo",
+            search.Suggestion(offers=[flight_offer, train_offer]),
+        )
+        response = await client.get(
+            url="/journeys/suggestions/{0}".format(suggestion.id),
+            params={
+                "include": "flightOffers,flightResults,flightResults.resultDetails",
+            },
+        )
+        includes = response.json()["included"]
+        includes_ids = {include["type"]: include["id"] for include in includes}
+        assert includes_ids["flight-offers"] == flight_offer.id
+        assert includes_ids["flight-search-results"] == flight_offer.result_id
+        assert includes_ids["flight-result-details"] == flight_result_detail_id
 
 
 class TestCreateSuggestionSearch:

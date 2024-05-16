@@ -790,6 +790,7 @@ paths:
   /journeys/suggestions/{journeySuggestionId}:
     parameters:
       - $ref: '#/components/parameters/journeySuggestionId'
+      - $ref: '#/components/parameters/journeySuggestionInclude'
     get:
       summary: Get journey suggestion
       tags:
@@ -806,6 +807,8 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/JourneySuggestion'
+                  included:
+                    $ref: '#/components/schemas/JourneySuggestionIncluded'
                 required:
                   - data
         '401':
@@ -2732,6 +2735,20 @@ components:
           enum:
             - journey-suggestions
           example: journey-suggestions
+    JourneySuggestionIncluded:
+      title: Journey Suggestion included
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/FlightOffer'
+          - $ref: '#/components/schemas/FlightSearchResult'
+          - $ref: '#/components/schemas/FlightResultDetail'
+        discriminator:
+          propertyName: type
+          mapping:
+            flight-offers: '#/components/schemas/FlightOffer'
+            flight-search-results: '#/components/schemas/FlightSearchResult'
+            flight-result-details: '#/components/schemas/FlightResultDetail'
     JourneySuggestionSearch:
       title: Journey Suggestion Search
       x-tags:
@@ -4104,6 +4121,23 @@ components:
         type: string
         example: 04f83af9-90bb-4a0f-9881-03e1e690f7f5
       description: Journey Suggestion identifier
+    journeySuggestionInclude:
+      name: include
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - flightOffers
+            - flightResults
+            - flightResults.resultDetails
+        example:
+          - flightOffers
+      description: Customize which related resources to return along with this Search Result
+      style: form
+      explode: false
     quoteId:
       name: quoteId
       in: path

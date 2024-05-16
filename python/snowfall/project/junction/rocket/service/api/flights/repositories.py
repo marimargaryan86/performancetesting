@@ -45,6 +45,18 @@ class FlightSearchResultRepository(
         pymongo.IndexModel("expires_at", expireAfterSeconds=1, background=True),
     )
 
+    async def find(
+        self,
+        identifiers: Sequence[str],
+        cursor: str,
+    ) -> resultset.ResultSet[FlightSearchResult]:
+        filter_ = {repository.mongo_id_key: {"$in": identifiers}} if identifiers else {}
+
+        return await self._find_with_cursor(
+            cur=cursor,
+            filter_=filter_,
+        )
+
     async def find_results_by_search_id(
         self,
         search_id: str,

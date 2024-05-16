@@ -31,6 +31,26 @@ def _flights_offers_resolver(
     return wrapper
 
 
+def _flights_results_resolver(
+    flights_results_repo: FlightSearchResultRepository,
+) -> includes.ResolverFunc:
+    async def wrapper(
+        identifiers: Sequence[str],
+        request: requests.Request,
+    ) -> Sequence[models.FlightSearchResultResource]:
+        result_set = await flights_results_repo.find(
+            identifiers=identifiers,
+            cursor="",
+        )
+
+        return [
+            models.FlightSearchResultResource.from_model(result)
+            async for result in result_set
+        ]
+
+    return wrapper
+
+
 def _flights_result_details_resolver(
     flights_results_repo: FlightSearchResultRepository,
 ) -> includes.ResolverFunc:
@@ -62,6 +82,10 @@ def register_resolvers(
         includes.Resolver(
             resource=models.OfferResource,
             func=_flights_offers_resolver(flights_results_repo),
+        ),
+        includes.Resolver(
+            resource=models.FlightSearchResultResource,
+            func=_flights_results_resolver(flights_results_repo),
         ),
         includes.Resolver(
             resource=models.ResultDetailResource,

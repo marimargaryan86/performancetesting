@@ -58,6 +58,8 @@ class Suggestion(std_models.Resource):
         request: requests.Request,
     ) -> Self:
         offers = more_itertools.bucket(proto.offers, lambda offer: offer.segment_type)
+        flight_offers = list(offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT])
+        train_offers = list(offers[segment_type_pb2.SEGMENT_TYPE_TRAIN])
 
         return cls(
             id=proto.id,
@@ -70,7 +72,7 @@ class Suggestion(std_models.Resource):
                             id=flight_offer.id,
                             type=flight_models.OfferResource.api_type,
                         )
-                        for flight_offer in offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT]
+                        for flight_offer in flight_offers
                     ],
                 ),
                 "trainOffers": std_models.Relationship(
@@ -79,7 +81,7 @@ class Suggestion(std_models.Resource):
                             id=train_offer.id,
                             type=train_models.OfferResource.api_type,
                         )
-                        for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
+                        for train_offer in train_offers
                     ],
                 ),
                 "flightResults": std_models.Relationship(
@@ -88,7 +90,7 @@ class Suggestion(std_models.Resource):
                             id=flight_offer.result_id,
                             type=flight_models.FlightSearchResultResource.api_type,
                         )
-                        for flight_offer in offers[segment_type_pb2.SEGMENT_TYPE_FLIGHT]
+                        for flight_offer in flight_offers
                     ],
                 ),
                 "trainResults": std_models.Relationship(
@@ -97,7 +99,7 @@ class Suggestion(std_models.Resource):
                             id=train_offer.result_id,
                             type=train_models.SearchResultResource.api_type,
                         )
-                        for train_offer in offers[segment_type_pb2.SEGMENT_TYPE_TRAIN]
+                        for train_offer in train_offers
                     ],
                 ),
             },

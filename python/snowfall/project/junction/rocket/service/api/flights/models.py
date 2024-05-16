@@ -169,13 +169,11 @@ class FlightSearchResultResource(models.Resource):
     def from_model(
         cls,
         search_result: FlightSearchResult,
-        search: FlightSearchRequestStorage,
     ) -> FlightSearchResultResource:
-        expires_at = search.expires_at.isoformat()
         return cls(
             id=search_result.id,
             type="flight-search-results",
-            attributes={"expiresAt": expires_at},
+            attributes={"expiresAt": search_result.expires_at},
             relationships={
                 "offers": {
                     "data": [
@@ -190,7 +188,10 @@ class FlightSearchResultResource(models.Resource):
                     ],
                 },
                 "search": {
-                    "data": SearchResource.from_model(search),
+                    "data": models.ResourceIdentifier(
+                        id=search_result.search_id,
+                        type=SearchResource.api_type,
+                    ),
                 },
             },
         )

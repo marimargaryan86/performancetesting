@@ -193,10 +193,7 @@ class FlightSearchRetrieval(endpoints.HTTPEndpoint):
         result_set = await results_repo.find_results_by_search_id(search_id)
 
         response_data = [
-            FlightSearchResultResource.from_model(
-                search_result=search_result,
-                search=search,
-            )
+            FlightSearchResultResource.from_model(search_result)
             async for search_result in result_set
         ]
 
@@ -419,10 +416,7 @@ class FlightSearchResultRetrieval(endpoints.HTTPEndpoint):
 
         return await messages.create_response(
             body=models.Body(
-                data=FlightSearchResultResource.from_model(
-                    search_result=search_result,
-                    search=search,
-                ),
+                data=FlightSearchResultResource.from_model(search_result),
             ),
             request=request,
         )
