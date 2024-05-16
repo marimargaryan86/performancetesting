@@ -1,4 +1,5 @@
 import dataclasses
+import decimal
 from typing import Any, TypeVar
 
 import httpx
@@ -189,18 +190,27 @@ class SilverrailClient(client.HttpClient):
         self,
         record_locator: str,
         payment: booking.AbstractPaymentRequestType.Payment,
+        *,
+        confirm_booking: bool = False,
     ) -> booking.AddPaymentResponse:
         request = booking.BookingAddPaymentRequestInput(
             body=booking.BookingAddPaymentRequestInput.Body(
                 add_payment_request=booking.AddPaymentRequest(
+                    parameters=booking.AddPaymentRequest.Parameters(
+                        confirm_booking=confirm_booking,
+                    ),
                     context=self._booking_context,
                     record_locator=record_locator,
                     payment=payment,
                     fulfillment_information=booking.FulfillmentInformationType(
                         ticket_option=booking.TicketingOptionType(
-                            code=booking.TicketingOptionTypeCode.EML,
-                            type_value="E_MAIL",
-                            destination="Ticket by E-mail",
+                            code=booking.TicketingOptionTypeCode.ETK,
+                            type_value="E_TICKET",
+                            description="E-Ticket",
+                            fee=booking.RefundableMoneyType(
+                                value=decimal.Decimal(0),
+                                currency="EUR",
+                            ),
                         ),
                     ),
                 ),
@@ -220,12 +230,14 @@ class SilverrailClient(client.HttpClient):
     async def confirm_booking(
         self,
         record_locator: str,
+        order_id: str,
     ) -> booking.ConfirmBookingRecordResponse:
         request = booking.BookingConfirmBookingRecordRequestInput(
             body=booking.BookingConfirmBookingRecordRequestInput.Body(
                 confirm_booking_record_request=booking.ConfirmBookingRecordRequest(
                     context=self._booking_context,
                     record_locator=record_locator,
+                    order_locator=order_id,
                 ),
             ),
         )

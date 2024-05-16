@@ -1,6 +1,7 @@
 import datetime
 import json
 import zoneinfo
+from typing import TypeVar
 from unittest import mock
 
 import aiofiles
@@ -28,6 +29,8 @@ from snowfall.stdlib.transport.amqp import consumer, producer
 from snowfall.vendor.silverrail import client
 from snowfall.vendor.silverrail.models import booking as vendor_booking
 from snowfall.vendor.silverrail.models import shopping
+
+T = TypeVar("T")  # noqa: WPS111
 
 
 async def _load_xml_fixture(
@@ -198,19 +201,45 @@ async def get_cached_price_quote() -> cache.PriceQuote:
     )
 
 
-async def get_create_booking_record() -> vendor_booking.CreateBookingRecordResponse:
-    response = await _load_xml_fixture("create_booking_record.xml")
+async def _load_fixture_object(path: str, output_class: type[T]) -> T:
+    response = await _load_xml_fixture(path)
     parser = parsers.XmlParser(
         config=parsers_config.ParserConfig(fail_on_unknown_properties=False),
     )
-    output: vendor_booking.BookingCreateBookingRecordOutput = parser.from_bytes(
-        response,
+    return parser.from_bytes(response, output_class)
+
+
+async def get_create_booking_record() -> vendor_booking.CreateBookingRecordResponse:
+    output = await _load_fixture_object(
+        "create_booking_record.xml",
         vendor_booking.BookingCreateBookingRecordOutput,
     )
     if not output.body or output.body.create_booking_record_response is None:
         raise RuntimeError("Wrong configured fixture")
 
     return output.body.create_booking_record_response
+
+
+async def get_add_payment() -> vendor_booking.AddPaymentResponse:
+    output = await _load_fixture_object(
+        "add_payment.xml",
+        vendor_booking.BookingAddPaymentRequestOutput,
+    )
+    if not output.body or output.body.add_payment_response is None:
+        raise RuntimeError("Wrong configured fixture")
+
+    return output.body.add_payment_response
+
+
+async def get_confirm_booking() -> vendor_booking.ConfirmBookingRecordResponse:
+    output = await _load_fixture_object(
+        "confirm_booking.xml",
+        vendor_booking.BookingConfirmBookingRecordRequestOutput,
+    )
+    if not output.body or output.body.confirm_booking_record_response is None:
+        raise RuntimeError("Wrong configured fixture")
+
+    return output.body.confirm_booking_record_response
 
 
 @pytest.fixture()
@@ -225,6 +254,14 @@ async def silverrail_client() -> client.SilverrailClient:
         create_booking_record=mock.AsyncMock(
             name="create_booking_record",
             return_value=await get_create_booking_record(),
+        ),
+        add_payment=mock.AsyncMock(
+            name="add_payment",
+            return_value=await get_add_payment(),
+        ),
+        confirm_booking=mock.AsyncMock(
+            name="confirm_booking",
+            return_value=await get_confirm_booking(),
         ),
     )
 

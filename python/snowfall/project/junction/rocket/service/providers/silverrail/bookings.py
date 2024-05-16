@@ -1,7 +1,7 @@
 import datetime
+import decimal
 import pathlib
 from collections.abc import Callable, Mapping
-from typing import TypeVar
 
 import httpx
 from dateutil import relativedelta
@@ -23,15 +23,20 @@ from snowfall.stdlib.transport.amqp import types as amqp_types
 from snowfall.vendor.silverrail import client, errors
 from snowfall.vendor.silverrail.models import booking as booking_models
 
-T = TypeVar("T")  # noqa: WPS111
+
+class BookingFailedError(Exception):
+    """Raised when not possible to continue booking because of an error."""
+
+    def __init__(self, booking: models_pb2.Booking):
+        self.booking = booking
 
 
 class RequiredInformationMissingError(Exception):
     """Raised when required field is not available on the time of booking."""
 
 
-class BookingFailedError(Exception):
-    """Raised when booking is not successful."""
+class BookingRequestFailedError(Exception):
+    """Raised when booking request is unsuccessful."""
 
 
 class PassengerInformationValidator:
@@ -153,102 +158,54 @@ class Booker:
             raise cache.QuoteNotFoundError()
 
         task_booking = task.booking
-
-        exception_kwargs = {
-            "passengers": price_quote.passengers,
-            "ptp_price": price_quote.ptp_price,
-            "leg_solution": price_quote.leg_solution,
-            "booking_id": task.booking.id,
-        }
-
-        age_ref_map = {
-            passenger.age: passenger.passenger_spec_id
-            for passenger in price_quote.passengers.passenger
-            if passenger.age and passenger.passenger_spec_id
-        }
-        booking_leg_solution = price_quote.booking_leg_solution
-
         try:
-            passengers = booking_models.CreateBookingRecordRequestType.Passengers(
-                passenger=[
-                    self._parse_passenger(
-                        passenger,
-                        age_ref_map,
-                        booking_leg_solution,
-                    )
-                    for passenger in task_booking.passengers
-                ],
-            )
-        except RequiredInformationMissingError as exc:
-            self._logger.exception(
-                "Failed to create booking",
-                **exception_kwargs,
-            )
-
-            task_booking.status = models_pb2.Booking.STATUS_ERROR
-            task_booking.provider_booking.raw_data = repr(exc)
-
-            return task_booking
-
-        try:
-            response = await self._client.create_booking_record(
-                passengers=passengers,
-                leg_solution=booking_models.LegSolutionsType(
-                    leg_solution=[booking_leg_solution],
-                ),
-                prices=booking_models.CreateBookingRecordRequestType.Prices(
-                    point_to_point_price=[price_quote.booking_ptp_price],
-                ),
-            )
-        except httpx.HTTPError as ex:
-            self._logger.exception(
-                "Failed to create booking",
-                **exception_kwargs,
-            )
-
-            task_booking.status = models_pb2.Booking.STATUS_ERROR
-            task_booking.provider_booking.raw_data = repr(ex)
-
-            return task_booking
-
-        try:
-            self._validate_response(response)
-        except (RequiredInformationMissingError, BookingFailedError):
-            self._logger.exception(
-                "Invalid response",
-                **exception_kwargs,
-            )
-            task_booking.status = models_pb2.Booking.STATUS_ERROR
-            task_booking.provider_booking.raw_data = xml_serialization.serialize(
-                response,
-            )
-
-            return task_booking
+            response = await self._create_booking(price_quote, task_booking)
+        except BookingFailedError as create_booking_error:
+            return create_booking_error.booking
 
         booking_reference = sequence.to_composite_id([
             order.order_id
             for order in response.booking_record.orders.order  # type: ignore[union-attr]
             if order.order_id
         ])
+
         try:
             booking = self._response_to_booking(
-                response=response,
-                booking_reference=booking_reference,
-            )
-        except errors.SilverrailUnexpectedFormatError:
-            self._logger.exception(
-                "Failed to generate booking from response",
-                booking_id=task.booking.id,
-            )
-
-            task_booking.status = models_pb2.Booking.STATUS_ERROR
-            task_booking.provider_booking.raw_data = xml_serialization.serialize(
                 response,
+                booking_reference,
+                task_booking,
             )
-
-            return task_booking
-
+        except BookingFailedError as new_booking_error:
+            return new_booking_error.booking
         task_booking.MergeFrom(booking)
+
+        confirmation_at_payment_required = bool(
+            response.booking_record.payment_requirements.confirmation_upon_add_payment,  # type: ignore[union-attr]
+        )
+        information_required = any(
+            order.confirmation_information_required
+            for order in response.booking_record.orders.order  # type: ignore[union-attr]
+        )
+
+        try:
+            await self._add_payment(
+                task_booking,
+                confirmation_required=confirmation_at_payment_required,
+                information_required=information_required,
+            )
+        except BookingFailedError as add_payment_error:
+            return add_payment_error.booking
+
+        # TODO(hovhannes.d): Do we need to check the status before confirming?
+        if not confirmation_at_payment_required:
+            try:
+                await self._confirm_booking(
+                    booking.provider_booking.record_locator,
+                    response,
+                    task_booking,
+                )
+            except BookingFailedError as confirmation_failed_error:
+                return confirmation_failed_error.booking
 
         await self._storage.put(
             pathlib.Path(booking_reference),
@@ -257,42 +214,290 @@ class Booker:
 
         return task_booking
 
-    def _validate_response(  # noqa: WPS238
+    async def _create_booking(
         self,
-        response: booking_models.CreateBookingRecordResponse,
-    ) -> None:
-        if not response.request_status:
-            raise RequiredInformationMissingError("RequestStatus is absent.")
-        if not response.booking_record:
-            raise RequiredInformationMissingError("BookingRecord is absent.")
+        price_quote: cache.PriceQuote,
+        task_booking: models_pb2.Booking,
+    ) -> booking_models.CreateBookingRecordResponse:
+        exception_kwargs = {
+            "passengers": price_quote.passengers,
+            "ptp_price": price_quote.ptp_price,
+            "leg_solution": price_quote.leg_solution,
+            "booking_id": task_booking.id,
+        }
 
-        if not response.request_status.success:
-            raise BookingFailedError("Unsuccessful booking.")
+        # TODO(hovhannes.d): Sync with product to know which delivery methods should we
+        #  use. Might be needed to filter offers on search stage, to not check it here.
+        self._validate_etk_supported(price_quote, task_booking)
+        response = await self._request_booking(price_quote, task_booking)
+
+        if not response.booking_record:
+            self._logger.error(
+                "Booking record is missing",
+                **exception_kwargs,
+            )
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
 
         if not response.booking_record.orders:
-            raise RequiredInformationMissingError("Order information is absent.")
+            self._logger.error(
+                "Order information is missing",
+                **exception_kwargs,
+            )
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
 
-    def _response_to_booking(  # noqa: WPS238
+        if not response.booking_record.payment_requirements:
+            self._logger.error(
+                "Payment requirements information is missing",
+                **exception_kwargs,
+            )
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
+
+        return response
+
+    async def _request_booking(
+        self,
+        price_quote: cache.PriceQuote,
+        task_booking: models_pb2.Booking,
+    ) -> booking_models.CreateBookingRecordResponse:
+        passengers = self._get_passengers(price_quote, task_booking)
+        exception_kwargs = {
+            "passengers": price_quote.passengers,
+            "ptp_price": price_quote.ptp_price,
+            "leg_solution": price_quote.leg_solution,
+            "booking_id": task_booking.id,
+        }
+        try:
+            response = await self._client.create_booking_record(
+                passengers=passengers,
+                leg_solution=booking_models.LegSolutionsType(
+                    leg_solution=[price_quote.booking_leg_solution],
+                ),
+                prices=booking_models.CreateBookingRecordRequestType.Prices(
+                    point_to_point_price=[price_quote.booking_ptp_price],
+                ),
+            )
+        except (httpx.HTTPError, errors.SilverrailUnexpectedFormatError) as ex:
+            self._logger.exception(
+                "Failed to create booking",
+                **exception_kwargs,
+            )
+
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = repr(ex)
+
+            raise BookingFailedError(task_booking) from ex
+
+        if not response.request_status or not response.request_status.success:
+            self._logger.error("Booking request failed")
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
+        return response
+
+    def _get_passengers(
+        self,
+        price_quote: cache.PriceQuote,
+        booking: models_pb2.Booking,
+    ) -> booking_models.CreateBookingRecordRequestType.Passengers:
+        exception_kwargs = {
+            "passengers": price_quote.passengers,
+            "ptp_price": price_quote.ptp_price,
+            "leg_solution": price_quote.leg_solution,
+            "booking_id": booking.id,
+        }
+        age_ref_map = {
+            passenger.age: passenger.passenger_spec_id
+            for passenger in price_quote.passengers.passenger
+            if passenger.age and passenger.passenger_spec_id
+        }
+        try:
+            return booking_models.CreateBookingRecordRequestType.Passengers(
+                passenger=[
+                    self._parse_passenger(
+                        passenger,
+                        age_ref_map,
+                        price_quote.booking_leg_solution,
+                    )
+                    for passenger in booking.passengers
+                ],
+            )
+        except RequiredInformationMissingError as exc:
+            self._logger.exception(
+                "Failed to create booking",
+                **exception_kwargs,
+            )
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            booking.provider_booking.raw_data = repr(exc)
+
+            raise BookingFailedError(booking) from exc
+
+    def _validate_etk_supported(
+        self,
+        price_quote: cache.PriceQuote,
+        booking: models_pb2.Booking,
+    ) -> None:
+        if not price_quote.ptp_price.ticketable_fares:
+            ptp_price = xml_serialization.serialize(price_quote.ptp_price)
+            self._logger.error(
+                "Ticketable fare information is missing",
+                ptp_price=ptp_price,
+            )
+
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            booking.provider_booking.raw_data = ptp_price
+            raise BookingFailedError(booking)
+
+        for fare in price_quote.ptp_price.ticketable_fares.ticketable_fare:
+            options = fare.ticketing_options_available
+            ptp_price = xml_serialization.serialize(price_quote.ptp_price)
+            if not options or not options.etk:
+                self._logger.error(
+                    "E-ticket not supported",
+                    ptp_price=ptp_price,
+                )
+                booking.status = models_pb2.Booking.STATUS_ERROR
+                booking.provider_booking.raw_data = ptp_price
+                raise BookingFailedError(booking)
+
+    async def _confirm_order(
+        self,
+        record_locator: str,
+        order_id: str,
+        booking: models_pb2.Booking,
+    ) -> None:
+        try:
+            result = await self._client.confirm_booking(
+                record_locator,
+                order_id,
+            )
+        except (httpx.HTTPError, errors.SilverrailUnexpectedFormatError) as exc:
+            self._logger.exception("Failed to confirm one of the orders")
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            raise BookingFailedError(booking) from exc
+
+        if not result.request_status or not result.request_status.success:
+            self._logger.error("Failed to confirm one of the orders")
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            raise BookingFailedError(booking)
+
+    async def _confirm_booking(
+        self,
+        record_locator: str,
+        booking_response: booking_models.CreateBookingRecordResponse,
+        booking: models_pb2.Booking,
+    ) -> None:
+        # TODO(hovhannes.d): make this async gather.
+        for order in booking_response.booking_record.orders.order:  # type: ignore[union-attr]
+            if not order.order_id:
+                self._logger.error("OrderID is missing")
+                booking.status = models_pb2.Booking.STATUS_ERROR
+                raise BookingFailedError(booking)
+
+            await self._confirm_order(record_locator, order.order_id, booking)
+
+    async def _add_payment(
+        self,
+        booking: models_pb2.Booking,
+        *,
+        confirmation_required: bool,
+        information_required: bool,
+    ) -> booking_models.AddPaymentResponse:
+        # TODO(hovhannes.d): Sync with product and check payment type and account etc.
+        payment = booking_models.AbstractPaymentRequestType.Payment(
+            form_of_payment=booking_models.FormOfPaymentType(
+                value="NONE",
+                type_value=booking_models.FormOfPaymentTypeType.OA,
+                authenticate_payer_required=True,
+            ),
+            amount=booking_models.MoneyType(
+                value=decimal.Decimal(booking.trip_option.price.units),
+                currency=booking.trip_option.price.currency_code,
+            ),
+            on_account=booking_models.OnAccountType(
+                number="7039937961194902",
+                validation_code="0003",
+                account_name="EUR",
+            ),
+        )
+
+        # TODO(hovhannes.d): Check this with product. What to do in such case?
+        if confirmation_required and information_required:
+            self._logger.error("Confirmation information is required while absent")
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            raise BookingFailedError(booking)
+
+        try:
+            response = await self._client.add_payment(
+                booking.provider_booking.record_locator,
+                payment,
+                confirm_booking=confirmation_required,
+            )
+        except (httpx.HTTPError, errors.SilverrailUnexpectedFormatError) as exc:
+            self._logger.exception("Payment request failed")
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            raise BookingFailedError(booking) from exc
+
+        if not response.request_status or not response.request_status.success:
+            self._logger.error(
+                "Adding payment unsuccessful",
+                payment_response=xml_serialization.serialize(response),
+            )
+            booking.status = models_pb2.Booking.STATUS_ERROR
+            raise BookingFailedError(booking)
+
+        return response
+
+    def _response_to_booking(
         self,
         response: booking_models.CreateBookingRecordResponse,
         booking_reference: str,
+        task_booking: models_pb2.Booking,
     ) -> models_pb2.Booking:
         if not response.booking_record or not response.booking_record.revenue_total:
-            raise errors.SilverrailUnexpectedFormatError()
+            self._logger.error("No booking record information")
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
 
-        if response.booking_record.revenue_total.value is None:
-            raise errors.SilverrailUnexpectedFormatError("Revenue amount is missing.")
-        if response.booking_record.revenue_total.currency is None:
-            raise errors.SilverrailUnexpectedFormatError("Revenue currency is missing.")
+        revenue = response.booking_record.revenue_total
+        if revenue.value is None or revenue.currency is None:
+            self._logger.error("Revenue information is missing")
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
+
+        if response.record_locator is None:
+            self._logger.error("Record locator is missing")
+            task_booking.status = models_pb2.Booking.STATUS_ERROR
+            task_booking.provider_booking.raw_data = xml_serialization.serialize(
+                response,
+            )
+            raise BookingFailedError(task_booking)
 
         price = money.from_string(
-            string_amount=str(response.booking_record.revenue_total.value),
+            string_amount=str(revenue.value),
             currency=money.Currency(
-                response.booking_record.revenue_total.currency.upper(),
+                revenue.currency.upper(),
             ),
         )
-        if response.record_locator is None:
-            raise errors.SilverrailUnexpectedFormatError()
 
         return models_pb2.Booking(
             status=models_pb2.Booking.STATUS_CONFIRMED,

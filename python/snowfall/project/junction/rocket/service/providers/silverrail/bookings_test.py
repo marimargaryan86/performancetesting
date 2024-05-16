@@ -114,6 +114,7 @@ def get_booking_task(passenger_first_name: str) -> amqp_pb2.PlaceBookingTask:
 async def test_booking_successful(  # noqa: WPS218
     silverrail_booker: bookings.Booker,
     booking_storage: mock.AsyncMock,
+    silverrail_client: mock.AsyncMock,
 ) -> None:
     expected_reference = "Ty1TTk9XRkFMTC1DQ0EwMDAwVEotUE9VMDAwMDAx"
     task = get_booking_task("First")
@@ -136,6 +137,9 @@ async def test_booking_successful(  # noqa: WPS218
         booking_raw,
     )
     assert stored_booking == booking
+
+    silverrail_client.add_payment.assert_awaited()
+    silverrail_client.confirm_booking.assert_awaited()
 
 
 async def test_booking_required_request_field_missing(
@@ -187,3 +191,27 @@ async def test_booking_required_response_field_missing(
 
     assert booking.status == booking_models.Booking.STATUS_ERROR
     assert booking.provider_booking.raw_data
+
+
+async def test_booking_add_payment_unsuccessful(
+    silverrail_booker: bookings.Booker,
+    silverrail_client: mock.AsyncMock,
+) -> None:
+    result = silverrail_client.add_payment.return_value
+    result.request_status.__dict__["success"] = False
+    task = get_booking_task("First")
+    booking = await silverrail_booker.book(task=task)
+
+    assert booking.status == booking_models.Booking.STATUS_ERROR
+
+
+async def test_booking_confirm_booking_unsuccessful(
+    silverrail_booker: bookings.Booker,
+    silverrail_client: mock.AsyncMock,
+) -> None:
+    result = silverrail_client.confirm_booking.return_value
+    result.request_status.__dict__["success"] = False
+    task = get_booking_task("First")
+    booking = await silverrail_booker.book(task=task)
+
+    assert booking.status == booking_models.Booking.STATUS_ERROR
