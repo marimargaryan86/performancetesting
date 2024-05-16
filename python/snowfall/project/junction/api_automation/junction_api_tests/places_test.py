@@ -127,12 +127,12 @@ async def test_places_list_name_like(
     place_data = await qa_client.places.get_place_list(
         name_like=valid_place_filters.name_like,
     )
-    assert place_data.id, "Place data does not have an id"
+    assert place_data.places[0].id, "Place data does not have an id"
     assert (
-        valid_place_filters.name_like in place_data.name
+        valid_place_filters.name_like in place_data.places[0].name
     ), "{0} is not contained in {1}".format(
         valid_place_filters.name_like,
-        place_data.name,
+        place_data.places[0].name,
     )
 
 
@@ -144,8 +144,8 @@ async def test_places_list_type_eq(
     place_data = await qa_client.places.get_place_list(
         type_eq=valid_place_filters.type_eq,
     )
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.place_type == valid_place_filters.type_eq
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert place_data.places[0].place_type == valid_place_filters.type_eq
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -156,12 +156,12 @@ async def test_places_list_multi_type_eq(
     place_data = await qa_client.places.get_place_list(
         type_eq="airport,railway-station",
     )
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.place_type in {
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert place_data.places[0].place_type in {
         "airport",
         "railway-station",
     }, "Expected place_type to be 'airport' or 'railway-station', got {0}".format(
-        place_data.place_type,
+        place_data.places[0].place_type,
     )
 
 
@@ -173,8 +173,8 @@ async def test_places_list_iata_eq(
     place_data = await qa_client.places.get_place_list(
         iata_eq=valid_place_filters.iata_eq,
     )
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.iata_code == valid_place_filters.iata_eq
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert place_data.places[0].iata_code == valid_place_filters.iata_eq
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -191,14 +191,19 @@ async def test_places_coordinates(
         valid_place_filters.coordinates.split(","),
     )
 
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.latitude == latitude, "Expected latitude {0}, but got {1}".format(
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert (
+        place_data.places[0].latitude == latitude
+    ), "Expected latitude {0}, but got {1}".format(
         latitude,
-        place_data.latitude,
+        place_data.places[0].latitude,
     )
     assert (
-        place_data.longitude == longitude
-    ), "Expected longitude {0}, but got {1}".format(longitude, place_data.longitude)
+        place_data.places[0].longitude == longitude
+    ), "Expected longitude {0}, but got {1}".format(
+        longitude,
+        place_data.places[0].longitude,
+    )
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -209,11 +214,11 @@ async def test_places_search_within(
     place_data = await qa_client.places.get_place_list(
         place_to_search_within=valid_place_filters.place_to_search_within,
     )
-    assert place_data.id, "Place data does not have an id"
+    assert place_data.places[0].id, "Place data does not have an id"
     assert (
-        place_data.country_code == "DE"
+        place_data.places[0].country_code == "DE"
     ), "Expected all places to have the country code 'DE', but found a country code of '{0}' in the data.".format(
-        place_data.country_code,
+        place_data.places[0].country_code,
     )
 
 
@@ -227,27 +232,32 @@ async def test_combination_no_iata(  # noqa: WPS218
         type_eq=valid_place_filters_combination.type_eq,
         coordinates=valid_place_filters_combination.coordinates,
     )
-    assert place_data.id, "Place data does not have an id"
+    assert place_data.places[0].id, "Place data does not have an id"
     assert (
-        valid_place_filters_combination.name_like in place_data.name
+        valid_place_filters_combination.name_like in place_data.places[0].name
     ), "{0} is not contained in {1}".format(
         valid_place_filters_combination.name_like,
-        place_data.name,
+        place_data.places[0].name,
     )
-    assert place_data.place_type == valid_place_filters_combination.type_eq
+    assert place_data.places[0].place_type == valid_place_filters_combination.type_eq
     longitude, latitude, _radius = map(
         float,
         valid_place_filters_combination.coordinates.split(","),
     )
 
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.latitude == latitude, "Expected latitude {0}, but got {1}".format(
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert (
+        place_data.places[0].latitude == latitude
+    ), "Expected latitude {0}, but got {1}".format(
         latitude,
-        place_data.latitude,
+        place_data.places[0].latitude,
     )
     assert (
-        place_data.longitude == longitude
-    ), "Expected longitude {0}, but got {1}".format(longitude, place_data.longitude)
+        place_data.places[0].longitude == longitude
+    ), "Expected longitude {0}, but got {1}".format(
+        longitude,
+        place_data.places[0].longitude,
+    )
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -268,22 +278,22 @@ async def test_combination_with_iata(  # noqa: WPS218
         type_eq=valid_place_filters_combination.type_eq,
         iata_eq=valid_place_filters_combination.iata_eq,
     )
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.country_code == expected_data.country_code
-    assert place_data.country_name == expected_data.country_name
-    assert place_data.iata_code == expected_data.iata_code
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert place_data.places[0].country_code == expected_data.country_code
+    assert place_data.places[0].country_name == expected_data.country_name
+    assert place_data.places[0].iata_code == expected_data.iata_code
 
     assert (
-        place_data.latitude == expected_data.latitude
+        place_data.places[0].latitude == expected_data.latitude
     ), "Expected latitude {0}, but got {1}".format(
         expected_data.latitude,
-        place_data.latitude,
+        place_data.places[0].latitude,
     )
     assert (
-        place_data.longitude == expected_data.longitude
+        place_data.places[0].longitude == expected_data.longitude
     ), "Expected longitude {0}, but got {1}".format(
         expected_data.longitude,
-        place_data.longitude,
+        place_data.places[0].longitude,
     )
 
 
@@ -361,8 +371,8 @@ async def test_places_list_name_like_no_iata(
     place_data = await qa_client.places.get_place_list(
         name_like="Vienna",
     )
-    assert place_data.id, "Place data does not have an id"
-    assert place_data.name == "Vienna", "The response value is not 'Vienna'"
+    assert place_data.places[0].id, "Place data does not have an id"
+    assert place_data.places[0].name == "Vienna", "The response value is not 'Vienna'"
 
 
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
@@ -374,22 +384,22 @@ async def test_places_list_pagination(
         name_like=valid_place_filters.name_like,
         page_limit=valid_place_filters.page_limit,
     )
-    assert place_data.id, "Place data does not have an id"
+    assert place_data.places[0].id, "Place data does not have an id"
     assert (
-        len(place_data.items) == valid_place_filters.page_limit
+        len(place_data.places) == valid_place_filters.page_limit
     ), "Expected {0} items in the first response, found {1}".format(
         valid_place_filters.page_limit,
-        len(place_data.items),
+        len(place_data.places),
     )
 
     next_link = place_data.next_link
     next_page_data = await qa_client.places.get_place_by_next_link(url=next_link)
-    assert next_page_data.id, "Next page data does not have an id"
+    assert next_page_data.places[0].id, "Next page data does not have an id"
     assert (
-        len(next_page_data.items) == valid_place_filters.page_limit
+        len(next_page_data.places) == valid_place_filters.page_limit
     ), "Expected {0} items in the second response, found {1}".format(
         valid_place_filters.page_limit,
-        len(next_page_data.items),
+        len(next_page_data.places),
     )
 
 
@@ -401,20 +411,20 @@ async def test_places_list_not_default_limit(
     place_data = await qa_client.places.get_place_list(
         page_limit=valid_place_filters_combination.page_limit,
     )
-    assert place_data.id, "Place data does not have an id"
+    assert place_data.places[0].id, "Place data does not have an id"
     assert (
-        len(place_data.items) == valid_place_filters_combination.page_limit
+        len(place_data.places) == valid_place_filters_combination.page_limit
     ), "Expected {0} items in the first response, found {1}".format(
         valid_place_filters_combination.page_limit,
-        len(place_data.items),
+        len(place_data.places),
     )
 
     next_link = place_data.next_link
     next_page_data = await qa_client.places.get_place_by_next_link(url=next_link)
-    assert next_page_data.id, "Next page data does not have an id"
+    assert next_page_data.places[0].id, "Next page data does not have an id"
     assert (
-        len(next_page_data.items) == valid_place_filters_combination.page_limit
+        len(next_page_data.places) == valid_place_filters_combination.page_limit
     ), "Expected {0} items in the second response, found {1}".format(
         valid_place_filters_combination.page_limit,
-        len(next_page_data.items),
+        len(next_page_data.places),
     )

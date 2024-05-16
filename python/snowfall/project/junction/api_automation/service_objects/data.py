@@ -16,87 +16,53 @@ class BaseResult:
 
 
 class PlaceData(BaseResult):
-    def __init__(self, data: Mapping[str, Any]):
-        super().__init__(data)
-        self._data = data
-
     @property
     def id(self) -> str:
-        return get_nested_attribute(self._data, "data.id")
+        return get_nested_attribute(self._data, "id")
 
     @property
     def name(self) -> str:
-        return get_nested_attribute(self._data, "data.attributes.name")
+        return get_nested_attribute(self._data, "attributes.name")
 
     @property
     def latitude(self) -> float:
-        return get_nested_attribute(self._data, "data.attributes.latitude")
+        return get_nested_attribute(self._data, "attributes.latitude")
 
     @property
     def longitude(self) -> float:
-        return get_nested_attribute(self._data, "data.attributes.longitude")
+        return get_nested_attribute(self._data, "attributes.longitude")
 
     @property
     def country_code(self) -> str:
-        return get_nested_attribute(self._data, "data.attributes.countryCode")
+        return get_nested_attribute(self._data, "attributes.countryCode")
 
     @property
     def country_name(self) -> str:
-        return get_nested_attribute(self._data, "data.attributes.countryName")
+        return get_nested_attribute(self._data, "attributes.countryName")
 
     @property
     def iata_code(self) -> str:
-        return get_nested_attribute(self._data, "data.attributes.iataCode")
+        return get_nested_attribute(self._data, "attributes.iataCode")
+
+    @property
+    def place_type(self) -> str:
+        return get_nested_attribute(self._data, "attributes.placeType")
 
 
 class PlaceListData(BaseResult):
     def __init__(self, data: Mapping[str, Any]):
         super().__init__(data)
-        self._data = data
+        self._places = []
+        for place in self._data["data"]:
+            self._places.append(PlaceData(place))
 
     @property
-    def id(self) -> str:
-        return get_nested_attribute(self._data, "data.0.id")
-
-    @property
-    def name(self) -> str:
-        return get_nested_attribute(self._data, "data.0.attributes.name")
-
-    @property
-    def latitude(self) -> float:
-        return get_nested_attribute(self._data, "data.0.attributes.latitude")
-
-    @property
-    def longitude(self) -> float:
-        return get_nested_attribute(self._data, "data.0.attributes.longitude")
-
-    @property
-    def country_code(self) -> str:
-        return get_nested_attribute(self._data, "data.0.attributes.countryCode")
-
-    @property
-    def country_name(self) -> str:
-        return get_nested_attribute(self._data, "data.0.attributes.countryName")
-
-    @property
-    def place_type(self) -> str:
-        return get_nested_attribute(self._data, "data.0.attributes.placeType")
-
-    @property
-    def iata_code(self) -> str:
-        return get_nested_attribute(self._data, "data.0.attributes.iataCode")
-
-    @property
-    def place_to_search_within(self) -> str:
-        return get_nested_attribute(self._data, "data.0.attributes.iataCode")
+    def places(self) -> list[PlaceData]:
+        return self._places
 
     @property
     def next_link(self) -> str:
         return get_nested_attribute(self._data, "links.next")
-
-    @property
-    def items(self) -> list[dict[str, Any]]:
-        return get_nested_attribute(self._data, "data")
 
 
 class FlightSearchResult:

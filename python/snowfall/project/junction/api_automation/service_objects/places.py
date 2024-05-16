@@ -21,7 +21,7 @@ class PlacesClient:
             url=url,
         )
 
-        return PlaceData(result)
+        return PlaceData(result["data"])
 
     async def get_place_list(
         self,
