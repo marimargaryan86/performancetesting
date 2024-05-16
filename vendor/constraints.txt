@@ -134,7 +134,7 @@
 //     "types-aiobotocore==2.12.3",
 //     "types-aiofiles==23.2.0.20240403",
 //     "types-antlr4-python3-runtime==4.13.0.20240331",
-//     "types-hvac==2.1.0.20240329",
+//     "types-hvac==2.1.0.20240514",
 //     "types-jsonschema==4.22.0.20240501",
 //     "types-protobuf==4.25.0.20240417",
 //     "types-python-dateutil==2.9.0.20240316",
@@ -9537,13 +9537,13 @@
           "artifacts": [
             {
               "algorithm": "sha256",
-              "hash": "db1fbea36275697e1024717f6080934efc1d1d3ac4a85272a13100ade259e730",
-              "url": "https://files.pythonhosted.org/packages/e4/55/b847789788fe5b50985ea1e03b51cd3d98b6da268b7df1944833e56f2f81/types_hvac-2.1.0.20240329-py3-none-any.whl"
+              "hash": "769f733b41e959d4df5d5dc034e28122796ca06280706fe01fef92f280a7a336",
+              "url": "https://files.pythonhosted.org/packages/fc/fc/7f578dfa3fc02b82c7c392dae4f4c20f0057dc42e18542b651eb84d9c24b/types_hvac-2.1.0.20240514-py3-none-any.whl"
             },
             {
               "algorithm": "sha256",
-              "hash": "2cd2746737f8279ddaab3713fb0f11f80e04357d9e71af879ff5223bdf272983",
-              "url": "https://files.pythonhosted.org/packages/d3/13/f5b400240036fb7cfa7fce4e216362db38dd2b867fc57dec5d15464badcf/types-hvac-2.1.0.20240329.tar.gz"
+              "hash": "2c69b6bd7d397577da8927894bd1c31dddfded7cd66eaa268c901f71c4cc1465",
+              "url": "https://files.pythonhosted.org/packages/7d/3e/ffb7d333d6cc85ec1d37c4d845681706bdcb1b536d4f6348d1ecb8b27b03/types-hvac-2.1.0.20240514.tar.gz"
             }
           ],
           "project_name": "types-hvac",
@@ -9551,7 +9551,7 @@
             "types-requests"
           ],
           "requires_python": ">=3.8",
-          "version": "2.1.0.20240329"
+          "version": "2.1.0.20240514"
         },
         {
           "artifacts": [
@@ -10626,7 +10626,7 @@
     "types-aiobotocore==2.12.3",
     "types-aiofiles==23.2.0.20240403",
     "types-antlr4-python3-runtime==4.13.0.20240331",
-    "types-hvac==2.1.0.20240329",
+    "types-hvac==2.1.0.20240514",
     "types-jsonschema==4.22.0.20240501",
     "types-protobuf==4.25.0.20240417",
     "types-python-dateutil==2.9.0.20240316",

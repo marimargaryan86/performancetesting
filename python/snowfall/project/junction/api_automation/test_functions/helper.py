@@ -161,6 +161,10 @@ def get_variable_from_server(
         returned_data = client.read(query)
     except exceptions.Forbidden:
         returned_data = {}
+
+    if not isinstance(returned_data, dict):
+        raise TypeError
+
     return returned_data
 
 
