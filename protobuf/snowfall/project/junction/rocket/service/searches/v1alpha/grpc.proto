@@ -17,6 +17,7 @@ service SearchResultService {
 
 service OfferService {
   rpc GetOffer(GetOfferRequest) returns (GetOfferResponse) {}
+  rpc ListOffers(ListOffersRequest) returns (ListOffersResponse) {}
 }
 
 service QuoteService {
@@ -54,6 +55,22 @@ message GetOfferRequest {
 
 message GetOfferResponse {
   Offer offer = 1;
+}
+
+message ListOffersRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  message ListOfIds {
+    repeated string ids = 1;
+  }
+  oneof filter {
+    ListOfIds ids = 3;
+  }
+}
+
+message ListOffersResponse {
+  repeated Offer offers = 1;
+  string next_page_token = 2;
 }
 
 message CreateQuoteRequest {

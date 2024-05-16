@@ -127,6 +127,19 @@ class OfferService(service.Service, grpc_pb2_grpc.OfferServiceServicer):
 
         return grpc_pb2.GetOfferResponse(offer=offer)
 
+    async def ListOffers(  # type: ignore[override] # noqa: N802
+        self,
+        request: grpc_pb2.ListOffersRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> grpc_pb2.ListOffersResponse:
+        offers = await self._offers_repo.find(request.ids.ids, request.page_token)
+        offers.limit(limit=request.page_size)
+
+        return grpc_pb2.ListOffersResponse(
+            offers=[offer async for offer in offers],
+            next_page_token=await offers.cursor(),
+        )
+
 
 class QuoteService(service.Service, grpc_pb2_grpc.QuoteServiceServicer):
     def __init__(
