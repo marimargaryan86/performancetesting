@@ -37,7 +37,7 @@
 *.proto
 /openapi/**/openapi.*
 
-[Specification][2] @rocket-leads
+[Specification] @rocket-leads
 /openapi/junction/rocket_api/openapi.*
 /protobuf/snowfall/project/junction/rocket/**/*.proto
 
